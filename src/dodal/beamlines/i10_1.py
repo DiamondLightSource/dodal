@@ -83,6 +83,16 @@ def electromagnet_sr570() -> ElectromagnetSR570:
 
 
 @devices.factory()
+def electromagnet_sr570_scaler_monitor(
+    mirror6_sr570: I10JSR570,
+    electromagnet_scaler_card: ElectromagnetScalerCard1,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=mirror6_sr570.ca1, counter=electromagnet_scaler_card.mon
+    )
+
+
+@devices.factory()
 def electromagnet_sr570_scaler_tey(
     electromagnet_sr570: ElectromagnetSR570,
     electromagnet_scaler_card: ElectromagnetScalerCard1,
