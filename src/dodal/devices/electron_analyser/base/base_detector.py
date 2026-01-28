@@ -110,6 +110,9 @@ class ElectronAnalyserRegionDetector(
         await super().trigger()
 
 
+# Used in sm-bluesky, but will hopefully be removed along with
+# ElectronAnalyserRegionDetector in future. Blocked by:
+# https://github.com/bluesky/bluesky/pull/1978
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
     GenericAnalyserDriverIO, GenericRegion
 ]
