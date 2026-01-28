@@ -8,6 +8,7 @@ from dodal.devices.i10_1 import (
     ElectromagnetMagnetField,
     ElectromagnetScalerCard1,
     ElectromagnetSR570,
+    ElectromagnetStage,
 )
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
@@ -97,4 +98,11 @@ def electromagnet_sr570_scaler_fy(
 def em_temperature_controller() -> Lakeshore336:
     return Lakeshore336(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
+    )
+
+
+@devices.factory()
+def electromagnet_stage() -> ElectromagnetStage:
+    return ElectromagnetStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-CRYO-01:",
     )
