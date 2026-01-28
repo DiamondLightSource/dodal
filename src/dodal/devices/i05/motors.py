@@ -13,9 +13,6 @@ from dodal.devices.motors import (
     XYZPolarAzimuthTiltStage,
 )
 
-ANGLE_DEG = 50
-THETA = radians(ANGLE_DEG)
-
 
 class I05Goniometer(XYZPolarAzimuthTiltStage):
     """
@@ -33,8 +30,11 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         polar_infix: str = _POLAR,
         azimuth_infix: str = _AZIMUTH,
         tilt_infix: str = _TILT,
+        rotation_angle_deg: float = 50,
         name: str = "",
     ):
+        self.theta = radians(rotation_angle_deg)
+
         super().__init__(
             prefix,
             name,
@@ -52,41 +52,43 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
                 self._set_long_calc,
                 x=self.x,
                 y=self.y,
+                theta=self.theta,
             )
             self.perp = derived_signal_rw(
                 self._read_perp_calc,
                 self._set_perp_calc,
                 x=self.x,
                 y=self.y,
+                theta=self.theta,
             )
 
-    def _read_long_calc(self, x: float, y: float) -> float:
-        return y * cos(THETA) - x * sin(THETA)
+    def _read_long_calc(self, x: float, y: float, theta: float) -> float:
+        return y * cos(theta) - x * sin(theta)
 
     async def _set_long_calc(self, value: float) -> None:
         x_pos, y_pos = await asyncio.gather(
             self.x.user_readback.get_value(), self.y.user_readback.get_value()
         )
-        perp = self._read_perp_calc(x_pos, y_pos)
+        perp = self._read_perp_calc(x_pos, y_pos, self.theta)
         long = value
 
-        new_x_pos = -1 * long * sin(THETA) + perp * cos(THETA)
-        new_y_pos = long * cos(THETA) + perp * sin(THETA)
+        new_x_pos = -1 * long * sin(self.theta) + perp * cos(self.theta)
+        new_y_pos = long * cos(self.theta) + perp * sin(self.theta)
 
         await asyncio.gather(self.x.set(new_x_pos), self.y.set(new_y_pos))
 
-    def _read_perp_calc(self, x: float, y: float) -> float:
-        return y * sin(THETA) + x * cos(THETA)
+    def _read_perp_calc(self, x: float, y: float, theta: float) -> float:
+        return y * sin(theta) + x * cos(theta)
 
     async def _set_perp_calc(self, value: float) -> None:
         x_pos, y_pos = await asyncio.gather(
             self.x.user_readback.get_value(), self.y.user_readback.get_value()
         )
 
-        long = self._read_long_calc(x_pos, y_pos)
+        long = self._read_long_calc(x_pos, y_pos, self.theta)
         perp = value
 
-        new_x_pos = -1 * long * sin(THETA) + perp * cos(THETA)
-        new_y_pos = long * cos(THETA) + perp * sin(THETA)
+        new_x_pos = -1 * long * sin(self.theta) + perp * cos(self.theta)
+        new_y_pos = long * cos(self.theta) + perp * sin(self.theta)
 
         await asyncio.gather(self.x.set(new_x_pos), self.y.set(new_y_pos))
