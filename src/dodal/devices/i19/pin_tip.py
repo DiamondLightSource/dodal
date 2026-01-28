@@ -7,9 +7,9 @@ class PinTipCentreHolder(StandardReadable):
     It uses the CenterX and CenterY PVs in the overlay plugin for the OAV device to
     save and read the pit tip location.
 
-    Signals:
-        pin_tip_i: x position of the pin tip, in pixels.
-        pin_tip_j: y position of the pin tip, in pixels.
+    Attributes:
+        pin_tip_i (SignalRW): x position of the pin tip, in pixels.
+        pin_tip_j (SignalRW): y position of the pin tip, in pixels.
 
     This workaround is necessary because it's not yet possible to get these values back
     from a plan in blueapi. It will be removed once this is completed

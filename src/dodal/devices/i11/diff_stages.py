@@ -4,11 +4,9 @@ from dodal.devices.motors import Stage
 
 
 class DiffractometerStage(Stage):
-    """
-    This is the diffractometer stage which contains both detectors,
+    """This is the diffractometer stage which contains both detectors,
     it allows for rotations and also sample position. Contains:
-    theta, delta, two_theta, sample_position
-    """
+    theta, delta, two_theta, sample_position."""
 
     def __init__(
         self,
@@ -29,11 +27,9 @@ class DiffractometerStage(Stage):
 
 
 class DiffractometerBase(Stage):
-    """
-    This is the diffractometer stage which contains both detectors,
+    """This is the diffractometer stage which contains both detectors,
     it allows for translation about x and y and also sample position. Contains:
-    x1, x2, y1, y2, y3. Used for aligning the detector to the beam/sample
-    """
+    x1, x2, y1, y2, y3. Used for aligning the detector to the beam/sample."""
 
     def __init__(
         self,

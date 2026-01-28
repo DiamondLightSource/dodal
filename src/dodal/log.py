@@ -57,11 +57,11 @@ class CircularMemoryHandler(logging.Handler):
     """Loosely based on the MemoryHandler, which keeps a buffer and writes it when full
     or when there is a record of specific level. This instead keeps a circular buffer
     that always contains the last {capacity} number of messages, this is only flushed
-    when a log of specific {flush_level} comes in. On flush this buffer is then passed to
-    the {target} handler.
+    when a log of specific {flush_level} comes in. On flush this buffer is then passed
+    to the {target} handler.
 
-    The CircularMemoryHandler becomes the owner of the target handler which will be closed
-    on close of this handler.
+    The CircularMemoryHandler becomes the owner of the target handler which will be
+    closed on close of this handler.
     """
 
     def __init__(self, capacity, flush_level=logging.ERROR, target=None):
@@ -76,9 +76,7 @@ class CircularMemoryHandler(logging.Handler):
             self.flush()
 
     def flush(self):
-        """
-        Pass the contents of the buffer forward to the target.
-        """
+        """Pass the contents of the buffer forward to the target."""
         self.acquire()
         try:
             if self.target:
@@ -151,7 +149,8 @@ def set_up_graylog_handler(logger: Logger, host: str, port: int):
 
 def set_up_info_file_handler(logger, path: Path, filename: str):
     """Set up a file handler for the logger, at INFO level, which will keep 30 days
-    of logs, rotating once per day. Creates the directory if necessary."""
+    of logs, rotating once per day. Creates the directory if necessary.
+    """
     print(f"Logging to INFO file handler {path / filename}")
     path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
@@ -167,7 +166,8 @@ def set_up_debug_memory_handler(
 ):
     """Set up a Memory handler which holds 200k lines, and writes them to an hourly
     log file when it sees a message of severity ERROR. Creates the directory if
-    necessary"""
+    necessary.
+    """
     debug_path = path / "debug"
     print(f"Logging to DEBUG handler {debug_path / filename}")
     debug_path.mkdir(parents=True, exist_ok=True)
@@ -204,17 +204,20 @@ def set_up_all_logging_handlers(
     debug_logging_path: Path | None = None,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
+
     Args:
-        logger:                 the logging.Logger object to apply all the handlers to.
-        logging_path:           The location to store log files.
-        filename:               The log filename.
-        dev_mode:               If true, will log to graylog on localhost instead of
-                                production. Defaults to False.
-        error_log_buffer_lines: Number of lines for the CircularMemoryHandler to keep in
-                                buffer and write to file when encountering an error message.
-        graylog_port:           The port to send graylog messages to, if None uses the
-                                default dodal port
-        debug_logging_path:     The location to store debug log files, if None uses `logging_path`
+        logger (Logger): The logging.Logger object to apply all the handlers to.
+        logging_path (Path): The location to store log files.
+        filename (str): The log filename.
+        dev_mode (bool): If true, will log to graylog on localhost instead of
+             production. Defaults to False.
+        error_log_buffer_lines (int): Number of lines for the CircularMemoryHandler to
+            keep in buffer and write to file when encountering an error message.
+        graylog_port (int, optional): The port to send graylog messages to, if None uses
+            the default dodal port
+        debug_logging_path (Path, optional): The location to store debug log files, if
+            None uses `logging_path`
+
     Returns:
         A DodaLogHandlers TypedDict with the created handlers.
     """
@@ -261,7 +264,7 @@ def get_logging_file_paths() -> tuple[Path, Path]:
 
     Returns:
         tuple[Path, Path]: Paths to the standard log file and to the debug log file,
-                           for the file handlers to write to
+            for the file handlers to write to
     """
     beamline: str | None = environ.get("BEAMLINE")
 

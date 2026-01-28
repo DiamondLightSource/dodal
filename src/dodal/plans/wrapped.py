@@ -18,8 +18,8 @@ Non-serialisable fields are ignored when they are optional
 https://github.com/DiamondLightSource/blueapi/issues/711
 
 We may also need other adjustments for UI purposes, e.g.
-Forcing uniqueness or orderedness of Readables
-Limits and metadata (e.g. units)
+    - Forcing uniqueness or orderedness of Readables.
+    - Limits and metadata (e.g. units).
 """
 
 

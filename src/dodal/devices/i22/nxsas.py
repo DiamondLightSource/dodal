@@ -57,10 +57,8 @@ class MetadataHolder:
 
 @dataclass
 class NXSasMetadataHolder(MetadataHolder):
-    """
-    Required fields for NXDetectors that are used in an NXsas application definition.
-    All fields are Configuration and read once per run only.
-    """
+    """Required fields for NXDetectors that are used in an NXsas application definition.
+    All fields are Configuration and read once per run only."""
 
     distance: ValueAndUnits
     x_pixel_size: ValueAndUnits

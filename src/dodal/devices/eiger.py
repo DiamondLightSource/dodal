@@ -323,8 +323,9 @@ class EigerDetector(Device, Stageable):
         return status
 
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
-        """Ensures the energy threshold on the detector is set to the specified energy (in eV),
-        within the specified tolerance.
+        """Ensures the energy threshold on the detector is set to the specified energy
+        (in eV), within the specified tolerance.
+
         Args:
             energy (float): The energy to set (in eV)
             tolerance (float, optional): If the energy is already set to within

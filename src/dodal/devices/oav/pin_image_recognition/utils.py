@@ -100,9 +100,7 @@ NONE_VALUE: Final[int] = -1
 
 @dataclass
 class SampleLocation:
-    """
-    Holder type for results from sample detection.
-    """
+    """Holder type for results from sample detection."""
 
     tip_x: int | None
     tip_y: int | None
@@ -111,6 +109,28 @@ class SampleLocation:
 
 
 class MxSampleDetect:
+    """Configures sample detection parameters.
+
+    Args:
+        preprocess (Callable): A preprocessing function applied to the array after
+            conversion to grayscale. See implementations of common functions above
+            for predefined conversions. Defaults to a no-op (i.e. no preprocessing).
+
+        for open and close operations, please read:
+            https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
+
+        open_ksize (int, optional): Kernel size for "open" operation, if set to zero
+            then ignore "open" operation.
+        open_iterations (int, optional): Number of iterations for "open" operation.
+        canny_upper (int, optional): Upper threshold for canny edge detection.
+        canny_lower (int, optional): Lower threshold for canny edge detection.
+        close_ksize (int, optional): Kernel size for "close" operation.
+        close_iterations (int, optional): Number of iterations for "close" operation.
+        scan_direction (ScanDirections, optional): ScanDirections.FORWARD for
+            left-to-right, ScanDirections.REVERSE for right-to-left.
+        min_tip_height (int, optional): Minimum height of pin tip.
+    """
+
     def __init__(
         self,
         *,
@@ -124,27 +144,6 @@ class MxSampleDetect:
         scan_direction: ScanDirections = ScanDirections.FORWARD,
         min_tip_height: int = 5,
     ):
-        """
-        Configures sample detection parameters.
-
-        Args:
-            preprocess: A preprocessing function applied to the array after conversion to grayscale.
-                See implementations of common functions above for predefined conversions
-                Defaults to a no-op (i.e. no preprocessing)
-
-            for open and close operations, please read:
-                https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
-
-            open_ksize: kernel size for "open" operation, if set to zero then ignore "open" operation
-            open_iterations: number of iterations for "open" operation
-            canny_upper: upper threshold for canny edge detection
-            canny_lower: lower threshold for canny edge detection
-            close_ksize: kernel size for "close" operation
-            close_iterations: number of iterations for "close" operation
-            scan_direction: ScanDirections.FORWARD for left-to-right, ScanDirections.REVERSE for right-to-left
-            min_tip_height: minimum height of pin tip
-        """
-
         self.preprocess = preprocess
         self.open_ksize = open_ksize
         self.open_iterations = open_iterations
@@ -185,17 +184,16 @@ class MxSampleDetect:
     def _first_and_last_nonzero_by_columns(
         arr: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Finds the indexes of the first & last non-zero values by column in a 2d array.
+        """Finds the indexes of the first & last non-zero values by column in a 2d array.
 
         Outputs will contain NONE_VALUE if no non-zero values exist in a column.
 
-        i.e. for input:
-        [
-            [0, 0, 0, 1],
-            [1, 1, 0, 0],
-            [0, 1, 0, 1],
-        ]
+        i.e. for input::
+            [
+                [0, 0, 0, 1],
+                [1, 1, 0, 0],
+                [0, 1, 0, 1],
+            ]
 
         first_nonzero will be: [1, 1, NONE_VALUE, 0]
         last_nonzero will be [1, 2, NONE_VALUE, 2]

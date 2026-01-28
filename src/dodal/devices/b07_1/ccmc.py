@@ -25,13 +25,16 @@ error_message = "Can not get energy value in eV from ccmc position: "
 class ChannelCutMonochromator(
     StandardReadable, Movable[ChannelCutMonochromatorPositions]
 ):
-    """
-    Device to move the channel cut monochromator (ccmc). CCMC has three
+    """Device to move the channel cut monochromator (ccmc). CCMC has three
     choices of crystal (Xtal for short). Setting energy is by means of a
     multi-positioner. The positions are named after the nominal energies of the
     crystals. To change energy select one of the crystals from the list.
     This causes the Y motor to move that crystal into the beam and other
     motors have to align the angles correctly.
+
+    Args:
+        prefix (str): Beamline specific part of the PV.
+        name (str, optional): Name of the device.
     """
 
     def __init__(
@@ -39,14 +42,6 @@ class ChannelCutMonochromator(
         prefix: str,
         name: str = "",
     ) -> None:
-        """
-        Parameters
-        ----------
-        prefix:
-            Beamline specific part of the PV
-        name:
-            Name of the device
-        """
         with self.add_children_as_readables():
             # crystal motors
             self._xyz = XYZStage(prefix)

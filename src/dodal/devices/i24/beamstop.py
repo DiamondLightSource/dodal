@@ -21,8 +21,8 @@ class Beamstop(XYZStage):
     The additional y_rotation motor is independent of the positioner and can to be moved
     on its own as needed.
 
-    WARNING. Before moving the y_rotation motor away from 0, it is important to make sure
-    that the backlight is in the "OUT" position to avoid a collision.
+    WARNING. Before moving the y_rotation motor away from 0, it is important to make
+    sure that the backlight is in the "OUT" position to avoid a collision.
     See also https://github.com/DiamondLightSource/dodal/issues/646.
     """
 

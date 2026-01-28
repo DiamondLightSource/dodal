@@ -1,4 +1,4 @@
-"""A small temporary device to get the beam center positions on i24"""
+"""A small temporary device to get the beam center positions on i24."""
 
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_rw

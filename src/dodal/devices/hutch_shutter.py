@@ -58,14 +58,14 @@ class HutchInterlock(StandardReadable):
 class HutchShutter(StandardReadable, Movable[ShutterDemand]):
     """Device to operate the hutch shutter.
 
-    When a demand is sent, the device should first check the hutch status \
-    and raise an error if it's not interlocked (searched and locked), meaning it's not \
+    When a demand is sent, the device should first check the hutch status
+    and raise an error if it's not interlocked (searched and locked), meaning it's not
     safe to operate the shutter.
 
-    If the requested shutter position is "Open", the shutter control PV should first \
-    go to "Reset" and then move to "Open". This is because before opening the hutch \
-    shutter, the interlock status PV (`-PS-SHTR-01:ILKSTA`) will show as `failed` until \
-    the hutch shutter is reset. This will set the interlock status to `OK`, allowing \
+    If the requested shutter position is "Open", the shutter control PV should first
+    go to "Reset" and then move to "Open". This is because before opening the hutch
+    shutter, the interlock status PV (`-PS-SHTR-01:ILKSTA`) will show as `failed` until
+    the hutch shutter is reset. This will set the interlock status to `OK`, allowing
     for shutter operations. Until this step is done, the hutch shutter can't be opened.
     The reset is not needed for closing the shutter.
     """

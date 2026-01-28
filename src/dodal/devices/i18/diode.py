@@ -5,7 +5,7 @@ from dodal.devices.positioner import create_positioner
 
 
 class FilterAValues(StrictEnum):
-    """Maps from a short usable name to the string name in EPICS"""
+    """Maps from a short usable name to the string name in EPICS."""
 
     AL_2MM = "2 mm Al"
     AL_1_5MM = "1.5 mm Al"

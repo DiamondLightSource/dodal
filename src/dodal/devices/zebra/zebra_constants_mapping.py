@@ -5,11 +5,12 @@ from pydantic import BaseModel, Field, model_validator
 
 class ZebraMappingValidations(BaseModel):
     """Raises an exception if field set to -1 is accessed, and validate against
-    multiple fields mapping to the same integer"""
+    multiple fields mapping to the same integer."""
 
     def __getattribute__(self, name: str):
-        """To protect against mismatch between the Zebra configuration that a plan expects and the Zebra which has
-        been instantiated, raise exception if a field which has been set to -1 is accessed."""
+        """To protect against mismatch between the Zebra configuration that a plan
+        expects and the Zebra which has been instantiated, raise exception if a field
+        which has been set to -1 is accessed."""
         value = object.__getattribute__(self, name)
         if not name.startswith("__"):
             if value == -1:
@@ -20,7 +21,7 @@ class ZebraMappingValidations(BaseModel):
 
     @model_validator(mode="after")
     def ensure_no_duplicate_connections(self):
-        """Check that TTL outputs and sources are mapped to unique integers"""
+        """Check that TTL outputs and sources are mapped to unique integers."""
 
         integer_fields = {
             key: value
@@ -40,7 +41,8 @@ class ZebraMappingValidations(BaseModel):
 
 class ZebraTTLOutputs(ZebraMappingValidations):
     """Maps hardware to the Zebra TTL output (1-4) that they're physically wired to, or
-    None if that hardware is not connected. A value of -1 means this hardware is not connected."""
+    None if that hardware is not connected. A value of -1 means this hardware is not
+    connected."""
 
     TTL_EIGER: int = Field(default=-1, ge=-1, le=4)
     TTL_PILATUS: int = Field(default=-1, ge=-1, le=4)
@@ -53,7 +55,7 @@ class ZebraTTLOutputs(ZebraMappingValidations):
 
 
 class ZebraSources(ZebraMappingValidations):
-    """Maps internal Zebra signal source to their integer PV value"""
+    """Maps internal Zebra signal source to their integer PV value."""
 
     DISCONNECT: int = Field(default=0, ge=0, le=63)
     IN1_TTL: int = Field(default=1, ge=0, le=63)
@@ -75,8 +77,7 @@ class ZebraSources(ZebraMappingValidations):
 
 class ZebraMapping(ZebraMappingValidations):
     """Mappings to locate a Zebra device's Ophyd signals based on a specific
-    Zebra's hardware configuration and wiring.
-    """
+    Zebra's hardware configuration and wiring."""
 
     # Zebra ophyd signal for output can be accessed
     # with, eg, zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR]

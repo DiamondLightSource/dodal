@@ -8,7 +8,17 @@ from ophyd_async.epics.core import epics_signal_r
 
 class Andor2Point(SingleTriggerDetector):
     """Using the andor2 as if it is a massive point detector, read the read uncached
-    value after a picture is taken."""
+    value after a picture is taken.
+
+    Args:
+        prefix (str): Beamline camera PV.
+        drv_suffix (str): Camera PV suffix.
+        read_uncached (dict[str,str]): A dictionary contains the name and the PV
+            suffix for the statistic plugin.
+        name (str): Name of the device.
+        plugins ([dict[str, NDPluginBaseIO], optional): Dictionary containing
+            plugin that are forward to the base class.
+    """
 
     def __init__(
         self,
@@ -18,20 +28,6 @@ class Andor2Point(SingleTriggerDetector):
         name: str = "",
         plugins: dict[str, NDPluginBaseIO] | None = None,
     ) -> None:
-        """
-        Parameters
-        ----------
-        prefix: str,
-           Beamline camera pv
-        drv_suffix : str,
-            Camera pv suffix
-        read_uncached: dict[str,str]
-            A dictionary contains the name and the pv suffix for the statistic plugin.
-        name: str:
-            Name of the device.
-        plugins:: Optional[dict[str, NDPluginBaseIO] | None
-            Dictionary containing plugin that are forward to the base class.
-        """
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             for k, v in read_uncached.items():
                 setattr(self, k, epics_signal_r(float, prefix + v))

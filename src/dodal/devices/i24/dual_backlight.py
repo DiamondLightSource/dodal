@@ -27,13 +27,13 @@ class BacklightPositioner(StandardReadable):
 
 
 class DualBacklight(StandardReadable):
-    """
-    Device to trigger the dual backlight on I24.
+    """Device to trigger the dual backlight on I24.
     This device is made up by two LEDs:
         - LED1 is the "backlight", can be moved to 5 different positions.
         - LED2 is a "frontlight", it does not move, just switches on and off.
 
-    To set the position for LED1:
+    To set the position for LED1::
+
         b = DualBacklight(name="backlight)
         b.backlight_position.set("OAV2")
 

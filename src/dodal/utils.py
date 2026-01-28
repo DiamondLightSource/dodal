@@ -149,34 +149,35 @@ class DeviceInitializationController(Generic[T]):
         Once the device is connected, the value of mock must be consistent, or connect
         must be False.
 
-        Additional keyword arguments will be passed through to the wrapped factory function.
+        Additional keyword arguments will be passed through to the wrapped factory
+        function.
 
         Args:
-            connect_immediately (bool, default False): whether to call connect on the
-              device before returning it- connect is idempotent for ophyd-async devices.
-              Not connecting to the device allows for the instance to be created prior
-              to the RunEngine event loop being configured or for connect to be called
-              lazily e.g. by the `ensure_connected` stub.
-            name (str | None, optional): an override name to give the device, which is
-              also used to name its children. Defaults to None, which does not name the
-              device unless the device has no name and this Controller is configured to
-              use_factory_name, which propagates the name of the wrapped factory
-              function to the device instance.
-            connection_timeout (float | None, optional): an override timeout length in
-              seconds for the connect method, if it is called. Defaults to None, which
-              defers to the timeout configured for this Controller: the default uses
-              ophyd_async's DEFAULT_TIMEOUT.
-            mock (bool | None, optional): overrides whether to connect to Mock signal
-              backends, if connect is called. Defaults to None, which uses the mock
-              parameter of this Controller. This value must be used consistently when
-              connect is called on the Device.
+            connect_immediately (bool, default False): Whether to call connect on the
+                device before returning it- connect is idempotent for ophyd-async
+                devices. Not connecting to the device allows for the instance to be
+                created prior to the RunEngine event loop being configured or for
+                connect to be called lazily e.g. by the `ensure_connected` stub.
+            name (str, optional): An override name to give the device, which is
+                also used to name its children. Defaults to None, which does not name
+                the device unless the device has no name and this Controller is
+                configured to use_factory_name, which propagates the name of the wrapped
+                factory function to the device instance.
+            connection_timeout (float, optional): An override timeout length in
+                seconds for the connect method, if it is called. Defaults to None, which
+                defers to the timeout configured for this Controller: the default uses
+                ophyd_async's DEFAULT_TIMEOUT.
+            mock (bool, optional): Overrides whether to connect to Mock signal
+                backends, if connect is called. Defaults to None, which uses the mock
+                parameter of this Controller. This value must be used consistently when
+                connect is called on the Device.
 
         Returns:
-            T: a singleton instance of the Device class returned by the wrapped factory.
+            T: A singleton instance of the Device class returned by the wrapped factory.
 
         Raises:
-            RuntimeError:   If the device factory was invoked again with different
-             keyword arguments, without previously invoking cache_clear()
+            RuntimeError: If the device factory was invoked again with different
+                keyword arguments, without previously invoking cache_clear().
         """
         is_v2_device = is_v2_device_factory(self._factory)
         is_mock = mock if mock is not None else self._mock
@@ -240,8 +241,8 @@ def make_device(
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
-    """Makes all devices in the given beamline module, for those modules using device factories
-    as opposed to the DeviceManager.
+    """Makes all devices in the given beamline module, for those modules using device
+    factories as opposed to the DeviceManager.
 
     In cases of device interdependencies it ensures a device is created before any which
     depend on it.
@@ -251,10 +252,10 @@ def make_all_devices(
         **kwargs: Arguments passed on to every device.
 
     Returns:
-        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: This represents a tuple containing two dictionaries:
-
-    A dictionary where the keys are device names and the values are devices.
-    A dictionary where the keys are device names and the values are exceptions.
+        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: This represents a tuple
+            containing two dictionaries:
+              -A dictionary where the keys are device names and the values are devices.
+              -A dictionary where the keys are device names and the values are exceptions.
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
@@ -278,12 +279,12 @@ def invoke_factories(
     this will detect a dependency and create and cache the non-dependant device first.
 
     Args:
-        factories: Mapping of function name -> function
+        factories (Mapping[str, AnyDeviceFactory]): Mapping of function name -> function
 
     Returns:
-        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries.
-        One mapping device name to device, one mapping device name to exception for
-        any failed devices
+        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries:
+            - One mapping device name to device
+            - One mapping device name to exception for any failed devices
     """
 
     devices: dict[str, AnyDevice] = {}
@@ -344,13 +345,14 @@ def extract_dependencies(
 ) -> Iterable[str]:
     """Compute dependencies for a device factory. Dependencies are named in the
     factory function signature, similar to pytest fixtures. For example given
-    def device_one(): and def device_two(device_one: Readable):, indicate taht
+    def device_one(): and def device_two(device_one: Readable):, indicate that
     device_one is a dependency of device_two.
 
     Args:
-        factories: All factories, mapping of function name -> function
-        factory_name: The name of the factory in factories whose dependencies need
-        computing
+        factories (Mapping[str, AnyDeviceFactory]): All factories, mapping of
+            function name -> function
+        factory_name (str): The name of the factory in factories whose dependencies need
+            computing
 
     Returns:
         Iterable[str]: Generator of factory names
@@ -371,9 +373,9 @@ def collect_factories(
     via the return type signature e.g. def my_device() -> ADeviceType:
 
     Args:
-        module: The module to inspect
-        include_skipped: If True, also load factories with the @skip_device annotation.
-        Defaults to False.
+        module (ModuleType): The module to inspect
+        include_skipped (bool, optional): If True, also load factories with the
+            @skip_device annotation. Defaults to False.
 
     Returns:
         dict[str, AnyDeviceFactory]: Mapping of factory name -> factory.
@@ -445,20 +447,20 @@ def is_v1_device_type(obj: type[Any]) -> bool:
 def filter_ophyd_devices(
     devices: Mapping[str, AnyDevice],
 ) -> tuple[Mapping[str, OphydV1Device], Mapping[str, OphydV2Device]]:
-    """
-    Split a dictionary of ophyd and ophyd-async devices
-    (i.e. the output of make_all_devices) into 2 separate dictionaries of the
-    different types. Useful when special handling is needed for each type of device.
+    """Split a dictionary of ophyd and ophyd-async devices (i.e. the output of
+    make_all_devices) into 2 separate dictionaries of the different types. Useful when
+    special handling is needed for each type of device.
 
     Args:
-        devices: Dictionary of device name to ophyd or ophyd-async device.
+        devices (Mapping[str, AnyDevice]): Dictionary of device name to ophyd or
+            ophyd-async device.
 
     Raises:
         ValueError: If anything in the dictionary doesn't come from either library.
 
     Returns:
         Tuple of two dictionaries, one mapping names to ophyd devices and one mapping
-        names to ophyd-async devices.
+            names to ophyd-async devices.
     """
 
     ophyd_devices = {}
@@ -474,8 +476,7 @@ def filter_ophyd_devices(
 
 
 def get_beamline_based_on_environment_variable() -> ModuleType:
-    """
-    Gets the dodal module for the current beamline, as specified by the
+    """Gets the dodal module for the current beamline, as specified by the
     BEAMLINE environment variable.
     """
     beamline = get_beamline_name("")
