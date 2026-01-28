@@ -1,38 +1,47 @@
-from dodal.beamlines.i10_shared import devices as i10_shared_devices
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
-from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
-from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name
+from dodal.devices.i10.i10_devices_configs import (
+    devices_diagnostics_j,
+    devices_em_temperature_controller,
+    devices_idd,
+    devices_idu,
+    devices_mirror_j,
+    devices_shared_diagnostics,
+    devices_shared_mirror,
+    devices_shared_slit,
+    devices_slit_j,
+    pgm_device,
+)
 
-BL = get_beamline_name("i10-1")
-set_log_beamline(BL)
-set_utils_beamline(BL)
-PREFIX = BeamlinePrefix("i10", "J")
 devices = DeviceManager()
-devices.include(i10_shared_devices)
+
+"""------------------shared-----------------------------------------"""
+"""Insertion Devices"""
+
+devices.include(devices_idd)
+devices.include(devices_idu)
+
+"""Mirrors"""
+devices.include(devices_shared_mirror)
+
+"""Slits"""
+devices.include(devices_shared_slit)
+
+"""Diagnostics"""
+devices.include(devices_shared_diagnostics)
+
+"""Energy"""
+devices.include(pgm_device)
 
 
-@devices.factory()
-def em_temperature_controller() -> Lakeshore336:
-    return Lakeshore336(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
-    )
+"""------------------i10 j devices-----------------------------------------"""
 
+"""Mirrors"""
+devices.include(devices_mirror_j)
+"""Diagnostics"""
+devices.include(devices_diagnostics_j)
 
-@devices.factory()
-def slits() -> I10JSlits:
-    return I10JSlits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-")
+"""Optic slits """
+devices.include(devices_slit_j)
 
-
-@devices.factory()
-def diagnostic() -> I10JDiagnostic:
-    return I10JDiagnostic(
-        prefix=f"{PREFIX.beamline_prefix}-DI-",
-    )
-
-
-@devices.factory()
-def focusing_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
+"""EM devices"""
+devices.include(devices_em_temperature_controller)
