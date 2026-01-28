@@ -1,10 +1,19 @@
-from dodal.devices.b07_1.ccmc import (
-    ChannelCutMonochromator,
-    ChannelCutMonochromatorPositions,
+from .analyser import (
+    B071ElectronAnalyserController,
+    B071SpecsAnalyserDriverIO,
+    B071SpecsRegion,
+    B071SpecsSequence,
+    SpecsPhoibos,
 )
-from dodal.devices.b07_1.enums import Grating, LensMode
+from .ccmc import ChannelCutMonochromator, ChannelCutMonochromatorPositions
+from .enums import Grating, LensMode
 
 __all__ = [
+    "B071ElectronAnalyserController",
+    "B071SpecsAnalyserDriverIO",
+    "B071SpecsRegion",
+    "B071SpecsSequence",
+    "SpecsPhoibos",
     "Grating",
     "LensMode",
     "ChannelCutMonochromator",

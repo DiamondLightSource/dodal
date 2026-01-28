@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import InOut, init_devices
 
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
@@ -13,23 +13,13 @@ from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     DualEnergySource,
-    ElectronAnalyserController,
-    ElectronAnalyserDetector,
     EnergySource,
-    TAbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.specs import (
-    SpecsAnalyserDriverIO,
-    SpecsSequence,
-)
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaAnalyserDriverIO,
-    VGScientaSequence,
-)
+from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
-from tests.devices.electron_analyser.helper_util import get_test_sequence
+from tests.devices.electron_analyser.helper_util import DRIVER_TO_TEST_SEQUENCE
 
 
 @pytest.fixture
@@ -70,35 +60,48 @@ async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySourc
     return dual_energy_source
 
 
+def fast_shutter() -> GenericFastShutter:
+    with init_devices(mock=True):
+        fast_shutter = GenericFastShutter[InOut](
+            pv="TEST:",
+            open_state=InOut.OUT,
+            close_state=InOut.IN,
+        )
+    return fast_shutter
+
+
 @pytest.fixture
-def sequence_class(
-    sim_driver: AbstractAnalyserDriverIO,
-) -> type[AbstractBaseSequence]:
-    # We must include the pass energy, lens and psu mode types here, otherwise the
-    # sequence file can't be loaded as pydantic won't be able to resolve the enums.
-    if isinstance(sim_driver, VGScientaAnalyserDriverIO):
-        return VGScientaSequence[
-            sim_driver.lens_mode_type,
-            sim_driver.psu_mode_type,
-            sim_driver.pass_energy_type,
-        ]
-    elif isinstance(sim_driver, SpecsAnalyserDriverIO):
-        return SpecsSequence[sim_driver.lens_mode_type, sim_driver.psu_mode_type]
-    raise ValueError("class " + str(sim_driver) + " not recognised")
+def dual_fast_shutter(
+    source_selector: SourceSelector,
+) -> DualFastShutter[InOut]:
+    with init_devices(mock=True):
+        shutter1 = GenericFastShutter[InOut](
+            pv="TEST:",
+            open_state=InOut.OUT,
+            close_state=InOut.IN,
+        )
+
+    with init_devices(mock=True):
+        shutter2 = GenericFastShutter[InOut](
+            pv="TEST:",
+            open_state=InOut.OUT,
+            close_state=InOut.IN,
+        )
+
+    with init_devices(mock=True):
+        dual_fast_shutter = DualFastShutter[InOut](
+            shutter1,
+            shutter2,
+            source_selector.selected_source,
+        )
+    return dual_fast_shutter
 
 
 @pytest.fixture
 def sequence(
     sim_driver: AbstractAnalyserDriverIO,
-    sequence_class: type[TAbstractBaseSequence],
-    single_energy_source: EnergySource,
 ) -> AbstractBaseSequence:
-    controller = ElectronAnalyserController(sim_driver, single_energy_source)
-    det = ElectronAnalyserDetector(
-        sequence_class=sequence_class,
-        controller=controller,
-    )
-    return det.load_sequence(get_test_sequence(type(sim_driver)))
+    return DRIVER_TO_TEST_SEQUENCE[type(sim_driver)]
 
 
 @pytest.fixture
