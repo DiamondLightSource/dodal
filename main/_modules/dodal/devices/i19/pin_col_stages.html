@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i19.pin_col_stages &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.i19.pin_col_stages &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -859,10 +859,10 @@ window.addEventListener("load", load);
 <span class="sd">    one of the available apertures.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        pinhole_x: The position of the x motor on the pinhole stage</span>
-<span class="sd">        pinhole_y: The position of the y motor on the pinhole stage</span>
-<span class="sd">        collimator_x: The position of the x motor on the collimator stage</span>
-<span class="sd">        collimator_y: The position of the y motor on the collimator stage</span>
+<span class="sd">        pinhole_x (float): The position of the x motor on the pinhole stage.</span>
+<span class="sd">        pinhole_y (float): The position of the y motor on the pinhole stage.</span>
+<span class="sd">        collimator_x (float): The position of the x motor on the collimator stage.</span>
+<span class="sd">        collimator_y (float): The position of the y motor on the collimator stage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">pinhole_x</span><span class="p">:</span> <span class="nb">float</span>
@@ -876,7 +876,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i19.pin_col_stages.PinColConfiguration.html#dodal.devices.i19.pin_col_stages.PinColConfiguration">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PinColConfiguration</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Full MAPT configuration table, including out positions and selection for the</span>
-<span class="sd">    Pinhole and Collimator control.&quot;&quot;&quot;</span>
+<span class="sd">    Pinhole and Collimator control.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">apertures</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
@@ -895,7 +896,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i19.pin_col_stages.PinholeCollimatorControl.html#dodal.devices.i19.pin_col_stages.PinholeCollimatorControl">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PinholeCollimatorControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to control the Pinhole and Collimator stages moves on I19-2, using the</span>
-<span class="sd">    MAPT configuration table to look up the positions.&quot;&quot;&quot;</span>
+<span class="sd">    MAPT configuration table to look up the positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -950,7 +952,8 @@ window.addEventListener("load", load);
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_safe_move_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_PinColPosition</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the pinhole and collimator stages safely to the in position.</span>
 <span class="sd">        In order to avoid a collision, we have to make sure that the pinhole stage is</span>
-<span class="sd">        always moved in before the collimator stage.&quot;&quot;&quot;</span>
+<span class="sd">        always moved in before the collimator stage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Moving pinhole and collimator stages to in position: </span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>

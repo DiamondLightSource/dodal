@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.adsim &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.beamlines.adsim &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1158,23 +1158,32 @@ dodal and ophyd-async against what appear to be “real” signals.</p>
 <p>Start the simulated beamline by following the epics-containers tutorial at
 <a class="reference external" href="https://epics-containers.github.io/main/tutorials/launch_example.html">https://epics-containers.github.io/main/tutorials/launch_example.html</a>
 And ensure that the signals are visible:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`sh</span>
-<span class="pre">export</span> <span class="pre">EPICS_CA_ADDR_LIST=127.0.0.1:9064</span>
-<span class="pre">export</span> <span class="pre">EPICS_CA_NAME_SERVERS=127.0.0.1:9064</span>
-<span class="pre">export</span> <span class="pre">EPICS_PVA_NAME_SERVERS=127.0.0.1:9075</span>
-<span class="pre">`</span></code></p>
-<p>How to use the devices in a plan:
-In an ipython terminal run:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
-from bluesky.run_engine import RunEngine</p>
-<p>from dodal.beamlines.adsim import devices
-from dodal.plans import count</p>
-<p>run_engine = RunEngine()</p>
-<p>built = devices.build_and_connect().or_raise()
-d = built[“det”]
-s = built[“stage”]</p>
-<p>run_engine(count([d], num=10))
-<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sh</span>
+<span class="n">export</span> <span class="n">EPICS_CA_ADDR_LIST</span><span class="o">=</span><span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">9064</span>
+<span class="n">export</span> <span class="n">EPICS_CA_NAME_SERVERS</span><span class="o">=</span><span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">9064</span>
+<span class="n">export</span> <span class="n">EPICS_PVA_NAME_SERVERS</span><span class="o">=</span><span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">9075</span>
+</pre></div>
+</div>
+<section id="how-to-use-the-devices-in-a-plan">
+<h3>How to use the devices in a plan:<a class="headerlink" href="#how-to-use-the-devices-in-a-plan" title="Link to this heading">#</a></h3>
+<p>In an ipython terminal run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.run_engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunEngine</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.beamlines.adsim</span><span class="w"> </span><span class="kn">import</span> <span class="n">devices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.plans</span><span class="w"> </span><span class="kn">import</span> <span class="n">count</span>
+
+
+<span class="n">run_engine</span> <span class="o">=</span> <span class="n">RunEngine</span><span class="p">()</span>
+
+<span class="n">built</span> <span class="o">=</span> <span class="n">devices</span><span class="o">.</span><span class="n">build_and_connect</span><span class="p">()</span><span class="o">.</span><span class="n">or_raise</span><span class="p">()</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">built</span><span class="p">[</span><span class="s2">&quot;det&quot;</span><span class="p">]</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">built</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span>
+
+<span class="n">run_engine</span><span class="p">(</span><span class="n">count</span><span class="p">([</span><span class="n">d</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
 </section>
 </dd></dl>
 

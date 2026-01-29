@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.adsim &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.beamlines.adsim &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -837,32 +837,32 @@ window.addEventListener("load", load);
 
 <span class="sd">Start the simulated beamline by following the epics-containers tutorial at</span>
 <span class="sd">https://epics-containers.github.io/main/tutorials/launch_example.html</span>
-<span class="sd">And ensure that the signals are visible:</span>
+<span class="sd">And ensure that the signals are visible::</span>
 
-<span class="sd">```sh</span>
-<span class="sd">export EPICS_CA_ADDR_LIST=127.0.0.1:9064</span>
-<span class="sd">export EPICS_CA_NAME_SERVERS=127.0.0.1:9064</span>
-<span class="sd">export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075</span>
-<span class="sd">```</span>
+<span class="sd">    sh</span>
+<span class="sd">    export EPICS_CA_ADDR_LIST=127.0.0.1:9064</span>
+<span class="sd">    export EPICS_CA_NAME_SERVERS=127.0.0.1:9064</span>
+<span class="sd">    export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075</span>
 
 <span class="sd">How to use the devices in a plan:</span>
-<span class="sd">In an ipython terminal run:</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
 
-<span class="sd">```python</span>
-<span class="sd">from bluesky.run_engine import RunEngine</span>
+<span class="sd">In an ipython terminal run::</span>
 
-<span class="sd">from dodal.beamlines.adsim import devices</span>
-<span class="sd">from dodal.plans import count</span>
+<span class="sd">    python</span>
+<span class="sd">    from bluesky.run_engine import RunEngine</span>
+
+<span class="sd">    from dodal.beamlines.adsim import devices</span>
+<span class="sd">    from dodal.plans import count</span>
 
 
-<span class="sd">run_engine = RunEngine()</span>
+<span class="sd">    run_engine = RunEngine()</span>
 
-<span class="sd">built = devices.build_and_connect().or_raise()</span>
-<span class="sd">d = built[&quot;det&quot;]</span>
-<span class="sd">s = built[&quot;stage&quot;]</span>
+<span class="sd">    built = devices.build_and_connect().or_raise()</span>
+<span class="sd">    d = built[&quot;det&quot;]</span>
+<span class="sd">    s = built[&quot;stage&quot;]</span>
 
-<span class="sd">run_engine(count([d], num=10))</span>
-<span class="sd">```</span>
+<span class="sd">    run_engine(count([d], num=10))</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 

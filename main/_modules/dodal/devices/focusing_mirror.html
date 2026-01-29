@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -838,7 +838,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="MirrorType">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorType.html#dodal.devices.focusing_mirror.MirrorType">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MirrorType</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;See https://manual.nexusformat.org/classes/base_classes/NXmirror.html&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;See https://manual.nexusformat.org/classes/base_classes/NXmirror.html.&quot;&quot;&quot;</span>
 
     <span class="n">SINGLE</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span>
     <span class="n">MULTI</span> <span class="o">=</span> <span class="s2">&quot;multi&quot;</span></div>
@@ -876,8 +876,9 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SingleMirrorVoltage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SingleMirrorVoltage</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when</span>
-<span class="sd">    the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract the bimorph mirror voltage PVs into a single device that can be set</span>
+<span class="sd">    asynchronously and returns when the demanded voltage setpoint is accepted, without</span>
+<span class="sd">    blocking the caller as this process can take significant time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
@@ -891,11 +892,14 @@ window.addEventListener("load", load);
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine the following operations into a single set:</span>
-<span class="sd">        1. apply the value to the setpoint PV</span>
-<span class="sd">        3. Wait until demand is accepted</span>
-<span class="sd">        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
+<span class="sd">        1. apply the value to the setpoint PV.</span>
+
+<span class="sd">        3. Wait until demand is accepted.</span>
+
+<span class="sd">        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the</span>
+<span class="sd">           result on the Status.</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa D415</span>
         <span class="n">setpoint_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setpoint_v</span>
         <span class="n">demand_accepted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_demand_accepted</span>
 
@@ -968,7 +972,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SimpleMirror">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.SimpleMirror.html#dodal.devices.focusing_mirror.SimpleMirror">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SimpleMirror</span><span class="p">(</span><span class="n">XYPitchStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple Focusing Mirror&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple Focusing Mirror.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1000,7 +1004,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="FocusingMirror">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirror.html#dodal.devices.focusing_mirror.FocusingMirror">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FocusingMirror</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Focusing Mirror&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Focusing Mirror.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1040,7 +1044,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FocusingMirrorWithStripes</span><span class="p">(</span><span class="n">FocusingMirror</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A focusing mirror where the stripe material can be changed. This is usually done</span>
-<span class="sd">    based on the energy of the beamline.&quot;&quot;&quot;</span>
+<span class="sd">    based on the energy of the beamline.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stripe</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">MirrorStripe</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;STRP:DVAL&quot;</span><span class="p">)</span>
@@ -1052,7 +1057,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="FocusingMirrorWithStripes.energy_to_stripe">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes.energy_to_stripe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">energy_to_stripe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MirrorStripeConfiguration</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the stripe, yaw angle and lateral position for the specified energy&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the stripe, yaw angle and lateral position for the specified energy.&quot;&quot;&quot;</span>
         <span class="c1"># In future, this should be configurable per-mirror</span>
         <span class="k">if</span> <span class="n">energy_kev</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;stripe&quot;</span><span class="p">:</span> <span class="n">MirrorStripe</span><span class="o">.</span><span class="n">BARE</span><span class="p">,</span> <span class="s2">&quot;yaw_mrad&quot;</span><span class="p">:</span> <span class="mf">6.2</span><span class="p">,</span> <span class="s2">&quot;lat_mm&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>

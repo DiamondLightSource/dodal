@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.focusing_mirror.SingleMirrorVoltage &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.focusing_mirror.SingleMirrorVoltage &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1135,8 +1135,9 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.focusing_mirror.SingleMirrorVoltage">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.focusing_mirror.</span></span><span class="sig-name descname"><span class="pre">SingleMirrorVoltage</span></span><a class="reference internal" href="../../_modules/dodal/devices/focusing_mirror.html#SingleMirrorVoltage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.focusing_mirror.SingleMirrorVoltage" title="Link to this definition">#</a></dt>
-<dd><p>Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
-the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.</p>
+<dd><p>Abstract the bimorph mirror voltage PVs into a single device that can be set
+asynchronously and returns when the demanded voltage setpoint is accepted, without
+blocking the caller as this process can take significant time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1149,7 +1150,7 @@ the demanded voltage setpoint is accepted, without blocking the caller as this p
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.focusing_mirror.SingleMirrorVoltage.set" title="dodal.devices.focusing_mirror.SingleMirrorVoltage.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value, *args, **kwargs)</p></td>
-<td><p>Combine the following operations into a single set: 1.</p></td>
+<td><p>Combine the following operations into a single set:</p></td>
 </tr>
 </tbody>
 </table>
@@ -1163,10 +1164,15 @@ the demanded voltage setpoint is accepted, without blocking the caller as this p
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.focusing_mirror.SingleMirrorVoltage.set">
 <span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/focusing_mirror.html#SingleMirrorVoltage.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.focusing_mirror.SingleMirrorVoltage.set" title="Link to this definition">#</a></dt>
-<dd><p>Combine the following operations into a single set:
-1. apply the value to the setpoint PV
-3. Wait until demand is accepted
-4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status</p>
+<dd><p>Combine the following operations into a single set:</p>
+<ol class="arabic simple">
+<li><p>apply the value to the setpoint PV.</p></li>
+</ol>
+<ol class="arabic simple" start="3">
+<li><p>Wait until demand is accepted.</p></li>
+<li><p>When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the
+result on the Status.</p></li>
+</ol>
 </dd></dl>
 
 </dd></dl>

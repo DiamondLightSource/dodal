@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_undulator &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.insertion_device.apple2_undulator &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -993,19 +993,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="UndulatorGap">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorGap.html#dodal.devices.insertion_device.UndulatorGap">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGap</span><span class="p">(</span><span class="n">GapSafeMotorNoStop</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apple 2 undulator gap motor device. With PV corrections.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apple 2 undulator gap motor device. With PV corrections.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): Beamline specific part of the PV</span>
+<span class="sd">        name (str): Name of the Id device</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            prefix : str</span>
-<span class="sd">                Beamline specific part of the PV</span>
-<span class="sd">            name : str</span>
-<span class="sd">                Name of the Id device</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGSETP&quot;</span><span class="p">)</span>
         <span class="c1"># Nothing move until this is set to 1 and it will return to 0 when done.</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
@@ -1026,8 +1021,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorGap.html#dodal.devices.insertion_device.UndulatorGap.prepare">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">FlyMotorInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Prepare for a fly scan by moving to the run-up position at max velocity.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare for a fly scan by moving to the run-up position at max velocity.</span>
 <span class="sd">        Stores fly info for later use in kickoff.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">max_velocity</span><span class="p">,</span> <span class="n">min_velocity</span><span class="p">,</span> <span class="n">egu</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
@@ -1055,18 +1049,14 @@ window.addEventListener("load", load);
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">UnstoppableMotor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Phase motor that will not stop.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Phase motor that will not stop.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): The setting prefix PV.</span>
+<span class="sd">        name (str, optional): Name of the Id phase device.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        prefix : str</span>
-<span class="sd">            The setting prefix PV.</span>
-<span class="sd">        name : str</span>
-<span class="sd">            Name of the Id phase device</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">motor_pv</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MTR&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">motor_pv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SET&quot;</span><span class="p">)</span>
@@ -1106,10 +1096,9 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="UndulatorLockedPhaseAxes.get_timeout">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorLockedPhaseAxes.html#dodal.devices.insertion_device.UndulatorLockedPhaseAxes.get_timeout">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get all motor speed, current positions and target positions to calculate required timeout.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all motor speed, current positions and target positions to calculate</span>
+<span class="sd">        required timeout.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">timeouts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
             <span class="o">*</span><span class="p">[</span>
                 <span class="n">estimate_motor_timeout</span><span class="p">(</span>
@@ -1122,8 +1111,7 @@ window.addEventListener("load", load);
         <span class="p">)</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A 2.0 multiplier is required to prevent premature motor timeouts in phase</span>
 <span class="sd">        axes as it is a master-slave system, where the slave&#39;s movement,</span>
-<span class="sd">        being dependent on the master, can take up to twice as long to complete.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        being dependent on the master, can take up to twice as long to complete.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">timeouts</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span></div>
 </div>
 
@@ -1132,14 +1120,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="UndulatorPhaseAxes">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorPhaseAxes.html#dodal.devices.insertion_device.UndulatorPhaseAxes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseAxes</span><span class="p">(</span><span class="n">UndulatorLockedPhaseAxes</span><span class="p">[</span><span class="n">Apple2PhasesVal</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.</span>
-<span class="sd">    e.g. top_outer == Q1</span>
-<span class="sd">         top_inner == Q2</span>
-<span class="sd">         btm_inner == q3</span>
-<span class="sd">         btm_outer == q4</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A collection of 4 phase Motor to make up the full id phase motion. We are using</span>
+<span class="sd">    the diamond PV convention. e.g.::</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        top_outer == Q1</span>
+<span class="sd">        top_inner == Q2</span>
+<span class="sd">        btm_inner == q3</span>
+<span class="sd">        btm_outer == q4</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa D415</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1171,9 +1159,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="UndulatorJawPhase">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorJawPhase.html#dodal.devices.insertion_device.UndulatorJawPhase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorJawPhase</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A JawPhase movable, this is use for moving the jaw phase which is use to control the</span>
-<span class="sd">    linear arbitrary polarisation but only on some of the beamline.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A JawPhase movable, this is use for moving the jaw phase which is use to control</span>
+<span class="sd">    the linear arbitrary polarisation but only on some of the beamline.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1197,8 +1184,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="UndulatorJawPhase.get_timeout">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorJawPhase.html#dodal.devices.insertion_device.UndulatorJawPhase.get_timeout">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get motor speed, current position and target position to calculate required timeout.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get motor speed, current position and target position to calculate required</span>
+<span class="sd">        timeout.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="k">await</span> <span class="n">estimate_motor_timeout</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="p">,</span>
@@ -1215,29 +1202,20 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Apple2">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2.html#dodal.devices.insertion_device.Apple2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">Apple2Val</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">PhaseAxesType</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Device representing the combined motor controls for an Apple2 undulator.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device representing the combined motor controls for an Apple2 undulator.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    gap : UndulatorGap</span>
-<span class="sd">        The undulator gap motor device.</span>
-<span class="sd">    phase : UndulatorPhaseAxes</span>
-<span class="sd">        The undulator phase axes device, consisting of four phase motors.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        gap (UndulatorGap): The undulator gap motor device.</span>
+<span class="sd">        phase (UndulatorPhaseAxes): The undulator phase axes device, consisting of four</span>
+<span class="sd">            phase motors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id_gap (UndulatorGap): An UndulatorGap device.</span>
+<span class="sd">        id_phase (UndulatorPhaseAxes): An UndulatorPhaseAxes device.</span>
+<span class="sd">        name (str, optional): Name of the device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span> <span class="n">id_phase</span><span class="p">:</span> <span class="n">PhaseAxesType</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        id_gap: UndulatorGap</span>
-<span class="sd">            An UndulatorGap device.</span>
-<span class="sd">        id_phase: UndulatorPhaseAxes</span>
-<span class="sd">            An UndulatorPhaseAxes device.</span>
-<span class="sd">        name: str</span>
-<span class="sd">            Name of the device.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gap</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_gap</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_phase</span><span class="p">)</span>
@@ -1247,11 +1225,9 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2.html#dodal.devices.insertion_device.Apple2.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_motor_values</span><span class="p">:</span> <span class="n">Apple2Val</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check ID is in a movable state and set all the demand value before moving them</span>
-<span class="sd">        all at the same time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check ID is in a movable state and set all the demand value before moving</span>
+<span class="sd">        them all at the same time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># Only need to check gap as the phase motors share both status and gate with gap.</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
 

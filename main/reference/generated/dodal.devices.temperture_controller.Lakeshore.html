@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.temperture_controller.Lakeshore &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.temperture_controller.Lakeshore &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1163,8 +1163,8 @@ It supports multiple channels and PID control.</p>
 <dt class="sig sig-object py" id="dodal.devices.temperture_controller.Lakeshore.control_channel">
 <span class="sig-name descname"><span class="pre">control_channel</span></span><a class="headerlink" href="#dodal.devices.temperture_controller.Lakeshore.control_channel" title="Link to this definition">#</a></dt>
 <dd><p>Signal for selecting the control channel,
-optional readback as hinted signal
-(default readback channel is the same as control channel).</p>
+optional readback as hinted signal (default readback channel is the same
+as control channel).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>derived_signal_rw</p>
@@ -1175,7 +1175,8 @@ optional readback as hinted signal
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.temperture_controller.Lakeshore.temperature_high_limit">
 <span class="sig-name descname"><span class="pre">temperature_high_limit</span></span><a class="headerlink" href="#dodal.devices.temperture_controller.Lakeshore.temperature_high_limit" title="Link to this definition">#</a></dt>
-<dd><p>Signal to store the soft high temperature limit.</p>
+<dd><p>Signal to store the soft high
+temperature limit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>soft_signal_rw</p>
@@ -1186,7 +1187,8 @@ optional readback as hinted signal
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.temperture_controller.Lakeshore.temperature_low_limit">
 <span class="sig-name descname"><span class="pre">temperature_low_limit</span></span><a class="headerlink" href="#dodal.devices.temperture_controller.Lakeshore.temperature_low_limit" title="Link to this definition">#</a></dt>
-<dd><p>Signal to store the soft low temperature limit.</p>
+<dd><p>Signal to store the soft low
+temperature limit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>soft_signal_rw</p>
@@ -1194,35 +1196,24 @@ optional readback as hinted signal
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.temperture_controller.Lakeshore.set">
-<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/temperture_controller/lakeshore/lakeshore.html#Lakeshore.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.temperture_controller.Lakeshore.set" title="Link to this definition">#</a></dt>
-<dd><p>Set the temperature setpoint for the selected control channel.</p>
-</dd></dl>
-
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>num_readback_channel</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
-<li><p><strong>heater_setting</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><em>type</em></a><em>[</em><em>SignalDatatypeT</em><em>]</em>)</p></li>
-<li><p><strong>control_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>single_control_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>)</p></li>
-<li><p><strong>prefix</strong> – The EPICS prefix for the device.</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The EPICS prefix for the device.</p></li>
 <li><p><strong>no_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of temperature channels.</p></li>
-<li><p><strong>heater_setting</strong> – Enum type for heater settings.</p></li>
-<li><p><strong>control_channel</strong> – The initial control channel (default is 1).</p></li>
-<li><p><strong>single_control_channel</strong> – Whether to use a single control channel (default is False).</p></li>
-<li><p><strong>name</strong> – Name of the device.</p></li>
-<li><p><strong>num_readback_channel</strong></p></li>
+<li><p><strong>heater_setting</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><em>type</em></a><em>[</em><em>SignalDatatypeT</em><em>]</em>) – Enum type for heater settings.</p></li>
+<li><p><strong>control_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – The initial control channel (default is 1).</p></li>
+<li><p><strong>single_control_channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to use a single control
+channel (default is False).</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the device.</p></li>
+<li><p><strong>num_readback_channel</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="dodal.devices.temperture_controller.Lakeshore.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.temperture_controller.Lakeshore.set" title="dodal.devices.temperture_controller.Lakeshore.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
 <td><p>Set the temperature setpoint for the active control channel.</p></td>
 </tr>
 </tbody>
@@ -1235,8 +1226,8 @@ optional readback as hinted signal
 </table>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/temperture_controller/lakeshore/lakeshore.html#Lakeshore.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="dodal.devices.temperture_controller.Lakeshore.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/temperture_controller/lakeshore/lakeshore.html#Lakeshore.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.temperture_controller.Lakeshore.set" title="Link to this definition">#</a></dt>
 <dd><p>Set the temperature setpoint for the active control channel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1306,7 +1297,6 @@ optional readback as hinted signal
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.temperture_controller.Lakeshore.temperature_high_limit"><code class="docutils literal notranslate"><span class="pre">Lakeshore.temperature_high_limit</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.temperture_controller.Lakeshore.temperature_low_limit"><code class="docutils literal notranslate"><span class="pre">Lakeshore.temperature_low_limit</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.temperture_controller.Lakeshore.set"><code class="docutils literal notranslate"><span class="pre">Lakeshore.set()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">Lakeshore.set()</span></code></a></li>
 </ul>
 </li>
 </ul>

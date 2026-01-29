@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -936,10 +936,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="AllValvesControl">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.AllValvesControl.html#dodal.devices.pressure_jump_cell.AllValvesControl">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AllValvesControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The default IOC for this device only controls</span>
-<span class="sd">    specific valves. Other valves are under manual</span>
-<span class="sd">    control.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The default IOC for this device only controls specific valves. Other valves are</span>
+<span class="sd">    under manual control.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1006,12 +1004,10 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="PressureTransducer">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureTransducer.html#dodal.devices.pressure_jump_cell.PressureTransducer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PressureTransducer</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Pressure transducer for a high pressure X-ray cell.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pressure transducer for a high pressure X-ray cell.</span>
 <span class="sd">    This is the chamber and there are three of them.</span>
 <span class="sd">    1 is the start, 3 is where the sample is.</span>
 <span class="sd">    NOTE: the distinction between the adc prefix and the cell prefix is kept here.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1078,9 +1074,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="PressureJumpCellController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellController.html#dodal.devices.pressure_jump_cell.PressureJumpCellController">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PressureJumpCellController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Top-level control for a fixed pressure or pressure jumps.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Top-level control for a fixed pressure or pressure jumps.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
@@ -1110,8 +1104,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellController.html#dodal.devices.pressure_jump_cell.PressureJumpCellController.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets the desired pressure waiting for the device to complete the operation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the desired pressure waiting for the device to complete the</span>
+<span class="sd">        operation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">timeout</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
 
@@ -1149,10 +1143,11 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCell.html#dodal.devices.pressure_jump_cell.PressureJumpCell">[docs]</a>
 <span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">BusyMock</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PressureJumpCell</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.</span>
-<span class="sd">    prefix: str</span>
-<span class="sd">        The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): The prefix of beamline - SPECIAL - unusual that the cell prefix is</span>
+<span class="sd">            computed separately.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

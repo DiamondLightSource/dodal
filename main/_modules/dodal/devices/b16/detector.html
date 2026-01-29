@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.b16.detector &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.b16.detector &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -821,10 +821,9 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="software_triggered_tiff_area_detector">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.b16.detector.html#dodal.devices.b16.detector.software_triggered_tiff_area_detector">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">software_triggered_tiff_area_detector</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wrapper for AreaDetector with fixed dead time (defaulted to 0)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for AreaDetector with fixed dead time (defaulted to 0)</span>
 <span class="sd">    and a TIFF file writer.</span>
-<span class="sd">    Most detectors in B16 could be configured like this</span>
+<span class="sd">    Most detectors in B16 could be configured like this.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">AreaDetector</span><span class="p">(</span>
         <span class="n">writer</span><span class="o">=</span><span class="n">ADTIFFWriter</span><span class="o">.</span><span class="n">with_io</span><span class="p">(</span>

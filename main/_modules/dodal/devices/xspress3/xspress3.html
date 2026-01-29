@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.xspress3.xspress3 &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.xspress3.xspress3 &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -876,19 +876,16 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">Xspress3</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Stageable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Xpress/XpressMini is a region of interest (ROI) picker that sums the detector</span>
 <span class="sd">    output into a scaler with user-defined regions. It is often used as a signal</span>
-<span class="sd">    discriminator to provide better energy resolution and signal to noise in X-ray detection experiments.</span>
+<span class="sd">    discriminator to provide better energy resolution and signal to noise in X-ray</span>
+<span class="sd">    detection experiments.</span>
 <span class="sd">    This currently only provide staging functionality.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    prefix:</span>
-<span class="sd">        Beamline part of PV</span>
-<span class="sd">    name:</span>
-<span class="sd">        Name of the device</span>
-<span class="sd">    num_channels:</span>
-<span class="sd">        Number of channel xspress3 has, default is 1 for mini.</span>
-<span class="sd">    timeout:</span>
-<span class="sd">        How long to wait for before timing out for staging/arming of detector default is 1 sec</span>
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): Beamline part of PV.</span>
+<span class="sd">        name (str, optional): Name of the device.</span>
+<span class="sd">        num_channels (int): Number of channel xspress3 has, default is 1 for mini.</span>
+<span class="sd">        timeout (float): How long to wait for before timing out for staging/arming of</span>
+<span class="sd">            detector, the default is 1 sec.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

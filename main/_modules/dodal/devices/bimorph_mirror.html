@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.bimorph_mirror &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.bimorph_mirror &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -860,10 +860,19 @@ window.addEventListener("load", load);
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of PVs comprising a single bimorph channel.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        target_voltage: Float RW_RBV for target voltage, which can be set using parent mirror&#39;s all target proc</span>
-<span class="sd">        output_voltage: Float RW_RBV for current voltage on bimorph</span>
-<span class="sd">        status: BimorphMirrorOnOff readable for ON/OFF status of channel</span>
-<span class="sd">        shift: Float writeable shifting channel voltage</span>
+<span class="sd">        target_voltage (SignalRW): Float RW_RBV for target voltage, which can be set</span>
+<span class="sd">            using parent mirror&#39;s all target proc.</span>
+<span class="sd">        output_voltage (SignalRW): Float RW_RBV for current voltage on bimorph.</span>
+<span class="sd">        status (SignalR): BimorphMirrorOnOff readable for ON/OFF status of channel.</span>
+<span class="sd">        shift (SignalW): Float writeable shifting channel voltage.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): PV prefix.</span>
+<span class="sd">        number_of_channels (int): Number of channels on bimorph mirror (can be zero).</span>
+<span class="sd">        name (str, optional): Name of device.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: number_of_channels is less than zero.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">target_voltage</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;VTRGT&quot;</span><span class="p">),</span> <span class="n">Format</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">]</span>
@@ -879,21 +888,14 @@ window.addEventListener("load", load);
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent CAENels Bimorph Mirrors.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        channels: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel</span>
-<span class="sd">        enabled: Writeable BimorphOnOff</span>
-<span class="sd">        status: Readable BimorphMirrorStatus Busy/Idle status</span>
-<span class="sd">        err: Alarm status&quot;&quot;&quot;</span>
+<span class="sd">        channels (DeviceVector): DeviceVector of BimorphMirrorChannel, indexed from 1,</span>
+<span class="sd">            for each channel.</span>
+<span class="sd">        enabled (SignalW): Writeable BimorphOnOff.</span>
+<span class="sd">        status (SignalR): Readable BimorphMirrorStatus Busy/Idle status.</span>
+<span class="sd">        err (SignalR): Alarm status.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">number_of_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            prefix: str PV prefix</span>
-<span class="sd">            number_of_channels: int number of channels on bimorph mirror (can be zero)</span>
-<span class="sd">            name: str name of device</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: number_of_channels is less than zero&quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">number_of_channels</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of channels is below zero: </span><span class="si">{</span><span class="n">number_of_channels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -917,11 +919,11 @@ window.addEventListener("load", load);
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets bimorph voltages in parallel via target voltage and all proc.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            value: List of float target voltages</span>
+<span class="sd">            value (list[float]): List of float target voltages.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            ValueError: On set to non-existent channel&quot;&quot;&quot;</span>
-
+<span class="sd">            ValueError: On set to non-existent channel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Length of value input array does not match number of </span><span class="se">\</span>

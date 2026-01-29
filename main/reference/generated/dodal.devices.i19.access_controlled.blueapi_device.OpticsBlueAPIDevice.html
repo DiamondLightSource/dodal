@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1141,8 +1141,11 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.i19.access_controlled.blueapi_device.</span></span><span class="sig-name descname"><span class="pre">OpticsBlueAPIDevice</span></span><a class="reference internal" href="../../_modules/dodal/devices/i19/access_controlled/blueapi_device.html#OpticsBlueAPIDevice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice" title="Link to this definition">#</a></dt>
-<dd><p>General device that a REST call to the blueapi instance controlling the optics     hutch running on the I19 cluster, which will evaluate the current hutch in use vs     the hutch sending the request and decide if the plan will be run or not.</p>
-<p>For details see the architecture described in     <a class="github reference external" href="https://github.com/DiamondLightSource/i19-bluesky/issues/30">DiamondLightSource/i19-bluesky#30</a>.</p>
+<dd><p>General device that a REST call to the blueapi instance controlling the optics
+hutch running on the I19 cluster, which will evaluate the current hutch in use vs
+the hutch sending the request and decide if the plan will be run or not.</p>
+<p>For details see the architecture described in
+<a class="github reference external" href="https://github.com/DiamondLightSource/i19-bluesky/issues/30">DiamondLightSource/i19-bluesky#30</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1156,7 +1159,7 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice.set" title="dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
-<td><p>On set send a POST request to the optics blueapi with the name and         parameters, gets the generated task_id and then sends a PUT request that runs         the plan.</p></td>
+<td><p>On set send a POST request to the optics blueapi with the name and parameters, gets the generated task_id and then sends a PUT request that runs the plan.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1170,23 +1173,24 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice.set">
 <span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/i19/access_controlled/blueapi_device.html#OpticsBlueAPIDevice.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i19.access_controlled.blueapi_device.OpticsBlueAPIDevice.set" title="Link to this definition">#</a></dt>
-<dd><p>On set send a POST request to the optics blueapi with the name and         parameters, gets the generated task_id and then sends a PUT request that runs         the plan.</p>
+<dd><p>On set send a POST request to the optics blueapi with the name and
+parameters, gets the generated task_id and then sends a PUT request that runs
+the plan.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – <p>The value passed here should be the parameters for the POST                 request, taking the form:
-{</p>
-<blockquote>
-<div><p>”name”: “plan_name”,
-“params”: {</p>
-<blockquote>
-<div><p>”experiment_hutch”: f”{hutch_name}”,
-“access_device”: “access_control”,
-“other_params”: “…”,
-…</p>
-</div></blockquote>
-<p>}</p>
-</div></blockquote>
-<p>}</p>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – <p>The value passed here should be the parameters for the POST
+request, taking the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;plan_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;experiment_hutch&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hutch_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;access_device&quot;</span><span class="p">:</span> <span class="s2">&quot;access_control&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;other_params&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </p>
 </dd>
 </dl>

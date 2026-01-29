@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_grid_scan.GridAxis &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.fast_grid_scan.GridAxis &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1151,7 +1151,7 @@
 <td><p>Determine whether a single axis coordinate is within the grid.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position" title="dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">steps_to_motor_position</span></code></a>(steps)</p></td>
-<td><p>Gives the motor position based on steps, where steps are 0 indexed</p></td>
+<td><p>Gives the motor position based on steps, where steps are 0 indexed.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1160,7 +1160,7 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.GridAxis.end" title="dodal.devices.fast_grid_scan.GridAxis.end"><code class="xref py py-obj docutils literal notranslate"><span class="pre">end</span></code></a></p></td>
-<td><p>Gives the point where the final frame is taken</p></td>
+<td><p>Gives the point where the final frame is taken.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">start</span></code></p></td>
 <td><p></p></td>
@@ -1177,13 +1177,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position">
 <span class="sig-name descname"><span class="pre">steps_to_motor_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/fast_grid_scan.html#GridAxis.steps_to_motor_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position" title="Link to this definition">#</a></dt>
-<dd><p>Gives the motor position based on steps, where steps are 0 indexed</p>
+<dd><p>Gives the motor position based on steps, where steps are 0 indexed.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.GridAxis.end">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">end</span></span><a class="headerlink" href="#dodal.devices.fast_grid_scan.GridAxis.end" title="Link to this definition">#</a></dt>
-<dd><p>Gives the point where the final frame is taken</p>
+<dd><p>Gives the point where the final frame is taken.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1194,10 +1194,13 @@ The coordinate is from a continuous coordinate space based on the
 XRC grid where the origin corresponds to the centre of the first grid box.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>steps</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – The coordinate to check</p>
+<dd class="field-odd"><p><strong>steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The coordinate to check.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the coordinate falls within the grid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>

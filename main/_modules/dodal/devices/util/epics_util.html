@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.epics_util &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.util.epics_util &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -827,7 +827,7 @@ window.addEventListener("load", load);
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a `Component` around an `EpicsSignal` that waits for a callback on a put.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        pv_name (str): The name of the PV for the `EpicsSignal`</span>
+<span class="sd">        pv_name (str): The name of the PV for the `EpicsSignal`.</span>
 <span class="sd">        wait (str, optional): The timeout to wait for a callback. Defaults to 3.0.</span>
 
 <span class="sd">    Returns:</span>
@@ -844,24 +844,24 @@ window.addEventListener("load", load);
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
     <span class="n">associated_obj</span><span class="p">:</span> <span class="n">OphydDevice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates and initiates an asynchronous chaining of functions which return a status</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates and initiates an asynchronous chaining of functions which return a status.</span>
 
 <span class="sd">    Usage:</span>
 <span class="sd">    This function can be used to take a series of status-returning functions and run</span>
 <span class="sd">    them all sequentially and in the background by making use of callbacks. It also</span>
-<span class="sd">    ensures exceptions on each returned status are propagated</span>
+<span class="sd">    ensures exceptions on each returned status are propagated.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    functions_to_chain( list(function - &gt; StatusBase) ): A list of functions which each</span>
-<span class="sd">                                                            return a status object</span>
-<span class="sd">    associated_obj (Device | None): The device that should be associated with the</span>
-<span class="sd">                                        returned status</span>
+<span class="sd">        functions_to_chain (Sequence(function - &gt; StatusBase)): A list of functions</span>
+<span class="sd">            which each return a status object.</span>
+<span class="sd">        timeout (float, optional): The timeout period, defaults to 60.</span>
+<span class="sd">        associated_obj (OphydDevice, optional): The device that should be associated</span>
+<span class="sd">            with the returned status.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    Status: A status object which is marked as complete once all of the Status objects</span>
-<span class="sd">    returned by the unwrapped functions have completed.</span>
+<span class="sd">        Status: A status object which is marked as complete once all of the Status</span>
+<span class="sd">            objects returned by the unwrapped functions have completed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># The returned status - marked as finished at the end of the callback chain. If any</span>
     <span class="c1"># intermediate statuses have an exception, the full_status will timeout.</span>
     <span class="n">full_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">associated_obj</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>

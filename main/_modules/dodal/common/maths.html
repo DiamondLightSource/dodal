@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.maths &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.common.maths &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -813,28 +813,24 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="step_to_num">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.html#dodal.common.step_to_num">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">step_to_num</span><span class="p">(</span><span class="n">start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Standard handling for converting from start, stop, step to start, stop, num</span>
-<span class="sd">    Forces step to be same direction as length</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standard handling for converting from start, stop, step to start, stop, num.</span>
+<span class="sd">    Forces step to be same direction as length.</span>
 <span class="sd">    Includes a final point if it is within 1% of the final step, prevents floating</span>
 <span class="sd">    point arithmatic errors from giving inconsistent shaped scans between steps of an</span>
 <span class="sd">    outer axis.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        start (float):</span>
-<span class="sd">            Start of length, will be returned unchanged</span>
-<span class="sd">        stop (float):</span>
-<span class="sd">            End of length, if length/step does not divide cleanly will be returned</span>
-<span class="sd">            extended up to 1% of step, or else truncated.</span>
-<span class="sd">        step (float):</span>
-<span class="sd">            Length of a step along the line formed from start to stop.</span>
-<span class="sd">            If stop &lt; start, will be coerced to be backwards.</span>
+<span class="sd">        start (float): Start of length, will be returned unchanged.</span>
+<span class="sd">        stop (float): End of length, if length/step does not divide cleanly will be</span>
+<span class="sd">            returned extended up to 1% of step, or else truncated.</span>
+<span class="sd">        step (float): Length of a step along the line formed from start to stop. If</span>
+<span class="sd">            stop &lt; start, will be coerced to be backwards.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        start, adjusted_stop, num = Tuple[float, float, int]</span>
-<span class="sd">        start will be returned unchanged</span>
-<span class="sd">        adjusted_stop = start + (num - 1) * step</span>
-<span class="sd">        num is the maximal number of steps that could fit into the length.</span>
+<span class="sd">            - start will be returned unchanged.</span>
+<span class="sd">            - adjusted_stop = start + (num - 1) * step.</span>
+<span class="sd">            - num is the maximal number of steps that could fit into the length.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Make step be the right direction</span>
@@ -848,16 +844,17 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="in_micros">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.html#dodal.common.in_micros">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">in_micros</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts between a positive number of seconds and an equivalent</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts between a positive number of seconds and an equivalent</span>
 <span class="sd">    number of microseconds.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        t (float): A time in seconds</span>
+<span class="sd">        t (float): A time in seconds.</span>
+
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: if t &lt; 0</span>
+<span class="sd">        ValueError: if t &lt; 0.</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">        t (int): A time in microseconds, rounded up to the nearest whole microsecond,</span>
+<span class="sd">        int: A time in microseconds, rounded up to the nearest whole microsecond.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a positive time in seconds, got </span><span class="si">{</span><span class="n">t</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -868,8 +865,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Rectangle2D">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Rectangle2D</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A 2D rectangle defined by two opposite corners.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A 2D rectangle defined by two opposite corners.</span>
 
 <span class="sd">    This class represents a rectangle in 2D space using two points: (x1, y1) and (x2, y2).</span>
 <span class="sd">    It provides methods to query rectangle properties and check point containment.</span>
@@ -879,26 +875,22 @@ window.addEventListener("load", load);
 <span class="sd">        y1 (float): The y-coordinate of the first corner.</span>
 <span class="sd">        x2 (float): The x-coordinate of the second corner.</span>
 <span class="sd">        y2 (float): The y-coordinate of the second corner.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x1 (float): The x-coordinate of the first corner.</span>
+<span class="sd">        y1 (float): The y-coordinate of the first corner.</span>
+<span class="sd">        x2 (float): The x-coordinate of the second corner.</span>
+<span class="sd">        y2 (float): The y-coordinate of the second corner.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y2</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a Rectangle2D with two corner points.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            x1 (float): The x-coordinate of the first corner.</span>
-<span class="sd">            y1 (float): The y-coordinate of the first corner.</span>
-<span class="sd">            x2 (float): The x-coordinate of the second corner.</span>
-<span class="sd">            y2 (float): The y-coordinate of the second corner.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y1</span> <span class="o">=</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y2</span> <span class="o">=</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span>
 
 <div class="viewcode-block" id="Rectangle2D.get_max_x">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_max_x">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_max_x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the maximum x-coordinate of the rectangle.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the maximum x-coordinate of the rectangle.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The larger of the two x-coordinates (x1, x2).</span>
@@ -909,8 +901,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Rectangle2D.get_min_x">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_min_x">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_min_x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the minimum x-coordinate of the rectangle.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the minimum x-coordinate of the rectangle.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The smaller of the two x-coordinates (x1, x2).</span>
@@ -921,8 +912,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Rectangle2D.get_max_y">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_max_y">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_max_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the maximum y-coordinate of the rectangle.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the maximum y-coordinate of the rectangle.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The larger of the two y-coordinates (y1, y2).</span>
@@ -933,8 +923,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Rectangle2D.get_min_y">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_min_y">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_min_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the minimum y-coordinate of the rectangle.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the minimum y-coordinate of the rectangle.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The smaller of the two y-coordinates (y1, y2).</span>
@@ -945,8 +934,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Rectangle2D.contains">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.contains">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if a point is contained within the rectangle.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a point is contained within the rectangle.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (float): The x-coordinate of the point.</span>

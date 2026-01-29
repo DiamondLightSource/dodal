@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i11.nx100robot.NX100Robot &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.i11.nx100robot.NX100Robot &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1138,8 +1138,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.i11.nx100robot.NX100Robot">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.i11.nx100robot.</span></span><span class="sig-name descname"><span class="pre">NX100Robot</span></span><a class="reference internal" href="../../_modules/dodal/devices/i11/nx100robot.html#NX100Robot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i11.nx100robot.NX100Robot" title="Link to this definition">#</a></dt>
-<dd><p>This is a Yaskawa Motoman that uses an NX100 controller. It consists of a robot arm
-with a gripper and a carousel for sample handling. It can pick and place samples
+<dd><p>This is a Yaskawa Motoman that uses an NX100 controller. It consists of a robot
+arm with a gripper and a carousel for sample handling. It can pick and place samples
 from the carousel to the diffractometer and vice versa.</p>
 <p>Has set, pause, resume, stop, locate, stage methods.</p>
 <dl class="field-list simple">
@@ -1154,7 +1154,7 @@ from the carousel to the diffractometer and vice versa.</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.i11.nx100robot.NX100Robot.clear_sample" title="dodal.devices.i11.nx100robot.NX100Robot.clear_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_sample</span></code></a>([table_in])</p></td>
-<td><p>clears the sample from the diffractometer and places it on the carousel.</p></td>
+<td><p>Clears the sample from the diffractometer and places it on the carousel.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.i11.nx100robot.NX100Robot.load_sample" title="dodal.devices.i11.nx100robot.NX100Robot.load_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_sample</span></code></a>(sample_location)</p></td>
 <td><p>Loads a sample from the carousel to the diffractometer.</p></td>
@@ -1198,8 +1198,9 @@ from the carousel to the diffractometer and vice versa.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.i11.nx100robot.NX100Robot.clear_sample">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_in</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/i11/nx100robot.html#NX100Robot.clear_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i11.nx100robot.NX100Robot.clear_sample" title="Link to this definition">#</a></dt>
-<dd><p>clears the sample from the diffractometer and places it on the carousel.
-if table_in is True, it will also move the sample holder to the table in position.</p>
+<dd><p>Clears the sample from the diffractometer and places it on the carousel.
+if table_in is True, it will also move the sample holder to the table in
+position.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>table_in</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p>

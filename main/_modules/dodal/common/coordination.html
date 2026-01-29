@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.coordination &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.common.coordination &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -816,14 +816,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="group_uuid">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.html#dodal.common.group_uuid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">group_uuid</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Group</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns a unique but human-readable string, to assist debugging orchestrated groups.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a unique but human-readable string, to assist debugging orchestrated</span>
+<span class="sd">    groups.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        name (str): A human readable name</span>
+<span class="sd">        name (str): A human readable name.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        readable_uid (Group): name appended with a unique string</span>
+<span class="sd">        readable_uid (Group): Name appended with a unique string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">6</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
@@ -832,26 +832,24 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="inject">
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.html#dodal.common.inject">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">inject</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function to mark a defaulted argument of a plan as a reference to a device stored</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to mark a defaulted argument of a plan as a reference to a device stored</span>
 <span class="sd">    in another context and not available to be referenced directly.</span>
-<span class="sd">    Bypasses type checking, returning x as Any and therefore valid as a default</span>
-<span class="sd">    argument, leaving handling to the context from which the plan is called.</span>
-<span class="sd">    Assumes that device.name is unique.</span>
-<span class="sd">    e.g. For a 1-dimensional scan, that is usually performed on a Movable with</span>
-<span class="sd">    name &quot;stage_x&quot;</span>
 
-<span class="sd">    def scan(x: Movable = inject(&quot;stage_x&quot;), start: float = 0.0 ...)</span>
+<span class="sd">    Bypasses type checking, returning x as Any and therefore valid as a default</span>
+<span class="sd">    argument, leaving handling to the context from which the plan is called. Assumes</span>
+<span class="sd">    that device.name is unique. e.g. For a 1-dimensional scan, that is usually performed</span>
+<span class="sd">    on a Movable with name &quot;stage_x&quot;::</span>
+
+<span class="sd">        def scan(x: Movable = inject(&quot;stage_x&quot;), start: float = 0.0 ...)</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Name of a Device to be fetched from an external context. This can be</span>
-<span class="sd">        left blank when injecting device composites (the default)</span>
+<span class="sd">            left blank when injecting device composites (the default).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Any: name but without typing checking, valid as any default type</span>
+<span class="sd">        Any: Name but without typing checking, valid as any default type.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="n">name</span></div>
 
 </pre></div>

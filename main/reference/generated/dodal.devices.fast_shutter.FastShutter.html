@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_shutter.FastShutter &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.fast_shutter.FastShutter &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1138,14 +1138,16 @@
 <dd><p>Enum device specialised for a fast shutter with configured open_state and
 close_state so it is generic enough to be used with any device or plan without
 knowing the specific enum to use.</p>
-<dl class="simple">
-<dt>For example:</dt><dd><p>await shutter.set(shutter.open_state)
-await shutter.set(shutter.close_state)</p>
-</dd>
-<dt>OR</dt><dd><p>run_engine(bps.mv(shutter, shutter.open_state))
-run_engine(bps.mv(shutter, shutter.close_state))</p>
-</dd>
-</dl>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="n">shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">shutter</span><span class="o">.</span><span class="n">open_state</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">shutter</span><span class="o">.</span><span class="n">close_state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>OR:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_engine</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">shutter</span><span class="p">,</span> <span class="n">shutter</span><span class="o">.</span><span class="n">open_state</span><span class="p">))</span>
+<span class="n">run_engine</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">shutter</span><span class="p">,</span> <span class="n">shutter</span><span class="o">.</span><span class="n">close_state</span><span class="p">))</span>
+</pre></div>
+</div>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>

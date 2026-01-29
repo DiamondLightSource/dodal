@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_region &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_region &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -837,11 +837,13 @@ window.addEventListener("load", load);
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">java_to_python_case</span><span class="p">(</span><span class="n">java_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a camelCase Java-style string to a snake_case Python-style string.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a camelCase Java-style string to a snake_case Python-style string.</span>
 
-<span class="sd">    :param java_str: The Java-style camelCase string.</span>
-<span class="sd">    :return: The Python-style snake_case string.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        java_str (str): The Java-style camelCase string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The Python-style snake_case string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">new_value</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;(.)([A-Z][a-z]+)&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1_\2&quot;</span><span class="p">,</span> <span class="n">java_str</span><span class="p">)</span>
     <span class="n">new_value</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;([a-z0-9])([A-Z])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1_\2&quot;</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -878,9 +880,8 @@ window.addEventListener("load", load);
     <span class="n">JavaToPythonModel</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAcquisitionMode</span><span class="p">,</span> <span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPassEnergy</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generic region model that holds the data. Specialised region models should inherit</span>
-<span class="sd">    this to extend functionality. All energy units are assumed to be in eV.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic region model that holds the data. Specialised region models should</span>
+<span class="sd">    inherit this to extend functionality. All energy units are assumed to be in eV.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;New_region&quot;</span>
@@ -902,18 +903,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="AbstractBaseRegion.is_binding_energy">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.is_binding_energy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_binding_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns true if the energy_mode is binding.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if the energy_mode is binding.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">BINDING</span></div>
 
 
 <div class="viewcode-block" id="AbstractBaseRegion.is_kinetic_energy">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.is_kinetic_energy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns true if the energy_mode is kinetic.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if the energy_mode is kinetic.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span></div>
 
 
@@ -925,19 +922,18 @@ window.addEventListener("load", load);
         <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get a region with a new energy mode: Kinetic or Binding.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a region with a new energy mode: Kinetic or Binding.</span>
 <span class="sd">        It caculates new values for low_energy, centre_energy, high_energy, via the</span>
 <span class="sd">        excitation enerrgy. It doesn&#39;t calculate anything if the region is already of</span>
 <span class="sd">        the same energy mode.</span>
 
-<span class="sd">        Parameters:</span>
-<span class="sd">            energy_mode: Mode you want to switch the region to.</span>
-<span class="sd">            excitation_energy: Energy conversion for low_energy, centre_energy, and</span>
-<span class="sd">                               high_energy for new energy mode.</span>
-<span class="sd">            copy: Defaults to True. If true, create a copy of this region to alter for</span>
-<span class="sd">                  the new energy_mode and return it. If False, alter this region for the</span>
-<span class="sd">                  energy_mode and return it self.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            energy_mode (EnergyMode): Mode you want to switch the region to.</span>
+<span class="sd">            excitation_energy (float): Energy conversion for low_energy, centre_energy,</span>
+<span class="sd">                and high_energy for new energy mode.</span>
+<span class="sd">            copy (bool, optional): Defaults to True. If true, create a copy of this</span>
+<span class="sd">                region to alter for the new energy_mode and return it. If False, alter</span>
+<span class="sd">                this region for the energy_mode and return it self.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Region with selected energy mode and new calculated energy values.</span>
@@ -969,14 +965,16 @@ window.addEventListener("load", load);
 <span class="sd">        new values for low_energy, centre_energy, and high_energy while also preserving</span>
 <span class="sd">        the original energy mode e.g mode BINDING will stay as BINDING.</span>
 
-<span class="sd">        Parameters:</span>
-<span class="sd">            excitation_energy: Energy conversion for low_energy, centre_energy, and</span>
-<span class="sd">                               high_energy for new energy mode.</span>
-<span class="sd">            copy: Defaults to True. If true, create a copy of this region to alter to</span>
-<span class="sd">                  calculate new energy values to return. If false, alter this region.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            excitation_energy (float): Energy conversion for low_energy, centre_energy,</span>
+<span class="sd">                and high_energy for new energy mode.</span>
+<span class="sd">            copy (bool, optional): Defaults to True. If true, create a copy of this</span>
+<span class="sd">                region to alter to calculate new energy values to return. If false,</span>
+<span class="sd">                alter this region.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            Region with selected original energy mode and new calculated KINETIC energy</span>
-<span class="sd">            values for epics.</span>
+<span class="sd">                values for epics.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">original_energy_mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">switch_energy_mode</span><span class="p">(</span><span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">,</span> <span class="n">copy</span><span class="p">)</span>
@@ -1003,8 +1001,7 @@ window.addEventListener("load", load);
     <span class="n">JavaToPythonModel</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generic sequence model that holds the list of region data. Specialised sequence</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic sequence model that holds the list of region data. Specialised sequence</span>
 <span class="sd">    models should inherit this to extend functionality and define type of region to</span>
 <span class="sd">    hold.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

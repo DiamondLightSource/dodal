@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.linkam3 &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.linkam3 &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -828,15 +828,17 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Linkam3">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.linkam3.Linkam3.html#dodal.devices.linkam3.Linkam3">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Linkam3</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to represent a Linkam3 temperature controller</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to represent a Linkam3 temperature controller.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        tolerance (float): Deadband around the setpoint within which the position is assumed to have been reached</span>
-<span class="sd">        settle_time (int): The delay between reaching the setpoint and the move being considered complete</span>
+<span class="sd">        tolerance (float): Deadband around the setpoint within which the position is</span>
+<span class="sd">            assumed to have been reached.</span>
+<span class="sd">        settle_time (int): The delay between reaching the setpoint and the move being</span>
+<span class="sd">            considered complete.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        prefix (str): PV prefix for this device</span>
-<span class="sd">        name (str): unique name for this device</span>
+<span class="sd">        prefix (str): PV prefix for this device.</span>
+<span class="sd">        name (str): Unique name for this device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>

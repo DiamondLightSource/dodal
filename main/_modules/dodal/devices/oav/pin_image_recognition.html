@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -841,8 +841,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="PinTipDetection">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.pin_image_recognition.PinTipDetection.html#dodal.devices.oav.pin_image_recognition.PinTipDetection">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PinTipDetection</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A device which will read from an on-axis view and calculate the location of the</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A device which will read from an on-axis view and calculate the location of the</span>
 <span class="sd">    pin-tip (in pixels) of that frame.</span>
 
 <span class="sd">    Used for pin tip centring workflow.</span>
@@ -853,7 +852,8 @@ window.addEventListener("load", load);
 <span class="sd">    If no tip is found it will return {INVALID_POSITION}. However, it will also</span>
 <span class="sd">    occasionally give incorrect data. Therefore, it is recommended that you trigger</span>
 <span class="sd">    this device, which will attempt to find a pin within {validity_timeout} seconds if</span>
-<span class="sd">    no tip is found after this time it will not error but instead return {INVALID_POSITION}.</span>
+<span class="sd">    no tip is found after this time it will not error but instead return</span>
+<span class="sd">    {INVALID_POSITION}.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">INVALID_POSITION</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">])</span>
@@ -909,9 +909,7 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge_setter</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">edge_bottom</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_tip_and_edge_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SampleLocation</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the location of the pin tip and the top and bottom edges.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the location of the pin tip and the top and bottom edges.&quot;&quot;&quot;</span>
         <span class="n">preprocess_key</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_operation</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">preprocess_iter</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_iterations</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">preprocess_ksize</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_ksize</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>

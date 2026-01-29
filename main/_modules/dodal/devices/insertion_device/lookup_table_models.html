@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -815,21 +815,21 @@ window.addEventListener("load", load);
 
 <span class="sd">Data format produced</span>
 <span class="sd">The lookup-table dictionary created by convert_csv_to_lookup() follows this</span>
-<span class="sd">structure:</span>
+<span class="sd">structure::</span>
 
-<span class="sd">{</span>
-<span class="sd">  &quot;POL_MODE&quot;: {</span>
-<span class="sd">    &quot;energy_entries&quot;: [</span>
-<span class="sd">        {</span>
-<span class="sd">            &quot;low&quot;: &lt;float&gt;,</span>
-<span class="sd">            &quot;high&quot;: &lt;float&gt;,</span>
-<span class="sd">            &quot;poly&quot;: &lt;numpy.poly1d&gt;</span>
-<span class="sd">        },</span>
-<span class="sd">      ...</span>
-<span class="sd">    ]</span>
-<span class="sd">  },</span>
-<span class="sd">  ...</span>
-<span class="sd">}</span>
+<span class="sd">    {</span>
+<span class="sd">    &quot;POL_MODE&quot;: {</span>
+<span class="sd">        &quot;energy_entries&quot;: [</span>
+<span class="sd">            {</span>
+<span class="sd">                &quot;low&quot;: &lt;float&gt;,</span>
+<span class="sd">                &quot;high&quot;: &lt;float&gt;,</span>
+<span class="sd">                &quot;poly&quot;: &lt;numpy.poly1d&gt;</span>
+<span class="sd">            },</span>
+<span class="sd">        ...</span>
+<span class="sd">        ]</span>
+<span class="sd">    },</span>
+<span class="sd">    ...</span>
+<span class="sd">    }</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
@@ -887,7 +887,9 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="LookupTableColumnConfig">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.LookupTableColumnConfig.html#dodal.devices.insertion_device.LookupTableColumnConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LookupTableColumnConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration on how to process a csv file columns into a LookupTable data model.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration on how to process a csv file columns into a LookupTable data</span>
+<span class="sd">    model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">source</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span>
         <span class="n">Source</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -925,7 +927,9 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_and_convert_poly</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span> <span class="o">|</span> <span class="nb">list</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;If reading from serialized data, it will be using a list. Convert to np.poly1d&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If reading from serialized data, it will be using a list. Convert to</span>
+<span class="sd">        np.poly1d.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
@@ -980,15 +984,12 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="EnergyCoverage.get_poly">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage.get_poly">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the numpy.poly1d polynomial applicable for the given energy.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the numpy.poly1d polynomial applicable for the given energy.</span>
 
-<span class="sd">        Parameters:</span>
-<span class="sd">        -----------</span>
-<span class="sd">        energy:</span>
-<span class="sd">            Energy value in the same units used to create the lookup table.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            energy (float): Energy value in the same units used to create the lookup</span>
+<span class="sd">                table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_energy</span> <span class="o">&lt;=</span> <span class="n">energy</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_energy</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Demanding energy must lie between </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_energy</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_energy</span><span class="si">}</span><span class="s2">!&quot;</span>
@@ -1007,7 +1008,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage.get_energy_index">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_energy_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Binary search assumes self.energy_entries is sorted by min_energy.</span>
-<span class="sd">        Return index or None if not found.&quot;&quot;&quot;</span>
+<span class="sd">        Return index or None if not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">max_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_entries</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">min_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">min_index</span> <span class="o">&lt;=</span> <span class="n">max_index</span><span class="p">:</span>
@@ -1027,9 +1029,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="LookupTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.LookupTable.html#dodal.devices.insertion_device.LookupTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LookupTable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="n">EnergyCoverage</span><span class="p">]]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Specialised lookup table for insertion devices to relate the energy and polarisation</span>
-<span class="sd">    values to Apple2 motor positions.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialised lookup table for insertion devices to relate the energy and</span>
+<span class="sd">    polarisation values to Apple2 motor positions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1047,7 +1048,8 @@ window.addEventListener("load", load);
         <span class="n">energy_coverage</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EnergyCoverage</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a LookupTable containing multiple EnergyCoverage</span>
-<span class="sd">        for provided polarisations.&quot;&quot;&quot;</span>
+<span class="sd">        for provided polarisations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">root_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">pols</span><span class="p">,</span> <span class="n">energy_coverage</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root_data</span><span class="p">)</span></div>
 
@@ -1059,15 +1061,12 @@ window.addEventListener("load", load);
         <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the numpy.poly1d polynomial applicable for the given energy and polarisation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the numpy.poly1d polynomial applicable for the given energy and</span>
+<span class="sd">        polarisation.</span>
 
-<span class="sd">        Parameters:</span>
-<span class="sd">        -----------</span>
-<span class="sd">        energy:</span>
-<span class="sd">            Energy value in the same units used to create the lookup table.</span>
-<span class="sd">        pol:</span>
-<span class="sd">            Polarisation mode (Pol enum).</span>
+<span class="sd">        Args:</span>
+<span class="sd">            energy (float): Energy value in the same units used to create the lookup table.</span>
+<span class="sd">            pol (Pol): Polarisation mode enum.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">get_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
 </div>
@@ -1081,21 +1080,17 @@ window.addEventListener("load", load);
     <span class="n">lut_config</span><span class="p">:</span> <span class="n">LookupTableColumnConfig</span><span class="p">,</span>
     <span class="n">skip_line_start_with</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LookupTable</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert CSV content into the Apple2 lookup-table dictionary.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert CSV content into the Apple2 lookup-table dictionary.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    -----------</span>
-<span class="sd">    file_contents:</span>
-<span class="sd">        The CSV file contents as string.</span>
-<span class="sd">    lut_config:</span>
-<span class="sd">        The configuration that how to process the file_contents into a LookupTable.</span>
-<span class="sd">    skip_line_start_with</span>
-<span class="sd">        Lines beginning with this prefix are skipped (default &quot;#&quot;).</span>
+<span class="sd">    Args:</span>
+<span class="sd">        file_contents (str): The CSV file contents as string.</span>
+<span class="sd">        lut_config (LookupTableColumnConfig): The configuration that how to process the</span>
+<span class="sd">            file_contents into a LookupTable.</span>
+<span class="sd">        skip_line_start_with (str, optional): Lines beginning with this prefix are</span>
+<span class="sd">            skipped (default &quot;#&quot;).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    -----------</span>
-<span class="sd">    LookupTable</span>
+<span class="sd">        LookupTable</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">temp_mode_entries</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">EnergyCoverageEntry</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 

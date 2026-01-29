@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.common &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.common &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1157,7 +1157,7 @@
 <td><p>Converts between a positive number of seconds and an equivalent number of microseconds.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.common.step_to_num" title="dodal.common.step_to_num"><code class="xref py py-obj docutils literal notranslate"><span class="pre">step_to_num</span></code></a>(start, stop, step)</p></td>
-<td><p>Standard handling for converting from start, stop, step to start, stop, num Forces step to be same direction as length Includes a final point if it is within 1% of the final step, prevents floating point arithmatic errors from giving inconsistent shaped scans between steps of an outer axis.</p></td>
+<td><p>Standard handling for converting from start, stop, step to start, stop, num.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1165,13 +1165,14 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.common.group_uuid">
 <span class="sig-prename descclassname"><span class="pre">dodal.common.</span></span><span class="sig-name descname"><span class="pre">group_uuid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../_modules/dodal/common/coordination.html#group_uuid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.common.group_uuid" title="Link to this definition">#</a></dt>
-<dd><p>Returns a unique but human-readable string, to assist debugging orchestrated groups.</p>
+<dd><p>Returns a unique but human-readable string, to assist debugging orchestrated
+groups.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – A human readable name</p>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – A human readable name.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>name appended with a unique string</p>
+<dd class="field-even"><p>Name appended with a unique string.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>readable_uid (Group)</p>
@@ -1183,22 +1184,21 @@
 <dt class="sig sig-object py" id="dodal.common.inject">
 <span class="sig-prename descclassname"><span class="pre">dodal.common.</span></span><span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a></span></span><a class="reference internal" href="../../_modules/dodal/common/coordination.html#inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.common.inject" title="Link to this definition">#</a></dt>
 <dd><p>Function to mark a defaulted argument of a plan as a reference to a device stored
-in another context and not available to be referenced directly.
-Bypasses type checking, returning x as Any and therefore valid as a default
-argument, leaving handling to the context from which the plan is called.
-Assumes that device.name is unique.
-e.g. For a 1-dimensional scan, that is usually performed on a Movable with
-name “stage_x”</p>
-<p>def scan(x: Movable = inject(“stage_x”), start: float = 0.0 …)</p>
+in another context and not available to be referenced directly.</p>
+<p>Bypasses type checking, returning x as Any and therefore valid as a default
+argument, leaving handling to the context from which the plan is called. Assumes
+that device.name is unique. e.g. For a 1-dimensional scan, that is usually performed
+on a Movable with name “stage_x”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">scan</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Movable</span> <span class="o">=</span> <span class="n">inject</span><span class="p">(</span><span class="s2">&quot;stage_x&quot;</span><span class="p">),</span> <span class="n">start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of a Device to be fetched from an external context. This can be</p></li>
-<li><p><strong>composites</strong> (<em>left blank when injecting device</em>)</p></li>
-</ul>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of a Device to be fetched from an external context. This can be
+left blank when injecting device composites (the default).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>name but without typing checking, valid as any default type</p>
+<dd class="field-even"><p>Name but without typing checking, valid as any default type.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Any</p>
@@ -1213,16 +1213,16 @@ name “stage_x”</p>
 number of microseconds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – A time in seconds</p>
+<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – A time in seconds.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if t &lt; 0</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if t &lt; 0.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A time in microseconds, rounded up to the nearest whole microsecond,</p>
+<dd class="field-odd"><p>A time in microseconds, rounded up to the nearest whole microsecond.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>t (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>)</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1230,29 +1230,34 @@ number of microseconds.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.common.step_to_num">
 <span class="sig-prename descclassname"><span class="pre">dodal.common.</span></span><span class="sig-name descname"><span class="pre">step_to_num</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/common/maths.html#step_to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.common.step_to_num" title="Link to this definition">#</a></dt>
-<dd><p>Standard handling for converting from start, stop, step to start, stop, num
-Forces step to be same direction as length
+<dd><p>Standard handling for converting from start, stop, step to start, stop, num.
+Forces step to be same direction as length.
 Includes a final point if it is within 1% of the final step, prevents floating
 point arithmatic errors from giving inconsistent shaped scans between steps of an
 outer axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Start of length, will be returned unchanged</p></li>
-<li><p><strong>stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – End of length, if length/step does not divide cleanly will be returned
-extended up to 1% of step, or else truncated.</p></li>
-<li><p><strong>step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Length of a step along the line formed from start to stop.
-If stop &lt; start, will be coerced to be backwards.</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Start of length, will be returned unchanged.</p></li>
+<li><p><strong>stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – End of length, if length/step does not divide cleanly will be
+returned extended up to 1% of step, or else truncated.</p></li>
+<li><p><strong>step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Length of a step along the line formed from start to stop. If
+stop &lt; start, will be coerced to be backwards.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>start, adjusted_stop, num = Tuple[float, float, int]
-start will be returned unchanged
-adjusted_stop = start + (num - 1) * step
-num is the maximal number of steps that could fit into the length.</p>
+<dd class="field-odd"><p><dl class="simple">
+<dt>start, adjusted_stop, num = Tuple[float, float, int]</dt><dd><ul class="simple">
+<li><p>start will be returned unchanged.</p></li>
+<li><p>adjusted_stop = start + (num - 1) * step.</p></li>
+<li><p>num is the maximal number of steps that could fit into the length.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd>
 </dl>
 </dd></dl>

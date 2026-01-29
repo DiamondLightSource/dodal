@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_controller &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_controller &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -832,10 +832,19 @@ window.addEventListener("load", load);
     <span class="n">ConstantDeadTimeController</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">],</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Specialised controller for the electron analysers to provide additional setup logic</span>
-<span class="sd">    such as selecting the energy source to use from requested region and giving the</span>
-<span class="sd">    driver the correct region parameters.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialised controller for the electron analysers to provide additional setup</span>
+<span class="sd">    logic such as selecting the energy source to use from requested region and giving</span>
+<span class="sd">    the driver the correct region parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver (TAbstractAnalyserDriverIO): The electron analyser driver to wrap</span>
+<span class="sd">            around that holds the PV&#39;s.</span>
+<span class="sd">        energy_source (AbstractEnergySource): Device that holds the excitation</span>
+<span class="sd">            energy and ability to switch between sources.</span>
+<span class="sd">        deadtime (float, optional): For a given exposure, what is the safest minimum</span>
+<span class="sd">            time between exposures that can be determined without reading signals.</span>
+<span class="sd">        image_mode (ADImageMode, optional): The image mode to configure the driver</span>
+<span class="sd">            with before measuring.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -847,15 +856,6 @@ window.addEventListener("load", load);
         <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">image_mode</span><span class="p">:</span> <span class="n">ADImageMode</span> <span class="o">=</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters:</span>
-<span class="sd">            driver: The electron analyser driver to wrap around that holds the PV&#39;s.</span>
-<span class="sd">            energy_source: Device that holds the excitation energy and ability to switch</span>
-<span class="sd">                           between sources.</span>
-<span class="sd">            deadtime: For a given exposure, what is the safest minimum time between</span>
-<span class="sd">                      exposures that can be determined without reading signals.</span>
-<span class="sd">            image_mode: The image mode to configure the driver with before measuring.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_source</span> <span class="o">=</span> <span class="n">energy_source</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span> <span class="o">=</span> <span class="n">shutter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source_selector</span> <span class="o">=</span> <span class="n">source_selector</span>

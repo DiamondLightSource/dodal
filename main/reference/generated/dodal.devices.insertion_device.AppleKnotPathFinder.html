@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.AppleKnotPathFinder &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.insertion_device.AppleKnotPathFinder &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1135,11 +1135,11 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.AppleKnotPathFinder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.</span></span><span class="sig-name descname"><span class="pre">AppleKnotPathFinder</span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple_knot_controller.html#AppleKnotPathFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.AppleKnotPathFinder" title="Link to this definition">#</a></dt>
-<dd><p>Class to find a safe path for AppleKnot undulator moves that avoids the exclusion zone
-around 0-0 gap-phase. We rely on axis-aligned (manhattan) moves and splitting moves
-that cross zero phase into two segments via an intermediate point at zero phase and
-a safe gap value. We ASSUME the exclusion zones are rectangles aligned with the axes
-in a shape of hanoi tower centered at (0,0).
+<dd><p>Class to find a safe path for AppleKnot undulator moves that avoids the exclusion
+zone around 0-0 gap-phase. We rely on axis-aligned (manhattan) moves and splitting
+moves that cross zero phase into two segments via an intermediate point at zero
+phase and a safe gap value. We ASSUME the exclusion zones are rectangles aligned
+with the axes in a shape of hanoi tower centered at (0,0).
 Gap and phase motors are NOT moved together but instead are moved sequentially.
 Sequential move guarantees safe pass avoiding exslusion zones.
 We can not use asynchronous move of gap and phase because we can not currently rely
@@ -1162,7 +1162,8 @@ See <a class="reference external" href="https://confluence.diamond.ac.uk/x/vQENA
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.AppleKnotPathFinder.get_apple_knot_val_path">
 <span class="sig-name descname"><span class="pre">get_apple_knot_val_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.apple2_undulator.Apple2Val"><span class="pre">Apple2Val</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.apple2_undulator.Apple2Val"><span class="pre">Apple2Val</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.apple2_undulator.Apple2Val"><span class="pre">Apple2Val</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple_knot_controller.html#AppleKnotPathFinder.get_apple_knot_val_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.AppleKnotPathFinder.get_apple_knot_val_path" title="Link to this definition">#</a></dt>
-<dd><p>Get a list of Apple2Val representing the path from start to end avoiding exclusion zones.</p>
+<dd><p>Get a list of Apple2Val representing the path from start to end avoiding
+exclusion zones.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

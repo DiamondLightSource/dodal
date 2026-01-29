@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.utils &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.utils &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -855,9 +855,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="EdgeOutputArrayImageType">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.utils.EdgeOutputArrayImageType.html#dodal.devices.oav.utils.EdgeOutputArrayImageType">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EdgeOutputArrayImageType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enum to store the types of image to tweak the output array. We use Original.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum to store the types of image to tweak the output array. We use Original.&quot;&quot;&quot;</span>
 
     <span class="n">ORIGINAL</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">GREYSCALE</span> <span class="o">=</span> <span class="mi">1</span>
@@ -874,8 +872,9 @@ window.addEventListener("load", load);
     <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span>
     <span class="n">oav</span><span class="p">:</span> <span class="n">OAV</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the required move so that the given pixel is in the centre of the beam.&quot;&quot;&quot;</span>
-
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the required move so that the given pixel is in the centre of the</span>
+<span class="sd">    beam.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">current_motor_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">gonio</span><span class="o">.</span><span class="n">x</span><span class="p">)),</span>
@@ -915,7 +914,7 @@ window.addEventListener("load", load);
     <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">xyz_direction</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the x, y, z position of a pixel in mm&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the x, y, z position of a pixel in mm.&quot;&quot;&quot;</span>
     <span class="n">beam_distance_px</span><span class="p">:</span> <span class="n">Pixel</span> <span class="o">=</span> <span class="n">calculate_beam_distance</span><span class="p">(</span><span class="n">beam_centre</span><span class="p">,</span> <span class="o">*</span><span class="n">pixel</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">current_x_y_z</span> <span class="o">+</span> <span class="n">camera_coordinates_to_xyz_mm</span><span class="p">(</span>
@@ -949,13 +948,11 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="convert_to_gray_and_blur">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.convert_to_gray_and_blur">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_to_gray_and_blur</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">MatLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cv2</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">MatLike</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Preprocess the image array data (convert to grayscale and apply a gaussian blur)</span>
-<span class="sd">    Image is converted to grayscale (using a weighted mean as green contributes more to brightness)</span>
-<span class="sd">    as we aren&#39;t interested in data relating to colour. A blur is then applied to mitigate</span>
-<span class="sd">    errors due to rogue hot pixels.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Preprocess the image array data (convert to grayscale and apply a gaussian blur)</span>
+<span class="sd">    Image is converted to grayscale (using a weighted mean as green contributes more to</span>
+<span class="sd">    brightness) as we aren&#39;t interested in data relating to colour. A blur is then</span>
+<span class="sd">    applied to mitigate errors due to rogue hot pixels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># kernel size describes how many of the neighbouring pixels are used for the blur,</span>
     <span class="c1"># higher kernal size means more of a blur effect</span>
     <span class="n">kernel_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>

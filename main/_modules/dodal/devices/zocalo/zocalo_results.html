@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -867,25 +867,27 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XrcResult">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.XrcResult.html#dodal.devices.zocalo.XrcResult">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XrcResult</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Information about a diffracting centre.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Information about a diffracting centre.</span>
 
 <span class="sd">    NOTE: the coordinate systems of centre_of_mass and max_voxel/bounding_box are not</span>
-<span class="sd">        the same; centre_of_mass coordinates are continuous whereas max_voxel and bounding_box</span>
-<span class="sd">        coordinates are discrete.</span>
+<span class="sd">        the same; centre_of_mass coordinates are continuous whereas max_voxel and</span>
+<span class="sd">        bounding_box coordinates are discrete.</span>
+
 <span class="sd">    Attributes:</span>
-<span class="sd">         centre_of_mass: The position of the centre of mass of the crystal, adjusted so that</span>
-<span class="sd">         grid box centres lie on integer grid coordinates, such that a 1x1x1 crystal detected in</span>
-<span class="sd">         a single grid box at 0, 0, 0, has c.o.m. of 0, 0, 0, not 0.5, 0.5, 0.5</span>
-<span class="sd">         max_voxel: Position of the voxel with the maximum count, in integer coordinates</span>
-<span class="sd">         max_count: max count achieved in a single voxel for the crystal</span>
-<span class="sd">         n_voxels: Number of voxels (aka grid boxes) in the diffracting centre</span>
-<span class="sd">         total_count: Total of above-threshold spot counts in the labelled voxels</span>
-<span class="sd">         bounding_box: The rectangular prism that bounds the crystal, expressed</span>
-<span class="sd">            as the volume of whole boxes as a half-open range i.e such that</span>
+<span class="sd">         centre_of_mass (list[float]): The position of the centre of mass of the</span>
+<span class="sd">            crystal, adjusted so that grid box centres lie on integer grid coordinates,</span>
+<span class="sd">            such that a 1x1x1 crystal detected in a single grid box at 0, 0, 0, has</span>
+<span class="sd">            c.o.m. of 0, 0, 0, not 0.5, 0.5, 0.5.</span>
+<span class="sd">         max_voxel (list[int]): Position of the voxel with the maximum count, in integer</span>
+<span class="sd">            coordinates.</span>
+<span class="sd">         max_count (int): Max count achieved in a single voxel for the crystal.</span>
+<span class="sd">         n_voxels (int): Number of voxels (aka grid boxes) in the diffracting centre.</span>
+<span class="sd">         total_count (int): Total of above-threshold spot counts in the labelled voxels.</span>
+<span class="sd">         bounding_box (list[list[int]]): The rectangular prism that bounds the crystal,</span>
+<span class="sd">            expressed as the volume of whole boxes as a half-open range i.e such that</span>
 <span class="sd">            p1 = (x1, y1, z1) &lt;= p &lt; p2 = (x2, y2, z2) and</span>
 <span class="sd">            p2 - p1 gives the dimensions in whole voxels.</span>
-<span class="sd">         sample_id: The sample id associated with the centre.</span>
+<span class="sd">         sample_id (int): The sample id associated with the centre.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">centre_of_mass</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
@@ -923,21 +925,17 @@ window.addEventListener("load", load);
 <span class="sd">    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        name (str): Name of the device</span>
-
-<span class="sd">        zocalo_environment (str): How zocalo is configured. Defaults to i03&#39;s development configuration</span>
-
-<span class="sd">        channel (str): Name for the results Queue</span>
-
-<span class="sd">        sort_key (str): How results are ranked. Defaults to sorting by highest counts</span>
-
-<span class="sd">        timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting</span>
-<span class="sd">        from when the ZocaloResults device is triggered</span>
-
-<span class="sd">        prefix (str): EPICS PV prefix for the device</span>
-
-<span class="sd">        results_source (ZocaloSource): Where to get results from, GPU or CPU analysis</span>
-
+<span class="sd">        name (str, optional): Name of the device.</span>
+<span class="sd">        zocalo_environment (str, optional): How zocalo is configured. Defaults to i03&#39;s</span>
+<span class="sd">            development configuration.</span>
+<span class="sd">        channel (str, optional): Name for the results Queue.</span>
+<span class="sd">        sort_key (str, optional): How results are ranked. Defaults to sorting by highest</span>
+<span class="sd">            counts.</span>
+<span class="sd">        timeout_s (float, optional): Maximum time to wait for the Queue to be filled by</span>
+<span class="sd">            an object, starting from when the ZocaloResults device is triggered.</span>
+<span class="sd">        prefix (str): EPICS PV prefix for the device.</span>
+<span class="sd">        results_source (ZocaloSource, optional): Where to get results from, GPU or CPU</span>
+<span class="sd">            analysis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1024,8 +1022,8 @@ window.addEventListener("load", load);
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stages the Zocalo device by: subscribing to the queue, doing a background</span>
 <span class="sd">        sleep for a few seconds to wait for any stale messages to be received, then</span>
 <span class="sd">        clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP</span>
-<span class="sd">        before triggering processing for the experiment&quot;&quot;&quot;</span>
-
+<span class="sd">        before triggering processing for the experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Subscribing to results queue&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_subscribe_to_results</span><span class="p">()</span>
@@ -1138,8 +1136,10 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">get_full_processing_results</span><span class="p">(</span>
     <span class="n">zocalo</span><span class="p">:</span> <span class="n">ZocaloResults</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A plan that will return the raw zocalo results, ranked in descending order according to the sort key.</span>
-<span class="sd">    Returns empty list in the event no results found.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A plan that will return the raw zocalo results, ranked in descending order</span>
+<span class="sd">    according to the sort key.</span>
+<span class="sd">    Returns empty list in the event no results found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrieving raw zocalo processing results&quot;</span><span class="p">)</span>
     <span class="n">com</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">centre_of_mass</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
     <span class="n">max_voxel</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">max_voxel</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>

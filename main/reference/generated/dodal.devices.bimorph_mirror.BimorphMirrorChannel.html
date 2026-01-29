@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.bimorph_mirror.BimorphMirrorChannel &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.bimorph_mirror.BimorphMirrorChannel &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1139,34 +1139,59 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.bimorph_mirror.BimorphMirrorChannel.target_voltage">
 <span class="sig-name descname"><span class="pre">target_voltage</span></span><a class="headerlink" href="#dodal.devices.bimorph_mirror.BimorphMirrorChannel.target_voltage" title="Link to this definition">#</a></dt>
-<dd><p>Float RW_RBV for target voltage, which can be set using parent mirror’s all target proc</p>
+<dd><p>Float RW_RBV for target voltage, which can be set
+using parent mirror’s all target proc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalRW</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.bimorph_mirror.BimorphMirrorChannel.output_voltage">
 <span class="sig-name descname"><span class="pre">output_voltage</span></span><a class="headerlink" href="#dodal.devices.bimorph_mirror.BimorphMirrorChannel.output_voltage" title="Link to this definition">#</a></dt>
-<dd><p>Float RW_RBV for current voltage on bimorph</p>
+<dd><p>Float RW_RBV for current voltage on bimorph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalRW</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.bimorph_mirror.BimorphMirrorChannel.status">
 <span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#dodal.devices.bimorph_mirror.BimorphMirrorChannel.status" title="Link to this definition">#</a></dt>
-<dd><p>BimorphMirrorOnOff readable for ON/OFF status of channel</p>
+<dd><p>BimorphMirrorOnOff readable for ON/OFF status of channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.bimorph_mirror.BimorphMirrorChannel.shift">
 <span class="sig-name descname"><span class="pre">shift</span></span><a class="headerlink" href="#dodal.devices.bimorph_mirror.BimorphMirrorChannel.shift" title="Link to this definition">#</a></dt>
-<dd><p>Float writeable shifting channel voltage</p>
+<dd><p>Float writeable shifting channel voltage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalW</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – PV prefix.</p></li>
+<li><p><strong>number_of_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of channels on bimorph mirror (can be zero).</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Name of device.</p></li>
 <li><p><strong>with_pvi</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 </ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – number_of_channels is less than zero.</p>
 </dd>
 </dl>
 <p class="rubric">Methods</p>

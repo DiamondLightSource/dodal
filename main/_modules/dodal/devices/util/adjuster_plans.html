@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.adjuster_plans &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.util.adjuster_plans &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -807,8 +807,7 @@ window.addEventListener("load", load);
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.util.adjuster_plans</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">All the methods in this module return a bluesky plan generator that adjusts a value</span>
+<span></span><span class="sd">&quot;&quot;&quot;All the methods in this module return a bluesky plan generator that adjusts a value</span>
 <span class="sd">according to some criteria either via feedback, preset positions, lookup tables etc.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -826,7 +825,7 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">lookup_table_adjuster</span><span class="p">(</span>
     <span class="n">lookup_table</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">output_device</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="nb">input</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a callable that adjusts a value according to a lookup table&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a callable that adjusts a value according to a lookup table.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">adjust</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="n">setpoint</span> <span class="o">=</span> <span class="n">lookup_table</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>

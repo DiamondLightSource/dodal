@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser.base.ElectronAnalyserController &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.electron_analyser.base.ElectronAnalyserController &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1138,26 +1138,22 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.electron_analyser.base.ElectronAnalyserController">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.electron_analyser.base.</span></span><span class="sig-name descname"><span class="pre">ElectronAnalyserController</span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/base_controller.html#ElectronAnalyserController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.ElectronAnalyserController" title="Link to this definition">#</a></dt>
-<dd><p>Specialised controller for the electron analysers to provide additional setup logic
-such as selecting the energy source to use from requested region and giving the
-driver the correct region parameters.</p>
+<dd><p>Specialised controller for the electron analysers to provide additional setup
+logic such as selecting the energy source to use from requested region and giving
+the driver the correct region parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>driver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractAnalyserDriverIO</span></code>, bound= <a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html#dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO" title="dodal.devices.electron_analyser.base.base_driver_io.AbstractAnalyserDriverIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAnalyserDriverIO</span></code></a>)</span>)</p></li>
-<li><p><strong>energy_source</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource" title="dodal.devices.electron_analyser.base.energy_sources.AbstractEnergySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEnergySource</span></code></a></span>)</p></li>
+<li><p><strong>driver</strong> (<em>TAbstractAnalyserDriverIO</em>) – The electron analyser driver to wrap
+around that holds the PV’s.</p></li>
+<li><p><strong>energy_source</strong> (<a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource" title="dodal.devices.electron_analyser.base.AbstractEnergySource"><em>AbstractEnergySource</em></a>) – Device that holds the excitation
+energy and ability to switch between sources.</p></li>
+<li><p><strong>deadtime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – For a given exposure, what is the safest minimum
+time between exposures that can be determined without reading signals.</p></li>
+<li><p><strong>image_mode</strong> (<em>ADImageMode</em><em>, </em><em>optional</em>) – The image mode to configure the driver
+with before measuring.</p></li>
 <li><p><strong>shutter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html#dodal.devices.fast_shutter.FastShutter" title="dodal.devices.fast_shutter.FastShutter"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastShutter</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>source_selector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html#dodal.devices.selectable_source.SourceSelector" title="dodal.devices.selectable_source.SourceSelector"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceSelector</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>deadtime</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>image_mode</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ADImageMode</span></code></span>, default: <code class="docutils literal notranslate"><span class="pre">&lt;ADImageMode.SINGLE:</span> <span class="pre">'Single'&gt;</span></code>)</p></li>
-<li><p><strong>driver</strong> – The electron analyser driver to wrap around that holds the PV’s.</p></li>
-<li><p><strong>energy_source</strong> – Device that holds the excitation energy and ability to switch
-between sources.</p></li>
-<li><p><strong>deadtime</strong> – For a given exposure, what is the safest minimum time between
-exposures that can be determined without reading signals.</p></li>
-<li><p><strong>image_mode</strong> – The image mode to configure the driver with before measuring.</p></li>
-<li><p><strong>shutter</strong></p></li>
-<li><p><strong>source_selector</strong></p></li>
 </ul>
 </dd>
 </dl>

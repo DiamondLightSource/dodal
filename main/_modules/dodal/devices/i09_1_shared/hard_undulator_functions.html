@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i09_1_shared.hard_undulator_functions &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.i09_1_shared.hard_undulator_functions &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -861,9 +861,7 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_undulator_parameter_max</span><span class="p">(</span>
     <span class="n">magnet_field</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">undulator_period_mm</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the maximum undulator parameter.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the maximum undulator parameter.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="p">(</span>
             <span class="mi">2</span>
@@ -887,22 +885,25 @@ window.addEventListener("load", load);
     <span class="n">gap_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">undulator_period_mm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">27</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the undulator gap required to produce a given energy at a given harmonic order.</span>
-<span class="sd">    This algorithm was provided by the I09 beamline scientists, and is based on the physics of undulator radiation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the undulator gap required to produce a given energy at a given</span>
+<span class="sd">    harmonic order. This algorithm was provided by the I09 beamline scientists, and is</span>
+<span class="sd">    based on the physics of undulator radiation.</span>
+
 <span class="sd">    https://cxro.lbl.gov//PDF/X-Ray-Data-Booklet.pdf</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        photon_energy_kev (float): Requested photon energy in keV.</span>
-<span class="sd">        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.</span>
-<span class="sd">        order (int, optional): Harmonic order for which to calculate the gap. Defaults to 1.</span>
-<span class="sd">        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.</span>
+<span class="sd">        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and</span>
+<span class="sd">            beamline parameters for each harmonic order.</span>
+<span class="sd">        order (int, optional): Harmonic order for which to calculate the gap. Defaults</span>
+<span class="sd">            to 1.</span>
+<span class="sd">        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults</span>
+<span class="sd">            to 0.0.</span>
 <span class="sd">        undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        float: Calculated undulator gap in millimeters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">_validate_order</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">look_up_table</span><span class="p">)</span>
     <span class="n">gamma</span> <span class="o">=</span> <span class="n">_calculate_gamma</span><span class="p">(</span><span class="n">look_up_table</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
 
@@ -958,15 +959,17 @@ window.addEventListener("load", load);
     <span class="n">gap_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">undulator_period_mm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">27</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the photon energy produced by the undulator at a given gap and harmonic order.</span>
-<span class="sd">    Reverse of the calculate_gap_i09_hu function.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the photon energy produced by the undulator at a given gap and harmonic</span>
+<span class="sd">    order. Reverse of the calculate_gap_i09_hu function.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        gap (float): Undulator gap in millimeters.</span>
-<span class="sd">        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.</span>
-<span class="sd">        order (int, optional): Harmonic order for which to calculate the energy. Defaults to 1.</span>
-<span class="sd">        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.</span>
+<span class="sd">        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and</span>
+<span class="sd">            beamline parameters for each harmonic order.</span>
+<span class="sd">        order (int, optional): Harmonic order for which to calculate the energy.</span>
+<span class="sd">            Defaults to 1.</span>
+<span class="sd">        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults</span>
+<span class="sd">            to 0.0.</span>
 <span class="sd">        undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.</span>
 
 <span class="sd">    Returns:</span>

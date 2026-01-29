@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -836,9 +836,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="OAVParameters">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAVParameters</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The parameters to set up the OAV depending on the context.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The parameters to set up the OAV depending on the context.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -858,8 +856,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.load_json">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">load_json</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Loads the json from the specified file, and returns a dict with all the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads the json from the specified file, and returns a dict with all the</span>
 <span class="sd">        individual top-level k-v pairs, and one with all the subdicts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -917,9 +914,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="OAVParameters.get_max_tip_distance_in_pixels">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.get_max_tip_distance_in_pixels">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_max_tip_distance_in_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the maximum tip distance in pixels.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the maximum tip distance in pixels.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tip_distance</span> <span class="o">/</span> <span class="n">microns_per_pixel</span></div>
 </div>
 
@@ -986,7 +981,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="OAVConfigBeamCentre">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfigBeamCentre.html#dodal.devices.oav.oav_parameters.OAVConfigBeamCentre">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAVConfigBeamCentre</span><span class="p">(</span><span class="n">OAVConfigBase</span><span class="p">[</span><span class="n">ZoomParamsCrosshair</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read the OAV config files and return a dictionary of {&#39;zoom_level&#39;: ZoomParams}\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the OAV config files and return a dictionary of {&#39;zoom_level&#39;: ZoomParams}</span>
 <span class="sd">    with information about microns per pixels and crosshairs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

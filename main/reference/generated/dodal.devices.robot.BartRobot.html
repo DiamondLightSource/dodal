@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.robot.BartRobot &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.robot.BartRobot &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1151,7 +1151,7 @@
 <td><p>This co-routine will finish when either the beamline reaches the specified state or the robot gives an error (whichever happens first).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.robot.BartRobot.set" title="dodal.devices.robot.BartRobot.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
-<td><p>Perform a sample load from the specified sample location :type value: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleLocation</span></code></a></span> :param value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.</p></td>
+<td><p>Perform a sample load from the specified sample location.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1196,12 +1196,15 @@ there is an error a RobotLoadError error is raised.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.robot.BartRobot.set">
 <span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><span class="pre">SampleLocation</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/robot.html#BartRobot.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.robot.BartRobot.set" title="Link to this definition">#</a></dt>
-<dd><p>Perform a sample load from the specified sample location
-:type value: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleLocation</span></code></a></span>
-:param value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.</p>
+<dd><p>Perform a sample load from the specified sample location.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>RobotLoadError if a timeout occurs</strong><strong>, or </strong><strong>if an error occurs loading the sample.</strong> – </p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><em>SampleLocation</em></a>) – The pin and puck to load, or SAMPLE_LOCATION_EMPTY
+to unload the sample.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RobotLoadError</strong> – If a timeout occurs, or if an error occurs loading the
+    sample.</p>
 </dd>
 </dl>
 </dd></dl>

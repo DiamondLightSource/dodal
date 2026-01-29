@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.areadetector.plugins.mjpg &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.areadetector.plugins.mjpg &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -839,7 +839,8 @@ window.addEventListener("load", load);
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The MJPG areadetector plugin creates an MJPG video stream of the camera&#39;s output.</span>
 
 <span class="sd">    This devices uses that stream to grab images. When it is triggered it will send the</span>
-<span class="sd">    latest image from the stream to the `post_processing` method for child classes to handle.</span>
+<span class="sd">    latest image from the stream to the `post_processing` method for child classes to</span>
+<span class="sd">    handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -865,9 +866,9 @@ window.addEventListener("load", load);
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_save_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A helper function to save a given image to the path supplied by the \</span>
-<span class="sd">            directory and filename signals. The full resultant path is put on the \</span>
-<span class="sd">            last_saved_path signal</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A helper function to save a given image to the path supplied by the</span>
+<span class="sd">        directory and filename signals. The full resultant path is put on the</span>
+<span class="sd">        last_saved_path signal.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">filename_str</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">directory_str</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
@@ -890,7 +891,7 @@ window.addEventListener("load", load);
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This takes a snapshot image from the MJPG stream and send it to the</span>
 <span class="sd">        post_processing method, expected to be implemented by a child of this class.</span>
 
-<span class="sd">        It is the responsibility of the child class to save any resulting images by \</span>
+<span class="sd">        It is the responsibility of the child class to save any resulting images by</span>
 <span class="sd">        calling _save_image.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">url_str</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i19.access_controlled.shutter &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.i19.access_controlled.shutter &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -821,18 +821,18 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="AccessControlledShutter">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.i19.access_controlled.shutter.AccessControlledShutter.html#dodal.devices.i19.access_controlled.shutter.AccessControlledShutter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AccessControlledShutter</span><span class="p">(</span><span class="n">OpticsBlueAPIDevice</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; I19-specific device to operate the hutch shutter.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;I19-specific device to operate the hutch shutter.</span>
 
-<span class="sd">    This device will send a REST call to the blueapi instance controlling the optics \</span>
-<span class="sd">    hutch running on the I19 cluster, which will evaluate the current hutch in use vs \</span>
+<span class="sd">    This device will send a REST call to the blueapi instance controlling the optics</span>
+<span class="sd">    hutch running on the I19 cluster, which will evaluate the current hutch in use vs</span>
 <span class="sd">    the hutch sending the request and decide if the plan will be run or not.</span>
-<span class="sd">    As the two hutches are located in series, checking the hutch in use is necessary to \</span>
+<span class="sd">    As the two hutches are located in series, checking the hutch in use is necessary to</span>
 <span class="sd">    avoid accidentally operating the shutter from one hutch while the other has beamtime.</span>
 
-<span class="sd">    The name of the hutch that wants to operate the shutter should be passed to the \</span>
+<span class="sd">    The name of the hutch that wants to operate the shutter should be passed to the</span>
 <span class="sd">    device upon instantiation.</span>
 
-<span class="sd">    For details see the architecture described in \</span>
+<span class="sd">    For details see the architecture described in</span>
 <span class="sd">    https://github.com/DiamondLightSource/i19-bluesky/issues/30.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

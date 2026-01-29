@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.current_amplifiers.current_amplifier_detector &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.current_amplifiers.current_amplifier_detector &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -829,11 +829,11 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CurrentAmpDet">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmpDet.html#dodal.devices.current_amplifiers.CurrentAmpDet">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CurrentAmpDet</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides</span>
-<span class="sd">      the option for automatically changing the CurrentAmp gain to within the optimal</span>
-<span class="sd">      range. It also converts the currentAmp/counter output back into the detector</span>
-<span class="sd">      current output in Amp.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides</span>
+<span class="sd">    the option for automatically changing the CurrentAmp gain to within the optimal</span>
+<span class="sd">    range. It also converts the currentAmp/counter output back into the detector</span>
+<span class="sd">    current output in Amp.</span>
+
 <span class="sd">    Attributes:</span>
 <span class="sd">        current_amp (currentAmp): Current amplifier type device.</span>
 <span class="sd">        counter (CurrentAmpCounter): Counter that capture the current amplifier output.</span>
@@ -861,9 +861,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CurrentAmpDet.read">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmpDet.html#dodal.devices.current_amplifiers.CurrentAmpDet.read">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reading</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read is modified so that if auto_mode is true it will optimise gain before</span>
-<span class="sd">         taking the final reading</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read is modified so that if auto_mode is true it will optimise gain before</span>
+<span class="sd">        taking the final reading.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_mode</span><span class="o">.</span><span class="n">get_value</span><span class="p">():</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-Attempting auto-gain&quot;</span><span class="p">)</span>
@@ -901,8 +900,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CurrentAmpDet.get_corrected_current">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmpDet.html#dodal.devices.current_amplifiers.CurrentAmpDet.get_corrected_current">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_corrected_current</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert the output(count and gain) back into the read detector output in Amp.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the output (count and gain) back into the read detector output in</span>
+<span class="sd">        Amp.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current_gain</span><span class="p">,</span> <span class="n">voltage_per_sec</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current_amp</span><span class="p">()</span><span class="o">.</span><span class="n">get_gain</span><span class="p">(),</span>

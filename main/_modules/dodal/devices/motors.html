@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.motors &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -825,21 +825,18 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Stage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.Stage.html#dodal.devices.motors.Stage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Stage</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For these devices, the following co-ordinates are typical but not enforced:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;For these devices, the following co-ordinates are typical but not enforced:</span>
 <span class="sd">    - z is horizontal &amp; parallel to the direction of beam travel</span>
 <span class="sd">    - y is vertical and antiparallel to the force of gravity</span>
 <span class="sd">    - x is the cross product of y🞬z</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    prefix:</span>
-<span class="sd">        Common part of the EPICS PV for all motors, including &quot;:&quot;.</span>
-<span class="sd">    name:</span>
-<span class="sd">        Name of the stage, each child motor will be named &quot;{name}-{field_name}&quot;</span>
-<span class="sd">    *_infix:</span>
-<span class="sd">        Infix between the common prefix and the EPICS motor record fields for the field.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        prefix (str): Common part of the EPICS PV for all motors, including &quot;:&quot;.</span>
+<span class="sd">        name (str, optional): Name of the stage, each child motor will be named</span>
+<span class="sd">            &quot;{name}-{field_name}&quot;.</span>
+<span class="sd">        *_infix: Infix between the common prefix and the EPICS motor record fields for</span>
+<span class="sd">            the field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa D415</span>
 
     <span class="o">...</span></div>
 
@@ -848,9 +845,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XThetaStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XThetaStage.html#dodal.devices.motors.XThetaStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XThetaStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Two-axis stage with an x and a theta motor.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Two-axis stage with an x and a theta motor.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span> <span class="n">theta_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span>
@@ -865,9 +860,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYStage.html#dodal.devices.motors.XYStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A standard two-axis stage with an x and a y motor.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A standard two-axis stage with an x and a y motor.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span>
@@ -882,9 +875,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYZStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZStage.html#dodal.devices.motors.XYZStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYZStage</span><span class="p">(</span><span class="n">XYStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A standard three-axis stage with an x, a y, and a z motor.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A standard three-axis stage with an x, a y, and a z motor.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -903,9 +894,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYZThetaStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZThetaStage.html#dodal.devices.motors.XYZThetaStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYZThetaStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Four-axis stage with a standard xyz stage and one axis of rotation: theta.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Four-axis stage with a standard xyz stage and one axis of rotation: theta.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -925,9 +914,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYZOmegaStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZOmegaStage.html#dodal.devices.motors.XYZOmegaStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYZOmegaStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Four-axis stage with a standard xyz stage and one axis of rotation: omega.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Four-axis stage with a standard xyz stage and one axis of rotation: omega.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -967,8 +954,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYZPolarAzimuthStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPolarAzimuthStage.html#dodal.devices.motors.XYZPolarAzimuthStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYZPolarAzimuthStage</span><span class="p">(</span><span class="n">XYZPolarStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Five-axis stage with a standard xyz stage and two axis of rotation: polar and azimuth.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Five-axis stage with a standard xyz stage and two axis of rotation: polar and</span>
+<span class="sd">    azimuth.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -990,9 +977,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYZPolarAzimuthTiltStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPolarAzimuthTiltStage.html#dodal.devices.motors.XYZPolarAzimuthTiltStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYZPolarAzimuthTiltStage</span><span class="p">(</span><span class="n">XYZPolarAzimuthStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Six-axis stage with a standard xyz stage and three axis of rotation: polar, azimuth</span>
-<span class="sd">    and tilt.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Six-axis stage with a standard xyz stage and three axis of rotation: polar,</span>
+<span class="sd">    azimuth and tilt.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1017,9 +1003,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYPhiStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYPhiStage.html#dodal.devices.motors.XYPhiStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYPhiStage</span><span class="p">(</span><span class="n">XYStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Three-axis stage with a standard xy stage and one axis of rotation: phi.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Three-axis stage with a standard xy stage and one axis of rotation: phi.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1038,9 +1022,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYPitchStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYPitchStage.html#dodal.devices.motors.XYPitchStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYPitchStage</span><span class="p">(</span><span class="n">XYStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Three-axis stage with a standard xy stage and one axis of rotation: pitch.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Three-axis stage with a standard xy stage and one axis of rotation: pitch.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1059,9 +1041,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYRollStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYRollStage.html#dodal.devices.motors.XYRollStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYRollStage</span><span class="p">(</span><span class="n">XYStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Three-axis stage with a standard xy stage and one axis of rotation: roll.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Three-axis stage with a standard xy stage and one axis of rotation: roll.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1080,8 +1060,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYZPitchYawStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPitchYawStage.html#dodal.devices.motors.XYZPitchYawStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYZPitchYawStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Five-axis stage with a standard xyz stage and two axes of rotation: pitch and yaw.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Five-axis stage with a standard xyz stage and two axes of rotation: pitch and</span>
+<span class="sd">    yaw.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1104,8 +1084,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="XYZPitchYawRollStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPitchYawRollStage.html#dodal.devices.motors.XYZPitchYawRollStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XYZPitchYawRollStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,</span>
 <span class="sd">    and roll.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1131,8 +1110,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SixAxisGonio">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.SixAxisGonio.html#dodal.devices.motors.SixAxisGonio">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SixAxisGonio</span><span class="p">(</span><span class="n">XYZOmegaStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Six-axis goniometer with a standard xyz stage and three axes of rotation:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Six-axis goniometer with a standard xyz stage and three axes of rotation:</span>
 <span class="sd">    kappa, phi and omega.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1161,8 +1139,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SixAxisGonioKappaPhi">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.SixAxisGonioKappaPhi.html#dodal.devices.motors.SixAxisGonioKappaPhi">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SixAxisGonioKappaPhi</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Six-axis goniometer with a standard xyz stage and two axes of rotation:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Six-axis goniometer with a standard xyz stage and two axes of rotation:</span>
 <span class="sd">    kappa and phi.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1186,9 +1163,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="YZStage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.YZStage.html#dodal.devices.motors.YZStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">YZStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Two-axis stage with an x and a z motor.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Two-axis stage with an x and a z motor.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span>
@@ -1219,9 +1194,9 @@ window.addEventListener("load", load);
 <span class="sd">    Args:</span>
 <span class="sd">        motor_theta (Motor): this is the rotation axis of the sample.</span>
 <span class="sd">        motor_i (Motor): this is the axis that, when the sample is at 0 deg rotation,</span>
-<span class="sd">                         a move here is entirely parallel with the derived axis.</span>
+<span class="sd">            a move here is entirely parallel with the derived axis.</span>
 <span class="sd">        motor_j (Motor): this is the axis that, when the sample is at 90 deg rotation,</span>
-<span class="sd">                         a move here is entirely parallel with the derived axis.</span>
+<span class="sd">            a move here is entirely parallel with the derived axis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span><span class="n">j_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">i_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">rot_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>

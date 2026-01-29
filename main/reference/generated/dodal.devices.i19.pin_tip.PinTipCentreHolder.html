@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i19.pin_tip.PinTipCentreHolder &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.i19.pin_tip.PinTipCentreHolder &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1141,11 +1141,28 @@
 <dd><p>Temporary device to hold the pin tip x,y positions for centring.
 It uses the CenterX and CenterY PVs in the overlay plugin for the OAV device to
 save and read the pit tip location.</p>
-<dl class="simple">
-<dt>Signals:</dt><dd><p>pin_tip_i: x position of the pin tip, in pixels.
-pin_tip_j: y position of the pin tip, in pixels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.i19.pin_tip.PinTipCentreHolder.pin_tip_i">
+<span class="sig-name descname"><span class="pre">pin_tip_i</span></span><a class="headerlink" href="#dodal.devices.i19.pin_tip.PinTipCentreHolder.pin_tip_i" title="Link to this definition">#</a></dt>
+<dd><p>x position of the pin tip, in pixels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalRW</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.i19.pin_tip.PinTipCentreHolder.pin_tip_j">
+<span class="sig-name descname"><span class="pre">pin_tip_j</span></span><a class="headerlink" href="#dodal.devices.i19.pin_tip.PinTipCentreHolder.pin_tip_j" title="Link to this definition">#</a></dt>
+<dd><p>y position of the pin tip, in pixels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalRW</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p>This workaround is necessary because it’s not yet possible to get these values back
 from a plan in blueapi. It will be removed once this is completed
 <a class="github reference external" href="https://github.com/DiamondLightSource/blueapi/issues/1349">DiamondLightSource/blueapi#1349</a></p>
@@ -1221,7 +1238,11 @@ from a plan in blueapi. It will be removed once this is completed
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i19.pin_tip.PinTipCentreHolder"><code class="docutils literal notranslate"><span class="pre">PinTipCentreHolder</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i19.pin_tip.PinTipCentreHolder"><code class="docutils literal notranslate"><span class="pre">PinTipCentreHolder</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i19.pin_tip.PinTipCentreHolder.pin_tip_i"><code class="docutils literal notranslate"><span class="pre">PinTipCentreHolder.pin_tip_i</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i19.pin_tip.PinTipCentreHolder.pin_tip_j"><code class="docutils literal notranslate"><span class="pre">PinTipCentreHolder.pin_tip_j</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.current_amplifiers.current_amplifier &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.current_amplifiers.current_amplifier &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -820,14 +820,13 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CurrentAmp">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CurrentAmp</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class for current amplifier, it contains the minimal functionality</span>
-<span class="sd">     a current amplifier needs:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for current amplifier, it contains the minimal functionality</span>
+<span class="sd">    a current amplifier needs:</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        gain_conversion_table (Enum): The conversion table between current</span>
-<span class="sd">        and gain setting.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">            and gain setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa D415</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gain_conversion_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gain_conversion_table</span> <span class="o">=</span> <span class="n">gain_conversion_table</span>
@@ -859,7 +858,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_gain">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Enum</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current gain setting</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current gain setting.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Enum: The member name of the current gain setting in gain_conversion_table.</span>
@@ -870,14 +869,14 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_upperlimit">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_upperlimit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the upper limit of the current amplifier&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the upper limit of the current amplifier.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="CurrentAmp.get_lowerlimit">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_lowerlimit">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_lowerlimit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the lower limit of the current amplifier&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the lower limit of the current amplifier.&quot;&quot;&quot;</span></div>
 </div>
 
 
@@ -885,9 +884,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CurrentAmpCounter">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmpCounter.html#dodal.devices.current_amplifiers.CurrentAmpCounter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CurrentAmpCounter</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class for current amplifier counter, it contain the minimal implementations</span>
-<span class="sd">      required for a counter/detector to function with CurrentAmpDet:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for current amplifier counter, it contain the minimal implementations</span>
+<span class="sd">        required for a counter/detector to function with CurrentAmpDet.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        count_per_volt (float): The conversion factor between counter output and voltage.</span>
@@ -901,10 +899,10 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmpCounter.html#dodal.devices.current_amplifiers.CurrentAmpCounter.get_count">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;Get count</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get count.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            float: Current count</span>
+<span class="sd">            float: Current count.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 
@@ -912,10 +910,10 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmpCounter.html#dodal.devices.current_amplifiers.CurrentAmpCounter.get_count_per_sec">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_count_per_sec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get count per second</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get count per second.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            float: Current count per second</span>
+<span class="sd">            float: Current count per second.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 
@@ -923,10 +921,10 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmpCounter.html#dodal.devices.current_amplifiers.CurrentAmpCounter.get_voltage_per_sec">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_voltage_per_sec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get count per second in voltage</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get count per second in voltage.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            float: Current count in volt per second</span>
+<span class="sd">            float: Current count in volt per second.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 
@@ -935,7 +933,7 @@ window.addEventListener("load", load);
     <span class="nd">@abstractmethod</span>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare method for setting up the counter&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare method for setting up the counter.&quot;&quot;&quot;</span></div>
 </div>
 
 </pre></div>

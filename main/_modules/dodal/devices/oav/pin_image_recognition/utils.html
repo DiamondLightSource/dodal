@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition.utils &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition.utils &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -950,9 +950,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.SampleLocation.html#dodal.devices.oav.pin_image_recognition.utils.SampleLocation">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SampleLocation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Holder type for results from sample detection.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Holder type for results from sample detection.&quot;&quot;&quot;</span>
 
     <span class="n">tip_x</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="n">tip_y</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
@@ -964,6 +962,28 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="MxSampleDetect">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect.html#dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MxSampleDetect</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configures sample detection parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        preprocess (Callable): A preprocessing function applied to the array after</span>
+<span class="sd">            conversion to grayscale. See implementations of common functions above</span>
+<span class="sd">            for predefined conversions. Defaults to a no-op (i.e. no preprocessing).</span>
+
+<span class="sd">        for open and close operations, please read:</span>
+<span class="sd">            https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html</span>
+
+<span class="sd">        open_ksize (int, optional): Kernel size for &quot;open&quot; operation, if set to zero</span>
+<span class="sd">            then ignore &quot;open&quot; operation.</span>
+<span class="sd">        open_iterations (int, optional): Number of iterations for &quot;open&quot; operation.</span>
+<span class="sd">        canny_upper (int, optional): Upper threshold for canny edge detection.</span>
+<span class="sd">        canny_lower (int, optional): Lower threshold for canny edge detection.</span>
+<span class="sd">        close_ksize (int, optional): Kernel size for &quot;close&quot; operation.</span>
+<span class="sd">        close_iterations (int, optional): Number of iterations for &quot;close&quot; operation.</span>
+<span class="sd">        scan_direction (ScanDirections, optional): ScanDirections.FORWARD for</span>
+<span class="sd">            left-to-right, ScanDirections.REVERSE for right-to-left.</span>
+<span class="sd">        min_tip_height (int, optional): Minimum height of pin tip.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -977,27 +997,6 @@ window.addEventListener("load", load);
         <span class="n">scan_direction</span><span class="p">:</span> <span class="n">ScanDirections</span> <span class="o">=</span> <span class="n">ScanDirections</span><span class="o">.</span><span class="n">FORWARD</span><span class="p">,</span>
         <span class="n">min_tip_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Configures sample detection parameters.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            preprocess: A preprocessing function applied to the array after conversion to grayscale.</span>
-<span class="sd">                See implementations of common functions above for predefined conversions</span>
-<span class="sd">                Defaults to a no-op (i.e. no preprocessing)</span>
-
-<span class="sd">            for open and close operations, please read:</span>
-<span class="sd">                https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html</span>
-
-<span class="sd">            open_ksize: kernel size for &quot;open&quot; operation, if set to zero then ignore &quot;open&quot; operation</span>
-<span class="sd">            open_iterations: number of iterations for &quot;open&quot; operation</span>
-<span class="sd">            canny_upper: upper threshold for canny edge detection</span>
-<span class="sd">            canny_lower: lower threshold for canny edge detection</span>
-<span class="sd">            close_ksize: kernel size for &quot;close&quot; operation</span>
-<span class="sd">            close_iterations: number of iterations for &quot;close&quot; operation</span>
-<span class="sd">            scan_direction: ScanDirections.FORWARD for left-to-right, ScanDirections.REVERSE for right-to-left</span>
-<span class="sd">            min_tip_height: minimum height of pin tip</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">preprocess</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span> <span class="o">=</span> <span class="n">open_ksize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_iterations</span> <span class="o">=</span> <span class="n">open_iterations</span>
@@ -1038,17 +1037,16 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">_first_and_last_nonzero_by_columns</span><span class="p">(</span>
         <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Finds the indexes of the first &amp; last non-zero values by column in a 2d array.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds the indexes of the first &amp; last non-zero values by column in a 2d array.</span>
 
 <span class="sd">        Outputs will contain NONE_VALUE if no non-zero values exist in a column.</span>
 
-<span class="sd">        i.e. for input:</span>
-<span class="sd">        [</span>
-<span class="sd">            [0, 0, 0, 1],</span>
-<span class="sd">            [1, 1, 0, 0],</span>
-<span class="sd">            [0, 1, 0, 1],</span>
-<span class="sd">        ]</span>
+<span class="sd">        i.e. for input::</span>
+<span class="sd">            [</span>
+<span class="sd">                [0, 0, 0, 1],</span>
+<span class="sd">                [1, 1, 0, 0],</span>
+<span class="sd">                [0, 1, 0, 1],</span>
+<span class="sd">            ]</span>
 
 <span class="sd">        first_nonzero will be: [1, 1, NONE_VALUE, 0]</span>
 <span class="sd">        last_nonzero will be [1, 2, NONE_VALUE, 2]</span>

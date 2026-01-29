@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.undulator &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.undulator &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -852,9 +852,16 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="BaseUndulator">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.BaseUndulator.html#dodal.devices.undulator.BaseUndulator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseUndulator</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class for undulator devices providing gap control and access management.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for undulator devices providing gap control and access management.</span>
 <span class="sd">    This class expects target gap value [mm] passed in set method.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): PV prefix.</span>
+<span class="sd">        poles (int, optional): Number of magnetic poles built into the undulator.</span>
+<span class="sd">        length (float, optional): Length of the undulator in meters.</span>
+<span class="sd">        undulator_period(int, optional): Undulator period.</span>
+<span class="sd">        baton (Baton, optional): Baton object if provided.</span>
+<span class="sd">        name (str, optional): Name for device. Defaults to &quot;&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -866,15 +873,6 @@ window.addEventListener("load", load);
         <span class="n">baton</span><span class="p">:</span> <span class="n">Baton</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            prefix: PV prefix</span>
-<span class="sd">            poles (int, optional): Number of magnetic poles built into the undulator</span>
-<span class="sd">            length (float, optional): Length of the undulator in meters</span>
-<span class="sd">            undulator_period(int, optional): Undulator period</span>
-<span class="sd">            baton (optional): Baton object if provided.</span>
-<span class="sd">            name (str, optional): Name for device. Defaults to &quot;&quot;.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">baton</span><span class="p">)</span> <span class="k">if</span> <span class="n">baton</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
@@ -904,19 +902,17 @@ window.addEventListener("load", load);
     <span class="nd">@abstractmethod</span>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Move undulator to a given position.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move undulator to a given position.</span>
 <span class="sd">        Abstract method - must be implemented by subclasses.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            value: target position - units depend on implementation</span>
+<span class="sd">            value (float): Target Position - units depend on implementation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span></div>
 
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_gap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set the undulator gap to a given value in mm.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the undulator gap to a given value in mm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            value: gap in mm</span>
@@ -943,11 +939,11 @@ window.addEventListener("load", load);
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;In test mode, not moving ID gap&quot;</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_gap_within_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if the undulator gap is within the acceptable threshold of the target gap.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the undulator gap is within the acceptable threshold of the target gap.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            target_gap: target gap in mm</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            True if the gap is within the threshold, False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -956,16 +952,16 @@ window.addEventListener("load", load);
         <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">target_gap</span> <span class="o">-</span> <span class="n">current_gap</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_is_commissioning_mode_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Asynchronously checks if commissioning mode is enabled via the baton reference.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Asynchronously checks if commissioning mode is enabled via the baton</span>
+<span class="sd">        reference.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span> <span class="ow">and</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span><span class="p">()</span><span class="o">.</span><span class="n">commissioning</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
 
 <div class="viewcode-block" id="BaseUndulator.raise_if_not_enabled">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.BaseUndulator.html#dodal.devices.undulator.BaseUndulator.raise_if_not_enabled">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">raise_if_not_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AccessError</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Asynchronously raises AccessError if gap access is disabled and not in commissioning mode.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Asynchronously raises AccessError if gap access is disabled and not in</span>
+<span class="sd">        commissioning mode.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">access_level</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_access</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">commissioning_mode</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_commissioning_mode_enabled</span><span class="p">()</span>
@@ -978,10 +974,19 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="UndulatorInKeV">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.UndulatorInKeV.html#dodal.devices.undulator.UndulatorInKeV">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorInKeV</span><span class="p">(</span><span class="n">BaseUndulator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An Undulator-type insertion device, used to control photon emission at a given beam energy.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An Undulator-type insertion device, used to control photon emission at a given</span>
+<span class="sd">    beam energy.</span>
 <span class="sd">    This class expects energy [keV] passed in set method and does conversion to gap</span>
 <span class="sd">    internally, for which it requires path to lookup table file in constructor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): PV prefix.</span>
+<span class="sd">        id_gap_lookup_table_path (str): Path to a lookup table file.</span>
+<span class="sd">        poles (int, optional): Number of magnetic poles built into the undulator.</span>
+<span class="sd">        length (float, optional): Length of the undulator in meters.</span>
+<span class="sd">        undulator_period(int, optional): Undulator period.</span>
+<span class="sd">        baton (Baton, optional): Baton object if provided.</span>
+<span class="sd">        name (str, optional): Name for device. Defaults to &quot;&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -994,18 +999,6 @@ window.addEventListener("load", load);
         <span class="n">baton</span><span class="p">:</span> <span class="n">Baton</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            prefix: PV prefix</span>
-<span class="sd">            id_gap_lookup_table_path (str): Path to a lookup table file</span>
-<span class="sd">            poles (int, optional): Number of magnetic poles built into the undulator</span>
-<span class="sd">            length (float, optional): Length of the undulator in meters</span>
-<span class="sd">            undulator_period(int, optional): Undulator period</span>
-<span class="sd">            baton (optional): Baton object if provided.</span>
-<span class="sd">            name (str, optional): Name for device. Defaults to &quot;&quot;.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span> <span class="o">=</span> <span class="n">id_gap_lookup_table_path</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
@@ -1020,11 +1013,10 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.UndulatorInKeV.html#dodal.devices.undulator.UndulatorInKeV.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check conditions and Set undulator gap to a given energy in keV</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check conditions and Set undulator gap to a given energy in keV.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            value: energy in keV</span>
+<span class="sd">            value (float): Energy in keV.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Convert energy in keV to gap in mm first</span>
         <span class="n">target_gap</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_gap_to_match_energy</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -1035,9 +1027,8 @@ window.addEventListener("load", load);
 
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_gap_to_match_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        get a 2d np.array from lookup table that</span>
-<span class="sd">        converts energies to undulator gap distance</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a 2d np.array from lookup table that converts energies to undulator gap</span>
+<span class="sd">        distance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">energy_to_distance_table</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="k">await</span> <span class="n">energy_distance_table</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span>
@@ -1054,38 +1045,30 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="UndulatorInMm">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.UndulatorInMm.html#dodal.devices.undulator.UndulatorInMm">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorInMm</span><span class="p">(</span><span class="n">BaseUndulator</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An Undulator-type insertion device, used to control photon emission.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An Undulator-type insertion device, used to control photon emission.</span>
 <span class="sd">    This class expects gap [mm] passed in set method.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (float): Value in mm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="UndulatorInMm.set">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.UndulatorInMm.html#dodal.devices.undulator.UndulatorInMm.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check conditions and Set undulator gap to a given value in mm</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            value: value in mm</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_gap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
-</div>
 
 
 
 <div class="viewcode-block" id="UndulatorOrder">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.UndulatorOrder.html#dodal.devices.undulator.UndulatorOrder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorOrder</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Locatable</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents the order of an undulator device. Allows setting and locating the order.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the order of an undulator device. Allows setting and locating the</span>
+<span class="sd">    order.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name for device. Defaults to &quot;&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            name: Name for device. Defaults to &quot;&quot;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>

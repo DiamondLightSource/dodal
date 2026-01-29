@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -844,9 +844,8 @@ window.addEventListener("load", load);
     <span class="n">AsyncConfigurable</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Detector for data acquisition of electron analyser. Can only acquire using settings</span>
-<span class="sd">    already configured for the device.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detector for data acquisition of electron analyser. Can only acquire using</span>
+<span class="sd">    settings already configured for the device.</span>
 
 <span class="sd">    If possible, this should be changed to inherit from a StandardDetector. Currently,</span>
 <span class="sd">    StandardDetector forces you to use a file writer which doesn&#39;t apply here.</span>
@@ -904,9 +903,8 @@ window.addEventListener("load", load);
     <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extends electron analyser detector to configure specific region settings before data</span>
-<span class="sd">    acquisition. It is designed to only exist inside a plan.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extends electron analyser detector to configure specific region settings before</span>
+<span class="sd">    data acquisition. It is designed to only exist inside a plan.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -944,10 +942,9 @@ window.addEventListener("load", load);
     <span class="n">Stageable</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractBaseSequence</span><span class="p">,</span> <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Electron analyser detector with the additional functionality to load a sequence file</span>
-<span class="sd">    and create a list of temporary ElectronAnalyserRegionDetector objects. These will</span>
-<span class="sd">    setup configured region settings before data acquisition.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Electron analyser detector with the additional functionality to load a sequence</span>
+<span class="sd">    file and create a list of temporary ElectronAnalyserRegionDetector objects. These</span>
+<span class="sd">    will setup configured region settings before data acquisition.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -965,8 +962,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Prepare the detector for use by ensuring it is idle and ready.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare the detector for use by ensuring it is idle and ready.</span>
 
 <span class="sd">        This method asynchronously stages the detector by first disarming the controller</span>
 <span class="sd">        to ensure the detector is not actively acquiring data, then invokes the driver&#39;s</span>
@@ -990,11 +986,10 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ElectronAnalyserDetector.load_sequence">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.load_sequence">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">load_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TAbstractBaseSequence</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load the sequence data from a provided json file into a sequence class.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the sequence data from a provided json file into a sequence class.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            filename: Path to the sequence file containing the region data.</span>
+<span class="sd">            filename (str): Path to the sequence file containing the region data.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Pydantic model representing the sequence file.</span>
@@ -1009,17 +1004,17 @@ window.addEventListener("load", load);
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span>
         <span class="n">ElectronAnalyserRegionDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">]</span>
     <span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a list of detectors equal to the number of regions in a sequence file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a list of detectors equal to the number of regions in a sequence file.</span>
 <span class="sd">        Each detector is responsible for setting up a specific region.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            filename:     Path to the sequence file containing the region data.</span>
-<span class="sd">            enabled_only: If true, only include the region if enabled is True.</span>
+<span class="sd">            filename (str): Path to the sequence file containing the region data.</span>
+<span class="sd">            enabled_only (bool, optional): If true, only include the region if enabled</span>
+<span class="sd">                is True.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List of ElectronAnalyserRegionDetector, equal to the number of regions in</span>
-<span class="sd">            the sequence file.</span>
+<span class="sd">                the sequence file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_sequence</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">regions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>

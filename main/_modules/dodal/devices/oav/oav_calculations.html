@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -822,19 +822,24 @@ window.addEventListener("load", load);
     <span class="n">y_vertical_sign</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">z_vertical_sign</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millimetres.</span>
-<span class="sd">    For an overview of the coordinate system for I03 see https://github.com/DiamondLightSource/hyperion/wiki/Gridscan-Coordinate-System.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts from (horizontal,vertical) pixel measurements from the OAV camera into</span>
+<span class="sd">    to (x, y, z) motor coordinates in millimetres.</span>
+<span class="sd">    For an overview of the coordinate system for I03 see</span>
+<span class="sd">    https://github.com/DiamondLightSource/hyperion/wiki/Gridscan-Coordinate-System.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        horizontal (float): A i value from the camera in pixels.</span>
 <span class="sd">        vertical (float): A j value from the camera in pixels.</span>
-<span class="sd">        omega (float): The omega angle of the smargon that the horizontal, vertical measurements were obtained at.</span>
-<span class="sd">        microns_per_i_pixel (float): The number of microns per i pixel, adjusted for the zoom level horizontal was measured at.</span>
-<span class="sd">        microns_per_j_pixel (float): The number of microns per j pixel, adjusted for the zoom level vertical was measured at.</span>
-<span class="sd">        x_horizontal_sign (int): Direction mapping for x, positive means the oav and motor are on same direction, default from hyperion</span>
-<span class="sd">        y_vertical_sign (int): Direction mapping for y</span>
-<span class="sd">        z_vertical_sign (int): Direction mapping for z</span>
+<span class="sd">        omega (float): The omega angle of the smargon that the horizontal, vertical</span>
+<span class="sd">            measurements were obtained at.</span>
+<span class="sd">        microns_per_i_pixel (float): The number of microns per i pixel, adjusted for</span>
+<span class="sd">            the zoom level horizontal was measured at.</span>
+<span class="sd">        microns_per_j_pixel (float): The number of microns per j pixel, adjusted for</span>
+<span class="sd">            the zoom level vertical was measured at.</span>
+<span class="sd">        x_horizontal_sign (int): Direction mapping for x, positive means the oav and</span>
+<span class="sd">            motor are on same direction, default from hyperion.</span>
+<span class="sd">        y_vertical_sign (int): Direction mapping for y.</span>
+<span class="sd">        z_vertical_sign (int): Direction mapping for z.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Convert the vertical and horizontal into mm.</span>
     <span class="n">horizontal</span> <span class="o">*=</span> <span class="n">microns_per_i_pixel</span> <span class="o">*</span> <span class="mf">1e-3</span>
@@ -863,15 +868,17 @@ window.addEventListener("load", load);
     <span class="n">horizontal_pixels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">vertical_pixels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculates the distance between the beam centre and the given (horizontal, vertical).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the distance between the beam centre and the given (horizontal,</span>
+<span class="sd">    vertical).</span>
 
 <span class="sd">    Args:</span>
+<span class="sd">        beam_centre (tuple[int, int]): The position of the beam in pixels.</span>
 <span class="sd">        horizontal_pixels (int): The x (camera coordinates) value in pixels.</span>
 <span class="sd">        vertical_pixels (int): The y (camera coordinates) value in pixels.</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">        The distance between the beam centre and the (horizontal, vertical) point in pixels as a tuple</span>
-<span class="sd">        (horizontal_distance, vertical_distance).</span>
+<span class="sd">        tuple: The distance between the beam centre and the (horizontal, vertical) point</span>
+<span class="sd">            in pixels as a tuple (horizontal_distance, vertical_distance).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">beam_x</span><span class="p">,</span> <span class="n">beam_y</span> <span class="o">=</span> <span class="n">beam_centre</span>
     <span class="k">return</span> <span class="p">(</span>

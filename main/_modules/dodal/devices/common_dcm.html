@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.common_dcm &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.common_dcm &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -853,19 +853,23 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="DoubleCrystalMonochromatorBase">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.common_dcm.DoubleCrystalMonochromatorBase.html#dodal.devices.common_dcm.DoubleCrystalMonochromatorBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DoubleCrystalMonochromatorBase</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base device for the double crystal monochromator (DCM), used to select the energy of the beam.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base device for the double crystal monochromator (DCM), used to select the energy</span>
+<span class="sd">    of the beam.</span>
 
-<span class="sd">    Features common across all DCM&#39;s should include virtual motors to set energy/wavelength and contain two crystals,</span>
-<span class="sd">    each of which can be movable. Some DCM&#39;s contain crystals with roll motors, and some contain crystals with roll and pitch motors.</span>
-<span class="sd">    This base device accounts for all combinations of this.</span>
+<span class="sd">    Features common across all DCM&#39;s should include virtual motors to set</span>
+<span class="sd">    energy/wavelength and contain two crystals, each of which can be movable. Some DCM&#39;s</span>
+<span class="sd">    contain crystals with roll motors, and some contain crystals with roll and pitch</span>
+<span class="sd">    motors. This base device accounts for all combinations of this.</span>
 
-<span class="sd">    This device should act as a parent for beamline-specific DCM&#39;s which do not match the standard EPICS interface, it provides</span>
-<span class="sd">    only energy and the crystal configuration.  Most beamlines should use DoubleCrystalMonochromator instead</span>
+<span class="sd">    This device should act as a parent for beamline-specific DCM&#39;s which do not match</span>
+<span class="sd">    the standard EPICS interface, it provides only energy and the crystal configuration.</span>
+<span class="sd">    Most beamlines should use DoubleCrystalMonochromator instead.</span>
 
-<span class="sd">    Bluesky plans using DCM&#39;s should be typed to specify which types of crystals are required. For example, a plan</span>
-<span class="sd">    which only requires one crystal which can roll should be typed</span>
-<span class="sd">    &#39;def my_plan(dcm: DoubleCrystalMonochromatorBase[RollCrystal, StationaryCrystal])`</span>
+<span class="sd">    Bluesky plans using DCM&#39;s should be typed to specify which types of crystals are</span>
+<span class="sd">    required. For example, a plan which only requires one crystal which can roll should</span>
+<span class="sd">    be typed::</span>
+
+<span class="sd">        def my_plan(dcm: DoubleCrystalMonochromatorBase[RollCrystal,StationaryCrystal])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -901,17 +905,23 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">DoubleCrystalMonochromator</span><span class="p">(</span>
     <span class="n">DoubleCrystalMonochromatorBase</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Common device for the double crystal monochromator (DCM), used to select the energy of the beam.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Common device for the double crystal monochromator (DCM), used to select the</span>
+<span class="sd">    energy of the beam.</span>
 
-<span class="sd">    Features common across all DCM&#39;s should include virtual motors to set energy/wavelength and contain two crystals,</span>
-<span class="sd">    each of which can be movable. Some DCM&#39;s contain crystals with roll motors, and some contain crystals with roll and pitch motors.</span>
+<span class="sd">    Features common across all DCM&#39;s should include virtual motors to set</span>
+<span class="sd">    energy/wavelength and contain two crystals, each of which can be movable. Some DCM&#39;s</span>
+<span class="sd">    contain crystals with roll motors, and some contain crystals with roll and pitch</span>
+<span class="sd">    motors.</span>
 <span class="sd">    This base device accounts for all combinations of this.</span>
 
-<span class="sd">    This device should act as a parent for beamline-specific DCM&#39;s, in which any other missing signals can be added.</span>
+<span class="sd">    This device should act as a parent for beamline-specific DCM&#39;s, in which any other</span>
+<span class="sd">    missing signals can be added.</span>
 
-<span class="sd">    Bluesky plans using DCM&#39;s should be typed to specify which types of crystals are required. For example, a plan which only</span>
-<span class="sd">    requires one crystal which can roll should be typed &#39;def my_plan(dcm: DoubleCrystalMonochromator[RollCrystal, StationaryCrystal])`</span>
+<span class="sd">    Bluesky plans using DCM&#39;s should be typed to specify which types of crystals are</span>
+<span class="sd">    required. For example, a plan which only requires one crystal which can roll should</span>
+<span class="sd">    be typed::</span>
+
+<span class="sd">        def my_plan(dcm: DoubleCrystalMonochromator[RollCrystal, StationaryCrystal])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -935,9 +945,9 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">DoubleCrystalMonochromatorWithDSpacing</span><span class="p">(</span>
     <span class="n">DoubleCrystalMonochromator</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Adds crystal D-spacing metadata to the DoubleCrystalMonochromator class.  This should be used in preference to the</span>
-<span class="sd">    DoubleCrystalMonochromator on beamlines which have a &quot;DSPACING:RBV&quot; pv on their DCM.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds crystal D-spacing metadata to the DoubleCrystalMonochromator class.  This</span>
+<span class="sd">    should be used in preference to the DoubleCrystalMonochromator on beamlines which</span>
+<span class="sd">    have a &quot;DSPACING:RBV&quot; pv on their DCM.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

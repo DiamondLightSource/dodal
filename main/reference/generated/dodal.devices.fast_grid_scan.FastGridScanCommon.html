@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_grid_scan.FastGridScanCommon &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.fast_grid_scan.FastGridScanCommon &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1136,8 +1136,8 @@
 <dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.FastGridScanCommon">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.fast_grid_scan.</span></span><span class="sig-name descname"><span class="pre">FastGridScanCommon</span></span><a class="reference internal" href="../../_modules/dodal/devices/fast_grid_scan.html#FastGridScanCommon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_grid_scan.FastGridScanCommon" title="Link to this definition">#</a></dt>
 <dd><p>Device containing the minimal signals for a general fast grid scan.</p>
-<p>When the motion program is started, the goniometer will move in a snake-like grid trajectory,
-with X as the fast axis and Y as the slow axis.</p>
+<p>When the motion program is started, the goniometer will move in a snake-like grid
+trajectory, with X as the fast axis and Y as the slow axis.</p>
 <p>See ZebraFastGridScanThreeD as an example of how to implement.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1158,7 +1158,7 @@ with X as the fast axis and Y as the slow axis.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.FastGridScanCommon.prepare" title="dodal.devices.fast_grid_scan.FastGridScanCommon.prepare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare</span></code></a>(value)</p></td>
-<td><p>Submit the gridscan parameters to the device for validation prior to gridscan kickoff :type value: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)</span> :param value: the gridscan parameters</p></td>
+<td><p>Submit the gridscan parameters to the device for validation prior to gridscan kickoff.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1173,12 +1173,13 @@ with X as the fast axis and Y as the slow axis.</p>
 <dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.FastGridScanCommon.prepare">
 <span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ParamType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/fast_grid_scan.html#FastGridScanCommon.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_grid_scan.FastGridScanCommon.prepare" title="Link to this definition">#</a></dt>
 <dd><p>Submit the gridscan parameters to the device for validation prior to
-gridscan kickoff
-:type value: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)</span>
-:param value: the gridscan parameters</p>
+gridscan kickoff.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>GridScanInvalidError</strong> – if the gridscan parameters were not valid</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>ParamType</em>) – The gridscan parameters.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>GridScanInvalidError</strong> – If the gridscan parameters were not valid.</p>
 </dd>
 </dl>
 </dd></dl>

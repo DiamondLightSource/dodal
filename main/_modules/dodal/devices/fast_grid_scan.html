@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -857,13 +857,13 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="GridAxis.steps_to_motor_position">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">steps_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gives the motor position based on steps, where steps are 0 indexed&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gives the motor position based on steps, where steps are 0 indexed.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size_mm</span> <span class="o">*</span> <span class="n">steps</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gives the point where the final frame is taken&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gives the point where the final frame is taken.&quot;&quot;&quot;</span>
         <span class="c1"># Note that full_steps is one indexed e.g. if there is one step then the end is</span>
         <span class="c1"># refering to the first position</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
@@ -871,16 +871,15 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="GridAxis.is_within">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.is_within">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_within</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Determine whether a single axis coordinate is within the grid.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine whether a single axis coordinate is within the grid.</span>
 <span class="sd">        The coordinate is from a continuous coordinate space based on the</span>
 <span class="sd">        XRC grid where the origin corresponds to the centre of the first grid box.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            steps: The coordinate to check</span>
+<span class="sd">            steps (float): The coordinate to check.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            True if the coordinate falls within the grid.</span>
+<span class="sd">            bool: True if the coordinate falls within the grid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="n">steps</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_steps</span> <span class="o">-</span> <span class="mf">0.5</span></div>
 </div>
@@ -890,8 +889,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="GridScanParamsCommon">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GridScanParamsCommon</span><span class="p">(</span><span class="n">AbstractExperimentWithBeamParams</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Common holder class for the parameters of a grid scan in a similar</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Common holder class for the parameters of a grid scan in a similar</span>
 <span class="sd">    layout to EPICS. The parameters and functions of this class are common</span>
 <span class="sd">    to both the zebra and panda triggered fast grid scans in 2d or 3d.</span>
 
@@ -930,10 +928,12 @@ window.addEventListener("load", load);
 <span class="sd">        to a real motor position.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            grid_position: The x, y, z position in grid steps. The origin is at the</span>
-<span class="sd">                centre of the first grid box</span>
+<span class="sd">            grid_position (ndarray): The x, y, z position in grid steps. The origin is</span>
+<span class="sd">                at the centre of the first grid box</span>
+
 <span class="sd">        Returns:</span>
-<span class="sd">            The motor position this corresponds to.</span>
+<span class="sd">            ndarray: The motor position this corresponds to.</span>
+
 <span class="sd">        Raises:</span>
 <span class="sd">            IndexError if the desired position is outside the grid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -959,8 +959,8 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">GridScanParamsThreeD</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Additional parameters required to do a 3 dimensional gridscan.</span>
 
-<span class="sd">    A 3D gridscan works by doing two 2D gridscans. The first of these grids is x_steps by</span>
-<span class="sd">    y_steps. The sample is then rotated by 90 degrees, and then the second grid is</span>
+<span class="sd">    A 3D gridscan works by doing two 2D gridscans. The first of these grids is x_steps</span>
+<span class="sd">    by y_steps. The sample is then rotated by 90 degrees, and then the second grid is</span>
 <span class="sd">    x_steps by z_steps.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1005,8 +1005,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ZebraGridScanParamsThreeD">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD.html#dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZebraGridScanParamsThreeD</span><span class="p">(</span><span class="n">GridScanParamsThreeD</span><span class="p">,</span> <span class="n">WithDwellTime</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Params for standard Zebra FGS. Adds on the dwell time, which is really the time</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Params for standard Zebra FGS. Adds on the dwell time, which is really the time</span>
 <span class="sd">    between trigger positions.</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
@@ -1015,9 +1014,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="PandAGridScanParams">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.PandAGridScanParams.html#dodal.devices.fast_grid_scan.PandAGridScanParams">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PandAGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsThreeD</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Params for panda constant-motion scan. Adds on the goniometer run-up distance</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Params for panda constant-motion scan. Adds on the goniometer run-up distance.&quot;&quot;&quot;</span>
 
     <span class="n">run_up_distance_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.17</span></div>
 
@@ -1044,8 +1041,8 @@ window.addEventListener("load", load);
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device containing the minimal signals for a general fast grid scan.</span>
 
-<span class="sd">    When the motion program is started, the goniometer will move in a snake-like grid trajectory,</span>
-<span class="sd">    with X as the fast axis and Y as the slow axis.</span>
+<span class="sd">    When the motion program is started, the goniometer will move in a snake-like grid</span>
+<span class="sd">    trajectory, with X as the fast axis and Y as the slow axis.</span>
 
 <span class="sd">    See ZebraFastGridScanThreeD as an example of how to implement.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1140,14 +1137,14 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon.prepare">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ParamType</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Submit the gridscan parameters to the device for validation prior to</span>
-<span class="sd">        gridscan kickoff</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit the gridscan parameters to the device for validation prior to</span>
+<span class="sd">        gridscan kickoff.</span>
+
 <span class="sd">        Args:</span>
-<span class="sd">            value: the gridscan parameters</span>
+<span class="sd">            value (ParamType): The gridscan parameters.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            GridScanInvalidError: if the gridscan parameters were not valid</span>
+<span class="sd">            GridScanInvalidError: If the gridscan parameters were not valid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">set_statuses</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -1276,8 +1273,8 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">ZebraFastGridScanThreeD</span><span class="p">(</span><span class="n">FastGridScanThreeD</span><span class="p">[</span><span class="n">ZebraGridScanParamsThreeD</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for standard Zebra 3D FGS.</span>
 
-<span class="sd">    In this scan, the goniometer&#39;s velocity profile follows a parabolic shape between X steps,</span>
-<span class="sd">    with the slowest points occuring at each X step.</span>
+<span class="sd">    In this scan, the goniometer&#39;s velocity profile follows a parabolic shape between X</span>
+<span class="sd">    steps, with the slowest points occuring at each X step.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1301,8 +1298,8 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">PandAFastGridScan</span><span class="p">(</span><span class="n">FastGridScanThreeD</span><span class="p">[</span><span class="n">PandAGridScanParams</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for panda constant-motion scan.</span>
 
-<span class="sd">    In this scan, the goniometer&#39;s velocity</span>
-<span class="sd">    is constant through each row. It doesn&#39;t slow down when going through trigger points.</span>
+<span class="sd">    In this scan, the goniometer&#39;s velocity is constant through each row. It doesn&#39;t</span>
+<span class="sd">    slow down when going through trigger points.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1331,14 +1328,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="set_fast_grid_scan_params">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.html#dodal.devices.fast_grid_scan.set_fast_grid_scan_params">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_fast_grid_scan_params</span><span class="p">(</span><span class="n">scan</span><span class="p">:</span> <span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ParamType</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ParamType</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Apply the fast grid scan parameters to the grid scan device and validate them</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply the fast grid scan parameters to the grid scan device and validate them.</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        scan: The fast grid scan device</span>
-<span class="sd">        params: The parameters to set</span>
+<span class="sd">        scan (FastGridScancommon[ParamType]): The fast grid scan device.</span>
+<span class="sd">        params (ParamType): The parameters to set.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        GridScanInvalidError: if the grid scan parameters are not valid</span>
+<span class="sd">        GridScanInvalidError: if the grid scan parameters are not valid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">yield from</span> <span class="n">prepare</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 

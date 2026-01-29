@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.hutch_shutter.HutchShutter &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.hutch_shutter.HutchShutter &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1136,8 +1136,14 @@
 <dt class="sig sig-object py" id="dodal.devices.hutch_shutter.HutchShutter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.hutch_shutter.</span></span><span class="sig-name descname"><span class="pre">HutchShutter</span></span><a class="reference internal" href="../../_modules/dodal/devices/hutch_shutter.html#HutchShutter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.hutch_shutter.HutchShutter" title="Link to this definition">#</a></dt>
 <dd><p>Device to operate the hutch shutter.</p>
-<p>When a demand is sent, the device should first check the hutch status     and raise an error if it’s not interlocked (searched and locked), meaning it’s not     safe to operate the shutter.</p>
-<p>If the requested shutter position is “Open”, the shutter control PV should first     go to “Reset” and then move to “Open”. This is because before opening the hutch     shutter, the interlock status PV (<code class="xref any docutils literal notranslate"><span class="pre">-PS-SHTR-01:ILKSTA</span></code>) will show as <code class="xref any docutils literal notranslate"><span class="pre">failed</span></code> until     the hutch shutter is reset. This will set the interlock status to <code class="xref any docutils literal notranslate"><span class="pre">OK</span></code>, allowing     for shutter operations. Until this step is done, the hutch shutter can’t be opened.
+<p>When a demand is sent, the device should first check the hutch status
+and raise an error if it’s not interlocked (searched and locked), meaning it’s not
+safe to operate the shutter.</p>
+<p>If the requested shutter position is “Open”, the shutter control PV should first
+go to “Reset” and then move to “Open”. This is because before opening the hutch
+shutter, the interlock status PV (<code class="xref any docutils literal notranslate"><span class="pre">-PS-SHTR-01:ILKSTA</span></code>) will show as <code class="xref any docutils literal notranslate"><span class="pre">failed</span></code> until
+the hutch shutter is reset. This will set the interlock status to <code class="xref any docutils literal notranslate"><span class="pre">OK</span></code>, allowing
+for shutter operations. Until this step is done, the hutch shutter can’t be opened.
 The reset is not needed for closing the shutter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

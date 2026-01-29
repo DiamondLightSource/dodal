@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.current_amplifiers.sr570 &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.current_amplifiers.sr570 &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -824,7 +824,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SR570GainTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.SR570GainTable.html#dodal.devices.current_amplifiers.SR570GainTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SR570GainTable</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coarse/unit sensitivity setting for SR570 current amplifier&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coarse/unit sensitivity setting for SR570 current amplifier.&quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="s2">&quot;mA/V&quot;</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="s2">&quot;uA/V&quot;</span>
@@ -836,7 +836,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SR570FineGainTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.SR570FineGainTable.html#dodal.devices.current_amplifiers.SR570FineGainTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SR570FineGainTable</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fine sensitivity setting for SR570 current amplifier&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fine sensitivity setting for SR570 current amplifier.&quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
@@ -853,7 +853,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SR570RaiseTimeTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.SR570RaiseTimeTable.html#dodal.devices.current_amplifiers.SR570RaiseTimeTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SR570RaiseTimeTable</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the gain dependent raise time(s) for SR570 current amplifier&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the gain dependent raise time(s) for SR570 current amplifier.&quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="mf">1e-4</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="mf">1e-2</span>
@@ -866,7 +866,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.SR570FullGainTable.html#dodal.devices.current_amplifiers.SR570FullGainTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SR570FullGainTable</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Combined gain table, as each gain step is a combination of both coarse gain and</span>
-<span class="sd">    fine gain setting&quot;&quot;&quot;</span>
+<span class="sd">    fine gain setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="p">[</span><span class="n">SR570GainTable</span><span class="o">.</span><span class="n">SEN_1</span><span class="p">,</span> <span class="n">SR570FineGainTable</span><span class="o">.</span><span class="n">SEN_1</span><span class="p">]</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="p">[</span><span class="n">SR570GainTable</span><span class="o">.</span><span class="n">SEN_2</span><span class="p">,</span> <span class="n">SR570FineGainTable</span><span class="o">.</span><span class="n">SEN_9</span><span class="p">]</span>
@@ -902,7 +903,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SR570GainToCurrentTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.SR570GainToCurrentTable.html#dodal.devices.current_amplifiers.SR570GainToCurrentTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SR570GainToCurrentTable</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conversion table for gain (sensitivity) to current&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conversion table for gain (sensitivity) to current.&quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="mf">1e3</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="mf">2e3</span>
@@ -938,10 +939,10 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SR570">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.SR570.html#dodal.devices.current_amplifiers.SR570">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SR570</span><span class="p">(</span><span class="n">CurrentAmp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    SR570 current amplifier device. This is similar to Femto with the only different</span>
-<span class="sd">     is SR570 has two gain setting fine and coarse, therefore it requires extra</span>
-<span class="sd">     gain tables.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SR570 current amplifier device. This is similar to Femto with the only different</span>
+<span class="sd">    is SR570 has two gain setting fine and coarse, therefore it requires extra</span>
+<span class="sd">    gain tables.</span>
+
 <span class="sd">    Attributes:</span>
 <span class="sd">        fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.</span>
 <span class="sd">        coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.</span>
@@ -955,7 +956,6 @@ window.addEventListener("load", load);
 <span class="sd">            setting in gain_conversion_table.</span>
 <span class="sd">        upperlimit (float): upperlimit of the current amplifier</span>
 <span class="sd">        lowerlimit (float): lowerlimit of the current amplifier</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

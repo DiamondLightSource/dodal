@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.current_amplifiers.femto &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.current_amplifiers.femto &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -824,7 +824,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Femto3xxGainTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.Femto3xxGainTable.html#dodal.devices.current_amplifiers.Femto3xxGainTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Femto3xxGainTable</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the sensitivity setting for Femto 3xx current amplifier&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the sensitivity setting for Femto 3xx current amplifier.&quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="s2">&quot;10^4&quot;</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="s2">&quot;10^5&quot;</span>
@@ -842,7 +842,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Femto3xxGainToCurrentTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.Femto3xxGainToCurrentTable.html#dodal.devices.current_amplifiers.Femto3xxGainToCurrentTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Femto3xxGainToCurrentTable</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the voltage to current setting for Femto 3xx current amplifier&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the voltage to current setting for Femto 3xx current amplifier.&quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="mf">1e4</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="mf">1e5</span>
@@ -860,7 +860,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Femto3xxRaiseTime">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.Femto3xxRaiseTime.html#dodal.devices.current_amplifiers.Femto3xxRaiseTime">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Femto3xxRaiseTime</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the gain dependent raise time(s) for Femto 3xx current amplifier&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;These are the gain dependent raise time(s) for Femto 3xx current amplifier.&quot;&quot;&quot;</span>
 
     <span class="n">SEN_1</span> <span class="o">=</span> <span class="mf">0.8e-3</span>
     <span class="n">SEN_2</span> <span class="o">=</span> <span class="mf">0.8e-3</span>
@@ -878,10 +878,10 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="FemtoDDPCA">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.FemtoDDPCA.html#dodal.devices.current_amplifiers.FemtoDDPCA">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FemtoDDPCA</span><span class="p">(</span><span class="n">CurrentAmp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Femto current amplifier device, this class should cover all DDPCA Femto current</span>
-<span class="sd">      amplifiers, As the main different between all the DDPCA Femto is their gain table</span>
-<span class="sd">        and response time table.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Femto current amplifier device, this class should cover all DDPCA Femto current</span>
+<span class="sd">    amplifiers, As the main different between all the DDPCA Femto is their gain table</span>
+<span class="sd">    and response time table.</span>
+
 <span class="sd">    Attributes:</span>
 <span class="sd">        gain (SignalRW): This is the epic signal that control current amplifier gain.</span>
 <span class="sd">        gain_table (strictEnum): The table epic use to set gain.</span>
@@ -889,8 +889,7 @@ window.addEventListener("load", load);
 <span class="sd">        lowerlimit (float): lowerlimit of the current amplifier</span>
 <span class="sd">        timeout (float): Maximum waiting time in second for setting gain.</span>
 <span class="sd">        raise_timetable (Enum): Table contain the minimum amount of time to wait after</span>
-<span class="sd">         changing gain.</span>
-
+<span class="sd">            changing gain.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

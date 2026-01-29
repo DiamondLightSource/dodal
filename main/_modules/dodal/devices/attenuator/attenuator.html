@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.attenuator.attenuator &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.attenuator.attenuator &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -851,13 +851,15 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.attenuator.attenuator.BinaryFilterAttenuator.html#dodal.devices.attenuator.attenuator.BinaryFilterAttenuator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BinaryFilterAttenuator</span><span class="p">(</span><span class="n">ReadOnlyAttenuator</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The attenuator will insert filters into the beam to reduce its transmission.</span>
-<span class="sd">    In this attenuator, each filter can be in one of two states: IN or OUT</span>
+<span class="sd">    In this attenuator, each filter can be in one of two states: IN or OUT.</span>
 
 <span class="sd">    This device should be set with:</span>
+
 <span class="sd">        yield from bps.set(attenuator, desired_transmission)</span>
 
 <span class="sd">    Where desired_transmission is fraction e.g. 0-1. When the actual_transmission is</span>
-<span class="sd">    read from the device it is also fractional&quot;&quot;&quot;</span>
+<span class="sd">    read from the device it is also fractional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">num_filters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_calculated_filter_states</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
@@ -888,11 +890,10 @@ window.addEventListener("load", load);
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the transmission to the fractional (0-1) value given.</span>
 
-<span class="sd">        The attenuator IOC will then insert filters to reach the desired transmission for</span>
-<span class="sd">        the current beamline energy, the set will only complete when they have all been</span>
-<span class="sd">        applied.</span>
+<span class="sd">        The attenuator IOC will then insert filters to reach the desired transmission</span>
+<span class="sd">        for the current beamline energy, the set will only complete when they have all</span>
+<span class="sd">        been applied.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using current energy &quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_current_energy</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting desired transmission to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -933,7 +934,8 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">EnumFilterAttenuator</span><span class="p">(</span><span class="n">ReadOnlyAttenuator</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The attenuator will insert filters into the beam to reduce its transmission.</span>
 
-<span class="sd">    This device is currently working, but feature incomplete. See https://github.com/DiamondLightSource/dodal/issues/972</span>
+<span class="sd">    This device is currently working, but feature incomplete. See</span>
+<span class="sd">    https://github.com/DiamondLightSource/dodal/issues/972</span>
 
 <span class="sd">    In this attenuator, the state of a filter corresponds to the selected material,</span>
 <span class="sd">    e.g Ag50, in contrast to being either &#39;IN&#39; or &#39;OUT&#39;; see BinaryFilterAttenuator.</span>
@@ -966,11 +968,10 @@ window.addEventListener("load", load);
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the transmission to the fractional (0-1) value given.</span>
 
-<span class="sd">        The attenuator IOC will then insert filters to reach the desired transmission for</span>
-<span class="sd">        the current beamline energy, the set will only complete when they have all been</span>
-<span class="sd">        applied.</span>
+<span class="sd">        The attenuator IOC will then insert filters to reach the desired transmission</span>
+<span class="sd">        for the current beamline energy, the set will only complete when they have all</span>
+<span class="sd">        been applied.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># auto move should normally be on, but check here incase it was manually turned off</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_move_on_desired_transmission_set</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">YesNo</span><span class="o">.</span><span class="n">YES</span><span class="p">)</span>
 

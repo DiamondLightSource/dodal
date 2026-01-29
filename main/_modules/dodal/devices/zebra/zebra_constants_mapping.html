@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra.zebra_constants_mapping &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.zebra.zebra_constants_mapping &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -816,11 +816,14 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_constants_mapping.ZebraMappingValidations.html#dodal.devices.zebra.zebra_constants_mapping.ZebraMappingValidations">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZebraMappingValidations</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raises an exception if field set to -1 is accessed, and validate against</span>
-<span class="sd">    multiple fields mapping to the same integer&quot;&quot;&quot;</span>
+<span class="sd">    multiple fields mapping to the same integer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;To protect against mismatch between the Zebra configuration that a plan expects and the Zebra which has</span>
-<span class="sd">        been instantiated, raise exception if a field which has been set to -1 is accessed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;To protect against mismatch between the Zebra configuration that a plan</span>
+<span class="sd">        expects and the Zebra which has been instantiated, raise exception if a field</span>
+<span class="sd">        which has been set to -1 is accessed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
@@ -833,8 +836,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_constants_mapping.ZebraMappingValidations.html#dodal.devices.zebra.zebra_constants_mapping.ZebraMappingValidations.ensure_no_duplicate_connections">[docs]</a>
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ensure_no_duplicate_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that TTL outputs and sources are mapped to unique integers&quot;&quot;&quot;</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that TTL outputs and sources are mapped to unique integers.&quot;&quot;&quot;</span>
         <span class="n">integer_fields</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">key</span><span class="p">:</span> <span class="n">value</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
@@ -857,7 +859,9 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_constants_mapping.ZebraTTLOutputs.html#dodal.devices.zebra.zebra_constants_mapping.ZebraTTLOutputs">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZebraTTLOutputs</span><span class="p">(</span><span class="n">ZebraMappingValidations</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps hardware to the Zebra TTL output (1-4) that they&#39;re physically wired to, or</span>
-<span class="sd">    None if that hardware is not connected. A value of -1 means this hardware is not connected.&quot;&quot;&quot;</span>
+<span class="sd">    None if that hardware is not connected. A value of -1 means this hardware is not</span>
+<span class="sd">    connected.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">TTL_EIGER</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">TTL_PILATUS</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -873,7 +877,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ZebraSources">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_constants_mapping.ZebraSources.html#dodal.devices.zebra.zebra_constants_mapping.ZebraSources">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZebraSources</span><span class="p">(</span><span class="n">ZebraMappingValidations</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps internal Zebra signal source to their integer PV value&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps internal Zebra signal source to their integer PV value.&quot;&quot;&quot;</span>
 
     <span class="n">DISCONNECT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">63</span><span class="p">)</span>
     <span class="n">IN1_TTL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">63</span><span class="p">)</span>

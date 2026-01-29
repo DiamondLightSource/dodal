@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple_knot_controller &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.insertion_device.apple_knot_controller &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -833,12 +833,11 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="AppleKnotPathFinder">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.AppleKnotPathFinder.html#dodal.devices.insertion_device.AppleKnotPathFinder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AppleKnotPathFinder</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class to find a safe path for AppleKnot undulator moves that avoids the exclusion zone</span>
-<span class="sd">    around 0-0 gap-phase. We rely on axis-aligned (manhattan) moves and splitting moves</span>
-<span class="sd">    that cross zero phase into two segments via an intermediate point at zero phase and</span>
-<span class="sd">    a safe gap value. We ASSUME the exclusion zones are rectangles aligned with the axes</span>
-<span class="sd">    in a shape of hanoi tower centered at (0,0).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to find a safe path for AppleKnot undulator moves that avoids the exclusion</span>
+<span class="sd">    zone around 0-0 gap-phase. We rely on axis-aligned (manhattan) moves and splitting</span>
+<span class="sd">    moves that cross zero phase into two segments via an intermediate point at zero</span>
+<span class="sd">    phase and a safe gap value. We ASSUME the exclusion zones are rectangles aligned</span>
+<span class="sd">    with the axes in a shape of hanoi tower centered at (0,0).</span>
 <span class="sd">    Gap and phase motors are NOT moved together but instead are moved sequentially.</span>
 <span class="sd">    Sequential move guarantees safe pass avoiding exslusion zones.</span>
 <span class="sd">    We can not use asynchronous move of gap and phase because we can not currently rely</span>
@@ -858,8 +857,8 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">get_apple_knot_val_path</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">start_val</span><span class="p">:</span> <span class="n">Apple2Val</span><span class="p">,</span> <span class="n">end_val</span><span class="p">:</span> <span class="n">Apple2Val</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Apple2Val</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get a list of Apple2Val representing the path from start to end avoiding exclusion zones.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a list of Apple2Val representing the path from start to end avoiding</span>
+<span class="sd">        exclusion zones.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">apple_knot_val_path</span> <span class="o">=</span> <span class="p">()</span>
         <span class="c1"># Defensive checks for no movement</span>
@@ -894,9 +893,9 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">_apple_knot_manhattan_path</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">apple_knot_val_path</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Apple2Val</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Apple2Val</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert a list of Apple2Val into a manhattan path avoiding exclusion zones.</span>
-<span class="sd">        Here all moves are done in axis-aligned steps (gap first then phase or vice versa).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a list of Apple2Val into a manhattan path avoiding exclusion zones.</span>
+<span class="sd">        Here all moves are done in axis-aligned steps (gap first then phase or vice</span>
+<span class="sd">        versa).</span>
 <span class="sd">        List of points is expanded to include intermediate points as needed so each move</span>
 <span class="sd">        happens within one sign of gap and phase (including zero phase).</span>
 <span class="sd">        For convenience we define:phase increase as West-East axis and gap increase</span>
@@ -955,9 +954,8 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">AppleKnotController</span><span class="p">(</span>
     <span class="n">Apple2Controller</span><span class="p">[</span><span class="n">Apple2</span><span class="p">[</span><span class="n">PhaseAxesType</span><span class="p">]],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">PhaseAxesType</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Controller for Apple Knot undulator with unique feature of calculating a move path</span>
-<span class="sd">    through gap and phase space avoiding the exclusion zone around 0-0 gap-phase.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Controller for Apple Knot undulator with unique feature of calculating a move</span>
+<span class="sd">    path through gap and phase space avoiding the exclusion zone around 0-0 gap-phase.</span>
 <span class="sd">    See https://confluence.diamond.ac.uk/x/vQENAg for more details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -992,8 +990,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="AppleKnotController.check_top_bottom_phase_match">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.AppleKnotController.html#dodal.devices.insertion_device.AppleKnotController.check_top_bottom_phase_match">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_top_bottom_phase_match</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check that the top and bottom phase motors are in sync.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the top and bottom phase motors are in sync.</span>
 <span class="sd">        Raise an error if they are not within tolerance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current_phase_top</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>

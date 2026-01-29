@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.snapshots.snapshot_image_processing &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.snapshots.snapshot_image_processing &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -819,12 +819,12 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="draw_crosshair">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.snapshots.snapshot_image_processing.html#dodal.devices.oav.snapshots.snapshot_image_processing.draw_crosshair">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">draw_crosshair</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">beam_x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">beam_y</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Draw a crosshair at the beam centre coordinates specified.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw a crosshair at the beam centre coordinates specified.</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        image: The image to draw the crosshair onto. This is mutated.</span>
-<span class="sd">        beam_x: The x-coordinate of the crosshair (pixels)</span>
-<span class="sd">        beam_y: The y-coordinate of the crosshair (pixels)</span>
+<span class="sd">        image (Image): The image to draw the crosshair onto. This is mutated.</span>
+<span class="sd">        beam_x (int): The x-coordinate of the crosshair (pixels).</span>
+<span class="sd">        beam_y (int): The y-coordinate of the crosshair (pixels).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
     <span class="n">outline_width</span> <span class="o">=</span> <span class="mi">1</span>
@@ -865,16 +865,18 @@ window.addEventListener("load", load);
     <span class="n">beam_pos_at_origin_px</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span>
     <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pixel</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the location of the beam centre in pixels on a reference image.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        sample_pos_mm: x, y location of the sample in mm relative to when the reference image</span>
-<span class="sd">            was taken.</span>
-<span class="sd">        beam_pos_at_origin_px: x, y position of the beam centre in the reference image (pixels)</span>
-<span class="sd">        microns_per_pixel: x, y scaling factor relating the sample position to the position in the image.</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        x, y location of the beam centre (pixels)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the location of the beam centre in pixels on a reference image.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        sample_pos_mm (tuple[float, float]): x, y location of the sample in mm relative</span>
+<span class="sd">            to when the reference image was taken.</span>
+<span class="sd">        beam_pos_at_origin_px (Pixel): x, y position of the beam centre in the reference</span>
+<span class="sd">            image (pixels).</span>
+<span class="sd">        microns_per_pixel (tuple[float, float]): x, y scaling factor relating the sample</span>
+<span class="sd">            position to the position in the image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pixel: x, y location of the beam centre (pixels).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">centre</span><span class="p">(</span><span class="n">sample_pos</span><span class="p">,</span> <span class="n">beam_pos</span><span class="p">,</span> <span class="n">um_per_px</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>

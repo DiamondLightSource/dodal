@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_to_redis_forwarder &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.oav_to_redis_forwarder &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -865,12 +865,23 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="OAVToRedisForwarder">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder.html#dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAVToRedisForwarder</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Forwards OAV image data to redis. To use call:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Forwards OAV image data to redis.</span>
 
-<span class="sd">    &gt; bps.kickoff(oav_forwarder)</span>
-<span class="sd">    &gt; bps.monitor(oav_forwarder.uuid)</span>
-<span class="sd">    &gt; bps.complete(oav_forwarder)</span>
+<span class="sd">    To use call::</span>
 
+<span class="sd">        bps.kickoff(oav_forwarder)</span>
+<span class="sd">        bps.monitor(oav_forwarder.uuid)</span>
+<span class="sd">        bps.complete(oav_forwarder)</span>
+
+<span class="sd">    Reads image data from the MJPEG stream on an OAV and forwards it into a</span>
+<span class="sd">    redis database. This is currently only used for murko integration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): The PV prefix of the OAV.</span>
+<span class="sd">        redis_host (str): The host where the redis database is running.</span>
+<span class="sd">        redis_password (str): The password for the redis database.</span>
+<span class="sd">        redis_db (int): Which redis database to connect to, defaults to 0.</span>
+<span class="sd">        name (str): The name of this device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">DATA_EXPIRY_DAYS</span> <span class="o">=</span> <span class="mi">7</span>
@@ -888,16 +899,6 @@ window.addEventListener("load", load);
         <span class="n">redis_db</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads image data from the MJPEG stream on an OAV and forwards it into a</span>
-<span class="sd">        redis database. This is currently only used for murko integration.</span>
-
-<span class="sd">        Arguments:</span>
-<span class="sd">            prefix: str             the PV prefix of the OAV</span>
-<span class="sd">            redis_host: str         the host where the redis database is running</span>
-<span class="sd">            redis_password: str     the password for the redis database</span>
-<span class="sd">            redis_db: int           which redis database to connect to, defaults to 0</span>
-<span class="sd">            name: str               the name of this device</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CAM:ArrayCounter_RBV&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
             <span class="p">{</span>
@@ -929,7 +930,9 @@ window.addEventListener("load", load);
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stores the raw bytes of the jpeg image in redis. Murko ultimately wants a</span>
 <span class="sd">        pickled numpy array of pixel values but raw byes are more space efficient. There</span>
-<span class="sd">        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592&quot;&quot;&quot;</span>
+<span class="sd">        may be better ways of doing this, see</span>
+<span class="sd">        https://github.com/DiamondLightSource/mx-bluesky/issues/592.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">jpeg_bytes</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_next_jpeg</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
         <span class="n">sample_id</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">redis_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;murko:</span><span class="si">{</span><span class="n">sample_id</span><span class="si">}</span><span class="s2">:raw&quot;</span>
@@ -951,12 +954,13 @@ window.addEventListener("load", load);
                 <span class="k">await</span> <span class="n">function_to_do</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_stream_to_redis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">ClientResponse</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">OAVSource</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Uses the update of the frame counter as a trigger to pull an image off the OAV</span>
-<span class="sd">        and into redis.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Uses the update of the frame counter as a trigger to pull an image off the</span>
+<span class="sd">        OAV and into redis.</span>
 
 <span class="sd">        The frame counter is continually increasing on the timescales we store data and</span>
 <span class="sd">        so can be used as a uuid. If the OAV is updating too quickly we may drop frames</span>
-<span class="sd">        but in this case a best effort on getting as many frames as possible is sufficient.</span>
+<span class="sd">        but in this case a best effort on getting as many frames as possible is</span>
+<span class="sd">        sufficient.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">done_status</span> <span class="o">=</span> <span class="n">AsyncStatus</span><span class="p">(</span>
             <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stop_flag</span><span class="o">.</span><span class="n">wait</span><span class="p">(),</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>

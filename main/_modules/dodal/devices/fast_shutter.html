@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_shutter &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.fast_shutter &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -830,15 +830,17 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="FastShutter">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_shutter.FastShutter.html#dodal.devices.fast_shutter.FastShutter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FastShutter</span><span class="p">(</span><span class="n">Movable</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enum device specialised for a fast shutter with configured open_state and</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum device specialised for a fast shutter with configured open_state and</span>
 <span class="sd">    close_state so it is generic enough to be used with any device or plan without</span>
 <span class="sd">    knowing the specific enum to use.</span>
 
-<span class="sd">    For example:</span>
+<span class="sd">    For example::</span>
+
 <span class="sd">        await shutter.set(shutter.open_state)</span>
 <span class="sd">        await shutter.set(shutter.close_state)</span>
-<span class="sd">    OR</span>
+
+<span class="sd">    OR::</span>
+
 <span class="sd">        run_engine(bps.mv(shutter, shutter.open_state))</span>
 <span class="sd">        run_engine(bps.mv(shutter, shutter.close_state))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -858,9 +860,16 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">GenericFastShutter</span><span class="p">(</span>
     <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">FastShutter</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implementation of fast shutter that connects to an epics pv. This pv is an enum that</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of fast shutter that connects to an epics pv. This pv is an enum that</span>
 <span class="sd">    controls the open and close state of the shutter.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pv (str): The pv to connect to the shutter device.</span>
+<span class="sd">        open_state (EnumTypesT): The enum value that corresponds with opening the</span>
+<span class="sd">            shutter.</span>
+<span class="sd">        close_state (EnumTypesT): The enum value that corresponds with closing the</span>
+<span class="sd">            shutter.</span>
+<span class="sd">        name (str, optional): The name of the shutter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -870,12 +879,6 @@ window.addEventListener("load", load);
         <span class="n">close_state</span><span class="p">:</span> <span class="n">EnumTypesT</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Arguments:</span>
-<span class="sd">            pv: The pv to connect to the shutter device.</span>
-<span class="sd">            open_state: The enum value that corresponds with opening the shutter.</span>
-<span class="sd">            close_state: The enum value that corresponds with closing the shutter.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_state</span> <span class="o">=</span> <span class="n">open_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_state</span> <span class="o">=</span> <span class="n">close_state</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
@@ -887,12 +890,19 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="DualFastShutter">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_shutter.DualFastShutter.html#dodal.devices.fast_shutter.DualFastShutter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DualFastShutter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">FastShutter</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A fast shutter device that handles the positions of two other fast shutters. The</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A fast shutter device that handles the positions of two other fast shutters. The</span>
 <span class="sd">    &quot;active&quot; shutter is the one that corrosponds to the selected_shutter signal. For</span>
 <span class="sd">    example, active shutter is shutter1 if selected_source is at SelectedSource.SOURCE1</span>
 <span class="sd">    and vise versa for shutter2 and SelectedSource.SOURCE2. Whenever a move is done on</span>
 <span class="sd">    this device, the inactive shutter is always set to the close_state.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        shutter1 (GenericFastShutter): Active shutter that corrosponds to</span>
+<span class="sd">            SelectedSource.SOURCE1.</span>
+<span class="sd">        shutter2 (GenericFastShutter): Active shutter that corrosponds to</span>
+<span class="sd">            SelectedSource.SOURCE2.</span>
+<span class="sd">        selected_source (SignalRW): Signal that decides the active shutter.</span>
+<span class="sd">        name (str, optional): Name of this device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -902,13 +912,6 @@ window.addEventListener("load", load);
         <span class="n">selected_source</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="n">SelectedSource</span><span class="p">],</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Arguments:</span>
-<span class="sd">            shutter1: Active shutter that corrosponds to SelectedSource.SOURCE1.</span>
-<span class="sd">            shutter2: Active shutter that corrosponds to SelectedSource.SOURCE2.</span>
-<span class="sd">            selected_source: Signal that decides the active shutter.</span>
-<span class="sd">            name: Name of this device.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_shutter_states</span><span class="p">(</span><span class="n">shutter1</span><span class="o">.</span><span class="n">open_state</span><span class="p">,</span> <span class="n">shutter2</span><span class="o">.</span><span class="n">open_state</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_shutter_states</span><span class="p">(</span><span class="n">shutter1</span><span class="o">.</span><span class="n">close_state</span><span class="p">,</span> <span class="n">shutter2</span><span class="o">.</span><span class="n">close_state</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_state</span> <span class="o">=</span> <span class="n">shutter1</span><span class="o">.</span><span class="n">open_state</span>

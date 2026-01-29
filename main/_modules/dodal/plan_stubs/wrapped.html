@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plan_stubs.wrapped &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.plan_stubs.wrapped &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -815,9 +815,7 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Wrappers for Bluesky built-in plan stubs with type hinting</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;Wrappers for Bluesky built-in plan stubs with type hinting.&quot;&quot;&quot;</span>
 
 <span class="n">Group</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;String identifier used by &#39;wait&#39; or stubs that await&quot;</span><span class="p">]</span>
 
@@ -829,22 +827,21 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">set_absolute</span><span class="p">(</span>
     <span class="n">movable</span><span class="p">:</span> <span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Set a device, wrapper for `bp.abs_set`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set a device, wrapper for `bp.abs_set`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        movable (Movable[T]): The device to set</span>
-<span class="sd">        value (T): The new value</span>
-<span class="sd">        group (Group | None, optional): The message group to associate with the</span>
-<span class="sd">                                           setting, for sequencing. Defaults to None.</span>
-<span class="sd">        wait (bool, optional): The group should wait until all setting is complete</span>
-<span class="sd">                               (e.g. a motor has finished moving). Defaults to False.</span>
+<span class="sd">        movable (Movable[T]): The device to set.</span>
+<span class="sd">        value (T): The new value.</span>
+<span class="sd">        group (Group | None, optional): The message group to associate with the setting,</span>
+<span class="sd">            for sequencing. Defaults to None.</span>
+<span class="sd">        wait (bool, optional): The group should wait until all setting is complete (e.g.</span>
+<span class="sd">            a motor has finished moving). Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        MsgGenerator: Plan</span>
+<span class="sd">        MsgGenerator: Plan.</span>
 
 <span class="sd">    Yields:</span>
-<span class="sd">        Iterator[MsgGenerator]: Bluesky messages</span>
+<span class="sd">        Iterator[MsgGenerator]: Bluesky messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">abs_set</span><span class="p">(</span><span class="n">movable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">))</span></div>
 
@@ -855,24 +852,22 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">set_relative</span><span class="p">(</span>
     <span class="n">movable</span><span class="p">:</span> <span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Change a device, wrapper for `bp.rel_set`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Change a device, wrapper for `bp.rel_set`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        movable (Movable): The device to set</span>
-<span class="sd">        value (T): The new value</span>
-<span class="sd">        group (Group | None, optional): The message group to associate with the</span>
-<span class="sd">                                           setting, for sequencing. Defaults to None.</span>
-<span class="sd">        wait (bool, optional): The group should wait until all setting is complete</span>
-<span class="sd">                               (e.g. a motor has finished moving). Defaults to False.</span>
+<span class="sd">        movable (Movable): The device to set.</span>
+<span class="sd">        value (T): The new value.</span>
+<span class="sd">        group (Group | None, optional): The message group to associate with the setting,</span>
+<span class="sd">            for sequencing. Defaults to None.</span>
+<span class="sd">        wait (bool, optional): The group should wait until all setting is complete (e.g.</span>
+<span class="sd">            a motor has finished moving). Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        MsgGenerator: Plan</span>
+<span class="sd">        MsgGenerator: Plan.</span>
 
 <span class="sd">    Yields:</span>
-<span class="sd">        Iterator[MsgGenerator]: Bluesky messages</span>
+<span class="sd">        Iterator[MsgGenerator]: Bluesky messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rel_set</span><span class="p">(</span><span class="n">movable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">))</span></div>
 
 
@@ -880,21 +875,19 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="move">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.html#dodal.plan_stubs.move">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="n">moves</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">T</span><span class="p">],</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Move a device, wrapper for `bp.mv`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Move a device, wrapper for `bp.mv`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        moves (Mapping[Movable, T]): Mapping of Movables to target positions</span>
-<span class="sd">        group (Group | None, optional): The message group to associate with the</span>
-<span class="sd">                                           setting, for sequencing. Defaults to None.</span>
+<span class="sd">        moves (Mapping[Movable, T]): Mapping of Movables to target positions.</span>
+<span class="sd">        group (Group | None, optional): The message group to associate with the setting,</span>
+<span class="sd">            for sequencing. Defaults to None.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        MsgGenerator: Plan</span>
+<span class="sd">        MsgGenerator: Plan.</span>
 
 <span class="sd">    Yields:</span>
-<span class="sd">        Iterator[MsgGenerator]: Bluesky messages</span>
+<span class="sd">        Iterator[MsgGenerator]: Bluesky messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="p">(</span>
         <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="o">*</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
     <span class="p">)</span></div>
@@ -906,21 +899,19 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">move_relative</span><span class="p">(</span>
     <span class="n">moves</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">T</span><span class="p">],</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Move a device relative to its current position, wrapper for `bp.mvr`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Move a device relative to its current position, wrapper for `bp.mvr`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        moves (Mapping[Movable, T]): Mapping of Movables to target deltas</span>
+<span class="sd">        moves (Mapping[Movable, T]): Mapping of Movables to target deltas.</span>
 <span class="sd">        group (Group | None, optional): The message group to associate with the</span>
-<span class="sd">                                           setting, for sequencing. Defaults to None.</span>
+<span class="sd">            setting, for sequencing. Defaults to None.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        MsgGenerator: Plan</span>
+<span class="sd">        MsgGenerator: Plan.</span>
 
 <span class="sd">    Yields:</span>
-<span class="sd">        Iterator[MsgGenerator]: Bluesky messages</span>
+<span class="sd">        Iterator[MsgGenerator]: Bluesky messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="p">(</span>
         <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mvr</span><span class="p">(</span><span class="o">*</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
     <span class="p">)</span></div>
@@ -930,19 +921,17 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="sleep">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.html#dodal.plan_stubs.sleep">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sleep</span><span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Suspend all action for a given time, wrapper for `bp.sleep`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Suspend all action for a given time, wrapper for `bp.sleep`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        time (float): Time to wait in seconds</span>
+<span class="sd">        time (float): Time to wait in seconds.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        MsgGenerator: Plan</span>
+<span class="sd">        MsgGenerator: Plan.</span>
 
 <span class="sd">    Yields:</span>
-<span class="sd">        Iterator[MsgGenerator]: Bluesky messages</span>
+<span class="sd">        Iterator[MsgGenerator]: Bluesky messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">time</span><span class="p">))</span></div>
 
 
@@ -953,24 +942,20 @@ window.addEventListener("load", load);
     <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wait for a group status to complete, wrapper for `bp.wait`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wait for a group status to complete, wrapper for `bp.wait`.</span>
 <span class="sd">    Does not expose move_on, as when used as a stub will not fail on Timeout.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        group (Group | None, optional): The name of the group to wait for, defaults</span>
-<span class="sd">                                           to None, in which case waits for all</span>
-<span class="sd">                                           groups that have not yet been awaited.</span>
-<span class="sd">        timeout (float | None, default=None): a timeout in seconds</span>
-
+<span class="sd">        group (Group | None, optional): The name of the group to wait for, defaults to</span>
+<span class="sd">            None, in which case waits for all groups that have not yet been awaited.</span>
+<span class="sd">        timeout (float | None, default=None): a timeout in seconds.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        MsgGenerator: Plan</span>
+<span class="sd">        MsgGenerator: Plan.</span>
 
 <span class="sd">    Yields:</span>
-<span class="sd">        Iterator[MsgGenerator]: Bluesky messages</span>
+<span class="sd">        Iterator[MsgGenerator]: Bluesky messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">))</span></div>
 
 </pre></div>

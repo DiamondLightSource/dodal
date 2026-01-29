@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -844,7 +844,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorConvertor.html#dodal.devices.insertion_device.EnergyMotorConvertor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorConvertor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position conversion&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position conversion.&quot;&quot;&quot;</span>
         <span class="o">...</span></div>
 
 
@@ -855,44 +855,51 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Apple2Controller">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2Controller.html#dodal.devices.insertion_device.Apple2Controller">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2Controller</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Apple2Type</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">    Abstract base class for controlling an Apple2 undulator device.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for controlling an Apple2 undulator device.</span>
 
 <span class="sd">    This class manages the undulator&#39;s gap and phase motors, and provides an interface</span>
 <span class="sd">    for controlling polarisation and energy settings. It exposes derived signals for</span>
 <span class="sd">    energy and polarisation, and handles conversion between energy/polarisation and</span>
 <span class="sd">    motor positions via a user-supplied conversion callable.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    apple2 : Reference[Apple2Type]</span>
-<span class="sd">        Reference to the Apple2 device containing gap and phase motors.</span>
-<span class="sd">    energy : derived_signal_rw</span>
-<span class="sd">        Derived signal for moving and reading back energy.</span>
-<span class="sd">    polarisation_setpoint : SignalR</span>
-<span class="sd">        Soft signal for the polarisation setpoint.</span>
-<span class="sd">    polarisation : derived_signal_rw</span>
-<span class="sd">        Hardware-backed signal for polarisation readback and control.</span>
-<span class="sd">    gap_energy_to_motor_converter : EnergyMotorConvertor</span>
-<span class="sd">        Callable that converts energy and polarisation to gap motor positions.</span>
-<span class="sd">    phase_energy_to_motor_converter : EnergyMotorConvertor</span>
-<span class="sd">        Callable that converts energy and polarisation to phase motor positions.</span>
-<span class="sd">    maximum_gap_motor_position : float</span>
-<span class="sd">        Maximum allowed position for the gap motor.</span>
-<span class="sd">    maximum_phase_motor_position : float</span>
-<span class="sd">        Maximum allowed position for the raw phase motors.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        apple2 (Reference[Apple2Type]): Reference to the Apple2 device containing gap</span>
+<span class="sd">            and phase motors.</span>
+<span class="sd">        energy (derived_signal_rw): Derived signal for moving and reading back energy.</span>
+<span class="sd">        polarisation_setpoint (SignalR): Soft signal for the polarisation setpoint.</span>
+<span class="sd">        polarisation (derived_signal_rw): Hardware-backed signal for polarisation</span>
+<span class="sd">            readback and control.</span>
+<span class="sd">        gap_energy_to_motor_converter (EnergyMotorConvertor): Callable that converts</span>
+<span class="sd">            energy and polarisation to gap motor positions.</span>
+<span class="sd">        phase_energy_to_motor_converter (EnergyMotorConvertor): Callable that converts</span>
+<span class="sd">            energy and polarisation to phase motor positions.</span>
+<span class="sd">        maximum_gap_motor_position (float): Maximum allowed position for the gap motor.</span>
+<span class="sd">        maximum_phase_motor_position (float): Maximum allowed position for the raw phase</span>
+<span class="sd">            motors.</span>
 
-<span class="sd">    Abstract Methods</span>
-<span class="sd">    ----------------</span>
-<span class="sd">    _get_apple2_value(gap: float, phase: float) -&gt; Apple2Val</span>
-<span class="sd">        Abstract method to return the Apple2Val used to set the apple2 with.</span>
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    - Subclasses must implement `_get_apple2_value` for beamline-specific logic.</span>
-<span class="sd">    - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.</span>
-<span class="sd">    - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),</span>
-<span class="sd">      positive circular (PC), negative circular (NC), and linear arbitrary (LA).</span>
+<span class="sd">    Args:</span>
+<span class="sd">        apple2 (Apple2): An Apple2 device.</span>
+<span class="sd">        gap_energy_motor_converter (EnergyMotorConvertor): The callable that handles</span>
+<span class="sd">            the gap look up table logic for the insertion device.</span>
+<span class="sd">        phase_energy_motor_converter (EnergyMotorConvertor): The callable that</span>
+<span class="sd">            handles the phase look up table logic for the insertion device.</span>
+<span class="sd">        maximum_gap_motor_position (float): Maximum allowed position for the gap motor.</span>
+<span class="sd">        maximum_phase_motor_position (float): Maximum allowed position for the raw phase</span>
+<span class="sd">            motors.</span>
+<span class="sd">        units (str): the units of this device. Defaults to eV.</span>
+<span class="sd">        name (str): Name of the device.</span>
+
+<span class="sd">    Abstract Methods:</span>
+<span class="sd">        _get_apple2_value(gap: float, phase: float) -&gt; Apple2Val</span>
+<span class="sd">            Abstract method to return the Apple2Val used to set the apple2 with.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        - Subclasses must implement `_get_apple2_value` for beamline-specific logic.</span>
+<span class="sd">        - LH3 polarisation is indistinguishable from LH in hardware; special handling is</span>
+<span class="sd">          provided.</span>
+<span class="sd">        - Supports multiple polarisation modes, including linear horizontal (LH), linear</span>
+<span class="sd">          vertical (LV), positive circular (PC), negative circular (NC), and linear</span>
+<span class="sd">          arbitrary (LA).</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -906,21 +913,6 @@ window.addEventListener("load", load);
         <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        apple2: Apple2</span>
-<span class="sd">            An Apple2 device.</span>
-<span class="sd">        gap_energy_motor_converter: EnergyMotorConvertor</span>
-<span class="sd">            The callable that handles the gap look up table logic for the insertion device.</span>
-<span class="sd">        phase_energy_motor_converter: EnergyMotorConvertor</span>
-<span class="sd">            The callable that handles the phase look up table logic for the insertion device.</span>
-<span class="sd">        units: str</span>
-<span class="sd">            the units of this device. Defaults to eV.</span>
-<span class="sd">        name: str</span>
-<span class="sd">            Name of the device.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">apple2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span> <span class="o">=</span> <span class="n">gap_energy_motor_converter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span> <span class="o">=</span> <span class="n">phase_energy_motor_converter</span>
@@ -970,8 +962,7 @@ window.addEventListener("load", load);
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_apple2_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Apple2Val</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method should be implemented by the beamline specific ID class as the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method should be implemented by the beamline specific ID class as the</span>
 <span class="sd">        motor positions will be different for each beamline depending on the</span>
 <span class="sd">        undulator design.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -996,8 +987,7 @@ window.addEventListener("load", load);
         <span class="k">return</span> <span class="n">energy</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_get_pol_setpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pol</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check the polarisation setpoint and if it is NONE try to read it from</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the polarisation setpoint and if it is NONE try to read it from</span>
 <span class="sd">        hardware.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
@@ -1062,11 +1052,11 @@ window.addEventListener("load", load);
         <span class="n">btm_outer</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Determine polarisation and phase value using motor position patterns.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine polarisation and phase value using motor position patterns.</span>
 <span class="sd">        However there is no way to return lh3 polarisation or higher harmonic setting.</span>
-<span class="sd">        (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy</span>
-<span class="sd">        to workout the polarisation but during my test the inverse poly is too unstable for general use.)</span>
+<span class="sd">        (May be for future one can use the inverse poly to work out the energy and try</span>
+<span class="sd">        to match it with the current energy to workout the polarisation but during my</span>
+<span class="sd">        test the inverse poly is too unstable for general use).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">gap</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_gap_motor_position</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -1141,7 +1131,8 @@ window.addEventListener("load", load);
 <span class="sd">    However, because of the high forces involved in polarization changes,</span>
 <span class="sd">    all movements must be performed using the Linear Horizontal (LH) mode.</span>
 <span class="sd">    A look-up table must also be used to determine the highest energy that can</span>
-<span class="sd">    be reached in LH mode.&quot;&quot;&quot;</span>
+<span class="sd">    be reached in LH mode.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

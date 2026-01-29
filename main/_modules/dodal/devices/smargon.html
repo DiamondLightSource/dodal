@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.smargon &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.smargon &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -891,7 +891,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CombinedMove">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.CombinedMove.html#dodal.devices.smargon.CombinedMove">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CombinedMove</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A move on multiple axes at once using a deferred move&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A move on multiple axes at once using a deferred move.&quot;&quot;&quot;</span>
 
     <span class="n">x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
@@ -905,8 +905,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Smargon">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Smargon</span><span class="p">(</span><span class="n">XYZOmegaStage</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Real motors added to allow stops following pin load (e.g. real_x1.stop() )</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Real motors added to allow stops following pin load (e.g. real_x1.stop() )</span>
 <span class="sd">    X1 and X2 real motors provide compound chi motion as well as the compound X travel,</span>
 <span class="sd">    increasing the gap between x1 and x2 changes chi, moving together changes virtual x.</span>
 <span class="sd">    Robot loading can nudge these and lead to errors.</span>

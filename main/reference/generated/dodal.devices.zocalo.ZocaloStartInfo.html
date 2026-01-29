@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.zocalo.ZocaloStartInfo &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.zocalo.ZocaloStartInfo &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1135,16 +1135,17 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.zocalo.ZocaloStartInfo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.zocalo.</span></span><span class="sig-name descname"><span class="pre">ZocaloStartInfo</span></span><a class="reference internal" href="../../_modules/dodal/devices/zocalo/zocalo_interaction.html#ZocaloStartInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.zocalo.ZocaloStartInfo" title="Link to this definition">#</a></dt>
-<dd><p>ispyb_dcid (int): The ID of the data collection in ISPyB
-filename (str): The name of the file that the detector will store into dev/shm
-start_frame_index (int): The index of the first image of this collection within the file</p>
+<dd><p>Attributes:
+ispyb_dcid (int): The ID of the data collection in ISPyB.
+filename (str): The name of the file that the detector will store into dev/shm.
+start_frame_index (int): The index of the first image of this collection within</p>
 <blockquote>
-<div><p>written by the detector</p>
+<div><p>the file written by the detector.</p>
 </div></blockquote>
-<p>number_of_frames (int): The number of frames in this collection
-message_index (int): Which trigger this is in the detector collection e.g. 0 for the</p>
+<p>number_of_frames (int): The number of frames in this collection.
+message_index (int): Which trigger this is in the detector collection e.g. 0 for</p>
 <blockquote>
-<div><p>first collection after a single arm, 1 for the next…</p>
+<div><p>the first collection after a single arm, 1 for the next…</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

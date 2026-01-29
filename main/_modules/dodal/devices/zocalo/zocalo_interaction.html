@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_interaction &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.zocalo.zocalo_interaction &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -833,14 +833,14 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloStartInfo.html#dodal.devices.zocalo.ZocaloStartInfo">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZocaloStartInfo</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ispyb_dcid (int): The ID of the data collection in ISPyB</span>
-<span class="sd">    filename (str): The name of the file that the detector will store into dev/shm</span>
-<span class="sd">    start_frame_index (int): The index of the first image of this collection within the file</span>
-<span class="sd">                             written by the detector</span>
-<span class="sd">    number_of_frames (int): The number of frames in this collection</span>
-<span class="sd">    message_index (int): Which trigger this is in the detector collection e.g. 0 for the</span>
-<span class="sd">                         first collection after a single arm, 1 for the next...</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Attributes:</span>
+<span class="sd">    ispyb_dcid (int): The ID of the data collection in ISPyB.</span>
+<span class="sd">    filename (str): The name of the file that the detector will store into dev/shm.</span>
+<span class="sd">    start_frame_index (int): The index of the first image of this collection within</span>
+<span class="sd">        the file written by the detector.</span>
+<span class="sd">    number_of_frames (int): The number of frames in this collection.</span>
+<span class="sd">    message_index (int): Which trigger this is in the detector collection e.g. 0 for</span>
+<span class="sd">        the first collection after a single arm, 1 for the next...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">ispyb_dcid</span><span class="p">:</span> <span class="nb">int</span>
@@ -870,7 +870,8 @@ window.addEventListener("load", load);
 <span class="sd">    into a plan, use the ZocaloResults ophyd device.</span>
 
 <span class="sd">    see https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html for</span>
-<span class="sd">    more information about zocalo.&quot;&quot;&quot;</span>
+<span class="sd">    more information about zocalo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ZOCALO_ENV</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zocalo_environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">environment</span>
@@ -899,10 +900,10 @@ window.addEventListener("load", load);
         <span class="n">start_data</span><span class="p">:</span> <span class="n">ZocaloStartInfo</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tells the data analysis pipeline we have started a run.</span>
-<span class="sd">        Assumes that appropriate data has already been put into ISPyB</span>
+<span class="sd">        Assumes that appropriate data has already been put into ISPyB.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            start_data (ZocaloStartInfo): Data about the collection to send to zocalo</span>
+<span class="sd">            start_data (ZocaloStartInfo): Data about the collection to send to zocalo.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting Zocalo job </span><span class="si">{</span><span class="n">start_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">start_data</span><span class="p">)</span>
@@ -914,12 +915,11 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloTrigger.html#dodal.devices.zocalo.ZocaloTrigger.run_end">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_collection_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tells the data analysis pipeline we have finished a run.</span>
-<span class="sd">        Assumes that appropriate data has already been put into ISPyB</span>
+<span class="sd">        Assumes that appropriate data has already been put into ISPyB.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            data_collection_id (int): The ID of the data collection representing the</span>
-<span class="sd">                                    gridscan in ISPyB</span>
-
+<span class="sd">                gridscan in ISPyB.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ending Zocalo job with ispyb id </span><span class="si">{</span><span class="n">data_collection_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_send_to_zocalo</span><span class="p">(</span>

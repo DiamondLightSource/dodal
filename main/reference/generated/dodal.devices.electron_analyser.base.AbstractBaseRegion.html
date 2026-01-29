@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser.base.AbstractBaseRegion &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.electron_analyser.base.AbstractBaseRegion &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1138,8 +1138,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.electron_analyser.base.AbstractBaseRegion">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.electron_analyser.base.</span></span><span class="sig-name descname"><span class="pre">AbstractBaseRegion</span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/base_region.html#AbstractBaseRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.AbstractBaseRegion" title="Link to this definition">#</a></dt>
-<dd><p>Generic region model that holds the data. Specialised region models should inherit
-this to extend functionality. All energy units are assumed to be in eV.</p>
+<dd><p>Generic region model that holds the data. Specialised region models should
+inherit this to extend functionality. All energy units are assumed to be in eV.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
@@ -1258,12 +1258,12 @@ the same energy mode.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>energy_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.electron_analyser.base.EnergyMode.html#dodal.devices.electron_analyser.base.EnergyMode" title="dodal.devices.electron_analyser.base.base_enums.EnergyMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></span>) – Mode you want to switch the region to.</p></li>
-<li><p><strong>excitation_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Energy conversion for low_energy, centre_energy, and
-high_energy for new energy mode.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – Defaults to True. If true, create a copy of this region to alter for
-the new energy_mode and return it. If False, alter this region for the
-energy_mode and return it self.</p></li>
+<li><p><strong>energy_mode</strong> (<a class="reference internal" href="dodal.devices.electron_analyser.base.EnergyMode.html#dodal.devices.electron_analyser.base.EnergyMode" title="dodal.devices.electron_analyser.base.EnergyMode"><em>EnergyMode</em></a>) – Mode you want to switch the region to.</p></li>
+<li><p><strong>excitation_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Energy conversion for low_energy, centre_energy,
+and high_energy for new energy mode.</p></li>
+<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Defaults to True. If true, create a copy of this
+region to alter for the new energy_mode and return it. If False, alter
+this region for the energy_mode and return it self.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1284,18 +1284,22 @@ the original energy mode e.g mode BINDING will stay as BINDING.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>excitation_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Energy conversion for low_energy, centre_energy, and
-high_energy for new energy mode.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – Defaults to True. If true, create a copy of this region to alter to
-calculate new energy values to return. If false, alter this region.</p></li>
+<li><p><strong>excitation_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Energy conversion for low_energy, centre_energy,
+and high_energy for new energy mode.</p></li>
+<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Defaults to True. If true, create a copy of this
+region to alter to calculate new energy values to return. If false,
+alter this region.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Self</span></code></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Region with selected original energy mode and new calculated KINETIC energy
-values for epics.</p>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Region with selected original energy mode and new calculated KINETIC energy</dt><dd><p>values for epics.</p>
+</dd>
+</dl>
+</p>
 </dd>
 </dl>
 </dd></dl>

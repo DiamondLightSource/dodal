@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.selectable_source &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.selectable_source &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -828,7 +828,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.selectable_source.html#dodal.devices.selectable_source.get_obj_from_selected_source">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_obj_from_selected_source</span><span class="p">(</span><span class="n">selected_source</span><span class="p">:</span> <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">s1</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">s2</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Util function that maps enum values for SelectedSource to two objects. It then</span>
-<span class="sd">    returns one of the objects that corrosponds to the selected_source value.&quot;&quot;&quot;</span>
+<span class="sd">    returns one of the objects that corrosponds to the selected_source value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">match</span> <span class="n">selected_source</span><span class="p">:</span>
         <span class="k">case</span> <span class="n">SelectedSource</span><span class="o">.</span><span class="n">SOURCE1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">s1</span>
@@ -841,7 +842,9 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.selectable_source.SourceSelector.html#dodal.devices.selectable_source.SourceSelector">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SourceSelector</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">SelectedSource</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device that holds a selected_source signal enum of SelectedSource. Useful for</span>
-<span class="sd">    beamlines with multiple sources to coordinate which energy source or shutter to use.&quot;&quot;&quot;</span>
+<span class="sd">    beamlines with multiple sources to coordinate which energy source or shutter to</span>
+<span class="sd">    use.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>

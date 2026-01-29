@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -884,7 +884,9 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">BeamCentreForZoom</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;These PVs hold the beam centre on the OAV at each zoom level.</span>
 
-<span class="sd">    When the zoom level is changed the IOC will update the OAV overlay PVs to be at these positions.&quot;&quot;&quot;</span>
+<span class="sd">    When the zoom level is changed the IOC will update the OAV overlay PVs to be at</span>
+<span class="sd">    these positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level_name_pv_suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">centre_value_pv_suffix</span><span class="p">:</span> <span class="nb">str</span>
@@ -920,14 +922,14 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.ZoomController.html#dodal.devices.oav.oav_detector.ZoomController">[docs]</a>
 <span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">InstantMovingZoom</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZoomController</span><span class="p">(</span><span class="n">BaseZoomController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Device to control the zoom level. This should be set like</span>
-<span class="sd">        o = OAV(name=&quot;oav&quot;)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to control the zoom level. This should be set like::</span>
+
+<span class="sd">        oav = OAV(name=&quot;oav&quot;)</span>
 <span class="sd">        oav.zoom_controller.set(&quot;1.0x&quot;)</span>
 
 <span class="sd">    Note that changing the zoom may change the AD wiring on the associated OAV, as such</span>
 <span class="sd">    you should wait on any zoom changes to finish before changing the OAV wiring.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa 415</span>
 
     <span class="n">DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S</span> <span class="o">=</span> <span class="mi">2</span>
 
@@ -978,14 +980,15 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="OAV">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAV</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class for oav device</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for oav device.</span>
 
-<span class="sd">    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x</span>
-<span class="sd">    y_direction(int): Same with x_direction but for motor y</span>
-<span class="sd">    z_direction(int): Same with x_direction but for motor z</span>
-<span class="sd">    mjpg_x_size_pv(str): PV infix for x_size in mjpg</span>
-<span class="sd">    mjpg_y_size_pv(str): PV infix for y_size in mjpg</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        x_direction(int, optional): Should only be 1 or -1, with 1 indicating the oav x</span>
+<span class="sd">            direction is the same with motor x.</span>
+<span class="sd">        y_direction(int, optional): Same with x_direction but for motor y.</span>
+<span class="sd">        z_direction(int, optional): Same with x_direction but for motor z.</span>
+<span class="sd">        mjpg_x_size_pv(str, optional): PV infix for x_size in mjpg.</span>
+<span class="sd">        mjpg_y_size_pv(str, optional): PV infix for y_size in mjpg.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">beam_centre_i</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
@@ -1073,16 +1076,17 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="OAVBeamCentreFile">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAVBeamCentreFile.html#dodal.devices.oav.oav_detector.OAVBeamCentreFile">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAVBeamCentreFile</span><span class="p">(</span><span class="n">OAV</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    OAV device that reads its beam centre values from a file. The config parameter</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;OAV device that reads its beam centre values from a file. The config parameter</span>
 <span class="sd">    must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam</span>
 <span class="sd">    centre values are stored.</span>
 
-<span class="sd">    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x</span>
-<span class="sd">    y_direction(int): Same with x_direction but for motor y</span>
-<span class="sd">    z_direction(int): Same with x_direction but for motor z</span>
-<span class="sd">    mjpg_x_size_pv(str): PV infix for x_size in mjpg</span>
-<span class="sd">    mjpg_y_size_pv(str): PV infix for y_size in mjpg</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        x_direction(int, optional): Should only be 1 or -1, with 1 indicating the oav x</span>
+<span class="sd">            direction is the same with motor x.</span>
+<span class="sd">        y_direction(int, optional): Same with x_direction but for motor y.</span>
+<span class="sd">        z_direction(int, optional): Same with x_direction but for motor z.</span>
+<span class="sd">        mjpg_x_size_pv(str, optional): PV infix for x_size in mjpg.</span>
+<span class="sd">        mjpg_y_size_pv(str, optional): PV infix for y_size in mjpg.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1128,8 +1132,9 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_beam_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coord</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \</span>
-<span class="sd">        zoom level. &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the beam location in pixels `xCentre` `yCentre`, for a requested</span>
+<span class="sd">        zoom level.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_zoom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_current_zoom</span><span class="p">(</span><span class="n">zoom_level</span><span class="p">)</span>
         <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">_zoom</span><span class="p">]</span><span class="o">.</span><span class="n">crosshair</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">size</span> <span class="o">/</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="n">coord</span><span class="p">])</span></div>

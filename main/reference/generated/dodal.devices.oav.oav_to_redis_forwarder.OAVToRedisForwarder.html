@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1138,33 +1138,23 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.oav.oav_to_redis_forwarder.</span></span><span class="sig-name descname"><span class="pre">OAVToRedisForwarder</span></span><a class="reference internal" href="../../_modules/dodal/devices/oav/oav_to_redis_forwarder.html#OAVToRedisForwarder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder" title="Link to this definition">#</a></dt>
-<dd><p>Forwards OAV image data to redis. To use call:</p>
-<p>&gt; bps.kickoff(oav_forwarder)
-&gt; bps.monitor(oav_forwarder.uuid)
-&gt; bps.complete(oav_forwarder)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>oav_roi</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV" title="dodal.devices.oav.oav_detector.OAV"><code class="xref py py-class docutils literal notranslate"><span class="pre">OAV</span></code></a></span>)</p></li>
-<li><p><strong>oav_fs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV" title="dodal.devices.oav.oav_detector.OAV"><code class="xref py py-class docutils literal notranslate"><span class="pre">OAV</span></code></a></span>)</p></li>
-<li><p><strong>redis_host</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>redis_password</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>redis_db</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Forwards OAV image data to redis.</p>
+<p>To use call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bps</span><span class="o">.</span><span class="n">kickoff</span><span class="p">(</span><span class="n">oav_forwarder</span><span class="p">)</span>
+<span class="n">bps</span><span class="o">.</span><span class="n">monitor</span><span class="p">(</span><span class="n">oav_forwarder</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+<span class="n">bps</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="n">oav_forwarder</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Reads image data from the MJPEG stream on an OAV and forwards it into a
 redis database. This is currently only used for murko integration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – str             the PV prefix of the OAV</p></li>
-<li><p><strong>redis_host</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – str         the host where the redis database is running</p></li>
-<li><p><strong>redis_password</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – str     the password for the redis database</p></li>
-<li><p><strong>redis_db</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">0</span></code>) – int           which redis database to connect to, defaults to 0</p></li>
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>) – str               the name of this device</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The PV prefix of the OAV.</p></li>
+<li><p><strong>redis_host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The host where the redis database is running.</p></li>
+<li><p><strong>redis_password</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The password for the redis database.</p></li>
+<li><p><strong>redis_db</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Which redis database to connect to, defaults to 0.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The name of this device.</p></li>
 <li><p><strong>oav_roi</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV" title="dodal.devices.oav.oav_detector.OAV"><code class="xref py py-class docutils literal notranslate"><span class="pre">OAV</span></code></a></span>)</p></li>
 <li><p><strong>oav_fs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV" title="dodal.devices.oav.oav_detector.OAV"><code class="xref py py-class docutils literal notranslate"><span class="pre">OAV</span></code></a></span>)</p></li>
 </ul>

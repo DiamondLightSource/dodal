@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.EnergyMotorLookup &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.insertion_device.EnergyMotorLookup &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1137,8 +1137,9 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.</span></span><span class="sig-name descname"><span class="pre">EnergyMotorLookup</span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/energy_motor_lookup.html#EnergyMotorLookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.EnergyMotorLookup" title="Link to this definition">#</a></dt>
 <dd><p>Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor
 position.</p>
-<p>After update_lookup_table() has populated the lookup table, <a class="reference internal" href="#dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table" title="dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_value_in_lookup_table()</span></code></a>
-can be used to compute gap / phase for a requested energy / polarisation pair.</p>
+<p>After update_lookup_table() has populated the lookup table,
+<a class="reference internal" href="#dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table" title="dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_value_in_lookup_table()</span></code></a> can be used to compute gap / phase for a requested
+energy / polarisation pair.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>lut</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.LookupTable.html#dodal.devices.insertion_device.LookupTable" title="dodal.devices.insertion_device.lookup_table_models.LookupTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupTable</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
@@ -1173,39 +1174,19 @@ on what updating lookup table does.</p>
 <span class="sig-name descname"><span class="pre">find_value_in_lookup_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol" title="dodal.devices.insertion_device.enum.Pol"><span class="pre">Pol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/energy_motor_lookup.html#EnergyMotorLookup.find_value_in_lookup_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table" title="Link to this definition">#</a></dt>
 <dd><p>Convert energy and polarisation to a value from the lookup table.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Desired energy.</p></li>
+<li><p><strong>pol</strong> (<a class="reference internal" href="dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol" title="dodal.devices.insertion_device.Pol"><em>Pol</em></a>) – Polarisation mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>gap / phase motor position from the lookup table.</p>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
 </dd>
 </dl>
-<section id="parameters">
-<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
-<dl class="simple">
-<dt>energy<span class="classifier">float</span></dt><dd><p>Desired energy.</p>
-</dd>
-<dt>pol<span class="classifier">Pol</span></dt><dd><p>Polarisation mode.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
-<p>:
-float</p>
-<blockquote>
-<div><p>gap / phase motor position from the lookup table.</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">param energy<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-<dt class="field-even">type energy<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
-</dd>
-<dt class="field-odd">param pol<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-<dt class="field-even">type pol<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol" title="dodal.devices.insertion_device.enum.Pol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pol</span></code></a></span></p>
-</dd>
-</dl>
-</section>
 </dd></dl>
 
 </dd></dl>

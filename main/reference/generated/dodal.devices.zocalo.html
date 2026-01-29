@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.zocalo &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.zocalo &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1142,7 +1142,7 @@
 <td><p>This class just sends 'run_start' and 'run_end' messages to zocalo, it is intended to be used in bluesky callback classes.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.zocalo.ZocaloStartInfo.html#dodal.devices.zocalo.ZocaloStartInfo" title="dodal.devices.zocalo.ZocaloStartInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZocaloStartInfo</span></code></a></p></td>
-<td><p>ispyb_dcid (int): The ID of the data collection in ISPyB filename (str): The name of the file that the detector will store into dev/shm start_frame_index (int): The index of the first image of this collection within the file                          written by the detector number_of_frames (int): The number of frames in this collection message_index (int): Which trigger this is in the detector collection e.g. 0 for the                      first collection after a single arm, 1 for the next.</p></td>
+<td><p>Attributes: ispyb_dcid (int): The ID of the data collection in ISPyB. filename (str): The name of the file that the detector will store into dev/shm. start_frame_index (int): The index of the first image of this collection within     the file written by the detector. number_of_frames (int): The number of frames in this collection. message_index (int): Which trigger this is in the detector collection e.g. 0 for     the first collection after a single arm, 1 for the next.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.zocalo.ZocaloSource.html#dodal.devices.zocalo.ZocaloSource" title="dodal.devices.zocalo.ZocaloSource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZocaloSource</span></code></a></p></td>
 <td><p></p></td>
@@ -1174,7 +1174,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.zocalo.get_full_processing_results">
 <span class="sig-prename descclassname"><span class="pre">dodal.devices.zocalo.</span></span><span class="sig-name descname"><span class="pre">get_full_processing_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zocalo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.zocalo.ZocaloResults.html#dodal.devices.zocalo.ZocaloResults" title="dodal.devices.zocalo.zocalo_results.ZocaloResults"><span class="pre">ZocaloResults</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" title="(in Python v3.14)"><span class="pre">Generator</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Msg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.zocalo.XrcResult.html#dodal.devices.zocalo.XrcResult" title="dodal.devices.zocalo.zocalo_results.XrcResult"><span class="pre">XrcResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/zocalo/zocalo_results.html#get_full_processing_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.zocalo.get_full_processing_results" title="Link to this definition">#</a></dt>
-<dd><p>A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
+<dd><p>A plan that will return the raw zocalo results, ranked in descending order
+according to the sort key.
 Returns empty list in the event no results found.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.oav_detector.OAVBeamCentreFile &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.oav.oav_detector.OAVBeamCentreFile &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1141,11 +1141,62 @@
 <dd><p>OAV device that reads its beam centre values from a file. The config parameter
 must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam
 centre values are stored.</p>
-<p>x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
-y_direction(int): Same with x_direction but for motor y
-z_direction(int): Same with x_direction but for motor z
-mjpg_x_size_pv(str): PV infix for x_size in mjpg
-mjpg_y_size_pv(str): PV infix for y_size in mjpg</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.oav.oav_detector.OAVBeamCentreFile.x_direction">
+<span class="sig-name descname"><span class="pre">x_direction</span></span><a class="headerlink" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.x_direction" title="Link to this definition">#</a></dt>
+<dd><p>Should only be 1 or -1, with 1 indicating the oav x
+direction is the same with motor x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.oav.oav_detector.OAVBeamCentreFile.y_direction">
+<span class="sig-name descname"><span class="pre">y_direction</span></span><a class="headerlink" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.y_direction" title="Link to this definition">#</a></dt>
+<dd><p>Same with x_direction but for motor y.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.oav.oav_detector.OAVBeamCentreFile.z_direction">
+<span class="sig-name descname"><span class="pre">z_direction</span></span><a class="headerlink" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.z_direction" title="Link to this definition">#</a></dt>
+<dd><p>Same with x_direction but for motor z.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.oav.oav_detector.OAVBeamCentreFile.mjpg_x_size_pv">
+<span class="sig-name descname"><span class="pre">mjpg_x_size_pv</span></span><a class="headerlink" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.mjpg_x_size_pv" title="Link to this definition">#</a></dt>
+<dd><p>PV infix for x_size in mjpg.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.oav.oav_detector.OAVBeamCentreFile.mjpg_y_size_pv">
+<span class="sig-name descname"><span class="pre">mjpg_y_size_pv</span></span><a class="headerlink" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.mjpg_y_size_pv" title="Link to this definition">#</a></dt>
+<dd><p>PV infix for y_size in mjpg.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1231,7 +1282,14 @@ mjpg_y_size_pv(str): PV infix for y_size in mjpg</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile"><code class="docutils literal notranslate"><span class="pre">OAVBeamCentreFile</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile"><code class="docutils literal notranslate"><span class="pre">OAVBeamCentreFile</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.x_direction"><code class="docutils literal notranslate"><span class="pre">OAVBeamCentreFile.x_direction</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.y_direction"><code class="docutils literal notranslate"><span class="pre">OAVBeamCentreFile.y_direction</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.z_direction"><code class="docutils literal notranslate"><span class="pre">OAVBeamCentreFile.z_direction</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.mjpg_x_size_pv"><code class="docutils literal notranslate"><span class="pre">OAVBeamCentreFile.mjpg_x_size_pv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_detector.OAVBeamCentreFile.mjpg_y_size_pv"><code class="docutils literal notranslate"><span class="pre">OAVBeamCentreFile.mjpg_y_size_pv</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

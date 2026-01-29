@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra.zebra &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.zebra.zebra &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -889,9 +889,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="RotationDirection">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra.RotationDirection.html#dodal.devices.zebra.zebra.RotationDirection">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RotationDirection</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from</span>
-<span class="sd">    the initial angle to obtain the final angle.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines for a swept angle whether the scan width (sweep) is to be added or</span>
+<span class="sd">    subtracted from the initial angle to obtain the final angle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">POSITIVE</span> <span class="o">=</span> <span class="s2">&quot;Positive&quot;</span>
@@ -946,7 +945,8 @@ window.addEventListener("load", load);
 <span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">InstantArmMock</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ArmingDevice</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ArmDemand</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A useful device that can abstract some of the logic of arming.</span>
-<span class="sd">    Allows a user to just call arm.set(ArmDemand.ARM)&quot;&quot;&quot;</span>
+<span class="sd">    Allows a user to just call arm.set(ArmDemand.ARM).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">TIMEOUT</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span>
 
@@ -1094,7 +1094,7 @@ window.addEventListener("load", load);
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Uses the specified `LogicGateConfiguration` to configure a gate on the Zebra.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            type (GateType): The type of gate e.g. AND/OR</span>
+<span class="sd">            type (GateType): The type of gate e.g. AND/OR.</span>
 <span class="sd">            gate_number (int): Which gate to configure.</span>
 <span class="sd">            config (LogicGateConfiguration): A configuration for the gate.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1138,8 +1138,7 @@ window.addEventListener("load", load);
 
 <span class="sd">        Args:</span>
 <span class="sd">            input_source (int): The source for the input (must be between 0 and 63).</span>
-<span class="sd">            invert (bool, optional): Whether the input should be inverted. Default</span>
-<span class="sd">                False.</span>
+<span class="sd">            invert (bool, optional): Whether the input should be inverted. Default False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            LogicGateConfiguration: A description of the gate configuration.</span>

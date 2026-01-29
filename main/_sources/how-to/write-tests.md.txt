@@ -31,9 +31,9 @@ class MyDevice(StandardReadable, Stageable):
         """
         Constructor for setting up instance of device.
 
-        Parameters:
-            prefix: Base PV used for connecting signals.
-            name: Name of the device.
+        Args:
+            prefix (str): Base PV used for connecting signals.
+            name (str): Name of the device.
         """
         with self.add_children_as_readables():
             self.signal_a = epics_signal_rw(float, prefix + "A")

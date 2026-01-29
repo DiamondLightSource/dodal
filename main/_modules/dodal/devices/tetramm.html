@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -904,7 +904,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="TetrammController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TetrammController</span><span class="p">(</span><span class="n">DetectorController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Controller for a TetrAMM current monitor&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Controller for a TetrAMM current monitor.&quot;&quot;&quot;</span>
 
     <span class="n">_supported_trigger_types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">EDGE_TRIGGER</span><span class="p">:</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">EXT_TRIGGER</span><span class="p">,</span>
@@ -995,9 +995,8 @@ window.addEventListener("load", load);
 <span class="sd">        sample rate, it will be lowered to the prior multiple ot ensure triggers</span>
 <span class="sd">        are not missed.</span>
 
-<span class="sd">        :param exposure: Desired exposure time.</span>
-<span class="sd">        :type exposure: How long to wait for the exposure time and acquire</span>
-<span class="sd">            period to be set.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            exposure (float): Desired exposure time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sample_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">sample_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">minimum_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimal_values_per_reading</span><span class="p">[</span>
@@ -1023,9 +1022,10 @@ window.addEventListener("load", load);
 <span class="sd">        Then, it checks that the DetectorState PV is in DEFAULT_GOOD_STATES,</span>
 <span class="sd">        and otherwise raises a ValueError.</span>
 
-<span class="sd">        :returns AsyncStatus:</span>
-<span class="sd">            An AsyncStatus that can be awaited to set driver.acquire to True and perform</span>
-<span class="sd">            subsequent raising (if applicable) due to detector state.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            AsyncStatus: An AsyncStatus that can be awaited to set driver.acquire to</span>
+<span class="sd">                True and perform subsequent raising (if applicable) due to detector</span>
+<span class="sd">                state.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">status</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1145,14 +1145,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="EigerDetector.set_detector_threshold">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.set_detector_threshold">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_detector_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensures the energy threshold on the detector is set to the specified energy (in eV),</span>
-<span class="sd">        within the specified tolerance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensures the energy threshold on the detector is set to the specified energy</span>
+<span class="sd">        (in eV), within the specified tolerance.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            energy (float): The energy to set (in eV)</span>
 <span class="sd">            tolerance (float, optional): If the energy is already set to within</span>
 <span class="sd">                this tolerance it is not set again. Defaults to 0.1eV.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">current_energy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">photon_energy</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting detector threshold to </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

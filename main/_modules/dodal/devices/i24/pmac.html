@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.pmac &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.i24.pmac &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -862,9 +862,11 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">EncReset</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;PMAC strings for position compare on encoder channels in the controller.</span>
 
-<span class="sd">    For example, for ENC5:</span>
+<span class="sd">    For example, for ENC5::</span>
+
 <span class="sd">        m508 sets position A to be compared with value in Channel5 in the controller.</span>
 <span class="sd">        m509 sets position B to be compared with value in Channel5 in the controller.</span>
+
 <span class="sd">    Note. These settings are usually used for initialisation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -972,8 +974,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.kickoff">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kick off the collection by sending a program number to the pmac_string and \</span>
-<span class="sd">            wait for the scan status PV to go to 1.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kick off the collection by sending a program number to the pmac_string and</span>
+<span class="sd">        wait for the scan status PV to go to 1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">prog_num_str</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_prog_number_string</span><span class="p">()</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signal_ref</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prog_num_str</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -988,8 +990,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.complete">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop collecting when the scan status PV goes to 0 or when counter PV hasn&#39;t \</span>
-<span class="sd">            updated for 30 seconds.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop collecting when the scan status PV goes to 0 or when counter PV hasn&#39;t</span>
+<span class="sd">        updated for 30 seconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">counter_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_counter_time_ref</span><span class="p">()</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">signal</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">observe_signals_value</span><span class="p">(</span>
@@ -1007,8 +1009,8 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ProgramAbort">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramAbort.html#dodal.devices.i24.pmac.ProgramAbort">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ProgramAbort</span><span class="p">(</span><span class="n">Triggerable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abort a data collection by setting the PMAC string and then wait for the \</span>
-<span class="sd">        status value to go back to 0.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abort a data collection by setting the PMAC string and then wait for the</span>
+<span class="sd">    status value to go back to 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

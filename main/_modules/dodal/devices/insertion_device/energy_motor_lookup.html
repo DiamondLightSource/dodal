@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.energy_motor_lookup &#8212; dodal 1.69.1.dev29+gd843abb3e documentation</title>
+    <title>dodal.devices.insertion_device.energy_motor_lookup &#8212; dodal 1.69.1.dev30+gc340ca5cc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=665ce89b"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ada2c31"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -822,12 +822,12 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="EnergyMotorLookup">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorLookup</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor</span>
 <span class="sd">    position.</span>
 
-<span class="sd">    After update_lookup_table() has populated the lookup table, `find_value_in_lookup_table()`</span>
-<span class="sd">    can be used to compute gap / phase for a requested energy / polarisation pair.</span>
+<span class="sd">    After update_lookup_table() has populated the lookup table,</span>
+<span class="sd">    `find_value_in_lookup_table()` can be used to compute gap / phase for a requested</span>
+<span class="sd">    energy / polarisation pair.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lut</span><span class="p">:</span> <span class="n">LookupTable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -839,27 +839,22 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup.update_lookup_table">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Do nothing by default. Sub classes may override this method to provide logic</span>
-<span class="sd">        on what updating lookup table does.&quot;&quot;&quot;</span>
+<span class="sd">        on what updating lookup table does.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="EnergyMotorLookup.find_value_in_lookup_table">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_value_in_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert energy and polarisation to a value from the lookup table.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert energy and polarisation to a value from the lookup table.</span>
 
-<span class="sd">        Parameters:</span>
-<span class="sd">        -----------</span>
-<span class="sd">        energy : float</span>
-<span class="sd">            Desired energy.</span>
-<span class="sd">        pol : Pol</span>
-<span class="sd">            Polarisation mode.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            energy (float): Desired energy.</span>
+<span class="sd">            pol (Pol): Polarisation mode.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">        ----------</span>
-<span class="sd">        float</span>
-<span class="sd">            gap / phase motor position from the lookup table.</span>
+<span class="sd">            float: gap / phase motor position from the lookup table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># if lut is empty, force an update to pull updated lut incase subclasses have</span>
         <span class="c1"># implemented it.</span>
@@ -875,7 +870,15 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html#dodal.devices.insertion_device.ConfigServerEnergyMotorLookup">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConfigServerEnergyMotorLookup</span><span class="p">(</span><span class="n">EnergyMotorLookup</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches and parses lookup table (csv) from a config server, supports dynamic</span>
-<span class="sd">    updates, and validates input.&quot;&quot;&quot;</span>
+<span class="sd">    updates, and validates input.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config_client (ConfigServer): The config server client to fetch the look up</span>
+<span class="sd">            table data.</span>
+<span class="sd">        lut_config (LookupTableColumnConfig): Configuration that defines how to</span>
+<span class="sd">            process file contents into a LookupTable.</span>
+<span class="sd">        path (Path): File path to the lookup table.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -883,16 +886,6 @@ window.addEventListener("load", load);
         <span class="n">lut_config</span><span class="p">:</span> <span class="n">LookupTableColumnConfig</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters:</span>
-<span class="sd">        -----------</span>
-<span class="sd">        config_client:</span>
-<span class="sd">            The config server client to fetch the look up table data.</span>
-<span class="sd">        lut_config:</span>
-<span class="sd">            Configuration that defines how to process file contents into a LookupTable</span>
-<span class="sd">        path:</span>
-<span class="sd">            File path to the lookup table.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span> <span class="o">=</span> <span class="n">config_client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lut_config</span> <span class="o">=</span> <span class="n">lut_config</span>
