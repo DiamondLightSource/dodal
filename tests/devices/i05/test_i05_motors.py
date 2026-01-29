@@ -5,7 +5,7 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.i05.motors import I05Goniometer
+from dodal.devices.i05 import I05Goniometer
 
 
 @pytest.fixture
