@@ -32,7 +32,7 @@ def rotate(
 
     from numpy import cos as c
     from numpy import sin as s
-    from numpy import radians
+    from math import radians
 
     def neg_s(x: float) -> float:
         return -s(x)
