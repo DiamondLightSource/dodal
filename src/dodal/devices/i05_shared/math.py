@@ -18,9 +18,14 @@ from collections.abc import Callable
 
 import numpy as np
 
+CallableRotationMatrixType = tuple[
+    tuple[Callable[[float], float], Callable[[float], float]],
+    tuple[Callable[[float], float], Callable[[float], float]],
+]
+
 
 def _get_rotation_matrix(
-    theta: float, callable_rotation_matrix: list[list[Callable[[float], float]]]
+    theta: float, callable_rotation_matrix: CallableRotationMatrixType
 ) -> np.ndarray:
     return np.array(
         [
@@ -34,21 +39,12 @@ def rotate(
     theta: float,
     x: float,
     y: float,
-    callable_rotation_matrix: list[list[Callable[[float], float]]],
+    callable_rotation_matrix: CallableRotationMatrixType,
+    inverse: bool = False,
 ) -> tuple[float, float]:
     rotation_matrix = _get_rotation_matrix(theta, callable_rotation_matrix)
+    if inverse:
+        rotation_matrix = rotation_matrix.T
     positions = np.array([x, y])
     rotation = rotation_matrix @ positions
-    return rotation[0], rotation[1]
-
-
-def inverse_rotate(
-    theta: float,
-    x: float,
-    y: float,
-    callable_rotation_matrix: list[list[Callable[[float], float]]],
-) -> tuple[float, float]:
-    rotation_matrix = _get_rotation_matrix(theta, callable_rotation_matrix)
-    positions = np.array([x, y])
-    rotation = rotation_matrix.T @ positions
     return rotation[0], rotation[1]

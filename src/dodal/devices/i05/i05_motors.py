@@ -5,7 +5,7 @@ from numpy import cos as c
 from numpy import sin as s
 from ophyd_async.core import derived_signal_rw
 
-from dodal.devices.i05_shared.math import inverse_rotate, rotate
+from dodal.devices.i05_shared.math import rotate
 from dodal.devices.motors import (
     _AZIMUTH,
     _POLAR,
@@ -21,7 +21,10 @@ def neg_s(x: float) -> float:
     return -s(x)
 
 
-ROTATION_MATRIX = [[c, s], [neg_s, c]]
+ROTATION_MATRIX = (
+    (c, s),
+    (neg_s, c),
+)
 
 
 class I05Goniometer(XYZPolarAzimuthTiltStage):
@@ -83,8 +86,8 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         )
         perp = value
         long = self._read_long_calc(x_pos, y_pos, self.rotation_angle_deg)
-        new_x, new_y = inverse_rotate(
-            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX
+        new_x, new_y = rotate(
+            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX, inverse=True
         )
         await asyncio.gather(self.x.set(new_x), self.y.set(new_y))
 
@@ -99,7 +102,7 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         )
         perp = self._read_perp_calc(x_pos, y_pos, self.rotation_angle_deg)
         long = value
-        new_x, new_y = inverse_rotate(
-            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX
+        new_x, new_y = rotate(
+            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX, inverse=True
         )
         await asyncio.gather(self.x.set(new_x), self.y.set(new_y))
