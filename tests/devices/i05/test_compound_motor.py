@@ -10,11 +10,6 @@ from ophyd_async.testing import assert_configuration, assert_reading, partial_re
 from dodal.devices.i05 import PolynomCompoundMotors
 
 
-@pytest.fixture()
-async def RE():
-    yield RunEngine()
-
-
 @pytest.fixture
 async def x_motor() -> SimMotor:
     async with init_devices(mock=True):
@@ -74,10 +69,10 @@ async def test_read_includes(mock_compound: PolynomCompoundMotors):
 
 async def test_move(
     mock_compound: PolynomCompoundMotors,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     new_position = 10.0
-    RE(bps.mv(mock_compound, new_position))
+    run_engine(bps.mv(mock_compound, new_position))
     for motor, coeff in mock_compound.motor_coeff_dict.items():
         expected_position = float(np.polynomial.polynomial.polyval(new_position, coeff))
         actual_position = await motor().user_readback.get_value()
@@ -86,9 +81,9 @@ async def test_move(
 
 async def test_move_and_locate(
     mock_compound: PolynomCompoundMotors,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     new_position = 1.23
-    RE(bps.mv(mock_compound, new_position))
+    run_engine(bps.mv(mock_compound, new_position))
     located_position = await mock_compound.locate()
     assert located_position == {"setpoint": new_position, "readback": new_position}
