@@ -19,17 +19,16 @@ in a container under [VSCode](https://code.visualstudio.com/)
 If on a DLS machine make sure you have python >3.11 running by doing `module load python/3.11`
 
 ```
-python3 -m venv venv
-source venv/bin/activate
-pip install --upgrade pip
-pip install -e '.[dev]'
+module load uv
+uv sync --group dev
+source .venv/bin/activate
 ```
 
 ## See what was installed
 
 To see a graph of the python package dependency tree type:
 
-    $ pipdeptree
+    $ uv tree
 
 :::
 
@@ -49,7 +48,7 @@ code .
 Now you have a development environment you can run the tests in a terminal:
 
 ```
-tox -p
+uv run tox -p
 ```
 
 This will run in parallel the following checks:

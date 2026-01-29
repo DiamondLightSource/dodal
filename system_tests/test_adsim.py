@@ -1,5 +1,5 @@
 import os
-from collections.abc import Generator
+from collections.abc import Generator, Mapping
 from pathlib import PurePath
 from typing import cast
 from unittest.mock import patch
@@ -16,14 +16,12 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import (
-    PathProvider,
     StandardDetector,
     StaticPathProvider,
     UUIDFilenameProvider,
 )
 
 from dodal.beamlines import adsim
-from dodal.common.beamlines.beamline_utils import clear_path_provider, set_path_provider
 from dodal.devices.motors import XThetaStage
 from dodal.plans import count
 
@@ -61,46 +59,28 @@ def with_env():
 
 
 @pytest.fixture
-def path_provider() -> Generator[PathProvider]:
-    # path must be available to the `det` container, so cannot use tmp_path
+def det() -> Generator[StandardDetector]:
     path_provider = StaticPathProvider(UUIDFilenameProvider(), PurePath("/tmp"))
-    set_path_provider(path_provider)
-    yield path_provider
-    clear_path_provider()
+    yield adsim.det.build(connect_immediately=True, path_provider=path_provider)
 
 
 @pytest.fixture
-def det(run_engine, path_provider: PathProvider) -> Generator[StandardDetector]:
-    yield adsim.det(connect_immediately=True)
-    adsim.det.cache_clear()
-
-
-@pytest.fixture
-def sim_stage(run_engine) -> Generator[XThetaStage]:
-    yield adsim.stage(connect_immediately=True)
-    adsim.stage.cache_clear()
-
-
-@pytest.fixture
-def documents_from_num(
-    request: pytest.FixtureRequest, det: StandardDetector, run_engine: RunEngine
-) -> dict[str, list[DocumentType]]:
-    docs: dict[str, list[DocumentType]] = {}
-    run_engine(
-        count({det}, num=request.param),
-        lambda name, doc: docs.setdefault(name, []).append(doc),
-    )
-    return docs
+def sim_stage() -> Generator[XThetaStage]:
+    yield adsim.stage.build(connect_immediately=True)
 
 
 @pytest.mark.requires(instrument="adsim")
-@pytest.mark.parametrize(
-    "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"]
-)
+@pytest.mark.parametrize("num, shape", ([1, (1,)], [3, (3,)]))
 def test_plan_produces_expected_start_document(
-    documents_from_num: dict[str, list[DocumentType]], shape: tuple[int, ...]
+    num: int,
+    shape: tuple[int, ...],
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[DocumentType]],
+    det: StandardDetector,
 ):
-    docs = documents_from_num.get("start")
+    run_engine(count({det}, num=num))
+
+    docs = run_engine_documents.get("start")
     assert docs and len(docs) == 1
     start = cast(RunStart, docs[0])
     assert start.get("shape") == shape
@@ -115,13 +95,17 @@ def test_plan_produces_expected_start_document(
 
 
 @pytest.mark.requires(instrument="adsim")
-@pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
-)
+@pytest.mark.parametrize("num, length", ([1, 1], [3, 3]))
 def test_plan_produces_expected_stop_document(
-    documents_from_num: dict[str, list[DocumentType]], length: int
+    num: int,
+    length: int,
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[DocumentType]],
+    det: StandardDetector,
 ):
-    docs = documents_from_num.get("stop")
+    run_engine(count({det}, num=num))
+
+    docs = run_engine_documents.get("stop")
     assert docs and len(docs) == 1
     stop = cast(RunStop, docs[0])
     assert stop.get("num_events") == {"primary": length}
@@ -129,11 +113,16 @@ def test_plan_produces_expected_stop_document(
 
 
 @pytest.mark.requires(instrument="adsim")
-@pytest.mark.parametrize("documents_from_num", [1], indirect=True)
+@pytest.mark.parametrize("num", [1])
 def test_plan_produces_expected_descriptor(
-    documents_from_num: dict[str, list[DocumentType]], det: StandardDetector
+    num: int,
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[DocumentType]],
+    det: StandardDetector,
 ):
-    docs = documents_from_num.get("descriptor")
+    run_engine(count({det}, num=num))
+
+    docs = run_engine_documents.get("descriptor")
     assert docs and len(docs) == 1
     descriptor = cast(EventDescriptor, docs[0])
     object_keys = descriptor.get("object_keys")
@@ -142,15 +131,17 @@ def test_plan_produces_expected_descriptor(
 
 
 @pytest.mark.requires(instrument="adsim")
-@pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
-)
+@pytest.mark.parametrize("num, length", ([1, 1], [3, 3]))
 def test_plan_produces_expected_events(
-    documents_from_num: dict[str, list[DocumentType]],
+    num: int,
     length: int,
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    docs = documents_from_num.get("event")
+    run_engine(count({det}, num=num))
+
+    docs = run_engine_documents.get("event")
     assert docs and len(docs) == length
     for i in range(len(docs)):
         event = cast(Event, docs[i])
@@ -159,12 +150,15 @@ def test_plan_produces_expected_events(
 
 
 @pytest.mark.requires(instrument="adsim")
-@pytest.mark.parametrize("documents_from_num", [1, 3], indirect=True)
+@pytest.mark.parametrize("num", [1, 3])
 def test_plan_produces_expected_resources(
-    documents_from_num: dict[str, list[DocumentType]],
+    num: int,
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    docs = documents_from_num.get("stream_resource")
+    run_engine(count({det}, num=num))
+    docs = run_engine_documents.get("stream_resource")
     data_keys = [det.name]
     assert docs and len(docs) == len(data_keys)
     for i in range(len(docs)):
@@ -178,15 +172,16 @@ def test_plan_produces_expected_resources(
 
 
 @pytest.mark.requires(instrument="adsim")
-@pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
-)
+@pytest.mark.parametrize("num, length", ([1, 1], [3, 3]))
 def test_plan_produces_expected_datums(
-    documents_from_num: dict[str, list[DocumentType]],
+    num: int,
     length: int,
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    docs = cast(list[StreamDatum], documents_from_num.get("stream_datum"))
+    run_engine(count({det}, num=num))
+    docs = cast(list[StreamDatum], run_engine_documents.get("stream_datum"))
     data_keys = [det.name]  # If we enable e.g. Stats plugin add to this
     assert (
         docs and len(docs) <= len(data_keys) * length
@@ -201,7 +196,7 @@ def test_plan_produces_expected_datums(
         stream_resource = [
             resource
             for resource in cast(
-                list[StreamResource], documents_from_num.get("stream_resource")
+                list[StreamResource], run_engine_documents.get("stream_resource")
             )
             if resource.get("data_key") == data_key
         ][0]

@@ -355,10 +355,44 @@ class DeviceManager:
         self._v1_factories = {}
         self._fixtures = {}
 
+    def get_all_factories(self) -> dict[str, V1DeviceFactory | DeviceFactory]:
+        return self._factories | self._v1_factories
+
     def fixture(self, func: Callable[[], T]) -> Callable[[], T]:
         """Add a function that can provide fixtures required by the factories"""
         self._fixtures[func.__name__] = func
         return func
+
+    def include(self, other: "DeviceManager"):
+        """
+        Merge an external DeviceManager into this one.
+
+        Registered devices from the included DeviceManager will be included
+        when all devices are built and will be available as dependencies when
+        building specific devices from this manager. Names of devices still
+        need to be unique and an error will be raised if an included device
+        shares a name with any existing device.
+
+        Fixtures are also included and will override any previously defined
+        fixtures in this manager. Fixtures defined after including the other
+        manager will take precedence over included ones.
+        """
+        # Bug in pyright means type checking doesn't recognise 'DeviceManager'
+        # as this class and fails with private member access
+        common = self._factories.keys() & other._factories  # noqa SLF001
+        common |= self._v1_factories.keys() & other._v1_factories  # noqa SLF001
+        common |= self._factories.keys() & other._v1_factories  # noqa SLF001
+        common |= self._v1_factories.keys() & other._factories  # noqa SLF001
+        if common:
+            raise ValueError(
+                f"Duplicate factories in included device manager: {common}"
+            )
+
+        self._factories.update(other._factories)  # noqa SLF001
+        self._v1_factories.update(other._v1_factories)  # noqa SLF001
+
+        # duplicate fixtures are not checked as fixtures can be overridden
+        self._fixtures.update(other._fixtures)  # noqa SLF001
 
     def v1_init(
         self,
@@ -456,7 +490,7 @@ class DeviceManager:
         return self.build_devices(
             *(
                 f
-                for f in (self._factories | self._v1_factories).values()
+                for f in (self.get_all_factories()).values()
                 # allow overriding skip but still allow fixtures to override devices
                 if (include_skipped or not f.skip)
             ),
