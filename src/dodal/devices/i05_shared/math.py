@@ -1,19 +1,3 @@
-"""
-Helper functions that can perform rotations on x and y. A matrix of callables is used so
-that any rotation can be used.
-
-from numpy import cos as c
-from numpy import sin as s
-
-def neg_s(x: float) -> float:
-    return -s(x)
-
-ROTATION_MATRIX = [[c, s], [neg_s, c]]
-x, y = 1, 5
-
-new_x, new_y = rotate_deg(45, x, y, ROTATION_MATRIX)
-"""
-
 from collections.abc import Callable
 
 import numpy as np
@@ -42,6 +26,22 @@ def rotate(
     callable_rotation_matrix: CallableRotationMatrixType,
     inverse: bool = False,
 ) -> tuple[float, float]:
+    """
+    Helper functions that can perform rotations on x and y. A matrix of callables is
+    parsed so any rotation can be used. An example is shown below:
+
+    from numpy import cos as c
+    from numpy import sin as s
+    from numpy import radians
+
+    def neg_s(x: float) -> float:
+        return -s(x)
+
+    ROTATION_MATRIX = [[c, s], [neg_s, c]]
+    x, y = 1, 5
+
+    new_x, new_y = rotate(radians(45), x, y, ROTATION_MATRIX)
+    """
     rotation_matrix = _get_rotation_matrix(theta, callable_rotation_matrix)
     if inverse:
         rotation_matrix = rotation_matrix.T
