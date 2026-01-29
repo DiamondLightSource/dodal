@@ -200,7 +200,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     def process_result(self, result: dict, metadata: MurkoMetadata):
         """Uses the 'most_likely_click' coordinates from Murko to calculate the
         horizontal and vertical distances from the beam centre, and store these values
-        as well as the omega angle the image was taken at."""
+        as well as the omega angle the image was taken at.
+        """
         omega = metadata["omega_angle"]
         coords = result["most_likely_click"]  # As proportion from top, left of image
         LOGGER.info(f"Got most_likely_click: {coords} at angle {omega}")
@@ -235,8 +236,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         When it is wrong it usually picks up the base of the pin, rather than the tip,
         meaning that by keeping only a percentage of the results with the smallest X we
         remove many of the outliers. Murko also occasionally picks a point in the bottom
-        left corner, which can be removed by filtering results with a small x pixel."""
-
+        left corner, which can be removed by filtering results with a small x pixel.
+        """
         LOGGER.info(f"Number of results before filtering: {len(self._results)}")
         sorted_results = sorted(self._results, key=lambda item: item.chosen_point_px[0])
 
@@ -280,7 +281,7 @@ def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, flo
     angles.
 
     Args:
-        v_dists (list): List of vertical distances from beam centre. Any units.
+        vertical_dists (list): List of vertical distances from beam centre. Any units.
         omegas (list): List of omega angles in degrees.
 
     Returns:

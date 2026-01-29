@@ -40,6 +40,7 @@ def run_functions_without_blocking(
     Args:
         functions_to_chain (Sequence(function - > StatusBase)): A list of functions
             which each return a status object.
+        timeout (float, optional): The timeout period, defaults to 60.
         associated_obj (OphydDevice, optional): The device that should be associated
             with the returned status.
 
@@ -47,7 +48,6 @@ def run_functions_without_blocking(
         Status: A status object which is marked as complete once all of the Status
             objects returned by the unwrapped functions have completed.
     """
-
     # The returned status - marked as finished at the end of the callback chain. If any
     # intermediate statuses have an exception, the full_status will timeout.
     full_status = Status(obj=associated_obj, timeout=timeout)

@@ -72,7 +72,8 @@ def andor2_det() -> Andor2Detector:
 @devices.factory()
 def andor2_point() -> Andor2Point:
     """Using the andor2 as if it is a massive point detector, read the meanValue and
-    total after a picture is taken."""
+    total after a picture is taken.
+    """
     return Andor2Point(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
         drv_suffix=CAM_SUFFIX,

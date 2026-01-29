@@ -9,7 +9,8 @@ class AcquireState(StrictEnum):
 
 class Xspress3Channel(Device):
     """Xspress3 Channel contains the truncated detector data and its collection conditions
-    including the definition of ROI(region of interest)."""
+    including the definition of ROI(region of interest).
+    """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.update_arrays = epics_signal_rw(AcquireState, prefix + "SCAS:TS:TSAcquire")

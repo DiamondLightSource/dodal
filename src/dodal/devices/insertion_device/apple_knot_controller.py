@@ -45,7 +45,8 @@ class AppleKnotPathFinder:
         self, start_val: Apple2Val, end_val: Apple2Val
     ) -> tuple[Apple2Val, ...]:
         """Get a list of Apple2Val representing the path from start to end avoiding
-        exclusion zones."""
+        exclusion zones.
+        """
         apple_knot_val_path = ()
         # Defensive checks for no movement
         if (
@@ -171,7 +172,8 @@ class AppleKnotController(
 
     async def check_top_bottom_phase_match(self) -> None:
         """Check that the top and bottom phase motors are in sync.
-        Raise an error if they are not within tolerance."""
+        Raise an error if they are not within tolerance.
+        """
         current_phase_top = float(
             await self.apple2().phase().top_outer.user_readback.get_value()
         )

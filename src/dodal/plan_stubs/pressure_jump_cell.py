@@ -7,7 +7,8 @@ def set_pressure_jump(
     pressure_cell: PressureJumpCell, pressure_from: int, pressure_to: int
 ):
     """Sets the desired pressures for a jump waiting for the device to complete the
-    operation."""
+    operation.
+    """
     yield from bps.mv(
         pressure_cell.control.from_pressure,
         pressure_from,

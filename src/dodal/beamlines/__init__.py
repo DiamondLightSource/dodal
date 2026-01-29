@@ -33,7 +33,6 @@ def all_beamline_modules() -> Iterable[str]:
     Returns:
         Iterable [str]: Generator of beamline module names.
     """
-
     # This is done by inspecting file names rather than modules to avoid
     # premature importing
     spec = importlib.util.find_spec(__name__)
@@ -73,7 +72,6 @@ def _module_name_overrides() -> Mapping[str, set[str]]:
         Mapping[str, set[str]]: A dictionary mapping the name of a dodal module to the
             set of beamlines it supports.
     """
-
     inverse_mapping: dict[str, set[str]] = {}
     for beamline, module in _BEAMLINE_NAME_OVERRIDES.items():
         inverse_mapping[module] = inverse_mapping.get(module, set()).union({beamline})
@@ -90,5 +88,4 @@ def module_name_for_beamline(beamline: str) -> str:
     Returns:
         str: The importable module name.
     """
-
     return _BEAMLINE_NAME_OVERRIDES.get(beamline, beamline)

@@ -203,8 +203,8 @@ class ZocaloResults(StandardReadable, Triggerable):
         """Stages the Zocalo device by: subscribing to the queue, doing a background
         sleep for a few seconds to wait for any stale messages to be received, then
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
-        before triggering processing for the experiment"""
-
+        before triggering processing for the experiment.
+        """
         LOGGER.info("Subscribing to results queue")
         try:
             self._subscribe_to_results()
@@ -312,7 +312,8 @@ def get_full_processing_results(
 ) -> Generator[Msg, Any, Sequence[XrcResult]]:
     """A plan that will return the raw zocalo results, ranked in descending order
     according to the sort key.
-    Returns empty list in the event no results found."""
+    Returns empty list in the event no results found.
+    """
     LOGGER.info("Retrieving raw zocalo processing results")
     com = yield from bps.rd(zocalo.centre_of_mass, default_value=[])
     max_voxel = yield from bps.rd(zocalo.max_voxel, default_value=[])

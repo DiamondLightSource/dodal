@@ -130,7 +130,8 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     async def beamline_status_or_error(self, expected_state: BeamlineStatus):
         """This co-routine will finish when either the beamline reaches the specified
         state or the robot gives an error (whichever happens first). In the case where
-        there is an error a RobotLoadError error is raised."""
+        there is an error a RobotLoadError error is raised.
+        """
 
         async def raise_if_error():
             await wait_for_value(

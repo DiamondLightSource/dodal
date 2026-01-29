@@ -123,7 +123,8 @@ def slits_6() -> Slits:
 @device_factory()
 def slits_7() -> Slits:
     """Compact JJ slits device is used for B21 slits 7. PV's operate in same way
-    but physically different to other slits, and uses X:GAP nomenclature."""
+    but physically different to other slits, and uses X:GAP nomenclature.
+    """
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-07:",
         x_gap="X:GAP",

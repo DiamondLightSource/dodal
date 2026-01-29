@@ -38,7 +38,6 @@ def _add_parallel_lines_to_image(
         orientation (Orientation): The orientation (horizontal or vertical) of the
             parallel lines to draw.
     """
-
     lines = [
         (
             (

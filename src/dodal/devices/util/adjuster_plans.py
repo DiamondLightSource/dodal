@@ -1,5 +1,4 @@
-"""
-All the methods in this module return a bluesky plan generator that adjusts a value
+"""All the methods in this module return a bluesky plan generator that adjusts a value
 according to some criteria either via feedback, preset positions, lookup tables etc.
 """
 

@@ -27,11 +27,11 @@ class DirectoryServiceClient(ABC):
 
     @abstractmethod
     async def create_new_collection(self) -> DataCollectionIdentifier:
-        """Create new collection"""
+        """Create new collection."""
 
     @abstractmethod
     async def get_current_collection(self) -> DataCollectionIdentifier:
-        """Get current collection"""
+        """Get current collection."""
 
 
 class DiamondFilenameProvider(FilenameProvider):
@@ -122,9 +122,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
         self._session: ClientSession | None
 
     async def update(self, **kwargs) -> None:
-        """
-        Creates a new data collection in the current visit.
-        """
+        """Creates a new data collection in the current visit."""
         # https://github.com/DiamondLightSource/dodal/issues/452
         # TODO: Allow selecting visit as part of a request
         # TODO: DAQ-4827: Pass AuthN information as part of request

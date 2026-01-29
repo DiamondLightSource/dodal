@@ -66,7 +66,7 @@ def det1z() -> Motor:
 
 @device_factory()
 def det2z() -> Motor:
-    """Deliberately the same as eht2dtx"""
+    """Deliberately the same as eht2dtx."""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 
@@ -85,7 +85,7 @@ def djack1() -> JackX:
 
 @device_factory()
 def eht2dtx() -> Motor:
-    """Deliberately the same as det2z"""
+    """Deliberately the same as det2z."""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 

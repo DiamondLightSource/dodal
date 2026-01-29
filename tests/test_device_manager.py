@@ -788,12 +788,12 @@ def test_lazy_fixtures_contains():
 def test_docstrings_are_kept(dm: DeviceManager):
     @dm.factory
     def foo():
-        """This is the docstring for foo"""
+        """This is the docstring for foo."""
         return Mock()
 
     @dm.v1_init(Mock(), prefix="MOCK_PREFIX")  # type: ignore
     def bar(_):
-        """This is the docstring for bar"""
+        """This is the docstring for bar."""
         pass
 
     assert foo.__doc__ == "This is the docstring for foo"

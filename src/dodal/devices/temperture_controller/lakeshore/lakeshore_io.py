@@ -3,8 +3,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class LakeshoreControlChannel(Device):
-    """
-    Single control channel for a Lakeshore temperature controller.
+    """Single control channel for a Lakeshore temperature controller.
 
     Provides access to setpoint, ramp rate, ramp enable, heater output, heater output
     range, PID parameters (P, I, D), and manual output for the channel.

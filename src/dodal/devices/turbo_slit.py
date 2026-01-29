@@ -13,10 +13,10 @@ class TurboSlit(StandardReadable, Movable[float]):
     scans.
     These slits can be scanned continously or in step mode.
     The relationship between the three motors is as follows:
-        - arc - position of the middle of the gap in degrees (coarse/ macro) extension
-        - gap - width in mm, provides energy resolution
+        - arc - position of the middle of the gap in degrees (coarse/ macro) extension.
+        - gap - width in mm, provides energy resolution.
         - xfine - main scanning axis in mm, selects the energy as part of the high
-          frequency scan
+          frequency scan.
     """
 
     def __init__(self, prefix: str, name: str = ""):
@@ -28,5 +28,5 @@ class TurboSlit(StandardReadable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        """This will move the default XFINE"""
+        """This will move the default XFINE."""
         await self.xfine.set(value)

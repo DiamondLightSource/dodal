@@ -100,8 +100,8 @@ class BimorphMirror(StandardReadable, Movable[list[float]]):
             value (list[float]): List of float target voltages.
 
         Raises:
-            ValueError: On set to non-existent channel."""
-
+            ValueError: On set to non-existent channel.
+        """
         if len(value) != len(self.channels):
             raise ValueError(
                 f"Length of value input array does not match number of \

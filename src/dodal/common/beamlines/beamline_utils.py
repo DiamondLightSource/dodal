@@ -102,6 +102,7 @@ def device_instantiation(
         post_create (Callable): (optional) a function to be run on the device after
             creation.
         bl_prefix (bool): If true, add the beamline prefix when instantiating.
+        **kwargs: Arguments passed on to every device factory.
 
     Returns:
         The instance of the device.

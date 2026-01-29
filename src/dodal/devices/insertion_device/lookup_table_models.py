@@ -77,7 +77,8 @@ class Source(NamedTuple):
 
 class LookupTableColumnConfig(BaseModel):
     """Configuration on how to process a csv file columns into a LookupTable data
-    model."""
+    model.
+    """
 
     source: A[
         Source | None,
@@ -115,7 +116,8 @@ class EnergyCoverageEntry(BaseModel):
         cls: type[Self], value: np.poly1d | list
     ) -> np.poly1d:
         """If reading from serialized data, it will be using a list. Convert to
-        np.poly1d"""
+        np.poly1d.
+        """
         if isinstance(value, list):
             return np.poly1d(value)
         return value
@@ -172,7 +174,6 @@ class EnergyCoverage(BaseModel):
             energy (float): Energy value in the same units used to create the lookup
                 table.
         """
-
         if not self.min_energy <= energy <= self.max_energy:
             raise ValueError(
                 f"Demanding energy must lie between {self.min_energy} and {self.max_energy}!"
@@ -188,7 +189,8 @@ class EnergyCoverage(BaseModel):
 
     def get_energy_index(self, energy: float) -> int | None:
         """Binary search assumes self.energy_entries is sorted by min_energy.
-        Return index or None if not found."""
+        Return index or None if not found.
+        """
         max_index = len(self.energy_entries) - 1
         min_index = 0
         while min_index <= max_index:
@@ -205,7 +207,8 @@ class EnergyCoverage(BaseModel):
 
 class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
     """Specialised lookup table for insertion devices to relate the energy and
-    polarisation values to Apple2 motor positions."""
+    polarisation values to Apple2 motor positions.
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -220,7 +223,8 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
         energy_coverage: list[EnergyCoverage],
     ) -> Self:
         """Generate a LookupTable containing multiple EnergyCoverage
-        for provided polarisations."""
+        for provided polarisations.
+        """
         root_data = dict(zip(pols, energy_coverage, strict=False))
         return cls(root=root_data)
 
@@ -229,8 +233,7 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
         energy: float,
         pol: Pol,
     ) -> np.poly1d:
-        """
-        Return the numpy.poly1d polynomial applicable for the given energy and
+        """Return the numpy.poly1d polynomial applicable for the given energy and
         polarisation.
 
         Args:

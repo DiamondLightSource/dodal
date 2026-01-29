@@ -58,6 +58,7 @@ def calculate_beam_distance(
     vertical).
 
     Args:
+        beam_centre (tuple[int, int]): The position of the beam in pixels.
         horizontal_pixels (int): The x (camera coordinates) value in pixels.
         vertical_pixels (int): The y (camera coordinates) value in pixels.
 

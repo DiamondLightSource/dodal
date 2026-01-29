@@ -24,7 +24,7 @@ class InvalidApertureMoveError(Exception):
 
 
 class _GDAParamApertureValue(StrictEnum):
-    """Maps from a short usable name to the value name in the GDA Beamline parameters"""
+    """Maps from a short usable name to the value name in the GDA Beamline parameters."""
 
     ROBOT_LOAD = "ROBOT_LOAD"
     SMALL = "SMALL_APERTURE"
@@ -206,7 +206,8 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
     async def _unpark(self, position_to_move_to: ApertureValue):
         """When the aperture is parked it is under the collimation table. It needs to be
-        moved out from under the table before it is moved up to beam height."""
+        moved out from under the table before it is moved up to beam height.
+        """
         position = self._loaded_positions[position_to_move_to]
         await self.aperture.z.set(position.aperture_z)
 

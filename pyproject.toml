@@ -22,15 +22,15 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",         # For pin-tip detection.
+    "opencv-python-headless",       # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
     "redis",
     "scanspec>=0.7.3",
-    "pyzmq==26.3.0",                  # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "pyzmq==26.3.0",                # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
     "deepdiff",
-    "daq-config-server>=v1.0.0", # For getting Configuration settings.
+    "daq-config-server>=v1.0.0",    # For getting Configuration settings.
 ]
 
 dynamic = ["version"]
@@ -53,7 +53,7 @@ dev = [
     "psutil",
     "pydata-sphinx-theme>=0.12",
     # Pin to previous pyright until https://github.com/microsoft/pyright/issues/11060 is fixed
-    "pyright==1.1.406", 
+    "pyright==1.1.406",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
@@ -61,7 +61,7 @@ dev = [
     "pytest-timeout",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<7.4.6",             #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
@@ -188,7 +188,7 @@ commands = [
 description = "Run tests with coverage"
 commands = [
     [
-        "pytest", 
+        "pytest",
         "--cov=dodal",
         "--cov-report",
         "term",
@@ -205,11 +205,14 @@ description = "Run system tests with coverage"
 commands = [
     [
         "pytest",
-        "-m", "not requires(instrument=\"i04\")",
-        "--cov-report", "xml:system_cov.xml",
+        "-m",
+        "not requires(instrument=\"i04\")",
+        "--cov-report",
+        "xml:system_cov.xml",
         "--timeout=10",
         "system_tests",
-        { replace = "posargs", default = [], extend = true },
+        { replace = "posargs", default = [
+        ], extend = true },
     ],
 ]
 
@@ -248,7 +251,16 @@ src = ["src", "tests"]
 line-length = 88
 lint.extend-ignore = [
     "E501", # Line too long
-    "F811", # support typing.overload decorator
+    "F811", # Support typing.overload decorator
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D105", # Missing docstring in magic method
+    "D106", # Missing docstring in public nested class
+    "D107", # Missing docstring in __init__
+    "D205", # 1 blank line requred between summary line and description
 ]
 lint.select = [
     "B",      # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
@@ -263,6 +275,7 @@ lint.select = [
     "RUF018", # walrus operators in asserts - https://docs.astral.sh/ruff/rules/assignment-in-assert/
     "TID251", # banned api - https://docs.astral.sh/ruff/rules/banned-api/
     "INP001", # missing __init__.py - https://docs.astral.sh/ruff/rules/implicit-namespace-package/
+    "D",      # pydocstyle - https://docs.astral.sh/ruff/rules/#pydocstyle-d
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -280,6 +293,9 @@ lint.select = [
 [tool.ruff.lint.flake8-import-conventions.extend-aliases]
 # We often shorten "Annotated" to "A" for brevity
 "typing.Annotated" = "A"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.importlinter]
 root_package = "dodal"

@@ -15,7 +15,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
     Attributes:
         gain_conversion_table (Enum): The conversion table between current
             and gain setting.
-    """
+    """  # noqa D415
 
     def __init__(self, gain_conversion_table: type[Enum], name: str = "") -> None:
         self.gain_conversion_table = gain_conversion_table
@@ -55,8 +55,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable):
-    """
-    Base class for current amplifier counter, it contain the minimal implementations
+    """Base class for current amplifier counter, it contain the minimal implementations
         required for a counter/detector to function with CurrentAmpDet.
 
     Attributes:

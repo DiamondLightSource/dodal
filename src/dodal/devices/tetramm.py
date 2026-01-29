@@ -75,7 +75,7 @@ class TetrammDriver(NDArrayBaseIO):
 
 
 class TetrammController(DetectorController):
-    """Controller for a TetrAMM current monitor"""
+    """Controller for a TetrAMM current monitor."""
 
     _supported_trigger_types = {
         DetectorTrigger.EDGE_TRIGGER: TetrammTrigger.EXT_TRIGGER,

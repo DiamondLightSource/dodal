@@ -144,7 +144,8 @@ class ProgramRunner(Device, Flyable):
     @AsyncStatus.wrap
     async def kickoff(self):
         """Kick off the collection by sending a program number to the pmac_string and
-        wait for the scan status PV to go to 1."""
+        wait for the scan status PV to go to 1.
+        """
         prog_num_str = await self._get_prog_number_string()
         await self._signal_ref().set(prog_num_str, wait=True)
         await wait_for_value(
@@ -156,7 +157,8 @@ class ProgramRunner(Device, Flyable):
     @AsyncStatus.wrap
     async def complete(self):
         """Stop collecting when the scan status PV goes to 0 or when counter PV hasn't
-        updated for 30 seconds."""
+        updated for 30 seconds.
+        """
         counter_time = await self._counter_time_ref().get_value()
         async for signal, value in observe_signals_value(
             self._status_ref(),
@@ -170,7 +172,8 @@ class ProgramRunner(Device, Flyable):
 
 class ProgramAbort(Triggerable):
     """Abort a data collection by setting the PMAC string and then wait for the
-    status value to go back to 0."""
+    status value to go back to 0.
+    """
 
     def __init__(
         self,

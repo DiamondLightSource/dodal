@@ -66,7 +66,8 @@ class UndulatorBase(abc.ABC, Device, Generic[T]):
     """Abstract base class for Apple2 undulator devices.
     This class provides common functionality for undulator devices, including
     gate and status signal management, safety checks before motion, and abstract
-    methods for setting demand positions and estimating move timeouts."""
+    methods for setting demand positions and estimating move timeouts.
+    """
 
     def __init__(self, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
@@ -91,7 +92,8 @@ class UndulatorBase(abc.ABC, Device, Generic[T]):
 
 class SafeUndulatorMover(StandardReadable, UndulatorBase, Generic[T]):
     """A device that will check it's safe to move the undulator before moving it and
-    wait for the undulator to be safe again before calling the move complete."""
+    wait for the undulator to be safe again before calling the move complete.
+    """
 
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
@@ -195,7 +197,8 @@ class UndulatorGap(GapSafeMotorNoStop):
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMotorInfo) -> None:
         """Prepare for a fly scan by moving to the run-up position at max velocity.
-        Stores fly info for later use in kickoff."""
+        Stores fly info for later use in kickoff.
+        """
         max_velocity, min_velocity, egu = await asyncio.gather(
             self.max_velocity.get_value(),
             self.min_velocity.get_value(),
@@ -263,8 +266,8 @@ class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseValType]):
 
     async def get_timeout(self) -> float:
         """Get all motor speed, current positions and target positions to calculate
-        required timeout."""
-
+        required timeout.
+        """
         timeouts = await asyncio.gather(
             *[
                 estimate_motor_timeout(
@@ -289,7 +292,7 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
         top_inner == Q2
         btm_inner == q3
         btm_outer == q4
-    """
+    """  # noqa D415
 
     def __init__(
         self,
@@ -319,7 +322,8 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
 
 class UndulatorJawPhase(SafeUndulatorMover[float]):
     """A JawPhase movable, this is use for moving the jaw phase which is use to control
-    the linear arbitrary polarisation but only on some of the beamline."""
+    the linear arbitrary polarisation but only on some of the beamline.
+    """
 
     def __init__(
         self,
@@ -341,7 +345,8 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
 
     async def get_timeout(self) -> float:
         """Get motor speed, current position and target position to calculate required
-        timeout."""
+        timeout.
+        """
         return await estimate_motor_timeout(
             self.jaw_phase.user_setpoint_readback,
             self.jaw_phase.user_readback,
@@ -375,8 +380,8 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
     @AsyncStatus.wrap
     async def set(self, id_motor_values: Apple2Val) -> None:
         """Check ID is in a movable state and set all the demand value before moving
-        them all at the same time."""
-
+        them all at the same time.
+        """
         # Only need to check gap as the phase motors share both status and gate with gap.
         await self.gap().raise_if_cannot_move()
 

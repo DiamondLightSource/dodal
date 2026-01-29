@@ -43,9 +43,9 @@ class OAVParameters:
 
     @staticmethod
     def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
+        """Loads the json from the specified file, and returns a dict with all the
+        individual top-level k-v pairs, and one with all the subdicts.
         """
-        Loads the json from the specified file, and returns a dict with all the
-        individual top-level k-v pairs, and one with all the subdicts."""
         with open(filename) as f:
             raw_params: dict[str, Any] = json.load(f)
         global_params = {
@@ -150,7 +150,8 @@ class OAVConfig(OAVConfigBase[ZoomParams]):
 
 class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
     """Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}
-    with information about microns per pixels and crosshairs."""
+    with information about microns per pixels and crosshairs.
+    """
 
     def __init__(
         self,

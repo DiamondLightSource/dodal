@@ -44,12 +44,12 @@ class GridAxis:
     full_steps: int
 
     def steps_to_motor_position(self, steps):
-        """Gives the motor position based on steps, where steps are 0 indexed"""
+        """Gives the motor position based on steps, where steps are 0 indexed."""
         return self.start + self.step_size_mm * steps
 
     @property
     def end(self):
-        """Gives the point where the final frame is taken"""
+        """Gives the point where the final frame is taken."""
         # Note that full_steps is one indexed e.g. if there is one step then the end is
         # refering to the first position
         return self.steps_to_motor_position(self.full_steps - 1)
@@ -174,7 +174,8 @@ class WithDwellTime(BaseModel):
 
 class ZebraGridScanParamsThreeD(GridScanParamsThreeD, WithDwellTime):
     """Params for standard Zebra FGS. Adds on the dwell time, which is really the time
-    between trigger positions."""
+    between trigger positions.
+    """
 
 
 class PandAGridScanParams(GridScanParamsThreeD):

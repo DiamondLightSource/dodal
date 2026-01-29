@@ -65,7 +65,8 @@ class BeamCentreForZoom(StandardReadable):
     """These PVs hold the beam centre on the OAV at each zoom level.
 
     When the zoom level is changed the IOC will update the OAV overlay PVs to be at
-    these positions."""
+    these positions.
+    """
 
     def __init__(
         self, prefix: str, level_name_pv_suffix: str, centre_value_pv_suffix: str
@@ -99,7 +100,7 @@ class ZoomController(BaseZoomController):
 
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
     you should wait on any zoom changes to finish before changing the OAV wiring.
-    """
+    """  # noqa 415
 
     DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 2
 
@@ -294,7 +295,8 @@ class OAVBeamCentreFile(OAV):
 
     def _get_beam_position(self, zoom_level: str, size: int, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested
-        zoom level."""
+        zoom level.
+        """
         _zoom = self._read_current_zoom(zoom_level)
         value = self.parameters[_zoom].crosshair[coord]
         return int(value * size / DEFAULT_OAV_WINDOW[coord])

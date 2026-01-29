@@ -1,6 +1,4 @@
-"""
-Allow external repos to reuse these fixtures so defined in single place.
-"""
+"""Allow external repos to reuse these fixtures so defined in single place."""
 
 import asyncio
 import copy

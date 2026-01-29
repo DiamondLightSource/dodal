@@ -68,7 +68,6 @@ async def xyzpyr_stage() -> XYZPitchYawRollStage:
 
 async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
     """Test setting x and y positions on the Table using the ophyd_async mock tools."""
-
     await assert_reading(
         xyzt_stage,
         {
@@ -266,7 +265,6 @@ async def test_setting_xyzpyr_position_table(
 
 async def test_setting(xy_stage: XYStage):
     """Test setting x and y positions on the XYStage using ophyd_async mock tools."""
-
     await assert_reading(
         xy_stage,
         {"xy_stage-x": partial_reading(0.0), "xy_stage-y": partial_reading(0.0)},

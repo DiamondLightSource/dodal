@@ -177,7 +177,8 @@ class AbstractBaseSequence(
 ):
     """Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to
-    hold."""
+    hold.
+    """
 
     version: float = 0.1  # If file format changes within prod, increment this number!
     regions: list[TAbstractBaseRegion] = Field(default_factory=lambda: [])

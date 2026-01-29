@@ -101,7 +101,8 @@ class CommissioningJungfrau(
     StandardDetector[JungfrauController, JungfrauCommissioningWriter]
 ):
     """Ophyd-async implementation of a Jungfrau 9M Detector, using a temporary
-    filewriter in place of Odin"""
+    filewriter in place of Odin.
+    """
 
     def __init__(
         self,

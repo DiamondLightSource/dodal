@@ -20,13 +20,15 @@ cause issue but that could conceivably be used in a beamline file.
 
 def not_a_device() -> None:
     """Importing DisconnectedError is enough to cause issue, but we
-    use it here to prevent linting from removing it from the imports."""
+    use it here to prevent linting from removing it from the imports.
+    """
     raise DisconnectedError()
 
 
 def also_not_a_device() -> float:
-    """log and hypot both do not have signatures.
-    Not required to actually be used, importing is enough."""
+    """Log and hypot both do not have signatures.
+    Not required to actually be used, importing is enough.
+    """
     return log(hypot(0, 0))
 
 

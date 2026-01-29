@@ -16,7 +16,8 @@ class PandAFilenameProvider(FilenameProvider):
 
 class PandASubpathProvider(UpdatingPathProvider):
     """Directory provider for the HDFPanda. Points to a panda subdirectory within the
-    directory path provided"""
+    directory path provided.
+    """
 
     resource_dir = Path("panda")
 
@@ -44,6 +45,7 @@ class PandASubpathProvider(UpdatingPathProvider):
             suffix (str, optional): Optional str that will be appended to the panda
                 device name along with the file type extension to construct the output
                 filename.
+            **kwargs: Seemingly unused.
         """
         self._output_directory = directory / self.resource_dir
         self._filename_provider.suffix = suffix

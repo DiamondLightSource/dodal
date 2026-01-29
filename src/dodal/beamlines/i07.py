@@ -16,7 +16,7 @@ devices = DeviceManager()
 
 @devices.factory()
 def dcm() -> DCM:
-    """Instantiate DCM using two PV bases"""
+    """Instantiate DCM using two PV bases."""
     return DCM(
         f"{PREFIX.beamline_prefix}-MO-DCM-01:", f"{PREFIX.beamline_prefix}-DI-DCM-01:"
     )
@@ -30,7 +30,8 @@ def harmonic() -> UndulatorOrder:
 @devices.factory()
 def id(harmonic: UndulatorOrder) -> InsertionDevice:
     """Get the i07 undulator device, instantiate it if it hasn't already been.
-    If this is called when already instantiated it will return the existing object."""
+    If this is called when already instantiated it will return the existing object.
+    """
     return InsertionDevice(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         harmonic,

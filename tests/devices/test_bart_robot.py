@@ -157,7 +157,6 @@ async def set_with_happy_path(
     device: BartRobot, mock_log_info: MagicMock
 ) -> AsyncStatus:
     """Mocks the logic that the robot would do on a successful load."""
-
     mock_log_info.side_effect = partial(_set_beamline_enabled_on_log_messages, device)
     set_mock_value(device.program_running, False)
     set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
@@ -169,7 +168,6 @@ async def set_with_unhappy_path(
     device: BartRobot, mock_log_info: MagicMock
 ) -> AsyncStatus:
     """Mocks the logic that the robot would do on a successful load."""
-
     mock_log_info.side_effect = partial(_error_on_unload_log_messages, device)
     set_mock_value(device.program_running, False)
     set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)

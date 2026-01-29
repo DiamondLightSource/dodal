@@ -90,7 +90,8 @@ class ElectronAnalyserRegionDetector(
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """Extends electron analyser detector to configure specific region settings before
-    data acquisition. It is designed to only exist inside a plan."""
+    data acquisition. It is designed to only exist inside a plan.
+    """
 
     def __init__(
         self,
@@ -126,7 +127,8 @@ class ElectronAnalyserDetector(
 ):
     """Electron analyser detector with the additional functionality to load a sequence
     file and create a list of temporary ElectronAnalyserRegionDetector objects. These
-    will setup configured region settings before data acquisition."""
+    will setup configured region settings before data acquisition.
+    """
 
     def __init__(
         self,

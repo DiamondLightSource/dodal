@@ -15,7 +15,8 @@ _commissioning_signal: SignalR | None = None
 def read_commissioning_mode() -> MsgGenerator[bool]:
     """Utility method for reading the commissioning mode state from the context
     of a bluesky plan, where a baton may or may not be present, or
-    commissioning mode is provided by some other mechanism."""
+    commissioning mode is provided by some other mechanism.
+    """
     if _commissioning_signal:
         return (yield from bps.rd(_commissioning_signal))
     else:
@@ -29,6 +30,7 @@ def set_commissioning_signal(signal: SignalR[bool] | None):
 
     Args:
         signal (SignalR): The signal which will be read in order to determine whether
-            commissioning mode is enabled."""
+            commissioning mode is enabled.
+    """
     global _commissioning_signal
     _commissioning_signal = signal

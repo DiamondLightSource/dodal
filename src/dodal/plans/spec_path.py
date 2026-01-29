@@ -29,7 +29,8 @@ def spec_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Generic plan for reading `detectors` at every point of a ScanSpec `Spec`.
-    A `Spec` is an N-dimensional path."""
+    A `Spec` is an N-dimensional path.
+    """
     # TODO: https://github.com/bluesky/scanspec/issues/154
     # support Static.duration: Spec[Literal["DURATION"]]
 
@@ -57,7 +58,6 @@ def _as_cycler(spec: Spec[Movable]) -> Cycler:
     Returns:
         Cycler: A new cycler.
     """
-
     midpoints = spec.frames().midpoints
     # Need to "add" the cyclers for all the axes together. The code below is
     # effectively: cycler(motor1, [...]) + cycler(motor2, [...]) + ...

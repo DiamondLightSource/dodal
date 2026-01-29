@@ -26,7 +26,8 @@ class EnergyMotorLookup:
 
     def update_lookup_table(self) -> None:
         """Do nothing by default. Sub classes may override this method to provide logic
-        on what updating lookup table does."""
+        on what updating lookup table does.
+        """
         pass
 
     def find_value_in_lookup_table(self, energy: float, pol: Pol) -> float:

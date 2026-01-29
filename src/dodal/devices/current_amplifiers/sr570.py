@@ -46,7 +46,8 @@ class SR570RaiseTimeTable(float, Enum):
 
 class SR570FullGainTable(Enum):
     """Combined gain table, as each gain step is a combination of both coarse gain and
-    fine gain setting."""
+    fine gain setting.
+    """
 
     SEN_1 = [SR570GainTable.SEN_1, SR570FineGainTable.SEN_1]
     SEN_2 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_9]

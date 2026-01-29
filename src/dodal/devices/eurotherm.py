@@ -111,7 +111,8 @@ class UpdatingEurothermGeneral(EurothermGeneral):
 
 class EurothermAutotune(StandardReadable):
     """Newer versions of Eurotherm controllers have the ability to Autotune the
-    PID values, and this is the device."""
+    PID values, and this is the device.
+    """
 
     def __init__(
         self,

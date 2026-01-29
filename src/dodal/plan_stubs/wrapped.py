@@ -54,7 +54,6 @@ def set_relative(
     Yields:
         Iterator[MsgGenerator]: Bluesky messages.
     """
-
     return (yield from bps.rel_set(movable, value, group=group, wait=wait))
 
 
@@ -72,7 +71,6 @@ def move(moves: Mapping[Movable[T], T], group: Group | None = None) -> MsgGenera
     Yields:
         Iterator[MsgGenerator]: Bluesky messages.
     """
-
     return (
         yield from bps.mv(*itertools.chain.from_iterable(moves.items()), group=group)
     )
@@ -94,7 +92,6 @@ def move_relative(
     Yields:
         Iterator[MsgGenerator]: Bluesky messages.
     """
-
     return (
         yield from bps.mvr(*itertools.chain.from_iterable(moves.items()), group=group)
     )
@@ -112,7 +109,6 @@ def sleep(time: float) -> MsgGenerator:
     Yields:
         Iterator[MsgGenerator]: Bluesky messages.
     """
-
     return (yield from bps.sleep(time))
 
 
@@ -134,5 +130,4 @@ def wait(
     Yields:
         Iterator[MsgGenerator]: Bluesky messages.
     """
-
     return (yield from bps.wait(group, timeout=timeout))

@@ -94,8 +94,7 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
 
 
 class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
-    """
-    Compound device to set both ID and energy motor at the same time with an option to add an offset.
+    """Compound device to set both ID and energy motor at the same time with an option to add an offset.
 
     Args:
         id_energy (InsertionDeviceEnergy): An InsertionDeviceEnergy device.

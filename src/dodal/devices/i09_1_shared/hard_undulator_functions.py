@@ -74,6 +74,7 @@ def calculate_gap_i09_hu(
     """Calculate the undulator gap required to produce a given energy at a given
     harmonic order. This algorithm was provided by the I09 beamline scientists, and is
     based on the physics of undulator radiation.
+
     https://cxro.lbl.gov//PDF/X-Ray-Data-Booklet.pdf
 
     Args:
@@ -89,7 +90,6 @@ def calculate_gap_i09_hu(
     Returns:
         float: Calculated undulator gap in millimeters.
     """
-
     _validate_order(order, look_up_table)
     gamma = _calculate_gamma(look_up_table, order)
 

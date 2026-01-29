@@ -56,8 +56,8 @@ def get_move_required_so_that_beam_is_at_pixel(
     oav: OAV,
 ) -> Generator[Msg, None, np.ndarray]:
     """Calculate the required move so that the given pixel is in the centre of the
-    beam."""
-
+    beam.
+    """
     current_motor_xyz = np.array(
         [
             (yield from bps.rd(gonio.x)),
@@ -125,8 +125,8 @@ def convert_to_gray_and_blur(data: cv2.typing.MatLike) -> cv2.typing.MatLike:
     """Preprocess the image array data (convert to grayscale and apply a gaussian blur)
     Image is converted to grayscale (using a weighted mean as green contributes more to
     brightness) as we aren't interested in data relating to colour. A blur is then
-    applied to mitigate errors due to rogue hot pixels."""
-
+    applied to mitigate errors due to rogue hot pixels.
+    """
     # kernel size describes how many of the neighbouring pixels are used for the blur,
     # higher kernal size means more of a blur effect
     kernel_size = (7, 7)

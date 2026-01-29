@@ -49,7 +49,8 @@ class CurrentAmpDet(StandardReadable, Preparable):
 
     async def read(self) -> dict[str, Reading]:
         """Read is modified so that if auto_mode is true it will optimise gain before
-        taking the final reading."""
+        taking the final reading.
+        """
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")
             status = self.auto_gain()
@@ -84,7 +85,8 @@ class CurrentAmpDet(StandardReadable, Preparable):
 
     async def get_corrected_current(self) -> float:
         """Convert the output (count and gain) back into the read detector output in
-        Amp."""
+        Amp.
+        """
         current_gain, voltage_per_sec = await asyncio.gather(
             self.current_amp().get_gain(),
             self.counter().get_voltage_per_sec(),

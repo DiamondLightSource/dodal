@@ -203,8 +203,8 @@ def bimorph_optimisation(
 
     Args:
         detectors (list[Readable]): Detectors.
-        bimorph (BimorphMirror): BimorphMirror to move.
-        slit (Slits): Slits.
+        mirror (BimorphMirror): BimorphMirror to move.
+        slits (Slits): Slits.
         voltage_increment (float): Voltage increment applied to each bimorph electrode.
         active_dimension (SlitDimension): SlitDimension that slit will move in (X or Y).
         active_slit_center_start (float): Start position of center of slit in active
@@ -221,7 +221,6 @@ def bimorph_optimisation(
             (defaults to current voltages).
         metadata (dict[string, Any], optional): Metadata to add to start document.
     """
-
     _metadata = {
         "plan_args": {
             "detectors": {det.name for det in detectors},
@@ -323,8 +322,9 @@ def inner_scan(
     """Inner plan stub, which moves Slits and performs a read.
 
     Args:
+        detectors (list[Readable]): Detectors to collect from.
         mirror (BimorphMirror): BimorphMirror to move.
-        slit (Slits): Slits.
+        slits (Slits): Slits.
         oav: oav on-axis viewer.
         active_dimension (SlitDimension): SlitDimension that slit will move in (X or Y).
         active_slit_center_start (float): Start position of center of slit in active

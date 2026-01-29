@@ -33,7 +33,7 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 
 class EnergyMotorConvertor(Protocol):
     def __call__(self, energy: float, pol: Pol) -> float:
-        """Protocol to provide energy to motor position conversion"""
+        """Protocol to provide energy to motor position conversion."""
         ...
 
 
@@ -150,7 +150,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         """This method should be implemented by the beamline specific ID class as the
         motor positions will be different for each beamline depending on the
-        undulator design."""
+        undulator design.
+        """
 
     async def _set_motors_from_energy_and_polarisation(
         self, energy: float, pol: Pol
@@ -173,7 +174,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
     async def _check_and_get_pol_setpoint(self) -> Pol:
         """Check the polarisation setpoint and if it is NONE try to read it from
-        hardware."""
+        hardware.
+        """
         pol = await self.polarisation_setpoint.get_value()
 
         if pol == Pol.NONE:
@@ -238,7 +240,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         However there is no way to return lh3 polarisation or higher harmonic setting.
         (May be for future one can use the inverse poly to work out the energy and try
         to match it with the current energy to workout the polarisation but during my
-        test the inverse poly is too unstable for general use.)"""
+        test the inverse poly is too unstable for general use).
+        """
         if gap > self.maximum_gap_motor_position:
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
@@ -308,7 +311,8 @@ class Apple2EnforceLHMoveController(
     However, because of the high forces involved in polarization changes,
     all movements must be performed using the Linear Horizontal (LH) mode.
     A look-up table must also be used to determine the highest energy that can
-    be reached in LH mode."""
+    be reached in LH mode.
+    """
 
     def __init__(
         self,

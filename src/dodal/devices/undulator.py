@@ -98,8 +98,7 @@ class BaseUndulator(StandardReadable, Movable[float], ABC):
         ...
 
     async def _set_gap(self, value: float) -> None:
-        """
-        Set the undulator gap to a given value in mm.
+        """Set the undulator gap to a given value in mm.
 
         Args:
             value: gap in mm
@@ -126,8 +125,7 @@ class BaseUndulator(StandardReadable, Movable[float], ABC):
             LOGGER.warning("In test mode, not moving ID gap")
 
     async def _check_gap_within_threshold(self, target_gap: float) -> bool:
-        """
-        Check if the undulator gap is within the acceptable threshold of the target gap.
+        """Check if the undulator gap is within the acceptable threshold of the target gap.
 
         Args:
             target_gap: target gap in mm
@@ -141,12 +139,14 @@ class BaseUndulator(StandardReadable, Movable[float], ABC):
 
     async def _is_commissioning_mode_enabled(self) -> bool | None:
         """Asynchronously checks if commissioning mode is enabled via the baton
-        reference."""
+        reference.
+        """
         return self.baton_ref and await self.baton_ref().commissioning.get_value()
 
     async def raise_if_not_enabled(self) -> AccessError | None:
         """Asynchronously raises AccessError if gap access is disabled and not in
-        commissioning mode."""
+        commissioning mode.
+        """
         access_level = await self.gap_access.get_value()
         commissioning_mode = await self._is_commissioning_mode_enabled()
         if access_level is EnabledDisabledUpper.DISABLED and not commissioning_mode:
@@ -205,7 +205,8 @@ class UndulatorInKeV(BaseUndulator):
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
         """Get a 2d np.array from lookup table that converts energies to undulator gap
-        distance."""
+        distance.
+        """
         energy_to_distance_table: np.ndarray = await energy_distance_table(
             self.id_gap_lookup_table_path
         )

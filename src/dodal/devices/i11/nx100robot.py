@@ -38,7 +38,8 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     arm with a gripper and a carousel for sample handling. It can pick and place samples
     from the carousel to the diffractometer and vice versa.
 
-    Has set, pause, resume, stop, locate, stage methods."""
+    Has set, pause, resume, stop, locate, stage methods.
+    """
 
     MAX_NUMBER_OF_SAMPLES = 200
     MIN_NUMBER_OF_SAMPLES = 1
@@ -71,8 +72,8 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     async def clear_sample(self, table_in: bool = True):
         """Clears the sample from the diffractometer and places it on the carousel.
         if table_in is True, it will also move the sample holder to the table in
-        position."""
-
+        position.
+        """
         sample_state = await self.robot_sample_state.get_value()
         if sample_state == RobotSampleState.DIFFRACTOMETER:
             await asyncio.gather(

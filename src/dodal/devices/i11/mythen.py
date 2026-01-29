@@ -99,7 +99,7 @@ _BIT_DEPTH = 24
 
 
 class Mythen3Controller(ADBaseController):
-    """ADBaseController` for a Mythen3"""
+    """ADBaseController` for a Mythen3."""
 
     def __init__(self, driver: Mythen3Driver):
         self._driver = driver
@@ -135,7 +135,8 @@ class Mythen3Controller(ADBaseController):
 
 class Mythen3(AreaDetector[Mythen3Controller]):
     """The detector may be configured for an external trigger on a GPIO port,
-    which must be done prior to preparing the detector."""
+    which must be done prior to preparing the detector.
+    """
 
     def __init__(
         self,

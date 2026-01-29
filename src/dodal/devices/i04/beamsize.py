@@ -7,7 +7,8 @@ from dodal.devices.i04.transfocator import Transfocator
 
 class Beamsize(BeamsizeBase):
     """Device that calculates the size of the beam by taking the minimum of the
-    transfocator size and the aperture scatterguard diameter."""
+    transfocator size and the aperture scatterguard diameter.
+    """
 
     def __init__(
         self,

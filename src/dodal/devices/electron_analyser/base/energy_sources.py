@@ -15,7 +15,8 @@ from dodal.devices.selectable_source import SelectedSource, get_obj_from_selecte
 
 class AbstractEnergySource(StandardReadable):
     """Abstract device that wraps an energy source signal and provides common interface
-    via a energy signal."""
+    via a energy signal.
+    """
 
     def __init__(self, name: str = "") -> None:
         super().__init__(name)
@@ -23,15 +24,14 @@ class AbstractEnergySource(StandardReadable):
     @property
     @abstractmethod
     def energy(self) -> SignalR[float]:
-        """
-        Signal to provide the excitation energy value in eV.
-        """
+        """Signal to provide the excitation energy value in eV."""
 
 
 class EnergySource(AbstractEnergySource):
     """Wraps a signal that relates to energy and provides common interface via energy
     signal. It provides the name of the wrapped signal as a child signal in the
-    read_configuration via wrapped_device_name and adds the signal as a readable."""
+    read_configuration via wrapped_device_name and adds the signal as a readable.
+    """
 
     def __init__(self, source: SignalR[float], name: str = "") -> None:
         self.add_readables([source])

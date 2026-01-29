@@ -331,7 +331,6 @@ class EigerDetector(Device, Stageable):
             tolerance (float, optional): If the energy is already set to within
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
-
         current_energy = float(self.cam.photon_energy.get())
         if abs(current_energy - energy) > tolerance:
             LOGGER.info(f"Setting detector threshold to {energy}")

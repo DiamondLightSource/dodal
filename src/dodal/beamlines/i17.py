@@ -1,5 +1,6 @@
 """The I17 hardware doesn't exist yet, but this configuration file is useful for
-creating plans in sm-bluesky as devices build up."""
+creating plans in sm-bluesky as devices build up.
+"""
 
 from ophyd_async.core import StrictEnum
 
@@ -67,7 +68,7 @@ def id_phase() -> UndulatorPhaseAxes:
 
 @device_factory(skip=True)
 def id() -> Apple2:
-    """I17 insertion device:"""
+    """I17 insertion device."""
     return Apple2(
         id_gap=id_gap(),
         id_phase=id_phase(),

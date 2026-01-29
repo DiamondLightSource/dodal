@@ -20,7 +20,8 @@ class MaterialsEnum(Enum):
 @dataclass(frozen=True)
 class CrystalMetadata:
     """Metadata used in the NeXus format,
-    see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html"""
+    see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html.
+    """
 
     usage: Literal["Bragg", "Laue"]
     type: str
@@ -32,7 +33,8 @@ class CrystalMetadata:
         lattice_parameter: float, reflection: tuple[int, int, int]
     ) -> tuple[float, str]:
         """Calculates the d-spacing value in nanometers based on the given lattice
-        parameter and reflection indices."""
+        parameter and reflection indices.
+        """
         h_index, k_index, l_index = reflection
         d_spacing_m = lattice_parameter / math.sqrt(
             h_index**2 + k_index**2 + l_index**2

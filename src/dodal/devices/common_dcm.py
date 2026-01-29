@@ -121,7 +121,8 @@ class DoubleCrystalMonochromatorWithDSpacing(
 ):
     """Adds crystal D-spacing metadata to the DoubleCrystalMonochromator class.  This
     should be used in preference to the DoubleCrystalMonochromator on beamlines which
-    have a "DSPACING:RBV" pv on their DCM."""
+    have a "DSPACING:RBV" pv on their DCM.
+    """
 
     def __init__(
         self, prefix: str, xtal_1: type[Xtal_1], xtal_2: type[Xtal_2], name: str = ""

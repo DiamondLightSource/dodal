@@ -25,7 +25,7 @@ class Stage(StandardReadable, ABC):
             "{name}-{field_name}".
         *_infix: Infix between the common prefix and the EPICS motor record fields for
             the field.
-    """
+    """  # noqa D415
 
     ...
 
@@ -122,8 +122,8 @@ class XYZPolarStage(XYZStage):
 
 
 class XYZPolarAzimuthStage(XYZPolarStage):
-    """
-    Five-axis stage with a standard xyz stage and two axis of rotation: polar and azimuth.
+    """Five-axis stage with a standard xyz stage and two axis of rotation: polar and
+    azimuth.
     """
 
     def __init__(
@@ -142,9 +142,8 @@ class XYZPolarAzimuthStage(XYZPolarStage):
 
 
 class XYZPolarAzimuthTiltStage(XYZPolarAzimuthStage):
-    """
-    Six-axis stage with a standard xyz stage and three axis of rotation: polar, azimuth
-    and tilt.
+    """Six-axis stage with a standard xyz stage and three axis of rotation: polar,
+    azimuth and tilt.
     """
 
     def __init__(
@@ -215,7 +214,8 @@ class XYRollStage(XYStage):
 
 class XYZPitchYawStage(XYZStage):
     """Five-axis stage with a standard xyz stage and two axes of rotation: pitch and
-    yaw."""
+    yaw.
+    """
 
     def __init__(
         self,
@@ -235,7 +235,8 @@ class XYZPitchYawStage(XYZStage):
 
 class XYZPitchYawRollStage(XYZStage):
     """Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
-    and roll."""
+    and roll.
+    """
 
     def __init__(
         self,
@@ -257,7 +258,8 @@ class XYZPitchYawRollStage(XYZStage):
 
 class SixAxisGonio(XYZOmegaStage):
     """Six-axis goniometer with a standard xyz stage and three axes of rotation:
-    kappa, phi and omega."""
+    kappa, phi and omega.
+    """
 
     def __init__(
         self,
@@ -282,7 +284,8 @@ class SixAxisGonio(XYZOmegaStage):
 
 class SixAxisGonioKappaPhi(XYZStage):
     """Six-axis goniometer with a standard xyz stage and two axes of rotation:
-    kappa and phi."""
+    kappa and phi.
+    """
 
     def __init__(
         self,

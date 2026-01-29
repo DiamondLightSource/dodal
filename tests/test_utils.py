@@ -30,7 +30,8 @@ from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 @pytest.fixture()
 def alternate_config(tmp_path) -> str:
     """Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
-    in conftest.py"""
+    in conftest.py.
+    """
     alt_config_path = tmp_path / "alt_daq_configuration"
     copytree(MOCK_DAQ_CONFIG_PATH, alt_config_path)
     return str(alt_config_path)

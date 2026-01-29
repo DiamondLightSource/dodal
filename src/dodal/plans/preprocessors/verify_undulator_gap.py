@@ -23,7 +23,6 @@ def verify_undulator_gap_before_run_wrapper(
             inserted after the 'open_run' message is seen with the matching run key. If
             not specified, instead wrap the first run encountered.
     """
-
     # If no run_key specified, make sure we only do check on first run encountered
     _wrapped_run_name: None | str = None
 

@@ -20,7 +20,8 @@ class MinimalSlits(StandardReadable):
 
 class Slits(MinimalSlits):
     """Representation of a 4-blade set of slits. Allows control/readout of the gap
-    between each pair of blades."""
+    between each pair of blades.
+    """
 
     def __init__(
         self,

@@ -102,7 +102,8 @@ class ValveControl(
 
 class AllValvesControl(StandardReadable):
     """The default IOC for this device only controls specific valves. Other valves are
-    under manual control."""
+    under manual control.
+    """
 
     def __init__(
         self,
@@ -255,7 +256,8 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
     @AsyncStatus.wrap
     async def set(self, value: int):
         """Sets the desired pressure waiting for the device to complete the
-        operation."""
+        operation.
+        """
         timeout = await self.timeout.get_value()
 
         await self.target_pressure.set(value)

@@ -27,7 +27,7 @@ DEFAULT_SETTLE_TIME_S = 60
 
 
 class MirrorType(StrictEnum):
-    """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html"""
+    """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html."""
 
     SINGLE = "single"
     MULTI = "multi"
@@ -55,7 +55,8 @@ class MirrorVoltageDemand(StrictEnum):
 class SingleMirrorVoltage(Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set
     asynchronously and returns when the demanded voltage setpoint is accepted, without
-    blocking the caller as this process can take significant time."""
+    blocking the caller as this process can take significant time.
+    """
 
     def __init__(self, prefix: str, name: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
@@ -73,8 +74,7 @@ class SingleMirrorVoltage(Device):
 
         4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the
            result on the Status.
-        """
-
+        """  # noqa D415
         setpoint_v = self._setpoint_v
         demand_accepted = self._demand_accepted
 
@@ -140,7 +140,7 @@ class MirrorVoltages(StandardReadable):
 
 
 class SimpleMirror(XYPitchStage):
-    """Simple Focusing Mirror"""
+    """Simple Focusing Mirror."""
 
     def __init__(
         self,
@@ -169,7 +169,7 @@ class SimpleMirror(XYPitchStage):
 
 
 class FocusingMirror(StandardReadable):
-    """Focusing Mirror"""
+    """Focusing Mirror."""
 
     def __init__(
         self,
@@ -206,7 +206,8 @@ class FocusingMirror(StandardReadable):
 
 class FocusingMirrorWithStripes(FocusingMirror):
     """A focusing mirror where the stripe material can be changed. This is usually done
-    based on the energy of the beamline."""
+    based on the energy of the beamline.
+    """
 
     def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
@@ -216,7 +217,7 @@ class FocusingMirrorWithStripes(FocusingMirror):
         super().__init__(prefix, name, *args, **kwargs)
 
     def energy_to_stripe(self, energy_kev) -> MirrorStripeConfiguration:
-        """Return the stripe, yaw angle and lateral position for the specified energy"""
+        """Return the stripe, yaw angle and lateral position for the specified energy."""
         # In future, this should be configurable per-mirror
         if energy_kev < 7:
             return {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}

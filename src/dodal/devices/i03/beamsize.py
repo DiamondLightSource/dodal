@@ -7,7 +7,8 @@ from dodal.devices.i03.constants import BeamsizeConstants
 
 class Beamsize(BeamsizeBase):
     """Device that calculates the size of the beam by taking the minimum of the beam
-    dimensions and the aperture scatterguard diameter."""
+    dimensions and the aperture scatterguard diameter.
+    """
 
     def __init__(self, aperture_scatterguard: ApertureScatterguard, name=""):
         super().__init__(name=name)

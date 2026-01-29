@@ -68,7 +68,7 @@ class DeferMoves(StrictEnum):
 
 
 class CombinedMove(TypedDict, total=False):
-    """A move on multiple axes at once using a deferred move"""
+    """A move on multiple axes at once using a deferred move."""
 
     x: float | None
     y: float | None

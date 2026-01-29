@@ -58,7 +58,8 @@ class MetadataHolder:
 @dataclass
 class NXSasMetadataHolder(MetadataHolder):
     """Required fields for NXDetectors that are used in an NXsas application definition.
-    All fields are Configuration and read once per run only."""
+    All fields are Configuration and read once per run only.
+    """
 
     distance: ValueAndUnits
     x_pixel_size: ValueAndUnits
@@ -92,7 +93,8 @@ class NXSasPilatus(PilatusDetector):
         to comply with the NXsas application definition.
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
-        Writes hdf5 files."""
+        Writes hdf5 files.
+        """
         super().__init__(
             prefix,
             path_provider,
@@ -135,7 +137,8 @@ class NXSasOAV(AravisDetector):
         to comply with the NXsas application definition.
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
-        Writes hdf5 files."""
+        Writes hdf5 files.
+        """
         super().__init__(
             prefix,
             path_provider,
