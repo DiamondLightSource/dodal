@@ -1,6 +1,7 @@
 import asyncio
-from math import cos, radians, sin
+from math import radians
 
+import numpy as np
 from ophyd_async.core import derived_signal_rw
 
 from dodal.devices.motors import (
@@ -62,33 +63,46 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
                 theta=self.theta,
             )
 
+    def _rotation_matrix(self, theta) -> np.ndarray:
+        c, s = np.cos(theta), np.sin(theta)
+        return np.array([[c, s], [-s, c]])
+
+    def _inverse_rotation_matrix(self, theta) -> np.ndarray:
+        return self._rotation_matrix(theta).T
+
     def _read_long_calc(self, x: float, y: float, theta: float) -> float:
-        return y * cos(theta) - x * sin(theta)
+        vec = np.array([x, y])
+        perp, long = self._rotation_matrix(theta) @ vec
+        return long
 
     async def _set_long_calc(self, value: float) -> None:
         x_pos, y_pos = await asyncio.gather(
-            self.x.user_readback.get_value(), self.y.user_readback.get_value()
+            self.x.user_readback.get_value(),
+            self.y.user_readback.get_value(),
         )
         perp = self._read_perp_calc(x_pos, y_pos, self.theta)
         long = value
 
-        new_x_pos = -1 * long * sin(self.theta) + perp * cos(self.theta)
-        new_y_pos = long * cos(self.theta) + perp * sin(self.theta)
+        vec_rot = np.array([perp, long])
+        new_x_pos, new_y_pos = self._inverse_rotation_matrix(self.theta) @ vec_rot
 
         await asyncio.gather(self.x.set(new_x_pos), self.y.set(new_y_pos))
 
     def _read_perp_calc(self, x: float, y: float, theta: float) -> float:
-        return y * sin(theta) + x * cos(theta)
+        vec = np.array([x, y])
+        perp, long = self._rotation_matrix(theta) @ vec
+        return perp
 
     async def _set_perp_calc(self, value: float) -> None:
         x_pos, y_pos = await asyncio.gather(
-            self.x.user_readback.get_value(), self.y.user_readback.get_value()
+            self.x.user_readback.get_value(),
+            self.y.user_readback.get_value(),
         )
 
         long = self._read_long_calc(x_pos, y_pos, self.theta)
         perp = value
 
-        new_x_pos = -1 * long * sin(self.theta) + perp * cos(self.theta)
-        new_y_pos = long * cos(self.theta) + perp * sin(self.theta)
+        vec_rot = np.array([perp, long])
+        new_x_pos, new_y_pos = self._inverse_rotation_matrix(self.theta) @ vec_rot
 
         await asyncio.gather(self.x.set(new_x_pos), self.y.set(new_y_pos))
