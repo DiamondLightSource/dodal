@@ -1,10 +1,11 @@
 import asyncio
+from math import radians
 
 from numpy import cos as c
 from numpy import sin as s
 from ophyd_async.core import derived_signal_rw
 
-from dodal.devices.i05_shared.math import Vector2D
+from dodal.devices.i05_shared.math import inverse_rotate, rotate
 from dodal.devices.motors import (
     _AZIMUTH,
     _POLAR,
@@ -72,31 +73,33 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
             )
 
     def _read_perp_calc(self, x: float, y: float, angle_deg: float) -> float:
-        vec = Vector2D(x, y, ROTATION_MATRIX)
-        return vec.rotate_deg(angle_deg).x
+        new_x, new_y = rotate(radians(angle_deg), x, y, ROTATION_MATRIX)
+        return new_x
 
     async def _set_perp_calc(self, value: float) -> None:
-        z_pos, y_pos = await asyncio.gather(
-            self.z.user_readback.get_value(),
+        x_pos, y_pos = await asyncio.gather(
+            self.x.user_readback.get_value(),
             self.y.user_readback.get_value(),
         )
-        long = self._read_long_calc(z_pos, y_pos, self.rotation_angle_deg)
-        vec = Vector2D(value, long, ROTATION_MATRIX)
-        new_pos = vec.inverse_rotate_deg(self.rotation_angle_deg)
-
-        await asyncio.gather(self.z.set(new_pos.x), self.y.set(new_pos.y))
+        perp = value
+        long = self._read_long_calc(x_pos, y_pos, self.rotation_angle_deg)
+        new_x, new_y = inverse_rotate(
+            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX
+        )
+        await asyncio.gather(self.x.set(new_x), self.y.set(new_y))
 
     def _read_long_calc(self, x: float, y: float, angle_deg: float) -> float:
-        vec = Vector2D(x, y, ROTATION_MATRIX)
-        return vec.rotate_deg(angle_deg).y
+        new_x, new_y = rotate(radians(angle_deg), x, y, ROTATION_MATRIX)
+        return new_y
 
     async def _set_long_calc(self, value: float) -> None:
-        z_pos, y_pos = await asyncio.gather(
-            self.z.user_readback.get_value(),
+        x_pos, y_pos = await asyncio.gather(
+            self.x.user_readback.get_value(),
             self.y.user_readback.get_value(),
         )
-        perp = self._read_perp_calc(z_pos, y_pos, self.rotation_angle_deg)
-        vec = Vector2D(perp, value, ROTATION_MATRIX)
-        new_pos = vec.inverse_rotate_deg(self.rotation_angle_deg)
-
-        await asyncio.gather(self.z.set(new_pos.x), self.y.set(new_pos.y))
+        perp = self._read_perp_calc(x_pos, y_pos, self.rotation_angle_deg)
+        long = value
+        new_x, new_y = inverse_rotate(
+            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX
+        )
+        await asyncio.gather(self.x.set(new_x), self.y.set(new_y))
