@@ -1,16 +1,16 @@
-from ophyd_async.core import StandardReadable
-from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading, partial_reading
+
+from dodal.devices.i10_1 import ElectromagnetMagnetField
 
 
-class ElectromagnetMagnetField(StandardReadable):
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
-        with self.add_children_as_readables():
-            self.field = epics_signal_rw(
-                float, write_pv=prefix + "FIELD", read_pv=prefix + "FIELD:RBV"
-            )
-            self.current = epics_signal_rw(float, prefix + "DMD")
-        super().__init__(name=name)
+async def test_electronmagnet_magnet_field_read():
+    with init_devices(mock=True):
+        mock_em_field = ElectromagnetMagnetField(prefix="BLXX-EA-EMAG-01:")
+    await assert_reading(
+        mock_em_field,
+        {
+            "mock_em_field-field": partial_reading(0.0),
+            "mock_em_field-current": partial_reading(0.0),
+        },
+    )
