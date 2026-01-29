@@ -13,7 +13,7 @@ from dodal.log import LOGGER
 
 
 class SR570GainTable(StrictEnum):
-    """Coarse/unit sensitivity setting for SR570 current amplifier"""
+    """Coarse/unit sensitivity setting for SR570 current amplifier."""
 
     SEN_1 = "mA/V"
     SEN_2 = "uA/V"
@@ -22,7 +22,7 @@ class SR570GainTable(StrictEnum):
 
 
 class SR570FineGainTable(StrictEnum):
-    """Fine sensitivity setting for SR570 current amplifier"""
+    """Fine sensitivity setting for SR570 current amplifier."""
 
     SEN_1 = "1"
     SEN_2 = "2"
@@ -36,7 +36,7 @@ class SR570FineGainTable(StrictEnum):
 
 
 class SR570RaiseTimeTable(float, Enum):
-    """These are the gain dependent raise time(s) for SR570 current amplifier"""
+    """These are the gain dependent raise time(s) for SR570 current amplifier."""
 
     SEN_1 = 1e-4
     SEN_2 = 1e-2
@@ -46,7 +46,8 @@ class SR570RaiseTimeTable(float, Enum):
 
 class SR570FullGainTable(Enum):
     """Combined gain table, as each gain step is a combination of both coarse gain and
-    fine gain setting"""
+    fine gain setting.
+    """
 
     SEN_1 = [SR570GainTable.SEN_1, SR570FineGainTable.SEN_1]
     SEN_2 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_9]
@@ -79,7 +80,7 @@ class SR570FullGainTable(Enum):
 
 
 class SR570GainToCurrentTable(float, Enum):
-    """Conversion table for gain (sensitivity) to current"""
+    """Conversion table for gain (sensitivity) to current."""
 
     SEN_1 = 1e3
     SEN_2 = 2e3
@@ -112,10 +113,10 @@ class SR570GainToCurrentTable(float, Enum):
 
 
 class SR570(CurrentAmp):
-    """
-    SR570 current amplifier device. This is similar to Femto with the only different
-     is SR570 has two gain setting fine and coarse, therefore it requires extra
-     gain tables.
+    """SR570 current amplifier device. This is similar to Femto with the only different
+    is SR570 has two gain setting fine and coarse, therefore it requires extra
+    gain tables.
+
     Attributes:
         fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
         coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.
@@ -129,7 +130,6 @@ class SR570(CurrentAmp):
             setting in gain_conversion_table.
         upperlimit (float): upperlimit of the current amplifier
         lowerlimit (float): lowerlimit of the current amplifier
-
     """
 
     def __init__(
