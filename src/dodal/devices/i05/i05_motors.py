@@ -3,9 +3,10 @@ from math import radians
 
 from numpy import cos as c
 from numpy import sin as s
-from ophyd_async.core import derived_signal_rw
+from ophyd_async.core import SignalR, SignalRW, derived_signal_rw
+from ophyd_async.epics.motor import Motor
 
-from dodal.devices.i05_shared.math import rotate
+from dodal.devices.i05_shared.math import CallableRotationMatrixType, rotate
 from dodal.devices.motors import (
     _AZIMUTH,
     _POLAR,
@@ -60,19 +61,33 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         )
 
         with self.add_children_as_readables():
-            self.long = derived_signal_rw(
-                self._read_long_calc,
-                self._set_long_calc,
-                x=self.x,
-                y=self.y,
+            # self.perp = derived_signal_rw(
+            #     self._read_perp_calc,
+            #     self._set_perp_calc,
+            #     x=self.x,
+            #     y=self.y,
+            #     angle_deg=self.rotation_angle_deg,
+            # )
+            # self.long = derived_signal_rw(
+            #     self._read_long_calc,
+            #     self._set_long_calc,
+            #     x=self.x,
+            #     y=self.y,
+            #     angle_deg=self.rotation_angle_deg,
+            # )
+            self.perp = create_rw_rotation_axis_signal(
+                i=self.x,
+                j=self.y,
                 angle_deg=self.rotation_angle_deg,
+                rotation_matrix=ROTATION_MATRIX,
+                i_axis=True,
             )
-            self.perp = derived_signal_rw(
-                self._read_perp_calc,
-                self._set_perp_calc,
-                x=self.x,
-                y=self.y,
+            self.long = create_rw_rotation_axis_signal(
+                i=self.x,
+                j=self.y,
                 angle_deg=self.rotation_angle_deg,
+                rotation_matrix=ROTATION_MATRIX,
+                i_axis=False,
             )
 
     def _read_perp_calc(self, x: float, y: float, angle_deg: float) -> float:
@@ -106,3 +121,49 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
             radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX, inverse=True
         )
         await asyncio.gather(self.x.set(new_x), self.y.set(new_y))
+
+
+def create_rw_rotation_axis_signal(
+    i: Motor,
+    j: Motor,
+    angle_deg: SignalR[float] | float,
+    rotation_matrix: CallableRotationMatrixType,
+    i_axis: bool,
+) -> SignalRW[float]:
+    async def _get_angle_deg(angle_deg: SignalR[float] | float) -> float:
+        if isinstance(angle_deg, SignalR):
+            return await angle_deg.get_value()
+        return angle_deg
+
+    def _read_rotate_calc(
+        i: float, j: float, angle_deg: float, return_i: bool
+    ) -> float:
+        new_i, new_j = rotate(radians(angle_deg), i, j, rotation_matrix)
+        return new_i if return_i else new_j
+
+    async def _set_inverse_rotate_calc(value: float) -> None:
+        i_pos, j_pos, angle_deg_pos = await asyncio.gather(
+            i.user_readback.get_value(),
+            j.user_readback.get_value(),
+            _get_angle_deg(angle_deg),
+        )
+        if i_axis:
+            i_rotate = value
+            j_rotate = _read_rotate_calc(i_pos, j_pos, angle_deg_pos, return_i=False)
+        else:
+            i_rotate = _read_rotate_calc(i_pos, j_pos, angle_deg_pos, return_i=True)
+            j_rotate = value
+
+        new_i, new_j = rotate(
+            radians(angle_deg_pos), i_rotate, j_rotate, rotation_matrix, inverse=True
+        )
+        await asyncio.gather(i.set(new_i), j.set(new_j))
+
+    return derived_signal_rw(
+        _read_rotate_calc,
+        _set_inverse_rotate_calc,
+        i=i,
+        j=j,
+        angle_deg=angle_deg,
+        return_i=i_axis,
+    )
