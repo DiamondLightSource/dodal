@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import dataclass
 from math import radians
 
 import numpy as np
@@ -13,6 +14,37 @@ from dodal.devices.motors import (
     _Z,
     XYZPolarAzimuthTiltStage,
 )
+
+
+@dataclass
+class Vector2D:
+    x: float
+    y: float
+
+    def to_array(self) -> np.ndarray:
+        return np.array([self.x, self.y])
+
+    @classmethod
+    def from_array(cls, arr: np.ndarray) -> "Vector2D":
+        return cls(arr[0], arr[1])
+
+    def _rotation_matrix(self, theta) -> np.ndarray:
+        c, s = np.cos(theta), np.sin(theta)
+        return np.array([[c, s], [-s, c]])
+
+    def _inverse_rotation_matrix(self, theta) -> np.ndarray:
+        return self._rotation_matrix(theta).T
+
+    def rotate(self, theta: float) -> "Vector2D":
+        rotated = self._rotation_matrix(theta) @ self.to_array()
+        return Vector2D.from_array(rotated)
+
+    def inverse_rotate(self, theta: float) -> "Vector2D":
+        rotated = self._inverse_rotation_matrix(theta) @ self.to_array()
+        return Vector2D.from_array(rotated)
+
+    def __repr__(self):
+        return f"Vector2D(x={self.x}, y={self.y})"
 
 
 class I05Goniometer(XYZPolarAzimuthTiltStage):
@@ -63,17 +95,9 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
                 theta=self.theta,
             )
 
-    def _rotation_matrix(self, theta) -> np.ndarray:
-        c, s = np.cos(theta), np.sin(theta)
-        return np.array([[c, s], [-s, c]])
-
-    def _inverse_rotation_matrix(self, theta) -> np.ndarray:
-        return self._rotation_matrix(theta).T
-
     def _read_long_calc(self, x: float, y: float, theta: float) -> float:
-        vec = np.array([x, y])
-        perp, long = self._rotation_matrix(theta) @ vec
-        return long
+        vec = Vector2D(x, y)
+        return vec.rotate(theta).y
 
     async def _set_long_calc(self, value: float) -> None:
         x_pos, y_pos = await asyncio.gather(
@@ -81,28 +105,22 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
             self.y.user_readback.get_value(),
         )
         perp = self._read_perp_calc(x_pos, y_pos, self.theta)
-        long = value
+        new_vec = Vector2D(perp, value)
+        new_pos = new_vec.inverse_rotate(self.theta)
 
-        vec_rot = np.array([perp, long])
-        new_x_pos, new_y_pos = self._inverse_rotation_matrix(self.theta) @ vec_rot
-
-        await asyncio.gather(self.x.set(new_x_pos), self.y.set(new_y_pos))
+        await asyncio.gather(self.x.set(new_pos.x), self.y.set(new_pos.y))
 
     def _read_perp_calc(self, x: float, y: float, theta: float) -> float:
-        vec = np.array([x, y])
-        perp, long = self._rotation_matrix(theta) @ vec
-        return perp
+        vec = Vector2D(x, y)
+        return vec.rotate(theta).x
 
     async def _set_perp_calc(self, value: float) -> None:
         x_pos, y_pos = await asyncio.gather(
             self.x.user_readback.get_value(),
             self.y.user_readback.get_value(),
         )
-
         long = self._read_long_calc(x_pos, y_pos, self.theta)
-        perp = value
+        new_vec = Vector2D(value, long)
+        new_pos = new_vec.inverse_rotate(self.theta)
 
-        vec_rot = np.array([perp, long])
-        new_x_pos, new_y_pos = self._inverse_rotation_matrix(self.theta) @ vec_rot
-
-        await asyncio.gather(self.x.set(new_x_pos), self.y.set(new_y_pos))
+        await asyncio.gather(self.x.set(new_pos.x), self.y.set(new_pos.y))
