@@ -796,5 +796,5 @@ def test_docstrings_are_kept(dm: DeviceManager):
         """This is the docstring for bar."""
         pass
 
-    assert foo.__doc__ == "This is the docstring for foo"
-    assert bar.__doc__ == "This is the docstring for bar"
+    assert foo.__doc__ == "This is the docstring for foo."
+    assert bar.__doc__ == "This is the docstring for bar."
