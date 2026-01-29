@@ -50,6 +50,7 @@
    dodal.devices.i09_1_shared
    dodal.devices.i09_2_shared
    dodal.devices.i10
+   dodal.devices.i10_1
    dodal.devices.i11
    dodal.devices.i13_1
    dodal.devices.i15

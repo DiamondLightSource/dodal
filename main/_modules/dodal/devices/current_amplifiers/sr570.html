@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.current_amplifiers.sr570 &#8212; dodal 1.69.1.dev27+g384caa297 documentation</title>
+    <title>dodal.devices.current_amplifiers.sr570 &#8212; dodal 1.69.1.dev28+g6d91c38b8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f816b362"></script>
+    <script src="../../../../_static/documentation_options.js?v=ddf6111b"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -961,12 +961,12 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">fine_gain_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">StrictEnum</span><span class="p">],</span>
-        <span class="n">coarse_gain_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">StrictEnum</span><span class="p">],</span>
-        <span class="n">combined_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">],</span>
-        <span class="n">gain_to_current_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">],</span>
-        <span class="n">raise_timetable</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">],</span>
+        <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SENS:SEL&quot;</span><span class="p">,</span>
+        <span class="n">fine_gain_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">StrictEnum</span><span class="p">]</span> <span class="o">=</span> <span class="n">SR570FineGainTable</span><span class="p">,</span>
+        <span class="n">coarse_gain_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">StrictEnum</span><span class="p">]</span> <span class="o">=</span> <span class="n">SR570GainTable</span><span class="p">,</span>
+        <span class="n">combined_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">]</span> <span class="o">=</span> <span class="n">SR570FullGainTable</span><span class="p">,</span>
+        <span class="n">gain_to_current_table</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">]</span> <span class="o">=</span> <span class="n">SR570GainToCurrentTable</span><span class="p">,</span>
+        <span class="n">raise_timetable</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">]</span> <span class="o">=</span> <span class="n">SR570RaiseTimeTable</span><span class="p">,</span>
         <span class="n">upperlimit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.8</span><span class="p">,</span>
         <span class="n">lowerlimit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
