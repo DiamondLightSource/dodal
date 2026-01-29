@@ -1,5 +1,5 @@
 import asyncio
-from math import cos, sin
+from math import cos, radians, sin
 
 import pytest
 from ophyd_async.core import init_devices
@@ -16,11 +16,10 @@ async def goniometer():
 
 
 async def test_goniometer_read(goniometer: I05Goniometer) -> None:
-    x = 10.0
-    y = 5.0
-    theta = goniometer.theta
-    expected_long = y * cos(theta) - x * sin(theta)
-    expected_perp = y * sin(theta) + x * cos(theta)
+    x, y = 10, 5
+    theta = radians(goniometer.rotation_angle_deg)
+    expected_perp = x * cos(theta) + y * sin(theta)
+    expected_long = -x * sin(theta) + y * cos(theta)
 
     await asyncio.gather(goniometer.x.set(x), goniometer.y.set(y))
 
@@ -41,7 +40,7 @@ async def test_goniometer_read(goniometer: I05Goniometer) -> None:
 
 async def test_goniometer_set_long(goniometer: I05Goniometer) -> None:
     x, y = 10, 5
-    theta = goniometer.theta
+    theta = radians(goniometer.rotation_angle_deg)
     await asyncio.gather(goniometer.x.set(x), goniometer.y.set(y))
 
     perp_before = goniometer._read_perp_calc(x, y, theta)
@@ -61,7 +60,7 @@ async def test_goniometer_set_long(goniometer: I05Goniometer) -> None:
 
 async def test_goniometer_set_perp(goniometer: I05Goniometer) -> None:
     x, y = 10.0, 5.0
-    theta = goniometer.theta
+    theta = radians(goniometer.rotation_angle_deg)
     await asyncio.gather(goniometer.x.set(x), goniometer.y.set(y))
 
     long_before = goniometer._read_long_calc(x, y, theta)
