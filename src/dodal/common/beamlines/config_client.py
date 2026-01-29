@@ -1,7 +1,7 @@
 from daq_config_server.client import ConfigServer
 
 BEAMLINE_CONFIG_SERVER_ENDPOINTS = {
-    "i03": "https://daq-config.diamond.ac.uk",
+    "i03": "https://i03-daq-config.diamond.ac.uk",
     "i04": "https://daq-config.diamond.ac.uk",
 }
 
