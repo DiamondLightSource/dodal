@@ -260,7 +260,7 @@ lint.extend-ignore = [
     "D105", # Missing docstring in magic method
     "D106", # Missing docstring in public nested class
     "D107", # Missing docstring in __init__
-    "D205", # 1 blank line requred between summary line and description
+    "D205", # 1 blank line required between summary line and description
 ]
 lint.select = [
     "B",      # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
