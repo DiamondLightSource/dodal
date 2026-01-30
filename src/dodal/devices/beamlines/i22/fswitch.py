@@ -15,8 +15,7 @@ from dodal.common.enums import InOutUpper
 
 
 class FSwitch(StandardReadable):
-    """
-    Device for i22's fswitch. A filter switch for manipulating
+    """Device for i22's fswitch. A filter switch for manipulating
     compound refractive lenses. Also referred to as a transfocator.
 
     This currently only implements the minimum
@@ -25,7 +24,6 @@ class FSwitch(StandardReadable):
     Eventually this should be combined with the transfocator device in the i04
     module but is currently incompatible as the Epics interfaces are different.
     See https://github.com/DiamondLightSource/dodal/issues/399
-
     """
 
     NUM_FILTERS = 128

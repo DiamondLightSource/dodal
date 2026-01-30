@@ -11,8 +11,7 @@ from dodal.log import LOGGER
 
 
 class ZebraGridScanParamsTwoD(GridScanParamsCommon, WithDwellTime):
-    """
-    Params for 2D Zebra FGS. Adds on the dwell time, which is really the time
+    """Params for 2D Zebra FGS. Adds on the dwell time, which is really the time
     between trigger positions.
     """
 
@@ -23,7 +22,7 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
     - No Z steps, Z step sizes, or Y2 start positions, or Z2 start
     - No scan valid PV - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     - No program_number - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
-    """
+    """  # noqa D415
 
     def __init__(
         self, prefix: str, motion_controller_prefix: str, name: str = ""

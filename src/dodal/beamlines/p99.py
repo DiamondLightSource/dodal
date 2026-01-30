@@ -71,8 +71,9 @@ def andor2_det() -> Andor2Detector:
 
 @devices.factory()
 def andor2_point() -> Andor2Point:
-    """Using the andor2 as if it is a massive point detector, read the meanValue and total after
-    a picture is taken."""
+    """Using the andor2 as if it is a massive point detector, read the meanValue and
+    total after a picture is taken.
+    """
     return Andor2Point(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
         drv_suffix=CAM_SUFFIX,
@@ -82,9 +83,8 @@ def andor2_point() -> Andor2Point:
 
 @devices.factory()
 def panda() -> HDFPanda:
-    """
-    The Panda device is connected to two PMAC motors for position comparison under
-     the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
+    """The Panda device is connected to two PMAC motors for position comparison under
+    the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
     This setup is used for triggering detectors during a flyscan.
     """
     return HDFPanda(

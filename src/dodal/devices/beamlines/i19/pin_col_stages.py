@@ -45,10 +45,10 @@ class AperturePosition(BaseModel):
     one of the available apertures.
 
     Attributes:
-        pinhole_x: The position of the x motor on the pinhole stage
-        pinhole_y: The position of the y motor on the pinhole stage
-        collimator_x: The position of the x motor on the collimator stage
-        collimator_y: The position of the y motor on the collimator stage
+        pinhole_x (float): The position of the x motor on the pinhole stage.
+        pinhole_y (float): The position of the y motor on the pinhole stage.
+        collimator_x (float): The position of the x motor on the collimator stage.
+        collimator_y (float): The position of the y motor on the collimator stage.
     """
 
     pinhole_x: float
@@ -59,7 +59,8 @@ class AperturePosition(BaseModel):
 
 class PinColConfiguration(StandardReadable):
     """Full MAPT configuration table, including out positions and selection for the
-    Pinhole and Collimator control."""
+    Pinhole and Collimator control.
+    """
 
     def __init__(self, prefix: str, apertures: list[int], name: str = "") -> None:
         with self.add_children_as_readables():
@@ -75,7 +76,8 @@ class PinColConfiguration(StandardReadable):
 
 class PinholeCollimatorControl(StandardReadable, Movable[str]):
     """Device to control the Pinhole and Collimator stages moves on I19-2, using the
-    MAPT configuration table to look up the positions."""
+    MAPT configuration table to look up the positions.
+    """
 
     def __init__(
         self,
@@ -130,7 +132,8 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
     async def _safe_move_in(self, value: _PinColPosition):
         """Move the pinhole and collimator stages safely to the in position.
         In order to avoid a collision, we have to make sure that the pinhole stage is
-        always moved in before the collimator stage."""
+        always moved in before the collimator stage.
+        """
         LOGGER.info(
             f"Moving pinhole and collimator stages to in position: {value.value}"
         )

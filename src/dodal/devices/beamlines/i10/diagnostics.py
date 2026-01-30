@@ -86,7 +86,8 @@ class D3jPosition(StrictEnum):
 class I10PneumaticStage(StandardReadable):
     """Pneumatic stage only has two real positions in or out.
     Use for fluorescent screen which can be insert into the x-ray beam.
-    Most often use in conjunction with a webcam to locate the x-ray beam."""
+    Most often use in conjunction with a webcam to locate the x-ray beam.
+    """
 
     def __init__(
         self,
@@ -106,7 +107,7 @@ class I10PneumaticStage(StandardReadable):
 
 
 class ScreenCam(Device):
-    """Compound device of pneumatic stage(fluorescent screen) and webcam"""
+    """Compound device of pneumatic stage(fluorescent screen) and webcam."""
 
     def __init__(
         self,
@@ -191,7 +192,7 @@ class I10JDiagnostic(Device):
 
 
 class I10Diagnostic5ADet(Device):
-    """Diagnostic 5a detection with drain current and photo diode"""
+    """Diagnostic 5a detection with drain current and photo diode."""
 
     def __init__(
         self, prefix: str, name: str = "", connector: DeviceConnector | None = None

@@ -102,5 +102,5 @@ def lakeshore() -> Lakeshore336:
 
 @devices.factory()
 def smpm() -> XYZPolarAzimuthStage:
-    """Sample Manipulator"""
+    """Sample Manipulator."""
     return XYZPolarAzimuthStage(prefix=f"{I_PREFIX.beamline_prefix}-MO-SMPM-01:")

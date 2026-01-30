@@ -3,9 +3,7 @@ from ophyd_async.epics.core import epics_signal_r
 
 
 class QBPM(StandardReadable):
-    """
-    A beam position monitor that gives a position and intensity of the beam.
-    """
+    """A beam position monitor that gives a position and intensity of the beam."""
 
     def __init__(
         self,

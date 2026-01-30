@@ -34,18 +34,20 @@ class AttenuatorMotorPositionDemands(BaseModel):
 
 
 class AttenuatorMotorSquad(OpticsBlueAPIDevice):
-    """ I19-specific proxy device which requests absorber position changes in the x-ray attenuator.
+    """I19-specific proxy device which requests absorber position changes in the
+    x-ray attenuator.
 
     Sends REST call to blueapi controlling optics on the I19 cluster.
-     The hutch in use is compared against the hutch which sent the REST call.
+    The hutch in use is compared against the hutch which sent the REST call.
     Only the hutch in use will be permitted to execute a plan (requesting motor moves).
-    As the two hutches are located in series, checking the hutch in use is necessary to \
-    avoid accidentally operating optics devices from one hutch while the other has beam time.
+    As the two hutches are located in series, checking the hutch in use is necessary to
+    avoid accidentally operating optics devices from one hutch while the other has beam
+    time.
 
-    The name of the hutch that wants to operate the optics device is passed to the \
+    The name of the hutch that wants to operate the optics device is passed to the
     access controlled device upon instantiation of the latter.
 
-    For details see the architecture described in \
+    For details see the architecture described in
     https://github.com/DiamondLightSource/i19-bluesky/issues/30.
     """
 

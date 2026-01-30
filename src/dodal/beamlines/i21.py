@@ -85,7 +85,7 @@ def id(
 def id_controller(
     id: Apple2[UndulatorPhaseAxes],
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
-    """i21 insertion device controller."""
+    """I21 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=id,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(

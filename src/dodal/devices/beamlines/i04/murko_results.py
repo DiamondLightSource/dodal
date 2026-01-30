@@ -238,7 +238,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         remove many of the outliers. Murko also occasionally picks a point in the bottom
         left corner, which can be removed by filtering results with a small x pixel.
         """
-
         LOGGER.info(f"Number of results before filtering: {len(self._results)}")
         sorted_results = sorted(self._results, key=lambda item: item.chosen_point_px[0])
 
@@ -278,15 +277,16 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
-    """Get the least squares solution for y and z from the vertical distances and omega angles.
+    """Get the least squares solution for y and z from the vertical distances and omega
+    angles.
 
     Args:
-        v_dists (list): List of vertical distances from beam centre. Any units
+        vertical_dists (list): List of vertical distances from beam centre. Any units.
         omegas (list): List of omega angles in degrees.
 
     Returns:
         tuple[float, float]: y, z distances from centre, in whichever units
-        v_dists came as.
+            v_dists came as.
     """
     thetas = np.radians(omegas)
     matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
