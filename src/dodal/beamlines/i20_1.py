@@ -17,7 +17,7 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i20-1")
-PREFIX = BeamlinePrefix(BL, suffix="K")
+PREFIX = BeamlinePrefix(BL, suffix="P")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
