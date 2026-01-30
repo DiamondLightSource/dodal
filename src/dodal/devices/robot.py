@@ -194,12 +194,15 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
 
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
-        """
-        Perform a sample load from the specified sample location
+        """Perform a sample load from the specified sample location.
+
         Args:
-            value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.
+            value (SampleLocation): The pin and puck to load, or SAMPLE_LOCATION_EMPTY
+                to unload the sample.
+
         Raises:
-            RobotLoadError if a timeout occurs, or if an error occurs loading the sample.
+            RobotLoadError: If a timeout occurs, or if an error occurs loading the
+                sample.
         """
         try:
             if value != SAMPLE_LOCATION_EMPTY:

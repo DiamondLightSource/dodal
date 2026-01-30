@@ -24,8 +24,7 @@ _CONVERSION_CONSTANT = 12.3984
 
 
 class DCM(DoubleCrystalMonochromatorWithDSpacing[RollCrystal, PitchAndRollCrystal]):
-    """
-    A double crystal monochromator (DCM), used to select the energy of the beam.
+    """A double crystal monochromator (DCM), used to select the energy of the beam.
 
     perp describes the gap between the 2 DCM crystals which has to change as you alter
     the angle to select the requested energy.

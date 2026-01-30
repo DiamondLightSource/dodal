@@ -18,7 +18,7 @@ class Diffractometer(StandardReadable):
 
 
 class DetSlits(StandardReadable):
-    "Detector slits"
+    """Detector slits."""
 
     def __init__(
         self,
@@ -32,7 +32,7 @@ class DetSlits(StandardReadable):
 
 
 class PaStage(StandardReadable):
-    "Rasor detector stage"
+    """Rasor detector stage."""
 
     def __init__(
         self,

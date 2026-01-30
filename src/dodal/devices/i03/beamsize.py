@@ -6,8 +6,7 @@ from dodal.devices.i03.constants import BeamsizeConstants
 
 
 class Beamsize(BeamsizeBase):
-    """
-    Device that calculates the size of the beam by taking the minimum of the beam
+    """Device that calculates the size of the beam by taking the minimum of the beam
     dimensions and the aperture scatterguard diameter.
     """
 

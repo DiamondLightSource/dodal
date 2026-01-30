@@ -3,7 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class SampleMotors(StandardReadable):
-    """Virtual Smaract motors on i02-1 (VMXm)"""
+    """Virtual Smaract motors on i02-1 (VMXm)."""
 
     def __init__(
         self,
