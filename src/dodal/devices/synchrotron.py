@@ -39,17 +39,6 @@ class Synchrotron(StandardReadable):
     """A StandardReadable device that represents a synchrotron facility, providing access to
     various synchrotron parameters and operational status.
 
-    Parameters
-    ----------
-    name : str, optional
-        The name of the device. Default is an empty string.
-    signal_prefix : str, optional
-        The prefix for signal PVs. Default is Prefix.SIGNAL.
-    status_prefix : str, optional
-        The prefix for status PVs. Default is Prefix.STATUS.
-    topup_prefix : str, optional
-        The prefix for top-up related PVs. Default is Prefix.TOP_UP.
-
     Attributes:
     ----------
     current : EpicsSignalR
