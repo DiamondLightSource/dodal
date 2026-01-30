@@ -1,7 +1,7 @@
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.i10_1 import ElectromagnetMagnetField
+from dodal.devices.beamlines.i10_1 import ElectromagnetMagnetField
 
 
 async def test_electronmagnet_magnet_field_read():

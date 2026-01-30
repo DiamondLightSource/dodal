@@ -2,7 +2,7 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.i10_1 import I10JScalerCard
+from dodal.devices.beamlines.i10_1 import I10JScalerCard
 
 
 @pytest.fixture
