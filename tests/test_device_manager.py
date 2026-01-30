@@ -805,8 +805,6 @@ def test_docstrings_for_device_are_kept(dm: DeviceManager):
     def foo() -> DocsDevice:
         return DocsDevice()
 
-    assert OphydV2Device.__doc__ is not None
-
     assert foo.__doc__ == dedent("""\
             DocsDevice:
 
@@ -817,7 +815,7 @@ def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager)
     @dm.factory()
     def foo() -> DocsDevice:
         """Additional info on my device instance."""
-        return OphydV2Device()
+        return DocsDevice()
 
     assert foo.__doc__ == dedent("""\
             Additional info on my device instance.
