@@ -1,9 +1,8 @@
-"""
-note:
-    I10 has two insertion devices one up(idu) and one down stream(idd).
-    It is worth noting that the downstream device is slightly longer,
-    so it can reach Mn edge for linear arbitrary.
-    idd == id1,    idu == id2.
+"""note:
+I10 has two insertion devices one up(idu) and one down stream(idd).
+It is worth noting that the downstream device is slightly longer,
+so it can reach Mn edge for linear arbitrary.
+idd == id1,    idu == id2.
 """
 
 from pathlib import Path
@@ -70,7 +69,9 @@ def first_mirror() -> XYZPiezoCollimatingMirror:
 
 @devices.factory()
 def pgm() -> PlaneGratingMonochromator:
-    "I10 Plane Grating Monochromator, it can change energy via pgm.energy.set(<energy>)"
+    """I10 Plane Grating Monochromator, it can change energy via
+    pgm.energy.set(<energy>).
+    """
     return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I10Grating,
@@ -120,7 +121,7 @@ def idd(
     idd_phase: UndulatorPhaseAxes,
     idd_jaw_phase: UndulatorJawPhase,
 ) -> I10Apple2:
-    """i10 downstream insertion device:"""
+    """i10 downstream insertion device."""
     return I10Apple2(id_gap=idd_gap, id_phase=idd_phase, id_jaw_phase=idd_jaw_phase)
 
 
@@ -200,7 +201,7 @@ def idu(
     idu_phase: UndulatorPhaseAxes,
     idu_jaw_phase: UndulatorJawPhase,
 ) -> I10Apple2:
-    """i10 upstream insertion device"""
+    """i10 upstream insertion device."""
     return I10Apple2(id_gap=idu_gap, id_phase=idu_phase, id_jaw_phase=idu_jaw_phase)
 
 
