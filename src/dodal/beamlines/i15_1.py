@@ -6,6 +6,7 @@ from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
+from dodal.devices.i15_1.robot import Robot
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -155,3 +156,8 @@ def trans() -> XYPhiStage:
 @devices.factory()
 def xtal() -> LaueMonochrometer:
     return LaueMonochrometer(prefix=f"{PREFIX.beamline_prefix}-OP-LAUE-01:")
+
+
+@devices.factory()
+def robot() -> Robot:
+    return Robot(prefix=f"{PREFIX.beamline_prefix}-MO-ROBOT-01:")
