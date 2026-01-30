@@ -60,9 +60,7 @@ async def test_setting_xyz_piezo_coll_mirror_positions(
     roll: float,
     fpitch: float,
 ):
-    """
-    Test setting positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting positions on the Table using the ophyd_async mock tools."""
     # Call set to update the position
     set_mock_value(xyz_piezo_coll_mirror.x.user_readback, x)
     set_mock_value(xyz_piezo_coll_mirror.y.user_readback, y)
@@ -104,9 +102,7 @@ async def test_setting_xyz_switching_mirror_position_table(
     roll: float,
     mirror: MirrorEnum,
 ):
-    """
-    Test setting positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting positions on the Table using the ophyd_async mock tools."""
     # Call set to update the position
     set_mock_value(xyz_switching_mirror.x.user_readback, x)
     set_mock_value(xyz_switching_mirror.y.user_readback, y)
@@ -180,9 +176,7 @@ async def test_setting_xyz_piezo_switching_mirror_positions(
     fpitch: float,
     mirror: MirrorEnum,
 ):
-    """
-    Test setting positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting positions on the Table using the ophyd_async mock tools."""
     # Call set to update the position
     set_mock_value(xyz_piezo_switching_mirror.x.user_readback, x)
     set_mock_value(xyz_piezo_switching_mirror.y.user_readback, y)

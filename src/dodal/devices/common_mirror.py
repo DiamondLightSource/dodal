@@ -12,8 +12,7 @@ TMirror = TypeVar("TMirror", bound=StrictEnum)
 class XYZSwitchingMirror(
     XYZPitchYawRollStage, Generic[TMirror], Locatable[TMirror], Stoppable
 ):
-    """
-    A device representation set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors.
+    """A device representation set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors.
     To change mirror set mirror enum and trigger mirror change.
     """
 
@@ -53,9 +52,7 @@ class XYZSwitchingMirror(
 
 
 class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
-    """
-    Collimating mirror on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor.
-    """
+    """Collimating mirror on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor."""
 
     def __init__(
         self,
@@ -74,9 +71,7 @@ class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
 
 
 class XYZPiezoSwitchingMirror(XYZSwitchingMirror[TMirror], Generic[TMirror]):
-    """
-    A device representation set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor.
-    """
+    """A device representation set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor."""
 
     def __init__(
         self,
