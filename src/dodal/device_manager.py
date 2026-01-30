@@ -4,7 +4,7 @@ import typing
 from collections import UserDict
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
 from functools import cached_property, wraps
-from inspect import Parameter
+from inspect import Parameter, cleandoc
 from types import NoneType
 from typing import (
     Annotated,
@@ -636,12 +636,9 @@ def _format_doc(
     if not return_type:
         return factory.__doc__
     if existing := factory.__doc__:
-        return _type_docs(return_type, extra_docs=existing)
+        return f"{existing}\n\n{_type_docs(return_type)}"
     return _type_docs(return_type)
 
 
-def _type_docs(target: type[V1 | V2], extra_docs: str = "") -> str:
-    docs = f"{target.__name__}:\n\n{inspect.cleandoc(target.__doc__ or NO_DOCS)}"
-    if extra_docs != "":
-        docs = f"{extra_docs}\n\n{docs}"
-    return docs
+def _type_docs(target: type[V1 | V2]) -> str:
+    return f"{target.__name__}:\n\n{cleandoc(target.__doc__ or NO_DOCS)}"

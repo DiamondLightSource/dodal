@@ -1,4 +1,4 @@
-from inspect import cleandoc
+from textwrap import dedent
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -9,11 +9,9 @@ from pytest import RaisesExc, RaisesGroup
 
 from dodal.device_manager import (
     DEFAULT_TIMEOUT,
-    NO_DOCS,
     DeviceBuildResult,
     DeviceManager,
     LazyFixtures,
-    _type_docs,
 )
 
 
@@ -788,42 +786,45 @@ def test_lazy_fixtures_contains():
     assert "two" not in lf
 
 
-def test_docstrings_for_factory_instance_are_kept(dm: DeviceManager):
+def test_docstrings_for_untyped_factory(dm: DeviceManager):
     @dm.factory
     def foo():
         """This is the docstring for foo."""
         return Mock()
 
-    mock = Mock(__name__="Mock", __doc__=None)
-
-    @dm.v1_init(mock, prefix="MOCK_PREFIX")  # type: ignore
-    def bar(_):
-        """This is the docstring for bar."""
-        pass
+    @dm.factory
+    def bar():
+        return Mock()
 
     assert foo.__doc__ == "This is the docstring for foo."
-    assert bar.__doc__ == _type_docs(mock, extra_docs="This is the docstring for bar.")  # type: ignore
+    assert bar.__doc__ is None
 
 
 def test_docstrings_for_device_are_kept(dm: DeviceManager):
     @dm.factory()
-    def foo() -> OphydV2Device:
-        return OphydV2Device()
+    def foo() -> DocsDevice:
+        return DocsDevice()
 
     assert OphydV2Device.__doc__ is not None
 
-    assert foo.__doc__ == _type_docs(OphydV2Device)
+    assert foo.__doc__ == dedent("""\
+            DocsDevice:
+
+            Documentation for DocsDevice.""")
 
 
 def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager):
     @dm.factory()
-    def foo() -> OphydV2Device:
+    def foo() -> DocsDevice:
         """Additional info on my device instance."""
         return OphydV2Device()
 
-    assert foo.__doc__ == _type_docs(
-        OphydV2Device, extra_docs="Additional info on my device instance."
-    )
+    assert foo.__doc__ == dedent("""\
+            Additional info on my device instance.
+
+            DocsDevice:
+
+            Documentation for DocsDevice.""")
 
 
 class NoDocsDevice(OphydV2Device):
@@ -831,7 +832,7 @@ class NoDocsDevice(OphydV2Device):
 
 
 class DocsDevice(OphydV2Device):
-    """Documentation."""
+    """Documentation for DocsDevice."""
 
 
 def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
@@ -842,34 +843,82 @@ def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
         """Additional info on my device instance."""
         return NoDocsDevice()
 
-    assert foo.__doc__ == _type_docs(
-        NoDocsDevice, extra_docs="Additional info on my device instance."
-    )
+    assert foo.__doc__ == dedent("""\
+            Additional info on my device instance.
+
+            NoDocsDevice:
+
+            No documentation available.""")
 
 
-def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
+def test_docs_no_docs_available_added_for_no_docs_device(dm: DeviceManager):
     @dm.factory()
     def foo() -> NoDocsDevice:
         return NoDocsDevice()
 
-    assert foo.__doc__ == _type_docs(NoDocsDevice)
+    assert foo.__doc__ == dedent("""\
+            NoDocsDevice:
+
+            No documentation available.""")
 
 
-def test_type_docs_is_as_expected():
-    extra_docs = "foo"
-    expected_no_docs_device_docs = f"{NoDocsDevice.__name__}:\n\n{NO_DOCS}"
-    assert _type_docs(NoDocsDevice) == expected_no_docs_device_docs
-    assert (
-        _type_docs(NoDocsDevice, extra_docs)
-        == f"{extra_docs}\n\n{expected_no_docs_device_docs}"
-    )
+class NoDocsV1Device(OphydV1Device):
+    pass
 
-    expected_docs_device_docs = (
-        f"{DocsDevice.__name__}:\n\n{cleandoc(DocsDevice.__doc__)}"  # type: ignore
-    )
-    assert _type_docs(DocsDevice) == expected_docs_device_docs
 
-    assert (
-        _type_docs(DocsDevice, extra_docs=extra_docs)
-        == f"{extra_docs}\n\n{expected_docs_device_docs}"
-    )
+class DocsV1Device(OphydV1Device):
+    """Docs for DocsV1Device."""
+
+    pass
+
+
+def test_docstrings_for_v1_factory(dm: DeviceManager):
+    @dm.v1_init(NoDocsV1Device, prefix="DEMO")
+    def v1_undoc(dev: NoDocsV1Device):
+        pass
+
+    assert v1_undoc.__doc__ == dedent("""\
+            NoDocsV1Device:
+
+            No documentation available.""")
+
+
+def test_docstrings_for_v1_factory_with_docs(dm: DeviceManager):
+    @dm.v1_init(NoDocsV1Device, prefix="DEMO")
+    def v1_doc(dev: NoDocsV1Device):
+        """Docs for v1_doc."""
+        pass
+
+    assert v1_doc.__doc__ == dedent("""\
+            Docs for v1_doc.
+
+            NoDocsV1Device:
+
+            No documentation available.""")
+    pass
+
+
+def test_docstrings_for_v1_doc_factory(dm: DeviceManager):
+    @dm.v1_init(DocsV1Device, prefix="DEMO")
+    def v1_undoc(dev: DocsV1Device):
+        pass
+
+    assert v1_undoc.__doc__ == dedent("""\
+            DocsV1Device:
+
+            Docs for DocsV1Device.""")
+
+
+def test_docstrings_for_v1_doc_factory_with_docs(dm: DeviceManager):
+    @dm.v1_init(DocsV1Device, prefix="DEMO")
+    def v1_doc(dev: DocsV1Device):
+        """Docs for v1_doc."""
+        pass
+
+    assert v1_doc.__doc__ == dedent("""\
+            Docs for v1_doc.
+
+            DocsV1Device:
+
+            Docs for DocsV1Device.""")
+    pass
