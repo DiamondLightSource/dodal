@@ -2,10 +2,8 @@ from pathlib import Path
 
 from daq_config_server.client import ConfigServer
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
 from dodal.devices.i21 import (
     Grating,
 )
@@ -42,14 +40,15 @@ I21_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i21/software/gda/workspace_git/gda-diamond.git/configurations/i21-config/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "IDEnergy2GapCalibrations.csv"
 PHASE_LOOKUP_FILE_NAME = "IDEnergy2PhaseCalibrations.csv"
+devices = DeviceManager()
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def pgm() -> PlaneGratingMonochromator:
     return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
@@ -57,12 +56,12 @@ def pgm() -> PlaneGratingMonochromator:
     )
 
 
-@device_factory()
+@devices.factory()
 def id_gap() -> UndulatorGap:
     return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
-@device_factory()
+@devices.factory()
 def id_phase() -> UndulatorPhaseAxes:
     return UndulatorPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
@@ -73,20 +72,24 @@ def id_phase() -> UndulatorPhaseAxes:
     )
 
 
-@device_factory()
-def id() -> Apple2[UndulatorPhaseAxes]:
+@devices.factory()
+def id(
+    id_gap: UndulatorGap, id_phase: UndulatorPhaseAxes
+) -> Apple2[UndulatorPhaseAxes]:
     """I21 insertion device."""
     return Apple2[UndulatorPhaseAxes](
-        id_gap=id_gap(),
-        id_phase=id_phase(),
+        id_gap=id_gap,
+        id_phase=id_phase,
     )
 
 
-@device_factory()
-def id_controller() -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
-    """i21 insertion device controller."""
+@devices.factory()
+def id_controller(
+    id: Apple2[UndulatorPhaseAxes],
+) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
+    """I21 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
-        apple2=id(),
+        apple2=id,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(grating=I21_GRATING_COLUMNS),
             config_client=I21_CONF_CLIENT,
@@ -103,22 +106,28 @@ def id_controller() -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     )
 
 
-@device_factory()
-def id_energy() -> InsertionDeviceEnergy:
-    return InsertionDeviceEnergy(id_controller=id_controller())
+@devices.factory()
+def id_energy(
+    id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
+) -> InsertionDeviceEnergy:
+    return InsertionDeviceEnergy(id_controller=id_controller)
 
 
-@device_factory()
-def id_polarisation() -> InsertionDevicePolarisation:
-    return InsertionDevicePolarisation(id_controller=id_controller())
+@devices.factory()
+def id_polarisation(
+    id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
+) -> InsertionDevicePolarisation:
+    return InsertionDevicePolarisation(id_controller=id_controller)
 
 
-@device_factory()
-def energy_jid() -> BeamEnergy:
+@devices.factory()
+def energy(
+    id_energy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
+) -> BeamEnergy:
     """Beam energy."""
-    return BeamEnergy(id_energy=id_energy(), mono=pgm().energy)
+    return BeamEnergy(id_energy=id_energy, mono=pgm.energy)
 
 
-@device_factory()
+@devices.factory()
 def sample_temperature_controller() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")

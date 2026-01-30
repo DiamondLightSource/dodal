@@ -41,13 +41,13 @@ def base_y() -> Motor:
 
 @device_factory()
 def blower_y() -> Motor:
-    """Same motor as blowerZ"""
+    """Same motor as blowerZ."""
     return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
 
 
 @device_factory()
 def blower_z() -> Motor:
-    """Same motor as blowerY"""
+    """Same motor as blowerY."""
     return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
 
 

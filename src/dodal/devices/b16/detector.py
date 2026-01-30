@@ -10,10 +10,9 @@ from dodal.devices.controllers import ConstantDeadTimeController
 
 
 def software_triggered_tiff_area_detector(prefix: str, deadtime: float = 0.0):
-    """
-    Wrapper for AreaDetector with fixed dead time (defaulted to 0)
+    """Wrapper for AreaDetector with fixed dead time (defaulted to 0)
     and a TIFF file writer.
-    Most detectors in B16 could be configured like this
+    Most detectors in B16 could be configured like this.
     """
     return AreaDetector(
         writer=ADTIFFWriter.with_io(

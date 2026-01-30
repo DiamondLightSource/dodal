@@ -791,18 +791,18 @@ def test_lazy_fixtures_contains():
 def test_docstrings_for_factory_instance_are_kept(dm: DeviceManager):
     @dm.factory
     def foo():
-        """This is the docstring for foo"""
+        """This is the docstring for foo."""
         return Mock()
 
     mock = Mock(__name__="Mock", __doc__=None)
 
     @dm.v1_init(mock, prefix="MOCK_PREFIX")  # type: ignore
     def bar(_):
-        """This is the docstring for bar"""
+        """This is the docstring for bar."""
         pass
 
-    assert foo.__doc__ == "This is the docstring for foo"
-    assert bar.__doc__ == _type_docs(mock, extra_docs="This is the docstring for bar")  # type: ignore
+    assert foo.__doc__ == "This is the docstring for foo."
+    assert bar.__doc__ == _type_docs(mock, extra_docs="This is the docstring for bar.")  # type: ignore
 
 
 def test_docstrings_for_device_are_kept(dm: DeviceManager):
@@ -831,7 +831,7 @@ class NoDocsDevice(OphydV2Device):
 
 
 class DocsDevice(OphydV2Device):
-    "Documentation"
+    """Documentation."""
 
 
 def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(

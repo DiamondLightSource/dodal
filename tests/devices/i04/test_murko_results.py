@@ -116,7 +116,8 @@ def get_messages(
 ) -> tuple[list, dict]:
     """Generate mock Murko messages and metadata with accurate most_likely_click values,
     based on x, y, z and a range of omega values. By default, xyz lines up with the beam
-    centre."""
+    centre.
+    """
     messages = []
     uuid = 0
     omega = omega_start

@@ -3,9 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class SampleY(StandardReadable):
-    """
-    Motors for controlling the sample's y position and stretch in the y axis.
-    """
+    """Motors for controlling the sample's y position and stretch in the y axis."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
@@ -17,9 +15,7 @@ class SampleY(StandardReadable):
 
 
 class SampleTheta(StandardReadable):
-    """
-    Motors for controlling the sample's theta position and skew
-    """
+    """Motors for controlling the sample's theta position and skew."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
@@ -31,9 +27,7 @@ class SampleTheta(StandardReadable):
 
 
 class TomoStageWithStretchAndSkew(StandardReadable):
-    """
-    Grouping of motors for the P45 tomography stage
-    """
+    """Grouping of motors for the P45 tomography stage."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
