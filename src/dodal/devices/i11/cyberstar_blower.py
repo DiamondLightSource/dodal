@@ -9,7 +9,7 @@ EU = TypeVar("EU", bound=EurothermGeneral)
 
 
 class CyberstarBlower(StandardReadable, Generic[EU]):
-    """This is a specific device that uses a Eurotherm controller"""
+    """This is a specific device that uses a Eurotherm controller."""
 
     def __init__(
         self,

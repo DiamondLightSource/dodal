@@ -21,8 +21,7 @@ from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 
 
 class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
-    """
-    Compound device to link hard x-ray undulator gap and order to photon energy.
+    """Compound device to link hard x-ray undulator gap and order to photon energy.
     Setting the energy adjusts the undulator gap accordingly.
     """
 
@@ -83,8 +82,8 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
 
 
 class HardEnergy(StandardReadable, Locatable[float]):
-    """
-    Energy compound device that provides combined change of both DCM energy and undulator gap accordingly.
+    """Energy compound device that provides combined change of both DCM energy and
+    undulator gap accordingly.
     """
 
     def __init__(

@@ -20,7 +20,7 @@ devices = DeviceManager()
 
 @devices.factory()
 def shutter() -> HutchShutter:
-    """Real experiment shutter device for I19"""
+    """Real experiment shutter device for I19."""
     return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
