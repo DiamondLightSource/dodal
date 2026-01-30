@@ -1,50 +1,42 @@
-from collections.abc import Callable
-
 import numpy as np
 
-CallableRotationMatrixType = tuple[
-    tuple[Callable[[float], float], Callable[[float], float]],
-    tuple[Callable[[float], float], Callable[[float], float]],
-]
+"""
+| Rotation | Formula for X_rot | Formula for Y_rot |
+| -------- | ----------------- | ----------------- |
+| CCW      | x cosθ - y sinθ   | x sinθ + y cosθ   |
+| CW       | x cosθ + y sinθ   | -x sinθ + y cosθ  |
+"""
 
 
-def _get_rotation_matrix(
-    theta: float, callable_rotation_matrix: CallableRotationMatrixType
-) -> np.ndarray:
-    return np.array(
-        [
-            [fn(theta) for fn in row_functions]
-            for row_functions in callable_rotation_matrix
-        ]
-    )
-
-
-def rotate(
-    theta: float,
-    x: float,
-    y: float,
-    callable_rotation_matrix: CallableRotationMatrixType,
-    inverse: bool = False,
-) -> tuple[float, float]:
-    """
-    Helper functions that can perform rotations on x and y. A matrix of callables is
-    parsed so any rotation can be used. An example is shown below:
-
-    from numpy import cos as c
-    from numpy import sin as s
-    from math import radians
-
-    def neg_s(x: float) -> float:
-        return -s(x)
-
-    ROTATION_MATRIX = [[c, s], [neg_s, c]]
-    x, y = 1, 5
-
-    new_x, new_y = rotate(radians(45), x, y, ROTATION_MATRIX)
-    """
-    rotation_matrix = _get_rotation_matrix(theta, callable_rotation_matrix)
-    if inverse:
-        rotation_matrix = rotation_matrix.T
+def do_rotation(x: float, y: float, rotation_matrix: np.ndarray) -> tuple[float, float]:
     positions = np.array([x, y])
     rotation = rotation_matrix @ positions
     return rotation[0], rotation[1]
+
+
+def rotate_clockwise(
+    theta: float,
+    x: float,
+    y: float,
+) -> tuple[float, float]:
+    rotation_matrix = np.array(
+        [
+            [np.cos(theta), np.sin(theta)],
+            [-np.sin(theta), np.cos(theta)],
+        ]
+    )
+    return do_rotation(x, y, rotation_matrix)
+
+
+def rotate_counter_clockwise(
+    theta: float,
+    x: float,
+    y: float,
+) -> tuple[float, float]:
+    rotation_matrix = np.array(
+        [
+            [np.cos(theta), -np.sin(theta)],
+            [np.sin(theta), np.cos(theta)],
+        ]
+    )
+    return do_rotation(x, y, rotation_matrix)

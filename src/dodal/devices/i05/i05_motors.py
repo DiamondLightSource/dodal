@@ -1,12 +1,15 @@
 import asyncio
 from math import radians
 
-from numpy import cos as c
-from numpy import sin as s
-from ophyd_async.core import SignalR, SignalRW, derived_signal_rw
+from ophyd_async.core import (
+    SignalR,
+    SignalRW,
+    derived_signal_rw,
+)
+from ophyd_async.core._protocol import AsyncMovable
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.i05_shared.math import CallableRotationMatrixType, rotate
+from dodal.devices.i05_shared.math import rotate_clockwise, rotate_counter_clockwise
 from dodal.devices.motors import (
     _AZIMUTH,
     _POLAR,
@@ -15,16 +18,6 @@ from dodal.devices.motors import (
     _Y,
     _Z,
     XYZPolarAzimuthTiltStage,
-)
-
-
-def neg_s(x: float) -> float:
-    return -s(x)
-
-
-ROTATION_MATRIX = (
-    (c, s),
-    (neg_s, c),
 )
 
 
@@ -61,37 +54,12 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         )
 
         with self.add_children_as_readables():
-            # self.perp = derived_signal_rw(
-            #     self._read_perp_calc,
-            #     self._set_perp_calc,
-            #     x=self.x,
-            #     y=self.y,
-            #     angle_deg=self.rotation_angle_deg,
-            # )
-            # self.long = derived_signal_rw(
-            #     self._read_long_calc,
-            #     self._set_long_calc,
-            #     x=self.x,
-            #     y=self.y,
-            #     angle_deg=self.rotation_angle_deg,
-            # )
-            self.perp = create_rw_rotation_axis_signal(
-                i=self.x,
-                j=self.y,
-                angle_deg=self.rotation_angle_deg,
-                rotation_matrix=ROTATION_MATRIX,
-                i_axis=True,
-            )
-            self.long = create_rw_rotation_axis_signal(
-                i=self.x,
-                j=self.y,
-                angle_deg=self.rotation_angle_deg,
-                rotation_matrix=ROTATION_MATRIX,
-                i_axis=False,
+            self.perp, self.long = create_rotational_ij_component_signals_with_motors(
+                self.x, self.y, self.rotation_angle_deg
             )
 
     def _read_perp_calc(self, x: float, y: float, angle_deg: float) -> float:
-        new_x, new_y = rotate(radians(angle_deg), x, y, ROTATION_MATRIX)
+        new_x, new_y = rotate_clockwise(radians(angle_deg), x, y)
         return new_x
 
     async def _set_perp_calc(self, value: float) -> None:
@@ -101,13 +69,13 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         )
         perp = value
         long = self._read_long_calc(x_pos, y_pos, self.rotation_angle_deg)
-        new_x, new_y = rotate(
-            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX, inverse=True
+        new_x, new_y = rotate_counter_clockwise(
+            radians(self.rotation_angle_deg), perp, long
         )
         await asyncio.gather(self.x.set(new_x), self.y.set(new_y))
 
     def _read_long_calc(self, x: float, y: float, angle_deg: float) -> float:
-        new_x, new_y = rotate(radians(angle_deg), x, y, ROTATION_MATRIX)
+        new_x, new_y = rotate_clockwise(radians(angle_deg), x, y)
         return new_y
 
     async def _set_long_calc(self, value: float) -> None:
@@ -117,53 +85,123 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         )
         perp = self._read_perp_calc(x_pos, y_pos, self.rotation_angle_deg)
         long = value
-        new_x, new_y = rotate(
-            radians(self.rotation_angle_deg), perp, long, ROTATION_MATRIX, inverse=True
+        new_x, new_y = rotate_counter_clockwise(
+            radians(self.rotation_angle_deg), perp, long
         )
         await asyncio.gather(self.x.set(new_x), self.y.set(new_y))
 
 
-def create_rw_rotation_axis_signal(
-    i: Motor,
-    j: Motor,
-    angle_deg: SignalR[float] | float,
-    rotation_matrix: CallableRotationMatrixType,
-    i_axis: bool,
-) -> SignalRW[float]:
-    async def _get_angle_deg(angle_deg: SignalR[float] | float) -> float:
-        if isinstance(angle_deg, SignalR):
-            return await angle_deg.get_value()
-        return angle_deg
+# NOTE: This already exists in ophyd-async but is not exposed publically in current
+# release. It has been made public now https://github.com/bluesky/ophyd-async/pull/1172
+# so the below can be removed once we move to latest ophyd-async release.
+# @runtime_checkable
+# class AsyncMovable(Protocol[T_co]):
+#     @abstractmethod
+#     def set(self, value: T_co) -> AsyncStatus:
+#         """Return a ``Status`` that is marked done when the device is done moving."""
 
-    def _read_rotate_calc(
-        i: float, j: float, angle_deg: float, return_i: bool
-    ) -> float:
-        new_i, new_j = rotate(radians(angle_deg), i, j, rotation_matrix)
-        return new_i if return_i else new_j
 
-    async def _set_inverse_rotate_calc(value: float) -> None:
+async def _get_angle_deg(angle_deg: SignalR[float] | float) -> float:
+    if isinstance(angle_deg, SignalR):
+        return await angle_deg.get_value()
+    return angle_deg
+
+
+def create_rotational_ij_component_signals(
+    i_read: SignalR[float],
+    j_read: SignalR[float],
+    i_write: AsyncMovable[float],
+    j_write: AsyncMovable[float],
+    angle_deg: float | SignalR[float],
+) -> tuple[SignalRW[float], SignalRW[float]]:
+    """
+    Create virtual "rotated" i and j component signals from two real motors.
+
+    These virtual signals represent the i/j components after rotation by a given
+    angle. When writing to these virtual signals, the real motor positions are
+    adjusted using the inverse rotation so that the rotated component moves to the
+    requested value.
+
+    Args:
+        i_read (SignalR): SignalR representing the i motor readback.
+        j_read (SignalR): representing the j motor readback.
+        i_write (AsyncReadable): object for setting the i position.
+        j_write (AsyncReadbale): object for setting the j position.
+        angle_deg (float | SignalR): Rotation angle in degrees.
+
+    Returns:
+        tuple[SignalRW[float], SignalRW[float]] Two virtual read/write signals
+        corresponding to the rotated i and j components.
+    """
+
+    def _read_i_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
+        new_i, new_j = rotate_clockwise(radians(angle_deg), i, j)
+        return new_i
+
+    async def _set_i_rotation_component_calc(value: float) -> None:
+        """Move virtual i-axis to desired position while keeping j-axis constant in the
+        rotated frame."""
         i_pos, j_pos, angle_deg_pos = await asyncio.gather(
-            i.user_readback.get_value(),
-            j.user_readback.get_value(),
+            i_read.get_value(),
+            j_read.get_value(),
             _get_angle_deg(angle_deg),
         )
-        if i_axis:
-            i_rotate = value
-            j_rotate = _read_rotate_calc(i_pos, j_pos, angle_deg_pos, return_i=False)
-        else:
-            i_rotate = _read_rotate_calc(i_pos, j_pos, angle_deg_pos, return_i=True)
-            j_rotate = value
-
-        new_i, new_j = rotate(
-            radians(angle_deg_pos), i_rotate, j_rotate, rotation_matrix, inverse=True
+        # Rotated coordinates
+        i_rotation_target = value
+        j_rotation_current = _read_j_rotation_component_calc(
+            i_pos, j_pos, angle_deg_pos
         )
-        await asyncio.gather(i.set(new_i), j.set(new_j))
+        # Convert back to motor frame by doing inverse rotation to determine actual motor positions
+        new_i_pos, new_j_pos = rotate_counter_clockwise(
+            radians(angle_deg_pos), i_rotation_target, j_rotation_current
+        )
+        await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
+
+    def _read_j_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
+        new_i, new_j = rotate_clockwise(radians(angle_deg), i, j)
+        return new_j
+
+    async def _set_j_rotation_component_calc(value: float) -> None:
+        """Move virtual j-axis to desired position while keeping j-axis constant in the
+        rotated frame."""
+        i_pos, j_pos, angle_deg_pos = await asyncio.gather(
+            i_read.get_value(),
+            j_read.get_value(),
+            _get_angle_deg(angle_deg),
+        )
+        # Rotated coordinates
+        i_rotation_target = _read_i_rotation_component_calc(i_pos, j_pos, angle_deg_pos)
+        j_rotation_current = value
+        # Convert back to motor frame by doing inverse rotation to determine actual motor positions
+        new_i_pos, new_j_pos = rotate_counter_clockwise(
+            radians(angle_deg_pos), i_rotation_target, j_rotation_current
+        )
+        await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
 
     return derived_signal_rw(
-        _read_rotate_calc,
-        _set_inverse_rotate_calc,
-        i=i,
-        j=j,
+        _read_i_rotation_component_calc,
+        _set_i_rotation_component_calc,
+        i=i_read,
+        j=j_read,
         angle_deg=angle_deg,
-        return_i=i_axis,
+    ), derived_signal_rw(
+        _read_j_rotation_component_calc,
+        _set_j_rotation_component_calc,
+        i=i_read,
+        j=j_read,
+        angle_deg=angle_deg,
+    )
+
+
+def create_rotational_ij_component_signals_with_motors(
+    i: Motor,
+    j: Motor,
+    angle_deg: float | SignalR[float],
+) -> tuple[SignalRW[float], SignalRW[float]]:
+    return create_rotational_ij_component_signals(
+        i_read=i.user_readback,
+        i_write=i,  # type: ignore
+        j_read=j.user_readback,
+        j_write=j,  # type: ignore
+        angle_deg=angle_deg,
     )

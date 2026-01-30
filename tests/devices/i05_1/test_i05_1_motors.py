@@ -1,4 +1,8 @@
+import asyncio
+from math import radians
+
 import pytest
+from numpy import cos, sin
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -10,6 +14,35 @@ def xyzpad_stage() -> XYZPolarAzimuthDefocusStage:
     with init_devices(mock=True):
         xyzpad_stage = XYZPolarAzimuthDefocusStage("TEST:")
     return xyzpad_stage
+
+
+async def test_goniometer_read(xyzpad_stage: XYZPolarAzimuthDefocusStage) -> None:
+    x, y = 10, 5
+    angle_deg = 45
+    theta = radians(angle_deg)
+
+    expected_horz = x * cos(theta) + y * sin(theta)
+    expected_vert = x * -sin(theta) + y * cos(theta)
+
+    await asyncio.gather(
+        xyzpad_stage.x.set(x),
+        xyzpad_stage.y.set(y),
+        xyzpad_stage.azimuth.set(angle_deg),
+    )
+
+    await assert_reading(
+        xyzpad_stage,
+        {
+            xyzpad_stage.x.name: partial_reading(x),
+            xyzpad_stage.y.name: partial_reading(y),
+            xyzpad_stage.z.name: partial_reading(0),
+            xyzpad_stage.polar.name: partial_reading(0),
+            xyzpad_stage.azimuth.name: partial_reading(angle_deg),
+            xyzpad_stage.defocus.name: partial_reading(0),
+            xyzpad_stage.hor.name: partial_reading(expected_horz),
+            xyzpad_stage.vert.name: partial_reading(expected_vert),
+        },
+    )
 
 
 @pytest.mark.parametrize(
