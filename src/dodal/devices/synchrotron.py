@@ -36,13 +36,46 @@ class SynchrotronMode(StrictEnum):
 
 
 class Synchrotron(StandardReadable):
+    """A StandardReadable device that represents a synchrotron facility, providing access to
+    various synchrotron parameters and operational status.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the device. Default is an empty string.
+    signal_prefix : str, optional
+        The prefix for signal PVs. Default is Prefix.SIGNAL.
+    status_prefix : str, optional
+        The prefix for status PVs. Default is Prefix.STATUS.
+    topup_prefix : str, optional
+        The prefix for top-up related PVs. Default is Prefix.TOP_UP.
+
+    Attributes:
+    ----------
+    current : EpicsSignalR
+        Read-only signal for the synchrotron beam current (float).
+    energy : EpicsSignalR
+        Read-only signal for the beam energy (float).
+    probe : SoftSignalRW
+        Configurable signal for the probe type (str). Default is "x-ray".
+    type : SoftSignalRW
+        Configurable signal for the synchrotron type (str). Default is "Synchrotron X-ray Source".
+    synchrotron_mode : EpicsSignalR
+        Read-only signal for the current synchrotron mode (SynchrotronMode).
+    machine_user_countdown : EpicsSignalR
+        Read-only signal for the machine user countdown timer (float).
+    top_up_start_countdown : EpicsSignalR
+        Read-only signal for the top-up start countdown timer (float).
+    top_up_end_countdown : EpicsSignalR
+        Read-only signal for the top-up end countdown timer (float).
+    """
+
     def __init__(
         self,
-        name: str = "",
-        *,
         signal_prefix=Prefix.SIGNAL,
         status_prefix=Prefix.STATUS,
         topup_prefix=Prefix.TOP_UP,
+        name: str = "",
     ):
         with self.add_children_as_readables():
             self.current = epics_signal_r(float, signal_prefix + Suffix.SIGNAL)
