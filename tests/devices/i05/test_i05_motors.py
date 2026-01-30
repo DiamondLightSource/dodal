@@ -48,14 +48,15 @@ async def test_goniometer_set_long(goniometer: I05Goniometer) -> None:
     new_long = 20.0
     await goniometer.long.set(new_long)
 
-    x_new = await goniometer.x.user_readback.get_value()
-    y_new = await goniometer.y.user_readback.get_value()
+    x_new, y_new = await asyncio.gather(
+        goniometer.x.user_readback.get_value(), goniometer.y.user_readback.get_value()
+    )
 
-    long_after = goniometer._read_long_calc(x_new, y_new, angle_deg)
     perp_after = goniometer._read_perp_calc(x_new, y_new, angle_deg)
+    long_after = goniometer._read_long_calc(x_new, y_new, angle_deg)
 
-    assert long_after == pytest.approx(new_long)
     assert perp_after == pytest.approx(perp_before)
+    assert long_after == pytest.approx(new_long)
 
 
 async def test_goniometer_set_perp(goniometer: I05Goniometer) -> None:
@@ -68,8 +69,9 @@ async def test_goniometer_set_perp(goniometer: I05Goniometer) -> None:
     new_perp = 15.0
     await goniometer.perp.set(new_perp)
 
-    x_new_perp = await goniometer.x.user_readback.get_value()
-    y_new_perp = await goniometer.y.user_readback.get_value()
+    x_new_perp, y_new_perp = await asyncio.gather(
+        goniometer.x.user_readback.get_value(), goniometer.y.user_readback.get_value()
+    )
 
     long_after_perp = goniometer._read_long_calc(x_new_perp, y_new_perp, angle_deg)
     perp_after_perp = goniometer._read_perp_calc(x_new_perp, y_new_perp, angle_deg)
