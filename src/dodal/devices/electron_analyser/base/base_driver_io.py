@@ -56,8 +56,6 @@ class AbstractAnalyserDriverIO(
         pass_energy_type (type[TPassEnergy]): Can be enum or float, depending on
             electron analyser model. If enum, it determines the available pass
             energies for this device.
-        energy_source: Device that can give us the correct excitation energy (in eV)
-            and switch sources if applicable.
         name (str, optional): Name of the device.
     """
 
