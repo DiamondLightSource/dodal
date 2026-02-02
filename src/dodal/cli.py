@@ -33,7 +33,6 @@ def main(ctx: click.Context) -> None:
 @click.option("-n", "--name", "device_manager", default="devices")
 def describe(beamline: str, device_manager: str) -> None:
     """Initialises a beamline module, gets the docs of all devices and prints them."""
-
     os.environ["BEAMLINE"] = beamline
 
     module_name = module_name_for_beamline(beamline)
@@ -83,8 +82,8 @@ def describe(beamline: str, device_manager: str) -> None:
 @click.option("-n", "--name", "device_manager", default="devices")
 def connect(beamline: str, all: bool, sim_backend: bool, device_manager: str) -> None:
     """Initialises a beamline module, connects to all devices, reports
-    any connection issues."""
-
+    any connection issues.
+    """
     os.environ["BEAMLINE"] = beamline
 
     # We need to make a fake path provider for any detectors that need one,

@@ -3,7 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class MultiLayerMirror(StandardReadable):
-    """Multilayer Mirror"""
+    """Multilayer Mirror."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():

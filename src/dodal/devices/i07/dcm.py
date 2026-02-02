@@ -9,9 +9,8 @@ from dodal.devices.common_dcm import (
 
 
 class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
-    """
-    Device for i07's DCM, including temperature monitors and vertical motor which were
-    included in GDA.
+    """Device for i07's DCM, including temperature monitors and vertical motor which
+    were included in GDA.
     """
 
     def __init__(

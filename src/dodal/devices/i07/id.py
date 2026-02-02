@@ -5,8 +5,8 @@ from dodal.devices.util.lookup_tables import energy_distance_table
 
 
 class InsertionDevice(UndulatorInKeV):
-    """
-    Insertion device for i07 including beamline-specific energy-gap lookup behaviour
+    """Insertion device for i07 including beamline-specific energy-gap lookup
+    behaviour.
     """
 
     def __init__(
@@ -21,8 +21,7 @@ class InsertionDevice(UndulatorInKeV):
         self.harmonic = harmonic
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
-        """
-        i07's energy scans remain on a particular harmonic while changing energy.  The
+        """i07's energy scans remain on a particular harmonic while changing energy. The
         calibration table has one row for each harmonic, row contains max and min
         energies and their corresponding ID gaps.  The requested energy is used to
         interpolate between these values, assuming a linear relationship on the relevant
