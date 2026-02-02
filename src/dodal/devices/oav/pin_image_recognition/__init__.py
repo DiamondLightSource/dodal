@@ -111,12 +111,6 @@ class PinTipDetection(StandardReadable):
             LOGGER.error("Invalid preprocessing function, using identity")
             preprocess_func = identity()
 
-        direction = (
-            ScanDirections.FORWARD
-            if await self.scan_direction.get_value() == 0
-            else ScanDirections.REVERSE
-        )
-
         sample_detection = MxSampleDetect(
             preprocess=preprocess_func,
             canny_lower=await self.canny_lower_threshold.get_value(),
@@ -125,7 +119,7 @@ class PinTipDetection(StandardReadable):
             open_iterations=await self.open_iterations.get_value(),
             close_ksize=await self.close_ksize.get_value(),
             close_iterations=await self.close_iterations.get_value(),
-            scan_direction=direction,
+            scan_direction=await self.scan_direction.get_value(),
             min_tip_height=await self.min_tip_height.get_value(),
         )
 
