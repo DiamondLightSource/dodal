@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i04 &#8212; dodal 1.69.1.dev33+g9e8497690 documentation</title>
+    <title>dodal.beamlines.i04 &#8212; dodal 1.69.1.dev34+ge0514ae3a documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1b59a25d"></script>
+    <script src="../../../_static/documentation_options.js?v=1dadbaed"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -840,6 +840,7 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.mx_phase1.beamstop</span><span class="w"> </span><span class="kn">import</span> <span class="n">Beamstop</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_detector</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OAVBeamCentrePV</span><span class="p">,</span>
+    <span class="n">ZoomControllerWithBeamCentres</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAVConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_to_redis_forwarder</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAVToRedisForwarder</span>
@@ -878,7 +879,6 @@ window.addEventListener("load", load);
     <span class="n">outputs</span><span class="o">=</span><span class="p">(</span><span class="n">ZebraTTLOutputs</span><span class="p">(</span><span class="n">TTL_DETECTOR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">TTL_FAST_SHUTTER</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">TTL_XSPRESS3</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
     <span class="n">sources</span><span class="o">=</span><span class="n">ZebraSources</span><span class="p">(),</span>
 <span class="p">)</span>
-
 <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
@@ -1120,6 +1120,14 @@ window.addEventListener("load", load);
     <span class="k">return</span> <span class="n">CentreEllipseMethod</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-OAV-01:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
+
+
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zoom_controller</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ZoomControllerWithBeamCentres</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 zoom controller, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i04, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ZoomControllerWithBeamCentres</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-OAV-01:FZOOM:&quot;</span><span class="p">)</span>
 </pre></div>
 
                 </article>
