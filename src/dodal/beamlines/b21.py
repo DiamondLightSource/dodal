@@ -106,9 +106,8 @@ def slits_3() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-"""
-Slits 4 was removed from B21 after the camera length was fixed, it is not used anymore.
-"""
+"""Slits 4 was removed from B21 after the camera length was fixed, it is not used
+anymore."""
 
 
 @device_factory()
@@ -123,8 +122,7 @@ def slits_6() -> Slits:
 
 @device_factory()
 def slits_7() -> Slits:
-    """
-    Compact JJ slits device is used for B21 slits 7. PV's operate in same way
+    """Compact JJ slits device is used for B21 slits 7. PV's operate in same way
     but physically different to other slits, and uses X:GAP nomenclature.
     """
     return Slits(
