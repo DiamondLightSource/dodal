@@ -27,7 +27,8 @@ class MAPTConfigurationTable(StandardReadable):
 class MAPTConfigurationControl(StandardReadable):
     """A device to control the MAPT (Mini Aperture) configuration. It provides a signal
     to set the configuration PV to the requested value and a triggerable signal that
-    will move all the motors to the correct position."""
+    will move all the motors to the correct position.
+    """
 
     def __init__(
         self, prefix: str, aperture_request: type[SubsetEnum], name: str = ""
