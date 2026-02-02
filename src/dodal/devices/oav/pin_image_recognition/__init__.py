@@ -72,7 +72,7 @@ class PinTipDetection(StandardReadable):
         self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
         self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
         self.scan_direction = soft_signal_rw(
-            int, ScanDirections.FORWARD.value, name="scan_direction"
+            ScanDirections, ScanDirections.FORWARD, name="scan_direction"
         )
         self.min_tip_height = soft_signal_rw(int, 5, name="min_tip_height")
         self.validity_timeout = soft_signal_rw(float, 5.0, name="validity_timeout")
