@@ -213,7 +213,7 @@ class MxSampleDetect:
         return first_nonzero, last_nonzero
 
     def _locate_sample(self, edge_arr: np.ndarray) -> SampleLocation:
-        height, width = edge_arr.shape
+        edge_height, edge_width = edge_arr.shape
 
         top, bottom = MxSampleDetect._first_and_last_nonzero_by_columns(edge_arr)
 
@@ -237,22 +237,24 @@ class MxSampleDetect:
 
         # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
         if self.scan_direction == ScanDirections.FORWARD:
+            x_step = -1
             start_column = int(column_indices_with_non_narrow_widths[0])
         else:
+            x_step = 1
             start_column = int(column_indices_with_non_narrow_widths[-1])
 
         x = start_column
 
         # Move backwards to where there were no edges at all...
         while top[x] != NONE_VALUE:
-            x += -self.scan_direction.value
-            if x == -1 or x == width:
+            x += x_step
+            if (x_step < 0 and x < 0) or (x_step > 0 and x >= edge_width):
                 # (In this case the sample is off the edge of the picture.)
                 LOGGER.warning(
                     "pin-tip detection: Pin tip may be outside image area - assuming at edge."
                 )
                 break
-        x += self.scan_direction.value  # ...and forward one step. x is now at the tip.
+        x -= x_step  # ...and forward one step. x is now at the tip.
 
         tip_x = x
         tip_y = int(round(0.5 * (top[x] + bottom[x])))
