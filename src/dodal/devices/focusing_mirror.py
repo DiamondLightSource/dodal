@@ -223,3 +223,16 @@ class FocusingMirrorWithStripes(FocusingMirror):
             return {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}
         else:
             return {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}
+
+
+class FocusingMirrorWithPiezo(FocusingMirror):
+    """A focusing mirror which also has a piezoelectric actuator.
+    A voltage can be applied to the piezo to steer the beam by making the material
+    shrink or expand.
+    """
+
+    def __init__(self, prefix: str, name: str = "", *args, **kwargs):
+        with self.add_children_as_readables():
+            self.piezo = epics_signal_rw(float, f"{prefix}AOFPITCH")
+            self.piezo_rbv = epics_signal_r(float, f"{prefix}AOFPITCH:RBV")
+        super().__init__(prefix, name, *args, **kwargs)
