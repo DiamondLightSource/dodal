@@ -38,5 +38,5 @@ async def test_setup_pin_tip_from_params(
     assert await pin_tip_detection.canny_lower_threshold.get_value() == 5.0
     assert await pin_tip_detection.canny_upper_threshold.get_value() == 20.0
     assert await pin_tip_detection.preprocess_ksize.get_value() == 21
-    assert await pin_tip_detection.scan_direction.get_value() == scan_direction
+    assert await pin_tip_detection.scan_direction.get_value() == scan_direction.value
     assert await pin_tip_detection.min_tip_height.get_value() == 10
