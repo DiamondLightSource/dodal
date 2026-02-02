@@ -15,6 +15,7 @@ dodal.devices.focusing\_mirror
    :recursive:
 
    ~focusing_mirror.FocusingMirror
+   ~focusing_mirror.FocusingMirrorWithPiezo
    ~focusing_mirror.FocusingMirrorWithStripes
    ~focusing_mirror.MirrorStripe
    ~focusing_mirror.MirrorStripeConfiguration

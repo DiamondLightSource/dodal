@@ -1,0 +1,78 @@
+dodal.devices.i19.access\_controlled.piezo\_control.FocusingMirrorName
+======================================================================
+
+.. currentmodule:: dodal.devices.i19.access_controlled.piezo_control
+
+.. autoclass:: FocusingMirrorName
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FocusingMirrorName.VFM
+      
+      
+      ~FocusingMirrorName.HFM
+      
+   
+   
