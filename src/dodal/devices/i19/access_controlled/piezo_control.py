@@ -10,15 +10,12 @@ from dodal.devices.i19.access_controlled.blueapi_device import (
 from dodal.devices.i19.access_controlled.hutch_access import ACCESS_DEVICE_NAME
 
 
-class FocusingMirrorType(StrEnum):
+class FocusingMirrorName(StrEnum):
     VFM = "vfm"
     HFM = "hfm"
 
 
-PIEZO_CONTROL_PLAN_NAME = {
-    FocusingMirrorType.VFM: "apply_voltage_to_vfm_piezo",
-    FocusingMirrorType.HFM: "apply_voltage_to_hfm_piezo",
-}
+PIEZO_CONTROL_PLAN_NAME = "apply_voltage_to_piezo"
 
 
 # NOTE This device is only meant to control the piezo. There should be a separate device
@@ -48,7 +45,7 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
     def __init__(
         self,
         prefix: str,
-        mirror_type: FocusingMirrorType,
+        mirror_type: FocusingMirrorName,
         hutch: HutchState,
         instrument_session: str = "",
         name: str = "",
@@ -61,11 +58,12 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
     @AsyncStatus.wrap
     async def set(self, value: float):
         request_params = {
-            "name": PIEZO_CONTROL_PLAN_NAME[self.mirror],
+            "name": PIEZO_CONTROL_PLAN_NAME,
             "params": {
                 "experiment_hutch": self._invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,
                 "voltage_demand": value,
+                "focus_mirror": self.mirror.value,
             },
             "instrument_session": self.instrument_session,
         }
