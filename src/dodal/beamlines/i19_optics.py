@@ -2,6 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.device_manager import DeviceManager
+from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
@@ -30,3 +31,19 @@ def access_control() -> HutchAccessControl:
     return HutchAccessControl(
         f"{PREFIX.beamline_prefix}-OP-STAT-01:", ACCESS_DEVICE_NAME
     )
+
+
+@devices.factory()
+def vfm() -> FocusingMirrorWithPiezo:
+    """Get the i19 vfm device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
+
+
+@devices.factory()
+def hfm() -> FocusingMirrorWithPiezo:
+    """Get the i19 hfm device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
