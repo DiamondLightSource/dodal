@@ -40,16 +40,13 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
                 i=self.x,
                 j=self.y,
                 angle_deg=self.azimuth.user_readback,
+                clockwise_frame=True,
             )
-            self.perp, _ = create_rotational_ij_component_signals(
-                i_read=self.hor,
-                i_write=self.hor,
-                j_read=self.z.user_readback,
-                j_write=self.z,  # type: ignore
-                angle_deg=self.azimuth.user_readback,
-            )
-            self.long, _ = create_rotational_ij_component_signals_with_motors(
-                i=self.x,
-                j=self.y,
+            self.long, self.perp = create_rotational_ij_component_signals(
+                i_read=self.z.user_readback,
+                i_write=self.z,  # type: ignore
+                j_read=self.hor,
+                j_write=self.hor,
                 angle_deg=self.polar.user_readback,
+                clockwise_frame=False,
             )

@@ -113,6 +113,7 @@ def create_rotational_ij_component_signals(
     i_write: AsyncMovable[float],
     j_write: AsyncMovable[float],
     angle_deg: float | SignalR[float],
+    clockwise_frame: bool = True,
 ) -> tuple[SignalRW[float], SignalRW[float]]:
     """
     Create virtual "rotated" i and j component signals from two real motors.
@@ -134,8 +135,11 @@ def create_rotational_ij_component_signals(
         corresponding to the rotated i and j components.
     """
 
+    rotate = rotate_clockwise if clockwise_frame else rotate_counter_clockwise
+    reverse_rotate = rotate_counter_clockwise if clockwise_frame else rotate_clockwise
+
     def _read_i_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
-        new_i, new_j = rotate_clockwise(radians(angle_deg), i, j)
+        new_i, new_j = rotate(radians(angle_deg), i, j)
         return new_i
 
     async def _set_i_rotation_component_calc(value: float) -> None:
@@ -152,13 +156,13 @@ def create_rotational_ij_component_signals(
             i_pos, j_pos, angle_deg_pos
         )
         # Convert back to motor frame by doing inverse rotation to determine actual motor positions
-        new_i_pos, new_j_pos = rotate_counter_clockwise(
+        new_i_pos, new_j_pos = reverse_rotate(
             radians(angle_deg_pos), i_rotation_target, j_rotation_current
         )
         await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
 
     def _read_j_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
-        new_i, new_j = rotate_clockwise(radians(angle_deg), i, j)
+        new_i, new_j = rotate(radians(angle_deg), i, j)
         return new_j
 
     async def _set_j_rotation_component_calc(value: float) -> None:
@@ -173,7 +177,7 @@ def create_rotational_ij_component_signals(
         i_rotation_target = _read_i_rotation_component_calc(i_pos, j_pos, angle_deg_pos)
         j_rotation_current = value
         # Convert back to motor frame by doing inverse rotation to determine actual motor positions
-        new_i_pos, new_j_pos = rotate_counter_clockwise(
+        new_i_pos, new_j_pos = reverse_rotate(
             radians(angle_deg_pos), i_rotation_target, j_rotation_current
         )
         await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
@@ -194,9 +198,7 @@ def create_rotational_ij_component_signals(
 
 
 def create_rotational_ij_component_signals_with_motors(
-    i: Motor,
-    j: Motor,
-    angle_deg: float | SignalR[float],
+    i: Motor, j: Motor, angle_deg: float | SignalR[float], clockwise_frame: bool = True
 ) -> tuple[SignalRW[float], SignalRW[float]]:
     return create_rotational_ij_component_signals(
         i_read=i.user_readback,

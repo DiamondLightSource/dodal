@@ -19,7 +19,7 @@ async def test_goniometer_read(goniometer: I05Goniometer) -> None:
     x, y = 10, 5
     theta = radians(goniometer.rotation_angle_deg)
     expected_perp = x * cos(theta) + y * sin(theta)
-    expected_long = -x * sin(theta) + y * cos(theta)
+    expected_long = x * -sin(theta) + y * cos(theta)
 
     await asyncio.gather(goniometer.x.set(x), goniometer.y.set(y))
 
