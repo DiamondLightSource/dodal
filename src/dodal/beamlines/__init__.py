@@ -5,7 +5,7 @@ from pathlib import Path
 
 # Where beamline names (per the ${BEAMLINE} environment variable don't always
 # match up, we have to map between them bidirectionally). The most common use case is
-# beamlines with a "-"" in the name such as "i20-1", which is not valid in a Python
+# beamlines with a "-"" in the name such as "i19-1", which is not valid in a Python
 # module name. Add any new beamlines whose name differs from their module name to this
 # dictionary, which maps ${BEAMLINE} to dodal.beamlines.<MODULE NAME>
 _BEAMLINE_NAME_OVERRIDES = {
@@ -15,7 +15,6 @@ _BEAMLINE_NAME_OVERRIDES = {
     "i13-1": "i13_1",
     "i15-1": "i15_1",
     "i10-1": "i10_1",
-    "i20-1": "i20_1",
     "i19-1": "i19_1",
     "i19-2": "i19_2",
     "i19-optics": "i19_optics",
@@ -86,7 +85,7 @@ def _module_name_overrides() -> Mapping[str, set[str]]:
 def module_name_for_beamline(beamline: str) -> str:
     """
     Get the module name for a particular beamline, it may differ from the beamline
-    name e.g. i20-1 -> i20_1
+    name e.g.i19-1 -> i19_1
 
     Args:
         beamline: The beamline name as per the ${BEAMLINE} environment variable
