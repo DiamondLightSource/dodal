@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.cryostream &#8212; dodal 1.69.1.dev31+g3c5e720fa documentation</title>
+    <title>dodal.devices.cryostream &#8212; dodal 1.69.1.dev32+g130e50ee6 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=b9bd101b"></script>
+    <script src="../../../_static/documentation_options.js?v=5d9f4a88"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -910,6 +910,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CryoStreamGantry">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.cryostream.CryoStreamGantry.html#dodal.devices.cryostream.CryoStreamGantry">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CryoStreamGantry</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gantry controlling whether the standard Cryostream or the</span>
+<span class="sd">    HC1 cryostream is in position.</span>
+
+<span class="sd">    Note: this device is currently implemented read-only; moving the gantry without</span>
+<span class="sd">    adequate checks risks a collision if the gantry is moved while HC1 is selected</span>
+<span class="sd">    and in the IN position.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cryostream_selector</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>

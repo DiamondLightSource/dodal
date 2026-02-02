@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.robot &#8212; dodal 1.69.1.dev31+g3c5e720fa documentation</title>
+    <title>dodal.devices.robot &#8212; dodal 1.69.1.dev32+g130e50ee6 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=b9bd101b"></script>
+    <script src="../../../_static/documentation_options.js?v=5d9f4a88"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -909,6 +909,11 @@ window.addEventListener("load", load);
 
     <span class="c1"># How far the gonio position can be out before loading will fail</span>
     <span class="n">LOAD_TOLERANCE_MM</span> <span class="o">=</span> <span class="mf">0.02</span>
+
+    <span class="c1"># mode constants for CRYO_MODE - TODO when https://jira.diamond.ac.uk/browse/I03-1056</span>
+    <span class="c1"># is completed these should be made into a proper enum</span>
+    <span class="n">CRYO_MODE_WARM</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">CRYO_MODE_CRYO</span> <span class="o">=</span> <span class="mf">1.0</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>

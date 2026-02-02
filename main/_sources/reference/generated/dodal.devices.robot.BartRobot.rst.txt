@@ -39,6 +39,12 @@ dodal.devices.robot.BartRobot
    .. autosummary::
    
       
+      ~BartRobot.CRYO_MODE_CRYO
+      
+      
+      ~BartRobot.CRYO_MODE_WARM
+      
+      
       ~BartRobot.LIGHT_CURTAIN_TRIPPED
       
       
