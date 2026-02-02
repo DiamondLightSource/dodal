@@ -60,8 +60,7 @@ def undulator() -> UndulatorInKeV:
 # See https://github.com/DiamondLightSource/dodal/issues/1180
 @device_factory(skip=True)
 def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
-    """
-    A double crystal monocromator device, used to select the beam energy.
+    """A double crystal monocromator device, used to select the beam energy.
 
     Once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
     calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml

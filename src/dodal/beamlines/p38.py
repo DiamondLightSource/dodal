@@ -198,7 +198,7 @@ def linkam() -> Linkam3:
 
 @device_factory()
 def ppump() -> WatsonMarlow323Pump:
-    """Peristaltic Pump"""
+    """Peristaltic Pump."""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
 
 

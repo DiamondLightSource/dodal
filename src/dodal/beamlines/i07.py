@@ -16,7 +16,7 @@ devices = DeviceManager()
 
 @devices.factory()
 def dcm() -> DCM:
-    """Instantiate DCM using two PV bases"""
+    """Instantiate DCM using two PV bases."""
     return DCM(
         f"{PREFIX.beamline_prefix}-MO-DCM-01:", f"{PREFIX.beamline_prefix}-DI-DCM-01:"
     )
