@@ -1,0 +1,120 @@
+import asyncio
+from math import radians
+
+from ophyd_async.core import (
+    SignalR,
+    SignalRW,
+    derived_signal_rw,
+)
+from ophyd_async.core._protocol import AsyncMovable
+from ophyd_async.epics.motor import Motor
+
+from dodal.devices.i05_shared.math import rotate_clockwise, rotate_counter_clockwise
+
+
+async def _get_angle_deg(angle_deg: SignalR[float] | float) -> float:
+    if isinstance(angle_deg, SignalR):
+        return await angle_deg.get_value()
+    return angle_deg
+
+
+def create_rotational_ij_component_signals(
+    i_read: SignalR[float],
+    j_read: SignalR[float],
+    i_write: AsyncMovable[float],
+    j_write: AsyncMovable[float],
+    angle_deg: float | SignalR[float],
+    clockwise_frame: bool = True,
+) -> tuple[SignalRW[float], SignalRW[float]]:
+    """
+    Create virtual "rotated" i and j component signals from two real motors.
+
+    These virtual signals represent the i/j components after rotation by a given
+    angle. When writing to these virtual signals, the real motor positions are
+    adjusted using the inverse rotation so that the rotated component moves to the
+    requested value.
+
+    Args:
+        i_read (SignalR): SignalR representing the i motor readback.
+        j_read (SignalR): representing the j motor readback.
+        i_write (AsyncReadable): object for setting the i position.
+        j_write (AsyncReadbale): object for setting the j position.
+        angle_deg (float | SignalR): Rotation angle in degrees.
+
+    Returns:
+        tuple[SignalRW[float], SignalRW[float]] Two virtual read/write signals
+        corresponding to the rotated i and j components.
+    """
+
+    rotate = rotate_clockwise if clockwise_frame else rotate_counter_clockwise
+    reverse_rotate = rotate_counter_clockwise if clockwise_frame else rotate_clockwise
+
+    def _read_i_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
+        new_i, new_j = rotate(radians(angle_deg), i, j)
+        return new_i
+
+    async def _set_i_rotation_component_calc(value: float) -> None:
+        """Move virtual i-axis to desired position while keeping j-axis constant in the
+        rotated frame."""
+        i_pos, j_pos, angle_deg_pos = await asyncio.gather(
+            i_read.get_value(),
+            j_read.get_value(),
+            _get_angle_deg(angle_deg),
+        )
+        # Rotated coordinates
+        i_rotation_target = value
+        j_rotation_current = _read_j_rotation_component_calc(
+            i_pos, j_pos, angle_deg_pos
+        )
+        # Convert back to motor frame by doing inverse rotation to determine actual motor positions
+        new_i_pos, new_j_pos = reverse_rotate(
+            radians(angle_deg_pos), i_rotation_target, j_rotation_current
+        )
+        await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
+
+    def _read_j_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
+        new_i, new_j = rotate(radians(angle_deg), i, j)
+        return new_j
+
+    async def _set_j_rotation_component_calc(value: float) -> None:
+        """Move virtual j-axis to desired position while keeping j-axis constant in the
+        rotated frame."""
+        i_pos, j_pos, angle_deg_pos = await asyncio.gather(
+            i_read.get_value(),
+            j_read.get_value(),
+            _get_angle_deg(angle_deg),
+        )
+        # Rotated coordinates
+        i_rotation_target = _read_i_rotation_component_calc(i_pos, j_pos, angle_deg_pos)
+        j_rotation_current = value
+        # Convert back to motor frame by doing inverse rotation to determine actual motor positions
+        new_i_pos, new_j_pos = reverse_rotate(
+            radians(angle_deg_pos), i_rotation_target, j_rotation_current
+        )
+        await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
+
+    return derived_signal_rw(
+        _read_i_rotation_component_calc,
+        _set_i_rotation_component_calc,
+        i=i_read,
+        j=j_read,
+        angle_deg=angle_deg,
+    ), derived_signal_rw(
+        _read_j_rotation_component_calc,
+        _set_j_rotation_component_calc,
+        i=i_read,
+        j=j_read,
+        angle_deg=angle_deg,
+    )
+
+
+def create_rotational_ij_component_signals_with_motors(
+    i: Motor, j: Motor, angle_deg: float | SignalR[float], clockwise_frame: bool = True
+) -> tuple[SignalRW[float], SignalRW[float]]:
+    return create_rotational_ij_component_signals(
+        i_read=i.user_readback,
+        i_write=i,  # type: ignore
+        j_read=j.user_readback,
+        j_write=j,  # type: ignore
+        angle_deg=angle_deg,
+    )

@@ -6,6 +6,18 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.i05 import I05Goniometer
+from tests.devices.i05_shared.rotation_signal_test_util import (
+    AxesTestConfig,
+    assert_set_axis_preserves_other,
+)
+
+
+def expected_perp_read(x: float, y: float, theta: float) -> float:
+    return x * cos(theta) + y * sin(theta)
+
+
+def expected_long_read(x: float, y: float, theta: float) -> float:
+    return x * -sin(theta) + y * cos(theta)
 
 
 @pytest.fixture
@@ -18,8 +30,8 @@ async def goniometer():
 async def test_goniometer_read(goniometer: I05Goniometer) -> None:
     x, y = 10, 5
     theta = radians(goniometer.rotation_angle_deg)
-    expected_perp = x * cos(theta) + y * sin(theta)
-    expected_long = x * -sin(theta) + y * cos(theta)
+    expected_perp = expected_perp_read(x, y, theta)
+    expected_long = expected_long_read(x, y, theta)
 
     await asyncio.gather(goniometer.x.set(x), goniometer.y.set(y))
 
@@ -38,43 +50,26 @@ async def test_goniometer_read(goniometer: I05Goniometer) -> None:
     )
 
 
-async def test_goniometer_set_long(goniometer: I05Goniometer) -> None:
-    x, y = 10, 5
-    angle_deg = goniometer.rotation_angle_deg
-    await asyncio.gather(goniometer.x.set(x), goniometer.y.set(y))
-
-    perp_before = goniometer._read_perp_calc(x, y, angle_deg)
-
-    new_long = 20.0
-    await goniometer.long.set(new_long)
-
-    x_new, y_new = await asyncio.gather(
-        goniometer.x.user_readback.get_value(), goniometer.y.user_readback.get_value()
+async def test_goniometer_perp_and_long_set(
+    goniometer: I05Goniometer,
+) -> None:
+    axes_test_config = AxesTestConfig(
+        i_read=goniometer.x.user_readback,
+        j_read=goniometer.y.user_readback,
+        i_write=goniometer.x,  # type: ignore
+        j_write=goniometer.y,  # type: ignore
+        angle_deg=goniometer.rotation_angle_deg,
+        expected_i_read_func=expected_perp_read,
+        expected_j_read_func=expected_long_read,
+        i_rotation_axis=goniometer.perp,
+        j_rotation_axis=goniometer.long,
     )
 
-    perp_after = goniometer._read_perp_calc(x_new, y_new, angle_deg)
-    long_after = goniometer._read_long_calc(x_new, y_new, angle_deg)
-
-    assert perp_after == pytest.approx(perp_before)
-    assert long_after == pytest.approx(new_long)
-
-
-async def test_goniometer_set_perp(goniometer: I05Goniometer) -> None:
-    x, y = 10.0, 5.0
-    angle_deg = goniometer.rotation_angle_deg
-    await asyncio.gather(goniometer.x.set(x), goniometer.y.set(y))
-
-    long_before = goniometer._read_long_calc(x, y, angle_deg)
-
-    new_perp = 15.0
-    await goniometer.perp.set(new_perp)
-
-    x_new_perp, y_new_perp = await asyncio.gather(
-        goniometer.x.user_readback.get_value(), goniometer.y.user_readback.get_value()
+    await assert_set_axis_preserves_other(
+        i_val=10,
+        j_val=5,
+        angle_deg_val=goniometer.rotation_angle_deg,
+        new_i_axis_value=20,
+        new_j_axis_value=20,
+        axes_config=axes_test_config,
     )
-
-    long_after_perp = goniometer._read_long_calc(x_new_perp, y_new_perp, angle_deg)
-    perp_after_perp = goniometer._read_perp_calc(x_new_perp, y_new_perp, angle_deg)
-
-    assert perp_after_perp == pytest.approx(new_perp, abs=1e-5)
-    assert long_after_perp == pytest.approx(long_before, abs=1e-5)
