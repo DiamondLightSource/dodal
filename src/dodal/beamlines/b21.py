@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
@@ -5,6 +8,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
@@ -22,6 +26,13 @@ BL = get_beamline_name("b21")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+# This should be removed when the DeviceManager is adopted
+try:
+    get_path_provider()
+except NameError:
+    # If one hasn't already been set, use a default to stop things crashing
+    set_path_provider(StaticPathProvider(UUIDFilenameProvider(), Path("/tmp")))
 
 
 @device_factory()
@@ -95,9 +106,8 @@ def slits_3() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-"""
-Slits 4 was removed from B21 after the camera length was fixed, it is not used anymore.
-"""
+"""Slits 4 was removed from B21 after the camera length was fixed, it is not used
+anymore."""
 
 
 @device_factory()
@@ -112,8 +122,7 @@ def slits_6() -> Slits:
 
 @device_factory()
 def slits_7() -> Slits:
-    """
-    Compact JJ slits device is used for B21 slits 7. PV's operate in same way
+    """Compact JJ slits device is used for B21 slits 7. PV's operate in same way
     but physically different to other slits, and uses X:GAP nomenclature.
     """
     return Slits(

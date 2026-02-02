@@ -71,7 +71,7 @@ def mock_j09_phase_energy_motor_lookup(
 @pytest.fixture
 async def mock_apple2(
     mock_id_gap: UndulatorGap, mock_phase_axes: UndulatorPhaseAxes
-) -> Apple2:
+) -> Apple2[UndulatorPhaseAxes]:
     async with init_devices(mock=True):
         mock_apple2 = Apple2(id_gap=mock_id_gap, id_phase=mock_phase_axes)
     return mock_apple2
@@ -79,12 +79,12 @@ async def mock_apple2(
 
 @pytest.fixture
 async def mock_id_controller(
-    mock_apple2: Apple2,
+    mock_apple2: Apple2[UndulatorPhaseAxes],
     mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
     mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
-) -> Apple2EnforceLHMoveController:
+) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     async with init_devices(mock=True):
-        mock_id_controller = Apple2EnforceLHMoveController(
+        mock_id_controller = Apple2EnforceLHMoveController[UndulatorPhaseAxes](
             apple2=mock_apple2,
             gap_energy_motor_lut=mock_j09_gap_energy_motor_lookup,
             phase_energy_motor_lut=mock_j09_phase_energy_motor_lookup,
@@ -95,7 +95,7 @@ async def mock_id_controller(
 
 @pytest.fixture
 async def mock_id_energy(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
 ) -> InsertionDeviceEnergy:
     async with init_devices(mock=True):
         mock_id_energy = InsertionDeviceEnergy(
@@ -116,7 +116,7 @@ async def beam_energy(
 
 @pytest.fixture
 async def mock_id_pol(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
 ) -> InsertionDevicePolarisation:
     async with init_devices(mock=True):
         mock_id_pol = InsertionDevicePolarisation(id_controller=mock_id_controller)
@@ -147,7 +147,7 @@ def test_j09_energy_motor_lookup_update_lut_success(
     ],
 )
 async def test_j09_apple2_controller_determine_pol(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -189,7 +189,7 @@ async def test_j09_apple2_controller_determine_pol(
     ],
 )
 async def test_j09_apple2_controller_set_pol_lh(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -223,7 +223,7 @@ async def test_j09_apple2_controller_set_pol_lh(
     ],
 )
 async def test_j09_apple2_controller_set_pol_does_nothing_when_pol_unchanged(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -272,7 +272,7 @@ async def test_j09_apple2_controller_set_pol_does_nothing_when_pol_unchanged(
     ],
 )
 async def test_j09_apple2_controller_set_pol(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -322,7 +322,7 @@ async def test_j09_apple2_controller_set_pol(
     ],
 )
 async def test_j09_apple2_controller_set_pol_does_not_go_via_lh_if_already_at_lh(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -359,7 +359,7 @@ async def test_j09_apple2_controller_set_pol_does_not_go_via_lh_if_already_at_lh
     ],
 )
 async def test_j09_apple2_controller_set_energy(
-    mock_id_controller: Apple2EnforceLHMoveController,
+    mock_id_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
     pol: Pol,
     energy: float,
     expected_gap: float,

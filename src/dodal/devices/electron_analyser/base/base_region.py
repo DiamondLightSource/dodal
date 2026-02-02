@@ -6,11 +6,12 @@ from typing import Generic, Self, TypeAlias, TypeVar
 from ophyd_async.core import StrictEnum, SupersetEnum
 from pydantic import BaseModel, Field, model_validator
 
-from dodal.devices.electron_analyser.base.base_enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.base.base_util import (
     to_binding_energy,
     to_kinetic_energy,
 )
+from dodal.devices.selectable_source import SelectedSource
 
 AnyAcqMode: TypeAlias = StrictEnum
 AnyLensMode: TypeAlias = SupersetEnum | StrictEnum
@@ -27,11 +28,13 @@ TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
 def java_to_python_case(java_str: str) -> str:
-    """
-    Convert a camelCase Java-style string to a snake_case Python-style string.
+    """Convert a camelCase Java-style string to a snake_case Python-style string.
 
-    :param java_str: The Java-style camelCase string.
-    :return: The Python-style snake_case string.
+    Args:
+        java_str (str): The Java-style camelCase string.
+
+    Returns:
+        str: The Python-style snake_case string.
     """
     new_value = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", java_str)
     new_value = re.sub("([a-z0-9])([A-Z])", r"\1_\2", new_value).lower()
@@ -66,9 +69,8 @@ class AbstractBaseRegion(
     JavaToPythonModel,
     Generic[TAcquisitionMode, TLensMode, TPassEnergy],
 ):
-    """
-    Generic region model that holds the data. Specialised region models should inherit
-    this to extend functionality. All energy units are assumed to be in eV.
+    """Generic region model that holds the data. Specialised region models should
+    inherit this to extend functionality. All energy units are assumed to be in eV.
     """
 
     name: str = "New_region"
@@ -88,15 +90,11 @@ class AbstractBaseRegion(
     energy_mode: EnergyMode = EnergyMode.KINETIC
 
     def is_binding_energy(self) -> bool:
-        """
-        Returns true if the energy_mode is binding.
-        """
+        """Returns true if the energy_mode is binding."""
         return self.energy_mode == EnergyMode.BINDING
 
     def is_kinetic_energy(self) -> bool:
-        """
-        Returns true if the energy_mode is kinetic.
-        """
+        """Returns true if the energy_mode is kinetic."""
         return self.energy_mode == EnergyMode.KINETIC
 
     def switch_energy_mode(
@@ -105,19 +103,18 @@ class AbstractBaseRegion(
         excitation_energy: float,
         copy: bool = True,
     ) -> Self:
-        """
-        Get a region with a new energy mode: Kinetic or Binding.
+        """Get a region with a new energy mode: Kinetic or Binding.
         It caculates new values for low_energy, centre_energy, high_energy, via the
         excitation enerrgy. It doesn't calculate anything if the region is already of
         the same energy mode.
 
-        Parameters:
-            energy_mode: Mode you want to switch the region to.
-            excitation_energy: Energy conversion for low_energy, centre_energy, and
-                               high_energy for new energy mode.
-            copy: Defaults to True. If true, create a copy of this region to alter for
-                  the new energy_mode and return it. If False, alter this region for the
-                  energy_mode and return it self.
+        Args:
+            energy_mode (EnergyMode): Mode you want to switch the region to.
+            excitation_energy (float): Energy conversion for low_energy, centre_energy,
+                and high_energy for new energy mode.
+            copy (bool, optional): Defaults to True. If true, create a copy of this
+                region to alter for the new energy_mode and return it. If False, alter
+                this region for the energy_mode and return it self.
 
         Returns:
             Region with selected energy mode and new calculated energy values.
@@ -146,14 +143,16 @@ class AbstractBaseRegion(
         new values for low_energy, centre_energy, and high_energy while also preserving
         the original energy mode e.g mode BINDING will stay as BINDING.
 
-        Parameters:
-            excitation_energy: Energy conversion for low_energy, centre_energy, and
-                               high_energy for new energy mode.
-            copy: Defaults to True. If true, create a copy of this region to alter to
-                  calculate new energy values to return. If false, alter this region.
+        Args:
+            excitation_energy (float): Energy conversion for low_energy, centre_energy,
+                and high_energy for new energy mode.
+            copy (bool, optional): Defaults to True. If true, create a copy of this
+                region to alter to calculate new energy values to return. If false,
+                alter this region.
+
         Returns:
             Region with selected original energy mode and new calculated KINETIC energy
-            values for epics.
+                values for epics.
         """
         original_energy_mode = self.energy_mode
         r = self.switch_energy_mode(EnergyMode.KINETIC, excitation_energy, copy)
@@ -176,8 +175,7 @@ class AbstractBaseSequence(
     JavaToPythonModel,
     Generic[TAbstractBaseRegion],
 ):
-    """
-    Generic sequence model that holds the list of region data. Specialised sequence
+    """Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to
     hold.
     """

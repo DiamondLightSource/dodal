@@ -23,8 +23,7 @@ class ThetaRollYZCrystal(ThetaYCrystal):
 
 
 class DCM(DoubleCrystalMonochromatorBase[ThetaRollYZCrystal, ThetaYCrystal]):
-    """
-    A double crystal monochromator device, used to select the beam energy.
+    """A double crystal monochromator device, used to select the beam energy.
 
     Once the i15 DCM supports all of the PVs required by DoubleCrystalMonochromator or
     DoubleCrystalMonochromatorWithDSpacing this class can be changed to inherit from it,

@@ -2,6 +2,7 @@ from .apple2_controller import (
     MAXIMUM_MOVE_TIME,
     Apple2Controller,
     Apple2EnforceLHMoveController,
+    Apple2Type,
     EnergyMotorConvertor,
 )
 from .apple2_undulator import (
@@ -16,6 +17,10 @@ from .apple2_undulator import (
     UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,
     UnstoppableMotor,
+)
+from .apple_knot_controller import (
+    AppleKnotController,
+    AppleKnotPathFinder,
 )
 from .energy import BeamEnergy, InsertionDeviceEnergy, InsertionDeviceEnergyBase
 from .energy_motor_lookup import (
@@ -33,8 +38,11 @@ from .polarisation import InsertionDevicePolarisation
 
 __all__ = [
     "Apple2",
+    "Apple2Type",
     "Apple2Controller",
     "Apple2EnforceLHMoveController",
+    "AppleKnotController",
+    "AppleKnotPathFinder",
     "UndulatorGap",
     "UndulatorPhaseAxes",
     "UndulatorJawPhase",

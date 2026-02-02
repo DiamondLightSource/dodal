@@ -302,36 +302,35 @@ class EigerDetector(Device, Stageable):
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
             self.detector_params.detector_distance
         )
-        status = self.cam.beam_center_x.set(
+        self.cam.beam_center_x.set(
             beam_x_pixels, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.cam.beam_center_y.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        self.cam.beam_center_y.set(
             beam_y_pixels, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.cam.det_distance.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        self.cam.det_distance.set(
             self.detector_params.detector_distance,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.omega_start.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        self.cam.omega_start.set(
             self.detector_params.omega_start,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.omega_incr.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        status = self.cam.omega_incr.set(
             self.detector_params.omega_increment,
             timeout=self.timeouts.general_status_timeout,
         )
-
         return status
 
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
-        """Ensures the energy threshold on the detector is set to the specified energy (in eV),
-        within the specified tolerance.
+        """Ensures the energy threshold on the detector is set to the specified energy
+        (in eV), within the specified tolerance.
+
         Args:
             energy (float): The energy to set (in eV)
             tolerance (float, optional): If the energy is already set to within
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
-
         current_energy = float(self.cam.photon_energy.get())
         if abs(current_energy - energy) > tolerance:
             LOGGER.info(f"Setting detector threshold to {energy}")
