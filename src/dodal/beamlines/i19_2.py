@@ -16,7 +16,7 @@ from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
 from dodal.devices.i19.access_controlled.blueapi_device import HutchState
 from dodal.devices.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
-    FocusingMirrorType,
+    FocusingMirrorName,
 )
 from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
 from dodal.devices.i19.backlight import BacklightPosition
@@ -135,7 +135,7 @@ def hfm_piezo() -> AccessControlledPiezoActuator:
     """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
-        mirror_type=FocusingMirrorType.HFM,
+        mirror_type=FocusingMirrorName.HFM,
         hutch=HutchState.EH2,
         instrument_session=I19_2_COMMISSIONING_INSTR_SESSION,
     )
@@ -148,7 +148,7 @@ def vfm_piezo() -> AccessControlledPiezoActuator:
     """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
-        mirror_type=FocusingMirrorType.VFM,
+        mirror_type=FocusingMirrorName.VFM,
         hutch=HutchState.EH2,
         instrument_session=I19_2_COMMISSIONING_INSTR_SESSION,
     )
