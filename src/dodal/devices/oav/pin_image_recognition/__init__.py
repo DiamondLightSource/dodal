@@ -72,7 +72,7 @@ class PinTipDetection(StandardReadable):
         self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
         self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
         self.scan_direction = soft_signal_rw(
-            ScanDirections, ScanDirections.FORWARD, name="scan_direction"
+            int, ScanDirections.FORWARD, name="scan_direction"
         )
         self.min_tip_height = soft_signal_rw(int, 5, name="min_tip_height")
         self.validity_timeout = soft_signal_rw(float, 5.0, name="validity_timeout")
@@ -111,6 +111,8 @@ class PinTipDetection(StandardReadable):
             LOGGER.error("Invalid preprocessing function, using identity")
             preprocess_func = identity()
 
+        direction = await self.scan_direction.get_value()
+
         sample_detection = MxSampleDetect(
             preprocess=preprocess_func,
             canny_lower=await self.canny_lower_threshold.get_value(),
@@ -119,7 +121,7 @@ class PinTipDetection(StandardReadable):
             open_iterations=await self.open_iterations.get_value(),
             close_ksize=await self.close_ksize.get_value(),
             close_iterations=await self.close_iterations.get_value(),
-            scan_direction=await self.scan_direction.get_value(),
+            scan_direction=ScanDirections(direction),
             min_tip_height=await self.min_tip_height.get_value(),
         )
 

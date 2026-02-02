@@ -10,7 +10,7 @@ from dodal.devices.oav.pin_image_recognition.utils import ScanDirections
 def setup_pin_tip_detection_params(
     pin_tip_detect_device: PinTipDetection,
     parameters: OAVParameters,
-    scan_direction: ScanDirections = ScanDirections.FORWARD,
+    scan_direction: ScanDirections = ScanDirections.FORWARD,  # type: ignore
     group: str = "pin_tip_parameters",
     wait: bool = True,
 ):
@@ -51,7 +51,9 @@ def setup_pin_tip_detection_params(
     )
 
     # Sample detection direction
-    yield from set_using_group(pin_tip_detect_device.scan_direction, scan_direction)
+    yield from set_using_group(
+        pin_tip_detect_device.scan_direction, scan_direction.value
+    )
 
     # Minimum height
     yield from set_using_group(

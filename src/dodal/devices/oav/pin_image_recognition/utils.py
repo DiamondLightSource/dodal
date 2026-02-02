@@ -1,15 +1,15 @@
 from collections.abc import Callable
 from dataclasses import dataclass
+from enum import Enum
 from typing import Final
 
 import cv2
 import numpy as np
-from ophyd_async.core import StrictEnum
 
 from dodal.log import LOGGER
 
 
-class ScanDirections(StrictEnum):
+class ScanDirections(Enum):
     FORWARD = 1
     REVERSE = -1
 
