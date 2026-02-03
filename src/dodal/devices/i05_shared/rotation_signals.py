@@ -37,9 +37,11 @@ def create_rotational_ij_component_signals(
     Args:
         i_read (SignalR): SignalR representing the i motor readback.
         j_read (SignalR): representing the j motor readback.
-        i_write (AsyncReadable): object for setting the i position.
-        j_write (AsyncReadbale): object for setting the j position.
+        i_write (Movable): object for setting the i position.
+        j_write (Movable): object for setting the j position.
         angle_deg (float | SignalR): Rotation angle in degrees.
+        clockwise_rotation(boolean): If True, the rotated frame is defined using a
+            clockwise rotation; otherwise, a counter-clockwise rotation is used.
 
     Returns:
         tuple[SignalRW[float], SignalRW[float]] Two virtual read/write signals
@@ -87,11 +89,13 @@ def create_rotational_ij_component_signals(
             _get_angle_deg(angle_deg),
         )
         # Rotated coordinates
-        i_rotation_target = _read_i_rotation_component_calc(i_pos, j_pos, angle_deg_pos)
-        j_rotation_current = value
+        i_rotation_current = _read_i_rotation_component_calc(
+            i_pos, j_pos, angle_deg_pos
+        )
+        j_rotation_target = value
         # Convert back to motor frame by doing inverse rotation to determine actual motor positions
         new_i_pos, new_j_pos = reverse_rotate(
-            radians(angle_deg_pos), i_rotation_target, j_rotation_current
+            radians(angle_deg_pos), i_rotation_current, j_rotation_target
         )
         await asyncio.gather(
             maybe_await(i_write.set(new_i_pos)), maybe_await(j_write.set(new_j_pos))
