@@ -6,7 +6,7 @@ from ophyd_async.core import StrictEnum
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i17.i17_apple2 import I17Apple2Controller
+from dodal.devices.beamlines.i17.i17_apple2 import I17Apple2Controller
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
