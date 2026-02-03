@@ -3,7 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class FocusingMirrorBase(StandardReadable):
-    """Focusing Mirror with curve, ellip & pitch"""
+    """Focusing Mirror with curve, ellip & pitch."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
@@ -15,7 +15,7 @@ class FocusingMirrorBase(StandardReadable):
 
 
 class FocusingMirrorHorizontal(FocusingMirrorBase):
-    """Focusing Mirror with curve, ellip, pitch & X"""
+    """Focusing Mirror with curve, ellip, pitch & X."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
@@ -25,7 +25,7 @@ class FocusingMirrorHorizontal(FocusingMirrorBase):
 
 
 class FocusingMirrorVertical(FocusingMirrorBase):
-    """Focusing Mirror with curve, ellip, pitch & Y"""
+    """Focusing Mirror with curve, ellip, pitch & Y."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
@@ -35,7 +35,7 @@ class FocusingMirrorVertical(FocusingMirrorBase):
 
 
 class FocusingMirror(FocusingMirrorBase):
-    """Focusing Mirror with curve, ellip, pitch, yaw, X & Y"""
+    """Focusing Mirror with curve, ellip, pitch, yaw, X & Y."""
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
@@ -47,7 +47,7 @@ class FocusingMirror(FocusingMirrorBase):
 
 
 class FocusingMirrorWithRoll(FocusingMirror):
-    """Focusing Mirror with curve, ellip, pitch, roll, yaw, X & Y"""
+    """Focusing Mirror with curve, ellip, pitch, roll, yaw, X & Y."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():

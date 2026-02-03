@@ -14,14 +14,13 @@ def create_driver(
     driver_class: type[TAbstractAnalyserDriverIO],
     **kwargs: Any,
 ) -> TAbstractAnalyserDriverIO:
-    """
-    Helper function that helps to reduce the code to setup an analyser driver. The
+    """Helper function that helps to reduce the code to setup an analyser driver. The
     parameters used for the enum types are taken directly from the subscripts of the
     class so the user only needs to provide it in one place.
 
     Args:
         driver_class: The class for the driver which must include the enums in the
-                      subscript, for example MyDriverClass[MyLensMode, ...]
+            subscript, for example MyDriverClass[MyLensMode, ...].
         kwargs: Additional key worded arguments that the driver needs for initalisation.
     """
     parameters = {
@@ -38,16 +37,15 @@ def create_detector(
     detector_class: type[TElectronAnalyserDetector],
     **kwargs: Any,
 ) -> TElectronAnalyserDetector:
-    """
-    Helper function that helps to reduce the code to setup an analyser detector. The
+    """Helper function that helps to reduce the code to setup an analyser detector. The
     parameters used for the enum types are taken directly from the subscripts of the
     class so the user only needs to provide it in one place.
 
     Args:
         detector_class: The class for the detector which must include the enums in the
-                        subscript, for example MyDetectorClass[MyLensMode, ...]
+            subscript, for example MyDetectorClass[MyLensMode, ...].
         kwargs: Additional key worded arguments that the detector needs for
-                initalisation.
+            initalisation.
     """
     parameters = {
         "lens_mode_type": get_args(detector_class)[0],

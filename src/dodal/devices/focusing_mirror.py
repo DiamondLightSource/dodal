@@ -27,7 +27,7 @@ DEFAULT_SETTLE_TIME_S = 60
 
 
 class MirrorType(StrictEnum):
-    """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html"""
+    """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html."""
 
     SINGLE = "single"
     MULTI = "multi"
@@ -53,8 +53,9 @@ class MirrorVoltageDemand(StrictEnum):
 
 
 class SingleMirrorVoltage(Device):
-    """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
-    the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
+    """Abstract the bimorph mirror voltage PVs into a single device that can be set
+    asynchronously and returns when the demanded voltage setpoint is accepted, without
+    blocking the caller as this process can take significant time.
     """
 
     def __init__(self, prefix: str, name: str = ""):
@@ -66,11 +67,14 @@ class SingleMirrorVoltage(Device):
     @AsyncStatus.wrap
     async def set(self, value, *args, **kwargs):
         """Combine the following operations into a single set:
-        1. apply the value to the setpoint PV
-        3. Wait until demand is accepted
-        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
-        """
 
+        1. apply the value to the setpoint PV.
+
+        3. Wait until demand is accepted.
+
+        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the
+           result on the Status.
+        """  # noqa D415
         setpoint_v = self._setpoint_v
         demand_accepted = self._demand_accepted
 
@@ -136,7 +140,7 @@ class MirrorVoltages(StandardReadable):
 
 
 class SimpleMirror(XYPitchStage):
-    """Simple Focusing Mirror"""
+    """Simple Focusing Mirror."""
 
     def __init__(
         self,
@@ -165,7 +169,7 @@ class SimpleMirror(XYPitchStage):
 
 
 class FocusingMirror(StandardReadable):
-    """Focusing Mirror"""
+    """Focusing Mirror."""
 
     def __init__(
         self,
@@ -202,7 +206,8 @@ class FocusingMirror(StandardReadable):
 
 class FocusingMirrorWithStripes(FocusingMirror):
     """A focusing mirror where the stripe material can be changed. This is usually done
-    based on the energy of the beamline."""
+    based on the energy of the beamline.
+    """
 
     def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
@@ -212,9 +217,22 @@ class FocusingMirrorWithStripes(FocusingMirror):
         super().__init__(prefix, name, *args, **kwargs)
 
     def energy_to_stripe(self, energy_kev) -> MirrorStripeConfiguration:
-        """Return the stripe, yaw angle and lateral position for the specified energy"""
+        """Return the stripe, yaw angle and lateral position for the specified energy."""
         # In future, this should be configurable per-mirror
         if energy_kev < 7:
             return {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}
         else:
             return {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}
+
+
+class FocusingMirrorWithPiezo(FocusingMirror):
+    """A focusing mirror which also has a piezoelectric actuator.
+    A voltage can be applied to the piezo to steer the beam by making the material
+    shrink or expand.
+    """
+
+    def __init__(self, prefix: str, name: str = "", *args, **kwargs):
+        with self.add_children_as_readables():
+            self.piezo = epics_signal_rw(float, f"{prefix}AOFPITCH")
+            self.piezo_rbv = epics_signal_r(float, f"{prefix}AOFPITCH:RBV")
+        super().__init__(prefix, name, *args, **kwargs)

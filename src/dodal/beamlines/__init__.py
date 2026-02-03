@@ -28,13 +28,11 @@ _BEAMLINE_NAME_OVERRIDES = {
 
 
 def all_beamline_modules() -> Iterable[str]:
-    """
-    Get the names of all importable modules in beamlines
+    """Get the names of all importable modules in beamlines.
 
     Returns:
-        Iterable[str]: Generator of beamline module names
+        Iterable [str]: Generator of beamline module names.
     """
-
     # This is done by inspecting file names rather than modules to avoid
     # premature importing
     spec = importlib.util.find_spec(__name__)
@@ -54,11 +52,10 @@ def all_beamline_modules() -> Iterable[str]:
 
 
 def all_beamline_names() -> Iterable[str]:
-    """
-    Get the names of all beamlines as per the ${BEAMLINE} environment variable
+    """Get the names of all beamlines as per the ${BEAMLINE} environment variable.
 
     Returns:
-        Iterable[str]: Generator of beamline names that dodal supports
+        Iterable[str]: Generator of beamline names that dodal supports.
     """
     inverse_mapping = _module_name_overrides()
     for module_name in all_beamline_modules():
@@ -67,16 +64,14 @@ def all_beamline_names() -> Iterable[str]:
 
 @lru_cache
 def _module_name_overrides() -> Mapping[str, set[str]]:
-    """
-    Get the inverse of _BEAMLINE_NAME_OVERRIDES so that modules can be mapped back to
+    """Get the inverse of _BEAMLINE_NAME_OVERRIDES so that modules can be mapped back to
     beamlines. _BEAMLINE_NAME_OVERRIDES is expected to be a constant so the return
     value is cached.
 
     Returns:
         Mapping[str, set[str]]: A dictionary mapping the name of a dodal module to the
-        set of beamlines it supports.
+            set of beamlines it supports.
     """
-
     inverse_mapping: dict[str, set[str]] = {}
     for beamline, module in _BEAMLINE_NAME_OVERRIDES.items():
         inverse_mapping[module] = inverse_mapping.get(module, set()).union({beamline})
@@ -84,15 +79,13 @@ def _module_name_overrides() -> Mapping[str, set[str]]:
 
 
 def module_name_for_beamline(beamline: str) -> str:
-    """
-    Get the module name for a particular beamline, it may differ from the beamline
-    name e.g. i20-1 -> i20_1
+    """Get the module name for a particular beamline, it may differ from the beamline
+    name e.g. i20-1 -> i20_1.
 
     Args:
-        beamline: The beamline name as per the ${BEAMLINE} environment variable
+        beamline (str): The beamline name as per the ${BEAMLINE} environment variable.
 
     Returns:
-        str: The importable module name
+        str: The importable module name.
     """
-
     return _BEAMLINE_NAME_OVERRIDES.get(beamline, beamline)
