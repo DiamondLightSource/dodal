@@ -9,7 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.i13_1.merlin import Merlin
+from dodal.devices.beamlines.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name

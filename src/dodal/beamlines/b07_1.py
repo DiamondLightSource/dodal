@@ -1,8 +1,8 @@
 from dodal.beamlines.b07_shared import devices as b07_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.b07 import PsuMode
-from dodal.devices.b07_1 import (
+from dodal.devices.beamlines.b07 import PsuMode
+from dodal.devices.beamlines.b07_1 import (
     ChannelCutMonochromator,
     Grating,
     LensMode,

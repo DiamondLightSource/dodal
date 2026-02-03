@@ -4,7 +4,7 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum, init_devices
 
-from dodal.devices import b07, i09
+from dodal.devices.beamlines import b07, i09
 from dodal.devices.electron_analyser.base import GenericAnalyserDriverIO
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
