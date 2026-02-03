@@ -5,6 +5,8 @@ from abc import ABC
 from ophyd_async.core import SignalRW, StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
+
 _X, _Y, _Z = "X", "Y", "Z"
 
 _OMEGA = "OMEGA"
@@ -365,14 +367,13 @@ def create_axis_perp_to_rotation(
     """
 
     def _get(j_val: float, i_val: float, rot_deg_value: float) -> float:
-        i_component = i_val * math.cos(math.radians(rot_deg_value))
-        j_component = j_val * math.sin(math.radians(rot_deg_value))
-        return i_component + j_component
+        x, y = rotate_clockwise(math.radians(rot_deg_value), i_val, j_val)
+        return x
 
     async def _set(vertical_value: float) -> None:
         rot_deg_value = await motor_theta.user_readback.get_value()
-        i_component = vertical_value * math.cos(math.radians(rot_deg_value))
-        j_component = vertical_value * math.sin(math.radians(rot_deg_value))
+        theta = math.radians(rot_deg_value)
+        i_component, j_component = rotate_counter_clockwise(theta, vertical_value, 0.0)
         await asyncio.gather(
             motor_i.set(i_component),
             motor_j.set(j_component),

@@ -9,7 +9,7 @@ from ophyd_async.core import (
 from ophyd_async.core._protocol import AsyncMovable
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.i05_shared.math import rotate_clockwise, rotate_counter_clockwise
+from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
 
 
 async def _get_angle_deg(angle_deg: SignalR[float] | float) -> float:
