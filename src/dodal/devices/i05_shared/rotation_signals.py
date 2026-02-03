@@ -52,70 +52,38 @@ def create_rotational_ij_component_signals(
         corresponding to the rotated i and j components.
     """
     rotate = rotate_clockwise if clockwise_frame else rotate_counter_clockwise
-    reverse_rotate = rotate_counter_clockwise if clockwise_frame else rotate_clockwise
+    inverse_rotate = rotate_counter_clockwise if clockwise_frame else rotate_clockwise
 
-    def _read_i_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
-        new_i, new_j = rotate(radians(angle_deg), i, j)
-        return new_i
-
-    async def _set_i_rotation_component_calc(value: float) -> None:
-        """Move virtual i-axis to desired position while keeping j-axis constant in the
-        rotated frame.
-        """
-        i_pos, j_pos, angle_deg_pos = await asyncio.gather(
+    async def _read_rotated() -> tuple[float, float, float]:
+        i, j, ang = await asyncio.gather(
             i_read.get_value(),
             j_read.get_value(),
             _get_angle_deg(angle_deg),
         )
-        # Rotated coordinates
-        i_rotation_target = value
-        j_rotation_current = _read_j_rotation_component_calc(
-            i_pos, j_pos, angle_deg_pos
-        )
-        # Convert back to motor frame by doing inverse rotation to determine actual motor positions
-        new_i_pos, new_j_pos = reverse_rotate(
-            radians(angle_deg_pos), i_rotation_target, j_rotation_current
-        )
+        return (*rotate(radians(ang), i, j), ang)
+
+    async def _write_rotated(i_rot: float, j_rot: float, ang: float) -> None:
+        i_new, j_new = inverse_rotate(radians(ang), i_rot, j_rot)
         await asyncio.gather(
-            maybe_await(i_write.set(new_i_pos)), maybe_await(j_write.set(new_j_pos))
+            maybe_await(i_write.set(i_new)),
+            maybe_await(j_write.set(j_new)),
         )
 
-    def _read_j_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
-        new_i, new_j = rotate(radians(angle_deg), i, j)
-        return new_j
+    def _read_i(i: float, j: float, ang: float) -> float:
+        return rotate(radians(ang), i, j)[0]
 
-    async def _set_j_rotation_component_calc(value: float) -> None:
-        """Move virtual j-axis to desired position while keeping j-axis constant in the
-        rotated frame.
-        """
-        i_pos, j_pos, angle_deg_pos = await asyncio.gather(
-            i_read.get_value(),
-            j_read.get_value(),
-            _get_angle_deg(angle_deg),
-        )
-        # Rotated coordinates
-        i_rotation_current = _read_i_rotation_component_calc(
-            i_pos, j_pos, angle_deg_pos
-        )
-        j_rotation_target = value
-        # Convert back to motor frame by doing inverse rotation to determine actual motor positions
-        new_i_pos, new_j_pos = reverse_rotate(
-            radians(angle_deg_pos), i_rotation_current, j_rotation_target
-        )
-        await asyncio.gather(
-            maybe_await(i_write.set(new_i_pos)), maybe_await(j_write.set(new_j_pos))
-        )
+    async def _set_i(value: float) -> None:
+        i_rot, j_rot, ang = await _read_rotated()
+        await _write_rotated(value, j_rot, ang)
 
-    return derived_signal_rw(
-        _read_i_rotation_component_calc,
-        _set_i_rotation_component_calc,
-        i=i_read,
-        j=j_read,
-        angle_deg=angle_deg,
-    ), derived_signal_rw(
-        _read_j_rotation_component_calc,
-        _set_j_rotation_component_calc,
-        i=i_read,
-        j=j_read,
-        angle_deg=angle_deg,
+    def _read_j(i: float, j: float, ang: float) -> float:
+        return rotate(radians(ang), i, j)[1]
+
+    async def _set_j(value: float) -> None:
+        i_rot, j_rot, ang = await _read_rotated()
+        await _write_rotated(i_rot, value, ang)
+
+    return (
+        derived_signal_rw(_read_i, _set_i, i=i_read, j=j_read, ang=angle_deg),
+        derived_signal_rw(_read_j, _set_j, i=i_read, j=j_read, ang=angle_deg),
     )
