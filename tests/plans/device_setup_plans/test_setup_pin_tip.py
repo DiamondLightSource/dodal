@@ -32,7 +32,9 @@ async def test_setup_pin_tip_from_params(
     params: OAVParameters,
     run_engine: RunEngine,
 ):
-    run_engine(setup_pin_tip_detection_params(pin_tip_detection, params))
+    run_engine(
+        setup_pin_tip_detection_params(pin_tip_detection, params, scan_direction)
+    )
 
     assert await pin_tip_detection.preprocess_operation.get_value() == 8
     assert await pin_tip_detection.canny_lower_threshold.get_value() == 5.0
