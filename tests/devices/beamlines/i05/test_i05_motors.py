@@ -5,8 +5,8 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.i05 import I05Goniometer
-from tests.devices.i05_shared.rotation_signal_test_util import (
+from dodal.devices.beamlines.i05 import I05Goniometer
+from tests.devices.beamlines.i05_shared.rotation_signal_test_util import (
     RotatedCartesianFrameTestConfig,
     assert_rotated_axes_are_orthogonal,
 )

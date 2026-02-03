@@ -2,11 +2,11 @@ import asyncio
 from math import cos, radians, sin
 
 import pytest
-from dodal.devices.i05_1 import XYZPolarAzimuthDefocusStage
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from tests.devices.i05_shared.rotation_signal_test_util import (
+from dodal.devices.beamlines.i05_1 import XYZPolarAzimuthDefocusStage
+from tests.devices.beamlines.i05_shared.rotation_signal_test_util import (
     RotatedCartesianFrameTestConfig,
     assert_rotated_axes_are_orthogonal,
 )
