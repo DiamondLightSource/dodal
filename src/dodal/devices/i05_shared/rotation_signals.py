@@ -7,7 +7,6 @@ from ophyd_async.core import (
     derived_signal_rw,
 )
 from ophyd_async.core._protocol import AsyncMovable
-from ophyd_async.epics.motor import Motor
 
 from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
 
@@ -104,17 +103,5 @@ def create_rotational_ij_component_signals(
         _set_j_rotation_component_calc,
         i=i_read,
         j=j_read,
-        angle_deg=angle_deg,
-    )
-
-
-def create_rotational_ij_component_signals_with_motors(
-    i: Motor, j: Motor, angle_deg: float | SignalR[float], clockwise_frame: bool = True
-) -> tuple[SignalRW[float], SignalRW[float]]:
-    return create_rotational_ij_component_signals(
-        i_read=i.user_readback,
-        i_write=i,  # type: ignore
-        j_read=j.user_readback,
-        j_write=j,  # type: ignore
         angle_deg=angle_deg,
     )

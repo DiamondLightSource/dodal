@@ -2,7 +2,6 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.devices.i05_shared.rotation_signals import (
     create_rotational_ij_component_signals,
-    create_rotational_ij_component_signals_with_motors,
 )
 from dodal.devices.motors import XYZPolarAzimuthStage
 
@@ -36,9 +35,11 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
 
         with self.add_children_as_readables():
             self.defocus = Motor(prefix + defocus_infix)
-            self.hor, self.vert = create_rotational_ij_component_signals_with_motors(
-                i=self.x,
-                j=self.y,
+            self.hor, self.vert = create_rotational_ij_component_signals(
+                i_read=self.x.user_readback,
+                j_read=self.y.user_readback,
+                i_write=self.x,  # type: ignore
+                j_write=self.y,  # type: ignore
                 angle_deg=self.azimuth.user_readback,
                 clockwise_frame=True,
             )

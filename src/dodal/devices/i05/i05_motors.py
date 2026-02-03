@@ -1,5 +1,5 @@
 from dodal.devices.i05_shared.rotation_signals import (
-    create_rotational_ij_component_signals_with_motors,
+    create_rotational_ij_component_signals,
 )
 from dodal.devices.motors import (
     _AZIMUTH,
@@ -16,7 +16,7 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
     """
     Six-axis stage with a standard xyz stage and three axis of rotation: polar, azimuth
     and tilt. This implementation extends to add perp and long rotations as derived
-    signals at a configured angle (default 50 degrees.)
+    signals at a configured angle (default 50 degrees).
     """
 
     def __init__(
@@ -45,6 +45,10 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         )
 
         with self.add_children_as_readables():
-            self.perp, self.long = create_rotational_ij_component_signals_with_motors(
-                self.x, self.y, self.rotation_angle_deg
+            self.perp, self.long = create_rotational_ij_component_signals(
+                i_read=self.x.user_readback,
+                i_write=self.x,  # type: ignore
+                j_read=self.y.user_readback,
+                j_write=self.y,  # type: ignore
+                angle_deg=self.rotation_angle_deg,
             )
