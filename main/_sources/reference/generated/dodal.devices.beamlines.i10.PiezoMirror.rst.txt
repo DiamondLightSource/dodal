@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i10.PiezoMirror
+=======================================
+
+.. currentmodule:: dodal.devices.beamlines.i10
+
+.. autoclass:: PiezoMirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

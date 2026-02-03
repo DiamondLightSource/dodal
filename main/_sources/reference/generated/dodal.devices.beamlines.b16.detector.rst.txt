@@ -1,0 +1,33 @@
+dodal.devices.beamlines.b16.detector
+====================================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.beamlines.b16.detector
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      software_triggered_tiff_area_detector
+   
+   
+
+   
+   
+   

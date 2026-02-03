@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i24 &#8212; dodal 1.69.1.dev36+g398f342be documentation</title>
+    <title>dodal.beamlines.i24 &#8212; dodal 1.69.1.dev37+g07c141699 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=cd457318"></script>
+    <script src="../../../_static/documentation_options.js?v=d4edd08a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -824,16 +824,16 @@ window.addEventListener("load", load);
     <span class="n">I24FilterOneSelections</span><span class="p">,</span>
     <span class="n">I24FilterTwoSelections</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.aperture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aperture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.beam_center</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorBeamCenter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.beamstop</span><span class="w"> </span><span class="kn">import</span> <span class="n">Beamstop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.commissioning_jungfrau</span><span class="w"> </span><span class="kn">import</span> <span class="n">CommissioningJungfrau</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DCM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.dual_backlight</span><span class="w"> </span><span class="kn">import</span> <span class="n">DualBacklight</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.focus_mirrors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FocusMirrorsMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.pmac</span><span class="w"> </span><span class="kn">import</span> <span class="n">PMAC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i24.vgonio</span><span class="w"> </span><span class="kn">import</span> <span class="n">VerticalGoniometer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.hutch_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">HutchShutter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.aperture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aperture</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.beam_center</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorBeamCenter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.beamstop</span><span class="w"> </span><span class="kn">import</span> <span class="n">Beamstop</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.commissioning_jungfrau</span><span class="w"> </span><span class="kn">import</span> <span class="n">CommissioningJungfrau</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DCM</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.dual_backlight</span><span class="w"> </span><span class="kn">import</span> <span class="n">DualBacklight</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.focus_mirrors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FocusMirrorsMode</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.pmac</span><span class="w"> </span><span class="kn">import</span> <span class="n">PMAC</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.vgonio</span><span class="w"> </span><span class="kn">import</span> <span class="n">VerticalGoniometer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">YZStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAVBeamCentreFile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAVConfigBeamCentre</span>

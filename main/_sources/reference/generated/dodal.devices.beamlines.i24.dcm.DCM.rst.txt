@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i24.dcm.DCM
+===================================
+
+.. currentmodule:: dodal.devices.beamlines.i24.dcm
+
+.. autoclass:: DCM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

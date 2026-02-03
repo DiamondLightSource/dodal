@@ -1,0 +1,72 @@
+dodal.devices.beamlines.i11.nx100robot.NX100Robot
+=================================================
+
+.. currentmodule:: dodal.devices.beamlines.i11.nx100robot
+
+.. autoclass:: NX100Robot
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~NX100Robot.clear_sample
+      
+      
+      
+      
+      
+      ~NX100Robot.load_sample
+      
+      
+      ~NX100Robot.locate
+      
+      
+      ~NX100Robot.pause
+      
+      
+      
+      
+      ~NX100Robot.recover
+      
+      
+      ~NX100Robot.resume
+      
+      
+      ~NX100Robot.set
+      
+      
+      
+      ~NX100Robot.stage
+      
+      
+      ~NX100Robot.stop
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~NX100Robot.MAX_NUMBER_OF_SAMPLES
+      
+      
+      ~NX100Robot.MIN_NUMBER_OF_SAMPLES
+      
+      
+      
+      
+      
+   
+   

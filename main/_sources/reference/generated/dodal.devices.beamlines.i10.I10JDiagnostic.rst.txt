@@ -1,0 +1,31 @@
+dodal.devices.beamlines.i10.I10JDiagnostic
+==========================================
+
+.. currentmodule:: dodal.devices.beamlines.i10
+
+.. autoclass:: I10JDiagnostic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
