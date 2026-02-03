@@ -5,7 +5,7 @@ from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
-from dodal.devices.motors import XYZPolarAzimuthTiltStage
+from dodal.devices.motors import XYZAzimuthTiltPolarStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
@@ -48,6 +48,6 @@ def lakeshore() -> Lakeshore336:
 
 
 @devices.factory()
-def hsmpm() -> XYZPolarAzimuthTiltStage:
+def hsmpm() -> XYZAzimuthTiltPolarStage:
     """Sample Manipulator."""
-    return XYZPolarAzimuthTiltStage(prefix=f"{PREFIX.beamline_prefix}-MO-HSMPM-01:")
+    return XYZAzimuthTiltPolarStage(prefix=f"{PREFIX.beamline_prefix}-MO-HSMPM-01:")
