@@ -116,8 +116,8 @@ class Scintillator(StandardReadable):
             await self.y_mm.set(self._scintillator_in_yz_mm[0])
 
     async def do_with_aperture_scatterguard_in_safe_pos(self, func):
-        """Perform the supplied function with the aperture-scatterguard to the SCIN_MOVE position,
-        then restore to its previous position.
+        """Move the aperture-scatterguard to SCIN_MOVE position, do the supplied function,
+        then restore aperture-scatterguard  to its previous position.
         Args:
             func: The async function to be applied"""
         scin_move_positions = self._aperture_scatterguard().get_scin_move_position()
