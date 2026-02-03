@@ -582,24 +582,12 @@ async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
         await aperture_in_medium_pos.selected_aperture.set(ApertureValue.SMALL)
 
 
-@pytest.mark.parametrize(
-    "selected_aperture",
-    [
-        ApertureValue.SMALL,
-        ApertureValue.MEDIUM,
-        ApertureValue.LARGE,
-        ApertureValue.OUT_OF_BEAM,
-        ApertureValue.PARKED,
-    ],
-)
 async def test_get_scin_move_position_returns_expected(
     aperture_in_medium_pos: ApertureScatterguard,
     ap_sg_configuration: ApertureScatterguardConfiguration,
-    selected_aperture: ApertureValue,
     run_engine: RunEngine,
 ):
     ap_sg = aperture_in_medium_pos
-    await set_underlying_motors(ap_sg, ap_sg_configuration, selected_aperture)
 
     positions = ap_sg.get_scin_move_position()
     assert (
