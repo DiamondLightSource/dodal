@@ -122,12 +122,14 @@ def test_rectangle_min_max(
     "theta,x,y,expected",
     [
         (0.0, 1.0, 2.0, (1.0, 2.0)),
-        (pi / 2, 1.0, 0.0, (0.0, -1.0)),  # 90° clockwise
+        (pi / 2, 1.0, 0.0, (0.0, -1.0)),  # 90 degress clockwise
         (pi, 1.0, 2.0, (-1.0, -2.0)),
         (2 * pi, 3.0, -4.0, (3.0, -4.0)),
     ],
 )
-def test_rotate_clockwise_known_angles(theta, x, y, expected):
+def test_rotate_clockwise_known_angles(
+    theta: float, x: float, y: float, expected: tuple[float, float]
+) -> None:
     x_new, y_new = rotate_clockwise(theta, x, y)
     assert x_new == pytest.approx(expected[0])
     assert y_new == pytest.approx(expected[1])
@@ -137,17 +139,19 @@ def test_rotate_clockwise_known_angles(theta, x, y, expected):
     "theta,x,y,expected",
     [
         (0.0, 1.0, 2.0, (1.0, 2.0)),
-        (pi / 2, 1.0, 0.0, (0.0, 1.0)),  # 90° CCW
+        (pi / 2, 1.0, 0.0, (0.0, 1.0)),  # 90 degrees counter clockwise
         (pi, 1.0, 2.0, (-1.0, -2.0)),
     ],
 )
-def test_rotate_counter_clockwise_known_angles(theta, x, y, expected):
+def test_rotate_counter_clockwise_known_angles(
+    theta: float, x: float, y: float, expected: tuple[float, float]
+) -> None:
     x_new, y_new = rotate_counter_clockwise(theta, x, y)
     assert x_new == pytest.approx(expected[0])
     assert y_new == pytest.approx(expected[1])
 
 
-def test_clockwise_and_counter_clockwise_are_inverses():
+def test_clockwise_and_counter_clockwise_are_inverses() -> None:
     x, y = 2.5, -1.3
     theta = 0.73
 
@@ -163,26 +167,23 @@ def test_rotation_preserves_length():
     theta = 1.234
 
     x_rot, y_rot = rotate_clockwise(theta, x, y)
-
     original_length = sqrt(x**2 + y**2)
     rotated_length = sqrt(x_rot**2 + y_rot**2)
 
     assert rotated_length == pytest.approx(original_length)
 
 
-def test_do_rotation_matches_manual_matrix_multiply():
+def test_do_rotation_matches_manual_matrix_multiply() -> None:
     x, y = 1.2, -0.4
     theta = 0.5
-
     rotation_matrix = np.array(
         [
             [np.cos(theta), -np.sin(theta)],
             [np.sin(theta), np.cos(theta)],
         ]
     )
-
     x_new, y_new = do_rotation(x, y, rotation_matrix)
-
     expected = rotation_matrix @ np.array([x, y])
+
     assert x_new == pytest.approx(expected[0])
     assert y_new == pytest.approx(expected[1])
