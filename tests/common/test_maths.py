@@ -1,7 +1,15 @@
+from math import pi, sqrt
+
+import numpy as np
 import pytest
 
 from dodal.common import in_micros, step_to_num
-from dodal.common.maths import Rectangle2D
+from dodal.common.maths import (
+    Rectangle2D,
+    do_rotation,
+    rotate_clockwise,
+    rotate_counter_clockwise,
+)
 
 
 @pytest.mark.parametrize(
@@ -108,3 +116,73 @@ def test_rectangle_min_max(
     assert rect.get_max_y() == max_y
     assert rect.get_min_x() == min_x
     assert rect.get_min_y() == min_y
+
+
+@pytest.mark.parametrize(
+    "theta,x,y,expected",
+    [
+        (0.0, 1.0, 2.0, (1.0, 2.0)),
+        (pi / 2, 1.0, 0.0, (0.0, -1.0)),  # 90° clockwise
+        (pi, 1.0, 2.0, (-1.0, -2.0)),
+        (2 * pi, 3.0, -4.0, (3.0, -4.0)),
+    ],
+)
+def test_rotate_clockwise_known_angles(theta, x, y, expected):
+    x_new, y_new = rotate_clockwise(theta, x, y)
+    assert x_new == pytest.approx(expected[0])
+    assert y_new == pytest.approx(expected[1])
+
+
+@pytest.mark.parametrize(
+    "theta,x,y,expected",
+    [
+        (0.0, 1.0, 2.0, (1.0, 2.0)),
+        (pi / 2, 1.0, 0.0, (0.0, 1.0)),  # 90° CCW
+        (pi, 1.0, 2.0, (-1.0, -2.0)),
+    ],
+)
+def test_rotate_counter_clockwise_known_angles(theta, x, y, expected):
+    x_new, y_new = rotate_counter_clockwise(theta, x, y)
+    assert x_new == pytest.approx(expected[0])
+    assert y_new == pytest.approx(expected[1])
+
+
+def test_clockwise_and_counter_clockwise_are_inverses():
+    x, y = 2.5, -1.3
+    theta = 0.73
+
+    x_rot, y_rot = rotate_clockwise(theta, x, y)
+    x_back, y_back = rotate_counter_clockwise(theta, x_rot, y_rot)
+
+    assert x_back == pytest.approx(x)
+    assert y_back == pytest.approx(y)
+
+
+def test_rotation_preserves_length():
+    x, y = 3.0, 4.0
+    theta = 1.234
+
+    x_rot, y_rot = rotate_clockwise(theta, x, y)
+
+    original_length = sqrt(x**2 + y**2)
+    rotated_length = sqrt(x_rot**2 + y_rot**2)
+
+    assert rotated_length == pytest.approx(original_length)
+
+
+def test_do_rotation_matches_manual_matrix_multiply():
+    x, y = 1.2, -0.4
+    theta = 0.5
+
+    rotation_matrix = np.array(
+        [
+            [np.cos(theta), -np.sin(theta)],
+            [np.sin(theta), np.cos(theta)],
+        ]
+    )
+
+    x_new, y_new = do_rotation(x, y, rotation_matrix)
+
+    expected = rotation_matrix @ np.array([x, y])
+    assert x_new == pytest.approx(expected[0])
+    assert y_new == pytest.approx(expected[1])
