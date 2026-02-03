@@ -42,7 +42,7 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
         z_infix="SMZ",
         polar_infix="POL",
         azimuth_infix="AZM",
-        defocus_infix="SDMF",
+        defocus_infix="SMDF",
         name="",
     ):
         super().__init__(
