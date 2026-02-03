@@ -79,9 +79,9 @@ async def test_xyzpad_hor_and_vert_set(
     axes_test_config = AxesTestConfig(
         i_read=xyzpad_stage.x.user_readback,
         j_read=xyzpad_stage.y.user_readback,
-        i_write=xyzpad_stage.x,  # type: ignore
-        j_write=xyzpad_stage.y,  # type: ignore
-        angle_deg=xyzpad_stage.azimuth,  # type: ignore
+        i_write=xyzpad_stage.x,
+        j_write=xyzpad_stage.y,
+        angle_deg=xyzpad_stage.azimuth,
         expected_i_read_func=expected_hor_read,
         expected_j_read_func=expected_vert_read,
         i_rotation_axis=xyzpad_stage.hor,
@@ -104,9 +104,9 @@ async def test_xyzpad_long_and_perp_set(
     axes_test_config = AxesTestConfig(
         i_read=xyzpad_stage.z.user_readback,
         j_read=xyzpad_stage.hor,
-        i_write=xyzpad_stage.z,  # type: ignore
-        j_write=xyzpad_stage.hor,  # type: ignore
-        angle_deg=xyzpad_stage.polar,  # type: ignore
+        i_write=xyzpad_stage.z,
+        j_write=xyzpad_stage.hor,
+        angle_deg=xyzpad_stage.polar,
         expected_i_read_func=expected_long_read,
         expected_j_read_func=expected_perp_read,
         i_rotation_axis=xyzpad_stage.long,

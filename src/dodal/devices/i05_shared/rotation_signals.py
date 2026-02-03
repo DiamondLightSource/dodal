@@ -1,12 +1,13 @@
 import asyncio
 from math import radians
 
+from bluesky.protocols import Movable
+from bluesky.utils import maybe_await
 from ophyd_async.core import (
     SignalR,
     SignalRW,
     derived_signal_rw,
 )
-from ophyd_async.core._protocol import AsyncMovable
 
 from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
 
@@ -20,8 +21,8 @@ async def _get_angle_deg(angle_deg: SignalR[float] | float) -> float:
 def create_rotational_ij_component_signals(
     i_read: SignalR[float],
     j_read: SignalR[float],
-    i_write: AsyncMovable[float],
-    j_write: AsyncMovable[float],
+    i_write: Movable[float],
+    j_write: Movable[float],
     angle_deg: float | SignalR[float],
     clockwise_frame: bool = True,
 ) -> tuple[SignalRW[float], SignalRW[float]]:
@@ -69,7 +70,9 @@ def create_rotational_ij_component_signals(
         new_i_pos, new_j_pos = reverse_rotate(
             radians(angle_deg_pos), i_rotation_target, j_rotation_current
         )
-        await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
+        await asyncio.gather(
+            maybe_await(i_write.set(new_i_pos)), maybe_await(j_write.set(new_j_pos))
+        )
 
     def _read_j_rotation_component_calc(i: float, j: float, angle_deg: float) -> float:
         new_i, new_j = rotate(radians(angle_deg), i, j)
@@ -90,7 +93,9 @@ def create_rotational_ij_component_signals(
         new_i_pos, new_j_pos = reverse_rotate(
             radians(angle_deg_pos), i_rotation_target, j_rotation_current
         )
-        await asyncio.gather(i_write.set(new_i_pos), j_write.set(new_j_pos))
+        await asyncio.gather(
+            maybe_await(i_write.set(new_i_pos)), maybe_await(j_write.set(new_j_pos))
+        )
 
     return derived_signal_rw(
         _read_i_rotation_component_calc,

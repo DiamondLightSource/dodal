@@ -47,8 +47,8 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         with self.add_children_as_readables():
             self.perp, self.long = create_rotational_ij_component_signals(
                 i_read=self.x.user_readback,
-                i_write=self.x,  # type: ignore
+                i_write=self.x,
                 j_read=self.y.user_readback,
-                j_write=self.y,  # type: ignore
+                j_write=self.y,
                 angle_deg=self.rotation_angle_deg,
             )
