@@ -87,6 +87,11 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     # How far the gonio position can be out before loading will fail
     LOAD_TOLERANCE_MM = 0.02
 
+    # mode constants for CRYO_MODE - TODO when https://jira.diamond.ac.uk/browse/I03-1056
+    # is completed these should be made into a proper enum
+    CRYO_MODE_WARM = 0.0
+    CRYO_MODE_CRYO = 1.0
+
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.barcode = epics_signal_r(str, prefix + "BARCODE")

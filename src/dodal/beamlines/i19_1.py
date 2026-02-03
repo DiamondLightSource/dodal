@@ -6,9 +6,12 @@ from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
 from dodal.devices.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.i19.access_controlled.piezo_control import (
+    AccessControlledPiezoActuator,
+    FocusingMirrorName,
+)
 from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
-    HutchState,
 )
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.pin_tip import PinTipCentreHolder
@@ -85,6 +88,7 @@ def pin_tip_centre1() -> PinTipCentreHolder:
     """I19-1 temporary device to hold the pin tip centre position for OAV1."""
     return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
+        overlay_channel=8,
     )
 
 
@@ -93,6 +97,7 @@ def pin_tip_centre2() -> PinTipCentreHolder:
     """I19-1 temporary device to hold the pin tip centre position for OAV2."""
     return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
+        overlay_channel=8,
     )
 
 
@@ -130,4 +135,30 @@ def zebra() -> Zebra:
     return Zebra(
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
+    )
+
+
+@devices.factory()
+def hfm_piezo() -> AccessControlledPiezoActuator:
+    """Get the i19-1 access controlled hfm piezo device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return AccessControlledPiezoActuator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
+        mirror_type=FocusingMirrorName.HFM,
+        hutch=HutchState.EH1,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
+    )
+
+
+@devices.factory()
+def vfm_piezo() -> AccessControlledPiezoActuator:
+    """Get the i19-1 access controlled vfm piezo device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return AccessControlledPiezoActuator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
+        mirror_type=FocusingMirrorName.VFM,
+        hutch=HutchState.EH1,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )
