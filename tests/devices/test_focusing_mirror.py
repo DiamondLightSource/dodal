@@ -6,6 +6,7 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import (
+    SignalR,
     callback_on_mock_put,
     get_mock_put,
     init_devices,
@@ -13,6 +14,7 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.focusing_mirror import (
+    FocusingMirrorWithPiezo,
     FocusingMirrorWithStripes,
     MirrorStripe,
     MirrorStripeConfiguration,
@@ -253,3 +255,13 @@ async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expe
     with init_devices(mock=True):
         device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")
     assert device.energy_to_stripe(energy_kev) == expected_config
+
+
+async def test_focusing_mirror_with_piezo():
+    with init_devices(mock=True):
+        device = FocusingMirrorWithPiezo(prefix="-OP-VFM-01:", name="vfm")
+    assert isinstance(device.piezo_rbv, SignalR)
+
+    await device.piezo.set(3.795)
+
+    assert await device.piezo.get_value() == 3.795
