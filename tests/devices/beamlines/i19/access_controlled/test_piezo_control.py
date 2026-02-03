@@ -95,13 +95,13 @@ async def test_vfm_piezo_makes_the_correct_rest_call(
     expected_params_json = json.dumps(expected_params)
     with (
         patch(
-            "dodal.devices.i19.access_controlled.blueapi_device.ClientSession.post"
+            "dodal.devices.beamlines.i19.access_controlled.blueapi_device.ClientSession.post"
         ) as mock_post,
         patch(
-            "dodal.devices.i19.access_controlled.blueapi_device.ClientSession.put"
+            "dodal.devices.beamlines.i19.access_controlled.blueapi_device.ClientSession.put"
         ) as mock_put,
         patch(
-            "dodal.devices.i19.access_controlled.blueapi_device.ClientSession.get"
+            "dodal.devices.beamlines.i19.access_controlled.blueapi_device.ClientSession.get"
         ) as mock_get,
     ):
         mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
@@ -143,13 +143,13 @@ async def test_hfm_piezo_makes_the_correct_rest_call(
     expected_params_json = json.dumps(expected_params)
     with (
         patch(
-            "dodal.devices.i19.access_controlled.blueapi_device.ClientSession.post"
+            "dodal.devices.beamlines.i19.access_controlled.blueapi_device.ClientSession.post"
         ) as mock_post,
         patch(
-            "dodal.devices.i19.access_controlled.blueapi_device.ClientSession.put"
+            "dodal.devices.beamlines.i19.access_controlled.blueapi_device.ClientSession.put"
         ) as mock_put,
         patch(
-            "dodal.devices.i19.access_controlled.blueapi_device.ClientSession.get"
+            "dodal.devices.beamlines.i19.access_controlled.blueapi_device.ClientSession.get"
         ) as mock_get,
     ):
         mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
