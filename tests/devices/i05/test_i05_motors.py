@@ -7,8 +7,8 @@ from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.i05 import I05Goniometer
 from tests.devices.i05_shared.rotation_signal_test_util import (
-    AxesTestConfig,
-    assert_set_axis_preserves_other,
+    RotatedCartesianFrameTestConfig,
+    assert_rotated_axes_are_orthogonal,
 )
 
 
@@ -21,7 +21,7 @@ def expected_long_read(x: float, y: float, theta: float) -> float:
 
 
 @pytest.fixture
-async def goniometer():
+async def goniometer() -> I05Goniometer:
     with init_devices(mock=True):
         goniometer = I05Goniometer("TEST:")
     return goniometer
@@ -50,26 +50,23 @@ async def test_goniometer_read(goniometer: I05Goniometer) -> None:
     )
 
 
-async def test_goniometer_perp_and_long_set(
-    goniometer: I05Goniometer,
-) -> None:
-    axes_test_config = AxesTestConfig(
+async def test_goniometer_perp_and_long_set(goniometer: I05Goniometer) -> None:
+    frame_config = RotatedCartesianFrameTestConfig(
         i_read=goniometer.x.user_readback,
         j_read=goniometer.y.user_readback,
-        i_write=goniometer.x,  # type: ignore
-        j_write=goniometer.y,  # type: ignore
+        i_write=goniometer.x,
+        j_write=goniometer.y,
         angle_deg=goniometer.rotation_angle_deg,
         expected_i_read_func=expected_perp_read,
         expected_j_read_func=expected_long_read,
         i_rotation_axis=goniometer.perp,
         j_rotation_axis=goniometer.long,
     )
-
-    await assert_set_axis_preserves_other(
+    await assert_rotated_axes_are_orthogonal(
         i_val=10,
         j_val=5,
         angle_deg_val=goniometer.rotation_angle_deg,
         new_i_axis_value=20,
         new_j_axis_value=20,
-        axes_config=axes_test_config,
+        frame_config=frame_config,
     )

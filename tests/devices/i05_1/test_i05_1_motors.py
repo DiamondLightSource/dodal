@@ -7,8 +7,8 @@ from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.i05_1 import XYZPolarAzimuthDefocusStage
 from tests.devices.i05_shared.rotation_signal_test_util import (
-    AxesTestConfig,
-    assert_set_axis_preserves_other,
+    RotatedCartesianFrameTestConfig,
+    assert_rotated_axes_are_orthogonal,
 )
 
 
@@ -55,7 +55,6 @@ async def test_xyzpad_stage_read(xyzpad_stage: XYZPolarAzimuthDefocusStage) -> N
         xyzpad_stage.azimuth.set(azimuth_angle_deg),
         xyzpad_stage.polar.set(polar_angle_deg),
     )
-
     await assert_reading(
         xyzpad_stage,
         {
@@ -76,7 +75,7 @@ async def test_xyzpad_stage_read(xyzpad_stage: XYZPolarAzimuthDefocusStage) -> N
 async def test_xyzpad_hor_and_vert_set(
     xyzpad_stage: XYZPolarAzimuthDefocusStage,
 ) -> None:
-    axes_test_config = AxesTestConfig(
+    frame_config = RotatedCartesianFrameTestConfig(
         i_read=xyzpad_stage.x.user_readback,
         j_read=xyzpad_stage.y.user_readback,
         i_write=xyzpad_stage.x,
@@ -87,21 +86,20 @@ async def test_xyzpad_hor_and_vert_set(
         i_rotation_axis=xyzpad_stage.hor,
         j_rotation_axis=xyzpad_stage.vert,
     )
-
-    await assert_set_axis_preserves_other(
+    await assert_rotated_axes_are_orthogonal(
         i_val=10,
         j_val=5,
         angle_deg_val=45,
         new_i_axis_value=20,
         new_j_axis_value=20,
-        axes_config=axes_test_config,
+        frame_config=frame_config,
     )
 
 
 async def test_xyzpad_long_and_perp_set(
     xyzpad_stage: XYZPolarAzimuthDefocusStage,
 ) -> None:
-    axes_test_config = AxesTestConfig(
+    frame_config = RotatedCartesianFrameTestConfig(
         i_read=xyzpad_stage.z.user_readback,
         j_read=xyzpad_stage.hor,
         i_write=xyzpad_stage.z,
@@ -112,12 +110,11 @@ async def test_xyzpad_long_and_perp_set(
         i_rotation_axis=xyzpad_stage.long,
         j_rotation_axis=xyzpad_stage.perp,
     )
-
-    await assert_set_axis_preserves_other(
+    await assert_rotated_axes_are_orthogonal(
         i_val=10,
         j_val=5,
         angle_deg_val=45,
         new_i_axis_value=20,
         new_j_axis_value=20,
-        axes_config=axes_test_config,
+        frame_config=frame_config,
     )
