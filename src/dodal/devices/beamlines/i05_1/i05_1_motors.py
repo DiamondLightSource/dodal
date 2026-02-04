@@ -1,8 +1,8 @@
-from dodal.devices.i05_shared.rotation_signals import (
-    create_rotational_ij_component_signals,
-)
 from ophyd_async.epics.motor import Motor
 
+from dodal.devices.beamlines.i05_shared.rotation_signals import (
+    create_rotational_ij_component_signals,
+)
 from dodal.devices.motors import XYZPolarAzimuthStage
 
 
