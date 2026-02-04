@@ -6,18 +6,20 @@ import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
+    FlyMotorInfo,
     callback_on_mock_put,
     get_mock_put,
     init_devices,
     set_mock_value,
 )
 from ophyd_async.testing import (
+    assert_configuration,
     assert_emitted,
     assert_reading,
     partial_reading,
 )
 
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2,
     Apple2Controller,
@@ -32,6 +34,7 @@ from dodal.devices.insertion_device.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,
+    UnstoppableMotor,
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
@@ -39,25 +42,17 @@ pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
 @pytest.fixture
-async def mock_locked_phase_axes(
-    prefix: str = "BLXX-EA-DET-007:",
-) -> UndulatorLockedPhaseAxes:
+async def unstoppable_motor():
     async with init_devices(mock=True):
-        mock_phase_axes = UndulatorLockedPhaseAxes(
-            prefix=prefix,
-            top_outer="RPQ1",
-            btm_inner="RPQ4",
-        )
-    assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
-    return mock_phase_axes
+        unstoppable_motor = UnstoppableMotor(prefix="MOTOR:", name="unstopable_motor")
+    return unstoppable_motor
+
+
+async def test_unstoppable_motor_stop_not_implemented(
+    unstoppable_motor: UnstoppableMotor, caplog: pytest.LogCaptureFixture
+):
+    await unstoppable_motor.stop()
+    assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
 
 
 async def test_in_motion_error(
@@ -69,7 +64,7 @@ async def test_in_motion_error(
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
     set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN)
-    set_value = Apple2PhasesVal("3", "2", "5", "7")
+    set_value = Apple2PhasesVal(3, 2, 5, 7)
     with pytest.raises(RuntimeError):
         await mock_phase_axes.set(set_value)
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
@@ -143,15 +138,13 @@ async def test_gap_success_scan(
     run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11))
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert (
-            run_engine_documents["event"][i]["data"]["mock_id_gap-user_readback"] == i
-        )
+        assert run_engine_documents["event"][i]["data"]["mock_id_gap"] == i
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
     mock_phase_axes: UndulatorPhaseAxes,
 ):
-    set_value = Apple2PhasesVal("3", "2", "5", "7")
+    set_value = Apple2PhasesVal(3, 2, 5, 7)
 
     callback_on_mock_put(
         mock_phase_axes.top_outer.user_setpoint,
@@ -163,10 +156,45 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
 
 
 async def test_phase_status_error(mock_phase_axes: UndulatorPhaseAxes):
-    set_value = Apple2PhasesVal("3", "2", "5", "7")
+    set_value = Apple2PhasesVal(3, 2, 5, 7)
     set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_phase_axes.set(set_value)
+
+
+async def test_gap_read_config(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.velocity, 2)
+    set_mock_value(mock_id_gap.motor_egu, "c")
+    await assert_configuration(
+        mock_id_gap,
+        {
+            "mock_id_gap-velocity": partial_reading(2.0),
+            "mock_id_gap-motor_egu": partial_reading("c"),
+            "mock_id_gap-offset": partial_reading(0.0),
+        },
+        full_match=False,
+    )
+
+
+async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 20)
+    set_mock_value(mock_id_gap.min_velocity, 11)
+    with pytest.raises(ValueError):
+        fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+        await mock_id_gap.prepare(fly_info)
+
+
+async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 1)
+    set_mock_value(mock_id_gap.acceleration_time, 0.5)
+    fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+    await mock_id_gap.prepare(fly_info)
+    get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
+        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+    )
+
+    assert await mock_id_gap.velocity.get_value() == 10
 
 
 @pytest.mark.parametrize(
@@ -228,9 +256,7 @@ async def test_phase_cal_timout(
 async def test_phase_success_set(
     mock_phase_axes: UndulatorPhaseAxes, run_engine: RunEngine
 ):
-    set_value = Apple2PhasesVal(
-        top_inner="3", top_outer="2", btm_inner="5", btm_outer="7"
-    )
+    set_value = Apple2PhasesVal(top_inner=3, top_outer=2, btm_inner=5, btm_outer=7)
     callback_on_mock_put(
         mock_phase_axes.top_inner.user_setpoint,
         lambda *_, **__: set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN),
@@ -259,25 +285,25 @@ async def test_phase_success_set(
     run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
     get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1, wait=True)
     get_mock_put(mock_phase_axes.top_inner.user_setpoint).assert_called_once_with(
-        set_value.top_inner, wait=True
+        str(set_value.top_inner), wait=True
     )
     get_mock_put(mock_phase_axes.top_outer.user_setpoint).assert_called_once_with(
-        set_value.top_outer, wait=True
+        str(set_value.top_outer), wait=True
     )
     get_mock_put(mock_phase_axes.btm_inner.user_setpoint).assert_called_once_with(
-        set_value.btm_inner, wait=True
+        str(set_value.btm_inner), wait=True
     )
     get_mock_put(mock_phase_axes.btm_outer.user_setpoint).assert_called_once_with(
-        set_value.btm_outer, wait=True
+        str(set_value.btm_outer), wait=True
     )
 
     await assert_reading(
         mock_phase_axes,
         {
-            "mock_phase_axes-top_inner-user_readback": partial_reading(3),
-            "mock_phase_axes-top_outer-user_readback": partial_reading(2),
-            "mock_phase_axes-btm_inner-user_readback": partial_reading(5),
-            "mock_phase_axes-btm_outer-user_readback": partial_reading(7),
+            "mock_phase_axes-top_inner": partial_reading(3),
+            "mock_phase_axes-top_outer": partial_reading(2),
+            "mock_phase_axes-btm_inner": partial_reading(5),
+            "mock_phase_axes-btm_outer": partial_reading(7),
         },
     )
 
@@ -350,24 +376,7 @@ async def test_jaw_phase_success_scan(
     run_engine(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11))
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert (
-            run_engine_documents["event"][i]["data"][
-                "mock_jaw_phase-jaw_phase-user_readback"
-            ]
-            == i
-        )
-
-
-@pytest.fixture
-async def mock_locked_apple2(
-    mock_id_gap: UndulatorGap,
-    mock_locked_phase_axes: UndulatorLockedPhaseAxes,
-) -> Apple2:
-    mock_locked_apple2 = Apple2(
-        id_gap=mock_id_gap,
-        id_phase=mock_locked_phase_axes,
-    )
-    return mock_locked_apple2
+        assert run_engine_documents["event"][i]["data"]["mock_jaw_phase-jaw_phase"] == i
 
 
 class DummyLockedApple2Controller(Apple2Controller[Apple2[UndulatorLockedPhaseAxes]]):
@@ -390,9 +399,10 @@ class DummyLockedApple2Controller(Apple2Controller[Apple2[UndulatorLockedPhaseAx
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         return Apple2Val(
             phase=Apple2LockedPhasesVal(
-                top_outer=f"{phase:.6f}", btm_inner=f"{phase:.6f}"
+                top_outer=phase,
+                btm_inner=phase,
             ),
-            gap=f"{gap:.6f}",
+            gap=gap,
         )
 
 
@@ -455,9 +465,9 @@ async def test_id_controller_energy_sets_correct_values(
     await mock_locked_controller.energy.set(100.0)
     expected_val = Apple2Val(
         phase=Apple2LockedPhasesVal(
-            top_outer=f"{configured_phase:.6f}",
-            btm_inner=f"{configured_phase:.6f}",
+            top_outer=configured_phase,
+            btm_inner=configured_phase,
         ),
-        gap=f"{configured_gap:.6f}",
+        gap=configured_gap,
     )
     mock_locked_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)

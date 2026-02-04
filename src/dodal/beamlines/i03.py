@@ -17,6 +17,10 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
+from dodal.devices.beamlines.i03 import Beamstop
+from dodal.devices.beamlines.i03.beamsize import Beamsize
+from dodal.devices.beamlines.i03.dcm import DCM
+from dodal.devices.beamlines.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.collimation_table import CollimationTable
 from dodal.devices.cryostream import (
     CryoStreamGantry,
@@ -31,10 +35,6 @@ from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
 from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i03 import Beamstop
-from dodal.devices.i03.beamsize import Beamsize
-from dodal.devices.i03.dcm import DCM
-from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -157,8 +157,11 @@ def detector_motion() -> DetectorMotion:
     )
 
 
-@devices.v1_init(EigerDetector, prefix="BL03I-EA-EIGER-01:", wait=False)
+@devices.v1_init(
+    EigerDetector, prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", wait=False
+)
 def eiger(eiger: EigerDetector) -> EigerDetector:
+    eiger.detector_id = 78
     return eiger
 
 

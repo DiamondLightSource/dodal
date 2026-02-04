@@ -2,6 +2,7 @@ from collections.abc import Generator
 from enum import IntEnum
 
 import bluesky.plan_stubs as bps
+import cv2
 import numpy as np
 from bluesky.utils import Msg
 
@@ -40,9 +41,7 @@ def bottom_right_from_top_left(
 
 
 class EdgeOutputArrayImageType(IntEnum):
-    """
-    Enum to store the types of image to tweak the output array. We use Original.
-    """
+    """Enum to store the types of image to tweak the output array. We use Original."""
 
     ORIGINAL = 0
     GREYSCALE = 1
@@ -56,8 +55,9 @@ def get_move_required_so_that_beam_is_at_pixel(
     pixel: Pixel,
     oav: OAV,
 ) -> Generator[Msg, None, np.ndarray]:
-    """Calculate the required move so that the given pixel is in the centre of the beam."""
-
+    """Calculate the required move so that the given pixel is in the centre of the
+    beam.
+    """
     current_motor_xyz = np.array(
         [
             (yield from bps.rd(gonio.x)),
@@ -94,7 +94,7 @@ def calculate_x_y_z_of_pixel(
     microns_per_pixel: tuple[float, float],
     xyz_direction: tuple[int, int, int],
 ) -> np.ndarray:
-    """Get the x, y, z position of a pixel in mm"""
+    """Get the x, y, z position of a pixel in mm."""
     beam_distance_px: Pixel = calculate_beam_distance(beam_centre, *pixel)
 
     return current_x_y_z + camera_coordinates_to_xyz_mm(
@@ -119,3 +119,17 @@ def wait_for_tip_to_be_found(
         raise PinNotFoundError(f"No pin found after {timeout} seconds")
 
     return Pixel((int(found_tip[0]), int(found_tip[1])))
+
+
+def convert_to_gray_and_blur(data: cv2.typing.MatLike) -> cv2.typing.MatLike:
+    """Preprocess the image array data (convert to grayscale and apply a gaussian blur)
+    Image is converted to grayscale (using a weighted mean as green contributes more to
+    brightness) as we aren't interested in data relating to colour. A blur is then
+    applied to mitigate errors due to rogue hot pixels.
+    """
+    # kernel size describes how many of the neighbouring pixels are used for the blur,
+    # higher kernal size means more of a blur effect
+    kernel_size = (7, 7)
+
+    gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+    return cv2.GaussianBlur(gray_arr, kernel_size, 0)

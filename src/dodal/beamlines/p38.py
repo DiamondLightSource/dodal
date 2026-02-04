@@ -15,9 +15,9 @@ from dodal.common.crystal_metadata import (
     make_crystal_metadata_from_material,
 )
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.beamlines.i22.dcm import DCM
+from dodal.devices.beamlines.i22.fswitch import FSwitch
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import DCM
-from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.devices.slits import Slits
@@ -198,7 +198,7 @@ def linkam() -> Linkam3:
 
 @device_factory()
 def ppump() -> WatsonMarlow323Pump:
-    """Peristaltic Pump"""
+    """Peristaltic Pump."""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
 
 

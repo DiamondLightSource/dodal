@@ -29,9 +29,8 @@ from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 
 @pytest.fixture()
 def alternate_config(tmp_path) -> str:
-    """
-    Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
-    in conftest.py
+    """Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
+    in conftest.py.
     """
     alt_config_path = tmp_path / "alt_daq_configuration"
     copytree(MOCK_DAQ_CONFIG_PATH, alt_config_path)
@@ -485,27 +484,3 @@ def test_filter_ophyd_devices_raises_for_extra_types():
 )
 def test_is_v2_device_type(input: Any, expected_result: bool):
     assert is_v2_device_type(input) == expected_result
-
-
-def test_calling_factory_with_different_args_raises_an_exception():
-    i04.oav(params=MagicMock())
-    with pytest.raises(
-        RuntimeError,
-        match="Device factory method called multiple times with different parameters",
-    ):
-        i04.oav(params=MagicMock())
-    i04.oav.cache_clear()
-
-
-def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear():
-    i04.oav(params=MagicMock())
-    i04.oav.cache_clear()
-    i04.oav(params=MagicMock())
-    i04.oav.cache_clear()
-
-
-def test_factory_calls_are_cached():
-    undulator1 = i04.undulator()
-    undulator2 = i04.undulator()
-    assert undulator1 is undulator2
-    i04.undulator.cache_clear()

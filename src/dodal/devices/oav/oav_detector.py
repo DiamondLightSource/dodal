@@ -1,13 +1,17 @@
+import asyncio
 from enum import IntEnum
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
+    DeviceMock,
+    DeviceVector,
     LazyMock,
     SignalR,
     SignalRW,
     StandardReadable,
+    default_mock_class,
     derived_signal_r,
     soft_signal_rw,
 )
@@ -22,6 +26,7 @@ from dodal.devices.oav.oav_parameters import (
 )
 from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
+from dodal.log import LOGGER
 
 
 class Coords(IntEnum):
@@ -56,37 +61,99 @@ class NullZoomController(BaseZoomController):
             await self.level.set(value, wait=True)
 
 
-class ZoomController(BaseZoomController):
+class BeamCentreForZoom(StandardReadable):
+    """These PVs hold the beam centre on the OAV at each zoom level.
+
+    When the zoom level is changed the IOC will update the OAV overlay PVs to be at
+    these positions.
     """
-    Device to control the zoom level. This should be set like
-        o = OAV(name="oav")
+
+    def __init__(
+        self, prefix: str, level_name_pv_suffix: str, centre_value_pv_suffix: str
+    ) -> None:
+        self.level_name = epics_signal_r(
+            str, f"{prefix}MP:SELECT.{level_name_pv_suffix}"
+        )
+        self.x_centre = epics_signal_rw(
+            float, f"{prefix}PBCX:VAL{centre_value_pv_suffix}"
+        )
+        self.y_centre = epics_signal_rw(
+            float, f"{prefix}PBCY:VAL{centre_value_pv_suffix}"
+        )
+        super().__init__()
+
+
+class InstantMovingZoom(DeviceMock["ZoomController"]):
+    """Mock behaviour that instantly moves the zoom."""
+
+    async def connect(self, device: "ZoomController") -> None:
+        """Mock signals to do an instant move on setpoint write."""
+        device.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 0.001  # type:ignore
+
+
+@default_mock_class(InstantMovingZoom)
+class ZoomController(BaseZoomController):
+    """Device to control the zoom level. This should be set like::
+
+        oav = OAV(name="oav")
         oav.zoom_controller.set("1.0x")
 
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
-    you should wait on any zoom changs to finish before changing the OAV wiring.
-    """
+    you should wait on any zoom changes to finish before changing the OAV wiring.
+    """  # noqa 415
+
+    DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 2
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.percentage = epics_signal_rw(float, f"{prefix}ZOOMPOSCMD")
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
         self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
+
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: str):
         await self.level.set(value, wait=True)
+        LOGGER.info(
+            f"Waiting {self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
+        )
+        await asyncio.sleep(self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S)
+
+
+class ZoomControllerWithBeamCentres(ZoomController):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        level_to_centre_mapping = [
+            ("ZRST", "A"),
+            ("ONST", "B"),
+            ("TWST", "C"),
+            ("THST", "D"),
+            ("FRST", "E"),
+            ("FVST", "F"),
+            ("SXST", "G"),
+            ("SVST", "H"),
+        ]
+
+        self.beam_centres = DeviceVector(
+            {
+                i: BeamCentreForZoom(prefix, *level_to_centre_mapping[i])
+                for i in range(len(level_to_centre_mapping))
+            }
+        )
+
+        super().__init__(prefix, name)
 
 
 class OAV(StandardReadable):
-    """
-    Class for oav device
+    """Class for oav device.
 
-    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
-    y_direction(int): Same with x_direction but for motor y
-    z_direction(int): Same with x_direction but for motor z
-    mjpg_x_size_pv(str): PV infix for x_size in mjpg
-    mjpg_y_size_pv(str): PV infix for y_size in mjpg
+    Attributes:
+        x_direction(int, optional): Should only be 1 or -1, with 1 indicating the oav x
+            direction is the same with motor x.
+        y_direction(int, optional): Same with x_direction but for motor y.
+        z_direction(int, optional): Same with x_direction but for motor z.
+        mjpg_x_size_pv(str, optional): PV infix for x_size in mjpg.
+        mjpg_y_size_pv(str, optional): PV infix for y_size in mjpg.
     """
 
     beam_centre_i: SignalR[int]
@@ -118,6 +185,7 @@ class OAV(StandardReadable):
             self.zoom_controller = zoom_controller
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
+
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(
                 f"{prefix}{mjpeg_prefix}:", name, mjpg_x_size_pv, mjpg_y_size_pv
@@ -170,16 +238,17 @@ class OAV(StandardReadable):
 
 
 class OAVBeamCentreFile(OAV):
-    """
-    OAV device that reads its beam centre values from a file. The config parameter
+    """OAV device that reads its beam centre values from a file. The config parameter
     must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam
     centre values are stored.
 
-    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
-    y_direction(int): Same with x_direction but for motor y
-    z_direction(int): Same with x_direction but for motor z
-    mjpg_x_size_pv(str): PV infix for x_size in mjpg
-    mjpg_y_size_pv(str): PV infix for y_size in mjpg
+    Attributes:
+        x_direction(int, optional): Should only be 1 or -1, with 1 indicating the oav x
+            direction is the same with motor x.
+        y_direction(int, optional): Same with x_direction but for motor y.
+        z_direction(int, optional): Same with x_direction but for motor z.
+        mjpg_x_size_pv(str, optional): PV infix for x_size in mjpg.
+        mjpg_y_size_pv(str, optional): PV infix for y_size in mjpg.
     """
 
     def __init__(
@@ -225,8 +294,9 @@ class OAVBeamCentreFile(OAV):
         self.set_name(self.name)
 
     def _get_beam_position(self, zoom_level: str, size: int, coord: int) -> int:
-        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
-        zoom level. """
+        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested
+        zoom level.
+        """
         _zoom = self._read_current_zoom(zoom_level)
         value = self.parameters[_zoom].crosshair[coord]
         return int(value * size / DEFAULT_OAV_WINDOW[coord])

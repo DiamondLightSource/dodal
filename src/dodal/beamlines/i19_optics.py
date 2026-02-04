@@ -1,14 +1,13 @@
 from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
-from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i19.access_controlled.hutch_access import (
+from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
     HutchAccessControl,
 )
+from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -17,20 +16,34 @@ PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory()
 def shutter() -> HutchShutter:
-    """Get the i19 hutch shutter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
+    """Real experiment shutter device for I19."""
     return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
-@device_factory()
+@devices.factory()
 def access_control() -> HutchAccessControl:
-    """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
+    """Device to check which hutch is the active hutch on i19."""
     return HutchAccessControl(
         f"{PREFIX.beamline_prefix}-OP-STAT-01:", ACCESS_DEVICE_NAME
     )
+
+
+@devices.factory()
+def vfm() -> FocusingMirrorWithPiezo:
+    """Get the i19 vfm device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
+
+
+@devices.factory()
+def hfm() -> FocusingMirrorWithPiezo:
+    """Get the i19 hfm device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-HFM-01:")

@@ -14,9 +14,11 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.robot import (
-    WAIT_FOR_NEW_PIN_MSG,
-    WAIT_FOR_OLD_PIN_MSG,
+    SAMPLE_LOCATION_EMPTY,
+    WAIT_FOR_BEAMLINE_DISABLE_MSG,
+    WAIT_FOR_BEAMLINE_ENABLE_MSG,
     BartRobot,
+    BeamlineStatus,
     PinMounted,
     RobotLoadError,
     SampleLocation,
@@ -35,14 +37,18 @@ async def robot_for_unload():
 
     async def finish_later():
         await drying_complete.wait()
+        await asyncio.sleep(0.1)
         set_mock_value(device.program_running, False)
+        set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
 
     async def fake_unload(*args, **kwargs):
         set_mock_value(device.program_running, True)
+        set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
         await trigger_complete.wait()
         asyncio.create_task(finish_later())
 
     get_mock_put(device.unload).side_effect = fake_unload
+    # device.unload.trigger = AsyncMock(side_effect=fake_unload)
     return device, trigger_complete, drying_complete
 
 
@@ -51,6 +57,7 @@ async def _get_bart_robot() -> BartRobot:
     device.LOAD_TIMEOUT = 1  # type: ignore
     device.NOT_BUSY_TIMEOUT = 1  # type: ignore
     await device.connect(mock=True)
+    # set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
     return device
 
 
@@ -108,7 +115,7 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
         await device.set(SampleLocation(15, 10))
     device.load.trigger.assert_called_once()  # type:ignore
     last_log = patch_logger.mock_calls[1].args[0]
-    assert "Waiting on old pin unloaded" in last_log
+    assert WAIT_FOR_BEAMLINE_DISABLE_MSG in last_log
 
 
 @patch("dodal.devices.robot.LOGGER")
@@ -126,34 +133,33 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     try:
         device.load.trigger.assert_called_once()  # type:ignore
         last_log = patch_logger.mock_calls[1].args[0]
-        assert "Waiting on new pin loaded" in last_log
+        assert WAIT_FOR_BEAMLINE_DISABLE_MSG in last_log
     except AssertionError:
         traceback.print_exception(exc_info.value)
         raise
 
 
-def _set_pin_sensor_on_log_messages(device: BartRobot, msg: str):
-    if msg == WAIT_FOR_OLD_PIN_MSG:
-        set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
-    elif msg == WAIT_FOR_NEW_PIN_MSG:
-        set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+def _set_beamline_enabled_on_log_messages(device: BartRobot, msg: str):
+    if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
+        set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
+    elif msg == WAIT_FOR_BEAMLINE_ENABLE_MSG:
+        set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
 
 
 def _error_on_unload_log_messages(device: BartRobot, msg: str):
-    if msg == WAIT_FOR_OLD_PIN_MSG:
+    if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
         set_mock_value(device.prog_error.code, 40)
         set_mock_value(device.prog_error.str, "Test error")
 
 
-# Use log info messages to determine when to set the gonio_pin_sensor, so we don't have to use any sleeps during testing
+# Use log info messages to determine when to set the beamline enable, so we don't have to use any sleeps during testing
 async def set_with_happy_path(
     device: BartRobot, mock_log_info: MagicMock
 ) -> AsyncStatus:
-    """Mocks the logic that the robot would do on a successful load"""
-
-    mock_log_info.side_effect = partial(_set_pin_sensor_on_log_messages, device)
+    """Mocks the logic that the robot would do on a successful load."""
+    mock_log_info.side_effect = partial(_set_beamline_enabled_on_log_messages, device)
     set_mock_value(device.program_running, False)
-    set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     status = device.set(SampleLocation(15, 10))
     return status
 
@@ -161,11 +167,10 @@ async def set_with_happy_path(
 async def set_with_unhappy_path(
     device: BartRobot, mock_log_info: MagicMock
 ) -> AsyncStatus:
-    """Mocks the logic that the robot would do on a successful load"""
-
+    """Mocks the logic that the robot would do on a successful load."""
     mock_log_info.side_effect = partial(_error_on_unload_log_messages, device)
     set_mock_value(device.program_running, False)
-    set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     status = device.set(SampleLocation(15, 10))
     return status
 
@@ -186,15 +191,16 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
 async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
-    status = device.pin_state_or_error()
+    set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
+    status = device.beamline_status_or_error(BeamlineStatus.ENABLED)
     with pytest.raises(RobotLoadError):
         await status
 
 
-async def test_given_waiting_for_pin_to_mount_when_pin_mounted_then_no_error_raised():
+async def test_given_waiting_for_beamline_to_enable_when_beamline_enabled_then_no_error_raised():
     device = await _get_bart_robot()
-    status = create_task(device.pin_state_or_error())
-    set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    status = create_task(device.beamline_status_or_error(BeamlineStatus.ENABLED))
+    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     await status
 
 
@@ -253,7 +259,7 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
 async def test_unloading_the_robot_waits_for_drying_to_complete(robot_for_unload):
     robot, trigger_completed, drying_completed = robot_for_unload
     drying_completed.set()
-    unload_status = robot.set(None)
+    unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 
     await asyncio.sleep(0.1)
     assert not unload_status.done
@@ -269,7 +275,7 @@ async def test_unloading_the_robot_times_out_if_unloading_takes_too_long(
 ):
     robot, trigger_completed, drying_completed = robot_for_unload
     drying_completed.set()
-    unload_status = robot.set(None)
+    unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 
     with pytest.raises(RobotLoadError) as exc_info:
         await unload_status
@@ -280,7 +286,7 @@ async def test_unloading_the_robot_times_out_if_unloading_takes_too_long(
 async def test_unloading_the_robot_times_out_if_drying_takes_too_long(robot_for_unload):
     robot, trigger_completed, drying_completed = robot_for_unload
     trigger_completed.set()
-    unload_status = robot.set(None)
+    unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 
     with pytest.raises(RobotLoadError) as exc_info:
         await unload_status

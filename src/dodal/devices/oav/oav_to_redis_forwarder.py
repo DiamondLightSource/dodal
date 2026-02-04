@@ -45,12 +45,23 @@ class OAVSource(StandardReadable):
 
 
 class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
-    """Forwards OAV image data to redis. To use call:
+    """Forwards OAV image data to redis.
 
-    > bps.kickoff(oav_forwarder)
-    > bps.monitor(oav_forwarder.uuid)
-    > bps.complete(oav_forwarder)
+    To use call::
 
+        bps.kickoff(oav_forwarder)
+        bps.monitor(oav_forwarder.uuid)
+        bps.complete(oav_forwarder)
+
+    Reads image data from the MJPEG stream on an OAV and forwards it into a
+    redis database. This is currently only used for murko integration.
+
+    Args:
+        prefix (str): The PV prefix of the OAV.
+        redis_host (str): The host where the redis database is running.
+        redis_password (str): The password for the redis database.
+        redis_db (int): Which redis database to connect to, defaults to 0.
+        name (str): The name of this device.
     """
 
     DATA_EXPIRY_DAYS = 7
@@ -68,16 +79,6 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         redis_db: int = 0,
         name: str = "",
     ) -> None:
-        """Reads image data from the MJPEG stream on an OAV and forwards it into a
-        redis database. This is currently only used for murko integration.
-
-        Arguments:
-            prefix: str             the PV prefix of the OAV
-            redis_host: str         the host where the redis database is running
-            redis_password: str     the password for the redis database
-            redis_db: int           which redis database to connect to, defaults to 0
-            name: str               the name of this device
-        """
         self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
         self.sources = DeviceVector(
             {
@@ -109,7 +110,9 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     ):
         """Stores the raw bytes of the jpeg image in redis. Murko ultimately wants a
         pickled numpy array of pixel values but raw byes are more space efficient. There
-        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592"""
+        may be better ways of doing this, see
+        https://github.com/DiamondLightSource/mx-bluesky/issues/592.
+        """
         jpeg_bytes = await get_next_jpeg(response)
         sample_id = await self.sample_id.get_value()
         redis_key = f"murko:{sample_id}:raw"
@@ -131,12 +134,13 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
                 await function_to_do(response, source)
 
     async def _stream_to_redis(self, response: ClientResponse, source: OAVSource):
-        """Uses the update of the frame counter as a trigger to pull an image off the OAV
-        and into redis.
+        """Uses the update of the frame counter as a trigger to pull an image off the
+        OAV and into redis.
 
         The frame counter is continually increasing on the timescales we store data and
         so can be used as a uuid. If the OAV is updating too quickly we may drop frames
-        but in this case a best effort on getting as many frames as possible is sufficient.
+        but in this case a best effort on getting as many frames as possible is
+        sufficient.
         """
         done_status = AsyncStatus(
             asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)

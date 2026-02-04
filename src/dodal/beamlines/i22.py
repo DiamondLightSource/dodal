@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import NDPluginBaseIO, NDPluginStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
@@ -6,6 +9,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, DET_SUFFIX, HDF5_SUFFIX
@@ -13,11 +17,15 @@ from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
 )
+from dodal.devices.beamlines.i22.dcm import DCM
+from dodal.devices.beamlines.i22.fswitch import FSwitch
+from dodal.devices.beamlines.i22.nxsas import (
+    NXSasMetadataHolder,
+    NXSasOAV,
+    NXSasPilatus,
+)
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import DCM
-from dodal.devices.i22.fswitch import FSwitch
-from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYPitchStage, XYRollStage, XYStage
 from dodal.devices.slits import Slits
@@ -32,6 +40,13 @@ BL = get_beamline_name("i22")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+# This should be removed when the DeviceManager is adopted
+try:
+    get_path_provider()
+except NameError:
+    # If one hasn't already been set, use a default to stop things crashing
+    set_path_provider(StaticPathProvider(UUIDFilenameProvider(), Path("/tmp")))
 
 
 @device_factory()
@@ -267,7 +282,7 @@ def linkam() -> Linkam3:
 
 @device_factory(skip=True)
 def ppump() -> WatsonMarlow323Pump:
-    """Sample Environment Peristaltic Pump"""
+    """Sample Environment Peristaltic Pump."""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
 
 
