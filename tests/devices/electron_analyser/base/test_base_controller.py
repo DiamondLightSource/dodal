@@ -3,7 +3,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from ophyd_async.core import TriggerInfo, get_mock_put, init_devices
 
-from dodal.devices.b07.analyser import Specs2DCMOS
+from dodal.devices.beamlines.b07.analyser import Specs2DCMOS
+from dodal.devices.beamlines.i09.analyser import EW4000
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
@@ -14,7 +15,6 @@ from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
 from dodal.devices.fast_shutter import DualFastShutter
-from dodal.devices.i09.analyser import EW4000
 from dodal.devices.selectable_source import SourceSelector
 from tests.devices.electron_analyser.helper_util import TEST_SEQUENCE_REGION_NAMES
 

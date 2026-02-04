@@ -1,9 +1,9 @@
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.b07.analyser import (
+from dodal.devices.beamlines.b07.analyser import (
     B07SpecsAnalyserDriverIO,
     B07SpecsSequence,
 )
-from dodal.devices.i09.analyser import (
+from dodal.devices.beamlines.i09.analyser import (
     I09VGScientaAnalyserDriverIO,
     I09VGScientaSequence,
 )
