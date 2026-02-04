@@ -2,16 +2,19 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.device_manager import DeviceManager
-from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
-from dodal.devices.i19.access_controlled.blueapi_device import HutchState
-from dodal.devices.i19.access_controlled.shutter import (
-    AccessControlledShutter,
-    HutchState,
+from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
+    AccessControlledPiezoActuator,
+    FocusingMirrorName,
 )
-from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.pin_tip import PinTipCentreHolder
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+)
+from dodal.devices.beamlines.i19.beamstop import BeamStop
+from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -132,4 +135,30 @@ def zebra() -> Zebra:
     return Zebra(
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
+    )
+
+
+@devices.factory()
+def hfm_piezo() -> AccessControlledPiezoActuator:
+    """Get the i19-1 access controlled hfm piezo device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return AccessControlledPiezoActuator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
+        mirror_type=FocusingMirrorName.HFM,
+        hutch=HutchState.EH1,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
+    )
+
+
+@devices.factory()
+def vfm_piezo() -> AccessControlledPiezoActuator:
+    """Get the i19-1 access controlled vfm piezo device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return AccessControlledPiezoActuator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
+        mirror_type=FocusingMirrorName.VFM,
+        hutch=HutchState.EH1,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )
