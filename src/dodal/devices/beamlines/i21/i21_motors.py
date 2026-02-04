@@ -130,7 +130,7 @@ class ToolPointMotion(StandardReadable, Movable):
         zero: tuple[float, float, float] = AXES_ZERO,
         name: str = "",
     ):
-        self.smp = Reference(smp)
+        self.smp_ref = Reference(smp)
         self._zero = zero
 
         with self.add_children_as_readables():
@@ -140,11 +140,11 @@ class ToolPointMotion(StandardReadable, Movable):
 
     async def _read_motor_positions(self) -> MotorPositions:
         x, y, z, tilt, azimuth = await asyncio.gather(
-            self.smp().x.user_readback.get_value(),
-            self.smp().y.user_readback.get_value(),
-            self.smp().z.user_readback.get_value(),
-            self.smp().tilt.user_readback.get_value(),
-            self.smp().azimuth.user_readback.get_value(),
+            self.smp_ref().x.user_readback.get_value(),
+            self.smp_ref().y.user_readback.get_value(),
+            self.smp_ref().z.user_readback.get_value(),
+            self.smp_ref().tilt.user_readback.get_value(),
+            self.smp_ref().azimuth.user_readback.get_value(),
         )
         return MotorPositions(x, y, z, tilt, azimuth)
 
@@ -152,11 +152,11 @@ class ToolPointMotion(StandardReadable, Movable):
         self, start: MotorPositions, end: MotorPositions
     ) -> None:
         await asyncio.gather(
-            self.smp().x.check_motor_limit(start.x, end.x),
-            self.smp().y.check_motor_limit(start.y, end.y),
-            self.smp().z.check_motor_limit(start.z, end.z),
-            self.smp().tilt.check_motor_limit(start.tilt, end.tilt),
-            self.smp().azimuth.check_motor_limit(start.azimuth, end.azimuth),
+            self.smp_ref().x.check_motor_limit(start.x, end.x),
+            self.smp_ref().y.check_motor_limit(start.y, end.y),
+            self.smp_ref().z.check_motor_limit(start.z, end.z),
+            self.smp_ref().tilt.check_motor_limit(start.tilt, end.tilt),
+            self.smp_ref().azimuth.check_motor_limit(start.azimuth, end.azimuth),
         )
 
     def _toolpoint_to_motor_positions(
@@ -192,11 +192,11 @@ class ToolPointMotion(StandardReadable, Movable):
         await self._check_motor_limits(start, end)
 
         await asyncio.gather(
-            self.smp().x.set(end.x),
-            self.smp().y.set(end.y),
-            self.smp().z.set(end.z),
-            self.smp().tilt.set(end.tilt),
-            self.smp().azimuth.set(end.azimuth),
+            self.smp_ref().x.set(end.x),
+            self.smp_ref().y.set(end.y),
+            self.smp_ref().z.set(end.z),
+            self.smp_ref().tilt.set(end.tilt),
+            self.smp_ref().azimuth.set(end.azimuth),
         )
 
     def _create_uvws(self) -> tuple[SignalRW[float], SignalRW[float], SignalRW[float]]:
@@ -224,29 +224,29 @@ class ToolPointMotion(StandardReadable, Movable):
         u = derived_signal_rw(
             read_u,
             set_u,
-            x=self.smp().x,
-            y=self.smp().y,
-            z=self.smp().z,
-            tilt=self.smp().tilt,
-            azimuth=self.smp().azimuth,
+            x=self.smp_ref().x,
+            y=self.smp_ref().y,
+            z=self.smp_ref().z,
+            tilt=self.smp_ref().tilt,
+            azimuth=self.smp_ref().azimuth,
         )
         v = derived_signal_rw(
             read_v,
             set_v,
-            x=self.smp().x,
-            y=self.smp().y,
-            z=self.smp().z,
-            tilt=self.smp().tilt,
-            azimuth=self.smp().azimuth,
+            x=self.smp_ref().x,
+            y=self.smp_ref().y,
+            z=self.smp_ref().z,
+            tilt=self.smp_ref().tilt,
+            azimuth=self.smp_ref().azimuth,
         )
         w = derived_signal_rw(
             read_w,
             set_w,
-            x=self.smp().x,
-            y=self.smp().y,
-            z=self.smp().z,
-            tilt=self.smp().tilt,
-            azimuth=self.smp().azimuth,
+            x=self.smp_ref().x,
+            y=self.smp_ref().y,
+            z=self.smp_ref().z,
+            tilt=self.smp_ref().tilt,
+            azimuth=self.smp_ref().azimuth,
         )
         return u, v, w
 
