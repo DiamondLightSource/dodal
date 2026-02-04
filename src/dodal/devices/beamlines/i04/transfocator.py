@@ -3,7 +3,6 @@ import asyncio
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
-    observe_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -57,16 +56,12 @@ class Transfocator(StandardReadable):
         """
         LOGGER.info(f"Transfocator setting {value} beamsize")
 
-        # Logic in the IOC calculates _num_lenses_calc_rbv when _vert_size_calc_sp changes
-
-        # Register an observer before setting _vert_size_calc_sp to ensure we don't miss changes
-        num_lenses_calc_iterator = observe_value(
-            self._num_lenses_calc_rbv, timeout=self.TIMEOUT
-        )
-
-        await anext(num_lenses_calc_iterator)
         await self._vert_size_calc_sp.set(value)
-        calc_lenses = await anext(num_lenses_calc_iterator)
+        # Logic in the IOC calculates _num_lenses_calc_rbv when _vert_size_calc_sp changes,
+        # but this isn't instant so we need a short sleep until
+        # https://jira.diamond.ac.uk/browse/I04-1100
+        await asyncio.sleep(0.1)
+        calc_lenses = await self._num_lenses_calc_rbv.get_value()
 
         async with periodic_reminder(
             f"Waiting for transfocator to insert {calc_lenses} into beam"
