@@ -1,0 +1,40 @@
+dodal.devices.motors.XYZPolarAzimuthTiltStage
+=============================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZPolarAzimuthTiltStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

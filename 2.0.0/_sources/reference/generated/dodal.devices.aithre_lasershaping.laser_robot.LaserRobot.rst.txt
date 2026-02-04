@@ -1,0 +1,50 @@
+dodal.devices.aithre\_lasershaping.laser\_robot.LaserRobot
+==========================================================
+
+.. currentmodule:: dodal.devices.aithre_lasershaping.laser_robot
+
+.. autoclass:: LaserRobot
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   

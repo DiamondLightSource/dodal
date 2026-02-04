@@ -1,0 +1,90 @@
+dodal.devices.beamlines.b07.PsuMode
+===================================
+
+.. currentmodule:: dodal.devices.beamlines.b07
+
+.. autoclass:: PsuMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PsuMode.V3500
+      
+      
+      ~PsuMode.V1500
+      
+      
+      ~PsuMode.V400
+      
+      
+      ~PsuMode.V100
+      
+      
+      ~PsuMode.V10
+      
+      
+      ~PsuMode.NOT_CONNECTED
+      
+   
+   

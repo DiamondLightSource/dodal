@@ -1,0 +1,84 @@
+dodal.devices.beamlines.i05.Grating
+===================================
+
+.. currentmodule:: dodal.devices.beamlines.i05
+
+.. autoclass:: Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Grating.PT_400
+      
+      
+      ~Grating.C_1600
+      
+      
+      ~Grating.RH_1600
+      
+      
+      ~Grating.PT_800
+      
+   
+   

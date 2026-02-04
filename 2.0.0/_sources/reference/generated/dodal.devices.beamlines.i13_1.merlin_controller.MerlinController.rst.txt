@@ -1,0 +1,33 @@
+dodal.devices.beamlines.i13\_1.merlin\_controller.MerlinController
+==================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i13_1.merlin_controller
+
+.. autoclass:: MerlinController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      ~MerlinController.disarm
+      
+      
+      
+      ~MerlinController.prepare
+      
+      
+      
+      
+      ~MerlinController.wait_for_idle
+      
+   
+   
+
+   
+   
+   

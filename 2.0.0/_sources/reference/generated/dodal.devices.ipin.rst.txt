@@ -1,0 +1,37 @@
+dodal.devices.ipin
+==================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~ipin.IPin
+   ~ipin.IPinGain
+
+
+
+
+.. automodule:: dodal.devices.ipin
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

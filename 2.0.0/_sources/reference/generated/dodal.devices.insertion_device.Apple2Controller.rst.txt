@@ -1,0 +1,43 @@
+dodal.devices.insertion\_device.Apple2Controller
+================================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: Apple2Controller
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~Apple2Controller.determine_phase_from_hardware
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

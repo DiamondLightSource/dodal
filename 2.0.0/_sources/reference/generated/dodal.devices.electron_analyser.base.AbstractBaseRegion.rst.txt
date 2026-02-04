@@ -1,0 +1,112 @@
+dodal.devices.electron\_analyser.base.AbstractBaseRegion
+========================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: AbstractBaseRegion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~AbstractBaseRegion.before_validation
+      
+      
+      
+      
+      
+      
+      ~AbstractBaseRegion.is_binding_energy
+      
+      
+      ~AbstractBaseRegion.is_kinetic_energy
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AbstractBaseRegion.prepare_for_epics
+      
+      
+      
+      
+      ~AbstractBaseRegion.switch_energy_mode
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~AbstractBaseRegion.model_config
+      
+      
+      
+      
+      
+      ~AbstractBaseRegion.name
+      
+      
+      ~AbstractBaseRegion.enabled
+      
+      
+      ~AbstractBaseRegion.slices
+      
+      
+      ~AbstractBaseRegion.iterations
+      
+      
+      ~AbstractBaseRegion.excitation_energy_source
+      
+      
+      ~AbstractBaseRegion.lens_mode
+      
+      
+      ~AbstractBaseRegion.pass_energy
+      
+      
+      ~AbstractBaseRegion.acquisition_mode
+      
+      
+      ~AbstractBaseRegion.low_energy
+      
+      
+      ~AbstractBaseRegion.centre_energy
+      
+      
+      ~AbstractBaseRegion.high_energy
+      
+      
+      ~AbstractBaseRegion.acquire_time
+      
+      
+      ~AbstractBaseRegion.energy_step
+      
+      
+      ~AbstractBaseRegion.energy_mode
+      
+   
+   

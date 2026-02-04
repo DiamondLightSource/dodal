@@ -1,0 +1,66 @@
+dodal.devices.electron\_analyser.base.GenericSequence
+=====================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: GenericSequence
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~GenericSequence.model_config
+      
+      
+      
+      
+      
+      ~GenericSequence.version
+      
+      
+      ~GenericSequence.regions
+      
+   
+   
