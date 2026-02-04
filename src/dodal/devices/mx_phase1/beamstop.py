@@ -13,8 +13,7 @@ _BEAMSTOP_OUT_DELTA_Y_MM = -2
 
 
 class BeamstopPositions(StrictEnum):
-    """
-    Beamstop positions.
+    """Beamstop positions.
     GDA supports Standard/High/Low resolution positions, as well as parked and
     robot load however all 3 resolution positions are the same. We also
     do not use the robot load position in Hyperion.
@@ -34,8 +33,7 @@ class BeamstopPositions(StrictEnum):
 
 
 class Beamstop(StandardReadable):
-    """
-    Beamstop for I03 and I04.
+    """Beamstop for I03 and I04.
 
     Attributes:
         x: beamstop x position in mm

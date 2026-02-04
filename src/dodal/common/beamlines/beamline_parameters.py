@@ -12,7 +12,8 @@ def get_beamline_parameters(
     beamline: str, beamline_param_path: str | None = None
 ) -> dict[str, Any]:
     """Loads the beamline parameters from the specified path, or according to the
-    environment variable if none is given"""
+    environment variable if none is given.
+    """
     if not beamline_param_path:
         beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline)
         if beamline_param_path is None:

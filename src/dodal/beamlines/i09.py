@@ -4,11 +4,12 @@ from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i09.enums import LensMode, PassEnergy, PsuMode
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
-from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
+from dodal.devices.motors import XYZPolarAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
@@ -97,3 +98,9 @@ def ew4000(
 @devices.factory()
 def lakeshore() -> Lakeshore336:
     return Lakeshore336(prefix="BL09L-VA-LAKE-01:")
+
+
+@devices.factory()
+def smpm() -> XYZPolarAzimuthStage:
+    """Sample Manipulator."""
+    return XYZPolarAzimuthStage(prefix=f"{I_PREFIX.beamline_prefix}-MO-SMPM-01:")

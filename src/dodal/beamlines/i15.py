@@ -2,15 +2,15 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i15.dcm import DCM
-from dodal.devices.i15.focussing_mirror import (
+from dodal.devices.beamlines.i15.dcm import DCM
+from dodal.devices.beamlines.i15.focussing_mirror import (
     FocusingMirror,
     FocusingMirrorHorizontal,
     FocusingMirrorVertical,
     FocusingMirrorWithRoll,
 )
-from dodal.devices.i15.jack import JackX, JackY
-from dodal.devices.i15.motors import UpstreamDownstreamPair
+from dodal.devices.beamlines.i15.jack import JackX, JackY
+from dodal.devices.beamlines.i15.motors import UpstreamDownstreamPair
 from dodal.devices.motors import (
     SixAxisGonioKappaPhi,
     XYStage,
@@ -66,7 +66,7 @@ def det1z() -> Motor:
 
 @device_factory()
 def det2z() -> Motor:
-    """Deliberately the same as eht2dtx"""
+    """Deliberately the same as eht2dtx."""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 
@@ -85,7 +85,7 @@ def djack1() -> JackX:
 
 @device_factory()
 def eht2dtx() -> Motor:
-    """Deliberately the same as det2z"""
+    """Deliberately the same as det2z."""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 

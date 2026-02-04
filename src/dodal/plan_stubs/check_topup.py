@@ -50,15 +50,17 @@ def _delay_to_avoid_topup(
     total_exposure_time_s: float,
 ) -> bool:
     """Determine whether we should delay collection until after a topup. Generally
-    if a topup is due to occur during the collection we will delay collection until after the topup.
-    However for long-running collections, impact of the topup is potentially less and collection-duration may be
-    a significant fraction of the topup-interval, therefore we may wish to collect during a topup.
+    if a topup is due to occur during the collection we will delay collection until
+    after the topup. However for long-running collections, impact of the topup is
+    potentially less and collection-duration may be a significant fraction of the
+    topup-interval, therefore we may wish to collect during a topup.
 
     Args:
-        total_run_time_s: Anticipated time until end of the collection in seconds
-        time_to_topup_s: Time to the start of the topup as measured from the PV
-        topup_configuration: configuration dictionary
-        total_exposure_time_s: Total exposure time of the sample in s"""
+        total_run_time_s (float): Anticipated time until end of the collection in seconds.
+        time_to_topup_s (float): Time to the start of the topup as measured from the PV.
+        topup_configuration (dict): Configuration dictionary.
+        total_exposure_time_s (float): Total exposure time of the sample in s.
+    """
     if total_run_time_s > time_to_topup_s:
         limit_s = topup_configuration.get(
             TopupConfig.THRESHOLD_EXPOSURE_S, DEFAULT_THRESHOLD_EXPOSURE_S
@@ -76,9 +78,7 @@ def _delay_to_avoid_topup(
                 """)
         return gate
     LOGGER.info(
-        """
-        Total run time less than time to next topup. Proceeding with collection.
-        """
+        """Total run time less than time to next topup. Proceeding with collection."""
     )
     return False
 
@@ -96,15 +96,15 @@ def check_topup_and_wait_if_necessary(
     total_exposure_time: float,
     ops_time: float,  # Account for xray centering, rotation speed, etc
 ):  # See https://github.com/DiamondLightSource/hyperion/issues/932
-    """A small plan to check if topup gating is permitted and sleep until the topup\
+    """A small plan to check if topup gating is permitted and sleep until the topup
         is over if it starts before the end of collection.
 
     Args:
         synchrotron (Synchrotron): Synchrotron device.
-        total_exposure_time (float): Expected total exposure time for \
-            collection, in seconds.
-        ops_time (float): Additional time to account for various operations,\
-            eg. x-ray centering, in seconds. Defaults to 30.0.
+        total_exposure_time (float): Expected total exposure time for  collection, in
+            seconds.
+        ops_time (float): Additional time to account for various operations, eg. x-ray
+            centering, in seconds. Defaults to 30.0.
     """
     machine_mode = yield from bps.rd(synchrotron.synchrotron_mode)
     assert isinstance(machine_mode, SynchrotronMode)

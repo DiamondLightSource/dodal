@@ -1,10 +1,12 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i06_shared import I06Grating
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
     UndulatorLockedPhaseAxes,
 )
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -13,6 +15,7 @@ BL = get_beamline_name("i06")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
 devices = DeviceManager()
 
 
@@ -59,3 +62,12 @@ def idu_phase() -> UndulatorLockedPhaseAxes:
 def idu(idu_gap: UndulatorGap, idu_phase: UndulatorLockedPhaseAxes) -> Apple2:
     """i06 upstream insertion device."""
     return Apple2(id_gap=idu_gap, id_phase=idu_phase)
+
+
+@devices.factory()
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=I06Grating,
+        grating_pv="NLINES2",
+    )

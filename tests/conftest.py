@@ -30,7 +30,7 @@ from dodal.utils import (
     collect_factories,
     make_all_devices,
 )
-from tests.devices.i10.test_data import LOOKUP_TABLE_PATH
+from tests.devices.beamlines.i10.test_data import LOOKUP_TABLE_PATH
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_data import TEST_LUT_TXT
 from tests.test_data import (
