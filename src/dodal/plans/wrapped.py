@@ -50,6 +50,7 @@ def count(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Reads from a number of devices.
+
     Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable
     parameters and metadata.
     """
@@ -111,8 +112,10 @@ def num_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent single or multi-motor trajector(y/ies).
+
     The scan is defined by number of points along scan trajector(y/ies).
-    Wraps bluesky.plans.scan(det, *args, num, md=metadata)."""
+    Wraps bluesky.plans.scan(det, *args, num, md=metadata).
+    """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params, num)
     metadata = metadata or {}
@@ -143,8 +146,10 @@ def num_grid_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan independent multi-motor trajectories.
+
     The scan is defined by number of points along scan trajectories.
-    Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata)."""
+    Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).
+    """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
     metadata = metadata or {}
@@ -175,8 +180,10 @@ def num_rscan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent trajector(y/ies), relative to current position(s).
+
     The scan is defined by number of points along scan trajector(y/ies).
-    Wraps bluesky.plans.rel_scan(det, *args, num, md=metadata)."""
+    Wraps bluesky.plans.rel_scan(det, *args, num, md=metadata).
+    """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params, num)
     metadata = metadata or {}
@@ -207,8 +214,10 @@ def num_grid_rscan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories, relative to current positions.
+
     The scan is defined by number of points along scan trajectories.
-    Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata)."""
+    Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata).
+    """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
     metadata = metadata or {}
@@ -258,8 +267,10 @@ def list_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent single or multi-motor trajector(y/ies).
+
     The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.list_scan(det, *args, md=metadata)."""
+    Wraps bluesky.plans.list_scan(det, *args, md=metadata).
+    """
     args, shape = _make_list_scan_args(params=params)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -289,8 +300,10 @@ def list_grid_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories.
+
     The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
+    Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    """
     args, shape = _make_list_scan_args(params=params, grid=True)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -321,8 +334,10 @@ def list_rscan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent trajector(y/ies), relative to current position.
+
     The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata)."""
+    Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata).
+    """
     args, shape = _make_list_scan_args(params=params)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -352,8 +367,10 @@ def list_grid_rscan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories, relative to current positions.
+
     The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.rel_list_grid_scan(det, *args, md=metadata)."""
+    Wraps bluesky.plans.rel_list_grid_scan(det, *args, md=metadata).
+    """
     args, shape = _make_list_scan_args(params=params, grid=True)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -384,7 +401,7 @@ def _make_stepped_list(
         if abs(step) > abs(stop - start):
             step = stop - start
         step = abs(step) * np.sign(stop - start)
-        stepped_list = np.arange(start=start, stop=stop, step=step).tolist()
+        stepped_list = np.arange(start, stop, step).tolist()
         if abs((stepped_list[-1] + step) - stop) <= abs(step * 0.05):
             stepped_list.append(stepped_list[-1] + step)
         rounded_stepped_list = round_list_elements(stepped_list=stepped_list, step=step)
@@ -468,8 +485,10 @@ def step_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent trajectories with specified step size.
+
     Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_scan(det, *args, md=metadata)."""
+    bluesky.plans.list_scan(det, *args, md=metadata).
+    """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params)
     metadata = metadata or {}
@@ -500,8 +519,10 @@ def step_grid_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories with specified step size.
+
     Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
+    bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
     metadata = metadata or {}
@@ -533,8 +554,10 @@ def step_rscan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent trajectories with specified step size, relative to position.
+
     Generates list(s) of points for each trajectory, used with
-    bluesky.plans.rel_list_scan(det, *args, md=metadata)."""
+    bluesky.plans.rel_list_scan(det, *args, md=metadata).
+    """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params)
     metadata = metadata or {}
@@ -565,8 +588,10 @@ def step_grid_rscan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories with specified step size, relative to position.
+
     Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
+    bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
     metadata = metadata or {}
