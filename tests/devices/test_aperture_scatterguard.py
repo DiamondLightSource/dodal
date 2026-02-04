@@ -6,6 +6,8 @@ from unittest.mock import AsyncMock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
+from bluesky.simulators import RunEngineSimulator, assert_message_and_return_remaining
+from bluesky.utils import MsgGenerator
 from ophyd_async.core import (
     callback_on_mock_put,
     get_mock,
@@ -13,12 +15,13 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.devices.aperturescatterguard import (
+from dodal.devices.mx_phase1.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
     ApertureScatterguardConfiguration,
     ApertureValue,
     InvalidApertureMoveError,
+    do_with_aperture_scatterguard_in_scin_move_position,
 )
 from tests.devices.conftest import set_to_position
 
@@ -596,4 +599,66 @@ async def test_get_scin_move_position_returns_expected(
     assert (
         positions[ap_sg.scatterguard.x]
         == ap_sg_configuration.scintillator_move_scatterguard_x
+    )
+
+
+def test_do_with_aperture_scatterguard_in_scin_move_position_moves_and_restores_ap_sg(
+    sim_run_engine: RunEngineSimulator,
+    aperture_in_medium_pos: ApertureScatterguard,
+):
+    ap_sg = aperture_in_medium_pos
+
+    def my_plan() -> MsgGenerator:
+        yield from bps.sleep(1.0)
+
+    sim_run_engine.add_read_handler_for(ap_sg.aperture.x.user_readback, 2.384)
+    sim_run_engine.add_read_handler_for(ap_sg.scatterguard.x.user_readback, 5.285)
+    msgs = sim_run_engine.simulate_plan(
+        do_with_aperture_scatterguard_in_scin_move_position(ap_sg, my_plan)
+    )
+
+    msgs = assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.aperture.x
+        and msg.args[0] == -4.91,
+    )
+    msgs = assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.scatterguard.x
+        and msg.args[0] == -4.75,
+    )
+    msgs = assert_message_and_return_remaining(msgs, lambda msg: msg.command == "sleep")
+    msgs = assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.aperture.x
+        and msg.args[0] == 2.384,
+    )
+    assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.scatterguard.x
+        and msg.args[0] == 5.285,
+    )
+
+
+def test_do_with_aperture_scatterguard_in_scin_move_position_does_not_restore_on_inner_failure(
+    run_engine: RunEngine,
+    aperture_in_medium_pos: ApertureScatterguard,
+):
+    ap_sg = aperture_in_medium_pos
+
+    def my_plan() -> MsgGenerator:
+        raise AssertionError("simulated exception")
+
+    with pytest.raises(AssertionError):
+        run_engine(do_with_aperture_scatterguard_in_scin_move_position(ap_sg, my_plan))
+
+    get_mock_put(ap_sg.aperture.x.user_setpoint).assert_called_once_with(
+        -4.91, wait=True
+    )
+    get_mock_put(ap_sg.scatterguard.x.user_setpoint).assert_called_once_with(
+        -4.75, wait=True
     )

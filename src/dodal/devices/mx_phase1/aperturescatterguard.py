@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+from collections.abc import Callable
 from math import inf
 
+import bluesky.plan_stubs as bps
+from bluesky.preprocessors import contingency_wrapper
 from bluesky.protocols import Preparable
+from bluesky.utils import MsgGenerator
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
@@ -401,3 +405,22 @@ class ApertureScatterguard(StandardReadable, Preparable):
             self.aperture.x: self._config.scintillator_move_aperture_x,
             self.scatterguard.x: self._config.scintillator_move_scatterguard_x,
         }
+
+
+def do_with_aperture_scatterguard_in_scin_move_position(
+    aperture_scatterguard: ApertureScatterguard, inner_plan: Callable[[], MsgGenerator]
+) -> MsgGenerator:
+    motors_and_safe_moves = aperture_scatterguard.get_scin_move_position()
+    saved_positions = {}
+    for motor in motors_and_safe_moves:
+        readback_ = yield from bps.rd(motor.user_readback)
+        saved_positions[motor] = readback_
+
+    for motor, position in motors_and_safe_moves.items():
+        yield from bps.mv(motor, position)
+
+    def restore_previous_position():
+        for motor, position in saved_positions.items():
+            yield from bps.mv(motor, position)
+
+    yield from contingency_wrapper(inner_plan(), else_plan=restore_previous_position)

@@ -1,10 +1,10 @@
 import asyncio
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import get_mock_put, init_devices
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.devices.aperturescatterguard import (
+from dodal.devices.mx_phase1.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
     ApertureScatterguardConfiguration,
@@ -85,10 +85,15 @@ async def set_to_position(
 ):
     aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = position.values
 
+    motors = [
+        aperture_scatterguard.aperture.x,
+        aperture_scatterguard.aperture.y,
+        aperture_scatterguard.aperture.z,
+        aperture_scatterguard.scatterguard.x,
+        aperture_scatterguard.scatterguard.y,
+    ]
     await asyncio.gather(
-        aperture_scatterguard.aperture.x.set(aperture_x),
-        aperture_scatterguard.aperture.y.set(aperture_y),
-        aperture_scatterguard.aperture.z.set(aperture_z),
-        aperture_scatterguard.scatterguard.x.set(scatterguard_x),
-        aperture_scatterguard.scatterguard.y.set(scatterguard_y),
+        *[m.set(value) for m, value in zip(motors, position.values, strict=True)]
     )
+    for signal in [m.user_setpoint for m in motors]:
+        get_mock_put(signal).reset_mock()

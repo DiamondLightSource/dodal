@@ -1,6 +1,6 @@
 from functools import cache
 
-from ophyd_async.core import PathProvider, Reference
+from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
@@ -9,11 +9,6 @@ from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
-from dodal.devices.aperturescatterguard import (
-    AperturePosition,
-    ApertureScatterguard,
-    load_configuration,
-)
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
@@ -37,13 +32,18 @@ from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVolta
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
+from dodal.devices.mx_phase1.aperturescatterguard import (
+    AperturePosition,
+    ApertureScatterguard,
+    load_configuration,
+)
+from dodal.devices.mx_phase1.scintillator import Scintillator
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
-from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -342,13 +342,9 @@ def fluorescence_det_motion() -> FluorescenceDetector:
 
 
 @devices.factory()
-def scintillator(
-    aperture_scatterguard: ApertureScatterguard, beamstop: Beamstop
-) -> Scintillator:
+def scintillator() -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
-        Reference(aperture_scatterguard),
-        Reference(beamstop),
         get_beamline_parameters(),
     )
 

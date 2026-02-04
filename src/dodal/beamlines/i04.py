@@ -1,13 +1,6 @@
-from ophyd_async.core import Reference
-
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.aperturescatterguard import (
-    AperturePosition,
-    ApertureScatterguard,
-    load_configuration,
-)
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
@@ -25,7 +18,13 @@ from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
+from dodal.devices.mx_phase1.aperturescatterguard import (
+    AperturePosition,
+    ApertureScatterguard,
+    load_configuration,
+)
 from dodal.devices.mx_phase1.beamstop import Beamstop
+from dodal.devices.mx_phase1.scintillator import Scintillator
 from dodal.devices.oav.oav_detector import (
     OAVBeamCentrePV,
     ZoomControllerWithBeamCentres,
@@ -35,7 +34,6 @@ from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
-from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -277,13 +275,9 @@ def pin_tip_detection() -> PinTipDetection:
 
 
 @devices.factory()
-def scintillator(
-    aperture_scatterguard: ApertureScatterguard, beamstop: Beamstop
-) -> Scintillator:
+def scintillator() -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
-        Reference(aperture_scatterguard),
-        Reference(beamstop),
         get_beamline_parameters(),
     )
 

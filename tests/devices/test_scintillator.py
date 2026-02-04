@@ -2,16 +2,17 @@ from contextlib import nullcontext
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
-from ophyd_async.core import Reference, get_mock_put, init_devices, set_mock_value
+from bluesky import RunEngine
+from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import assert_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.devices.aperturescatterguard import (
+from dodal.devices.mx_phase1.aperturescatterguard import (
     ApertureScatterguard,
     ApertureValue,
 )
-from dodal.devices.mx_phase1.beamstop import Beamstop, BeamstopPositions
-from dodal.devices.scintillator import InOut, Scintillator
+from dodal.devices.mx_phase1.beamstop import Beamstop
+from dodal.devices.mx_phase1.scintillator import InOut, Scintillator
 
 
 @pytest.fixture
@@ -35,10 +36,19 @@ def mock_beamline_parameters() -> GDABeamlineParameters:
 
 
 @pytest.fixture
-def beamstop(mock_beamline_parameters) -> Beamstop:
+async def beamstop(mock_beamline_parameters) -> Beamstop:
     beamstop = Beamstop("-MO-BS-01:", mock_beamline_parameters, name="beamstop")
-    beamstop.selected_pos.get_value = AsyncMock(
-        return_value=BeamstopPositions.DATA_COLLECTION
+    async with init_devices(mock=True):
+        beamstop = Beamstop("", mock_beamline_parameters)
+
+    set_mock_value(
+        beamstop.x_mm.user_readback, mock_beamline_parameters["in_beam_x_STANDARD"]
+    )
+    set_mock_value(
+        beamstop.y_mm.user_readback, mock_beamline_parameters["in_beam_y_STANDARD"]
+    )
+    set_mock_value(
+        beamstop.z_mm.user_readback, mock_beamline_parameters["in_beam_z_STANDARD"]
     )
     return beamstop
 
@@ -46,7 +56,6 @@ def beamstop(mock_beamline_parameters) -> Beamstop:
 @pytest.fixture
 async def scintillator_and_ap_sg(
     mock_beamline_parameters: GDABeamlineParameters,
-    beamstop: Beamstop,
     ap_sg: ApertureScatterguard,
 ) -> tuple[Scintillator, ApertureScatterguard]:
     async with init_devices(mock=True):
@@ -56,8 +65,6 @@ async def scintillator_and_ap_sg(
         scintillator = Scintillator(
             prefix="",
             name="test_scin",
-            aperture_scatterguard=Reference(ap_sg),
-            beamstop=Reference(beamstop),
             beamline_parameters=mock_beamline_parameters,
         )
     set_mock_value(ap_sg.aperture.x.user_readback, 1.0)
@@ -90,23 +97,29 @@ async def test_given_at_positions_when_position_read_then_returns_expected(
     assert in_out == expected_position
 
 
-async def test_when_set_to_unknown_position_then_error_raised(
+def test_when_set_to_unknown_position_then_error_raised(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+    beamstop: Beamstop,
+    run_engine: RunEngine,
 ):
-    scintillator, _ = scintillator_and_ap_sg
-    await scintillator.y_mm.set(100.855)
-    await scintillator.z_mm.set(101.5115)
+    scintillator, ap_sg = scintillator_and_ap_sg
+    set_mock_value(scintillator.y_mm.user_readback, 100.855)
+    set_mock_value(scintillator.z_mm.user_readback, 101.5115)
     with pytest.raises(ValueError):
-        await scintillator.selected_pos.set(InOut.UNKNOWN)
+        run_engine(
+            scintillator.move_scintillator_safely(ap_sg, beamstop, InOut.UNKNOWN)
+        )
 
 
 async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_returns_expected(
+    run_engine: RunEngine,
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+    beamstop: Beamstop,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
     ap_sg.selected_aperture.get_value.return_value = ApertureValue.PARKED  # type: ignore
 
-    await scintillator.selected_pos.set(InOut.OUT)
+    run_engine(scintillator.move_scintillator_safely(ap_sg, beamstop, InOut.OUT))
 
     await assert_value(scintillator.y_mm.user_setpoint, -0.02)
     await assert_value(scintillator.z_mm.user_setpoint, 0.1)
@@ -114,11 +127,13 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
 
 async def test_given_aperture_scatterguard_parked_when_set_to_in_position_then_returns_expected(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+    run_engine: RunEngine,
+    beamstop: Beamstop,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
     ap_sg.selected_aperture.get_value.return_value = ApertureValue.PARKED  # type: ignore
 
-    await scintillator.selected_pos.set(InOut.IN)
+    run_engine(scintillator.move_scintillator_safely(ap_sg, beamstop, InOut.IN))
 
     await assert_value(scintillator.y_mm.user_setpoint, 100.855)
     await assert_value(scintillator.z_mm.user_setpoint, 101.5115)
@@ -137,13 +152,14 @@ async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_not
     expected_position,
     y,
     z,
+    run_engine: RunEngine,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
     ap_sg.get_scin_move_position.return_value = {  # type: ignore
         ap_sg.aperture.x: -1.0,
         ap_sg.scatterguard.x: -1.5,
     }
-    beamstop.selected_pos.get_value.return_value = BeamstopPositions.UNKNOWN  # type: ignore
+    set_mock_value(beamstop.x_mm.user_readback, 25)  # unknown position
     await scintillator.y_mm.set(y)
     await scintillator.z_mm.set(z)
 
@@ -151,7 +167,9 @@ async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_not
     get_mock_put(scintillator.z_mm.user_setpoint).reset_mock()
 
     ap_sg.selected_aperture.get_value.return_value = ApertureValue.LARGE  # type: ignore
-    await scintillator.selected_pos.set(expected_position)
+    run_engine(
+        scintillator.move_scintillator_safely(ap_sg, beamstop, expected_position)
+    )
 
     get_mock_put(scintillator.y_mm.user_setpoint).assert_not_called()
     get_mock_put(scintillator.z_mm.user_setpoint).assert_not_called()
@@ -160,21 +178,24 @@ async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_not
 
 
 @pytest.mark.parametrize(
-    "beamstop_position, expected_good",
+    "beamstop_y_position, expected_good",
     [
-        [BeamstopPositions.DATA_COLLECTION, True],
-        [BeamstopPositions.OUT_OF_BEAM, True],
-        [BeamstopPositions.UNKNOWN, False],
+        [45.4, True],  #  in beam
+        [43.4, True],  # Out of beam
+        [25, False],  # Unknown position
     ],
 )
 async def test_beamstop_check_in_known_good_position(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
     beamstop: Beamstop,
-    beamstop_position: BeamstopPositions,
+    beamstop_y_position: float,
     expected_good: bool,
+    run_engine: RunEngine,
 ):
-    beamstop.selected_pos.get_value.return_value = beamstop_position  # type: ignore
-    scintillator, _ = scintillator_and_ap_sg
+    set_mock_value(
+        beamstop.y_mm.user_readback, beamstop_y_position
+    )  # Beamstop out of beam
+    scintillator, ap_sg = scintillator_and_ap_sg
 
     with (
         pytest.raises(
@@ -183,7 +204,7 @@ async def test_beamstop_check_in_known_good_position(
         if not expected_good
         else nullcontext()
     ):
-        await scintillator.selected_pos.set(InOut.OUT)
+        run_engine(scintillator.move_scintillator_safely(ap_sg, beamstop, InOut.OUT))
 
 
 @pytest.mark.parametrize(
@@ -201,6 +222,8 @@ async def test_move_scintillator_moves_ap_sg_to_scin_move_and_back(
     final_z: float,
     swap_order: bool,
     final_position: InOut,
+    beamstop: Beamstop,
+    run_engine: RunEngine,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
     ap_sg.get_scin_move_position.return_value = {  # type: ignore
@@ -226,7 +249,7 @@ async def test_move_scintillator_moves_ap_sg_to_scin_move_and_back(
     parent.scintillator.attach_mock(
         get_mock_put(scintillator.z_mm.user_setpoint), "z_mm"
     )
-    await scintillator.selected_pos.set(final_position)
+    run_engine(scintillator.move_scintillator_safely(ap_sg, beamstop, final_position))
 
     expected_scintillator_move = [
         call.scintillator.y_mm(final_y, wait=True),
