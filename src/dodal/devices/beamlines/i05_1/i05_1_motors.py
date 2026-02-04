@@ -1,12 +1,12 @@
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.beamlines.i05_shared.rotation_signals import (
+from dodal.devices.motors import (
+    XYZAzimuthPolarStage,
     create_rotational_ij_component_signals,
 )
-from dodal.devices.motors import XYZPolarAzimuthStage
 
 
-class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
+class XYZPolarAzimuthDefocusStage(XYZAzimuthPolarStage):
     """Six-axis stage with a standard xyz stage and three axis of rotation: polar,
     azimuth, and defocus.
 
@@ -40,8 +40,8 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
         x_infix="SMX",
         y_infix="SMY",
         z_infix="SMZ",
-        polar_infix="POL",
         azimuth_infix="AZM",
+        polar_infix="POL",
         defocus_infix="SMDF",
         name="",
     ):
@@ -51,8 +51,8 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
             x_infix=x_infix,
             y_infix=y_infix,
             z_infix=z_infix,
-            polar_infix=polar_infix,
             azimuth_infix=azimuth_infix,
+            polar_infix=polar_infix,
         )
 
         with self.add_children_as_readables():

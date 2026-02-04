@@ -5,6 +5,10 @@ from daq_config_server.client import ConfigServer
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i21 import Grating
+from dodal.devices.beamlines.i21.i21_motors import (
+    I21XYZAzimuthTiltPolarStage,
+    ToolPointMotion,
+)
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
@@ -129,3 +133,13 @@ def energy(
 @devices.factory()
 def sample_temperature_controller() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
+
+
+@devices.factory()
+def smp() -> I21XYZAzimuthTiltPolarStage:
+    return I21XYZAzimuthTiltPolarStage(prefix=f"{PREFIX.beamline_prefix}-EA-SMPL-01:")
+
+
+@devices.factory()
+def uvw(smp: I21XYZAzimuthTiltPolarStage) -> ToolPointMotion:
+    return ToolPointMotion(smp)

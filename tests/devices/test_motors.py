@@ -9,10 +9,10 @@ from dodal.devices.motors import (
     SixAxisGonio,
     XThetaStage,
     XYStage,
+    XYZAzimuthStage,
+    XYZAzimuthTiltPolarStage,
+    XYZAzimuthTiltStage,
     XYZPitchYawRollStage,
-    XYZPolarAzimuthStage,
-    XYZPolarAzimuthTiltStage,
-    XYZPolarStage,
     XYZThetaStage,
 )
 
@@ -25,24 +25,24 @@ async def xyzt_stage() -> XYZThetaStage:
 
 
 @pytest.fixture
-async def xyzp_stage() -> XYZPolarStage:
+async def xyza_stage() -> XYZAzimuthStage:
     async with init_devices(mock=True):
-        xyzp_stage = XYZPolarStage("")
-    return xyzp_stage
+        xyza_stage = XYZAzimuthStage("")
+    return xyza_stage
 
 
 @pytest.fixture
-async def xyzpa_stage() -> XYZPolarAzimuthStage:
+async def xyzat_stage() -> XYZAzimuthTiltStage:
     async with init_devices(mock=True):
-        xyzpa_stage = XYZPolarAzimuthStage("")
-    return xyzpa_stage
+        xyzat_stage = XYZAzimuthTiltStage("")
+    return xyzat_stage
 
 
 @pytest.fixture
-async def xyzpat_stage() -> XYZPolarAzimuthTiltStage:
+async def xyzatp_stage() -> XYZAzimuthTiltPolarStage:
     async with init_devices(mock=True):
-        xyzpat_stage = XYZPolarAzimuthTiltStage("")
-    return xyzpat_stage
+        xyzatp_stage = XYZAzimuthTiltPolarStage("")
+    return xyzatp_stage
 
 
 @pytest.fixture
@@ -123,38 +123,38 @@ async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
 
 
 @pytest.mark.parametrize(
-    "x, y, z, polar",
+    "x, y, z, azimuth",
     [
         (0, 0, 0, 0),
         (1.23, 2.40, 0.0, 0.0),
         (1.23, 2.40, 3.51, 24.0),
     ],
 )
-async def test_setting_xyzp_position_table(
-    xyzp_stage: XYZPolarStage,
+async def test_setting_xyza_position_table(
+    xyza_stage: XYZAzimuthStage,
     x: float,
     y: float,
     z: float,
-    polar: float,
+    azimuth: float,
 ):
-    set_mock_value(xyzp_stage.x.user_readback, x)
-    set_mock_value(xyzp_stage.y.user_readback, y)
-    set_mock_value(xyzp_stage.z.user_readback, z)
-    set_mock_value(xyzp_stage.polar.user_readback, polar)
+    set_mock_value(xyza_stage.x.user_readback, x)
+    set_mock_value(xyza_stage.y.user_readback, y)
+    set_mock_value(xyza_stage.z.user_readback, z)
+    set_mock_value(xyza_stage.azimuth.user_readback, azimuth)
 
     await assert_reading(
-        xyzp_stage,
+        xyza_stage,
         {
-            "xyzp_stage-x": partial_reading(x),
-            "xyzp_stage-y": partial_reading(y),
-            "xyzp_stage-z": partial_reading(z),
-            "xyzp_stage-polar": partial_reading(polar),
+            "xyza_stage-x": partial_reading(x),
+            "xyza_stage-y": partial_reading(y),
+            "xyza_stage-z": partial_reading(z),
+            "xyza_stage-azimuth": partial_reading(azimuth),
         },
     )
 
 
 @pytest.mark.parametrize(
-    "x, y, z, polar, azimuth",
+    "x, y, z, azimuth, tilt",
     [
         (0, 0, 0, 0, 0),
         (1.23, 2.40, 0.0, 0.0, 0),
@@ -162,33 +162,33 @@ async def test_setting_xyzp_position_table(
     ],
 )
 async def test_setting_xyzpa_position_table(
-    xyzpa_stage: XYZPolarAzimuthStage,
+    xyzat_stage: XYZAzimuthTiltStage,
     x: float,
     y: float,
     z: float,
-    polar: float,
     azimuth: float,
+    tilt: float,
 ):
-    set_mock_value(xyzpa_stage.x.user_readback, x)
-    set_mock_value(xyzpa_stage.y.user_readback, y)
-    set_mock_value(xyzpa_stage.z.user_readback, z)
-    set_mock_value(xyzpa_stage.polar.user_readback, polar)
-    set_mock_value(xyzpa_stage.azimuth.user_readback, azimuth)
+    set_mock_value(xyzat_stage.x.user_readback, x)
+    set_mock_value(xyzat_stage.y.user_readback, y)
+    set_mock_value(xyzat_stage.z.user_readback, z)
+    set_mock_value(xyzat_stage.azimuth.user_readback, azimuth)
+    set_mock_value(xyzat_stage.tilt.user_readback, tilt)
 
     await assert_reading(
-        xyzpa_stage,
+        xyzat_stage,
         {
-            "xyzpa_stage-x": partial_reading(x),
-            "xyzpa_stage-y": partial_reading(y),
-            "xyzpa_stage-z": partial_reading(z),
-            "xyzpa_stage-polar": partial_reading(polar),
-            "xyzpa_stage-azimuth": partial_reading(azimuth),
+            "xyzat_stage-x": partial_reading(x),
+            "xyzat_stage-y": partial_reading(y),
+            "xyzat_stage-z": partial_reading(z),
+            "xyzat_stage-azimuth": partial_reading(azimuth),
+            "xyzat_stage-tilt": partial_reading(tilt),
         },
     )
 
 
 @pytest.mark.parametrize(
-    "x, y, z, polar, azimuth, tilt",
+    "x, y, z, azimuth, tilt, polar",
     [
         (0, 0, 0, 0, 0, 0),
         (1.23, 2.40, 0.0, 0.0, 0.0, 0.0),
@@ -196,30 +196,30 @@ async def test_setting_xyzpa_position_table(
     ],
 )
 async def test_setting_xyzpat_position_table(
-    xyzpat_stage: XYZPolarAzimuthTiltStage,
+    xyzatp_stage: XYZAzimuthTiltPolarStage,
     x: float,
     y: float,
     z: float,
-    polar: float,
     azimuth: float,
     tilt: float,
+    polar: float,
 ) -> None:
-    set_mock_value(xyzpat_stage.x.user_readback, x)
-    set_mock_value(xyzpat_stage.y.user_readback, y)
-    set_mock_value(xyzpat_stage.z.user_readback, z)
-    set_mock_value(xyzpat_stage.polar.user_readback, polar)
-    set_mock_value(xyzpat_stage.azimuth.user_readback, azimuth)
-    set_mock_value(xyzpat_stage.tilt.user_readback, tilt)
+    set_mock_value(xyzatp_stage.x.user_readback, x)
+    set_mock_value(xyzatp_stage.y.user_readback, y)
+    set_mock_value(xyzatp_stage.z.user_readback, z)
+    set_mock_value(xyzatp_stage.polar.user_readback, polar)
+    set_mock_value(xyzatp_stage.azimuth.user_readback, azimuth)
+    set_mock_value(xyzatp_stage.tilt.user_readback, tilt)
 
     await assert_reading(
-        xyzpat_stage,
+        xyzatp_stage,
         {
-            "xyzpat_stage-x": partial_reading(x),
-            "xyzpat_stage-y": partial_reading(y),
-            "xyzpat_stage-z": partial_reading(z),
-            "xyzpat_stage-polar": partial_reading(polar),
-            "xyzpat_stage-azimuth": partial_reading(azimuth),
-            "xyzpat_stage-tilt": partial_reading(tilt),
+            "xyzatp_stage-x": partial_reading(x),
+            "xyzatp_stage-y": partial_reading(y),
+            "xyzatp_stage-z": partial_reading(z),
+            "xyzatp_stage-azimuth": partial_reading(azimuth),
+            "xyzatp_stage-tilt": partial_reading(tilt),
+            "xyzatp_stage-polar": partial_reading(polar),
         },
     )
 
