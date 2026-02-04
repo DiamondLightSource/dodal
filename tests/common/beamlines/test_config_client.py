@@ -22,7 +22,7 @@ def test_get_config_client_uses_i03_beamline_cluster_server_for_i03(
 
 
 @patch("dodal.common.beamlines.config_client.ConfigServer")
-def test_get_config_client_uses_entrally_deployed_config_server_for_i04(
+def test_get_config_client_uses_centrally_deployed_config_server_for_i04(
     mock_config_server: MagicMock,
 ):
     get_config_client("i04")
