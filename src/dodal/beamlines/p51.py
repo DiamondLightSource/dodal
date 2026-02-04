@@ -38,32 +38,26 @@ set_path_provider(
 """
 NOTE: Due to the CA gateway machine being switched off, PVs are not available remotely
 and you need to be on the beamline network to access them.
-The simplest way to do this is to `ssh i20-1-ws001` and run dodal connect i20_1 from there.
+The simplest way to do this is to `ssh i20-1-ws001` and run dodal connect i20_1 from
+there.
 """
 
 
 @device_factory()
 def turbo_slit() -> TurboSlit:
-    """
-    turboslit for selecting energy from the polychromator
-    """
-
+    """Turboslit for selecting energy from the polychromator."""
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
 
 
 @device_factory()
 def turbo_slit_x() -> Motor:
-    """
-    turbo slit x motor
-    """
+    """Turbo slit x motor."""
     return Motor(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
 
 
 @device_factory()
 def turbo_slit_pmac() -> PmacIO:
-    """
-    PMac controller using running fly scans with trajectory
-    """
+    """PMac controller using running fly scans with trajectory."""
     motor = turbo_slit_x()
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-STEP-06:",
@@ -93,9 +87,7 @@ def alignment_y() -> Motor:
 
 @device_factory(skip=True)
 def xspress3() -> Xspress3:
-    """
-    16 channels Xspress3 detector
-    """
+    """16 channels Xspress3 detector."""
     return Xspress3(
         f"{PREFIX.beamline_prefix}-EA-DET-03:",
         num_channels=16,

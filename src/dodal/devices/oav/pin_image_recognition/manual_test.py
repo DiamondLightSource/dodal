@@ -1,5 +1,4 @@
-"""
-Note: this file exists exclusively to make it easier to manually run
+"""Note: this file exists exclusively to make it easier to manually run
 image recognition on a beamline without setting up all of the
 bluesky infrastructure.
 
