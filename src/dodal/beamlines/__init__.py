@@ -79,7 +79,7 @@ def _module_name_overrides() -> Mapping[str, set[str]]:
 
 def module_name_for_beamline(beamline: str) -> str:
     """Get the module name for a particular beamline, it may differ from the beamline
-    name e.g. i20-1 -> i20_1.
+    name e.g. i19-1 -> i19_1.
 
     Args:
         beamline (str): The beamline name as per the ${BEAMLINE} environment variable.
