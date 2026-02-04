@@ -1,9 +1,9 @@
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i09_1 import SpecsPhoibos225
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import EnergySource
-from dodal.devices.i09_1 import SpecsPhoibos225
 from dodal.devices.motors import XYZPolarAzimuthTiltStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336

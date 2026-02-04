@@ -12,9 +12,9 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.b07 import LensMode
-from dodal.devices.b07.analyser import B07SpecsAnalyserDriverIO
-from dodal.devices.b07_shared import PsuMode
+from dodal.devices.beamlines.b07 import LensMode
+from dodal.devices.beamlines.b07.analyser import B07SpecsAnalyserDriverIO
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (

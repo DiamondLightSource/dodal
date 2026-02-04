@@ -2,13 +2,16 @@ from typing import Any
 
 import pytest
 
+from dodal.devices.beamlines.i09 import LensMode, PassEnergy
+from dodal.devices.beamlines.i09.analyser import (
+    I09VGScientaRegion,
+    I09VGScientaSequence,
+)
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     AcquisitionMode,
     DetectorMode,
 )
-from dodal.devices.i09 import LensMode, PassEnergy
-from dodal.devices.i09.analyser import I09VGScientaRegion, I09VGScientaSequence
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,

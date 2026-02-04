@@ -13,11 +13,11 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.i09.analyser import (
+from dodal.devices.beamlines.i09 import (
     I09VGScientaAnalyserDriverIO,
     I09VGScientaRegion,
 )
+from dodal.devices.electron_analyser.base import EnergyMode
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
 )

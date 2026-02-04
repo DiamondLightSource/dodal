@@ -2,9 +2,8 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.b07 import LensMode
-from dodal.devices.b07.analyser import B07SpecsSequence
-from dodal.devices.b07_shared import PsuMode
+from dodal.devices.beamlines.b07 import B07SpecsSequence, LensMode
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.specs import AcquisitionMode
 from dodal.devices.selectable_source import SelectedSource

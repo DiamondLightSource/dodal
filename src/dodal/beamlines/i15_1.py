@@ -2,10 +2,10 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i15.laue import LaueMonochrometer
-from dodal.devices.i15.motors import NumberedTripleAxisStage
-from dodal.devices.i15.multilayer_mirror import MultiLayerMirror
-from dodal.devices.i15.rail import Rail
+from dodal.devices.beamlines.i15.laue import LaueMonochrometer
+from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
+from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
+from dodal.devices.beamlines.i15.rail import Rail
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron

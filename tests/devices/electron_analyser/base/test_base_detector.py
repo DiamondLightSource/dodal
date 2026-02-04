@@ -9,7 +9,8 @@ from ophyd_async.testing import (
     assert_reading,
 )
 
-from dodal.devices.b07.analyser import Specs2DCMOS
+from dodal.devices.beamlines.b07.analyser import Specs2DCMOS
+from dodal.devices.beamlines.i09.analyser import EW4000
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
     EnergySource,
@@ -20,7 +21,6 @@ from dodal.devices.electron_analyser.base import (
 )
 from dodal.devices.electron_analyser.base.energy_sources import EnergySource
 from dodal.devices.fast_shutter import DualFastShutter
-from dodal.devices.i09.analyser import EW4000
 from dodal.devices.selectable_source import SourceSelector
 
 

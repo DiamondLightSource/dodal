@@ -2,7 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.devices.b07 import B07SpecsRegion
+from dodal.devices.beamlines.b07 import B07SpecsRegion
+from dodal.devices.beamlines.i09 import I09VGScientaRegion
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     EnergyMode,
@@ -14,7 +15,6 @@ from dodal.devices.electron_analyser.base import (
 )
 from dodal.devices.electron_analyser.specs import SpecsSequence
 from dodal.devices.electron_analyser.vgscienta import VGScientaSequence
-from dodal.devices.i09 import I09VGScientaRegion
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
     b07_specs_test_sequence_loader,
