@@ -22,15 +22,16 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",       # For pin-tip detection.
+    "opencv-python-headless",          # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
     "redis",
     "scanspec>=0.7.3",
-    "pyzmq==26.3.0",                # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "pyzmq==26.3.0",                   # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
     "deepdiff",
-    "daq-config-server>=v1.0.0",    # For getting Configuration settings.
+    "daq-config-server>=v1.0.0",       # For getting Configuration settings.
+    "mysql-connector-python == 9.5.0", # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
 ]
 
 dynamic = ["version"]
@@ -60,7 +61,7 @@ dev = [
     "pytest-timeout",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",             #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
