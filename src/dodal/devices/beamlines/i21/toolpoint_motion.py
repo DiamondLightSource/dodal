@@ -153,21 +153,21 @@ class ToolPointMotion(StandardReadable, Movable):
 
     def _create_uvws(self) -> tuple[SignalRW[float], SignalRW[float], SignalRW[float]]:
         def read_u(x: float, y: float, z: float, tilt: float, azimuth: float) -> float:
-            return xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[0]
+            return float(xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[0])
 
         async def set_u(value: float) -> None:
             u, v, w, tilt, azimuth = await self._read_all()
             await self._write_all(value, v, w, tilt, azimuth)
 
         def read_v(x: float, y: float, z: float, tilt: float, azimuth: float) -> float:
-            return xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[1]
+            return float(xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[1])
 
         async def set_v(value: float) -> None:
             u, v, w, tilt, azimuth = await self._read_all()
             await self._write_all(u, value, w, tilt, azimuth)
 
         def read_w(x: float, y: float, z: float, tilt: float, azimuth: float) -> float:
-            return xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[2]
+            return float(xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[2])
 
         async def set_w(value: float) -> None:
             u, v, w, tilt, azimuth = await self._read_all()
