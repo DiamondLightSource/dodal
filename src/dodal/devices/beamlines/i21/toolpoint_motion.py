@@ -42,7 +42,8 @@ def toolpoint_to_xyz(
     tool = np.array([u, v, w])
     offset = np.array(zero)
     xyz = offset + rotation @ tool
-    return tuple(xyz.astype(float))
+    x, y, z = xyz
+    return float(x), float(y), float(z)
 
 
 def xyz_to_toolpoint(
@@ -58,7 +59,8 @@ def xyz_to_toolpoint(
     offset = np.array(zero)
 
     tool = rotation.T @ (xyz - offset)
-    return tuple(tool.astype(float))
+    u, v, w = tool
+    return float(u), float(v), float(w)
 
 
 @dataclass(frozen=True)
@@ -66,8 +68,8 @@ class ToolPointMotorPositions:
     x: float
     y: float
     z: float
-    tilt: float
-    azimuth: float
+    tilt_deg: float
+    azimuth_deg: float
 
 
 class ToolPointMotion(StandardReadable, Movable):
@@ -109,8 +111,10 @@ class ToolPointMotion(StandardReadable, Movable):
             self.smp_ref().x.check_motor_limit(start.x, end.x),
             self.smp_ref().y.check_motor_limit(start.y, end.y),
             self.smp_ref().z.check_motor_limit(start.z, end.z),
-            self.smp_ref().tilt.check_motor_limit(start.tilt, end.tilt),
-            self.smp_ref().azimuth.check_motor_limit(start.azimuth, end.azimuth),
+            self.smp_ref().tilt.check_motor_limit(start.tilt_deg, end.tilt_deg),
+            self.smp_ref().azimuth.check_motor_limit(
+                start.azimuth_deg, end.azimuth_deg
+            ),
         )
 
     def _toolpoint_to_motor_positions(
@@ -121,8 +125,8 @@ class ToolPointMotion(StandardReadable, Movable):
             x=x,
             y=y,
             z=z,
-            tilt=tilt,
-            azimuth=azimuth,
+            tilt_deg=tilt,
+            azimuth_deg=azimuth,
         )
 
     async def _read_all(self) -> tuple[float, float, float, float, float]:
@@ -131,11 +135,11 @@ class ToolPointMotion(StandardReadable, Movable):
             pos.x,
             pos.y,
             pos.z,
-            pos.tilt,
-            pos.azimuth,
+            pos.tilt_deg,
+            pos.azimuth_deg,
             self._zero,
         )
-        return u, v, w, pos.tilt, pos.azimuth
+        return u, v, w, pos.tilt_deg, pos.azimuth_deg
 
     async def _write_all(
         self, u: float, v: float, w: float, tilt: float, azimuth: float
@@ -149,31 +153,43 @@ class ToolPointMotion(StandardReadable, Movable):
             self.smp_ref().x.set(end.x),
             self.smp_ref().y.set(end.y),
             self.smp_ref().z.set(end.z),
-            self.smp_ref().tilt.set(end.tilt),
-            self.smp_ref().azimuth.set(end.azimuth),
+            self.smp_ref().tilt.set(end.tilt_deg),
+            self.smp_ref().azimuth.set(end.azimuth_deg),
         )
 
     def _create_uvws(self) -> tuple[SignalRW[float], SignalRW[float], SignalRW[float]]:
-        def read_u(x: float, y: float, z: float, tilt: float, azimuth: float) -> float:
-            return float(xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[0])
+        def read_u(
+            x: float, y: float, z: float, tilt_deg: float, azimuth_deg: float
+        ) -> float:
+            return float(
+                xyz_to_toolpoint(x, y, z, tilt_deg, azimuth_deg, self._zero)[0]
+            )
 
         async def set_u(value: float) -> None:
-            u, v, w, tilt, azimuth = await self._read_all()
-            await self._write_all(value, v, w, tilt, azimuth)
+            u, v, w, tilt_deg, azimuth_deg = await self._read_all()
+            await self._write_all(value, v, w, tilt_deg, azimuth_deg)
 
-        def read_v(x: float, y: float, z: float, tilt: float, azimuth: float) -> float:
-            return float(xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[1])
+        def read_v(
+            x: float, y: float, z: float, tilt_deg: float, azimuth_deg: float
+        ) -> float:
+            return float(
+                xyz_to_toolpoint(x, y, z, tilt_deg, azimuth_deg, self._zero)[1]
+            )
 
         async def set_v(value: float) -> None:
-            u, v, w, tilt, azimuth = await self._read_all()
-            await self._write_all(u, value, w, tilt, azimuth)
+            u, v, w, tilt_deg, azimuth_deg = await self._read_all()
+            await self._write_all(u, value, w, tilt_deg, azimuth_deg)
 
-        def read_w(x: float, y: float, z: float, tilt: float, azimuth: float) -> float:
-            return float(xyz_to_toolpoint(x, y, z, tilt, azimuth, self._zero)[2])
+        def read_w(
+            x: float, y: float, z: float, tilt_deg: float, azimuth_deg: float
+        ) -> float:
+            return float(
+                xyz_to_toolpoint(x, y, z, tilt_deg, azimuth_deg, self._zero)[2]
+            )
 
         async def set_w(value: float) -> None:
-            u, v, w, tilt, azimuth = await self._read_all()
-            await self._write_all(u, v, value, tilt, azimuth)
+            u, v, w, tilt_deg, azimuth_deg = await self._read_all()
+            await self._write_all(u, v, value, tilt_deg, azimuth_deg)
 
         u = derived_signal_rw(
             read_u,
@@ -181,8 +197,8 @@ class ToolPointMotion(StandardReadable, Movable):
             x=self.smp_ref().x,
             y=self.smp_ref().y,
             z=self.smp_ref().z,
-            tilt=self.smp_ref().tilt,
-            azimuth=self.smp_ref().azimuth,
+            tilt_deg=self.smp_ref().tilt,
+            azimuth_deg=self.smp_ref().azimuth,
         )
         v = derived_signal_rw(
             read_v,
@@ -190,8 +206,8 @@ class ToolPointMotion(StandardReadable, Movable):
             x=self.smp_ref().x,
             y=self.smp_ref().y,
             z=self.smp_ref().z,
-            tilt=self.smp_ref().tilt,
-            azimuth=self.smp_ref().azimuth,
+            tilt_deg=self.smp_ref().tilt,
+            azimuth_deg=self.smp_ref().azimuth,
         )
         w = derived_signal_rw(
             read_w,
@@ -199,11 +215,13 @@ class ToolPointMotion(StandardReadable, Movable):
             x=self.smp_ref().x,
             y=self.smp_ref().y,
             z=self.smp_ref().z,
-            tilt=self.smp_ref().tilt,
-            azimuth=self.smp_ref().azimuth,
+            tilt_deg=self.smp_ref().tilt,
+            azimuth_deg=self.smp_ref().azimuth,
         )
         return u, v, w
 
     @AsyncStatus.wrap
     async def set(self, value: ToolPointMotorPositions):
-        await self._write_all(value.x, value.y, value.z, value.tilt, value.azimuth)
+        await self._write_all(
+            value.x, value.y, value.z, value.tilt_deg, value.azimuth_deg
+        )

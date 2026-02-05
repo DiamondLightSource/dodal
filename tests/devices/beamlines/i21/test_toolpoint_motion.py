@@ -26,6 +26,42 @@ def uvw(smp: XYZAzimuthTiltPolarParallelPerpendicularStage) -> ToolPointMotion:
     return uvw
 
 
+def expected_u_read(
+    pos: ToolPointMotorPositions, zero: tuple[float, float, float]
+) -> float:
+    dx, dz = pos.x - zero[0], pos.z - zero[2]
+    expected_u = dx * cos(radians(pos.tilt_deg)) - dz * sin(radians(pos.tilt_deg))
+    return expected_u
+
+
+def expected_v_read(
+    pos: ToolPointMotorPositions, zero: tuple[float, float, float]
+) -> float:
+    dx, dy, dz = pos.x - zero[0], pos.y - zero[1], pos.z - zero[2]
+    azimuth = radians(pos.azimuth_deg)
+    tilt = radians(pos.tilt_deg)
+    expected_v = (
+        dx * sin(tilt) * sin(azimuth)
+        + dy * cos(azimuth)
+        + dz * cos(tilt) * sin(azimuth)
+    )
+    return expected_v
+
+
+def expected_w_read(
+    pos: ToolPointMotorPositions, zero: tuple[float, float, float]
+) -> float:
+    dx, dy, dz = pos.x - zero[0], pos.y - zero[1], pos.z - zero[2]
+    azimuth = radians(pos.azimuth_deg)
+    tilt = radians(pos.tilt_deg)
+    expected_w = (
+        dx * cos(azimuth) * sin(tilt)
+        - dy * sin(azimuth)
+        + dz * cos(tilt) * cos(azimuth)
+    )
+    return expected_w
+
+
 async def test_uvw_read(uvw: ToolPointMotion) -> None:
     x, y, z = 5, 10, 15
     dx, dy, dz = x - uvw._zero[0], y - uvw._zero[1], z - uvw._zero[2]
@@ -68,6 +104,7 @@ async def test_uvw_read(uvw: ToolPointMotion) -> None:
 async def test_uvw_u_set(uvw: ToolPointMotion) -> None:
     x, y, z = 5, 10, 15
     azimuth_deg, tilt_deg = 10, 30
+    # azimuth, tilt = radians(azimuth_deg), radians(tilt_deg)
 
     smp = uvw.smp_ref()
     await asyncio.gather(
@@ -83,7 +120,25 @@ async def test_uvw_u_set(uvw: ToolPointMotion) -> None:
     expected_v = read[1]
     expected_w = read[2]
 
+    # expected_x = (
+    #     x
+    #     + u_value * cos(tilt)
+    #     + expected_v * sin(tilt) * sin(azimuth)
+    #     + expected_w * cos(azimuth) * sin(tilt)
+    # )
+    # expected_y = y + expected_v * cos(azimuth) - expected_w * sin(azimuth)
+    # expected_z = (
+    #     z
+    #     - u_value * sin(tilt)
+    #     + expected_v * cos(tilt) * sin(azimuth)
+    #     + expected_w * cos(tilt) * cos(azimuth)
+    # )
+
     await uvw.u.set(u_value)
+    # assert await smp.x.user_readback.get_value() == expected_x
+    # assert await smp.y.user_readback.get_value() == expected_y
+    # assert await smp.z.user_readback.get_value() == expected_z
+
     await assert_reading(
         uvw,
         {
@@ -156,7 +211,7 @@ async def test_uvw_w_set(uvw: ToolPointMotion) -> None:
 
 
 async def test_uvw_set(uvw: ToolPointMotion) -> None:
-    pos = ToolPointMotorPositions(x=10, y=20, z=30, tilt=40, azimuth=50)
+    pos = ToolPointMotorPositions(x=10, y=20, z=30, tilt_deg=40, azimuth_deg=50)
     await uvw.set(pos)
 
     await assert_reading(
@@ -169,5 +224,5 @@ async def test_uvw_set(uvw: ToolPointMotion) -> None:
         full_match=False,
     )
 
-    assert await uvw.smp_ref().azimuth.user_readback.get_value() == pos.azimuth
-    assert await uvw.smp_ref().tilt.user_readback.get_value() == pos.tilt
+    assert await uvw.smp_ref().azimuth.user_readback.get_value() == pos.azimuth_deg
+    assert await uvw.smp_ref().tilt.user_readback.get_value() == pos.tilt_deg
