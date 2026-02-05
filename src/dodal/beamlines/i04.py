@@ -11,23 +11,24 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
+from dodal.devices.beamlines.i03.dcm import DCM
+from dodal.devices.beamlines.i04.beam_centre import CentreEllipseMethod
+from dodal.devices.beamlines.i04.beamsize import Beamsize
+from dodal.devices.beamlines.i04.constants import RedisConstants
+from dodal.devices.beamlines.i04.max_pixel import MaxPixel
+from dodal.devices.beamlines.i04.murko_results import MurkoResultsDevice
+from dodal.devices.beamlines.i04.transfocator import Transfocator
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
-from dodal.devices.i03.dcm import DCM
-from dodal.devices.i04.beam_centre import CentreEllipseMethod
-from dodal.devices.i04.beamsize import Beamsize
-from dodal.devices.i04.constants import RedisConstants
-from dodal.devices.i04.max_pixel import MaxPixel
-from dodal.devices.i04.murko_results import MurkoResultsDevice
-from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
 from dodal.devices.oav.oav_detector import (
     OAVBeamCentrePV,
+    ZoomControllerWithBeamCentres,
 )
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
@@ -66,7 +67,6 @@ I04_ZEBRA_MAPPING = ZebraMapping(
     outputs=(ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
     sources=ZebraSources(),
 )
-
 PREFIX = BeamlinePrefix(BL)
 
 devices = DeviceManager()
@@ -305,3 +305,11 @@ def beam_centre() -> CentreEllipseMethod:
     return CentreEllipseMethod(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
     )
+
+
+@devices.factory()
+def zoom_controller() -> ZoomControllerWithBeamCentres:
+    """Get the i04 zoom controller, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return ZoomControllerWithBeamCentres(f"{PREFIX.beamline_prefix}-EA-OAV-01:FZOOM:")
