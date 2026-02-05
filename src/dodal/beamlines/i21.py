@@ -4,10 +4,10 @@ from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i21 import Grating
-from dodal.devices.beamlines.i21.i21_motors import (
-    I21XYZAzimuthTiltPolarStage,
+from dodal.devices.beamlines.i21 import (
+    Grating,
     ToolPointMotion,
+    XYZAzimuthTiltPolarParallelPerpendicularStage,
 )
 from dodal.devices.insertion_device import (
     Apple2,
@@ -136,10 +136,12 @@ def sample_temperature_controller() -> Lakeshore336:
 
 
 @devices.factory()
-def smp() -> I21XYZAzimuthTiltPolarStage:
-    return I21XYZAzimuthTiltPolarStage(prefix=f"{PREFIX.beamline_prefix}-EA-SMPL-01:")
+def smp() -> XYZAzimuthTiltPolarParallelPerpendicularStage:
+    return XYZAzimuthTiltPolarParallelPerpendicularStage(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SMPL-01:"
+    )
 
 
 @devices.factory()
-def uvw(smp: I21XYZAzimuthTiltPolarStage) -> ToolPointMotion:
+def uvw(smp: XYZAzimuthTiltPolarParallelPerpendicularStage) -> ToolPointMotion:
     return ToolPointMotion(smp)
