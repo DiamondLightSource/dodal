@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines &#8212; dodal 1.69.1.dev38+g111ce25e3 documentation</title>
+    <title>dodal.beamlines &#8212; dodal 2.0.1.dev1+gfbc62313b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=41755329"></script>
+    <script src="../../_static/documentation_options.js?v=459a5be4"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -814,7 +814,7 @@ window.addEventListener("load", load);
 
 <span class="c1"># Where beamline names (per the ${BEAMLINE} environment variable don&#39;t always</span>
 <span class="c1"># match up, we have to map between them bidirectionally). The most common use case is</span>
-<span class="c1"># beamlines with a &quot;-&quot;&quot; in the name such as &quot;i20-1&quot;, which is not valid in a Python</span>
+<span class="c1"># beamlines with a &quot;-&quot;&quot; in the name such as &quot;i19-1&quot;, which is not valid in a Python</span>
 <span class="c1"># module name. Add any new beamlines whose name differs from their module name to this</span>
 <span class="c1"># dictionary, which maps ${BEAMLINE} to dodal.beamlines.&lt;MODULE NAME&gt;</span>
 <span class="n">_BEAMLINE_NAME_OVERRIDES</span> <span class="o">=</span> <span class="p">{</span>
@@ -824,7 +824,6 @@ window.addEventListener("load", load);
     <span class="s2">&quot;i13-1&quot;</span><span class="p">:</span> <span class="s2">&quot;i13_1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;i15-1&quot;</span><span class="p">:</span> <span class="s2">&quot;i15_1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;i10-1&quot;</span><span class="p">:</span> <span class="s2">&quot;i10_1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;i20-1&quot;</span><span class="p">:</span> <span class="s2">&quot;i20_1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;i19-1&quot;</span><span class="p">:</span> <span class="s2">&quot;i19_1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;i19-2&quot;</span><span class="p">:</span> <span class="s2">&quot;i19_2&quot;</span><span class="p">,</span>
     <span class="s2">&quot;i19-optics&quot;</span><span class="p">:</span> <span class="s2">&quot;i19_optics&quot;</span><span class="p">,</span>
@@ -897,7 +896,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../reference/generated/dodal.beamlines.html#dodal.beamlines.module_name_for_beamline">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">module_name_for_beamline</span><span class="p">(</span><span class="n">beamline</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the module name for a particular beamline, it may differ from the beamline</span>
-<span class="sd">    name e.g. i20-1 -&gt; i20_1.</span>
+<span class="sd">    name e.g. i19-1 -&gt; i19_1.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        beamline (str): The beamline name as per the ${BEAMLINE} environment variable.</span>

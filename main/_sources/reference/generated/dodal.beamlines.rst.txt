@@ -47,7 +47,6 @@
    dodal.beamlines.i19_1
    dodal.beamlines.i19_2
    dodal.beamlines.i19_optics
-   dodal.beamlines.i20_1
    dodal.beamlines.i21
    dodal.beamlines.i22
    dodal.beamlines.i23
@@ -56,6 +55,7 @@
    dodal.beamlines.k11
    dodal.beamlines.p38
    dodal.beamlines.p45
+   dodal.beamlines.p51
    dodal.beamlines.p60
    dodal.beamlines.p99
    dodal.beamlines.training_rig
