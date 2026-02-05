@@ -224,10 +224,10 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
 
     get_mock(device).assert_has_calls(
         [
-            call.reset.put(None, wait=True),
-            call.next_puck.put(ANY, wait=True),
-            call.next_pin.put(ANY, wait=True),
-            call.load.put(None, wait=True),
+            call.reset.put(None),
+            call.next_puck.put(ANY),
+            call.next_pin.put(ANY),
+            call.load.put(None),
         ]
     )
 

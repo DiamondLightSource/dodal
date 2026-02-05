@@ -127,7 +127,7 @@ async def test_controller_prepare_sets_excitation_energy(
     await analyser_controller.prepare(TriggerInfo())
     get_mock_put(
         analyser_controller.driver.cached_excitation_energy
-    ).assert_awaited_once_with(excitation_energy, wait=True)
+    ).assert_awaited_once_with(excitation_energy)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -157,7 +157,7 @@ async def test_controller_setup_with_region_sets_region_for_epics_and_sets_drive
         source_selector = analyser_controller.source_selector
         if source_selector is not None:
             get_mock_put(source_selector.selected_source).assert_called_once_with(
-                region.excitation_energy_source, wait=True
+                region.excitation_energy_source
             )
         # Check set was called with epics_region
         epics_region = mock_prepare_for_epics.call_args[0][0].prepare_for_epics(
@@ -178,7 +178,7 @@ async def test_controller_setup_with_region_moves_selected_source_if_not_none(
     if source_selector is not None:
         await analyser_controller.setup_with_region(region)
         get_mock_put(source_selector.selected_source).assert_awaited_once_with(
-            region.excitation_energy_source, wait=True
+            region.excitation_energy_source
         )
 
 
@@ -193,7 +193,7 @@ async def test_controller_setup_with_region_moves_shutter_if_not_none(
     if shutter is not None:
         await analyser_controller.setup_with_region(region)
         get_mock_put(shutter.shutter_state).assert_awaited_once_with(
-            shutter.close_state, wait=True
+            shutter.close_state
         )
 
 
@@ -205,6 +205,4 @@ async def test_controller_prepare_moves_shutters_if_not_none(
     shutter = analyser_controller.shutter
     if shutter is not None:
         await analyser_controller.prepare(TriggerInfo())
-        get_mock_put(shutter.shutter_state).assert_awaited_once_with(
-            shutter.open_state, wait=True
-        )
+        get_mock_put(shutter.shutter_state).assert_awaited_once_with(shutter.open_state)

@@ -53,7 +53,7 @@ def _assert_patched_ap_sg_has_call(
         position.values,
         strict=False,
     ):
-        get_mock_put(motor.user_setpoint).assert_called_with(pos, wait=True)
+        get_mock_put(motor.user_setpoint).assert_called_with(pos)
 
 
 def _assert_position_in_reading(
@@ -80,11 +80,11 @@ async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_u
 
     parent_mock.assert_has_calls(
         [
-            call.scatterguard.x.user_setpoint.put(5.3375, wait=True),
-            call.scatterguard.y.user_setpoint.put(-3.55, wait=True),
-            call.aperture.x.user_setpoint.put(2.43, wait=True),
-            call.aperture.y.user_setpoint.put(48.974, wait=True),
-            call.aperture.z.user_setpoint.put(15.8, wait=True),
+            call.scatterguard.x.user_setpoint.put(5.3375),
+            call.scatterguard.y.user_setpoint.put(-3.55),
+            call.aperture.x.user_setpoint.put(2.43),
+            call.aperture.y.user_setpoint.put(48.974),
+            call.aperture.z.user_setpoint.put(15.8),
         ]
     )
 
@@ -510,9 +510,7 @@ async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_
 
     await ap_sg.selected_aperture.set(selected_aperture)
 
-    assert parent_mock.method_calls[0] == call.selected_aperture.put(
-        selected_aperture, wait=True
-    )
+    assert parent_mock.method_calls[0] == call.selected_aperture.put(selected_aperture)
     assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
         aperture_positions[selected_aperture].aperture_z, wait=True
     )

@@ -188,7 +188,7 @@ async def test_dcm_offset_only_set_when_energy_set_completes(
     offset_put.assert_not_called()
     release_undulator.set()
     await asyncio.wait_for(status, timeout=1)
-    offset_put.assert_called_with(25.6, wait=True)
+    offset_put.assert_called_with(25.6)
 
 
 async def test_energy_set_only_complete_when_all_statuses_are_finished(

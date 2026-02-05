@@ -191,7 +191,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
     get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
-        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+        str(fly_info.ramp_up_start_pos(0.5))
     )
 
     assert await mock_id_gap.velocity.get_value() == 10
@@ -283,7 +283,7 @@ async def test_phase_success_set(
 
     callback_on_mock_put(mock_phase_axes.set_move, lambda *_, **__: set_complete_move())
     run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
-    get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1, wait=True)
+    get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1)
     get_mock_put(mock_phase_axes.top_inner.user_setpoint).assert_called_once_with(
         str(set_value.top_inner), wait=True
     )

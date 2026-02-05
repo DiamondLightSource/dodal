@@ -94,9 +94,9 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop(
 
     run_engine(bps.abs_set(beamstop.selected_pos, demanded_pos, wait=True))
 
-    assert get_mock_put(x_mock).call_args_list == [call(expected_coords[0], wait=True)]
-    assert get_mock_put(y_mock).call_args_list == [call(expected_coords[1], wait=True)]
-    assert get_mock_put(z_mock).call_args_list == [call(expected_coords[2], wait=True)]
+    assert get_mock_put(x_mock).call_args_list == [call(expected_coords[0])]
+    assert get_mock_put(y_mock).call_args_list == [call(expected_coords[1])]
+    assert get_mock_put(z_mock).call_args_list == [call(expected_coords[2])]
 
     assert parent_mock.method_calls[0] == call.beamstop_z(30.0, wait=True)
 

@@ -40,19 +40,19 @@ async def test_pmac_motor_move(fake_pmac: PMAC, run_engine: RunEngine):
 
 
 async def test_pmac_set_pmac_string(fake_pmac: PMAC, run_engine: RunEngine):
-    run_engine(bps.abs_set(fake_pmac.pmac_string, "M712=0 M711=1", wait=True))
+    run_engine(bps.abs_set(fake_pmac.pmac_string, "M712=0 M711=1"))
 
     assert await fake_pmac.pmac_string.get_value() == "M712=0 M711=1"
 
 
 async def test_pmac_pmac_to_zero(fake_pmac: PMAC, run_engine: RunEngine):
-    run_engine(bps.trigger(fake_pmac.to_xyz_zero, wait=True))
+    run_engine(bps.trigger(fake_pmac.to_xyz_zero))
 
     assert await fake_pmac.pmac_string.get_value() == "&2!x0y0z0"
 
 
 async def test_pmac_home(fake_pmac: PMAC, run_engine: RunEngine):
-    run_engine(bps.trigger(fake_pmac.home, wait=True))
+    run_engine(bps.trigger(fake_pmac.home))
 
     assert await fake_pmac.pmac_string.get_value() == f"{CS_STR}{HOME_STR}"
 
@@ -64,7 +64,7 @@ async def test_set_pmac_string_for_laser(fake_pmac: PMAC, run_engine: RunEngine)
 
 
 async def test_set_pmac_string_for_enc_reset(fake_pmac: PMAC, run_engine: RunEngine):
-    run_engine(bps.abs_set(fake_pmac.enc_reset, EncReset.ENC7, wait=True))
+    run_engine(bps.abs_set(fake_pmac.enc_reset, EncReset.ENC7))
 
     assert await fake_pmac.pmac_string.get_value() == "m708=100 m709=150"
 
@@ -138,12 +138,12 @@ async def test_counter_refresh_timeout(fake_pmac: PMAC):
 @patch("dodal.devices.beamlines.i24.pmac.sleep")
 async def test_abort_program(mock_sleep, fake_pmac: PMAC, run_engine: RunEngine):
     set_mock_value(fake_pmac.scanstatus, 0)
-    run_engine(bps.trigger(fake_pmac.abort_program, wait=True))
+    run_engine(bps.trigger(fake_pmac.abort_program))
 
     mock_pmac_string = get_mock_put(fake_pmac.pmac_string)
     mock_pmac_string.assert_has_calls(
         [
-            call("A", wait=True),
-            call("P2401=0", wait=True),
+            call("A"),
+            call("P2401=0"),
         ]
     )

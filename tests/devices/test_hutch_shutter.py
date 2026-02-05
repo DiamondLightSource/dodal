@@ -80,7 +80,7 @@ async def test_shutter_operations(
 
     call_list = []
     for i in expected_calls:
-        call_list.append(call(i, wait=True))
+        call_list.append(call(i))
     mock_shutter_control = get_mock_put(fake_shutter.control)
     mock_shutter_control.assert_has_calls(call_list)
 
