@@ -104,7 +104,7 @@ class ToolPointMotion(StandardReadable, Movable):
         )
         return ToolPointMotorPositions(x, y, z, tilt, azimuth)
 
-    async def _check_motor_limits(
+    async def check_motor_limits(
         self, start: ToolPointMotorPositions, end: ToolPointMotorPositions
     ) -> None:
         await asyncio.gather(
@@ -147,7 +147,7 @@ class ToolPointMotion(StandardReadable, Movable):
         start = await self._read_motor_positions()
         end = self._toolpoint_to_motor_positions(u, v, w, tilt, azimuth)
 
-        await self._check_motor_limits(start, end)
+        await self.check_motor_limits(start, end)
 
         await asyncio.gather(
             self.smp_ref().x.set(end.x),
