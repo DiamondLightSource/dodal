@@ -1,7 +1,7 @@
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
@@ -17,6 +17,7 @@ PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 
+devices = DeviceManager()
 """
 Define device factory functions below this point.
 A device factory function is any function that has a return type which conforms
@@ -24,7 +25,7 @@ to one or more Bluesky Protocols.
 """
 
 
-@device_factory()
+@devices.factory()
 def att_y() -> NumberedTripleAxisStage:
     return NumberedTripleAxisStage(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
@@ -34,64 +35,64 @@ def att_y() -> NumberedTripleAxisStage:
     )
 
 
-@device_factory()
+@devices.factory()
 def base_y() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-01:Y")
 
 
-@device_factory()
+@devices.factory()
 def blower_y() -> Motor:
     """Same motor as blowerZ."""
     return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
 
 
-@device_factory()
+@devices.factory()
 def blower_z() -> Motor:
     """Same motor as blowerY."""
     return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
 
 
-@device_factory()
+@devices.factory()
 def bs2() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-SMAR-02:")
 
 
-@device_factory()
+@devices.factory()
 def clean() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-ABSB-01:CLEAN:")
 
 
-@device_factory()
+@devices.factory()
 def det2() -> YZStage:
     return YZStage(f"{PREFIX.beamline_prefix}-EA-DET-02:")
 
 
-@device_factory()
+@devices.factory()
 def env_x() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X")
 
 
-@device_factory()
+@devices.factory()
 def f2y() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-OP-ATTN-02:Y")
 
 
-@device_factory()
+@devices.factory()
 def m1() -> MultiLayerMirror:
     return MultiLayerMirror(f"{PREFIX.beamline_prefix}-OP-MIRR-01:")
 
 
-@device_factory()
+@devices.factory()
 def rail() -> Rail:
     return Rail(f"{PREFIX.beamline_prefix}-MO-RAIL-01:")
 
 
-@device_factory(skip=True)
+@devices.factory(skip=True)
 def sam() -> XYPhiStage:
     return XYPhiStage(f"{PREFIX.beamline_prefix}-MO-TABLE-01:SAMPLE:", phi_infix="PHI2")
 
 
-@device_factory()
+@devices.factory()
 def slits_1() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
@@ -100,7 +101,7 @@ def slits_1() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def slits_2() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
@@ -109,7 +110,7 @@ def slits_2() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def slits_3() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
@@ -118,7 +119,7 @@ def slits_3() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def slits_4() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
@@ -127,7 +128,7 @@ def slits_4() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def slits_5() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
@@ -136,21 +137,21 @@ def slits_5() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def tth() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-01:TTH")
 
 
-@device_factory()
+@devices.factory()
 def trans() -> XYPhiStage:
     return XYPhiStage(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01:TRANS:")
 
 
-@device_factory()
+@devices.factory()
 def xtal() -> LaueMonochrometer:
     return LaueMonochrometer(prefix=f"{PREFIX.beamline_prefix}-OP-LAUE-01:")
