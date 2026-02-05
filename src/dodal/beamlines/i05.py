@@ -1,8 +1,8 @@
 from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i05.enums import M4M5Mirror
 from dodal.devices.common_mirror import XYZSwitchingMirror
-from dodal.devices.i05.enums import M4M5Mirror
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
