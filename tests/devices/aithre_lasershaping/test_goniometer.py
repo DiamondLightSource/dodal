@@ -10,7 +10,7 @@ from dodal.devices.aithre_lasershaping.goniometer import Goniometer
 @pytest.fixture
 def goniometer() -> Goniometer:
     with init_devices(mock=True):
-        gonio = aithre.goniometer(connect_immediately=True, mock=True)
+        gonio = aithre.goniometer.build(connect_immediately=True, mock=True)
     return gonio
 
 
