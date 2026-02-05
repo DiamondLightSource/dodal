@@ -1,6 +1,6 @@
 from functools import cache
 
-from ophyd_async.core import PathProvider
+from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
@@ -342,10 +342,14 @@ def fluorescence_det_motion() -> FluorescenceDetector:
 
 
 @devices.factory()
-def scintillator() -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, beamstop: Beamstop
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         get_beamline_parameters(),
+        Reference(aperture_scatterguard),
+        Reference(beamstop),
     )
 
 

@@ -68,36 +68,6 @@ class Scintillator(StandardReadable):
 
         super().__init__(name)
 
-    def move_scintillator_safely(
-        self,
-        position: InOut,
-    ) -> MsgGenerator:
-        """Bluesky plan to move the scintillator which moves the aperture-scatterguard out of the way
-        for the duration of the move and then restores it.
-
-        Args:
-            aperture_scatterguard (ApertureScatterguard):
-                The aperture-scatterguard device which will be moved
-            beamstop (Beamstop):
-                The beamstop device which will be checked for potential collisions
-            position (InOut):
-                The scintillator position to move to
-        """
-        current_pos = yield from bps.rd(self.selected_pos)
-        if current_pos == position:
-            return
-
-        def _move_to_new_position():
-            yield from bps.abs_set(self.selected_pos, position, wait=True)
-
-        match position:
-            case InOut.OUT | InOut.IN:
-                yield from do_with_aperture_scatterguard_in_scin_move_position(
-                    self._aperture_scatterguard(), _move_to_new_position
-                )
-            case _:
-                raise ValueError(f"Cannot set scintillator to position {position}")
-
     def _check_position(self, current_pos: list[float], pos_to_check: list[float]):
         return all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
@@ -158,3 +128,33 @@ class Scintillator(StandardReadable):
                 raise ValueError(
                     f"Scintillator cannot be moved due to beamstop position {position}, must be in either in DATA_COLLECTION or OUT_OF_BEAM position."
                 )
+
+
+def move_scintillator_safely(
+    scintillator: Scintillator,
+    position: InOut,
+) -> MsgGenerator:
+    """Bluesky plan to move the scintillator which moves the aperture-scatterguard out of the way
+    for the duration of the move and then restores it.
+
+    Args:
+        scintillator (Scintillator):
+            The scintillator to move
+        position (InOut):
+            The scintillator position to move to
+    """
+    current_pos = yield from bps.rd(scintillator.selected_pos)
+    if current_pos == position:
+        return
+
+    def _move_to_new_position():
+        yield from bps.abs_set(scintillator.selected_pos, position, wait=True)
+
+    match position:
+        case InOut.OUT | InOut.IN:
+            yield from do_with_aperture_scatterguard_in_scin_move_position(
+                scintillator._aperture_scatterguard(),  # noqa: SLF001
+                _move_to_new_position,
+            )
+        case _:
+            raise ValueError(f"Cannot set scintillator to position {position}")

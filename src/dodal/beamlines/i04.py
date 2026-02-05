@@ -1,3 +1,5 @@
+from ophyd_async.core import Reference
+
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -275,10 +277,14 @@ def pin_tip_detection() -> PinTipDetection:
 
 
 @devices.factory()
-def scintillator() -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, beamstop: Beamstop
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         get_beamline_parameters(),
+        Reference(aperture_scatterguard),
+        Reference(beamstop),
     )
 
 
