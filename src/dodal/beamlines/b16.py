@@ -11,7 +11,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.b16.detector import (
+from dodal.devices.beamlines.b16.detector import (
     software_triggered_tiff_area_detector,
 )
 from dodal.devices.motors import XYZStage

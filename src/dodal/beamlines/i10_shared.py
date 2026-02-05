@@ -11,20 +11,20 @@ from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
-from dodal.devices.i10 import (
+from dodal.devices.beamlines.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
     I10SharedSlitsDrainCurrent,
 )
-from dodal.devices.i10.i10_apple2 import (
+from dodal.devices.beamlines.i10.i10_apple2 import (
     I10Apple2,
     I10Apple2Controller,
     LinearArbitraryAngle,
 )
 
 # Imports taken from i10 while we work out how to deal with split end stations
-from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.beamlines.i10.i10_setting_data import I10Grating
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,

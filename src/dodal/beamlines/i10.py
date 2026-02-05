@@ -1,22 +1,22 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
-from dodal.devices.current_amplifiers import CurrentAmpDet
-from dodal.devices.i10 import (
+from dodal.devices.beamlines.i10 import (
     I10Diagnostic,
     I10Diagnostic5ADet,
     I10Slits,
     I10SlitsDrainCurrent,
 )
-from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
-from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
-from dodal.devices.i10.rasor.rasor_motors import (
+from dodal.devices.beamlines.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
+from dodal.devices.beamlines.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
+from dodal.devices.beamlines.i10.rasor.rasor_motors import (
     DetSlits,
     Diffractometer,
     PaStage,
 )
-from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
+from dodal.devices.beamlines.i10.rasor.rasor_scaler_cards import RasorScalerCard1
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
+from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.motors import XYStage, XYZStage
 from dodal.devices.temperture_controller import (
     Lakeshore340,

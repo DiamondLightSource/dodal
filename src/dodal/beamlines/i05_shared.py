@@ -1,6 +1,6 @@
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i05.enums import Grating, M3MJ6Mirror
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
-from dodal.devices.i05.enums import Grating, M3MJ6Mirror
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,

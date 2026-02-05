@@ -27,7 +27,13 @@ For example, only use `XYStage` for two perpendicular motors (e.g. X and Y axes 
 - Only a device that represents a group of motors with a physical relationship, should be defined in `motor`.
 - If your class define an `XYStage` but you need extra signals or behaviour, extend the `XYStage` class outside the `motor` module.
 
-**Only if no suitable class exists**, create a new device that connects to the required signals. During review, refactor to align with existing devices if needed, using inheritance or composition to deduplicate code.  
+**Only if no suitable class exists**, create a new device that connects to the required signals. During review, refactor to align with existing devices if needed, using inheritance or composition to deduplicate code.
+
+Devices that are generic and reusable across multiple beamlines should be defined under `dodal.devices`. For example, `dodal.devices.motors.XYStage` is generic enough that most beamlines can use it directly or inherit from it.
+
+Devices that are specific to a single beamline should be placed under `dodal.devices.beamlines.iXX`. For instance, a detector that is only used on that beamline and is too specialized to be reused elsewhere belongs here.
+
+If a beamline has multiple endstations and a device is shared between them, it should be defined under `dodal.devices.beamlines.iXX_shared`.
 
 Writing a device class
 ======================
@@ -36,7 +42,7 @@ To develop a new device, get an initial, working version of your code into the m
 
 - **Follow the [ophyd-async device implementation guide](https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html)** to structure your device code.
 - **Choose the right base class** by consulting the [base class guide](https://blueskyproject.io/ophyd-async/main/how-to/choose-right-baseclass.html), If your device needs to move, you'll need to extend the Movable protocol. For detailed guidance on when and how to do this, refer to the [movable device guide](https://blueskyproject.io/ophyd-async/main/explanations/when-to-extend-movable.html). 
-- **Add static metadata (if any) to the device class** using a [soft signal](https://blueskyproject.io/ophyd-async/main/_api/ophyd_async/ophyd_async.core.html#ophyd_async.core.soft_signal_rw) or existing device epics record. For example this could be a manufacturer or brand name of the device. Another example is crystal metadata in [i22 DCM](https://diamondlightsource.github.io/dodal/main/reference/generated/dodal.devices.i22.dcm.DCM.html#dodal.devices.i22.dcm.DCM) In some cases it might be beneficial to ask controls team to create an additional epics field containing metadata for such device. 
+- **Add static metadata (if any) to the device class** using a [soft signal](https://blueskyproject.io/ophyd-async/main/_api/ophyd_async/ophyd_async.core.html#ophyd_async.core.soft_signal_rw) or existing device epics record. For example this could be a manufacturer or brand name of the device. Another example is crystal metadata in [i22 DCM](https://diamondlightsource.github.io/dodal/main/reference/generated/dodal.devices.beamlines.i22.dcm.DCM.html#dodal.devices.beamlines.i22.dcm.DCM) In some cases it might be beneficial to ask controls team to create an additional epics field containing metadata for such device. 
 - **Write thorough unit tests** for all expected use cases. Reference the [ophyd-async device test guide](https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html) for best practices.
 - **Validate your device on the beamline** and keep notes of any issues for later fixes.
 - **Make use of type annotations** so that pyright will validate that you are passing around values that ophyd-async will accept.

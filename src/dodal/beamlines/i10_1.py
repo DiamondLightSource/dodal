@@ -1,14 +1,14 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
-from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
-from dodal.devices.i10 import I10JDiagnostic, I10JSlits
-from dodal.devices.i10_1 import (
+from dodal.devices.beamlines.i10 import I10JDiagnostic, I10JSlits
+from dodal.devices.beamlines.i10_1 import (
     ElectromagnetMagnetField,
     ElectromagnetStage,
     I10JScalerCard,
 )
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
+from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
