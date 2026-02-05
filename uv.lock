@@ -769,7 +769,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.14.0" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.15.0" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -2079,7 +2079,7 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.14.2"
+version = "0.15"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bluesky" },
@@ -2093,9 +2093,9 @@ dependencies = [
     { name = "stamina" },
     { name = "velocity-profile" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f4/41/33d7e597e4cea13b1d5a4bf95406daa0157a061707aa385ae081525e2432/ophyd_async-0.14.2.tar.gz", hash = "sha256:800bf6cdafd6318de3cd51c47791a924b9189aff2ced057b0443e67576fa455f", size = 527311, upload-time = "2025-12-19T11:23:19.554Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/28/b2/96a078a2d3166d68b28f2fa8bbc3a3de6542e8b697b07a6cea3f81ff1e04/ophyd_async-0.15.tar.gz", hash = "sha256:a7ece326d8d961c4337664905bda351e2e02558932cc905cc57f94509d7f01b0", size = 534343, upload-time = "2026-02-03T15:17:32.089Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/31/79/4348eeb2450739b45881315944b0fc7c52fc94859c83cbe31802e16eb37b/ophyd_async-0.14.2-py3-none-any.whl", hash = "sha256:c6dada008e7829a39dd485b45177d91717f05ff6c6b2066a2ff505ffc40285a3", size = 205449, upload-time = "2025-12-19T11:23:18.494Z" },
+    { url = "https://files.pythonhosted.org/packages/83/07/f92719d58628c41a234a2c4b9974ada666786cf113715fb78fd6df6e32d6/ophyd_async-0.15-py3-none-any.whl", hash = "sha256:aa0b8f386341dcd537c53c06245896949797b7387bcdba6fc553bcea9fc26e45", size = 208418, upload-time = "2026-02-03T15:17:30.825Z" },
 ]
 
 [package.optional-dependencies]
