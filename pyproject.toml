@@ -28,7 +28,7 @@ dependencies = [
     "aiohttp",
     "redis",
     "scanspec>=0.7.3",
-    "pyzmq==26.3.0",                # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "pyzmq==26.4.0",                # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
     "deepdiff",
     "daq-config-server>=v1.0.0",    # For getting Configuration settings.
 ]
