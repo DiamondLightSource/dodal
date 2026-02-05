@@ -26,17 +26,9 @@ def uvw(smp: XYZAzimuthTiltPolarParallelPerpendicularStage) -> ToolPointMotion:
     return uvw
 
 
-def expected_u_read(
+def expected_uvw_read(
     pos: ToolPointMotorPositions, zero: tuple[float, float, float]
-) -> float:
-    dx, dz = pos.x - zero[0], pos.z - zero[2]
-    expected_u = dx * cos(radians(pos.tilt_deg)) - dz * sin(radians(pos.tilt_deg))
-    return expected_u
-
-
-def expected_v_read(
-    pos: ToolPointMotorPositions, zero: tuple[float, float, float]
-) -> float:
+) -> tuple[float, float, float]:
     dx, dy, dz = pos.x - zero[0], pos.y - zero[1], pos.z - zero[2]
     azimuth = radians(pos.azimuth_deg)
     tilt = radians(pos.tilt_deg)
@@ -45,40 +37,27 @@ def expected_v_read(
         + dy * cos(azimuth)
         + dz * cos(tilt) * sin(azimuth)
     )
-    return expected_v
-
-
-def expected_w_read(
-    pos: ToolPointMotorPositions, zero: tuple[float, float, float]
-) -> float:
-    dx, dy, dz = pos.x - zero[0], pos.y - zero[1], pos.z - zero[2]
-    azimuth = radians(pos.azimuth_deg)
-    tilt = radians(pos.tilt_deg)
+    expected_v = (
+        dx * sin(tilt) * sin(azimuth)
+        + dy * cos(azimuth)
+        + dz * cos(tilt) * sin(azimuth)
+    )
     expected_w = (
         dx * cos(azimuth) * sin(tilt)
         - dy * sin(azimuth)
         + dz * cos(tilt) * cos(azimuth)
     )
-    return expected_w
+    return expected_v, expected_v, expected_w
 
 
 async def test_uvw_read(uvw: ToolPointMotion) -> None:
     x, y, z = 5, 10, 15
-    dx, dy, dz = x - uvw._zero[0], y - uvw._zero[1], z - uvw._zero[2]
     azimuth_deg, tilt_deg = 10, 30
-    azimuth, tilt = radians(azimuth_deg), radians(tilt_deg)
 
-    expected_u = dx * cos(tilt) - dz * sin(tilt)
-    expected_v = (
-        dx * sin(tilt) * sin(azimuth)
-        + dy * cos(azimuth)
-        + dz * cos(tilt) * sin(azimuth)
+    pos = ToolPointMotorPositions(
+        x=x, y=y, z=z, azimuth_deg=azimuth_deg, tilt_deg=tilt_deg
     )
-    expected_w = (
-        dx * cos(azimuth) * sin(tilt)
-        - dy * sin(azimuth)
-        + dz * cos(tilt) * cos(azimuth)
-    )
+    expected_u, expected_v, expected_w = expected_uvw_read(pos, uvw._zero)
 
     smp = uvw.smp_ref()
     await asyncio.gather(
@@ -119,7 +98,6 @@ async def test_uvw_u_set(uvw: ToolPointMotion) -> None:
     u_value = 50
     expected_v = read[1]
     expected_w = read[2]
-
     # expected_x = (
     #     x
     #     + u_value * cos(tilt)
