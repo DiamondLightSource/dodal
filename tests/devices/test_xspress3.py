@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import ANY, Mock
+from unittest.mock import Mock
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -56,7 +56,7 @@ async def test_stage_in_run_engine_success_in_busy_state(
     run_engine(bps.stage(mock_xspress3mini, wait=True))
 
     get_mock_put(mock_xspress3mini.trigger_mode).assert_called_once_with(
-        TriggerMode.BURST, wait=ANY
+        TriggerMode.BURST
     )
     await asyncio.sleep(0.2)
     assert 2 == get_mock_put(mock_xspress3mini.acquire).call_count

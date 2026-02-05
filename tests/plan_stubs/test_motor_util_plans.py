@@ -190,13 +190,9 @@ async def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_hom
         )
     )
 
-    get_mock_put(my_device.x.user_setpoint).assert_has_calls(
-        [call(0, wait=ANY), call(initial_x, wait=ANY)]
-    )
+    get_mock_put(my_device.x.user_setpoint).assert_has_calls([call(0), call(initial_x)])
 
-    get_mock_put(my_device.y.user_setpoint).assert_has_calls(
-        [call(0, wait=ANY), call(initial_y, wait=ANY)]
-    )
+    get_mock_put(my_device.y.user_setpoint).assert_has_calls([call(0), call(initial_y)])
 
 
 @pytest.mark.parametrize(
@@ -336,9 +332,9 @@ async def test_given_move_to_home_fails_reset_still(
     assert isinstance(e.value.__cause__, MyError)
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY), call(initial_x, wait=ANY)]
+        [call(0.0), call(initial_x)]
     )
 
     get_mock_put(my_device.y.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY), call(initial_y, wait=ANY)]
+        [call(0.0), call(initial_y)]
     )

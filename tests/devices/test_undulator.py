@@ -178,16 +178,12 @@ async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disab
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)
 
-    get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
-        15.0, wait=True
-    )
+    get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(15.0)
 
 
 async def test_undulator_mm_move(undulator_in_mm: UndulatorInMm):
     await undulator_in_mm.set(10.0)
-    get_mock_put(undulator_in_mm.gap_motor.user_setpoint).assert_called_once_with(
-        10.0, wait=True
-    )
+    get_mock_put(undulator_in_mm.gap_motor.user_setpoint).assert_called_once_with(10.0)
 
 
 async def test_order_read(
