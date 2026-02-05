@@ -43,53 +43,25 @@ async def test_analyser_sets_region_correctly(
     run_engine(bps.mv(sim_driver, region), wait=True)
 
     # Need to add energy_mode
-    get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
-    get_mock_put(sim_driver.energy_mode).assert_called_once_with(
-        region.energy_mode, wait=True
-    )
+    get_mock_put(sim_driver.region_name).assert_called_once_with(region.name)
+    get_mock_put(sim_driver.energy_mode).assert_called_once_with(region.energy_mode)
     get_mock_put(sim_driver.acquisition_mode).assert_called_once_with(
-        region.acquisition_mode, wait=True
+        region.acquisition_mode
     )
-    get_mock_put(sim_driver.lens_mode).assert_called_once_with(
-        region.lens_mode, wait=True
-    )
-    get_mock_put(sim_driver.low_energy).assert_called_once_with(
-        region.low_energy, wait=True
-    )
-    get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-        region.centre_energy, wait=True
-    )
-    get_mock_put(sim_driver.high_energy).assert_called_once_with(
-        region.high_energy, wait=True
-    )
-    get_mock_put(sim_driver.pass_energy).assert_called_once_with(
-        region.pass_energy, wait=True
-    )
-    get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
-    get_mock_put(sim_driver.acquire_time).assert_called_once_with(
-        region.acquire_time, wait=True
-    )
-    get_mock_put(sim_driver.iterations).assert_called_once_with(
-        region.iterations, wait=True
-    )
-    get_mock_put(sim_driver.detector_mode).assert_called_once_with(
-        region.detector_mode, wait=True
-    )
-    get_mock_put(sim_driver.energy_step).assert_called_once_with(
-        region.energy_step, wait=True
-    )
-    get_mock_put(sim_driver.region_min_x).assert_called_once_with(
-        region.min_x, wait=True
-    )
-    get_mock_put(sim_driver.region_size_x).assert_called_once_with(
-        region.size_x, wait=True
-    )
-    get_mock_put(sim_driver.region_min_y).assert_called_once_with(
-        region.min_y, wait=True
-    )
-    get_mock_put(sim_driver.region_size_y).assert_called_once_with(
-        region.size_y, wait=True
-    )
+    get_mock_put(sim_driver.lens_mode).assert_called_once_with(region.lens_mode)
+    get_mock_put(sim_driver.low_energy).assert_called_once_with(region.low_energy)
+    get_mock_put(sim_driver.centre_energy).assert_called_once_with(region.centre_energy)
+    get_mock_put(sim_driver.high_energy).assert_called_once_with(region.high_energy)
+    get_mock_put(sim_driver.pass_energy).assert_called_once_with(region.pass_energy)
+    get_mock_put(sim_driver.slices).assert_called_once_with(region.slices)
+    get_mock_put(sim_driver.acquire_time).assert_called_once_with(region.acquire_time)
+    get_mock_put(sim_driver.iterations).assert_called_once_with(region.iterations)
+    get_mock_put(sim_driver.detector_mode).assert_called_once_with(region.detector_mode)
+    get_mock_put(sim_driver.energy_step).assert_called_once_with(region.energy_step)
+    get_mock_put(sim_driver.region_min_x).assert_called_once_with(region.min_x)
+    get_mock_put(sim_driver.region_size_x).assert_called_once_with(region.size_x)
+    get_mock_put(sim_driver.region_min_y).assert_called_once_with(region.min_y)
+    get_mock_put(sim_driver.region_size_y).assert_called_once_with(region.size_y)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

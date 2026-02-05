@@ -98,7 +98,7 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop(
     assert get_mock_put(y_mock).call_args_list == [call(expected_coords[1])]
     assert get_mock_put(z_mock).call_args_list == [call(expected_coords[2])]
 
-    assert parent_mock.method_calls[0] == call.beamstop_z(30.0, wait=True)
+    assert parent_mock.method_calls[0] == call.beamstop_z(30.0)
 
 
 async def test_set_beamstop_position_to_unknown_raises_error(
@@ -126,9 +126,9 @@ async def test_beamstop_select_pos_moves_z_axis_first(
     parent = get_mock(beamstop)
     parent.assert_has_calls(
         [
-            call.selected_pos.put(BeamstopPositions.DATA_COLLECTION, wait=True),
-            call.z_mm.user_setpoint.put(30.0, wait=True),
-            call.x_mm.user_setpoint.put(1.52, wait=True),
-            call.y_mm.user_setpoint.put(44.78, wait=True),
+            call.selected_pos.put(BeamstopPositions.DATA_COLLECTION),
+            call.z_mm.user_setpoint.put(30.0),
+            call.x_mm.user_setpoint.put(1.52),
+            call.y_mm.user_setpoint.put(44.78),
         ]
     )

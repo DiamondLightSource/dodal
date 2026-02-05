@@ -512,7 +512,7 @@ async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_
 
     assert parent_mock.method_calls[0] == call.selected_aperture.put(selected_aperture)
     assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
-        aperture_positions[selected_aperture].aperture_z, wait=True
+        aperture_positions[selected_aperture].aperture_z
     )
 
 
@@ -539,11 +539,9 @@ async def test_given_parked_and_ap_sg_prepared_when_move_in_then_z_moved_out_fir
 
     await ap_sg.prepare(selected_aperture)
 
-    assert parent_mock.method_calls[0] == call.selected_aperture.put(
-        selected_aperture, wait=True
-    )
+    assert parent_mock.method_calls[0] == call.selected_aperture.put(selected_aperture)
     assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
-        aperture_positions[selected_aperture].aperture_z, wait=True
+        aperture_positions[selected_aperture].aperture_z
     )
 
 
