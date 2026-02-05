@@ -1,0 +1,40 @@
+dodal.devices.beamlines.p45.SampleY
+===================================
+
+.. currentmodule:: dodal.devices.beamlines.p45
+
+.. autoclass:: SampleY
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

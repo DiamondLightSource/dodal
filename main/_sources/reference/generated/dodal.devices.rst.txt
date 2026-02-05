@@ -42,7 +42,6 @@
    dodal.devices.motors
    dodal.devices.mx_phase1
    dodal.devices.oav
-   dodal.devices.p45
    dodal.devices.pgm
    dodal.devices.positioner
    dodal.devices.pressure_jump_cell

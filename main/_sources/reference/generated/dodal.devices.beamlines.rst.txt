@@ -35,6 +35,7 @@ dodal.devices.beamlines
    dodal.devices.beamlines.i21
    dodal.devices.beamlines.i22
    dodal.devices.beamlines.i24
+   dodal.devices.beamlines.p45
    dodal.devices.beamlines.p60
    dodal.devices.beamlines.p99
 
