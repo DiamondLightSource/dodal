@@ -7,6 +7,7 @@ from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i21 import (
     ToolPointMotion,
+    ToolPointMotorPositions,
     XYZAzimuthTiltPolarParallelPerpendicularStage,
 )
 
@@ -52,13 +53,15 @@ async def test_uvw_read(uvw: ToolPointMotion) -> None:
         smp.tilt.set(tilt_deg),
     )
 
+    smp_read = await smp.read()
     await assert_reading(
         uvw,
         {
             uvw.u.name: partial_reading(expected_u),
             uvw.v.name: partial_reading(expected_v),
             uvw.w.name: partial_reading(expected_w),
-        },
+        }
+        | smp_read,
     )
 
 
@@ -75,12 +78,12 @@ async def test_uvw_u_set(uvw: ToolPointMotion) -> None:
         smp.tilt.set(tilt_deg),
     )
 
-    u_value = 50
     read = await uvw._read_all()
+    u_value = 50
     expected_v = read[1]
     expected_w = read[2]
 
-    await uvw.u.set(50)
+    await uvw.u.set(u_value)
     await assert_reading(
         uvw,
         {
@@ -88,6 +91,7 @@ async def test_uvw_u_set(uvw: ToolPointMotion) -> None:
             uvw.v.name: partial_reading(expected_v),
             uvw.w.name: partial_reading(expected_w),
         },
+        full_match=False,
     )
 
 
@@ -109,7 +113,7 @@ async def test_uvw_v_set(uvw: ToolPointMotion) -> None:
     v_value = 50
     expected_w = read[2]
 
-    await uvw.v.set(50)
+    await uvw.v.set(v_value)
     await assert_reading(
         uvw,
         {
@@ -117,6 +121,7 @@ async def test_uvw_v_set(uvw: ToolPointMotion) -> None:
             uvw.v.name: partial_reading(v_value),
             uvw.w.name: partial_reading(expected_w),
         },
+        full_match=False,
     )
 
 
@@ -138,7 +143,7 @@ async def test_uvw_w_set(uvw: ToolPointMotion) -> None:
     expected_v = read[1]
     w_value = 50
 
-    await uvw.w.set(50)
+    await uvw.w.set(w_value)
     await assert_reading(
         uvw,
         {
@@ -146,4 +151,23 @@ async def test_uvw_w_set(uvw: ToolPointMotion) -> None:
             uvw.v.name: partial_reading(expected_v),
             uvw.w.name: partial_reading(w_value),
         },
+        full_match=False,
     )
+
+
+async def test_uvw_set(uvw: ToolPointMotion) -> None:
+    pos = ToolPointMotorPositions(x=10, y=20, z=30, tilt=40, azimuth=50)
+    await uvw.set(pos)
+
+    await assert_reading(
+        uvw,
+        {
+            uvw.u.name: partial_reading(pos.x),
+            uvw.v.name: partial_reading(pos.y),
+            uvw.w.name: partial_reading(pos.z),
+        },
+        full_match=False,
+    )
+
+    assert await uvw.smp_ref().azimuth.user_readback.get_value() == pos.azimuth
+    assert await uvw.smp_ref().tilt.user_readback.get_value() == pos.tilt

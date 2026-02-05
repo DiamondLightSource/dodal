@@ -62,7 +62,7 @@ def xyz_to_toolpoint(
 
 
 @dataclass(frozen=True)
-class MotorPositions:
+class ToolPointMotorPositions:
     x: float
     y: float
     z: float
@@ -88,9 +88,11 @@ class ToolPointMotion(StandardReadable, Movable):
         with self.add_children_as_readables():
             self.u, self.v, self.w = self._create_uvws()
 
+        self.add_readables([smp])
+
         super().__init__(name=name)
 
-    async def _read_motor_positions(self) -> MotorPositions:
+    async def _read_motor_positions(self) -> ToolPointMotorPositions:
         x, y, z, tilt, azimuth = await asyncio.gather(
             self.smp_ref().x.user_readback.get_value(),
             self.smp_ref().y.user_readback.get_value(),
@@ -98,10 +100,10 @@ class ToolPointMotion(StandardReadable, Movable):
             self.smp_ref().tilt.user_readback.get_value(),
             self.smp_ref().azimuth.user_readback.get_value(),
         )
-        return MotorPositions(x, y, z, tilt, azimuth)
+        return ToolPointMotorPositions(x, y, z, tilt, azimuth)
 
     async def _check_motor_limits(
-        self, start: MotorPositions, end: MotorPositions
+        self, start: ToolPointMotorPositions, end: ToolPointMotorPositions
     ) -> None:
         await asyncio.gather(
             self.smp_ref().x.check_motor_limit(start.x, end.x),
@@ -113,9 +115,9 @@ class ToolPointMotion(StandardReadable, Movable):
 
     def _toolpoint_to_motor_positions(
         self, u: float, v: float, w: float, tilt: float, azimuth: float
-    ) -> MotorPositions:
+    ) -> ToolPointMotorPositions:
         x, y, z = toolpoint_to_xyz(u, v, w, tilt, azimuth, self._zero)
-        return MotorPositions(
+        return ToolPointMotorPositions(
             x=x,
             y=y,
             z=z,
@@ -203,5 +205,5 @@ class ToolPointMotion(StandardReadable, Movable):
         return u, v, w
 
     @AsyncStatus.wrap
-    async def set(self, value: MotorPositions):
+    async def set(self, value: ToolPointMotorPositions):
         await self._write_all(value.x, value.y, value.z, value.tilt, value.azimuth)
