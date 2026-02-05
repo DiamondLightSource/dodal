@@ -71,4 +71,4 @@ class ChannelCutMonochromator(
 
     @AsyncStatus.wrap
     async def set(self, value: ChannelCutMonochromatorPositions) -> None:
-        await self.crystal.set(value, wait=True)
+        await self.crystal.set(value)

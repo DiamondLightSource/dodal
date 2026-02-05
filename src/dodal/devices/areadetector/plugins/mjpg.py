@@ -68,7 +68,7 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
         await asyncio_save_image(image, path)
 
-        await self.last_saved_path.set(path, wait=True)
+        await self.last_saved_path.set(path)
 
     @AsyncStatus.wrap
     async def trigger(self):

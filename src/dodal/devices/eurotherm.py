@@ -91,7 +91,7 @@ class EurothermGeneral(StandardReadable, Locatable[float], Generic[P]):
     @AsyncStatus.wrap
     async def set(self, value: float):
         """Set the blower to a specific temperature."""
-        await self.setpoint.set(value, wait=True)
+        await self.setpoint.set(value)
 
     async def locate(self) -> Location[float]:
         setpoint = await self.setpoint.get_value()

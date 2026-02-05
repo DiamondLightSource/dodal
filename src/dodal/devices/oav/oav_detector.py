@@ -58,7 +58,7 @@ class NullZoomController(BaseZoomController):
         if value != "1.0x":
             raise Exception("Attempting to set zoom level of a null zoom controller")
         else:
-            await self.level.set(value, wait=True)
+            await self.level.set(value)
 
 
 class BeamCentreForZoom(StandardReadable):
@@ -114,7 +114,7 @@ class ZoomController(BaseZoomController):
 
     @AsyncStatus.wrap
     async def set(self, value: str):
-        await self.level.set(value, wait=True)
+        await self.level.set(value)
         LOGGER.info(
             f"Waiting {self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
         )
