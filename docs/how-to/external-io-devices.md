@@ -14,7 +14,7 @@ It's not recommended to read from the filesystem going forward and instead devel
 
 ## Extant examples
 
-- [aperturescatterguard](../../src/dodal/devices/aperturescatterguard.py) - reads a set of valid positions from a file.
+- [aperturescatterguard](../../src/dodal/devices/mx_phase1/aperturescatterguard.py) - reads a set of valid positions from a file.
 - [oav_to_redis_forwarder](../../src/dodal/devices/oav/oav_to_redis_forwarder.py) - pushes data into redis
 - [OAV_detector](../../src/dodal/devices/oav/oav_detector.py) - detector configuration is based on a file on disk
 

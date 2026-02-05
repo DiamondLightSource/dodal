@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 from collections.abc import Callable
-from math import inf
+from math import inf, isclose
 
 import bluesky.plan_stubs as bps
 from bluesky.preprocessors import contingency_wrapper
@@ -110,6 +110,7 @@ class ApertureValue(StrictEnum):
     LARGE = "LARGE_APERTURE"
     OUT_OF_BEAM = "Out of beam"
     PARKED = "Parked"  # Parked under the collimation table for manual load
+    SCIN_MOVE = "Scintillator Move"  # Transient position that is not defined by a single location
 
     def __str__(self):
         return self.name.capitalize()
@@ -208,6 +209,8 @@ class ApertureScatterguard(StandardReadable, Preparable):
                 large=self.aperture.large,
                 medium=self.aperture.medium,
                 small=self.aperture.small,
+                current_sg_x=self.scatterguard.x.user_readback,
+                current_ap_x=self.aperture.x.user_readback,
                 current_ap_y=self.aperture.y.user_readback,
                 current_ap_z=self.aperture.z.user_readback,
             )
@@ -243,12 +246,32 @@ class ApertureScatterguard(StandardReadable, Preparable):
             raise NotImplementedError(
                 "Currently not able to park aperture/scatterguard, see https://github.com/DiamondLightSource/mx-bluesky/issues/1197"
             )
+        if value == ApertureValue.SCIN_MOVE:
+            raise NotImplementedError(
+                "The SCIN_MOVE position cannot be set directly - use move_scintillator_safely plan instead."
+            )
 
         position = self._config.aperture_positions[value]
 
+        current_sg_x = await self.scatterguard.x.user_readback.get_value()
+        current_ap_x = await self.aperture.x.user_readback.get_value()
         current_ap_y = await self.aperture.y.user_readback.get_value()
         current_ap_z = await self.aperture.z.user_readback.get_value()
-        if self._is_in_position(ApertureValue.PARKED, current_ap_y, current_ap_z):
+        if self._is_in_position(
+            ApertureValue.SCIN_MOVE,
+            current_sg_x,
+            current_ap_x,
+            current_ap_y,
+            current_ap_z,
+        ):
+            raise NotImplementedError(
+                "Cannot move aperture-scatterguard while in SCIN_MOVE position, please ensure scintillator "
+                "move is complete and restore the aperture-scatterguard position."
+            )
+
+        if self._is_in_position(
+            ApertureValue.PARKED, current_sg_x, current_ap_x, current_ap_y, current_ap_z
+        ):
             await self._unpark(value)
 
         await self._check_safe_to_move(position.aperture_z)
@@ -293,8 +316,24 @@ class ApertureScatterguard(StandardReadable, Preparable):
         return self._config.aperture_positions[current_aperture].diameter
 
     def _is_in_position(
-        self, position: ApertureValue, current_ap_y: float, current_ap_z: float
+        self,
+        position: ApertureValue,
+        current_sg_x: float,
+        current_ap_x: float,
+        current_ap_y: float,
+        current_ap_z: float,
     ) -> bool:
+        if position == ApertureValue.SCIN_MOVE:
+            return isclose(
+                self._config.scintillator_move_aperture_x,
+                current_ap_x,
+                abs_tol=self._tolerances.aperture_x,
+            ) and isclose(
+                self._config.scintillator_move_scatterguard_x,
+                current_sg_x,
+                abs_tol=self._tolerances.scatterguard_x,
+            )
+
         position_y = self._config.aperture_positions[position].aperture_y
         position_z = self._config.aperture_positions[position].aperture_z
         y_matches = abs(current_ap_y - position_y) <= self._tolerances.aperture_y
@@ -306,19 +345,35 @@ class ApertureScatterguard(StandardReadable, Preparable):
         large: float,
         medium: float,
         small: float,
+        current_sg_x: float,
+        current_ap_x: float,
         current_ap_y: float,
         current_ap_z: float,
     ) -> ApertureValue:
+        if self._is_in_position(
+            ApertureValue.SCIN_MOVE,
+            current_sg_x,
+            current_ap_x,
+            current_ap_y,
+            current_ap_z,
+        ):
+            return ApertureValue.SCIN_MOVE
         if large == 1:
             return ApertureValue.LARGE
         elif medium == 1:
             return ApertureValue.MEDIUM
         elif small == 1:
             return ApertureValue.SMALL
-        elif self._is_in_position(ApertureValue.PARKED, current_ap_y, current_ap_z):
+        elif self._is_in_position(
+            ApertureValue.PARKED, current_sg_x, current_ap_x, current_ap_y, current_ap_z
+        ):
             return ApertureValue.PARKED
         elif self._is_in_position(
-            ApertureValue.OUT_OF_BEAM, current_ap_y, current_ap_z
+            ApertureValue.OUT_OF_BEAM,
+            current_sg_x,
+            current_ap_x,
+            current_ap_y,
+            current_ap_z,
         ):
             return ApertureValue.OUT_OF_BEAM
 
@@ -384,9 +439,13 @@ class ApertureScatterguard(StandardReadable, Preparable):
         Moving the assembly whilst out of the beam has no collision risk so we can just
         move all the motors together.
         """
+        current_x = await self.aperture.x.user_readback.get_value()
+        current_sg_x = await self.scatterguard.x.user_readback.get_value()
         current_y = await self.aperture.y.user_readback.get_value()
         current_z = await self.aperture.z.user_readback.get_value()
-        if self._is_in_position(ApertureValue.OUT_OF_BEAM, current_y, current_z):
+        if self._is_in_position(
+            ApertureValue.OUT_OF_BEAM, current_sg_x, current_x, current_y, current_z
+        ):
             aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
                 self._config.aperture_positions[value].values
             )

@@ -662,3 +662,66 @@ def test_do_with_aperture_scatterguard_in_scin_move_position_does_not_restore_on
     get_mock_put(ap_sg.scatterguard.x.user_setpoint).assert_called_once_with(
         -4.75, wait=True
     )
+
+
+async def test_set_scin_move_position_raises_not_implemented(
+    aperture_in_medium_pos: ApertureScatterguard,
+):
+    aperture_scatterguard = aperture_in_medium_pos
+    with pytest.raises(
+        NotImplementedError, match="The SCIN_MOVE position cannot be set directly"
+    ):
+        await aperture_scatterguard.selected_aperture.set(ApertureValue.SCIN_MOVE)
+
+
+@pytest.mark.parametrize(
+    "ap_x_offset, sg_x_offset, expected_value",
+    [
+        [-0.0041, 0, ApertureValue.MEDIUM],
+        [-0.0039, 0, ApertureValue.SCIN_MOVE],
+        [0.0041, 0, ApertureValue.MEDIUM],
+        [0, -0.09, ApertureValue.SCIN_MOVE],
+        [0, 0.09, ApertureValue.SCIN_MOVE],
+        [0, 0.11, ApertureValue.MEDIUM],
+        [0, -0.11, ApertureValue.MEDIUM],
+    ],
+)
+async def test_get_selected_position_returns_scin_move(
+    ap_x_offset: float,
+    sg_x_offset: float,
+    expected_value: ApertureValue | None,
+    aperture_in_medium_pos: ApertureScatterguard,
+    ap_sg_configuration: ApertureScatterguardConfiguration,
+):
+    aperture_scatterguard = aperture_in_medium_pos
+    set_mock_value(
+        aperture_scatterguard.aperture.x.user_readback,
+        ap_sg_configuration.scintillator_move_aperture_x + ap_x_offset,
+    )
+
+    set_mock_value(
+        aperture_scatterguard.scatterguard.x.user_readback,
+        ap_sg_configuration.scintillator_move_scatterguard_x + sg_x_offset,
+    )
+
+    assert await aperture_scatterguard.selected_aperture.get_value() == expected_value
+
+
+async def test_set_selected_position_raises_not_implemented_if_currently_in_scin_move_position(
+    aperture_in_medium_pos: ApertureScatterguard,
+    ap_sg_configuration: ApertureScatterguardConfiguration,
+):
+    aperture_scatterguard = aperture_in_medium_pos
+    set_mock_value(
+        aperture_scatterguard.aperture.x.user_readback,
+        ap_sg_configuration.scintillator_move_aperture_x,
+    )
+    set_mock_value(
+        aperture_scatterguard.scatterguard.x.user_readback,
+        ap_sg_configuration.scintillator_move_scatterguard_x,
+    )
+    with pytest.raises(
+        NotImplementedError,
+        match="Cannot move aperture-scatterguard while in SCIN_MOVE position",
+    ):
+        await aperture_scatterguard.selected_aperture.set(ApertureValue.SMALL)
