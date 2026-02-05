@@ -16,8 +16,8 @@ from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-BL = get_beamline_name("i20-1")
-PREFIX = BeamlinePrefix(BL, suffix="J")
+BL = get_beamline_name("p51")
+PREFIX = BeamlinePrefix(BL, suffix="P")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -30,7 +30,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/i20-1/data/2023/cm33897-5/bluesky"),
+        Path("/dls/p51/data/2026/cm44254-1/tmp"),
         client=RemoteDirectoryServiceClient("http://i20-1-control:8088/api"),
     )
 )
@@ -38,7 +38,7 @@ set_path_provider(
 """
 NOTE: Due to the CA gateway machine being switched off, PVs are not available remotely
 and you need to be on the beamline network to access them.
-The simplest way to do this is to `ssh i20-1-ws001` and run dodal connect i20_1 from
+The simplest way to do this is to `ssh i20-1-ws001` and run dodal connect p51 from
 there.
 """
 
