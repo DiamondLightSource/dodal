@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import bluesky.plan_stubs as bps
@@ -14,7 +14,7 @@ from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
 
 
-class SlitDimension(str, Enum):
+class SlitDimension(StrEnum):
     """Enum representing the dimensions of a 2d slit.
 
     Used to describe which dimension the pencil beam scan should move across.

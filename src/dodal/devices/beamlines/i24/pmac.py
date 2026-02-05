@@ -1,5 +1,5 @@
 from asyncio import sleep
-from enum import Enum, IntEnum
+from enum import IntEnum, StrEnum
 
 from bluesky.protocols import Flyable, Movable, Triggerable
 from ophyd_async.core import (
@@ -27,7 +27,7 @@ class ScanState(IntEnum):
     DONE = 0
 
 
-class LaserSettings(str, Enum):
+class LaserSettings(StrEnum):
     """PMAC strings to switch laser on and off.
     Note. On the PMAC, M-variables usually have to do with position compare
     set up.
@@ -42,7 +42,7 @@ class LaserSettings(str, Enum):
     LASER_2_OFF = " M812=0 M811=1"
 
 
-class EncReset(str, Enum):
+class EncReset(StrEnum):
     """PMAC strings for position compare on encoder channels in the controller.
 
     For example, for ENC5::
