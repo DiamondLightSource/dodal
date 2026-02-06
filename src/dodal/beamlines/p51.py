@@ -10,7 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.turbo_slit import TurboSlit
 from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
@@ -27,13 +27,16 @@ set_utils_beamline(BL)
 # Communication with GDA is also WIP so for now we determine an arbitrary scan number
 # locally and write the commissioning directory. The scan number is not guaranteed to
 # be unique and the data is at risk - this configuration is for testing only.
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/dls/p51/data/2026/cm44254-1/tmp"),
-        client=RemoteDirectoryServiceClient("http://i20-1-control:8088/api"),
+try:
+    get_path_provider()
+except NameError:
+    set_path_provider(
+        StaticVisitPathProvider(
+            BL,
+            Path("/dls/p51/data/2026/cm44254-1/tmp"),
+            client=LocalDirectoryServiceClient(),
+        )
     )
-)
 
 """
 NOTE: Due to the CA gateway machine being switched off, PVs are not available remotely
