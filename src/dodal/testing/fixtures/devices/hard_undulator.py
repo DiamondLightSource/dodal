@@ -4,7 +4,7 @@ import pytest
 from daq_config_server.client import ConfigServer
 from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 
-from dodal.devices.i09_1_shared.hard_undulator_functions import (
+from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
     I09_HU_UNDULATOR_LUT_COLUMN_NAMES,
 )
 

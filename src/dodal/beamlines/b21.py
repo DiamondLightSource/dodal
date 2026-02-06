@@ -12,8 +12,8 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.devices.beamlines.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.focusing_mirror import SimpleMirror
-from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYStage
 from dodal.devices.slits import Slits
@@ -106,9 +106,8 @@ def slits_3() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-"""
-Slits 4 was removed from B21 after the camera length was fixed, it is not used anymore.
-"""
+"""Slits 4 was removed from B21 after the camera length was fixed, it is not used
+anymore."""
 
 
 @device_factory()
@@ -123,8 +122,7 @@ def slits_6() -> Slits:
 
 @device_factory()
 def slits_7() -> Slits:
-    """
-    Compact JJ slits device is used for B21 slits 7. PV's operate in same way
+    """Compact JJ slits device is used for B21 slits 7. PV's operate in same way
     but physically different to other slits, and uses X:GAP nomenclature.
     """
     return Slits(

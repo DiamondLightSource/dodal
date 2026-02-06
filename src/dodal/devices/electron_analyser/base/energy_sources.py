@@ -14,9 +14,8 @@ from dodal.devices.selectable_source import SelectedSource, get_obj_from_selecte
 
 
 class AbstractEnergySource(StandardReadable):
-    """
-    Abstract device that wraps an energy source signal and provides common interface via
-    a energy signal.
+    """Abstract device that wraps an energy source signal and provides common interface
+    via a energy signal.
     """
 
     def __init__(self, name: str = "") -> None:
@@ -25,14 +24,11 @@ class AbstractEnergySource(StandardReadable):
     @property
     @abstractmethod
     def energy(self) -> SignalR[float]:
-        """
-        Signal to provide the excitation energy value in eV.
-        """
+        """Signal to provide the excitation energy value in eV."""
 
 
 class EnergySource(AbstractEnergySource):
-    """
-    Wraps a signal that relates to energy and provides common interface via energy
+    """Wraps a signal that relates to energy and provides common interface via energy
     signal. It provides the name of the wrapped signal as a child signal in the
     read_configuration via wrapped_device_name and adds the signal as a readable.
     """
@@ -59,11 +55,17 @@ def get_float_from_selected_source(
 
 
 class DualEnergySource(AbstractEnergySource):
-    """
-    Holds two EnergySource devices and provides a signal to read energy depending on
+    """Holds two EnergySource devices and provides a signal to read energy depending on
     which source is selected. The energy is the one that corrosponds to the
     selected_source signal. For example, selected_source is source1 if selected_source
-    is at SelectedSource.SOURCE1 and vise versa for source2 and SelectedSource.SOURCE2.
+    is at SelectedSource.SOURCE1 and vise versa for source2 and
+    SelectedSource.SOURCE2.
+
+    Args:
+        source1 (SignalR): Energy source that corrosponds to SelectedSource.SOURCE1.
+        source2 (SignalR): Energy source that corrosponds to SelectedSource.SOURCE2.
+        selected_source (SignalRW): Signal that decides the active energy source.
+        name (str, optional): Name of this device.
     """
 
     def __init__(
@@ -73,14 +75,6 @@ class DualEnergySource(AbstractEnergySource):
         selected_source: SignalRW[SelectedSource],
         name: str = "",
     ):
-        """
-        Args:
-            source1: Energy source that corrosponds to SelectedSource.SOURCE1.
-            source2: Energy source that corrosponds to SelectedSource.SOURCE2.
-            selected_source: Signal that decides the active energy source.
-            name: Name of this device.
-        """
-
         self.selected_source_ref = Reference(selected_source)
         with self.add_children_as_readables():
             self.source1 = EnergySource(source1)
