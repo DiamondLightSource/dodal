@@ -1,12 +1,14 @@
 import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
+from enum import StrEnum
 from functools import partial
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceMock,
+    SignalX,
     StandardReadable,
     StrictEnum,
     callback_on_mock_put,
@@ -29,6 +31,11 @@ class SampleLocation:
     position: int
 
 
+class ProgramNames(StrEnum):
+    PUCK = "PUCK.MB6"
+    BEAM = "PUCK.MB6"
+
+
 class ProgramRunning(StrictEnum):
     NO_PROGRAM_RUNNING = "No Program Running"
     PROGRAM_RUNNING = "Program Running"
@@ -44,11 +51,15 @@ class CurrentSample(StandardReadable):
 
 class MockRobot(DeviceMock["Robot"]):
     async def connect(self, device: "Robot") -> None:
-        def set_program(name, *_, **__):
+        def set_program(name: str, *_, **__):
             set_mock_value(device.program_name, name)
 
-        callback_on_mock_put(device.puck_load_program, partial(set_program, "PUCK.MB6"))
-        callback_on_mock_put(device.beam_load_program, partial(set_program, "BEAM.MB6"))
+        callback_on_mock_put(
+            device.puck_load_program, partial(set_program, ProgramNames.PUCK.value)
+        )
+        callback_on_mock_put(
+            device.beam_load_program, partial(set_program, ProgramNames.BEAM.value)
+        )
 
         def program_running(*_, **__):
             async def _program_running():
@@ -121,6 +132,29 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
         super().__init__(name)
 
+    async def _trigger_program_and_wait_for_complete(self, trigger_signal: SignalX):
+        await trigger_signal.trigger()
+
+        await wait_for_value(
+            self.program_running,
+            ProgramRunning.PROGRAM_RUNNING,
+            timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
+        )
+        await wait_for_value(
+            self.program_running,
+            ProgramRunning.NO_PROGRAM_RUNNING,
+            timeout=self.PROGRAM_COMPLETED_TIMEOUT,
+        )
+
+    async def _load_program_and_wait_for_loaded(
+        self, trigger_signal: SignalX, program_name: ProgramNames
+    ):
+        await trigger_signal.trigger()
+
+        await wait_for_value(
+            self.program_name, program_name.value, timeout=self.PROGRAM_LOADED_TIMEOUT
+        )
+
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
         """Perform a sample load from the specified sample location.
@@ -128,10 +162,8 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         Args:
             value (SampleLocation): the sample location
         """
-        await self.puck_load_program.trigger()
-
-        await wait_for_value(
-            self.program_name, "PUCK.MB6", timeout=self.PROGRAM_LOADED_TIMEOUT
+        await self._load_program_and_wait_for_loaded(
+            self.puck_load_program, ProgramNames.PUCK
         )
 
         await asyncio.gather(
@@ -139,37 +171,13 @@ class Robot(StandardReadable, Movable[SampleLocation]):
             set_and_wait_for_value(self.pos_sel, value.position),
         )
 
-        await self.puck_pick.trigger()
+        await self._trigger_program_and_wait_for_complete(self.puck_pick)
 
-        await wait_for_value(
-            self.program_running,
-            ProgramRunning.PROGRAM_RUNNING,
-            timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
-        )
-        await wait_for_value(
-            self.program_running,
-            ProgramRunning.NO_PROGRAM_RUNNING,
-            timeout=self.PROGRAM_COMPLETED_TIMEOUT,
+        await self._load_program_and_wait_for_loaded(
+            self.beam_load_program, ProgramNames.BEAM
         )
 
-        await self.beam_load_program.trigger()
-
-        await wait_for_value(
-            self.program_name, "BEAM.MB6", timeout=self.PROGRAM_LOADED_TIMEOUT
-        )
-
-        await self.beam_place.trigger()
-
-        await wait_for_value(
-            self.program_running,
-            ProgramRunning.PROGRAM_RUNNING,
-            timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
-        )
-        await wait_for_value(
-            self.program_running,
-            ProgramRunning.NO_PROGRAM_RUNNING,
-            timeout=self.PROGRAM_COMPLETED_TIMEOUT,
-        )
+        await self._trigger_program_and_wait_for_complete(self.beam_place)
 
         await asyncio.gather(
             self.current_sample.puck.set(value.puck),
