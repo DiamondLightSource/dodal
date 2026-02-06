@@ -1,7 +1,6 @@
 from unittest.mock import ANY, call
 
 import pytest
-from dodal.devices.i15_1.robot import ProgramRunning, Robot, SampleLocation
 from ophyd_async.core import (
     callback_on_mock_put,
     get_mock,
@@ -9,6 +8,8 @@ from ophyd_async.core import (
     init_devices,
     set_mock_value,
 )
+
+from dodal.devices.beamlines.i15_1.robot import ProgramRunning, Robot, SampleLocation
 
 
 @pytest.fixture
