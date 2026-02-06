@@ -258,7 +258,7 @@ class MxSampleDetect:
         tip_y = int(round(0.5 * (top[x] + bottom[x])))
 
         # clear edges to the left (right) of the tip.
-        if self.scan_direction.value == 1:
+        if self.scan_direction == ScanDirections.FORWARD:
             top[:x] = NONE_VALUE
             bottom[:x] = NONE_VALUE
         else:
