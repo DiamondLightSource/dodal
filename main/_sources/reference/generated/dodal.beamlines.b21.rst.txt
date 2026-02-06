@@ -20,6 +20,12 @@ dodal.beamlines.b21
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      path_provider
+   
    
 
    
