@@ -1,17 +1,15 @@
+from functools import cache
 from pathlib import Path
 
+from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    get_path_provider,
-    set_path_provider,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
+from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i18.diode import Diode
 from dodal.devices.beamlines.i18.kb_mirror import KBMirror
 from dodal.devices.common_dcm import (
@@ -32,33 +30,36 @@ PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+devices = DeviceManager()
 
-# Currently we must hard-code the visit, determining the visit at runtime requires
-# infrastructure that is still WIP.
-# Communication with GDA is also WIP so for now we determine an arbitrary scan number
-# locally and write the commissioning directory. The scan number is not guaranteed to
-# be unique and the data is at risk - this configuration is for testing only.
-set_path_provider(
-    StaticVisitPathProvider(
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    # Currently we must hard-code the visit, determining the visit at runtime requires
+    # infrastructure that is still WIP.
+    # Communication with GDA is also WIP so for now we determine an arbitrary scan number
+    # locally and write the commissioning directory. The scan number is not guaranteed to
+    # be unique and the data is at risk - this configuration is for testing only.
+    return StaticVisitPathProvider(
         BL,
         Path("/dls/i18/data/2024/cm37264-2/bluesky"),
         client=LocalDirectoryServiceClient(),
     )
-)
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180
-@device_factory(skip=True)
+@devices.factory(skip=True)
 def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
     """A double crystal monocromator device, used to select the beam energy.
 
@@ -70,7 +71,7 @@ def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
     )
 
 
-@device_factory()
+@devices.factory()
 def slits_1() -> Slits:
     return Slits(
         f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
@@ -80,52 +81,52 @@ def slits_1() -> Slits:
 
 
 # PandA IOC needs to be updated to support PVI
-@device_factory(skip=True)
-def panda1() -> HDFPanda:
+@devices.factory(skip=True)
+def panda1(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )
 
 
-@device_factory()
-def i0() -> TetrammDetector:
+@devices.factory()
+def i0(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         f"{PREFIX.beamline_prefix}-DI-XBPM-02:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         type="Cividec Diamond XBPM",
     )
 
 
-@device_factory()
-def it() -> TetrammDetector:
+@devices.factory()
+def it(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         f"{PREFIX.beamline_prefix}-DI-XBPM-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )
 
 
-@device_factory(skip=True)
+@devices.factory(skip=True)
 # VFM uses different IOC than HFM https://github.com/DiamondLightSource/dodal/issues/1009
 def vfm() -> KBMirror:
     return KBMirror(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
 
 
-@device_factory()
+@devices.factory()
 def hfm() -> KBMirror:
     return KBMirror(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
 
 
-@device_factory()
+@devices.factory()
 def d7_diode() -> Diode:
     return Diode(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:")
 
 
-@device_factory()
+@devices.factory()
 def main_table() -> XYZThetaStage:
     return XYZThetaStage(f"{PREFIX.beamline_prefix}-MO-TABLE-01:")
 
 
-@device_factory()
+@devices.factory()
 def thor_labs_stage() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-TABLE-02:")
