@@ -10,7 +10,7 @@ from dodal.devices.oav.pin_image_recognition.utils import ScanDirections
 def setup_pin_tip_detection_params(
     pin_tip_detect_device: PinTipDetection,
     parameters: OAVParameters,
-    scan_direction: ScanDirections = ScanDirections.FORWARD,  # type: ignore
+    scan_direction: ScanDirections = ScanDirections.FORWARD,
     group: str = "pin_tip_parameters",
     wait: bool = True,
 ):

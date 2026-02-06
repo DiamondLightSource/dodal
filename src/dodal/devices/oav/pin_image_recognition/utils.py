@@ -1,17 +1,18 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import auto
 from typing import Final
 
 import cv2
 import numpy as np
+from ophyd_async.core import StrictEnum
 
 from dodal.log import LOGGER
 
 
-class ScanDirections(Enum):
-    FORWARD = 1
-    REVERSE = -1
+class ScanDirections(StrictEnum):
+    FORWARD = auto()
+    REVERSE = auto()
 
 
 """
