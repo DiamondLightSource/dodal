@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 2.0.1.dev9+g1d5983fee documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 2.0.1.dev10+gdaee0a733 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=079d5eb7"></script>
+    <script src="../../../../_static/documentation_options.js?v=4fef1d20"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -883,7 +883,7 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;close_ksize&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_iterations</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;close_iterations&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scan_direction</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span>
-            <span class="nb">int</span><span class="p">,</span> <span class="n">ScanDirections</span><span class="o">.</span><span class="n">FORWARD</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;scan_direction&quot;</span>
+            <span class="n">ScanDirections</span><span class="p">,</span> <span class="n">ScanDirections</span><span class="o">.</span><span class="n">FORWARD</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;scan_direction&quot;</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_tip_height</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;min_tip_height&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validity_timeout</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;validity_timeout&quot;</span><span class="p">)</span>
@@ -922,12 +922,6 @@ window.addEventListener("load", load);
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid preprocessing function, using identity&quot;</span><span class="p">)</span>
             <span class="n">preprocess_func</span> <span class="o">=</span> <span class="n">identity</span><span class="p">()</span>
 
-        <span class="n">direction</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">ScanDirections</span><span class="o">.</span><span class="n">FORWARD</span>
-            <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_direction</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>
-            <span class="k">else</span> <span class="n">ScanDirections</span><span class="o">.</span><span class="n">REVERSE</span>
-        <span class="p">)</span>
-
         <span class="n">sample_detection</span> <span class="o">=</span> <span class="n">MxSampleDetect</span><span class="p">(</span>
             <span class="n">preprocess</span><span class="o">=</span><span class="n">preprocess_func</span><span class="p">,</span>
             <span class="n">canny_lower</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">canny_lower_threshold</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
@@ -936,7 +930,7 @@ window.addEventListener("load", load);
             <span class="n">open_iterations</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_iterations</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
             <span class="n">close_ksize</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
             <span class="n">close_iterations</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_iterations</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
-            <span class="n">scan_direction</span><span class="o">=</span><span class="n">direction</span><span class="p">,</span>
+            <span class="n">scan_direction</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_direction</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
             <span class="n">min_tip_height</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_tip_height</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
         <span class="p">)</span>
 
