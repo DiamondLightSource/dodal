@@ -61,9 +61,9 @@ class Synchrotron(StandardReadable):
 
     def __init__(
         self,
-        signal_prefix=Prefix.SIGNAL,
-        status_prefix=Prefix.STATUS,
-        topup_prefix=Prefix.TOP_UP,
+        signal_prefix: str = Prefix.SIGNAL,
+        status_prefix: str = Prefix.STATUS,
+        topup_prefix: str = Prefix.TOP_UP,
         name: str = "",
     ):
         with self.add_children_as_readables():
