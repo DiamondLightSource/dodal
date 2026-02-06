@@ -1,0 +1,26 @@
+dodal.devices.beamlines.i15\_1.robot.SampleLocation
+===================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.robot
+
+.. autoclass:: SampleLocation
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SampleLocation.location
+      
+      
+      ~SampleLocation.pin
+      
+   
+   
