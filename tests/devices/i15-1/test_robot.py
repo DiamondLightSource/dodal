@@ -9,7 +9,7 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.devices.i15_1.robot import Robot, SampleLocation
+from dodal.devices.i15_1.robot import ProgramRunning, Robot, SampleLocation
 
 
 @pytest.fixture
@@ -29,7 +29,6 @@ async def test_set_moves_to_position(robot: Robot) -> None:
 
     assert await robot.puck_sel.get_value() == 1
     assert await robot.pos_sel.get_value() == 2
-    # assert await robot.program_name.get_value() == "PUCK.MB6"
 
 
 async def test_puck_program_loaded_before_position_selected(robot: Robot) -> None:
@@ -45,23 +44,40 @@ async def test_puck_program_loaded_before_position_selected(robot: Robot) -> Non
     get_mock_put(robot.puck_sel).assert_called_once_with(1, wait=True)
     get_mock_put(robot.pos_sel).assert_called_once_with(2, wait=True)
 
-    # located_position = await robot.locate()
-    # assert located_position["setpoint"] == set_location
 
-
-async def test_trigger_causes_running_logic(robot: Robot):
-    set_location = SampleLocation(location=1, pin=2)
-    await robot.set(set_location)
-
-
-async def test_given_wrong_program_gets_loaded_robot_timesout(robot: Robot):
-    def change_program_name(*args, **kwargs):
+async def test_given_wrong_program_gets_loaded_robot_times_out(robot: Robot):
+    def change_to_wrong_program(*_, **__):
         set_mock_value(robot.program_name, "BAD PROGRAM")
 
-    callback_on_mock_put(robot.puck_load_program, change_program_name)
+    callback_on_mock_put(robot.puck_load_program, change_to_wrong_program)
 
     robot.PROGRAM_LOADED_TIMEOUT = 0.01
 
-    set_location = SampleLocation(location=1, pin=2)
     with pytest.raises(TimeoutError):
-        await robot.set(set_location)
+        await robot.set(SampleLocation(location=1, pin=2))
+
+    get_mock_put(robot.puck_pick).assert_not_called()
+
+
+async def test_given_program_doesnt_start_then_robot_timesout(robot: Robot):
+    def do_nothing(*_, **__):
+        pass
+
+    callback_on_mock_put(robot.puck_pick, do_nothing)
+
+    robot.PROGRAM_STARTED_RUNNING_TIMEOUT = 0.01
+
+    with pytest.raises(TimeoutError):
+        await robot.set(SampleLocation(location=1, pin=2))
+
+
+async def test_given_program_doesnt_stop_then_robot_timesout(robot: Robot):
+    def do_nothing(*_, **__):
+        set_mock_value(robot.program_running, ProgramRunning.PROGRAM_RUNNING)
+
+    callback_on_mock_put(robot.puck_pick, do_nothing)
+
+    robot.PROGRAM_COMPLETED_TIMEOUT = 0.01
+
+    with pytest.raises(TimeoutError):
+        await robot.set(SampleLocation(location=1, pin=2))

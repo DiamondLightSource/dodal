@@ -2,10 +2,8 @@ import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
-    Array1D,
     AsyncStatus,
     DeviceMock,
     StandardReadable,
@@ -37,12 +35,12 @@ class ProgramRunning(StrictEnum):
 
 class MockRobot(DeviceMock["Robot"]):
     async def connect(self, device: "Robot") -> None:
-        def change_program_name(*args, **kwargs):
+        def change_program_name(*_, **__):
             set_mock_value(device.program_name, "PUCK.MB6")
 
         callback_on_mock_put(device.puck_load_program, change_program_name)
 
-        def wrap_program_running(*args, **kwargs):
+        def wrap_program_running(*_, **__):
             async def program_running():
                 set_mock_value(device.program_running, ProgramRunning.PROGRAM_RUNNING)
                 await asyncio.sleep(0.01)
@@ -61,15 +59,13 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
     # How long to wait for the robot
     PROGRAM_LOADED_TIMEOUT = 1.0
-    PROGRAM_RUNNING_TIMEOUT = 10
-    PROGRAM_COMPLETED_TIMEOUT = 60
+    PROGRAM_STARTED_RUNNING_TIMEOUT = 10.0
+    PROGRAM_COMPLETED_TIMEOUT = 60.0
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             # Any signals that should be read at every point in the scan
-            # PUCK_SELECT PUCK_SELECT_RBV
             self.puck_sel = epics_signal_rw_rbv(float, f"{prefix}PUCK:PUCK_SEL")
-            # POSITION_SELECT POSITION_SELECT_RBV
             self.pos_sel = epics_signal_rw_rbv(float, f"{prefix}PUCK:POS_SEL")
 
         self.program_name = epics_signal_rw(str, f"{prefix}PROGRAM_NAME")
@@ -77,13 +73,17 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         self.program_running = epics_signal_r(
             ProgramRunning, f"{prefix}PROGRAM_RUNNING"
         )
-        self.prg_err_code = epics_signal_r(float, f"{prefix}PRG_ERR_CODE")
+
+        self.program_err_code = epics_signal_r(float, f"{prefix}PRG_ERR_CODE")
+        self.program_err_message = epics_signal_r(str, f"{prefix}RUN_ERR_MSG")
+
         self.run_err_code = epics_signal_r(float, f"{prefix}RUN_ERR_CODE")
-        self.ctlr_err_code = epics_signal_r(float, f"{prefix}CNTL_ERR_CODE")
+        self.controller_err_code = epics_signal_r(float, f"{prefix}CNTL_ERR_CODE")
 
         self.program_line = epics_signal_r(Sequence[str], f"{prefix}LINE_CONTENTS")
-        self.ctlr_err_message = epics_signal_r(Sequence[str], f"{prefix}CNTL_ERR_MSG")
-        self.prg_err_message = epics_signal_r(Array1D[np.uint8], f"{prefix}RUN_ERR_MSG")
+        self.controller_err_message = epics_signal_r(
+            Sequence[str], f"{prefix}CNTL_ERR_MSG"
+        )
 
         self.puck_pick = epics_signal_x(f"{prefix}PUCK:ACTION0.PROC")
         self.puck_place = epics_signal_x(f"{prefix}PUCK:ACTION1.PROC")
@@ -99,19 +99,19 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
         self.servo_off = epics_signal_x(f"{prefix}SOFF.PROC")
         self.servo_on = epics_signal_x(f"{prefix}SON.PROC")
+
         self.reset = epics_signal_x(f"{prefix}RESET.PROC")
 
         self.home = epics_signal_x(f"{prefix}Home.PROC")
 
         super().__init__(name)
 
-    # Locatable interface
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
         """Perform a sample load from the specified sample location.
 
         Args:
-            value: the sample location
+            value (SampleLocation): the sample location
         """
         await self.puck_load_program.trigger()
 
@@ -129,7 +129,7 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         await wait_for_value(
             self.program_running,
             ProgramRunning.PROGRAM_RUNNING,
-            timeout=self.PROGRAM_RUNNING_TIMEOUT,
+            timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
         )
         await wait_for_value(
             self.program_running,
