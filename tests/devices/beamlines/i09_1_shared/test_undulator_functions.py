@@ -4,10 +4,12 @@ from unittest.mock import patch
 import pytest
 from daq_config_server.client import ConfigServer
 
-from dodal.devices.beamlines.i09_1_shared import calculate_gap_i09_hu
+from dodal.devices.beamlines.i09_1_shared import (
+    calculate_energy_i09_hu,
+    calculate_gap_i09_hu,
+)
 from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
     I09HardLutProvider,
-    calculate_energy_i09_hu,
 )
 
 pytest_plugins = ["dodal.testing.fixtures.devices.hard_undulator"]
@@ -82,7 +84,7 @@ async def test_calculate_gap_from_energy_wrong_energy(
 
 
 @patch(
-    "dodal.devices.i09_1_shared.hard_undulator_functions._validate_energy_in_range",
+    "dodal.devices.beamlines.i09_1_shared.hard_undulator_functions._validate_energy_in_range",
     autospec=True,
 )
 async def test_calculate_gap_from_energy_wrong_k(
