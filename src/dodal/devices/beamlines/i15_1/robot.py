@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
+from functools import partial
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -43,22 +44,24 @@ class CurrentSample(StandardReadable):
 
 class MockRobot(DeviceMock["Robot"]):
     async def connect(self, device: "Robot") -> None:
-        def change_program_name(*_, **__):
-            set_mock_value(device.program_name, "PUCK.MB6")
+        def set_program(name, *_, **__):
+            set_mock_value(device.program_name, name)
 
-        callback_on_mock_put(device.puck_load_program, change_program_name)
+        callback_on_mock_put(device.puck_load_program, partial(set_program, "PUCK.MB6"))
+        callback_on_mock_put(device.beam_load_program, partial(set_program, "BEAM.MB6"))
 
-        def wrap_program_running(*_, **__):
-            async def program_running():
+        def program_running(*_, **__):
+            async def _program_running():
                 set_mock_value(device.program_running, ProgramRunning.PROGRAM_RUNNING)
                 await asyncio.sleep(0.01)
                 set_mock_value(
                     device.program_running, ProgramRunning.NO_PROGRAM_RUNNING
                 )
 
-            asyncio.create_task(program_running())
+            asyncio.create_task(_program_running())
 
-        callback_on_mock_put(device.puck_pick, wrap_program_running)
+        callback_on_mock_put(device.puck_pick, program_running)
+        callback_on_mock_put(device.beam_place, program_running)
 
 
 @default_mock_class(MockRobot)
@@ -137,6 +140,25 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
         await self.puck_pick.trigger()
+
+        await wait_for_value(
+            self.program_running,
+            ProgramRunning.PROGRAM_RUNNING,
+            timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
+        )
+        await wait_for_value(
+            self.program_running,
+            ProgramRunning.NO_PROGRAM_RUNNING,
+            timeout=self.PROGRAM_COMPLETED_TIMEOUT,
+        )
+
+        await self.beam_load_program.trigger()
+
+        await wait_for_value(
+            self.program_name, "BEAM.MB6", timeout=self.PROGRAM_LOADED_TIMEOUT
+        )
+
+        await self.beam_place.trigger()
 
         await wait_for_value(
             self.program_running,
