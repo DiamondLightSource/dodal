@@ -321,9 +321,6 @@ class FastGridScanCommon(
                 )
             )
 
-        # No need to reset self.position_counter - this should be done by the motion program
-        # set_statuses.append(set_and_wait_for_value(self.position_counter, 0))
-
         LOGGER.info("Gridscan parameters applied, waiting for sets to complete...")
 
         # wait for parameter sets to complete
