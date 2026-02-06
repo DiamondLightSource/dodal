@@ -24,8 +24,8 @@ from ophyd_async.epics.core import (
 
 @dataclass
 class SampleLocation:
-    location: int
-    pin: int
+    puck: int
+    position: int
 
 
 class ProgramRunning(StrictEnum):
@@ -120,8 +120,8 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
         await asyncio.gather(
-            set_and_wait_for_value(self.puck_sel, value.location),
-            set_and_wait_for_value(self.pos_sel, value.pin),
+            set_and_wait_for_value(self.puck_sel, value.puck),
+            set_and_wait_for_value(self.pos_sel, value.position),
         )
 
         await self.puck_pick.trigger()

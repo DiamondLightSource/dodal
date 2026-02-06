@@ -24,7 +24,7 @@ async def robot() -> Robot:
 
 
 async def test_set_moves_to_position(robot: Robot) -> None:
-    set_location = SampleLocation(location=1, pin=2)
+    set_location = SampleLocation(puck=1, position=2)
     await robot.set(set_location)
 
     assert await robot.puck_sel.get_value() == 1
@@ -32,7 +32,7 @@ async def test_set_moves_to_position(robot: Robot) -> None:
 
 
 async def test_puck_program_loaded_before_position_selected(robot: Robot) -> None:
-    set_location = SampleLocation(location=1, pin=2)
+    set_location = SampleLocation(puck=1, position=2)
     await robot.set(set_location)
 
     parent_mock = get_mock(robot)
@@ -54,7 +54,7 @@ async def test_given_wrong_program_gets_loaded_robot_times_out(robot: Robot):
     robot.PROGRAM_LOADED_TIMEOUT = 0.01
 
     with pytest.raises(TimeoutError):
-        await robot.set(SampleLocation(location=1, pin=2))
+        await robot.set(SampleLocation(puck=1, position=2))
 
     get_mock_put(robot.puck_pick).assert_not_called()
 
@@ -68,7 +68,7 @@ async def test_given_program_doesnt_start_then_robot_timesout(robot: Robot):
     robot.PROGRAM_STARTED_RUNNING_TIMEOUT = 0.01
 
     with pytest.raises(TimeoutError):
-        await robot.set(SampleLocation(location=1, pin=2))
+        await robot.set(SampleLocation(puck=1, position=2))
 
 
 async def test_given_program_doesnt_stop_then_robot_timesout(robot: Robot):
@@ -80,4 +80,4 @@ async def test_given_program_doesnt_stop_then_robot_timesout(robot: Robot):
     robot.PROGRAM_COMPLETED_TIMEOUT = 0.01
 
     with pytest.raises(TimeoutError):
-        await robot.set(SampleLocation(location=1, pin=2))
+        await robot.set(SampleLocation(puck=1, position=2))
