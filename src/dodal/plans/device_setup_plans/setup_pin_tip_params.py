@@ -51,9 +51,7 @@ def setup_pin_tip_detection_params(
     )
 
     # Sample detection direction
-    yield from set_using_group(
-        pin_tip_detect_device.scan_direction, scan_direction.value
-    )
+    yield from set_using_group(pin_tip_detect_device.scan_direction, scan_direction)
 
     # Minimum height
     yield from set_using_group(
