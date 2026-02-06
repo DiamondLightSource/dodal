@@ -1,11 +1,8 @@
-from pathlib import Path
-
 import pytest
-from ophyd_async.core import DetectorTrigger, TriggerInfo, init_devices
+from ophyd_async.core import DetectorTrigger, TriggerInfo
 from ophyd_async.epics.adcore import ADImageMode
 
-from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.beamlines import i11
 from dodal.devices.beamlines.i11.mythen import (
     _BIT_DEPTH,
     _DEADTIMES,
@@ -16,23 +13,7 @@ from dodal.devices.beamlines.i11.mythen import (
 
 @pytest.fixture
 async def i11_mythen() -> Mythen3:
-    set_path_provider(
-        StaticVisitPathProvider(
-            "i11",
-            Path("/dls/i11/data/2025/cm12356-1/"),
-            client=LocalDirectoryServiceClient(),
-        )
-    )
-
-    async with init_devices(mock=True):
-        i11_mythen = Mythen3(
-            prefix="BL11I-EA-DET-07:",
-            path_provider=get_path_provider(),
-            drv_suffix="DET",
-            fileio_suffix="HDF:",
-        )
-
-    return i11_mythen
+    return i11.mythen3.build(mock=True)
 
 
 def test_mythen_deadtime(i11_mythen: Mythen3) -> None:
