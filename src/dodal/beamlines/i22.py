@@ -1,27 +1,32 @@
+from functools import cache
 from pathlib import Path
 
-from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.core import (
+    PathProvider,
+    StaticPathProvider,
+    UUIDFilenameProvider,
+)
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import NDPluginBaseIO, NDPluginStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    get_path_provider,
-    set_path_provider,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
 )
+from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i22.dcm import DCM
+from dodal.devices.beamlines.i22.fswitch import FSwitch
+from dodal.devices.beamlines.i22.nxsas import (
+    NXSasMetadataHolder,
+    NXSasOAV,
+    NXSasPilatus,
+)
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import DCM
-from dodal.devices.i22.fswitch import FSwitch
-from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYPitchStage, XYRollStage, XYStage
 from dodal.devices.slits import Slits
@@ -37,16 +42,18 @@ PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-# This should be removed when the DeviceManager is adopted
-try:
-    get_path_provider()
-except NameError:
-    # If one hasn't already been set, use a default to stop things crashing
-    set_path_provider(StaticPathProvider(UUIDFilenameProvider(), Path("/tmp")))
+
+devices = DeviceManager()
 
 
-@device_factory()
-def saxs() -> PilatusDetector:
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
+
+
+@devices.factory()
+def saxs(path_provider: PathProvider) -> PilatusDetector:
     metadata_holder = NXSasMetadataHolder(
         x_pixel_size=(1.72e-1, "mm"),
         y_pixel_size=(1.72e-1, "mm"),
@@ -58,7 +65,7 @@ def saxs() -> PilatusDetector:
     )
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
@@ -70,13 +77,13 @@ def saxs() -> PilatusDetector:
     )
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
-def waxs() -> PilatusDetector:
+@devices.factory()
+def waxs(path_provider: PathProvider) -> PilatusDetector:
     metadata_holder = NXSasMetadataHolder(
         x_pixel_size=(1.72e-1, "mm"),
         y_pixel_size=(1.72e-1, "mm"),
@@ -88,7 +95,7 @@ def waxs() -> PilatusDetector:
     )
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
@@ -100,11 +107,11 @@ def waxs() -> PilatusDetector:
     )
 
 
-@device_factory()
-def i0() -> TetrammDetector:
+@devices.factory()
+def i0(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         type="Cividec Diamond XBPM",
         plugins={
             "stats": NDPluginBaseIO(
@@ -114,11 +121,11 @@ def i0() -> TetrammDetector:
     )
 
 
-@device_factory()
-def it() -> TetrammDetector:
+@devices.factory()
+def it(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         type="PIN Diode",
         plugins={
             "stats": NDPluginBaseIO(
@@ -128,35 +135,35 @@ def it() -> TetrammDetector:
     )
 
 
-@device_factory()
+@devices.factory()
 def vfm() -> FocusingMirror:
     return FocusingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:",
     )
 
 
-@device_factory()
+@devices.factory()
 def hfm() -> FocusingMirror:
     return FocusingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:HFM:",
     )
 
 
-@device_factory()
+@devices.factory()
 def bimorph_hfm() -> BimorphMirror:
     return BimorphMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G0:", number_of_channels=12
     )
 
 
-@device_factory()
+@devices.factory()
 def bimorph_vfm() -> BimorphMirror:
     return BimorphMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=32
     )
 
 
-@device_factory()
+@devices.factory()
 def dcm() -> DCM:
     return DCM(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
@@ -170,7 +177,7 @@ def dcm() -> DCM:
     )
 
 
-@device_factory()
+@devices.factory()
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
@@ -180,37 +187,37 @@ def undulator() -> UndulatorInKeV:
     )
 
 
-@device_factory()
+@devices.factory()
 def slits_1() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
-@device_factory()
+@devices.factory()
 def slits_2() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
 
 
-@device_factory()
+@devices.factory()
 def slits_3() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-@device_factory()
+@devices.factory()
 def slits_4() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
-@device_factory()
+@devices.factory()
 def slits_5() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
 
 
-@device_factory()
+@devices.factory()
 def slits_6() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
-@device_factory()
+@devices.factory()
 def fswitch() -> FSwitch:
     return FSwitch(
         prefix=f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
@@ -222,40 +229,40 @@ def fswitch() -> FSwitch:
 
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@device_factory()
-def panda1() -> HDFPanda:
+@devices.factory()
+def panda1(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )
 
 
-@device_factory(skip=True)
-def panda2() -> HDFPanda:
+@devices.factory()
+def panda2(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )
 
 
-@device_factory(skip=True)
-def panda3() -> HDFPanda:
+@devices.factory(skip=True)
+def panda3(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )
 
 
-@device_factory(skip=True)
-def panda4() -> HDFPanda:
+@devices.factory(skip=True)
+def panda4(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-04:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )
 
 
-@device_factory()
-def oav() -> AravisDetector:
+@devices.factory()
+def oav(path_provider: PathProvider) -> AravisDetector:
     metadata_holder = NXSasMetadataHolder(
         x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
         y_pixel_size=(3.45e-3, "mm"),
@@ -266,37 +273,37 @@ def oav() -> AravisDetector:
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         drv_suffix=DET_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         metadata_holder=metadata_holder,
     )
 
 
-@device_factory(skip=True)
+@devices.factory(skip=True)
 def linkam() -> Linkam3:
     return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05:")
 
 
-@device_factory(skip=True)
+@devices.factory(skip=True)
 def ppump() -> WatsonMarlow323Pump:
     """Sample Environment Peristaltic Pump."""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
 
 
-@device_factory()
+@devices.factory()
 def base() -> XYPitchStage:
     return XYPitchStage(f"{PREFIX.beamline_prefix}-MO-STABL-01:")
 
 
-@device_factory()
+@devices.factory()
 def bs1() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-SAXSP-01:BS1:")
 
 
-@device_factory()
+@devices.factory()
 def bs2() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-SAXSP-01:BS2:")
 
 
-@device_factory()
+@devices.factory()
 def bs3() -> XYRollStage:
     return XYRollStage(f"{PREFIX.beamline_prefix}-MO-SAXSP-01:BS3:")

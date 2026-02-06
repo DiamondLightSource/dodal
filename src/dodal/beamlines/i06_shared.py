@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i06_shared import I06Grating
+from dodal.devices.beamlines.i06_shared import I06Grating
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
@@ -15,6 +15,7 @@ BL = get_beamline_name("i06")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
 devices = DeviceManager()
 
 
