@@ -238,8 +238,7 @@ def set_up_all_logging_handlers(
 
 
 def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
-    """
-    Function to integrate bluesky and ophyd logging.
+    """Function to integrate bluesky and ophyd logging.
     Only required if dodal is NOT managed by BlueAPI.
 
     """
@@ -249,8 +248,7 @@ def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
 
 
 def do_default_logging_setup(dev_mode=False, graylog_port: int | None = None):
-    """
-    Function to set up default logging including graylog and bluesky and ophyd logs.
+    """Function to set up default logging including graylog and bluesky and ophyd logs.
     Only required if dodal is NOT managed by BlueAPI.
 
     """
