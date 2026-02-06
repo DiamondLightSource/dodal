@@ -285,16 +285,16 @@ async def test_phase_success_set(
     run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
     get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1)
     get_mock_put(mock_phase_axes.top_inner.user_setpoint).assert_called_once_with(
-        str(set_value.top_inner), wait=True
+        str(set_value.top_inner)
     )
     get_mock_put(mock_phase_axes.top_outer.user_setpoint).assert_called_once_with(
-        str(set_value.top_outer), wait=True
+        str(set_value.top_outer)
     )
     get_mock_put(mock_phase_axes.btm_inner.user_setpoint).assert_called_once_with(
-        str(set_value.btm_inner), wait=True
+        str(set_value.btm_inner)
     )
     get_mock_put(mock_phase_axes.btm_outer.user_setpoint).assert_called_once_with(
-        str(set_value.btm_outer), wait=True
+        str(set_value.btm_outer)
     )
 
     await assert_reading(
