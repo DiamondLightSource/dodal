@@ -33,6 +33,14 @@ class ProgramRunning(StrictEnum):
     PROGRAM_RUNNING = "Program Running"
 
 
+class CurrentSample(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.puck = epics_signal_rw(int, f"{prefix}PUCK:INDEX")
+            self.position = epics_signal_rw(int, f"{prefix}SAMPLE:INDEX")
+        super().__init__(name)
+
+
 class MockRobot(DeviceMock["Robot"]):
     async def connect(self, device: "Robot") -> None:
         def change_program_name(*_, **__):
@@ -62,47 +70,51 @@ class Robot(StandardReadable, Movable[SampleLocation]):
     PROGRAM_STARTED_RUNNING_TIMEOUT = 10.0
     PROGRAM_COMPLETED_TIMEOUT = 60.0
 
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(self, robot_prefix: str, current_sample_prefix: str, name: str = ""):
         with self.add_children_as_readables():
             # Any signals that should be read at every point in the scan
-            self.puck_sel = epics_signal_rw_rbv(float, f"{prefix}PUCK:PUCK_SEL")
-            self.pos_sel = epics_signal_rw_rbv(float, f"{prefix}PUCK:POS_SEL")
+            self.puck_sel = epics_signal_rw_rbv(float, f"{robot_prefix}PUCK:PUCK_SEL")
+            self.pos_sel = epics_signal_rw_rbv(float, f"{robot_prefix}PUCK:POS_SEL")
 
-        self.program_name = epics_signal_rw(str, f"{prefix}PROGRAM_NAME")
+        self.current_sample = CurrentSample(current_sample_prefix)
+
+        self.program_name = epics_signal_rw(str, f"{robot_prefix}PROGRAM_NAME")
 
         self.program_running = epics_signal_r(
-            ProgramRunning, f"{prefix}PROGRAM_RUNNING"
+            ProgramRunning, f"{robot_prefix}PROGRAM_RUNNING"
         )
 
-        self.program_err_code = epics_signal_r(float, f"{prefix}PRG_ERR_CODE")
-        self.program_err_message = epics_signal_r(str, f"{prefix}RUN_ERR_MSG")
+        self.program_err_code = epics_signal_r(float, f"{robot_prefix}PRG_ERR_CODE")
+        self.program_err_message = epics_signal_r(str, f"{robot_prefix}RUN_ERR_MSG")
 
-        self.run_err_code = epics_signal_r(float, f"{prefix}RUN_ERR_CODE")
-        self.controller_err_code = epics_signal_r(float, f"{prefix}CNTL_ERR_CODE")
+        self.run_err_code = epics_signal_r(float, f"{robot_prefix}RUN_ERR_CODE")
+        self.controller_err_code = epics_signal_r(float, f"{robot_prefix}CNTL_ERR_CODE")
 
-        self.program_line = epics_signal_r(Sequence[str], f"{prefix}LINE_CONTENTS")
+        self.program_line = epics_signal_r(
+            Sequence[str], f"{robot_prefix}LINE_CONTENTS"
+        )
         self.controller_err_message = epics_signal_r(
-            Sequence[str], f"{prefix}CNTL_ERR_MSG"
+            Sequence[str], f"{robot_prefix}CNTL_ERR_MSG"
         )
 
-        self.puck_pick = epics_signal_x(f"{prefix}PUCK:ACTION0.PROC")
-        self.puck_place = epics_signal_x(f"{prefix}PUCK:ACTION1.PROC")
-        self.puck_load_program = epics_signal_x(f"{prefix}PUCK:LOAD.PROC")
+        self.puck_pick = epics_signal_x(f"{robot_prefix}PUCK:ACTION0.PROC")
+        self.puck_place = epics_signal_x(f"{robot_prefix}PUCK:ACTION1.PROC")
+        self.puck_load_program = epics_signal_x(f"{robot_prefix}PUCK:LOAD.PROC")
 
-        self.beam_pick = epics_signal_x(f"{prefix}BEAM:ACTION0.PROC")
-        self.beam_place = epics_signal_x(f"{prefix}BEAM:ACTION1.PROC")
-        self.beam_load_program = epics_signal_x(f"{prefix}BEAM:LOAD.PROC")
+        self.beam_pick = epics_signal_x(f"{robot_prefix}BEAM:ACTION0.PROC")
+        self.beam_place = epics_signal_x(f"{robot_prefix}BEAM:ACTION1.PROC")
+        self.beam_load_program = epics_signal_x(f"{robot_prefix}BEAM:LOAD.PROC")
 
-        self.spinner_pick = epics_signal_x(f"{prefix}MOTOR:ACTION0.PROC")
-        self.spinner_place = epics_signal_x(f"{prefix}MOTOR:ACTION1.PROC")
-        self.spinner_load_program = epics_signal_x(f"{prefix}MOTOR:LOAD.PROC")
+        self.spinner_pick = epics_signal_x(f"{robot_prefix}MOTOR:ACTION0.PROC")
+        self.spinner_place = epics_signal_x(f"{robot_prefix}MOTOR:ACTION1.PROC")
+        self.spinner_load_program = epics_signal_x(f"{robot_prefix}MOTOR:LOAD.PROC")
 
-        self.servo_off = epics_signal_x(f"{prefix}SOFF.PROC")
-        self.servo_on = epics_signal_x(f"{prefix}SON.PROC")
+        self.servo_off = epics_signal_x(f"{robot_prefix}SOFF.PROC")
+        self.servo_on = epics_signal_x(f"{robot_prefix}SON.PROC")
 
-        self.reset = epics_signal_x(f"{prefix}RESET.PROC")
+        self.reset = epics_signal_x(f"{robot_prefix}RESET.PROC")
 
-        self.home = epics_signal_x(f"{prefix}Home.PROC")
+        self.home = epics_signal_x(f"{robot_prefix}Home.PROC")
 
         super().__init__(name)
 
@@ -135,4 +147,9 @@ class Robot(StandardReadable, Movable[SampleLocation]):
             self.program_running,
             ProgramRunning.NO_PROGRAM_RUNNING,
             timeout=self.PROGRAM_COMPLETED_TIMEOUT,
+        )
+
+        await asyncio.gather(
+            self.current_sample.puck.set(value.puck),
+            self.current_sample.position.set(value.position),
         )

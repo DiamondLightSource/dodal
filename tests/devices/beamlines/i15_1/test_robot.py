@@ -15,7 +15,7 @@ from dodal.devices.beamlines.i15_1.robot import ProgramRunning, Robot, SampleLoc
 @pytest.fixture
 async def robot() -> Robot:
     async with init_devices(mock=True):
-        robot = Robot(prefix="")
+        robot = Robot(robot_prefix="", current_sample_prefix="")
 
     set_mock_value(robot.puck_sel, 0)  # Set initial position
     set_mock_value(robot.pos_sel, 0)  # Set initial position
@@ -81,3 +81,10 @@ async def test_given_program_doesnt_stop_then_robot_timesout(robot: Robot):
 
     with pytest.raises(TimeoutError):
         await robot.set(SampleLocation(puck=1, position=2))
+
+
+async def test_after_robot_load_new_sample_position_is_put_in_index_pvs(robot: Robot):
+    await robot.set(SampleLocation(puck=1, position=2))
+
+    assert await robot.current_sample.puck.get_value() == 1
+    assert await robot.current_sample.position.get_value() == 2

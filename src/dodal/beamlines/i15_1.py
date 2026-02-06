@@ -160,4 +160,7 @@ def xtal() -> LaueMonochrometer:
 
 @devices.factory()
 def robot() -> Robot:
-    return Robot(prefix=f"{PREFIX.beamline_prefix}-MO-ROBOT-01:")
+    return Robot(
+        robot_prefix=f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
+        current_sample_prefix=f"{PREFIX.beamline_prefix}-EA-LOC-01:",
+    )
