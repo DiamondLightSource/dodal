@@ -148,7 +148,7 @@ class TetrammController(DetectorController):
 
     async def unstage(self):
         LOGGER.info("Unstaging TetrAMM")
-        await self._file_io.acquire.set(False, wait=False)
+        await self._file_io.acquire.set(False)
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
