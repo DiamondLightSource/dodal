@@ -2,12 +2,12 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.device_manager import DeviceManager
-from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
-from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i19.access_controlled.hutch_access import (
+from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
     HutchAccessControl,
 )
+from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 

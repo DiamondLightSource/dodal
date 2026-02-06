@@ -1,16 +1,16 @@
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i15.dcm import DCM
-from dodal.devices.i15.focussing_mirror import (
+from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i15.dcm import DCM
+from dodal.devices.beamlines.i15.focussing_mirror import (
     FocusingMirror,
     FocusingMirrorHorizontal,
     FocusingMirrorVertical,
     FocusingMirrorWithRoll,
 )
-from dodal.devices.i15.jack import JackX, JackY
-from dodal.devices.i15.motors import UpstreamDownstreamPair
+from dodal.devices.beamlines.i15.jack import JackX, JackY
+from dodal.devices.beamlines.i15.motors import UpstreamDownstreamPair
 from dodal.devices.motors import (
     SixAxisGonioKappaPhi,
     XYStage,
@@ -33,44 +33,46 @@ A device factory function is any function that has a return type which conforms
 to one or more Bluesky Protocols.
 """
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory()
 def arm() -> UpstreamDownstreamPair:
     return UpstreamDownstreamPair(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:ARM:")
 
 
-@device_factory()
+@devices.factory()
 def beamstop() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-RS-ABSB-04:")
 
 
-@device_factory()
+@devices.factory()
 def bs2() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-RS-ABSB-08:")
 
 
-@device_factory()
+@devices.factory()
 def bs3() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-RS-ABSB-09:")
 
 
-@device_factory()
+@devices.factory()
 def dcm() -> DCM:
     return DCM(f"{PREFIX.beamline_prefix}-OP-DCM-01:")
 
 
-@device_factory()
+@devices.factory()
 def det1z() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-DIFF-01:ARM:DETECTOR:Z")
 
 
-@device_factory()
+@devices.factory()
 def det2z() -> Motor:
     """Deliberately the same as eht2dtx."""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 
-@device_factory()
+@devices.factory()
 def diffractometer() -> SixAxisGonioKappaPhi:
     return SixAxisGonioKappaPhi(
         prefix=f"{PREFIX.beamline_prefix}-MO-DIFF-01:SAMPLE:",
@@ -78,78 +80,78 @@ def diffractometer() -> SixAxisGonioKappaPhi:
     )
 
 
-@device_factory()
+@devices.factory()
 def djack1() -> JackX:
     return JackX(f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:")
 
 
-@device_factory()
+@devices.factory()
 def eht2dtx() -> Motor:
     """Deliberately the same as det2z."""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 
-@device_factory()
+@devices.factory()
 def f2x() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-RS-ABSB-10:X")
 
 
-@device_factory()
+@devices.factory()
 def fs() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
-@device_factory()
+@devices.factory()
 def fs2() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-EA-SHTR-02:")
 
 
-@device_factory()
+@devices.factory()
 def hfm() -> FocusingMirrorWithRoll:
     return FocusingMirrorWithRoll(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
 
 
-@device_factory()
+@devices.factory()
 def laserboard() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:")
 
 
-@device_factory()
+@devices.factory()
 def obj() -> UpstreamDownstreamPair:
     return UpstreamDownstreamPair(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OBJ:")
 
 
-@device_factory()
+@devices.factory()
 def opticds() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:DS:")
 
 
-@device_factory()
+@devices.factory()
 def opticus() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:US:")
 
 
-@device_factory()
+@devices.factory()
 def pin3() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-AL-APTR-03:")
 
 
-@device_factory()
+@devices.factory()
 def pin() -> XYZPitchYawStage:
     return XYZPitchYawStage(f"{PREFIX.beamline_prefix}-AL-APTR-02:")
 
 
-@device_factory()
+@devices.factory()
 def qbpm1() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-DI-QBPM-01:")
 
 
-@device_factory()
+@devices.factory()
 def qbpm2() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-DI-QBPM-02:")
 
 
-@device_factory()
+@devices.factory()
 def s1() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
@@ -158,7 +160,7 @@ def s1() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def s2() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
@@ -167,7 +169,7 @@ def s2() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def s4() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
@@ -176,7 +178,7 @@ def s4() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def s5() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
@@ -185,7 +187,7 @@ def s5() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def s6() -> SlitsY:
     return SlitsY(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
@@ -193,7 +195,7 @@ def s6() -> SlitsY:
     )
 
 
-@device_factory()
+@devices.factory()
 def s7() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-07:",
@@ -202,41 +204,41 @@ def s7() -> Slits:
     )
 
 
-@device_factory()
+@devices.factory()
 def shd() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-MO-SHEAD-01:")
 
 
-@device_factory()
+@devices.factory()
 def shd2() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-MO-SHEAD-02:")
 
 
-@device_factory()
+@devices.factory()
 def shfm() -> FocusingMirrorHorizontal:
     return FocusingMirrorHorizontal(f"{PREFIX.beamline_prefix}-OP-MIRR-03:HFM:")
 
 
-@device_factory()
+@devices.factory()
 def skb() -> JackY:
     return JackY(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:")
 
 
-@device_factory()
+@devices.factory()
 def svfm() -> FocusingMirrorVertical:
     return FocusingMirrorVertical(f"{PREFIX.beamline_prefix}-OP-MIRR-03:VFM:")
 
 
-@device_factory()
+@devices.factory()
 def tab2jack() -> JackX:
     return JackX(f"{PREFIX.beamline_prefix}-MO-TABLE-03:BASE:")
 
 
-@device_factory()
+@devices.factory()
 def vfm() -> FocusingMirror:
     return FocusingMirror(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()

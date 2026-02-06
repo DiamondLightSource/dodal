@@ -2,19 +2,19 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.device_manager import DeviceManager
-from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
-from dodal.devices.i19.access_controlled.blueapi_device import HutchState
-from dodal.devices.i19.access_controlled.piezo_control import (
+from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
-from dodal.devices.i19.access_controlled.shutter import (
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
-from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.pin_tip import PinTipCentreHolder
+from dodal.devices.beamlines.i19.beamstop import BeamStop
+from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
