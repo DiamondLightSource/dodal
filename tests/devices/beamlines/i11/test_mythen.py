@@ -13,7 +13,7 @@ from dodal.devices.beamlines.i11.mythen import (
 
 @pytest.fixture
 async def i11_mythen() -> Mythen3:
-    return i11.mythen3.build(mock=True)
+    return i11.mythen3.build(connect_immediately=True, mock=True)
 
 
 def test_mythen_deadtime(i11_mythen: Mythen3) -> None:
