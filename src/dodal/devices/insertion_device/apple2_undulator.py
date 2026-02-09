@@ -397,10 +397,9 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         LOGGER.info(
             f"Moving {self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
-        await asyncio.gather(
-            self.gap().set_move.set(value=1, timeout=timeout),
-            self.phase().set_move.set(value=1, timeout=timeout),
-        )
+        self.gap().set_move.set(value=1, timeout=timeout)
+        self.phase().set_move.set(value=1, timeout=timeout)
+
         await wait_for_value(
             self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
         )
