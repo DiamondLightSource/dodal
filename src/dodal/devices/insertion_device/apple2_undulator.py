@@ -405,7 +405,8 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             )
             LOGGER.info("Gap and phase set_move()s completed.")
 
-        asyncio.create_task(initiate_moves())
+        # assign the task to prevent GC killing it
+        self._move_task = asyncio.create_task(initiate_moves())
 
         await wait_for_value(
             self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
