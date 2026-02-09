@@ -197,7 +197,7 @@ def test_make_num_scan_args(
     final_shape: list[int],
     final_length: int,
 ):
-    args, shape = _make_num_scan_args({x_axis: x_list, y_axis: y_list}, num=num)
+    args, shape = _make_num_scan_args([(x_axis, x_list), (y_axis, y_list)], num=num)
     assert shape == final_shape
     assert len(args) == final_length
     assert args[0] == x_axis
@@ -214,7 +214,7 @@ def test_num_scan_with_one_axis(
     docs = defaultdict(list)
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
-    run_engine(num_scan(detectors=[det], params={x_axis: x_list}, num=num))
+    run_engine(num_scan(detectors=[det], params=[(x_axis, x_list)], num=num))
 
     assert_emitted(
         docs,
@@ -245,7 +245,7 @@ def test_num_scan_with_two_axes(
     run_engine(
         num_scan(
             detectors=[det],
-            params={x_axis: x_list, y_axis: y_list},
+            params=[(x_axis, x_list), (y_axis, y_list)],
             num=num,
         )
     )
@@ -265,7 +265,7 @@ def test_num_scan_fails_when_given_wrong_number_of_params(
     run_engine: RunEngine, det: StandardDetector, x_axis: Motor, y_axis: Motor
 ):
     with pytest.raises(ValueError):
-        run_engine(num_scan(detectors=[det], params={x_axis: [-1, 1, 5]}, num=5))
+        run_engine(num_scan(detectors=[det], params=[(x_axis, [-1, 1, 5])], num=5))
 
 
 @pytest.mark.parametrize(
@@ -283,7 +283,7 @@ def test_num_scan_fails_when_given_bad_info(
         run_engine(
             num_scan(
                 detectors=[det],
-                params={x_axis: x_list, y_axis: y_list},
+                params=[(x_axis, x_list), (y_axis, y_list)],
             )
         )
 
@@ -306,7 +306,7 @@ def test_num_grid_scan(
     run_engine(
         num_grid_scan(
             detectors=[det],
-            params={x_axis: x_list, y_axis: y_list},
+            params=[(x_axis, x_list), (y_axis, y_list)],
         )
     )
 
@@ -338,7 +338,9 @@ def test_num_grid_scan_when_not_snaking(
 
     run_engine(
         num_grid_scan(
-            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
+            detectors=[det],
+            params=[(x_axis, x_list), (y_axis, y_list)],
+            snake_axes=False,
         )
     )
 
@@ -358,7 +360,9 @@ def test_num_grid_scan_fails_when_given_wrong_number_of_params(
 ):
     with pytest.raises(ValueError):
         run_engine(
-            num_grid_scan(detectors=[det], params={x_axis: [0, 1.1, 2], y_axis: [1.1]})
+            num_grid_scan(
+                detectors=[det], params=[(x_axis, [0, 1.1, 2]), (y_axis, [1.1])]
+            )
         )
 
 
@@ -377,7 +381,7 @@ def test_num_scan_fails_when_asked_to_snake_slow_axis(
         run_engine(
             num_grid_scan(
                 detectors=[det],
-                params={x_axis: x_list, y_axis: y_list},
+                params=[(x_axis, x_list), (y_axis, y_list)],
                 snake_axes=[x_axis],
             )
         )
@@ -394,7 +398,7 @@ def test_num_rscan(
     docs = defaultdict(list)
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
-    run_engine(num_rscan(detectors=[det], params={x_axis: x_list}, num=num))
+    run_engine(num_rscan(detectors=[det], params=[(x_axis, x_list)], num=num))
 
     assert_emitted(
         docs,
@@ -423,7 +427,7 @@ def test_num_rscan_with_two_axes(
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
     run_engine(
-        num_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list}, num=num)
+        num_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)], num=num)
     )
 
     assert_emitted(
@@ -453,7 +457,7 @@ def test_num_rscan_fails_when_given_bad_info(
         run_engine(
             num_rscan(
                 detectors=[det],
-                params={x_axis: x_list, y_axis: y_list},
+                params=[(x_axis, x_list), (y_axis, y_list)],
                 num=num,
             )
         )
@@ -477,7 +481,7 @@ def test_num_grid_rscan(
     run_engine(
         num_grid_rscan(
             detectors=[det],
-            params={x_axis: x_list, y_axis: y_list},
+            params=[(x_axis, x_list), (y_axis, y_list)],
         )
     )
 
@@ -509,7 +513,9 @@ def test_num_grid_rscan_when_not_snaking(
 
     run_engine(
         num_grid_rscan(
-            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
+            detectors=[det],
+            params=[(x_axis, x_list), (y_axis, y_list)],
+            snake_axes=False,
         )
     )
 
@@ -539,7 +545,7 @@ def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
         run_engine(
             num_grid_rscan(
                 detectors=[det],
-                params={x_axis: x_list, y_axis: y_list},
+                params=[(x_axis, x_list), (y_axis, y_list)],
                 snake_axes=[x_axis],
             )
         )
