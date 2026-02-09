@@ -1,4 +1,4 @@
-from unittest.mock import ANY, MagicMock, call, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from bluesky import plan_stubs as bps
@@ -292,11 +292,11 @@ async def test_given_home_and_reset_inner_plan_fails_reset_still(
         )
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY), call(initial_x, wait=ANY)]
+        [call(0.0), call(initial_x)]
     )
 
     get_mock_put(my_device.y.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY), call(initial_y, wait=ANY)]
+        [call(0.0), call(initial_y)]
     )
 
 
