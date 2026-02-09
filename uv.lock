@@ -761,7 +761,7 @@ requires-dist = [
     { name = "aiohttp" },
     { name = "bluesky", specifier = ">=1.14.5" },
     { name = "click" },
-    { name = "daq-config-server", specifier = ">=1.0.0" },
+    { name = "daq-config-server", specifier = ">=1.1.2" },
     { name = "deepdiff" },
     { name = "graypy" },
     { name = "mysql-connector-python", specifier = "==9.5.0" },
