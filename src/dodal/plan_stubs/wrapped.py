@@ -1,6 +1,6 @@
 import itertools
 from collections.abc import Mapping
-from typing import Annotated, TypeVar
+from typing import Annotated, Any, TypeVar
 
 import bluesky.plan_stubs as bps
 from bluesky.protocols import Movable, Readable, Stoppable
@@ -133,7 +133,7 @@ def wait(
     return (yield from bps.wait(group, timeout=timeout))
 
 
-def rd(readable: Readable) -> MsgGenerator:
+def rd(readable: Readable) -> MsgGenerator[Any]:
     """Reads a single-value non-triggered object, wrapper for `bp.rd`.
 
     Args:
