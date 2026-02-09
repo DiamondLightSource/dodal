@@ -37,12 +37,12 @@ async def test_puck_program_loaded_before_position_selected(robot: Robot) -> Non
 
     parent_mock = get_mock(robot)
 
-    assert parent_mock.mock_calls[0] == call.puck_load_program.put(ANY, wait=True)
-    assert parent_mock.mock_calls[1] == call.puck_sel.put(ANY, wait=True)
-    assert parent_mock.mock_calls[2] == call.pos_sel.put(ANY, wait=True)
+    assert parent_mock.mock_calls[0] == call.puck_load_program.put(ANY)
+    assert parent_mock.mock_calls[1] == call.puck_sel.put(ANY)
+    assert parent_mock.mock_calls[2] == call.pos_sel.put(ANY)
 
-    get_mock_put(robot.puck_sel).assert_called_once_with(1, wait=True)
-    get_mock_put(robot.pos_sel).assert_called_once_with(2, wait=True)
+    get_mock_put(robot.puck_sel).assert_called_once_with(1)
+    get_mock_put(robot.pos_sel).assert_called_once_with(2)
 
 
 async def test_given_wrong_program_gets_loaded_robot_times_out(robot: Robot):
