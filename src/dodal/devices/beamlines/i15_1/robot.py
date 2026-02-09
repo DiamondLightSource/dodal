@@ -33,7 +33,7 @@ class SampleLocation:
 
 class ProgramNames(StrEnum):
     PUCK = "PUCK.MB6"
-    BEAM = "PUCK.MB6"
+    BEAM = "BEAM.MB6"
 
 
 class ProgramRunning(StrictEnum):
