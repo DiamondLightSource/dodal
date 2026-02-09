@@ -64,20 +64,20 @@ def count(
 
 
 def _make_num_scan_args(
-    params: dict[Movable | Motor, list[float | int]], num: int | None = None
+    params: list[tuple[Movable | Motor, list[float | int]]], num: int | None = None
 ):
     shape = []
     if num:
         shape = [num]
         for param in params:
-            if len(params[param]) == 2:
+            if len(param[1]) == 2:
                 pass
             else:
                 raise ValueError("You must provide 'start stop' for each motor.")
     else:
         for param in params:
-            if len(params[param]) == 3:
-                shape.append(params[param][-1])
+            if len(param[1]) == 3:
+                shape.append(param[1][-1])
             else:
                 raise ValueError(
                     "You must provide 'start stop step' for each motor in a grid scan."
@@ -85,8 +85,8 @@ def _make_num_scan_args(
 
     args = []
     for param in params:
-        args.append(param)
-        args.extend(params[param])
+        args.append(param[0])
+        args.extend(param[1])
     return args, shape
 
 
@@ -101,11 +101,11 @@ def num_scan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent \
-            trajectories, provide '{movable1: [start1, stop1], movable2: [start2, \
-            stop2], ... , movableN: [startN, stopN]}'."
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, \
+            stop2]), ... , (movableN, [startN, stopN])]'."
         ),
     ],
     num: int | None = None,
@@ -135,11 +135,11 @@ def num_grid_scan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent \
-            trajectories, provide '{movable1: [start1, stop1, num1], ... , movableN: \
-            [startN, stopN, numN]}'."
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, num1]), (movable2, \
+            [start2, stop2, num2]), ... , (movableN, [startN, stopN, numN])]'."
         ),
     ],
     snake_axes: list | bool = True,
@@ -169,11 +169,11 @@ def num_rscan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent \
-            trajectories, provide '{movable1: [start1, stop1], movable2: [start2, \
-            stop2], ... , movableN: [startN, stopN]}'."
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, \
+            stop2]), ... , (movableN, [startN, stopN])]'."
         ),
     ],
     num: int | None = None,
@@ -203,11 +203,11 @@ def num_grid_rscan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent \
-            trajectories, provide '{movable1: [start1, stop1, num1], ... , movableN: \
-            [startN, stopN, numN]}'."
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, num1]), (movable2, \
+            [start2, stop2, num2]), ... , (movableN, [startN, stopN, numN])]'."
         ),
     ],
     snake_axes: list | bool = True,
