@@ -65,12 +65,11 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
 
     def callback_function(
         channel: BimorphMirrorChannel,
-    ) -> Callable[[float, bool], None]:
+    ) -> Callable[[float], None]:
         def output_voltage_propogation_and_status(
             value: float,
-            wait: bool = False,
         ):
-            channel.output_voltage.set(value, wait=wait)
+            channel.output_voltage.set(value)
             asyncio.create_task(busy_idle())
 
         return output_voltage_propogation_and_status

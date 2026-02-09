@@ -68,10 +68,8 @@ def mirror_with_mocked_put(mirror: BimorphMirror) -> BimorphMirror:
 
     for channel in mirror.channels.values():
 
-        def vout_propogation_and_status(
-            value: float, wait=False, signal=channel.output_voltage
-        ):
-            signal.set(value, wait=wait)
+        def vout_propogation_and_status(value: float, signal=channel.output_voltage):
+            signal.set(value)
             asyncio.create_task(busy_idle())
 
         callback_on_mock_put(channel.target_voltage, vout_propogation_and_status)
@@ -155,7 +153,7 @@ async def test_save_and_restore(
     run_engine(plan())
 
     for put in puts:
-        assert put.call_args_list == [call(4.0, wait=True), call(0.0, wait=True)]
+        assert put.call_args_list == [call(4.0), call(0.0)]
 
 
 @pytest.mark.parametrize("voltage_list", [[0.0 for _ in range(8)]])
