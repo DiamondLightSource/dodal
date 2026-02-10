@@ -500,7 +500,7 @@ def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_cor
     fake_eiger.odin.wait_for_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
-    fake_eiger.set_num_triggers_and_captures()
+    fake_eiger.set_num_triggers_and_captures().wait()
     assert fake_eiger.cam.num_triggers.get() > fake_eiger.detector_params.num_triggers
     assert fake_eiger.odin.file_writer.num_capture.get() == 0
 
