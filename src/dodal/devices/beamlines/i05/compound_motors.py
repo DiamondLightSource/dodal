@@ -24,33 +24,13 @@ class PolynomCompoundMotors(
     """PolynomCompoundMotors is a compound motor controller that synchronizes the movement of multiple motors based on polynomial relationships.
 
     When the master motor is moved, all driven (slave) motors are asynchronously moved to positions calculated using polynomial coefficients. The polynomial coefficients define the relationship between the master motor's position and each driven motor's position.
+    The master motor is always included with a default polynomial coefficient of [0.0, 1.0], representing a direct mapping.
+    Driven motors' positions are calculated using NumPy's polynomial evaluation.
 
-    master_motor : Motor
-        The master motor whose position determines the positions of the driven motors.
-    driven_dict : dict[Motor, Array1D[np.float64]]
-        Dictionary mapping each driven (slave) motor to its polynomial coefficients (as a NumPy array).
-    name : str, optional
-        Name of the compound motor group.
-
-    Attributes:
-    motor_coeff_dict : dict[Reference[Motor], Array1D[np.float64]]
-        Dictionary mapping motor references to their polynomial coefficients.
-    master : Reference[Motor]
-        Reference to the master motor.
-
-    Methods:
-    -------
-    set(new_position: float)
-        Asynchronously moves the master and all driven motors to positions determined by the polynomial relationships.
-    stop(success=False)
-        Asynchronously stops all motors immediately.
-    locate()
-        Returns the current setpoint and readback of the master motor.
-
-    Notes:
-    -----
-    - The master motor is always included with a default polynomial coefficient of [0.0, 1.0], representing a direct mapping.
-    - Driven motors' positions are calculated using NumPy's polynomial evaluation.
+    Args:
+    master(Motor): The master motor whose position determines the positions of the driven motors.
+    driven_dict (dict[Motor, Array1D[np.float64]]): Dictionary mapping each driven (slave) motor to its polynomial coefficients (as a NumPy array).
+    name (str,optional): Name of the compound motor group. Defaults to an empty string.
     """
 
     def __init__(
