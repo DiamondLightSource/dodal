@@ -3,7 +3,7 @@ import math
 from abc import ABC
 from functools import partial
 
-from bluesky.protocols import Locatable, Location, Reading
+from bluesky.protocols import Locatable, Location
 from ophyd_async.core import (
     CALCULATE_TIMEOUT,
     AsyncStatus,
@@ -166,9 +166,6 @@ class ModMotor(StandardReadable, Locatable[float]):
             self.user_setpoint.get_value(), self.user_readback.get_value()
         )
         return Location(setpoint=setpoint, readback=readback)
-
-    async def read(self) -> dict[str, Reading]:
-        return await super().read()
 
     @AsyncStatus.wrap
     async def set(
