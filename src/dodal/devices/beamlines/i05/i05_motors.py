@@ -28,8 +28,6 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
     behave as ordinary orthogonal Cartesian translation axes aligned with the incoming X-ray beam (long) and perpendicular to it (perp), while internally coordinating motion of the x (perpendicular to analyser axis)
     and y (along analyser axis) motors.
 
-    Unlike sample-frame axes that rotate with a live rotation motor, these axes are
-    defined at a constant orientation set by `rotation_angle_deg`.
     """
 
     def __init__(
