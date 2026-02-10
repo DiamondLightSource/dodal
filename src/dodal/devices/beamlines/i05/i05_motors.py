@@ -13,7 +13,7 @@ from dodal.devices.motors import (
 
 
 class I05Goniometer(XYZPolarAzimuthTiltStage):
-    """Six-axis stage with a standard xyz stage and three axis of rotation: polar,
+    """Six-physical-axis stage with a standard xyz translational stage and three axis of rotation: polar,
     azimuth, and tilt.
 
     In addition, it defines two virtual translational axes, `perp` and `long`, which
