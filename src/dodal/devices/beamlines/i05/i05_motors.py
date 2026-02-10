@@ -22,7 +22,7 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
     - `long`: Translation along the longitudinal direction of the rotated in-plane
         coordinate frame defined by ``rotation_angle_deg``.
 
-    - `perp`: Translation perpendicular to `long` within the x-y plane.
+    - `perp`: Translation along the rotated Y-axis.
 
     The `perp` and `long` axes are derived from the underlying x and y motors using a
     fixed rotation angle (default 50 degrees). From the user's point of view, these
