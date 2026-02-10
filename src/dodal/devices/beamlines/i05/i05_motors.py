@@ -13,25 +13,21 @@ from dodal.devices.motors import (
 
 
 class I05Goniometer(XYZPolarAzimuthTiltStage):
-    """Six-axis stage with a standard xyz stage and three axis of rotation: polar,
+    """Six-physical-axis stage with a standard xyz translational stage and three axis of rotation: polar,
     azimuth, and tilt.
 
     In addition, it defines two virtual translational axes, `perp` and `long`, which
     form a rotated Cartesian frame within the x-y plane.
 
-    - `long`: Translation along the longitudinal direction of the rotated in-plane
-        coordinate frame defined by ``rotation_angle_deg``.
+        - `long`: Translation along the rotated X-axis.
 
-    - `perp`: Translation perpendicular to `long` within the x-y plane.
+    - `perp`: Translation along the rotated Y-axis.
 
-    The `perp` and `long` axes are derived from the underlying x and y motors using a
-    fixed rotation angle (default 50 degrees). From the user's point of view, these
-    behave as ordinary orthogonal Cartesian translation axes aligned with physically
-    meaningful directions on the sample, while internally coordinating motion of the x
-    and y motors.
+    The `perp` and `long` axes are virtual axes derived from the underlying x and y motors using a
+    fixed rotation angle (default 50 degrees). Rotation angle corresponds to an angle between analyser axis and X-ray beam axis. From the user's point of view, these virtual axes
+    behave as ordinary orthogonal Cartesian translation axes aligned with the incoming X-ray beam (long) and perpendicular to it (perp), while internally coordinating motion of the x (perpendicular to analyser axis)
+    and y (along analyser axis) motors.
 
-    Unlike sample-frame axes that rotate with a live rotation motor, these axes are
-    defined at a constant orientation set by `rotation_angle_deg`.
     """
 
     def __init__(

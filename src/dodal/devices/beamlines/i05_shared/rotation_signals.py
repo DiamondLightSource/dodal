@@ -26,7 +26,7 @@ def create_rotational_ij_component_signals(
     angle_deg: float | SignalR[float],
     clockwise_frame: bool = True,
 ) -> tuple[SignalRW[float], SignalRW[float]]:
-    """Create virtual i/j signals representing a Cartesian coordinate frame
+    """Create virtual i/j axes representing a Cartesian coordinate frame
     that is rotated by a given angle relative to the underlying equipment axes.
 
     The returned signals expose the position of the system in a *rotated frame

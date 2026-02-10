@@ -7,23 +7,23 @@ from dodal.devices.motors import XYZPolarAzimuthStage
 
 
 class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
-    """Six-axis stage with a standard xyz stage and three axis of rotation: polar,
-    azimuth, and defocus.
+    """Six-physical-axis stage with a standard xyz stage, 2 axis of rotation: polar,
+    azimuth and one extra tranlastional axis defocus.
 
     This device exposes four virtual translational axes that are defined in frames
     of reference attached to the sample:
 
     - `hor` and `vert`:
-        Horizontal and vertical translation axes in the sample frame.
-        These axes are derived from the lab-frame x and y motors and rotate
+        Horizontal and vertical virtual translation axes of the rotated sample frame.
+        These axes are derived from X and Y axes rotated
         with the azimuth angle, so that motion along `hor` and `vert`
-        remains aligned with the sample regardless of its azimuthal rotation.
+        remains aligned with the gravity direction regardless of its azimuthal rotation.
 
     - `long` and `perp`:
-        Longitudinal and perpendicular translation axes in the tilted sample
-        frame. These axes are derived from the lab-frame z motor and the
-        sample-frame `hor` axis, and rotate with the polar angle.
-        Motion along `long` follows the sample's longitudinal direction,
+        Longitudinal and perpendicular virtual translation axes in the rotated sample
+        frame. These axes are derived from the Z-axis and the
+        virtual `hor` axis, and depend on the polar angle.
+        Motion along `long` aligned with the analyser axis,
         while `perp` moves perpendicular to it within the polar rotation plane.
 
     All four virtual axes behave as ordinary orthogonal Cartesian translations
