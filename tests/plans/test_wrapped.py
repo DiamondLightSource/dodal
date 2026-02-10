@@ -565,7 +565,7 @@ def test_make_list_scan_args(
     final_length: int,
 ):
     args, shape = _make_list_scan_args(
-        params={x_axis: x_list, y_axis: y_list}, grid=grid
+        params=[(x_axis, x_list), (y_axis, y_list)], grid=grid
     )
     assert len(args) == final_length
     assert shape == final_shape
@@ -576,7 +576,7 @@ def test_make_list_scan_args_fails_when_lists_are_different_lengths(
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
-        _make_list_scan_args(params={x_axis: [0, 1, 2], y_axis: [0, 1, 2, 3]})
+        _make_list_scan_args(params=[(x_axis, [0, 1, 2]), (y_axis, [0, 1, 2, 3])])
 
 
 @pytest.mark.parametrize("x_list", ([0, 1, 2, 3], [1.1, 2.2, 3.3]))
@@ -590,7 +590,7 @@ def test_list_scan(
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
     num = int(len(x_list))
 
-    run_engine(list_scan(detectors=[det], params={x_axis: x_list}))
+    run_engine(list_scan(detectors=[det], params=[(x_axis, x_list)]))
 
     assert_emitted(
         docs,
@@ -622,7 +622,7 @@ def test_list_scan_with_two_axes(
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
     num = int(len(x_list))
 
-    run_engine(list_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+    run_engine(list_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
 
     assert_emitted(
         docs,
@@ -645,7 +645,7 @@ def test_list_scan_fails_with_differnt_list_lengths(
         run_engine(
             list_scan(
                 detectors=[det],
-                params={x_axis: [1, 2, 3, 4, 5], y_axis: [1, 2, 3, 4]},
+                params=[(x_axis, [1, 2, 3, 4, 5]), (y_axis, [1, 2, 3, 4])],
             )
         )
 
@@ -669,7 +669,9 @@ def test_list_grid_scan(
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
     num = int(len(x_list) * len(y_list))
 
-    run_engine(list_grid_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+    run_engine(
+        list_grid_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
+    )
 
     assert_emitted(
         docs,
@@ -690,7 +692,7 @@ def test_list_rscan(
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
     num = int(len(x_list))
 
-    run_engine(list_rscan(detectors=[det], params={x_axis: x_list}))
+    run_engine(list_rscan(detectors=[det], params=[(x_axis, x_list)]))
 
     assert_emitted(
         docs,
@@ -722,7 +724,7 @@ def test_list_rscan_with_two_axes(
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
     num = int(len(x_list))
 
-    run_engine(list_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+    run_engine(list_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
 
     assert_emitted(
         docs,
@@ -745,7 +747,7 @@ def test_list_rscan_fails_with_differnt_list_lengths(
         run_engine(
             list_rscan(
                 detectors=[det],
-                params={x_axis: [1, 2, 3, 4, 5], y_axis: [1, 2, 3, 4]},
+                params=[(x_axis, [1, 2, 3, 4, 5]), (y_axis, [1, 2, 3, 4])],
             )
         )
 
@@ -770,7 +772,7 @@ def test_list_grid_rscan(
     num = int(len(x_list) * len(y_list))
 
     run_engine(
-        list_grid_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
+        list_grid_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
     )
 
     assert_emitted(
@@ -845,7 +847,7 @@ def test_make_step_scan_args(
     final_length: int,
 ):
     args, shape = _make_step_scan_args(
-        params={x_axis: x_list, y_axis: y_list}, grid=grid
+        params=[(x_axis, x_list), (y_axis, y_list)], grid=grid
     )
     assert shape == final_shape
     assert len(args) == final_length
@@ -873,7 +875,7 @@ def test_make_step_scan_args_fails_when_given_incorrect_number_of_parameters(
 ):
     with pytest.raises(ValueError):
         _make_step_scan_args(
-            params={x_axis: x_list, y_axis: y_list, z_axis: z_list}, grid=grid
+            params=[(x_axis, x_list), (y_axis, y_list), (z_axis, z_list)], grid=grid
         )
 
 
@@ -890,7 +892,7 @@ def test_step_scan(
     docs = defaultdict(list)
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
-    run_engine(step_scan(detectors=[det], params={x_axis: x_list}))
+    run_engine(step_scan(detectors=[det], params=[(x_axis, x_list)]))
 
     assert_emitted(
         docs,
@@ -923,7 +925,7 @@ def test_step_scan_with_multiple_axes(
     docs = defaultdict(list)
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
-    run_engine(step_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+    run_engine(step_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
 
     assert_emitted(
         docs,
@@ -956,7 +958,9 @@ def test_step_grid_scan(
     docs = defaultdict(list)
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
-    run_engine(step_grid_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+    run_engine(
+        step_grid_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
+    )
 
     assert_emitted(
         docs,
@@ -990,7 +994,9 @@ def test_step_grid_scan_when_not_snaking(
 
     run_engine(
         step_grid_scan(
-            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
+            detectors=[det],
+            params=[(x_axis, x_list), (y_axis, y_list)],
+            snake_axes=False,
         )
     )
 
@@ -1018,7 +1024,7 @@ def test_step_grid_scan_fails_when_given_incorrect_number_of_params(
 ):
     with pytest.raises(ValueError):
         run_engine(
-            step_grid_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
+            step_grid_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
         )
 
 
@@ -1035,7 +1041,7 @@ def test_step_rscan(
     docs = defaultdict(list)
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
-    run_engine(step_rscan(detectors=[det], params={x_axis: x_list}))
+    run_engine(step_rscan(detectors=[det], params=[(x_axis, x_list)]))
 
     assert_emitted(
         docs,
@@ -1068,7 +1074,7 @@ def test_step_rscan_with_multiple_axes(
     docs = defaultdict(list)
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
-    run_engine(step_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+    run_engine(step_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
 
     assert_emitted(
         docs,
@@ -1102,7 +1108,7 @@ def test_step_grid_rscan(
     run_engine.subscribe(lambda name, doc: docs[name].append(doc))
 
     run_engine(
-        step_grid_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
+        step_grid_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
     )
 
     assert_emitted(
@@ -1137,7 +1143,9 @@ def test_step_grid_rscan_when_not_snaking(
 
     run_engine(
         step_grid_rscan(
-            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
+            detectors=[det],
+            params=[(x_axis, x_list), (y_axis, y_list)],
+            snake_axes=False,
         )
     )
 
@@ -1165,5 +1173,7 @@ def test_step_grid_rscan_fails_when_given_incorrect_number_of_params(
 ):
     with pytest.raises(ValueError):
         run_engine(
-            step_grid_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
+            step_grid_rscan(
+                detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]
+            )
         )

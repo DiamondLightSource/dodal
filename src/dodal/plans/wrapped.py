@@ -113,8 +113,8 @@ def num_scan(
 ) -> MsgGenerator:
     """Scan concurrent single or multi-motor trajector(y/ies).
 
-    The scan is defined by number of points along scan trajector(y/ies).
-    Wraps bluesky.plans.scan(det, *args, num, md=metadata).
+    The scan is defined by number of points along scan trajector(y/ies). Wraps
+    bluesky.plans.scan(det, *args, num, md=metadata).
     """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params, num)
@@ -147,8 +147,8 @@ def num_grid_scan(
 ) -> MsgGenerator:
     """Scan independent multi-motor trajectories.
 
-    The scan is defined by number of points along scan trajectories.
-    Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).
+    Snakes all fast axes by default. The scan is defined by number of points along scan
+    trajectories. Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).
     """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
@@ -181,8 +181,8 @@ def num_rscan(
 ) -> MsgGenerator:
     """Scan concurrent trajector(y/ies), relative to current position(s).
 
-    The scan is defined by number of points along scan trajector(y/ies).
-    Wraps bluesky.plans.rel_scan(det, *args, num, md=metadata).
+    The scan is defined by number of points along scan trajector(y/ies). Wraps
+    bluesky.plans.rel_scan(det, *args, num, md=metadata).
     """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params, num)
@@ -215,8 +215,8 @@ def num_grid_rscan(
 ) -> MsgGenerator:
     """Scan independent trajectories, relative to current positions.
 
-    The scan is defined by number of points along scan trajectories.
-    Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata).
+    Snakes all fast axes by default. The scan is defined by number of points along scan
+    trajectories. Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata).
     """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
@@ -229,14 +229,14 @@ def num_grid_rscan(
 
 
 def _make_list_scan_args(
-    params: dict[Movable | Motor, list[float | int]], grid: bool | None = None
+    params: list[tuple[Movable | Motor, list[float | int]]], grid: bool | None = None
 ):
     shape = []
     args = []
     for param in params:
-        shape.append(len(params[param]))
-        args.append(param)
-        args.append(params[param])
+        shape.append(len(param[1]))
+        args.append(param[0])
+        args.append(param[1])
 
     if not grid:
         shape = list(set(shape))
@@ -257,11 +257,12 @@ def list_scan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, \
-            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
-            ...]}'. Number of points for each movable must be equal."
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
+            of points for each movable must be equal."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -289,11 +290,11 @@ def list_grid_scan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, \
-            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
-            ...]}'."
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -301,8 +302,8 @@ def list_grid_scan(
 ) -> MsgGenerator:
     """Scan independent trajectories.
 
-    The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    Snakes slow axes by default. The scan is defined by providing a list of points for
+    each scan trajectory. Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata).
     """
     args, shape = _make_list_scan_args(params=params, grid=True)
     metadata = metadata or {}
@@ -324,11 +325,12 @@ def list_rscan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, \
-            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
-            ...]}'. Number of points for each movable must be equal."
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
+            of points for each movable must be equal."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -356,11 +358,11 @@ def list_grid_rscan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, \
-            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
-            ...]}'."
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -418,47 +420,45 @@ def _make_stepped_list(
 
 
 def _make_step_scan_args(
-    params: dict[Movable | Motor, list[float | int]], grid: bool | None = None
+    params: list[tuple[Movable | Motor, list[float | int]]], grid: bool | None = None
 ):
     args = []
     shape = []
     stepped_list_length = None
     for param, movable_num in zip(params, range(len(params)), strict=True):
         if movable_num == 0:
-            if len(params[param]) == 3:
-                stepped_list, stepped_list_length = _make_stepped_list(
-                    params=params[param]
-                )
-                args.append(param)
+            if len(param[1]) == 3:
+                stepped_list, stepped_list_length = _make_stepped_list(params=param[1])
+                args.append(param[0])
                 args.append(stepped_list)
                 shape.append(stepped_list_length)
             else:
                 raise ValueError(
-                    f"You provided {len(params[param])} parameters, rather than 3."
+                    f"You provided {len(param[1])} parameters, rather than 3."
                 )
         elif movable_num >= 1:
             if grid:
-                if len(params[param]) == 3:
+                if len(param[1]) == 3:
                     stepped_list, stepped_list_length = _make_stepped_list(
-                        params=params[param]
+                        params=param[1]
                     )
-                    args.append(param)
+                    args.append(param[0])
                     args.append(stepped_list)
                     shape.append(stepped_list_length)
                 else:
                     raise ValueError(
-                        f"You provided {len(params[param])} parameters, rather than 3."
+                        f"You provided {len(param[1])} parameters, rather than 3."
                     )
             else:
-                if len(params[param]) == 2:
+                if len(param[1]) == 2:
                     stepped_list, stepped_list_length = _make_stepped_list(
-                        params=params[param], num=stepped_list_length
+                        params=param[1], num=stepped_list_length
                     )
-                    args.append(param)
+                    args.append(param[0])
                     args.append(stepped_list)
                 else:
                     raise ValueError(
-                        f"You provided {len(params[param])} parameters, rather than 2."
+                        f"You provided {len(param[1])} parameters, rather than 2."
                     )
 
     return args, shape
@@ -475,11 +475,11 @@ def step_scan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent \
-            trajectories, provide '{movable1: [start1, stop1, step1], movable2: \
-            [start2, step2], ... , movableN: [startN, stepN]}'."
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, step2]), ... , (movableN, [startN, stepN])]'."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -508,11 +508,11 @@ def step_grid_scan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent \
-            trajectories, provide '{movable1: [start1, stop1, step1], ... , movableN: \
-            [startN, stopN, stepN]}'."
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -520,8 +520,8 @@ def step_grid_scan(
 ) -> MsgGenerator:
     """Scan independent trajectories with specified step size.
 
-    Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    Snakes all slow axes by default. Generates list(s) of points for each trajectory,
+    used with bluesky.plans.list_grid_scan(det, *args, md=metadata).
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
@@ -544,11 +544,11 @@ def step_rscan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent \
-            trajectories, provide '{movable1: [start1, stop1, step1], movable2: \
-            [start2, step2], ... , movableN: [startN, stepN]}'."
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, step2]), ... , (movableN, [startN, stepN])]'."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -577,11 +577,11 @@ def step_grid_rscan(
         ),
     ],
     params: Annotated[
-        dict[Movable | Motor, list[float | int]],
+        list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent \
-            trajectories, provide '{movable1: [start1, stop1, step1], ... , movableN: \
-            [startN, stopN, stepN]}'."
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -589,8 +589,8 @@ def step_grid_rscan(
 ) -> MsgGenerator:
     """Scan independent trajectories with specified step size, relative to position.
 
-    Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    Snakes all slow axes by default. Generates list(s) of points for each trajectory,
+    used with bluesky.plans.list_grid_scan(det, *args, md=metadata).
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
