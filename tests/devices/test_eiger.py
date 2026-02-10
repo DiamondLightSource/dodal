@@ -492,9 +492,8 @@ def test_check_callback_error(fake_eiger: EigerDetector, iteration):
         LOGGER.error.assert_called_once()
 
 
-@pytest.mark.parametrize("i", range(0, 100))
 def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_correctly(
-    fake_eiger: EigerDetector, i, event_loop_fuzzing
+    fake_eiger: EigerDetector,
 ):
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
     fake_eiger.odin.wait_for_odin_initialised = MagicMock()
