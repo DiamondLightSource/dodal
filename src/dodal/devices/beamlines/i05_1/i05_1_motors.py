@@ -20,10 +20,10 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
         remains aligned with the gravity direction regardless of its azimuthal rotation.
 
     - `long` and `perp`:
-        Longitudinal and perpendicular translation axes in the tilted sample
-        frame. These axes are derived from the lab-frame z motor and the
-        sample-frame `hor` axis, and rotate with the polar angle.
-        Motion along `long` follows the sample's longitudinal direction,
+        Longitudinal and perpendicular virtual translation axes in the rotated sample
+        frame. These axes are derived from the Z-axis and the
+        virtual `hor` axis, and depend on the polar angle.
+        Motion along `long` aligned with the analyser axis,
         while `perp` moves perpendicular to it within the polar rotation plane.
 
     All four virtual axes behave as ordinary orthogonal Cartesian translations
