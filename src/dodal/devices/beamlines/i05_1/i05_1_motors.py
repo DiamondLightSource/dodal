@@ -7,8 +7,8 @@ from dodal.devices.motors import XYZPolarAzimuthStage
 
 
 class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
-    """Six-axis stage with a standard xyz stage and three axis of rotation: polar,
-    azimuth, and defocus.
+    """Six-physical-axis stage with a standard xyz stage, 2 axis of rotation: polar,
+    azimuth and one extra tranlastional axis defocus.
 
     This device exposes four virtual translational axes that are defined in frames
     of reference attached to the sample:
