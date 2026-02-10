@@ -8,10 +8,17 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     StrictEnum,
+    derived_signal_r,
     set_and_wait_for_value,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import (
+    CALCULATE_TIMEOUT,
+    CalculatableTimeout,
+    WatchableAsyncStatus,
+    epics_signal_r,
+    epics_signal_rw,
+)
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import XYZOmegaStage
@@ -78,6 +85,27 @@ class CombinedMove(TypedDict, total=False):
     chi: float | None
 
 
+class Mod360Motor(Motor):
+    def __init__(self, prefix: str, name="") -> None:
+        super().__init__(name)
+        self._raw_readback = epics_signal_r(float, prefix + ".RBV")
+        self.user_readback = derived_signal_r(
+            self._mod_360, raw_readback=self._raw_readback
+        )
+
+    def _mod_360(self, raw_readback: float) -> float:
+        return raw_readback % 360
+
+    def _nearest_360(self):
+        return round(await self.user_readback.get_value() / 360) * 360
+
+    @WatchableAsyncStatus.wrap
+    async def set(
+        self, new_position: float, timeout: CalculatableTimeout = CALCULATE_TIMEOUT
+    ):
+        return super().set(self._nearest_360 + new_position, timeout)
+
+
 class Smargon(XYZOmegaStage, Movable):
     """Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
@@ -89,6 +117,7 @@ class Smargon(XYZOmegaStage, Movable):
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
+            self.omega = Mod360Motor(prefix + "OMEGA")
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
             self.real_x1 = Motor(prefix + "MOTOR_3")
