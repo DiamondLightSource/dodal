@@ -1,3 +1,5 @@
+from ophyd_async.epics.motor import Motor
+
 from dodal.devices.motors import (
     _AZIMUTH,
     _TILT,
@@ -9,10 +11,11 @@ from dodal.devices.motors import (
 )
 
 
-class XYZAzimuthTiltPolarParallelPerpendicularStage(XYZAzimuthTiltPolarStage):
-    """Six-axis stage with a standard xyz stage and three axis of rotation: azimuth,
-    tilt and polar. It also exposes two virtual translational axes that are defined in
-    frames of reference attached to the sample.
+class I21SampleManipulatorStage(XYZAzimuthTiltPolarStage):
+    """Seven-axis stage with a standard xyz stage and four axis of rotation: azimuth,
+    tilt, polar, and difftth (diffraction diode rotation). It also exposes two
+    virtual translational axes that are defined in frames of reference attached to the
+    sample.
 
     - `para` and `perp`:
         Parallel and perpendicular translation axes in the sample frame.
@@ -46,6 +49,7 @@ class XYZAzimuthTiltPolarParallelPerpendicularStage(XYZAzimuthTiltPolarStage):
         azimuth_infix: str = _AZIMUTH,
         tilt_infix: str = _TILT,
         polar_infix: str = "RZ",
+        difftth_infix: str = "DRING",
     ):
         super().__init__(
             prefix=prefix,
@@ -58,6 +62,9 @@ class XYZAzimuthTiltPolarParallelPerpendicularStage(XYZAzimuthTiltPolarStage):
             polar_infix=polar_infix,
         )
         with self.add_children_as_readables():
+            # Diffraction diode rotation.
+            self.difftth = Motor(prefix + difftth_infix)
+
             self.para, self.perp = create_rotational_ij_component_signals(
                 i_read=self.x.user_readback,
                 j_read=self.y.user_readback,

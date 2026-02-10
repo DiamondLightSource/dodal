@@ -6,8 +6,8 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i21 import (
     Grating,
+    I21SampleManipulatorStage,
     ToolPointMotion,
-    XYZAzimuthTiltPolarParallelPerpendicularStage,
 )
 from dodal.devices.insertion_device import (
     Apple2,
@@ -136,12 +136,10 @@ def sample_temperature_controller() -> Lakeshore336:
 
 
 @devices.factory()
-def smp() -> XYZAzimuthTiltPolarParallelPerpendicularStage:
-    return XYZAzimuthTiltPolarParallelPerpendicularStage(
-        prefix=f"{PREFIX.beamline_prefix}-EA-SMPL-01:"
-    )
+def smp() -> I21SampleManipulatorStage:
+    return I21SampleManipulatorStage(prefix=f"{PREFIX.beamline_prefix}-EA-SMPL-01:")
 
 
 @devices.factory()
-def uvw(smp: XYZAzimuthTiltPolarParallelPerpendicularStage) -> ToolPointMotion:
+def uvw(smp: I21SampleManipulatorStage) -> ToolPointMotion:
     return ToolPointMotion(smp)

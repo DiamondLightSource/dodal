@@ -9,9 +9,9 @@ from ophyd_async.epics.motor import MotorLimitsError
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i21 import (
+    I21SampleManipulatorStage,
     ToolPointMotion,
     ToolPointMotorPositions,
-    XYZAzimuthTiltPolarParallelPerpendicularStage,
 )
 from dodal.devices.beamlines.i21.toolpoint_motion import (
     DEFAULT_AXES_ZERO,
@@ -21,14 +21,14 @@ from dodal.devices.beamlines.i21.toolpoint_motion import (
 
 
 @pytest.fixture
-def smp() -> XYZAzimuthTiltPolarParallelPerpendicularStage:
+def smp() -> I21SampleManipulatorStage:
     with init_devices(mock=True):
-        smp = XYZAzimuthTiltPolarParallelPerpendicularStage("TEST:")
+        smp = I21SampleManipulatorStage("TEST:")
     return smp
 
 
 @pytest.fixture
-def uvw(smp: XYZAzimuthTiltPolarParallelPerpendicularStage) -> ToolPointMotion:
+def uvw(smp: I21SampleManipulatorStage) -> ToolPointMotion:
     with init_devices(mock=True):
         uvw = ToolPointMotion(smp)
     return uvw

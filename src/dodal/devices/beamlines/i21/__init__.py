@@ -1,10 +1,10 @@
 from .enums import Grating
-from .i21_motors import XYZAzimuthTiltPolarParallelPerpendicularStage
+from .i21_motors import I21SampleManipulatorStage
 from .toolpoint_motion import ToolPointMotion, ToolPointMotorPositions
 
 __all__ = [
     "Grating",
-    "XYZAzimuthTiltPolarParallelPerpendicularStage",
+    "I21SampleManipulatorStage",
     "ToolPointMotion",
     "ToolPointMotorPositions",
 ]
