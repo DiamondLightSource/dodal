@@ -34,6 +34,6 @@ class Specs2DCMOS(ElectronAnalyserDetector[B07SpecsAnalyserDriverIO, B07SpecsReg
         shutter: FastShutter | None = None,
         name: str = "",
     ):
-        driver = B07SpecsAnalyserDriverIO(prefix)
-        controller = B07ElectronAnalyserController(driver, energy_source, shutter)
+        drv = B07SpecsAnalyserDriverIO(prefix)
+        controller = B07ElectronAnalyserController(drv, energy_source, shutter)
         super().__init__(controller, name)

@@ -36,6 +36,6 @@ class SpecsPhoibos(
         shutter: FastShutter | None = None,
         name: str = "",
     ):
-        driver = B071SpecsAnalyserDriverIO(prefix)
-        controller = B071ElectronAnalyserController(driver, energy_source, shutter)
+        drv = B071SpecsAnalyserDriverIO(prefix)
+        controller = B071ElectronAnalyserController(drv, energy_source, shutter)
         super().__init__(controller, name)

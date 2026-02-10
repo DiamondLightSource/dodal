@@ -47,9 +47,9 @@ class R4000(
         energy_source: AbstractEnergySource,
         name: str = "",
     ):
-        driver = P60VGScientaAnalyserDriverIO(prefix)
+        drv = P60VGScientaAnalyserDriverIO(prefix)
         controller = P60ElectronAnalyserController(
-            driver,
+            drv,
             energy_source=energy_source,
             shutter=None,
             source_selector=None,
