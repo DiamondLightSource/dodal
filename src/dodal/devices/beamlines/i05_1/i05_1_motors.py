@@ -14,10 +14,10 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
     of reference attached to the sample:
 
     - `hor` and `vert`:
-        Horizontal and vertical translation axes in the sample frame.
-        These axes are derived from the lab-frame x and y motors and rotate
+        Horizontal and vertical virtual translation axes of the rotated sample frame.
+        These axes are derived from X and Y axes rotated
         with the azimuth angle, so that motion along `hor` and `vert`
-        remains aligned with the sample regardless of its azimuthal rotation.
+        remains aligned with the gravity direction regardless of its azimuthal rotation.
 
     - `long` and `perp`:
         Longitudinal and perpendicular translation axes in the tilted sample
