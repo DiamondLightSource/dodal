@@ -147,8 +147,8 @@ def num_grid_scan(
 ) -> MsgGenerator:
     """Scan independent multi-motor trajectories.
 
-    Snakes all fast axes by default. The scan is defined by number of points along scan
-    trajectories. Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).
+    The scan is defined by number of points along scan trajectories. Snakes all fast
+    axes by default. Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).
     """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
@@ -215,8 +215,8 @@ def num_grid_rscan(
 ) -> MsgGenerator:
     """Scan independent trajectories, relative to current positions.
 
-    Snakes all fast axes by default. The scan is defined by number of points along scan
-    trajectories. Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata).
+    The scan is defined by number of points along scan trajectories. Snakes all fast
+    axes by default. Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata).
     """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
@@ -302,8 +302,8 @@ def list_grid_scan(
 ) -> MsgGenerator:
     """Scan independent trajectories.
 
-    Snakes slow axes by default. The scan is defined by providing a list of points for
-    each scan trajectory. Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    The scan is defined by providing a list of points for each scan trajectory. Snakes
+    slow axes by default. Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata).
     """
     args, shape = _make_list_scan_args(params=params, grid=True)
     metadata = metadata or {}
@@ -370,8 +370,9 @@ def list_grid_rscan(
 ) -> MsgGenerator:
     """Scan independent trajectories, relative to current positions.
 
-    The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.rel_list_grid_scan(det, *args, md=metadata).
+    The scan is defined by providing a list of points for each scan trajectory. Snakes
+    all fast axes by default. Wraps bluesky.plans.rel_list_grid_scan(det, *args,
+    md=metadata).
     """
     args, shape = _make_list_scan_args(params=params, grid=True)
     metadata = metadata or {}
@@ -520,8 +521,9 @@ def step_grid_scan(
 ) -> MsgGenerator:
     """Scan independent trajectories with specified step size.
 
-    Snakes all slow axes by default. Generates list(s) of points for each trajectory,
-    used with bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    Generates list(s) of points for each trajectory, used with
+    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by
+    default.
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
@@ -589,8 +591,9 @@ def step_grid_rscan(
 ) -> MsgGenerator:
     """Scan independent trajectories with specified step size, relative to position.
 
-    Snakes all slow axes by default. Generates list(s) of points for each trajectory,
-    used with bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    Generates list(s) of points for each trajectory, used with
+    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by
+    default.
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
