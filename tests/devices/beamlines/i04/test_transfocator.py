@@ -18,16 +18,9 @@ def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
     transfocator._vert_size_calc_sp.subscribe_reading(lens_number_is_half_beamsize)
 
 
-async def set_beamsize_to_same_value_as_mock_signal(
-    transfocator: Transfocator, value: float
-):
-    set_mock_value(transfocator._num_lenses_calc_rbv, value)
-    await transfocator.set(value)
-
-
-@patch("dodal.devices.beamlines.i04.transfocator.wait_for_value")
+@patch("dodal.devices.beamlines.i04.transfocator.asyncio.sleep", new=AsyncMock())
+@patch("dodal.devices.beamlines.i04.transfocator.wait_for_value", new=AsyncMock())
 async def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
-    mock_wait_for_value,
     fake_transfocator: Transfocator,
 ):
     given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
