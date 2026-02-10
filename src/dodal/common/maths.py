@@ -132,11 +132,7 @@ def do_rotation(x: float, y: float, rotation_matrix: np.ndarray) -> tuple[float,
     return float(rotation[0]), float(rotation[1])
 
 
-def rotate_clockwise(
-    theta: float,
-    x: float,
-    y: float,
-) -> tuple[float, float]:
+def rotate_clockwise(theta: float, x: float, y: float) -> tuple[float, float]:
     rotation_matrix = np.array(
         [
             [np.cos(theta), np.sin(theta)],
@@ -146,15 +142,5 @@ def rotate_clockwise(
     return do_rotation(x, y, rotation_matrix)
 
 
-def rotate_counter_clockwise(
-    theta: float,
-    x: float,
-    y: float,
-) -> tuple[float, float]:
-    rotation_matrix = np.array(
-        [
-            [np.cos(theta), -np.sin(theta)],
-            [np.sin(theta), np.cos(theta)],
-        ]
-    )
-    return do_rotation(x, y, rotation_matrix)
+def rotate_counter_clockwise(theta: float, x: float, y: float) -> tuple[float, float]:
+    return rotate_clockwise(-theta, x, y)
