@@ -19,6 +19,22 @@ class VirtualAxis(StandardReadable, Movable[float]):
 
 
 class B07SampleManipulator52B(XYZStage):
+    """Sample Manipulator of several Motors and VirtaulAxis.
+
+    Attributes:
+        x (Motor): Controls x direction.
+        y (Motor): Controls y direction.
+        z (Motor): Controls z direction.
+        roty (Motor): Controls y rotation.
+        rotz (Motor): Controls z rotation.
+        xp (Motor): Compound motor for x.
+        yp (Motor): Compound motor for y.
+        zp (Motor): Compound motor for z.
+        omega (VirtualAxis): Virtal rotational axis for the x direction.
+        phi (VirtualAxis): Virtal rotational axis for the y direction.
+        kappa (VirtualAxis): Virtal rotational axis for the z direction.
+    """
+
     def __init__(
         self,
         prefix: str,
