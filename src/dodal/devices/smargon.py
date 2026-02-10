@@ -7,6 +7,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
+    SignalRW,
     StrictEnum,
     set_and_wait_for_value,
     wait_for_value,
@@ -104,6 +105,17 @@ class Smargon(XYZOmegaStage, Movable):
 
         super().__init__(prefix, name)
 
+    async def _get_signal_and_check_limit(
+        self, motor_name: str, value: float
+    ) -> SignalRW[float]:
+        if motor_name == "omega":
+            # TODO should we check limit for omega?
+            return self.omega_axis.phase
+        else:
+            axis = getattr(self, motor_name)
+            await axis.check_motor_limit(await axis.user_setpoint.get_value(), value)
+            return axis.user_setpoint
+
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
         """This will move all motion together in a deferred move.
@@ -114,16 +126,16 @@ class Smargon(XYZOmegaStage, Movable):
         only come back after the motion on that axis finished.
         """
         await self.defer_move.set(DeferMoves.ON)
+        # TODO something something i03 broken smargon serialise moves workaround
         try:
             finished_moving = []
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None and isinstance(new_setpoint, int | float):
-                    axis: Motor = getattr(self, motor_name)
-                    await axis.check_motor_limit(
-                        await axis.user_setpoint.get_value(), new_setpoint
+                    signal = await self._get_signal_and_check_limit(
+                        motor_name, new_setpoint
                     )
                     put_completion = await set_and_wait_for_value(
-                        axis.user_setpoint,
+                        signal,
                         new_setpoint,
                         timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
                         wait_for_set_completion=False,

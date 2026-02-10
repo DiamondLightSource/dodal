@@ -215,3 +215,7 @@ async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out
 
     with pytest.raises(TimeoutError):
         await smargon.set(CombinedMove(x=10))
+
+
+def test_smargon_deferred_moves_move_omega_phase_not_absolute():
+    pass
