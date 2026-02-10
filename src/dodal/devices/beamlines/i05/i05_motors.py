@@ -19,8 +19,7 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
     In addition, it defines two virtual translational axes, `perp` and `long`, which
     form a rotated Cartesian frame within the x-y plane.
 
-    - `long`: Translation along the longitudinal direction of the rotated in-plane
-        coordinate frame defined by ``rotation_angle_deg``.
+        - `long`: Translation along the rotated X-axis.
 
     - `perp`: Translation along the rotated Y-axis.
 
