@@ -7,7 +7,11 @@ from dodal.devices.oav.pin_image_recognition import (
     MxSampleDetect,
     PinTipDetection,
 )
-from dodal.devices.oav.pin_image_recognition.utils import NONE_VALUE, SampleLocation
+from dodal.devices.oav.pin_image_recognition.utils import (
+    NONE_VALUE,
+    SampleLocation,
+    ScanDirections,
+)
 
 DEVICE_NAME = "pin_tip_detection"
 TRIGGERED_TIP_READING = DEVICE_NAME + "-triggered_tip"
@@ -35,7 +39,7 @@ async def test_soft_parameter_defaults_are_correct():
     assert await device.close_ksize.get_value() == 5
     assert await device.close_iterations.get_value() == 5
     assert await device.min_tip_height.get_value() == 5
-    assert await device.scan_direction.get_value() == 1
+    assert await device.scan_direction.get_value() == ScanDirections.FORWARD
     assert await device.preprocess_operation.get_value() == 10
     assert await device.preprocess_iterations.get_value() == 5
     assert await device.preprocess_ksize.get_value() == 5
@@ -50,7 +54,7 @@ async def test_numeric_soft_parameters_can_be_changed():
     await device.close_ksize.set(15)
     await device.close_iterations.set(20)
     await device.min_tip_height.set(25)
-    await device.scan_direction.set(-1)
+    await device.scan_direction.set(ScanDirections.REVERSE)
     await device.preprocess_operation.set(2)
     await device.preprocess_ksize.set(3)
     await device.preprocess_iterations.set(4)
@@ -61,7 +65,7 @@ async def test_numeric_soft_parameters_can_be_changed():
     assert await device.close_ksize.get_value() == 15
     assert await device.close_iterations.get_value() == 20
     assert await device.min_tip_height.get_value() == 25
-    assert await device.scan_direction.get_value() == -1
+    assert await device.scan_direction.get_value() == ScanDirections.REVERSE
     assert await device.preprocess_operation.get_value() == 2
     assert await device.preprocess_ksize.get_value() == 3
     assert await device.preprocess_iterations.get_value() == 4
