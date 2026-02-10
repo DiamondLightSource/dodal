@@ -109,7 +109,7 @@ async def test_given_set_with_value_outside_motor_limit(
         smargon.x,
         smargon.y,
         smargon.z,
-        smargon.omega,
+        # smargon.omega,
         smargon.chi,
         smargon.phi,
     ]:
@@ -117,6 +117,11 @@ async def test_given_set_with_value_outside_motor_limit(
         set_mock_value(motor.high_limit_travel, 1999)
         set_mock_value(motor.dial_low_limit_travel, -1999)
         set_mock_value(motor.dial_high_limit_travel, 1999)
+
+    set_mock_value(smargon.omega._real_motor.low_limit_travel, -1999)
+    set_mock_value(smargon.omega._real_motor.high_limit_travel, 1999)
+    set_mock_value(smargon.omega._real_motor.dial_low_limit_travel, -1999)
+    set_mock_value(smargon.omega._real_motor.dial_high_limit_travel, 1999)
 
     with pytest.raises(MotorLimitsError):
         await smargon.set(

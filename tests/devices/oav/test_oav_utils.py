@@ -85,7 +85,7 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
     run_engine: RunEngine,
 ):
     set_mock_value(oav.zoom_controller.level, zoom_level)
-    set_mock_value(smargon.omega.user_readback, angle)
+    set_mock_value(smargon.omega._real_motor.user_readback, angle)
     pos = run_engine(
         get_move_required_so_that_beam_is_at_pixel(smargon, pixel_to_move_to, oav)
     ).plan_result  # type: ignore

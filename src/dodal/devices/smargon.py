@@ -1,24 +1,20 @@
 import asyncio
 from enum import Enum
-from functools import partial
-
 from math import isclose
-from typing import TypedDict, cast, Unpack
+from typing import TypedDict, cast
 
-from bluesky.protocols import Movable, Locatable, T_co, Status, SyncOrAsync, Location, T
-
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
     StrictEnum,
     set_and_wait_for_value,
-    wait_for_value, StandardReadable, derived_signal_rw, SignalRW, derived_signal_r, CalculatableTimeout,
-    CALCULATE_TIMEOUT, StandardReadableFormat,
+    wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import XYZOmegaStage, XYZStage, _X, _Y, _Z, _OMEGA
+from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 
 
@@ -82,110 +78,7 @@ class CombinedMove(TypedDict, total=False):
     chi: float | None
 
 
-class ModMotor(StandardReadable, Locatable[float]):
-    def __init__(self, real_motor: Motor, name=""):
-        self._real_motor = real_motor
-        with self.add_children_as_readables():
-            self.user_setpoint = derived_signal_rw(
-                self._get_mod_360,
-                partial(self._set_mod_360, self._real_motor.user_setpoint),
-                real_value=self._real_motor.user_setpoint
-                )
-            self.user_readback = derived_signal_r(
-                self._get_mod_360,
-                real_value=self._real_motor.user_readback
-            )
-            self.velocity = derived_signal_rw(
-                self._identity,
-                partial(self._set_value, self._real_motor.velocity),
-                value=self._real_motor.velocity
-            )
-            self.max_velocity = derived_signal_r(
-                self._identity,
-                value=self._real_motor.max_velocity
-            )
-            # self.low_limit_travel = derived_signal_r(
-            #     lambda real_value: real_value,
-            #     real_value=self._real_motor.low_limit_travel
-            # )
-            # self.high_limit_travel = derived_signal_r(
-            #     lambda real_value: real_value,
-            #     real_value=self._real_motor.high_limit_travel
-            # )
-            # self.motor_egu = derived_signal_r(
-            #     lambda real_value: real_value,
-            #     real_value=self._real_motor.motor_egu
-            # )
-            # self.dial_low_limit_travel = derived_signal_r(
-            #     lambda real_value: real_value,
-            #     real_value=self._real_motor.dial_low_limit_travel
-            # )
-            # self.dial_high_limit_travel = derived_signal_r(
-            #     lambda real_value: real_value,
-            #     real_value=self._real_motor.high_limit_travel
-            # )
-        super().__init__(name=name)
-
-
-    def _identity(self, value: float) -> float:
-        return value
-
-
-    async def check_motor_limit(self, abs_start_pos: float, abs_end_pos: float):
-        offset = await self._current_offset()
-        await self._real_motor.check_motor_limit(abs_start_pos + offset, abs_end_pos + offset)
-
-
-    async def _set_value(self, real_signal: SignalRW, modded_value: float):
-        await real_signal.set(modded_value)
-
-    def _get_mod_360(self, real_value: float) -> float:
-        return real_value - self._offset_from_real_value(real_value)
-
-    def _offset_from_real_value(self, real_value: float) -> float:
-        return round(real_value / 360) * 360
-
-    async def _current_offset(self):
-        real_value = await(self._real_motor.user_readback.get_value())
-        return self._offset_from_real_value(real_value)
-
-    async def _set_mod_360(self, signal_to_set: SignalRW, modded_value: float):
-        real_value = await self._real_motor.user_readback.get_value()
-        await signal_to_set.set(modded_value + self._offset_from_real_value(real_value))
-
-    async def locate(self) -> Location[float]:
-        """Return the current setpoint and readback of the motor."""
-        setpoint, readback = await asyncio.gather(
-            self.user_setpoint.get_value(), self.user_readback.get_value()
-        )
-        return Location(setpoint=setpoint, readback=readback)
-
-    @AsyncStatus.wrap
-    async def set(self, value: float, timeout: CalculatableTimeout = CALCULATE_TIMEOUT) -> Location[float]:
-        offset = await self._current_offset()
-        await self._real_motor.set(value + offset, timeout)
-        return await self.locate()
-
-
-class BogusOmegaStage(XYZStage):
-    """Four-axis stage with a standard xyz stage and one axis of rotation: omega."""
-
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-        x_infix: str = _X,
-        y_infix: str = _Y,
-        z_infix: str = _Z,
-        omega_infix: str = _OMEGA,
-    ) -> None:
-        _omega = Motor(prefix + omega_infix)
-        with self.add_children_as_readables():
-            self.omega = ModMotor(_omega, "omega")
-        super().__init__(prefix, name, x_infix, y_infix, z_infix)
-
-
-class Smargon(BogusOmegaStage, Movable):
+class Smargon(XYZOmegaStage, Movable):
     """Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
     increasing the gap between x1 and x2 changes chi, moving together changes virtual x.
@@ -209,7 +102,7 @@ class Smargon(BogusOmegaStage, Movable):
 
         self.defer_move = epics_signal_rw(DeferMoves, prefix + "CS1:DeferMoves")
 
-        super().__init__(prefix, name)
+        super().__init__(prefix, name, mod_360_motor=True)
 
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
