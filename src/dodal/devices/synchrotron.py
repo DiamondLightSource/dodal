@@ -39,24 +39,21 @@ class Synchrotron(StandardReadable):
     """A StandardReadable device that represents a synchrotron facility, providing access to
     various synchrotron parameters and operational status.
 
+    Args:
+        signal_prefix (str, optional): Beamline part of PV. Defaults to Prefix.SIGNAL.
+        status_prefix (str, optional): Status part of PV. Defaults to Prefix.STATUS.
+        topup_prefix (str, optional): Top-up part of PV. Defaults to Prefix.TOP_UP.
+        name (str, optional): Name of the device. Defaults to an empty string.
+
     Attributes:
-    ----------
-    current : EpicsSignalR
-        Read-only signal for the synchrotron beam current (float).
-    energy : EpicsSignalR
-        Read-only signal for the beam energy (float).
-    probe : SoftSignalRW
-        Configurable signal for the probe type (str). Default is "x-ray".
-    type : SoftSignalRW
-        Configurable signal for the synchrotron type (str). Default is "Synchrotron X-ray Source".
-    synchrotron_mode : EpicsSignalR
-        Read-only signal for the current synchrotron mode (SynchrotronMode).
-    machine_user_countdown : EpicsSignalR
-        Read-only signal for the machine user countdown timer (float).
-    top_up_start_countdown : EpicsSignalR
-        Read-only signal for the top-up start countdown timer (float).
-    top_up_end_countdown : EpicsSignalR
-        Read-only signal for the top-up end countdown timer (float).
+        current (SignalR[float]): Read-only signal for the synchrotron beam current.
+        energy (SignalR[float]): Read-only signal for the beam energy.
+        probe (SignalR[str]): Read-only signal for the probe type. Defaults to ``"x-ray"``.
+        type (SignalR[str]): Read-only signal for the synchrotron type. Defaults to ``"Synchrotron X-ray Source"``.
+        synchrotron_mode (SignalR[SynchrotronMode]): Read-only signal for the current synchrotron operating mode.
+        machine_user_countdown (SignalR[float]): Read-only signal for the machine user countdown timer.
+        top_up_start_countdown (SignalR[float]): Read-only signal for the top-up start countdown timer.
+        top_up_end_countdown (SignalR[float]): Read-only signal for the top-up end countdown timer.
     """
 
     def __init__(
