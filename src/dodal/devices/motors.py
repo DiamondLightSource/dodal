@@ -419,13 +419,14 @@ def create_rotational_ij_component_signals(
     rotation so that the requested motion is achieved in the rotated frame.
 
     Args:
-        i_read (SignalR): SignalR representing the i motor readback.
-        j_read (SignalR): representing the j motor readback.
-        i_write (Movable): object for setting the i position.
-        j_write (Movable): object for setting the j position.
-        angle_deg (float | SignalR): Rotation angle in degrees.
-        clockwise_frame (boolean): If True, the rotated frame is defined using a
-            clockwise rotation; otherwise, a counter-clockwise rotation is used.
+        i_read (SignalR[float]): SignalR representing the i motor readback.
+        j_read (SignalR[float]): representing the j motor readback.
+        i_write (Movable[float]): object for setting the i position.
+        j_write (Movable[float]): object for setting the j position.
+        angle_deg (float | SignalR[float]): Rotation angle in degrees.
+        clockwise_frame (boolean, optional): If True, the rotated frame is using a
+            clockwise rotation; otherwise, a counter-clockwise rotation is used. Default
+            is True.
 
     Returns:
         tuple[SignalRW[float], SignalRW[float]] Two virtual read/write signals
