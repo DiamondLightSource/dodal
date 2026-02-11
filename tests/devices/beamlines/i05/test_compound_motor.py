@@ -43,7 +43,6 @@ async def mock_compound(
                 y_motor: np.array([1.0, 2.0], dtype=np.float64),
                 z_motor: np.array([-1.0, 0.5], dtype=np.float64),
             },
-            name="mock_compound",
         )
     return mock_compound
 
