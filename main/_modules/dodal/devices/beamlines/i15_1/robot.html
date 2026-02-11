@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.0.1.dev14+g07c462c2b documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.0.1.dev15+gee97fc144 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=f21f5470"></script>
+    <script src="../../../../../_static/documentation_options.js?v=e9ff39dd"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -810,11 +810,14 @@ window.addEventListener("load", load);
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">DeviceMock</span><span class="p">,</span>
+    <span class="n">SignalX</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">callback_on_mock_put</span><span class="p">,</span>
@@ -835,8 +838,16 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.SampleLocation.html#dodal.devices.beamlines.i15_1.robot.SampleLocation">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SampleLocation</span><span class="p">:</span>
-    <span class="n">location</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">pin</span><span class="p">:</span> <span class="nb">int</span></div>
+    <span class="n">puck</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">position</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="ProgramNames">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.ProgramNames.html#dodal.devices.beamlines.i15_1.robot.ProgramNames">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgramNames</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+    <span class="n">PUCK</span> <span class="o">=</span> <span class="s2">&quot;PUCK.MB6&quot;</span>
+    <span class="n">BEAM</span> <span class="o">=</span> <span class="s2">&quot;BEAM.MB6&quot;</span></div>
 
 
 
@@ -848,26 +859,43 @@ window.addEventListener("load", load);
 
 
 
+<div class="viewcode-block" id="CurrentSample">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.CurrentSample.html#dodal.devices.beamlines.i15_1.robot.CurrentSample">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CurrentSample</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">puck</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PUCK:INDEX&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SAMPLE:INDEX&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="MockRobot">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.MockRobot.html#dodal.devices.beamlines.i15_1.robot.MockRobot">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MockRobot</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">&quot;Robot&quot;</span><span class="p">]):</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="s2">&quot;Robot&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">change_program_name</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
-            <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">program_name</span><span class="p">,</span> <span class="s2">&quot;PUCK.MB6&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">set_program</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+            <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">program_name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">puck_load_program</span><span class="p">,</span> <span class="n">change_program_name</span><span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">puck_load_program</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">set_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">PUCK</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">beam_load_program</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">set_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">BEAM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="p">)</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">wrap_program_running</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
-            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">program_running</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">program_running</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_program_running</span><span class="p">():</span>
                 <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span> <span class="n">ProgramRunning</span><span class="o">.</span><span class="n">PROGRAM_RUNNING</span><span class="p">)</span>
                 <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
                 <span class="n">set_mock_value</span><span class="p">(</span>
                     <span class="n">device</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span> <span class="n">ProgramRunning</span><span class="o">.</span><span class="n">NO_PROGRAM_RUNNING</span>
                 <span class="p">)</span>
 
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">program_running</span><span class="p">())</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">_program_running</span><span class="p">())</span>
 
-        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">puck_pick</span><span class="p">,</span> <span class="n">wrap_program_running</span><span class="p">)</span></div>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">puck_pick</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">beam_place</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span></div>
 
 
 
@@ -882,71 +910,56 @@ window.addEventListener("load", load);
     <span class="n">PROGRAM_STARTED_RUNNING_TIMEOUT</span> <span class="o">=</span> <span class="mf">10.0</span>
     <span class="n">PROGRAM_COMPLETED_TIMEOUT</span> <span class="o">=</span> <span class="mf">60.0</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">current_sample_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="c1"># Any signals that should be read at every point in the scan</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PUCK:PUCK_SEL&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PUCK:POS_SEL&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:PUCK_SEL&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:POS_SEL&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">program_name</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PROGRAM_NAME&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span> <span class="o">=</span> <span class="n">CurrentSample</span><span class="p">(</span><span class="n">current_sample_prefix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">program_name</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PROGRAM_NAME&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">program_running</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-            <span class="n">ProgramRunning</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PROGRAM_RUNNING&quot;</span>
+            <span class="n">ProgramRunning</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PROGRAM_RUNNING&quot;</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">program_err_code</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PRG_ERR_CODE&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">program_err_message</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RUN_ERR_MSG&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">program_err_code</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PRG_ERR_CODE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">program_err_message</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">RUN_ERR_MSG&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_err_code</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RUN_ERR_CODE&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">controller_err_code</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CNTL_ERR_CODE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_err_code</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">RUN_ERR_CODE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller_err_code</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">CNTL_ERR_CODE&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">program_line</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">LINE_CONTENTS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">program_line</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">LINE_CONTENTS&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">controller_err_message</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-            <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CNTL_ERR_MSG&quot;</span>
+            <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">CNTL_ERR_MSG&quot;</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">puck_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PUCK:ACTION0.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">puck_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PUCK:ACTION1.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">puck_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PUCK:LOAD.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puck_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:ACTION0.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puck_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:ACTION1.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">puck_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:LOAD.PROC&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">beam_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BEAM:ACTION0.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beam_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BEAM:ACTION1.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beam_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BEAM:LOAD.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beam_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">BEAM:ACTION0.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beam_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">BEAM:ACTION1.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beam_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">BEAM:LOAD.PROC&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION0.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION1.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MOTOR:LOAD.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION0.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION1.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:LOAD.PROC&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">servo_off</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SOFF.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">servo_on</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SON.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servo_off</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">SOFF.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servo_on</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">SON.PROC&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RESET.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">RESET.PROC&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Home.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">Home.PROC&quot;</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Robot.set">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.Robot.html#dodal.devices.beamlines.i15_1.robot.Robot.set">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a sample load from the specified sample location.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            value (SampleLocation): the sample location</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">puck_load_program</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
-
-        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">program_name</span><span class="p">,</span> <span class="s2">&quot;PUCK.MB6&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">PROGRAM_LOADED_TIMEOUT</span>
-        <span class="p">)</span>
-
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">location</span><span class="p">),</span>
-            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">pin</span><span class="p">),</span>
-        <span class="p">)</span>
-
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">puck_pick</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_signal</span><span class="p">:</span> <span class="n">SignalX</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">trigger_signal</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
 
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span>
@@ -957,6 +970,46 @@ window.addEventListener("load", load);
             <span class="bp">self</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span>
             <span class="n">ProgramRunning</span><span class="o">.</span><span class="n">NO_PROGRAM_RUNNING</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">PROGRAM_COMPLETED_TIMEOUT</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_load_program_and_wait_for_loaded</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">trigger_signal</span><span class="p">:</span> <span class="n">SignalX</span><span class="p">,</span> <span class="n">program_name</span><span class="p">:</span> <span class="n">ProgramNames</span>
+    <span class="p">):</span>
+        <span class="k">await</span> <span class="n">trigger_signal</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
+
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">program_name</span><span class="p">,</span> <span class="n">program_name</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">PROGRAM_LOADED_TIMEOUT</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Robot.set">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.Robot.html#dodal.devices.beamlines.i15_1.robot.Robot.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a sample load from the specified sample location.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (SampleLocation): the sample location</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_program_and_wait_for_loaded</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">puck_load_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">PUCK</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">puck</span><span class="p">),</span>
+            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">position</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_pick</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_program_and_wait_for_loaded</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_load_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">BEAM</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beam_place</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">puck</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">puck</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">position</span><span class="p">),</span>
         <span class="p">)</span></div>
 </div>
 

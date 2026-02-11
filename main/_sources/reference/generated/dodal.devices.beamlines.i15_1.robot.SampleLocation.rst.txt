@@ -17,10 +17,10 @@ dodal.devices.beamlines.i15\_1.robot.SampleLocation
    .. autosummary::
    
       
-      ~SampleLocation.location
+      ~SampleLocation.puck
       
       
-      ~SampleLocation.pin
+      ~SampleLocation.position
       
    
    

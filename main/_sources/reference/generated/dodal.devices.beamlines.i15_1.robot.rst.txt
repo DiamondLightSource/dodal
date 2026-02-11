@@ -14,7 +14,9 @@ dodal.devices.beamlines.i15\_1.robot
    :toctree:
    :recursive:
 
+   ~robot.CurrentSample
    ~robot.MockRobot
+   ~robot.ProgramNames
    ~robot.ProgramRunning
    ~robot.Robot
    ~robot.SampleLocation
