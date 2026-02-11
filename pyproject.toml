@@ -30,7 +30,7 @@ dependencies = [
     "scanspec>=0.7.3",
     "pyzmq==27.1.0",
     "deepdiff",
-    "daq-config-server>=v1.0.0",    # For getting Configuration settings.
+    "daq-config-server>=v1.1.2",    # For getting Configuration settings.
 ]
 
 dynamic = ["version"]

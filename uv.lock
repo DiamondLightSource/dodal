@@ -644,7 +644,7 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.0.0"
+version = "1.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -657,10 +657,11 @@ dependencies = [
     { name = "requests" },
     { name = "urllib3" },
     { name = "uvicorn" },
+    { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/63/84/649f039a658994fdbe6ecf53e92ba01b65c53635965fe2f4c0c64fbb21a4/daq_config_server-1.0.0.tar.gz", hash = "sha256:63b4989c563520683fbda12aaa42ffeab5fcccc9cc2b25953fd6bc673ab91afd", size = 113002, upload-time = "2025-12-04T17:01:19.77Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/1e/37373402723769ced976215ffb1716353d89c0772d5bec8116d9f981d095/daq_config_server-1.1.2.tar.gz", hash = "sha256:2f8c9e43a41534d90512be7ecab37de0fdf33d4b00a6b61bd04e3c82d886062f", size = 126067, upload-time = "2026-01-12T11:28:21.034Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/05/5edbc534abf7edbd9cdd971f25809f7ae916e0d417756cb96fb11c49252c/daq_config_server-1.0.0-py3-none-any.whl", hash = "sha256:cfea960c4b6652784f598ce784fcd236f5fd1234f483c2c287b3a4ab96efb3c8", size = 19808, upload-time = "2025-12-04T17:01:18.392Z" },
+    { url = "https://files.pythonhosted.org/packages/13/9f/b8df9fad0b1005e95460ee92092a1da33c282c158336bc23bd7635981f29/daq_config_server-1.1.2-py3-none-any.whl", hash = "sha256:c2bca297feb01a51883e3df7d6ade11af9a3f311602e5584320b1e12881cf636", size = 29273, upload-time = "2026-01-12T11:28:19.635Z" },
 ]
 
 [[package]]
@@ -763,7 +764,7 @@ requires-dist = [
     { name = "aiohttp" },
     { name = "bluesky", specifier = ">=1.14.5" },
     { name = "click" },
-    { name = "daq-config-server", specifier = ">=1.0.0" },
+    { name = "daq-config-server", specifier = ">=1.1.2" },
     { name = "deepdiff" },
     { name = "graypy" },
     { name = "numpy" },
@@ -3830,6 +3831,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/31/74/09617788ea7f95c85d597d778a3ac370c961492e6065e99ca9d5f3ee26e8/workflows-3.2.tar.gz", hash = "sha256:510a6f919b415929377bb68df0d005c2064f0bf5e646f9ee50e3526c813526d9", size = 92242, upload-time = "2025-02-27T17:37:42.02Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8f/47/7902c3cea79f6a1964fac59b97fb9f11e5ea85e0c0582cc89b2c3193ea48/workflows-3.2-py3-none-any.whl", hash = "sha256:38eed7d209d626b371277bcbcd9c3d476bce9945467d1341c578b1c21ff4eec3", size = 66736, upload-time = "2025-02-27T17:37:40.441Z" },
+]
+
+[[package]]
+name = "xmltodict"
+version = "1.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/aa/917ceeed4dbb80d2f04dbd0c784b7ee7bba8ae5a54837ef0e5e062cd3cfb/xmltodict-1.0.2.tar.gz", hash = "sha256:54306780b7c2175a3967cad1db92f218207e5bc1aba697d887807c0fb68b7649", size = 25725, upload-time = "2025-09-17T21:59:26.459Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/20/69a0e6058bc5ea74892d089d64dfc3a62ba78917ec5e2cfa70f7c92ba3a5/xmltodict-1.0.2-py3-none-any.whl", hash = "sha256:62d0fddb0dcbc9f642745d8bbf4d81fd17d6dfaec5a15b5c1876300aad92af0d", size = 13893, upload-time = "2025-09-17T21:59:24.859Z" },
 ]
 
 [[package]]
