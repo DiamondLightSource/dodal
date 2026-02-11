@@ -30,57 +30,53 @@ def toolpoint_rotation_matrix(tilt_deg: float, azimuth_deg: float) -> np.ndarray
     )
 
 
-def uvw_to_xyz(
-    u: float,
-    v: float,
-    w: float,
-    tilt_deg: float,
-    azimuth_deg: float,
-    zero: tuple[float, float, float],
-) -> tuple[float, float, float]:
-    rotation = toolpoint_rotation_matrix(tilt_deg, azimuth_deg)
-    tool = np.array([u, v, w])
-    offset = np.array(zero)
-    xyz = offset + rotation @ tool
-    x, y, z = xyz
-    return float(x), float(y), float(z)
-
-
-def xyz_to_uvw(
-    x: float,
-    y: float,
-    z: float,
-    tilt_deg: float,
-    azimuth_deg: float,
-    zero: tuple[float, float, float],
-) -> tuple[float, float, float]:
-    rotation = toolpoint_rotation_matrix(tilt_deg, azimuth_deg)
-    xyz = np.array([x, y, z])
-    offset = np.array(zero)
-
-    tool = rotation.T @ (xyz - offset)
-    u, v, w = tool
-    return float(u), float(v), float(w)
-
-
-@dataclass
+@dataclass(kw_only=True)
 class AnglePositions:
     tilt_deg: float
     azimuth_deg: float
 
 
-@dataclass
+@dataclass(kw_only=True)
 class UVWMotorPositions(AnglePositions):
     u: float
     v: float
     w: float
 
 
-@dataclass
+@dataclass(kw_only=True)
 class XYZMotorPositions(AnglePositions):
     x: float
     y: float
     z: float
+
+
+def uvw_to_xyz(
+    pos: UVWMotorPositions,
+    zero: tuple[float, float, float],
+) -> XYZMotorPositions:
+    rotation = toolpoint_rotation_matrix(pos.tilt_deg, pos.azimuth_deg)
+    uvw = np.array([pos.u, pos.v, pos.w])
+    offset = np.array(zero)
+    xyz = offset + rotation @ uvw
+    x, y, z = xyz
+    return XYZMotorPositions(
+        x=x, y=y, z=z, tilt_deg=pos.tilt_deg, azimuth_deg=pos.azimuth_deg
+    )
+
+
+def xyz_to_uvw(
+    pos: XYZMotorPositions,
+    zero: tuple[float, float, float],
+) -> UVWMotorPositions:
+    rotation = toolpoint_rotation_matrix(pos.tilt_deg, pos.azimuth_deg)
+    xyz = np.array([pos.x, pos.y, pos.z])
+    offset = np.array(zero)
+
+    tool = rotation.T @ (xyz - offset)
+    u, v, w = tool
+    return UVWMotorPositions(
+        u=u, v=v, w=w, tilt_deg=pos.tilt_deg, azimuth_deg=pos.azimuth_deg
+    )
 
 
 class ToolPointMotion(StandardReadable, Movable):
@@ -120,74 +116,73 @@ class ToolPointMotion(StandardReadable, Movable):
 
     async def _get_real_motor_positions(
         self,
-    ) -> tuple[float, float, float, float, float]:
-        return await asyncio.gather(
+    ) -> XYZMotorPositions:
+        x, y, z, tilt, azimuth = await asyncio.gather(
             self.smp_ref().x.user_readback.get_value(),
             self.smp_ref().y.user_readback.get_value(),
             self.smp_ref().z.user_readback.get_value(),
             self.smp_ref().tilt.user_readback.get_value(),
             self.smp_ref().azimuth.user_readback.get_value(),
         )
+        return XYZMotorPositions(x=x, y=y, z=z, tilt_deg=tilt, azimuth_deg=azimuth)
 
-    async def _read_all_uvw(self) -> tuple[float, float, float, float, float]:
-        x, y, z, tilt, azimuth = await self._get_real_motor_positions()
-        u, v, w = xyz_to_uvw(
-            x=x,
-            y=y,
-            z=z,
-            tilt_deg=tilt,
-            azimuth_deg=azimuth,
-            zero=self._zero,
-        )
-        return u, v, w, tilt, azimuth
+    async def _read_all_uvw(self) -> UVWMotorPositions:
+        xyz_pos = await self._get_real_motor_positions()
+        uvw_pos = xyz_to_uvw(xyz_pos, zero=self._zero)
+        return uvw_pos
 
-    async def _write_all_uvw(
-        self, u: float, v: float, w: float, tilt: float, azimuth: float
-    ) -> None:
-        # Current positions
-        x0, y0, z0, tilt0, azimuth0 = await self._get_real_motor_positions()
-        start = XYZMotorPositions(x0, y0, z0, tilt0, azimuth0)
+    async def _write_all_uvw(self, uvw_pos: UVWMotorPositions) -> None:
+        xyz_start = await self._get_real_motor_positions()
+        xyz_end = uvw_to_xyz(uvw_pos, self._zero)
 
-        # Target positions
-        x, y, z = uvw_to_xyz(u, v, w, tilt, azimuth, self._zero)
-        end = XYZMotorPositions(x, y, z, tilt, azimuth)
-
-        await self.check_motor_limits(start, end)
+        await self.check_motor_limits(xyz_start, xyz_end)
         await asyncio.gather(
-            self.smp_ref().x.set(end.x),
-            self.smp_ref().y.set(end.y),
-            self.smp_ref().z.set(end.z),
-            self.smp_ref().tilt.set(end.tilt_deg),
-            self.smp_ref().azimuth.set(end.azimuth_deg),
+            self.smp_ref().x.set(xyz_end.x),
+            self.smp_ref().y.set(xyz_end.y),
+            self.smp_ref().z.set(xyz_end.z),
+            self.smp_ref().tilt.set(xyz_end.tilt_deg),
+            self.smp_ref().azimuth.set(xyz_end.azimuth_deg),
         )
 
     def _create_uvws(self) -> tuple[SignalRW[float], SignalRW[float], SignalRW[float]]:
         def read_u(
             x: float, y: float, z: float, tilt_deg: float, azimuth_deg: float
         ) -> float:
-            return float(xyz_to_uvw(x, y, z, tilt_deg, azimuth_deg, self._zero)[0])
+            pos = XYZMotorPositions(
+                x=x, y=y, z=z, tilt_deg=tilt_deg, azimuth_deg=azimuth_deg
+            )
+            return float(xyz_to_uvw(pos, self._zero).u)
 
         async def set_u(value: float) -> None:
-            u, v, w, tilt_deg, azimuth_deg = await self._read_all_uvw()
-            await self._write_all_uvw(value, v, w, tilt_deg, azimuth_deg)
+            uvw_pos = await self._read_all_uvw()
+            uvw_pos.u = value
+            await self._write_all_uvw(uvw_pos)
 
         def read_v(
             x: float, y: float, z: float, tilt_deg: float, azimuth_deg: float
         ) -> float:
-            return float(xyz_to_uvw(x, y, z, tilt_deg, azimuth_deg, self._zero)[1])
+            pos = XYZMotorPositions(
+                x=x, y=y, z=z, tilt_deg=tilt_deg, azimuth_deg=azimuth_deg
+            )
+            return float(xyz_to_uvw(pos, self._zero).v)
 
         async def set_v(value: float) -> None:
-            u, v, w, tilt_deg, azimuth_deg = await self._read_all_uvw()
-            await self._write_all_uvw(u, value, w, tilt_deg, azimuth_deg)
+            uvw_pos = await self._read_all_uvw()
+            uvw_pos.v = value
+            await self._write_all_uvw(uvw_pos)
 
         def read_w(
             x: float, y: float, z: float, tilt_deg: float, azimuth_deg: float
         ) -> float:
-            return float(xyz_to_uvw(x, y, z, tilt_deg, azimuth_deg, self._zero)[2])
+            pos = XYZMotorPositions(
+                x=x, y=y, z=z, tilt_deg=tilt_deg, azimuth_deg=azimuth_deg
+            )
+            return float(xyz_to_uvw(pos, self._zero).w)
 
         async def set_w(value: float) -> None:
-            u, v, w, tilt_deg, azimuth_deg = await self._read_all_uvw()
-            await self._write_all_uvw(u, v, value, tilt_deg, azimuth_deg)
+            uvw_pos = await self._read_all_uvw()
+            uvw_pos.w = value
+            await self._write_all_uvw(uvw_pos)
 
         u = derived_signal_rw(
             read_u,
@@ -220,10 +215,4 @@ class ToolPointMotion(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: UVWMotorPositions):
-        await self._write_all_uvw(
-            u=value.u,
-            v=value.v,
-            w=value.w,
-            tilt=value.tilt_deg,
-            azimuth=value.azimuth_deg,
-        )
+        await self._write_all_uvw(value)

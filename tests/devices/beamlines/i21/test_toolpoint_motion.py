@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import replace
 from math import cos, radians, sin
 from unittest.mock import AsyncMock
 
@@ -58,12 +59,14 @@ def expected_uvw_read(
     return expected_v, expected_v, expected_w
 
 
-def test_toolpoint_math_matches_legacy():
+def test_uvw_to_xyz_math_matches_legacy():
     zero = DEFAULT_AXES_ZERO
     u, v, w = 1.2, -3.4, 5.6
     tilt, azimuth = 30.0, 10.0
 
-    x_new, y_new, z_new = uvw_to_xyz(u, v, w, tilt, azimuth, zero)
+    uvw = UVWMotorPositions(u=u, v=v, w=w, tilt_deg=tilt, azimuth_deg=azimuth)
+
+    expected_xyz = uvw_to_xyz(uvw, zero)
 
     chi = radians(tilt)
     phi = radians(azimuth)
@@ -72,16 +75,19 @@ def test_toolpoint_math_matches_legacy():
     y_old = zero[1] + v * cos(phi) - w * sin(phi)
     z_old = zero[2] - u * sin(chi) + v * cos(chi) * sin(phi) + w * cos(chi) * cos(phi)
 
-    assert np.allclose([x_new, y_new, z_new], [x_old, y_old, z_old])
+    assert np.allclose(
+        [expected_xyz.x, expected_xyz.y, expected_xyz.z], [x_old, y_old, z_old]
+    )
 
 
-def test_xyz_to_toolpoint_matches_legacy():
+def test_xyz_to_uvw_math_matches_legacy():
     zero = DEFAULT_AXES_ZERO
 
     x, y, z = 12.3, -4.5, 6.7
     tilt, azimuth = 30.0, 10.0
+    xyz = XYZMotorPositions(x=x, y=y, z=z, tilt_deg=tilt, azimuth_deg=azimuth)
 
-    u_new, v_new, w_new = xyz_to_uvw(x, y, z, tilt, azimuth, zero)
+    expected_uvw = xyz_to_uvw(xyz, zero)
 
     chi = radians(tilt)
     phi = radians(azimuth)
@@ -95,8 +101,7 @@ def test_xyz_to_toolpoint_matches_legacy():
     w_old = dx * cos(phi) * sin(chi) - dy * sin(phi) + dz * cos(chi) * cos(phi)
 
     assert np.allclose(
-        [u_new, v_new, w_new],
-        [u_old, v_old, w_old],
+        [expected_uvw.u, expected_uvw.v, expected_uvw.w], [u_old, v_old, w_old]
     )
 
 
@@ -112,17 +117,18 @@ async def test_uvw_read(uvw: ToolPointMotion) -> None:
         smp.azimuth.set(azimuth_deg),
         smp.tilt.set(tilt_deg),
     )
-    expected_u, expected_v, expected_w = xyz_to_uvw(
-        x=x, y=y, z=z, tilt_deg=tilt_deg, azimuth_deg=azimuth_deg, zero=uvw._zero
+    xyz_pos = XYZMotorPositions(
+        x=x, y=y, z=z, tilt_deg=tilt_deg, azimuth_deg=azimuth_deg
     )
+    expected_uvw = xyz_to_uvw(xyz_pos, zero=uvw._zero)
 
     smp_read = await smp.read()
     await assert_reading(
         uvw,
         {
-            uvw.u.name: partial_reading(expected_u),
-            uvw.v.name: partial_reading(expected_v),
-            uvw.w.name: partial_reading(expected_w),
+            uvw.u.name: partial_reading(expected_uvw.u),
+            uvw.v.name: partial_reading(expected_uvw.v),
+            uvw.w.name: partial_reading(expected_uvw.w),
         }
         | smp_read,
     )
@@ -150,18 +156,16 @@ async def test_uvw_axis_set(
     )
 
     # Read initial toolpoint position
-    u0, v0, w0, tilt, azimuth = await uvw._read_all_uvw()
+    uvw_pos0 = await uvw._read_all_uvw()
 
     # Set the selected axis
     axis = getattr(uvw, axis_name)
     await axis.set(new_value)
 
     # Build expected toolpoint values
-    u = new_value if axis_name == "u" else u0
-    v = new_value if axis_name == "v" else v0
-    w = new_value if axis_name == "w" else w0
+    uvw_pos = replace(uvw_pos0, **{axis_name: new_value})
 
-    expected_x, expected_y, expected_z = uvw_to_xyz(u, v, w, tilt, azimuth, uvw._zero)
+    expected_xyz = uvw_to_xyz(uvw_pos, uvw._zero)
 
     actual_x, actual_y, actual_z = await asyncio.gather(
         smp.x.user_readback.get_value(),
@@ -169,16 +173,16 @@ async def test_uvw_axis_set(
         smp.z.user_readback.get_value(),
     )
 
-    assert np.isclose(actual_x, expected_x)
-    assert np.isclose(actual_y, expected_y)
-    assert np.isclose(actual_z, expected_z)
+    assert np.isclose(actual_x, expected_xyz.x)
+    assert np.isclose(actual_y, expected_xyz.y)
+    assert np.isclose(actual_z, expected_xyz.z)
 
     await assert_reading(
         uvw,
         {
-            uvw.u.name: partial_reading(u),
-            uvw.v.name: partial_reading(v),
-            uvw.w.name: partial_reading(w),
+            uvw.u.name: partial_reading(uvw_pos.u),
+            uvw.v.name: partial_reading(uvw_pos.v),
+            uvw.w.name: partial_reading(uvw_pos.w),
         },
         full_match=False,
     )
@@ -202,7 +206,6 @@ async def test_uvw_set(uvw: ToolPointMotion) -> None:
     assert await uvw.smp_ref().tilt.user_readback.get_value() == pos.tilt_deg
 
 
-@pytest.mark.asyncio
 async def test_uvw_check_motor_limits_calls_all_motors(
     uvw: ToolPointMotion,
 ) -> None:
@@ -227,7 +230,6 @@ async def test_uvw_check_motor_limits_calls_all_motors(
     )
 
 
-@pytest.mark.asyncio
 async def test_check_motor_limits_raises_on_failure(
     uvw: ToolPointMotion,
 ) -> None:
