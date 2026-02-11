@@ -21,16 +21,20 @@ class PolynomCompoundMotors(
     Locatable[float],
     Stoppable,
 ):
-    """PolynomCompoundMotors is a compound motor controller that synchronizes the movement of multiple motors based on polynomial relationships.
+    """Compound motor controller that synchronizes the movement of multiple motors
+    based on polynomial relationships.
 
-    When the master motor is moved, all driven (slave) motors are asynchronously moved to positions calculated using polynomial coefficients. The polynomial coefficients define the relationship between the master motor's position and each driven motor's position.
-    The master motor is always included with a default polynomial coefficient of [0.0, 1.0], representing a direct mapping.
-    Driven motors' positions are calculated using NumPy's polynomial evaluation.
+    When the master motor is moved, all driven (slave) motors are asynchronously moved
+    to positions calculated using polynomial coefficients from master motor position.
+    The master motor is always included with a default polynomial coefficient
+    of [0.0, 1.0], representing a direct mapping. Driven motors' positions are
+    calculated using NumPy's polynomial evaluation.
 
     Args:
-    master(Motor): The master motor whose position determines the positions of the driven motors.
-    driven_dict (dict[Motor, Array1D[np.float64]]): Dictionary mapping each driven (slave) motor to its polynomial coefficients (as a NumPy array).
-    name (str,optional): Name of the compound motor group. Defaults to an empty string.
+        master(Motor): master motor.
+        driven_dict (dict[Motor, Array1D[np.float64]]): dictionary that defines mapping
+            of each driven motor to its polynomial coefficients (NumPy array).
+        name (str,optional): name of the device. Defaults to an empty string.
     """
 
     def __init__(
