@@ -1,21 +1,52 @@
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import (
+    AsyncStatus,
+    DeviceMock,
+    StandardReadable,
+    StandardReadableFormat,
+    callback_on_mock_put,
+    default_mock_class,
+    set_mock_value,
+)
 from ophyd_async.epics.core import epics_signal_r, epics_signal_w
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import _OMEGA, XYZStage
 
 
+class InstantVirtualAxisMock(DeviceMock["VirtualAxis"]):
+    """Mock behaviour that instantly moves readback to setpoint."""
+
+    async def connect(self, device: "VirtualAxis") -> None:
+        # When setpoint is written to, immediately update readback and cast to int.
+        def _instant_move(value: float, wait: bool):
+            set_mock_value(device.user_readback, int(value))
+
+        callback_on_mock_put(device.user_setpoint, _instant_move)
+
+
+@default_mock_class(InstantVirtualAxisMock)
 class VirtualAxis(StandardReadable, Movable[float]):
+    """Device that has different user_readback and user_setpoint signals for read and
+    write. Represents the virtual axis coordinate system for the
+    B07SampleManipulator52B. The user_readback signal is the read signal for this device,
+    same as a Motor.
+    """
+
     def __init__(self, pv: str, name: str = ""):
-        with self.add_children_as_readables():
-            self.user_setpoint = epics_signal_w(float, pv)
+        self.user_setpoint = epics_signal_w(float, pv)
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.user_readback = epics_signal_r(int, pv + ".RBV")
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: float):
         await self.user_setpoint.set(value)
+
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        super().set_name(name, child_name_separator=child_name_separator)
+        # Readback should be named the same as its parent in read()
+        self.user_readback.set_name(name)
 
 
 class B07SampleManipulator52B(XYZStage):
