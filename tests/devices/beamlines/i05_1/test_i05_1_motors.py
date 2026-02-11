@@ -13,10 +13,10 @@ from tests.devices.beamlines.i05_shared.rotation_signal_test_util import (
 
 
 @pytest.fixture
-def xyzpad_stage() -> XYZPolarAzimuthDefocusStage:
+def sm() -> XYZPolarAzimuthDefocusStage:
     with init_devices(mock=True):
-        xyzpad_stage = XYZPolarAzimuthDefocusStage("TEST:")
-    return xyzpad_stage
+        sm = XYZPolarAzimuthDefocusStage("TEST:")
+    return sm
 
 
 def expected_hor_read(x: float, y: float, azimuth_theta: float) -> float:
@@ -35,7 +35,7 @@ def expected_perp_read(z: float, hor: float, polar_theta: float) -> float:
     return z * sin(polar_theta) + hor * cos(polar_theta)
 
 
-async def test_xyzpad_stage_read(xyzpad_stage: XYZPolarAzimuthDefocusStage) -> None:
+async def test_xyzpad_stage_read(sm: XYZPolarAzimuthDefocusStage) -> None:
     x, y = 10, 5
     azimuth_angle_deg = 45
     azimuth_theta = radians(azimuth_angle_deg)
@@ -49,42 +49,42 @@ async def test_xyzpad_stage_read(xyzpad_stage: XYZPolarAzimuthDefocusStage) -> N
     expected_perp = expected_perp_read(z, expected_hor, polar_theta)
 
     await asyncio.gather(
-        xyzpad_stage.x.set(x),
-        xyzpad_stage.y.set(y),
-        xyzpad_stage.z.set(z),
-        xyzpad_stage.azimuth.set(azimuth_angle_deg),
-        xyzpad_stage.polar.set(polar_angle_deg),
+        sm.x.set(x),
+        sm.y.set(y),
+        sm.z.set(z),
+        sm.azimuth.set(azimuth_angle_deg),
+        sm.polar.set(polar_angle_deg),
     )
     await assert_reading(
-        xyzpad_stage,
+        sm,
         {
-            xyzpad_stage.x.name: partial_reading(x),
-            xyzpad_stage.y.name: partial_reading(y),
-            xyzpad_stage.z.name: partial_reading(z),
-            xyzpad_stage.polar.name: partial_reading(polar_angle_deg),
-            xyzpad_stage.azimuth.name: partial_reading(azimuth_angle_deg),
-            xyzpad_stage.defocus.name: partial_reading(0),
-            xyzpad_stage.hor.name: partial_reading(expected_hor),
-            xyzpad_stage.vert.name: partial_reading(expected_vert),
-            xyzpad_stage.long.name: partial_reading(expected_long),
-            xyzpad_stage.perp.name: partial_reading(expected_perp),
+            sm.x.name: partial_reading(x),
+            sm.y.name: partial_reading(y),
+            sm.z.name: partial_reading(z),
+            sm.polar.name: partial_reading(polar_angle_deg),
+            sm.azimuth.name: partial_reading(azimuth_angle_deg),
+            sm.defocus.name: partial_reading(0),
+            sm.hor.name: partial_reading(expected_hor),
+            sm.vert.name: partial_reading(expected_vert),
+            sm.long.name: partial_reading(expected_long),
+            sm.perp.name: partial_reading(expected_perp),
         },
     )
 
 
 async def test_xyzpad_hor_and_vert_set(
-    xyzpad_stage: XYZPolarAzimuthDefocusStage,
+    sm: XYZPolarAzimuthDefocusStage,
 ) -> None:
     frame_config = RotatedCartesianFrameTestConfig(
-        i_read=xyzpad_stage.x.user_readback,
-        j_read=xyzpad_stage.y.user_readback,
-        i_write=xyzpad_stage.x,
-        j_write=xyzpad_stage.y,
-        angle_deg=xyzpad_stage.azimuth,
+        i_read=sm.x.user_readback,
+        j_read=sm.y.user_readback,
+        i_write=sm.x,
+        j_write=sm.y,
+        angle_deg=sm.azimuth,
         expected_i_read_func=expected_hor_read,
         expected_j_read_func=expected_vert_read,
-        i_rotation_axis=xyzpad_stage.hor,
-        j_rotation_axis=xyzpad_stage.vert,
+        i_rotation_axis=sm.hor,
+        j_rotation_axis=sm.vert,
     )
     await assert_rotated_axes_are_orthogonal(
         i_val=10,
@@ -97,18 +97,18 @@ async def test_xyzpad_hor_and_vert_set(
 
 
 async def test_xyzpad_long_and_perp_set(
-    xyzpad_stage: XYZPolarAzimuthDefocusStage,
+    sm: XYZPolarAzimuthDefocusStage,
 ) -> None:
     frame_config = RotatedCartesianFrameTestConfig(
-        i_read=xyzpad_stage.z.user_readback,
-        j_read=xyzpad_stage.hor,
-        i_write=xyzpad_stage.z,
-        j_write=xyzpad_stage.hor,
-        angle_deg=xyzpad_stage.polar,
+        i_read=sm.z.user_readback,
+        j_read=sm.hor,
+        i_write=sm.z,
+        j_write=sm.hor,
+        angle_deg=sm.polar,
         expected_i_read_func=expected_long_read,
         expected_j_read_func=expected_perp_read,
-        i_rotation_axis=xyzpad_stage.long,
-        j_rotation_axis=xyzpad_stage.perp,
+        i_rotation_axis=sm.long,
+        j_rotation_axis=sm.perp,
     )
     await assert_rotated_axes_are_orthogonal(
         i_val=10,
