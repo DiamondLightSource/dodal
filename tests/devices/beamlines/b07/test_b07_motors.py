@@ -59,8 +59,8 @@ async def test_sm52b_read(
             "sm52b-zp": partial_reading(zp),
             "sm52b-roty": partial_reading(roty),
             "sm52b-rotz": partial_reading(rotz),
-            "sm52b-kappa": partial_reading(int(kappa)),
-            "sm52b-phi": partial_reading(int(phi)),
-            "sm52b-omega": partial_reading(int(omega)),
+            "sm52b-kappa": partial_reading(kappa),
+            "sm52b-phi": partial_reading(phi),
+            "sm52b-omega": partial_reading(omega),
         },
     )
