@@ -203,9 +203,9 @@ def pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def smargon() -> Smargon:
-    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", name="gonio")
 
 
 @devices.factory()

@@ -15,6 +15,7 @@ from ophyd.log import logger as ophyd_logger
 
 LOGGER = logging.getLogger("Dodal")
 # Temporarily duplicated https://github.com/bluesky/ophyd-async/issues/550
+# Only required if dodal is NOT managed by BlueAPI.
 ophyd_async_logger = logging.getLogger("ophyd_async")
 LOGGER.setLevel(logging.DEBUG)
 
@@ -53,6 +54,7 @@ DEFAULT_FORMATTER = ColoredFormatterWithDeviceName(
 )
 
 
+# The following functions are used only if dodal is NOT managed by BlueAPI.
 class CircularMemoryHandler(logging.Handler):
     """Loosely based on the MemoryHandler, which keeps a buffer and writes it when full
     or when there is a record of specific level. This instead keeps a circular buffer
@@ -236,12 +238,20 @@ def set_up_all_logging_handlers(
 
 
 def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
+    """Function to integrate bluesky and ophyd logging.
+    Only required if dodal is NOT managed by BlueAPI.
+
+    """
     for logger in [ophyd_logger, bluesky_logger, ophyd_async_logger]:
         logger.parent = parent_logger
         logger.setLevel(logging.DEBUG)
 
 
 def do_default_logging_setup(dev_mode=False, graylog_port: int | None = None):
+    """Function to set up default logging including graylog and bluesky and ophyd logs.
+    Only required if dodal is NOT managed by BlueAPI.
+
+    """
     logging_path, debug_logging_path = get_logging_file_paths()
     set_up_all_logging_handlers(
         LOGGER,

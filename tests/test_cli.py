@@ -63,11 +63,9 @@ class UnconnectableOphydAsyncDevice(OphydV2Device):
 
 def device_results(
     ophyd_async_happy_devices: int = 0,
-    ophyd_async_instantiation_failures: int = 0,
-    ophyd_async_connection_failures: int = 0,
+    ophyd_async_failures: int = 0,
     ophyd_happy_devices: int = 0,
-    ophyd_instantiation_failures: int = 0,
-    ophyd_connection_failures: int = 0,
+    ophyd_failures: int = 0,
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
     devices = {
         **{
@@ -77,31 +75,16 @@ def device_results(
             for i in range(ophyd_async_happy_devices)
         },
         **{
-            f"ophyd_async_unconnectable_device_{i}": UnconnectableOphydAsyncDevice(
-                name=f"ophyd_async_unconnectable_device_{i}"
-            )
-            for i in range(ophyd_async_connection_failures)
-        },
-        **{
             f"ophyd_happy_device_{i}": OphydV1Device(name=f"ophyd_happy_device_{i}")
             for i in range(ophyd_happy_devices)
-        },
-        **{
-            f"ophyd_unconnectable_device_{i}": UnconnectableOphydDevice(
-                name=f"ophyd_unconnectable_device_{i}"
-            )
-            for i in range(ophyd_connection_failures)
         },
     }
     exceptions: dict[str, Exception] = {
         **{
             f"ophyd_async_failed_device_{i}": TimeoutError()
-            for i in range(ophyd_async_instantiation_failures)
+            for i in range(ophyd_async_failures)
         },
-        **{
-            f"ophyd_failed_device_{i}": TimeoutError()
-            for i in range(ophyd_instantiation_failures)
-        },
+        **{f"ophyd_failed_device_{i}": TimeoutError() for i in range(ophyd_failures)},
     }
     return devices, exceptions
 
@@ -139,75 +122,21 @@ def test_cli_connect_in_sim_mode(runner: CliRunner):
     [
         # Ophyd-Async Only
         (device_results(ophyd_async_happy_devices=6), 6),
-        (
-            device_results(
-                ophyd_async_happy_devices=3,
-                ophyd_async_connection_failures=3,
-            ),
-            3,
-        ),
-        (
-            device_results(
-                ophyd_async_happy_devices=3,
-                ophyd_async_instantiation_failures=3,
-            ),
-            3,
-        ),
-        (
-            device_results(
-                ophyd_async_happy_devices=2,
-                ophyd_async_instantiation_failures=2,
-                ophyd_async_connection_failures=2,
-            ),
-            2,
-        ),
-        (
-            device_results(
-                ophyd_async_instantiation_failures=3,
-                ophyd_async_connection_failures=3,
-            ),
-            0,
-        ),
+        (device_results(ophyd_async_happy_devices=3, ophyd_async_failures=3), 3),
+        (device_results(ophyd_async_happy_devices=2, ophyd_async_failures=2), 2),
+        (device_results(ophyd_async_failures=3), 0),
         # Ophyd Only
         (device_results(ophyd_happy_devices=6), 6),
-        (
-            device_results(
-                ophyd_happy_devices=3,
-                ophyd_connection_failures=3,
-            ),
-            3,
-        ),
-        (
-            device_results(
-                ophyd_happy_devices=3,
-                ophyd_instantiation_failures=3,
-            ),
-            3,
-        ),
-        (
-            device_results(
-                ophyd_happy_devices=2,
-                ophyd_instantiation_failures=2,
-                ophyd_connection_failures=2,
-            ),
-            2,
-        ),
-        (
-            device_results(
-                ophyd_instantiation_failures=3,
-                ophyd_connection_failures=3,
-            ),
-            0,
-        ),
+        (device_results(ophyd_happy_devices=3, ophyd_failures=3), 3),
+        (device_results(ophyd_happy_devices=2, ophyd_failures=2), 2),
+        (device_results(ophyd_failures=3), 0),
         # Mixture
         (
             device_results(
                 ophyd_happy_devices=1,
-                ophyd_instantiation_failures=1,
-                ophyd_connection_failures=1,
+                ophyd_failures=1,
                 ophyd_async_happy_devices=1,
-                ophyd_async_instantiation_failures=1,
-                ophyd_async_connection_failures=1,
+                ophyd_async_failures=1,
             ),
             2,
         ),
@@ -232,57 +161,21 @@ def test_cli_connect_reports_correct_number_of_connected_devices(
     "devices",
     [
         # Ophyd-Async Only
-        device_results(
-            ophyd_async_connection_failures=6,
-        ),
-        device_results(
-            ophyd_async_instantiation_failures=6,
-        ),
-        device_results(
-            ophyd_async_happy_devices=3,
-            ophyd_async_connection_failures=3,
-        ),
-        device_results(
-            ophyd_async_happy_devices=3, ophyd_async_instantiation_failures=3
-        ),
-        device_results(
-            ophyd_async_instantiation_failures=3,
-            ophyd_async_connection_failures=3,
-        ),
-        device_results(
-            ophyd_async_happy_devices=2,
-            ophyd_async_instantiation_failures=2,
-            ophyd_async_connection_failures=2,
-        ),
+        device_results(ophyd_async_failures=6),
+        device_results(ophyd_async_happy_devices=3, ophyd_async_failures=3),
+        device_results(ophyd_async_failures=3),
+        device_results(ophyd_async_happy_devices=2, ophyd_async_failures=2),
         # Ophyd Only
-        device_results(
-            ophyd_connection_failures=6,
-        ),
-        device_results(
-            ophyd_instantiation_failures=6,
-        ),
-        device_results(
-            ophyd_happy_devices=3,
-            ophyd_connection_failures=3,
-        ),
-        device_results(ophyd_happy_devices=3, ophyd_async_instantiation_failures=3),
-        device_results(
-            ophyd_instantiation_failures=3,
-            ophyd_connection_failures=3,
-        ),
-        device_results(
-            ophyd_happy_devices=2,
-            ophyd_instantiation_failures=2,
-            ophyd_connection_failures=2,
-        ),
+        device_results(ophyd_failures=6),
+        device_results(ophyd_happy_devices=3, ophyd_failures=3),
+        device_results(ophyd_failures=3),
+        device_results(ophyd_happy_devices=2, ophyd_failures=2),
         # Mixture
         device_results(
             ophyd_happy_devices=1,
-            ophyd_instantiation_failures=1,
-            ophyd_connection_failures=1,
+            ophyd_failures=1,
             ophyd_async_happy_devices=1,
-            ophyd_async_instantiation_failures=1,
-            ophyd_async_connection_failures=1,
+            ophyd_async_failures=1,
         ),
     ],
 )
@@ -332,8 +225,8 @@ def _mock_connect(
     catch_exceptions: bool = False,
 ) -> Result:
     with patch(
-        "dodal.cli.make_all_devices",
-        return_value=devices,
+        "dodal.cli.DeviceManager.build_and_connect",
+        return_value=(*devices, {}),
     ):
         result = runner.invoke(
             main,
