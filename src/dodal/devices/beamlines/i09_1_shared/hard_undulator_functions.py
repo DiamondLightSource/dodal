@@ -1,8 +1,6 @@
 import numpy as np
-from daq_config_server.client import ConfigServer
 from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 
-from dodal.devices.beamlines.i09_1_shared.hard_energy import LookUpTableProvider
 from dodal.log import LOGGER
 
 # Physics constants
@@ -29,20 +27,6 @@ I09_HU_UNDULATOR_LUT_COLUMN_NAMES = [
 ]
 MAGNET_BLOCKS_PER_PERIOD = 4
 MAGNET_BLOCK_HEIGHT_MM = 16
-
-
-class I09HardLutProvider(LookUpTableProvider):
-    def __init__(self, config_server: ConfigServer, filepath: str) -> None:
-        self.config_server = config_server
-        self.filepath = filepath
-
-    def get_look_up_table(self) -> GenericLookupTable:
-        self._lut = self.config_server.get_file_contents(
-            self.filepath,
-            desired_return_type=GenericLookupTable,
-            reset_cached_result=True,
-        )
-        return self._lut
 
 
 def _validate_order(look_up_table: GenericLookupTable, order: int) -> None:
@@ -98,7 +82,7 @@ def _calculate_undulator_parameter_max(
 
 
 def calculate_gap_i09_hu(
-    lut: LookUpTableProvider,
+    look_up_table: GenericLookupTable,
     value: float,
     order: int = 1,
 ) -> float:
@@ -107,8 +91,8 @@ def calculate_gap_i09_hu(
     https://cxro.lbl.gov//PDF/X-Ray-Data-Booklet.pdf.
 
     Args:
+        look_up_table (GenericLookupTable): Lookup table with beamline parameters for each harmonic order.
         value (float): Requested photon energy in keV.
-        lut (LookUpTableProvider): Lookup table provider to get beamline parameters for each harmonic order.
         order (int, optional): Harmonic order for which to calculate the gap. Defaults to 1.
 
     Returns:
@@ -116,7 +100,6 @@ def calculate_gap_i09_hu(
     """
     gap_offset: float = 0.0
     undulator_period_mm: int = 27
-    look_up_table: GenericLookupTable = lut.get_look_up_table()
 
     # Validate inputs
     _validate_order(look_up_table, order)
@@ -164,7 +147,7 @@ def calculate_gap_i09_hu(
 
 
 def calculate_energy_i09_hu(
-    lut: LookUpTableProvider,
+    look_up_table: GenericLookupTable,
     value: float,
     order: int = 1,
 ) -> float:
@@ -172,8 +155,8 @@ def calculate_energy_i09_hu(
     Reverse of the calculate_gap_i09_hu function.
 
     Args:
+        look_up_table (GenericLookupTable): Lookup table with beamline parameters for each harmonic order.
         value (float): Undulator gap in millimeters.
-        lut (LookUpTableProvider): Lookup table provider to get beamline parameters for each harmonic order.
         order (int, optional): Harmonic order for which to calculate the energy. Defaults to 1.
 
     Returns:
@@ -182,7 +165,6 @@ def calculate_energy_i09_hu(
     gap_offset: float = 0.0
     undulator_period_mm: int = 27
 
-    look_up_table: GenericLookupTable = lut.get_look_up_table()
     _validate_order(look_up_table, order)
 
     gamma = _calculate_gamma(look_up_table, order)

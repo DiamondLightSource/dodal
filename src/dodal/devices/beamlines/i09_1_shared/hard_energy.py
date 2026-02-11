@@ -2,6 +2,8 @@ from asyncio import gather
 from typing import Any, Protocol
 
 from bluesky.protocols import Locatable, Location, Movable
+from daq_config_server.client import ConfigServer
+from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -22,9 +24,25 @@ class LookUpTableProvider(Protocol):
 
 
 class EnergyGapConvertor(Protocol):
-    def __call__(self, lut: LookUpTableProvider, value: float, order: int) -> float:
+    def __call__(
+        self, look_up_table: GenericLookupTable, value: float, order: int
+    ) -> float:
         """Protocol to provide value conversion using lookup table provider."""
         ...
+
+
+class I09HardLutProvider(LookUpTableProvider):
+    def __init__(self, config_server: ConfigServer, filepath: str) -> None:
+        self.config_server = config_server
+        self.filepath = filepath
+
+    def get_look_up_table(self) -> GenericLookupTable:
+        self._lut: GenericLookupTable = self.config_server.get_file_contents(
+            self.filepath,
+            desired_return_type=GenericLookupTable,
+            reset_cached_result=True,
+        )
+        return self._lut
 
 
 class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
@@ -60,11 +78,13 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         super().__init__(name=name)
 
     def _read_energy(self, current_gap: float, current_order: int) -> float:
-        return self.gap_to_energy_func(self._lut_provider, current_gap, current_order)
+        _lookup_table = self._lut_provider.get_look_up_table()
+        return self.gap_to_energy_func(_lookup_table, current_gap, current_order)
 
     async def _set_energy(self, energy: float) -> None:
         current_order = await self._undulator_order_ref().value.get_value()
-        target_gap = self.energy_to_gap_func(self._lut_provider, energy, current_order)
+        _lookup_table = self._lut_provider.get_look_up_table()
+        target_gap = self.energy_to_gap_func(_lookup_table, energy, current_order)
         await self._undulator_ref().set(target_gap)
 
     @AsyncStatus.wrap

@@ -10,9 +10,9 @@ from dodal.devices.beamlines.i09_1_shared import (
 from dodal.devices.beamlines.i09_1_shared.hard_energy import (
     HardEnergy,
     HardInsertionDeviceEnergy,
+    I09HardLutProvider,
 )
 from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
-    I09HardLutProvider,
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
 )
