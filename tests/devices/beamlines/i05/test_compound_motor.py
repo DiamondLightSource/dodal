@@ -4,30 +4,29 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.epics.motor import Motor
-from ophyd_async.sim import SimMotor
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.beamlines.i05 import PolynomCompoundMotors
 
 
 @pytest.fixture
-async def x_motor() -> SimMotor:
+async def x_motor() -> Motor:
     async with init_devices(mock=True):
-        x_motor = SimMotor()
+        x_motor = Motor("")
     return x_motor
 
 
 @pytest.fixture
-async def y_motor() -> SimMotor:
+async def y_motor() -> Motor:
     async with init_devices(mock=True):
-        y_motor = SimMotor()
+        y_motor = Motor("")
     return y_motor
 
 
 @pytest.fixture
-async def z_motor() -> SimMotor:
+async def z_motor() -> Motor:
     async with init_devices(mock=True):
-        z_motor = SimMotor()
+        z_motor = Motor("")
     return z_motor
 
 
