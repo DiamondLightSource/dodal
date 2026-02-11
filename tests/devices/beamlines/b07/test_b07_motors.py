@@ -21,7 +21,7 @@ def sm52b() -> B07SampleManipulator52B:
         (2.0, 1.2, 3.51, 24.0, 1.0, 2.0, 5.0, 21.0, 1.0, 25.0, 19.2),
     ],
 )
-async def test_sm_read(
+async def test_sm52b_read(
     sm52b: B07SampleManipulator52B,
     x: float,
     y: float,
