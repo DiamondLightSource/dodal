@@ -71,12 +71,15 @@ def test_uvw_to_xyz_math_matches_legacy():
     chi = radians(tilt)
     phi = radians(azimuth)
 
-    x_old = zero[0] + u * cos(chi) + v * sin(chi) * sin(phi) + w * cos(phi) * sin(chi)
-    y_old = zero[1] + v * cos(phi) - w * sin(phi)
-    z_old = zero[2] - u * sin(chi) + v * cos(chi) * sin(phi) + w * cos(chi) * cos(phi)
-
+    x_legacy = (
+        zero[0] + u * cos(chi) + v * sin(chi) * sin(phi) + w * cos(phi) * sin(chi)
+    )
+    y_legacy = zero[1] + v * cos(phi) - w * sin(phi)
+    z_legacy = (
+        zero[2] - u * sin(chi) + v * cos(chi) * sin(phi) + w * cos(chi) * cos(phi)
+    )
     assert np.allclose(
-        [expected_xyz.x, expected_xyz.y, expected_xyz.z], [x_old, y_old, z_old]
+        [x_legacy, y_legacy, z_legacy], [expected_xyz.x, expected_xyz.y, expected_xyz.z]
     )
 
 
@@ -96,12 +99,12 @@ def test_xyz_to_uvw_math_matches_legacy():
     dy = y - zero[1]
     dz = z - zero[2]
 
-    u_old = dx * cos(chi) - dz * sin(chi)
-    v_old = dx * sin(chi) * sin(phi) + dy * cos(phi) + dz * cos(chi) * sin(phi)
-    w_old = dx * cos(phi) * sin(chi) - dy * sin(phi) + dz * cos(chi) * cos(phi)
+    u_legacy = dx * cos(chi) - dz * sin(chi)
+    v_legacy = dx * sin(chi) * sin(phi) + dy * cos(phi) + dz * cos(chi) * sin(phi)
+    w_legacy = dx * cos(phi) * sin(chi) - dy * sin(phi) + dz * cos(chi) * cos(phi)
 
     assert np.allclose(
-        [expected_uvw.u, expected_uvw.v, expected_uvw.w], [u_old, v_old, w_old]
+        [u_legacy, v_legacy, w_legacy], [expected_uvw.u, expected_uvw.v, expected_uvw.w]
     )
 
 
