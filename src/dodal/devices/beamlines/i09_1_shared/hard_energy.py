@@ -1,5 +1,5 @@
 from asyncio import gather
-from typing import Any, Protocol
+from typing import Protocol
 
 from bluesky.protocols import Locatable, Location, Movable
 from daq_config_server.client import ConfigServer
@@ -17,32 +17,12 @@ from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 
 
-class LookUpTableProvider(Protocol):
-    def get_look_up_table(self, *args, **kwargs) -> Any:
-        """Protocol to provide lookup table data."""
-        ...
-
-
 class EnergyGapConvertor(Protocol):
     def __call__(
         self, look_up_table: GenericLookupTable, value: float, order: int
     ) -> float:
-        """Protocol to provide value conversion using lookup table provider."""
+        """Protocol for a function to provide value conversion using lookup table."""
         ...
-
-
-class I09HardLutProvider(LookUpTableProvider):
-    def __init__(self, config_server: ConfigServer, filepath: str) -> None:
-        self.config_server = config_server
-        self.filepath = filepath
-
-    def get_look_up_table(self) -> GenericLookupTable:
-        self._lut: GenericLookupTable = self.config_server.get_file_contents(
-            self.filepath,
-            desired_return_type=GenericLookupTable,
-            reset_cached_result=True,
-        )
-        return self._lut
 
 
 class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
@@ -54,14 +34,16 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         self,
         undulator_order: UndulatorOrder,
         undulator: UndulatorInMm,
-        lut_provider: LookUpTableProvider,
+        config_server: ConfigServer,
+        filepath: str,
         gap_to_energy_func: EnergyGapConvertor,
         energy_to_gap_func: EnergyGapConvertor,
         name: str = "",
     ) -> None:
         self._undulator_order_ref = Reference(undulator_order)
         self._undulator_ref = Reference(undulator)
-        self._lut_provider = lut_provider
+        self.config_server = config_server
+        self.filepath = filepath
         self.gap_to_energy_func = gap_to_energy_func
         self.energy_to_gap_func = energy_to_gap_func
 
@@ -78,14 +60,24 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         super().__init__(name=name)
 
     def _read_energy(self, current_gap: float, current_order: int) -> float:
-        _lookup_table = self._lut_provider.get_look_up_table()
-        return self.gap_to_energy_func(_lookup_table, current_gap, current_order)
+        _lookup_table = self.get_look_up_table()
+        return self.gap_to_energy_func(
+            look_up_table=_lookup_table, value=current_gap, order=current_order
+        )
 
-    async def _set_energy(self, energy: float) -> None:
+    async def _set_energy(self, value: float) -> None:
         current_order = await self._undulator_order_ref().value.get_value()
-        _lookup_table = self._lut_provider.get_look_up_table()
-        target_gap = self.energy_to_gap_func(_lookup_table, energy, current_order)
+        _lookup_table = self.get_look_up_table()
+        target_gap = self.energy_to_gap_func(_lookup_table, value, current_order)
         await self._undulator_ref().set(target_gap)
+
+    def get_look_up_table(self) -> GenericLookupTable:
+        self._lut: GenericLookupTable = self.config_server.get_file_contents(
+            self.filepath,
+            desired_return_type=GenericLookupTable,
+            reset_cached_result=True,
+        )
+        return self._lut
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:

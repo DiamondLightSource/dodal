@@ -3,23 +3,26 @@ from unittest.mock import patch
 
 import pytest
 from daq_config_server.client import ConfigServer
+from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 
 from dodal.devices.beamlines.i09_1_shared import (
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
-)
-from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
-    I09HardLutProvider,
 )
 
 pytest_plugins = ["dodal.testing.fixtures.devices.hard_undulator"]
 
 
 @pytest.fixture()
-def lut_provider(
+def lut(
     mock_config_client: ConfigServer,
-) -> I09HardLutProvider:
-    return I09HardLutProvider(mock_config_client, "path/to/lut")
+) -> GenericLookupTable:
+    _lut = mock_config_client.get_file_contents(
+        file_path="path/to/lut",
+        desired_return_type=GenericLookupTable,
+        reset_cached_result=True,
+    )
+    return _lut
 
 
 @pytest.mark.parametrize(
@@ -34,9 +37,9 @@ async def test_calculate_gap_from_energy(
     energy: float,
     order: int,
     expected_gap: float,
-    lut_provider: I09HardLutProvider,
+    lut: GenericLookupTable,
 ):
-    assert calculate_gap_i09_hu(lut_provider, energy, order) == pytest.approx(
+    assert calculate_gap_i09_hu(lut, energy, order) == pytest.approx(
         expected_gap, abs=0.0001
     )
 
@@ -53,26 +56,24 @@ async def test_calculate_energy_from_gap(
     energy: float,
     order: int,
     gap: float,
-    lut_provider: I09HardLutProvider,
+    lut: GenericLookupTable,
 ):
-    assert calculate_energy_i09_hu(lut_provider, gap, order) == pytest.approx(
-        energy, abs=0.0001
-    )
+    assert calculate_energy_i09_hu(lut, gap, order) == pytest.approx(energy, abs=0.0001)
 
 
 async def test_calculate_gap_from_energy_wrong_order(
-    lut_provider: I09HardLutProvider,
+    lut: GenericLookupTable,
 ):
     wrong_order = 100
     with pytest.raises(
         ValueError,
         match=re.escape(f"Order parameter {wrong_order} not found in lookup table"),
     ):
-        calculate_gap_i09_hu(lut_provider, 30, wrong_order)
+        calculate_gap_i09_hu(lut, 30, wrong_order)
 
 
 async def test_calculate_gap_from_energy_wrong_energy(
-    lut_provider: I09HardLutProvider,
+    lut: GenericLookupTable,
 ):
     with pytest.raises(
         ValueError,
@@ -80,7 +81,7 @@ async def test_calculate_gap_from_energy_wrong_energy(
             "Requested energy 30 keV is out of range for harmonic 1: [2.12, 3.05] keV"
         ),
     ):
-        calculate_gap_i09_hu(lut_provider, 30, 1)
+        calculate_gap_i09_hu(lut, 30, 1)
 
 
 @patch(
@@ -89,7 +90,7 @@ async def test_calculate_gap_from_energy_wrong_energy(
 )
 async def test_calculate_gap_from_energy_wrong_k(
     validate_energy_in_range_mock,
-    lut_provider: I09HardLutProvider,
+    lut: GenericLookupTable,
 ):
     with pytest.raises(
         ValueError,
@@ -97,4 +98,4 @@ async def test_calculate_gap_from_energy_wrong_k(
             "Diffraction parameter squared must be positive! Calculated value -1.78"
         ),
     ):
-        calculate_gap_i09_hu(lut_provider, 30, 1)
+        calculate_gap_i09_hu(lut, 30, 1)

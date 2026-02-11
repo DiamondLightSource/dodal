@@ -16,9 +16,6 @@ from dodal.devices.beamlines.i09_1_shared import (
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
 )
-from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
-    I09HardLutProvider,
-)
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
@@ -62,7 +59,8 @@ async def hu_id_energy(
         hu_id_energy = HardInsertionDeviceEnergy(
             undulator_order=undulator_order,
             undulator=undulator_in_mm,
-            lut_provider=I09HardLutProvider(mock_config_client, "path/to/lut"),
+            config_server=mock_config_client,
+            filepath="path/to/lut",
             gap_to_energy_func=calculate_energy_i09_hu,
             energy_to_gap_func=calculate_gap_i09_hu,
         )

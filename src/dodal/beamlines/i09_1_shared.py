@@ -10,7 +10,6 @@ from dodal.devices.beamlines.i09_1_shared import (
 from dodal.devices.beamlines.i09_1_shared.hard_energy import (
     HardEnergy,
     HardInsertionDeviceEnergy,
-    I09HardLutProvider,
 )
 from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
     calculate_energy_i09_hu,
@@ -59,7 +58,8 @@ def hu_id_energy(
     return HardInsertionDeviceEnergy(
         undulator_order=harmonics,
         undulator=undulator,
-        lut_provider=I09HardLutProvider(I09_1_CONF_CLIENT, LOOK_UPTABLE_FILE),
+        config_server=I09_1_CONF_CLIENT,
+        filepath=LOOK_UPTABLE_FILE,
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
     )
