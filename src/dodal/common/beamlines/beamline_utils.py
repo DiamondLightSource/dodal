@@ -1,4 +1,5 @@
 import inspect
+import logging
 from collections.abc import Callable
 from typing import Annotated, Final, TypeVar, cast
 
@@ -24,6 +25,9 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def set_beamline(beamline: str):
@@ -162,6 +166,11 @@ def device_factory(
 def set_path_provider(provider: PathProvider):
     global PATH_PROVIDER
 
+    LOGGER.info(
+        "Setting global path provider to %s (previously %s)",
+        provider,
+        globals().get("PATH_PROVIDER"),
+    )
     PATH_PROVIDER = provider
 
 
@@ -171,6 +180,7 @@ def get_path_provider() -> PathProvider:
 
 def clear_path_provider() -> None:
     global PATH_PROVIDER
+    LOGGER.info("Clearing global path provider: %s", globals().get("PATH_PROVIDER"))
     try:
         del PATH_PROVIDER
     except NameError:
