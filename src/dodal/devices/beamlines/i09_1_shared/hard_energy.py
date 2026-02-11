@@ -98,6 +98,11 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
+        """Update energy demand and set energy to a given value in keV.
+
+        Args:
+            value (float): Energy in keV.
+        """
         self.energy_demand.set(value)
         await self.energy.set(value)
 
