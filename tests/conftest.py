@@ -14,6 +14,7 @@ from ophyd_async.core import (
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.beamlines.beamline_utils import clear_path_provider
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.visit import (
     DirectoryServiceClient,
     LocalDirectoryServiceClient,
@@ -171,3 +172,8 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
         det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore
     )
+
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    get_config_client.cache_clear()
