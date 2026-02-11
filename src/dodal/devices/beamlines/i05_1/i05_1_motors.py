@@ -37,13 +37,13 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
     def __init__(
         self,
         prefix: str,
-        x_infix="SMX",
-        y_infix="SMY",
-        z_infix="SMZ",
-        polar_infix="POL",
-        azimuth_infix="AZM",
-        defocus_infix="SMDF",
-        name="",
+        x_infix: str = "SMX",
+        y_infix: str = "SMY",
+        z_infix: str = "SMZ",
+        polar_infix: str = "POL",
+        azimuth_infix: str = "AZM",
+        defocus_infix: str = "SMDF",
+        name: str = "",
     ):
         super().__init__(
             prefix,
