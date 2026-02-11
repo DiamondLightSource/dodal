@@ -38,7 +38,7 @@ def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
 
 # CAM:IMAGE will fail to connect outside the beamline network,
 # see https://github.com/DiamondLightSource/dodal/issues/1852
-@devices.factory(mock=True)
+@devices.factory()
 def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{B_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
