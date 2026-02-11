@@ -14,6 +14,7 @@ dodal.devices.beamlines.b07
    :toctree:
    :recursive:
 
+   ~b07.B07SampleManipulator52B
    ~b07.Grating
    ~b07.LensMode
    ~b07.PsuMode

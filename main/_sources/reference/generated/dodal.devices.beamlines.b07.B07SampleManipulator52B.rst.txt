@@ -1,0 +1,40 @@
+dodal.devices.beamlines.b07.B07SampleManipulator52B
+===================================================
+
+.. currentmodule:: dodal.devices.beamlines.b07
+
+.. autoclass:: B07SampleManipulator52B
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

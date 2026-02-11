@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.motors &#8212; dodal 2.0.1.dev15+gee97fc144 documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 2.0.1.dev16+gaa40631e0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e9ff39dd"></script>
+    <script src="../../../_static/documentation_options.js?v=2971e045"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1128,7 +1128,7 @@ window.addEventListener("load", load);
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">kappa_infix</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">phi_infix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">,</span> <span class="n">omega_infix</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">vertical_in_lab_space</span> <span class="o">=</span> <span class="n">create_axis_perp_to_rotation</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span>
