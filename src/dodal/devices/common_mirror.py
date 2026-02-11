@@ -6,24 +6,44 @@ from ophyd_async.epics.core import epics_signal_rw, epics_signal_x
 
 from dodal.devices.motors import XYZPitchYawRollStage
 
+DEFAULT_MIRROR_READ_SUFFIX = "MIRCTRL:RBV:MIRROR"
+DEFAULT_MIRROR_WRITE_SUFFIX = "MIRCTRL:DMD:MIRROR"
+DEFAULT_MIRROR_CHANGE_SUFFIX = "MIRCTRL:SEQ:CHNG:MIRROR.PROC"
+DEFAULT_MIRROR_ABORT_SUFFIX = "MIRCTRL:DMD:ABORT.PROC"
+DEFAULT_FPITCH_READ_SUFFIX = "FPITCH:RBV"
+DEFAULT_FPITCH_WRITE_SUFFIX = "FPITCH:DMD"
+
+
 TMirror = TypeVar("TMirror", bound=StrictEnum)
 
 
 class XYZSwitchingMirror(
     XYZPitchYawRollStage, Generic[TMirror], Locatable[TMirror], Stoppable
 ):
-    """A device representation set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors.
-    To change mirror set mirror enum and trigger mirror change.
+    """Set of mirrors on hexapod stage.
+
+    This device controls set of mirrors on a hexapod stage with standard x,y,z and yaw,
+    pitch, roll motors.
+
+    Args:
+        prefix (str): EPICS PV prefix for the mirror.
+        mirrors (StrictEnum): enum representing set of mirrors
+        fpitch_read_suffix (str, optional): suffix for the fine pitch readback PV
+        fpitch_write_suffix (str, optional): suffix for the fine pitch setpoint PV
+        mirror_read_suffix (str, optional): suffix for mirror readback PV
+        mirror_write_suffix (str, optional): suffix for mirror demand PV
+        mirror_abort_suffix (str, optional): suffix for mirror abort PV
+        name (str, optional): name of the device.
     """
 
     def __init__(
         self,
         prefix: str,
         mirrors: type[TMirror],
-        mirror_read_suffix: str = "MIRCTRL:RBV:MIRROR",
-        mirror_write_suffix: str = "MIRCTRL:DMD:MIRROR",
-        mirror_change_suffix: str = "MIRCTRL:SEQ:CHNG:MIRROR.PROC",
-        mirror_abort_suffix: str = "MIRCTRL:DMD:ABORT.PROC",
+        mirror_read_suffix: str = DEFAULT_MIRROR_READ_SUFFIX,
+        mirror_write_suffix: str = DEFAULT_MIRROR_WRITE_SUFFIX,
+        mirror_change_suffix: str = DEFAULT_MIRROR_CHANGE_SUFFIX,
+        mirror_abort_suffix: str = DEFAULT_MIRROR_ABORT_SUFFIX,
         name: str = "",
     ):
         with self.add_children_as_readables():
@@ -52,7 +72,17 @@ class XYZSwitchingMirror(
 
 
 class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
-    """Collimating mirror on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor."""
+    """Collimating mirror on a hexapod stage.
+
+    This device controls mirror on a hexapod stage which includes standard x, y, z, yaw,
+    pitch and roll motors, as well as fine pitch piezo motor.
+
+    Args:
+        prefix (str): EPICS PV prefix for the mirror.
+        fpitch_read_suffix (str, optional): The suffix for the fine pitch readback PV.
+        fpitch_write_suffix (str, optional): The suffix for the fine pitch setpoint PV.
+        name (str, optional): The name of the device.
+    """
 
     def __init__(
         self,
@@ -71,18 +101,32 @@ class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
 
 
 class XYZPiezoSwitchingMirror(XYZSwitchingMirror[TMirror], Generic[TMirror]):
-    """A device representation set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor."""
+    """Set of mirrors on a hexapod stage with piezo fine pitch motor.
+
+    This device controls set of mirrors on a hexapod stage which includes standard x,
+    y, z, yaw, pitch and roll motors, as well as fine pitch piezo motor.
+
+    Args:
+        prefix (str): EPICS PV prefix for the mirror.
+        mirrors (StrictEnum): enum representing set of mirrors
+        fpitch_read_suffix (str, optional): suffix for the fine pitch readback PV
+        fpitch_write_suffix (str, optional): suffix for the fine pitch setpoint PV
+        mirror_read_suffix (str, optional): suffix for mirror readback PV
+        mirror_write_suffix (str, optional): suffix for mirror demand PV
+        mirror_abort_suffix (str, optional): suffix for mirror abort PV
+        name (str, optional): name of the device.
+    """
 
     def __init__(
         self,
         prefix: str,
         mirrors: type[TMirror],
-        fpitch_read_suffix: str = "FPITCH:RBV",
-        fpitch_write_suffix: str = "FPITCH:DMD",
-        mirror_read_suffix: str = "MIRCTRL:RBV:MIRROR",
-        mirror_write_suffix: str = "MIRCTRL:DMD:MIRROR",
-        mirror_change_suffix: str = "MIRCTRL:SEQ:CHNG:MIRROR.PROC",
-        mirror_abort_suffix: str = "MIRCTRL:DMD:ABORT.PROC",
+        fpitch_read_suffix: str = DEFAULT_FPITCH_READ_SUFFIX,
+        fpitch_write_suffix: str = DEFAULT_FPITCH_WRITE_SUFFIX,
+        mirror_read_suffix: str = DEFAULT_MIRROR_READ_SUFFIX,
+        mirror_write_suffix: str = DEFAULT_MIRROR_WRITE_SUFFIX,
+        mirror_change_suffix: str = DEFAULT_MIRROR_CHANGE_SUFFIX,
+        mirror_abort_suffix: str = DEFAULT_MIRROR_ABORT_SUFFIX,
         name: str = "",
     ):
         with self.add_children_as_readables():
@@ -91,7 +135,6 @@ class XYZPiezoSwitchingMirror(XYZSwitchingMirror[TMirror], Generic[TMirror]):
                 read_pv=prefix + fpitch_read_suffix,
                 write_pv=prefix + fpitch_write_suffix,
             )
-
         super().__init__(
             prefix=prefix,
             mirrors=mirrors,
