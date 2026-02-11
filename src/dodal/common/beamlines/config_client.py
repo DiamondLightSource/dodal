@@ -1,3 +1,5 @@
+from functools import cache
+
 from daq_config_server.client import ConfigServer
 
 BEAMLINE_CONFIG_SERVER_ENDPOINTS = {
@@ -6,6 +8,7 @@ BEAMLINE_CONFIG_SERVER_ENDPOINTS = {
 }
 
 
+@cache
 def get_config_client(beamline: str) -> ConfigServer:
     url = BEAMLINE_CONFIG_SERVER_ENDPOINTS.get(
         beamline, "https://daq-config.diamond.ac.uk"

@@ -66,7 +66,7 @@ V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
 AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
 
 
-def get_beamline_name(default: str) -> str:
+def get_beamline_name(default: str | None = None) -> str:
     return environ.get("BEAMLINE") or default
 
 

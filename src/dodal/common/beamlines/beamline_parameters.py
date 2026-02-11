@@ -8,19 +8,19 @@ BEAMLINE_PARAMETER_PATHS = {
 }
 
 
-def get_beamline_parameters(
-    beamline: str, beamline_param_path: str | None = None
-) -> dict[str, Any]:
-    """Loads the beamline parameters from the specified path, or according to the
-    environment variable if none is given.
+def get_beamline_parameters(beamline: str) -> dict[str, Any]:
+    """Loads the beamline parameters for a specified beamline from the config server.
+
+    Args:
+        beamline (str): The beamline for which beamline parameters will be retrieved.
+
+    Returns:
+        dict[str, Any]: Dict of beamline parameters.
     """
-    if not beamline_param_path:
-        beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline)
-        if beamline_param_path is None:
-            raise KeyError(
-                "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
-            )
+    beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline)
+    if beamline_param_path is None:
+        raise KeyError(
+            "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
+        )
     config_client = get_config_client(beamline)
-    return config_client.get_file_contents(
-        beamline_param_path, dict, reset_cached_result=True
-    )
+    return config_client.get_file_contents(beamline_param_path, dict)

@@ -48,10 +48,9 @@ class UndulatorDCM(StandardReadable, Movable[float]):
         )
         # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
         # Nb this parameter is misleadingly named to confuse you
-        self.dcm_fixed_offset_mm = get_beamline_parameters(
-            get_beamline_name("i03"),
-            daq_configuration_path + "/domain/beamlineParameters",
-        )["DCM_Perp_Offset_FIXED"]
+        self.dcm_fixed_offset_mm = get_beamline_parameters(get_beamline_name())[
+            "DCM_Perp_Offset_FIXED"
+        ]
 
         super().__init__(name)
 
