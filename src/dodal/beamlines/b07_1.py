@@ -7,6 +7,7 @@ from dodal.devices.beamlines.b07_1 import (
     SpecsPhoibos,
 )
 from dodal.devices.electron_analyser.base import EnergySource
+from dodal.devices.motors import XYZPolarAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -45,4 +46,17 @@ def analyser(energy_source: EnergySource) -> SpecsPhoibos:
     return SpecsPhoibos(
         prefix=f"{C_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         energy_source=energy_source,
+    )
+
+
+@devices.factory()
+def sm() -> XYZPolarAzimuthStage:
+    """Sample manipulator."""
+    return XYZPolarAzimuthStage(
+        f"{C_PREFIX.beamline_prefix}-EA-SM-01:",
+        x_infix="XP",
+        y_infix="YP",
+        z_infix="ZP",
+        polar_infix="ROTA",
+        azimuth_infix="ROTB",
     )

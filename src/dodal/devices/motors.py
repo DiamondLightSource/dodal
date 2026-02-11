@@ -275,7 +275,7 @@ class SixAxisGonio(XYZOmegaStage):
         with self.add_children_as_readables():
             self.kappa = Motor(prefix + kappa_infix)
             self.phi = Motor(prefix + phi_infix)
-        super().__init__(prefix, name, x_infix, y_infix, z_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix, omega_infix)
 
         self.vertical_in_lab_space = create_axis_perp_to_rotation(
             self.omega, self.y, self.z
