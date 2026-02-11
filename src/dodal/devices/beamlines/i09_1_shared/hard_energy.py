@@ -26,8 +26,14 @@ class EnergyGapConvertor(Protocol):
 
 
 class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
-    """Compound device to link hard x-ray undulator gap and order to photon energy.
+    """Compound device to control isertion device energy.
+
+    This device link hard x-ray undulator gap and order to photon energy.
     Setting the energy adjusts the undulator gap accordingly.
+
+    Attributes:
+        energy_demand (SignalRW[float]): The energy value that the user wants to set.
+        energy (SignalRW[float]): The actual energy of the insertion device.
     """
 
     def __init__(
@@ -40,12 +46,23 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         energy_to_gap_func: EnergyGapConvertor,
         name: str = "",
     ) -> None:
+        """Initialize the HardInsertionDeviceEnergy device.
+
+        Args:
+            undulator_order (UndulatorOrder): undulator order device.
+            undulator (UndulatorInMm): undulator device for gap control.
+            config_server (ConfigServer): Config server client to retrieve the lookup table.
+            filepath (str): File path to the lookup table on the config server.
+            gap_to_energy_func (EnergyGapConvertor): Function to convert gap to energy using the lookup table.
+            energy_to_gap_func (EnergyGapConvertor): Function to convert energy to gap using the lookup table.
+            name (str, optional): Name for the device. Defaults to empty string.
+        """
         self._undulator_order_ref = Reference(undulator_order)
         self._undulator_ref = Reference(undulator)
-        self.config_server = config_server
-        self.filepath = filepath
-        self.gap_to_energy_func = gap_to_energy_func
-        self.energy_to_gap_func = energy_to_gap_func
+        self._config_server = config_server
+        self._filepath = filepath
+        self._gap_to_energy_func = gap_to_energy_func
+        self._energy_to_gap_func = energy_to_gap_func
 
         self.add_readables([undulator_order, undulator.current_gap])
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -61,19 +78,19 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
 
     def _read_energy(self, current_gap: float, current_order: int) -> float:
         _lookup_table = self.get_look_up_table()
-        return self.gap_to_energy_func(
+        return self._gap_to_energy_func(
             look_up_table=_lookup_table, value=current_gap, order=current_order
         )
 
     async def _set_energy(self, value: float) -> None:
         current_order = await self._undulator_order_ref().value.get_value()
         _lookup_table = self.get_look_up_table()
-        target_gap = self.energy_to_gap_func(_lookup_table, value, current_order)
+        target_gap = self._energy_to_gap_func(_lookup_table, value, current_order)
         await self._undulator_ref().set(target_gap)
 
     def get_look_up_table(self) -> GenericLookupTable:
-        self._lut: GenericLookupTable = self.config_server.get_file_contents(
-            self.filepath,
+        self._lut: GenericLookupTable = self._config_server.get_file_contents(
+            self._filepath,
             desired_return_type=GenericLookupTable,
             reset_cached_result=True,
         )
@@ -86,8 +103,9 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
 
 
 class HardEnergy(StandardReadable, Locatable[float]):
-    """Energy compound device that provides combined change of both DCM energy and
-    undulator gap accordingly.
+    """Compound energy device.
+
+    This device changes both monochromator and insertion device energy.
     """
 
     def __init__(
@@ -96,6 +114,13 @@ class HardEnergy(StandardReadable, Locatable[float]):
         undulator_energy: HardInsertionDeviceEnergy,
         name: str = "",
     ) -> None:
+        """Initialize the HardEnergy device.
+
+        Args:
+            dcm (DoubleCrystalMonochromatorBase): Double crystal monochromator device.
+            undulator_energy (HardInsertionDeviceEnergy): Hard insertion device control.
+            name (str, optional): name for the device. Defaults to empty.
+        """
         self._dcm_ref = Reference(dcm)
         self._undulator_energy_ref = Reference(undulator_energy)
         self.add_readables([undulator_energy, dcm.energy_in_keV])
