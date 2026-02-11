@@ -9,7 +9,6 @@ from bluesky.preprocessors import run_decorator
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import get_mock, get_mock_put, set_mock_value
 
-from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.devices.beamlines.i03 import Beamstop, BeamstopPositions
 from dodal.testing.fixtures.config_server import fake_config_server_get_file_contents
 from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
