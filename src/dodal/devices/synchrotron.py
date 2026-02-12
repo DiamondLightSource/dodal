@@ -83,8 +83,9 @@ class Synchrotron(StandardReadable):
             change during topup.
         fill_period (signalR[float]): time between TopUp (in minutes).Used in data
             acquisition to monitor synchrotron state.
-        top_up_state (signalR[TopUpState]): state of the TopUp process. Used in data
-            acquisition to confirm state.
+        top_up_state (signalR[TopUpState]): tracks whether TopUp is currently running or
+            not. If it is anything other than Running or Stopping TopUp isn't active so
+            will not disturb the beam. Used in data acquisition to confirm TopUp state.
     """
 
     def __init__(
