@@ -12,8 +12,8 @@ from dodal.devices.beamlines.i15.focussing_mirror import (
 from dodal.devices.beamlines.i15.jack import JackX, JackY
 from dodal.devices.beamlines.i15.motors import UpstreamDownstreamPair
 from dodal.devices.motors import (
-    SixAxisGonioKappaPhi,
     XYStage,
+    XYZKappaPhiStage,
     XYZPitchYawStage,
     XYZStage,
 )
@@ -73,10 +73,10 @@ def det2z() -> Motor:
 
 
 @devices.factory()
-def diffractometer() -> SixAxisGonioKappaPhi:
-    return SixAxisGonioKappaPhi(
+def diffractometer() -> XYZKappaPhiStage:
+    return XYZKappaPhiStage(
         prefix=f"{PREFIX.beamline_prefix}-MO-DIFF-01:SAMPLE:",
-        phi_infix="KPHI",
+        infix_overrides={"phi": "KPHI"},
     )
 
 

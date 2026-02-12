@@ -56,6 +56,4 @@ def sm52b() -> B07SampleManipulator52B:
 @devices.factory()
 def sm21b() -> XYZPolarStage:
     """Sample manipulator. NOTE: The polar attribute is equivalent to GDA roty."""
-    return XYZPolarStage(
-        prefix=f"{B_PREFIX.beamline_prefix}-EA-SM-21:", polar_infix="ROTY"
-    )
+    return XYZPolarStage(prefix=f"{B_PREFIX.beamline_prefix}-EA-SM-21:", polar="ROTY")

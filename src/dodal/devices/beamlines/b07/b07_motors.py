@@ -1,9 +1,11 @@
+from typing import Annotated
+
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_rw_rbv
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import _OMEGA, XYZStage
+from dodal.devices.motors import _OMEGA, Infix, XYZStage
 
 
 class VirtualAxis(StandardReadable, Movable[float]):
@@ -49,43 +51,32 @@ class B07SampleManipulator52B(XYZStage):
         kappa (VirtualAxis): Virtal rotational axis for the z direction.
     """
 
+    roty: Annotated[Motor, Infix("ROTY")]
+    rotz: Annotated[Motor, Infix("ROTZ")]
+    xp: Annotated[Motor, Infix("XP")]
+    yp: Annotated[Motor, Infix("YP")]
+    zp: Annotated[Motor, Infix("ZP")]
+
     def __init__(
         self,
         prefix: str,
-        x_infix: str = "XP",
-        y_infix: str = "YP",
-        z_infix: str = "ZP",
-        roty_infix: str = "ROTY",
-        rotz_infix: str = "ROTZ",
         kappa_infix: str = "KAPPA",
         phi_infix: str = "PHI",
         omega_infix: str = _OMEGA,
         name: str = "",
+        **infix_overrides,
     ):
         """Initialise the device via prefix and infix PV configuration.
 
         Args:
             prefix (str): Base PV used for connecting signals.
-            x_infix (str, optional): Infix between base prefix and x motor record.
-            y_infix (str, optional): Infix between base prefix and y motor record.
-            z_infix (str, optional): Infix between base prefix and z motor record.
-            roty_infix (str, optional): Infix between base prefix and roty motor record.
-            rotz_infix (str, optional): Infix between base prefix and rotz motor record.
             kappa_infix (str, optional): Infix between base prefix and kappa virtual axis.
             phi_infix (str, optional): Infix between base prefix and phi virtual axis.
             omega_infix (str, optional): Infix between base prefix and omega virtual axis.
             name (str, optional): The name of this device.
+            infix_overrides: Additional kwargs for overriding motor pv infix.
         """
         with self.add_children_as_readables():
-            # Compound motors
-            self.xp = Motor(prefix + x_infix)
-            self.yp = Motor(prefix + y_infix)
-            self.zp = Motor(prefix + z_infix)
-
-            # Raw motors
-            self.roty = Motor(prefix + roty_infix)
-            self.rotz = Motor(prefix + rotz_infix)
-
             # Not standard motors, virtual axes coordinate system.
             self.kappa = VirtualAxis(prefix + kappa_infix)
             self.phi = VirtualAxis(prefix + phi_infix)
@@ -93,8 +84,6 @@ class B07SampleManipulator52B(XYZStage):
 
         super().__init__(
             prefix=prefix,
-            x_infix=x_infix,
-            y_infix=y_infix,
-            z_infix=z_infix,
             name=name,
+            infix_overrides=infix_overrides,
         )
