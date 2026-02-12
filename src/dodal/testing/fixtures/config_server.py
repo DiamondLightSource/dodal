@@ -18,12 +18,13 @@ def fake_config_server_get_file_contents(
     # Minimal logic required for unit tests
     with filepath.open("r") as f:
         contents = f.read()
-        if desired_return_type is str:
-            return contents
-        elif desired_return_type is dict:
-            return json.loads(contents)
-        elif issubclass(desired_return_type, ConfigModel):  # type: ignore
-            return desired_return_type.model_validate(json.loads(contents))
+    if desired_return_type is str:
+        return contents  # type: ignore
+    elif desired_return_type is dict:
+        return json.loads(contents)
+    elif issubclass(desired_return_type, ConfigModel):
+        return desired_return_type.model_validate(json.loads(contents))
+    raise ValueError("Invalid return type requested")
 
 
 @pytest.fixture(autouse=True)
