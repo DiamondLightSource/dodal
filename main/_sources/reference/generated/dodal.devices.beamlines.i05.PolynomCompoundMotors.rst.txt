@@ -1,0 +1,49 @@
+dodal.devices.beamlines.i05.PolynomCompoundMotors
+=================================================
+
+.. currentmodule:: dodal.devices.beamlines.i05
+
+.. autoclass:: PolynomCompoundMotors
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~PolynomCompoundMotors.locate
+      
+      
+      
+      
+      ~PolynomCompoundMotors.set
+      
+      
+      
+      
+      ~PolynomCompoundMotors.stop
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
