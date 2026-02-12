@@ -161,7 +161,7 @@ async def test_setting_xyza_position_table(
         (1.23, 2.40, 3.51, 24.0, 1.0),
     ],
 )
-async def test_setting_xyzpa_position_table(
+async def test_setting_xyzat_position_table(
     xyzat_stage: XYZAzimuthTiltStage,
     x: float,
     y: float,
@@ -195,7 +195,7 @@ async def test_setting_xyzpa_position_table(
         (1.23, 2.40, 3.51, 24.0, 1.0, 2.0),
     ],
 )
-async def test_setting_xyzpat_position_table(
+async def test_setting_xyzatp_position_table(
     xyzatp_stage: XYZAzimuthTiltPolarStage,
     x: float,
     y: float,
@@ -263,7 +263,7 @@ async def test_setting_xyzpyr_position_table(
     )
 
 
-async def test_setting(xy_stage: XYStage):
+async def test_setting_xy_stage(xy_stage: XYStage):
     """Test setting x and y positions on the XYStage using ophyd_async mock tools."""
     await assert_reading(
         xy_stage,

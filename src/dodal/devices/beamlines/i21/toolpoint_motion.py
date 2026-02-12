@@ -31,20 +31,20 @@ def toolpoint_rotation_matrix(tilt_deg: float, azimuth_deg: float) -> np.ndarray
 
 
 @dataclass(kw_only=True)
-class AnglePositions:
+class AngleMotorPositions:
     tilt_deg: float
     azimuth_deg: float
 
 
 @dataclass(kw_only=True)
-class UVWMotorPositions(AnglePositions):
+class UVWMotorPositions(AngleMotorPositions):
     u: float
     v: float
     w: float
 
 
 @dataclass(kw_only=True)
-class XYZMotorPositions(AnglePositions):
+class XYZMotorPositions(AngleMotorPositions):
     x: float
     y: float
     z: float
