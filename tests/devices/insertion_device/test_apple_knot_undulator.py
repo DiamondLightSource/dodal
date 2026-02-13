@@ -105,6 +105,43 @@ async def test_id_set_pol(
 
 
 @pytest.mark.parametrize(
+    "initial_pol, initial_energy, target_pol",
+    [
+        (Pol.LV, 40.0, Pol.LA),
+        (Pol.LV, 40.0, Pol.LH3),
+        (Pol.LV, 80.0, Pol.LV3),
+        (Pol.LV, 80.0, Pol.NONE),
+    ],
+)
+async def test_id_set_pol_fails(
+    mock_apple_knot_i05_controller: AppleKnotController[UndulatorLockedPhaseAxes],
+    mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
+    initial_pol: Pol,
+    initial_energy: float,
+    target_pol: Pol,
+):
+    mock_apple_knot_i05_controller._energy_set(initial_energy)
+    set_mock_value(
+        mock_locked_apple2.gap().user_readback,
+        energy_to_gap_converter(initial_energy, initial_pol),
+    )
+    set_mock_value(
+        mock_locked_apple2.phase().top_outer.user_readback,
+        energy_to_phase_converter(initial_energy, initial_pol),
+    )
+    set_mock_value(
+        mock_locked_apple2.phase().btm_inner.user_readback,
+        energy_to_phase_converter(initial_energy, initial_pol),
+    )
+    assert await mock_apple_knot_i05_controller.polarisation.get_value() == initial_pol
+    with pytest.raises(
+        RuntimeError,
+        match="No valid path found for move avoiding exclusion zones.",
+    ):
+        await mock_apple_knot_i05_controller.polarisation.set(target_pol)
+
+
+@pytest.mark.parametrize(
     "target_energy, initial_gap, initial_phase_top_outer",
     [
         (100.0, 10.0, 0.0),  # LH start point in exclusion zone
