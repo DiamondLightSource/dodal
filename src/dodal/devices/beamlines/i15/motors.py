@@ -2,15 +2,15 @@ from typing import Annotated
 
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import Infix, Stage
+from dodal.devices.motors import DefaultInfix, Stage
 
 
 class UpstreamDownstreamPair(Stage):
-    upstream: Annotated[Motor, Infix("US")]
-    downstream: Annotated[Motor, Infix("DS")]
+    upstream: Annotated[Motor, DefaultInfix("US")]
+    downstream: Annotated[Motor, DefaultInfix("DS")]
 
 
 class NumberedTripleAxisStage(Stage):
-    axis1: Annotated[Motor, Infix("AXIS1")]
-    axis2: Annotated[Motor, Infix("AXIS2")]
-    axis3: Annotated[Motor, Infix("AXIS3")]
+    axis1: Annotated[Motor, DefaultInfix("AXIS1")]
+    axis2: Annotated[Motor, DefaultInfix("AXIS2")]
+    axis3: Annotated[Motor, DefaultInfix("AXIS3")]

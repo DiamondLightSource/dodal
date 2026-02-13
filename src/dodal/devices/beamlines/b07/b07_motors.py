@@ -5,7 +5,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable, StandardReadableForm
 from ophyd_async.epics.core import epics_signal_rw_rbv
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import _OMEGA, Infix, XYZStage
+from dodal.devices.motors import _OMEGA, DefaultInfix, XYZStage
 
 
 class VirtualAxis(StandardReadable, Movable[float]):
@@ -51,11 +51,11 @@ class B07SampleManipulator52B(XYZStage):
         kappa (VirtualAxis): Virtal rotational axis for the z direction.
     """
 
-    roty: Annotated[Motor, Infix("ROTY")]
-    rotz: Annotated[Motor, Infix("ROTZ")]
-    xp: Annotated[Motor, Infix("XP")]
-    yp: Annotated[Motor, Infix("YP")]
-    zp: Annotated[Motor, Infix("ZP")]
+    roty: Annotated[Motor, DefaultInfix("ROTY")]
+    rotz: Annotated[Motor, DefaultInfix("ROTZ")]
+    xp: Annotated[Motor, DefaultInfix("XP")]
+    yp: Annotated[Motor, DefaultInfix("YP")]
+    zp: Annotated[Motor, DefaultInfix("ZP")]
 
     def __init__(
         self,
@@ -64,18 +64,9 @@ class B07SampleManipulator52B(XYZStage):
         phi_infix: str = "PHI",
         omega_infix: str = _OMEGA,
         name: str = "",
-        **infix_overrides,
+        **motor_infix_overrides: str,
     ):
-        """Initialise the device via prefix and infix PV configuration.
-
-        Args:
-            prefix (str): Base PV used for connecting signals.
-            kappa_infix (str, optional): Infix between base prefix and kappa virtual axis.
-            phi_infix (str, optional): Infix between base prefix and phi virtual axis.
-            omega_infix (str, optional): Infix between base prefix and omega virtual axis.
-            name (str, optional): The name of this device.
-            infix_overrides: Additional kwargs for overriding motor pv infix.
-        """
+        """Initialise the device via prefix and infix PV configuration."""
         with self.add_children_as_readables():
             # Not standard motors, virtual axes coordinate system.
             self.kappa = VirtualAxis(prefix + kappa_infix)
@@ -85,5 +76,5 @@ class B07SampleManipulator52B(XYZStage):
         super().__init__(
             prefix=prefix,
             name=name,
-            infix_overrides=infix_overrides,
+            **motor_infix_overrides,
         )

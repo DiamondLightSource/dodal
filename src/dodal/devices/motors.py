@@ -15,47 +15,56 @@ _TILT = "TILT"
 
 
 @dataclass(frozen=True)
-class Infix:
+class DefaultInfix:
     value: str
 
 
 class MotorGroup(StandardReadable):
-    axes: ClassVar[dict[str, str]]
+    motor_default_infixes: ClassVar[dict[str, str]]
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        axes: dict[str, str] = {}
-
+        motor_default_infixes: dict[str, str] = {}
         hints = get_type_hints(cls, include_extras=True)
-
         for name, hint in hints.items():
             if get_origin(hint) is Annotated:
                 base_type, *metadata = get_args(hint)
 
                 if base_type is Motor:
                     for meta in metadata:
-                        if isinstance(meta, Infix):
-                            axes[name] = meta.value
+                        if isinstance(meta, DefaultInfix):
+                            motor_default_infixes[name] = meta.value
                             break
                     else:
                         raise TypeError(f"{cls.__name__}.{name} missing Infix metadata")
 
-        cls.axes = axes
+        cls.motor_default_infixes = motor_default_infixes
 
     def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-        **infix_overrides,
+        self, prefix: str, name: str = "", **motor_infix_overrides: str
     ) -> None:
-        # infix_overrides = infix_overrides or {}
+        """Initialise MotorGroup with default motor infix. Can be overwritten via key
+        worded args for the motor you want. For example, if we have motor x and the
+        default infix is "X", we can override by providing x="X1".
+
+        MyMotorGroup("MyPrefix:", x="X1").
+
+        An error will be raised if provided an invalid motor name.
+        """
+        invalid = set(motor_infix_overrides) - set(self.motor_default_infixes)
+        if invalid:
+            valid = ", ".join(sorted(self.motor_default_infixes))
+            bad = ", ".join(sorted(invalid))
+            raise TypeError(
+                f"{type(self).__name__} got unexpected motor infix override(s): {bad}. "
+                f"Valid motor names are: {valid}"
+            )
 
         with self.add_children_as_readables():
-            for axis, default_infix in self.axes.items():
-                # apply override if provided
-                infix = infix_overrides.get(axis, default_infix)
-                setattr(self, axis, Motor(prefix + infix))
+            for motor_name, default_infix in self.motor_default_infixes.items():
+                infix = motor_infix_overrides.get(motor_name, default_infix)
+                setattr(self, motor_name, Motor(prefix + infix))
 
         super().__init__(name=name)
 
@@ -66,7 +75,7 @@ class Stage(MotorGroup):
     - y is vertical and antiparallel to the force of gravity
     - x is the cross product of y🞬z
 
-    Attributes:
+    Args:
         prefix (str): Common part of the EPICS PV for all motors, including ":".
         name (str, optional): Name of the stage, each child motor will be named
             "{name}-{field_name}".
@@ -78,41 +87,41 @@ class Stage(MotorGroup):
 
 
 class XThetaStage(Stage):
-    x: Annotated[Motor, Infix(_X)]
-    theta: Annotated[Motor, Infix("THETA")]
+    x: Annotated[Motor, DefaultInfix(_X)]
+    theta: Annotated[Motor, DefaultInfix("THETA")]
 
 
 class XYStage(Stage):
-    """Two-axis stage with an x and a y motor."""
+    """Two-axis stage. Motors x (infix="X") and y (infix="y")."""
 
-    x: Annotated[Motor, Infix(_X)]
-    y: Annotated[Motor, Infix(_Y)]
+    x: Annotated[Motor, DefaultInfix(_X)]
+    y: Annotated[Motor, DefaultInfix(_Y)]
 
 
 class XYZStage(XYStage):
     """Two-axis stage with an x and a y motor."""
 
-    z: Annotated[Motor, Infix(_Z)]
+    z: Annotated[Motor, DefaultInfix(_Z)]
 
 
 class XYZOmegaStage(XYZStage):
-    omega: Annotated[Motor, Infix(_OMEGA)]
+    omega: Annotated[Motor, DefaultInfix(_OMEGA)]
 
 
 class XYZAzimuthStage(XYZStage):
-    azimuth: Annotated[Motor, Infix(_AZIMUTH)]
+    azimuth: Annotated[Motor, DefaultInfix(_AZIMUTH)]
 
 
 class XYZThetaStage(XYZStage):
-    theta: Annotated[Motor, Infix("THETA")]
+    theta: Annotated[Motor, DefaultInfix("THETA")]
 
 
 class XYZPolarStage(XYZStage):
-    polar: Annotated[Motor, Infix(_POLAR)]
+    polar: Annotated[Motor, DefaultInfix(_POLAR)]
 
 
 class XYZPolarAzimuthStage(XYZPolarStage):
-    azimuth: Annotated[Motor, Infix(_AZIMUTH)]
+    azimuth: Annotated[Motor, DefaultInfix(_AZIMUTH)]
 
 
 class XYZPolarAzimuthTiltStage(XYZPolarAzimuthStage):
@@ -120,25 +129,25 @@ class XYZPolarAzimuthTiltStage(XYZPolarAzimuthStage):
     azimuth and tilt.
     """
 
-    tilt: Annotated[Motor, Infix(_TILT)]
+    tilt: Annotated[Motor, DefaultInfix(_TILT)]
 
 
 class XYPhiStage(XYStage):
     """Three-axis stage with a standard xy stage and one axis of rotation: phi."""
 
-    phi: Annotated[Motor, Infix("PHI")]
+    phi: Annotated[Motor, DefaultInfix("PHI")]
 
 
 class XYPitchStage(XYStage):
     """Three-axis stage with a standard xy stage and one axis of rotation: pitch."""
 
-    pitch: Annotated[Motor, Infix("PITCH")]
+    pitch: Annotated[Motor, DefaultInfix("PITCH")]
 
 
 class XYRollStage(XYStage):
     """Three-axis stage with a standard xy stage and one axis of rotation: roll."""
 
-    roll: Annotated[Motor, Infix("PITCH")]
+    roll: Annotated[Motor, DefaultInfix("PITCH")]
 
 
 class XYZPitchYawStage(XYZStage):
@@ -146,8 +155,8 @@ class XYZPitchYawStage(XYZStage):
     yaw.
     """
 
-    pitch: Annotated[Motor, Infix("PITCH")]
-    yaw: Annotated[Motor, Infix("YAW")]
+    pitch: Annotated[Motor, DefaultInfix("PITCH")]
+    yaw: Annotated[Motor, DefaultInfix("YAW")]
 
 
 class XYZPitchYawRollStage(XYZPitchYawStage):
@@ -155,7 +164,7 @@ class XYZPitchYawRollStage(XYZPitchYawStage):
     and roll.
     """
 
-    roll: Annotated[Motor, Infix("ROLL")]
+    roll: Annotated[Motor, DefaultInfix("ROLL")]
 
 
 class XYZOmegaKappaPhiStage(XYZOmegaStage):
@@ -163,8 +172,8 @@ class XYZOmegaKappaPhiStage(XYZOmegaStage):
     kappa, phi and omega.
     """
 
-    kappa: Annotated[Motor, Infix("KAPPA")]
-    phi: Annotated[Motor, Infix("PHI")]
+    kappa: Annotated[Motor, DefaultInfix("KAPPA")]
+    phi: Annotated[Motor, DefaultInfix("PHI")]
 
     def __init__(self, prefix: str, name: str = "", **infix_overrides):
         super().__init__(prefix, name, **infix_overrides)
@@ -179,15 +188,15 @@ class XYZKappaPhiStage(XYZStage):
     kappa and phi.
     """
 
-    kappa: Annotated[Motor, Infix("KAPPA")]
-    phi: Annotated[Motor, Infix("PHI")]
+    kappa: Annotated[Motor, DefaultInfix("KAPPA")]
+    phi: Annotated[Motor, DefaultInfix("PHI")]
 
 
 class YZStage(Stage):
     """Two-axis stage with an x and a z motor."""
 
-    y: Annotated[Motor, Infix(_Y)]
-    z: Annotated[Motor, Infix(_Z)]
+    y: Annotated[Motor, DefaultInfix(_Y)]
+    z: Annotated[Motor, DefaultInfix(_Z)]
 
 
 def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Motor):

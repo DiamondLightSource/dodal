@@ -3,7 +3,7 @@ from typing import Annotated
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import (
-    Infix,
+    DefaultInfix,
     XYZOmegaStage,
     create_axis_perp_to_rotation,
 )
@@ -21,16 +21,16 @@ class Goniometer(XYZOmegaStage):
     regardless of the current rotation.
     """
 
-    sampy: Annotated[Motor, Infix("SAMPY")]
-    sampz: Annotated[Motor, Infix("SAMPZ")]
+    sampy: Annotated[Motor, DefaultInfix("SAMPY")]
+    sampz: Annotated[Motor, DefaultInfix("SAMPZ")]
 
     def __init__(
         self,
         prefix: str,
         name: str = "",
-        **infix_overrides,
+        **motor_infix_overrides,
     ) -> None:
-        super().__init__(prefix=prefix, name=name, infix_overrides=infix_overrides)
+        super().__init__(prefix=prefix, name=name, **motor_infix_overrides)
         with self.add_children_as_readables():
             self.vertical_position = create_axis_perp_to_rotation(
                 self.omega, self.sampz, self.sampy
