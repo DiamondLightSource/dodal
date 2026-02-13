@@ -114,7 +114,7 @@ class ToolPointMotion(StandardReadable, Movable):
             ),
         )
 
-    async def _get_real_motor_positions(
+    async def _get_xyz_motor_positions(
         self,
     ) -> XYZMotorPositions:
         x, y, z, tilt, azimuth = await asyncio.gather(
@@ -127,12 +127,12 @@ class ToolPointMotion(StandardReadable, Movable):
         return XYZMotorPositions(x=x, y=y, z=z, tilt_deg=tilt, azimuth_deg=azimuth)
 
     async def _read_all_uvw(self) -> UVWMotorPositions:
-        xyz_pos = await self._get_real_motor_positions()
+        xyz_pos = await self._get_xyz_motor_positions()
         uvw_pos = xyz_to_uvw(xyz_pos, zero=self._zero)
         return uvw_pos
 
     async def _write_all_uvw(self, uvw_pos: UVWMotorPositions) -> None:
-        xyz_start = await self._get_real_motor_positions()
+        xyz_start = await self._get_xyz_motor_positions()
         xyz_end = uvw_to_xyz(uvw_pos, self._zero)
 
         await self.check_motor_limits(xyz_start, xyz_end)
