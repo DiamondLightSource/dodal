@@ -1,7 +1,7 @@
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.beamlines.b07.analyser import (
-    B07SpecsAnalyserDriverIO,
-    B07SpecsSequence,
+    B07BSpecsAnalyserDriverIO,
+    B07BSpecsSequence,
 )
 from dodal.devices.beamlines.i09.analyser import (
     I09VGScientaAnalyserDriverIO,
@@ -15,8 +15,8 @@ from tests.devices.electron_analyser.test_data import (
 TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 
 
-def b07_specs_test_sequence_loader() -> B07SpecsSequence:
-    return load_json_file_to_class(B07SpecsSequence, TEST_SPECS_SEQUENCE)
+def b07_specs_test_sequence_loader() -> B07BSpecsSequence:
+    return load_json_file_to_class(B07BSpecsSequence, TEST_SPECS_SEQUENCE)
 
 
 def i09_vgscienta_test_sequence_loader() -> I09VGScientaSequence:
@@ -25,6 +25,6 @@ def i09_vgscienta_test_sequence_loader() -> I09VGScientaSequence:
 
 # Map to know what function to load in sequence an analyser driver should use.
 DRIVER_TO_TEST_SEQUENCE = {
-    B07SpecsAnalyserDriverIO: b07_specs_test_sequence_loader(),
+    B07BSpecsAnalyserDriverIO: b07_specs_test_sequence_loader(),
     I09VGScientaAnalyserDriverIO: i09_vgscienta_test_sequence_loader(),
 }

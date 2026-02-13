@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.devices.beamlines.b07 import B07SpecsRegion
+from dodal.devices.beamlines.b07 import B07BSpecsRegion
 from dodal.devices.beamlines.i09 import I09VGScientaRegion
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
@@ -37,7 +37,7 @@ def expected_region_class(
     sequence: GenericSequence,
 ) -> type[AbstractBaseRegion]:
     if isinstance(sequence, SpecsSequence):
-        return B07SpecsRegion
+        return B07BSpecsRegion
     elif isinstance(sequence, VGScientaSequence):
         return I09VGScientaRegion
     raise TypeError(f"Unknown sequence type {type(sequence)}")

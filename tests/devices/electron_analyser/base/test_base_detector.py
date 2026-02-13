@@ -9,8 +9,8 @@ from ophyd_async.testing import (
     assert_reading,
 )
 
-from dodal.devices.beamlines.b07.analyser import Specs2DCMOS
-from dodal.devices.beamlines.i09.analyser import EW4000
+from dodal.devices.beamlines.b07.analyser import B07BSpecs150
+from dodal.devices.beamlines.i09.analyser import I09VGScientaEW4000
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
     EnergySource,
@@ -29,26 +29,28 @@ def ew4000(
     dual_energy_source: DualEnergySource,
     dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
-) -> EW4000:
+) -> I09VGScientaEW4000:
     with init_devices(mock=True):
-        ew4000 = EW4000("TEST:", dual_energy_source, dual_fast_shutter, source_selector)
+        ew4000 = I09VGScientaEW4000(
+            "TEST:", dual_energy_source, dual_fast_shutter, source_selector
+        )
     return ew4000
 
 
 @pytest.fixture
-def specs_2dcmos(single_energy_source: EnergySource) -> Specs2DCMOS:
+def specs150(single_energy_source: EnergySource) -> B07BSpecs150:
     with init_devices(mock=True):
-        specs_2dcmos = Specs2DCMOS("TEST:", single_energy_source)
+        specs150 = B07BSpecs150("TEST:", single_energy_source)
     # Needed for specs so we don't get division by zero error.
-    set_mock_value(specs_2dcmos.driver.slices, 1)
-    return specs_2dcmos
+    set_mock_value(specs150.driver.slices, 1)
+    return specs150
 
 
-@pytest.fixture(params=["ew4000", "specs_2dcmos"])
+@pytest.fixture(params=["ew4000", "specs150"])
 def sim_detector(
-    request: pytest.FixtureRequest, ew4000: EW4000, specs_2dcmos: Specs2DCMOS
+    request: pytest.FixtureRequest, ew4000: I09VGScientaEW4000, specs150: B07BSpecs150
 ) -> GenericElectronAnalyserDetector:
-    detectors = [ew4000, specs_2dcmos]
+    detectors = [ew4000, specs150]
     for detector in detectors:
         if detector.name == request.param:
             return detector

@@ -13,7 +13,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.beamlines.b07 import LensMode
-from dodal.devices.beamlines.b07.analyser import B07SpecsAnalyserDriverIO
+from dodal.devices.beamlines.b07.analyser import B07BSpecsAnalyserDriverIO
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
@@ -28,9 +28,9 @@ from tests.devices.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-async def sim_driver() -> B07SpecsAnalyserDriverIO:
+async def sim_driver() -> B07BSpecsAnalyserDriverIO:
     async with init_devices(mock=True):
-        sim_driver = B07SpecsAnalyserDriverIO(prefix="TEST:")
+        sim_driver = B07BSpecsAnalyserDriverIO(prefix="TEST:")
     return sim_driver
 
 

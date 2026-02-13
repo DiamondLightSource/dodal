@@ -4,12 +4,12 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum, init_devices
 
-from dodal.devices.beamlines.b07.analyser import B07SpecsAnalyserDriverIO
+from dodal.devices.beamlines.b07.analyser import B07BSpecsAnalyserDriverIO
 from dodal.devices.beamlines.i09.analyser import I09VGScientaAnalyserDriverIO
 from dodal.devices.electron_analyser.base import GenericAnalyserDriverIO
 
 
-@pytest.fixture(params=[I09VGScientaAnalyserDriverIO, B07SpecsAnalyserDriverIO])
+@pytest.fixture(params=[I09VGScientaAnalyserDriverIO, B07BSpecsAnalyserDriverIO])
 async def sim_driver(request: pytest.FixtureRequest) -> GenericAnalyserDriverIO:
     async with init_devices(mock=True):
         sim_driver = request.param(prefix="TEST:")
