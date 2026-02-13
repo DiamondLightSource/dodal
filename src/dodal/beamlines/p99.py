@@ -1,13 +1,11 @@
+from functools import cache
 from pathlib import Path
 
+from ophyd_async.core import PathProvider
 from ophyd_async.epics.adandor import Andor2Detector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    get_path_provider,
-    set_beamline,
-    set_path_provider,
-)
+from dodal.common.beamlines.beamline_utils import set_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
@@ -26,7 +24,19 @@ BL = get_beamline_name("p99")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_beamline(BL)
+
+
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticVisitPathProvider(
+        BL,
+        Path("/dls/p99/data/2024/cm37284-2/processing/writenData"),
+        client=LocalDirectoryServiceClient(),  # RemoteDirectoryServiceClient("http://p99-control:8088/api"),
+    )
 
 
 @devices.factory()
@@ -49,21 +59,12 @@ def lab_stage() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
 
 
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/dls/p99/data/2024/cm37284-2/processing/writenData"),
-        client=LocalDirectoryServiceClient(),  # RemoteDirectoryServiceClient("http://p99-control:8088/api"),
-    )
-)
-
-
 @devices.factory()
-def andor2_det() -> Andor2Detector:
+def andor2_det(path_provider: PathProvider) -> Andor2Detector:
     """Andor model:DU897_BV."""
     return Andor2Detector(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )
@@ -82,12 +83,12 @@ def andor2_point() -> Andor2Point:
 
 
 @devices.factory()
-def panda() -> HDFPanda:
+def panda(path_provider: PathProvider) -> HDFPanda:
     """The Panda device is connected to two PMAC motors for position comparison under
     the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
     This setup is used for triggering detectors during a flyscan.
     """
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )
