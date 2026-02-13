@@ -1,10 +1,12 @@
-import numpy.polynomial as poly
 import pytest
 from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.common.maths import Rectangle2D
+from dodal.devices.beamlines.i05_shared import (
+    energy_to_gap_converter,
+    energy_to_phase_converter,
+)
 from dodal.devices.insertion_device import (
     AppleKnotController,
     AppleKnotPathFinder,
@@ -16,47 +18,10 @@ from dodal.devices.insertion_device.apple2_undulator import (
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
-pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
-
-# Define exclusion zones in phase-gap space
-TEST_APPLE_KNOT_EXCLUSION_ZONES = (
-    Rectangle2D(-65.5, 0.0, 65.5, 25.5),  # mechanical limit
-    Rectangle2D(-10.5, 0.0, 10.5, 37.5),  # power load limit
-)
-# Test polynomials for energy to gap/phase conversion
-TEST_LH_GAP_POLYNOMIAL = poly.Polynomial([12.46, 0.832, -0.002])
-TEST_LV_GAP_POLYNOMIAL = poly.Polynomial([8.7456, 0.412, -0.0024317])
-TEST_C_GAP_POLYNOMIAL = poly.Polynomial([9.1763, 0.312, -0.000305968])
-TEST_C_PHASE_POLYNOMIAL = poly.Polynomial(
-    [4.4, 0.79, -0.022, 0.00041, -4.921e-6, 3.9683e-8]
-)
-
-
-def energy_to_gap_converter(energy: float, pol: Pol) -> float:
-    if pol == Pol.LH:
-        return float(TEST_LH_GAP_POLYNOMIAL(energy))
-    if pol == Pol.LV:
-        return float(TEST_LV_GAP_POLYNOMIAL(energy))
-    if pol == Pol.PC or pol == Pol.NC:
-        return float(TEST_C_GAP_POLYNOMIAL(energy))
-    return 0.0
-
-
-def energy_to_phase_converter(energy: float, pol: Pol) -> float:
-    if pol == Pol.LH:
-        return 0.0
-    if pol == Pol.LV:
-        return 70.0
-    if pol == Pol.PC:
-        return float(TEST_C_PHASE_POLYNOMIAL(energy))
-    if pol == Pol.NC:
-        return -float(TEST_C_PHASE_POLYNOMIAL(energy))
-    return 0.0
-
-
-@pytest.fixture
-def apple_knot_i05_path_finder() -> AppleKnotPathFinder:
-    return AppleKnotPathFinder(TEST_APPLE_KNOT_EXCLUSION_ZONES)
+pytest_plugins = [
+    "dodal.testing.fixtures.devices.apple2",
+    "dodal.testing.fixtures.devices.apple_knot",
+]
 
 
 @pytest.fixture
