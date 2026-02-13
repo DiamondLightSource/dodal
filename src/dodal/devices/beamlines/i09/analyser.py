@@ -35,7 +35,7 @@ I09ElectronAnalyserController = ElectronAnalyserController[
 ]
 
 
-class EW4000(
+class I09VGScientaEW4000(
     ElectronAnalyserDetector[I09VGScientaAnalyserDriverIO, I09VGScientaRegion]
 ):
     """Implementation of VGScienta Electron Analyser. This model is unique for i09

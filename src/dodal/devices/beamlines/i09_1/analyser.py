@@ -25,7 +25,7 @@ I091ElectronAnalyserController = ElectronAnalyserController[
 ]
 
 
-class SpecsPhoibos225(
+class I091SpecsPhoibos225(
     ElectronAnalyserDetector[I091SpecsAnalyserDriverIO, I091SpecsRegion]
 ):
     def __init__(

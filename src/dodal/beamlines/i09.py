@@ -4,7 +4,7 @@ from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i09 import EW4000
+from dodal.devices.beamlines.i09 import I09VGScientaEW4000
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
@@ -82,8 +82,8 @@ def ew4000(
     dual_energy_source: DualEnergySource,
     dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
-) -> EW4000:
-    return EW4000(
+) -> I09VGScientaEW4000:
+    return I09VGScientaEW4000(
         f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         dual_energy_source,
         dual_fast_shutter,

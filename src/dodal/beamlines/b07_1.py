@@ -2,9 +2,9 @@ from dodal.beamlines.b07_shared import devices as b07_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.b07_1 import (
+    B07CSpecs150,
     ChannelCutMonochromator,
     Grating,
-    SpecsPhoibos,
 )
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.motors import XYZPolarAzimuthStage
@@ -42,8 +42,8 @@ def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
 # CAM:IMAGE will fail to connect outside the beamline network,
 # see https://github.com/DiamondLightSource/dodal/issues/1852
 @devices.factory()
-def analyser(energy_source: EnergySource) -> SpecsPhoibos:
-    return SpecsPhoibos(
+def analyser(energy_source: EnergySource) -> B07CSpecs150:
+    return B07CSpecs150(
         prefix=f"{C_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         energy_source=energy_source,
     )

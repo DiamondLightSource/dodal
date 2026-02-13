@@ -12,21 +12,23 @@ from dodal.devices.electron_analyser.specs import (
 )
 from dodal.devices.fast_shutter import FastShutter
 
-B07SpecsRegion = SpecsRegion[LensMode, PsuMode]
-B07SpecsSequence = SpecsSequence[LensMode, PsuMode]
+B07BSpecsRegion = SpecsRegion[LensMode, PsuMode]
+B07BSpecsSequence = SpecsSequence[LensMode, PsuMode]
 
 
-class B07SpecsAnalyserDriverIO(SpecsAnalyserDriverIO):
+class B07BSpecsAnalyserDriverIO(SpecsAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix, LensMode, PsuMode, name)
 
 
-B07ElectronAnalyserController = ElectronAnalyserController[
-    B07SpecsAnalyserDriverIO, B07SpecsRegion
+B07BElectronAnalyserController = ElectronAnalyserController[
+    B07BSpecsAnalyserDriverIO, B07BSpecsRegion
 ]
 
 
-class Specs2DCMOS(ElectronAnalyserDetector[B07SpecsAnalyserDriverIO, B07SpecsRegion]):
+class B07BSpecs150(
+    ElectronAnalyserDetector[B07BSpecsAnalyserDriverIO, B07BSpecsRegion]
+):
     def __init__(
         self,
         prefix: str,
@@ -34,6 +36,6 @@ class Specs2DCMOS(ElectronAnalyserDetector[B07SpecsAnalyserDriverIO, B07SpecsReg
         shutter: FastShutter | None = None,
         name: str = "",
     ):
-        drv = B07SpecsAnalyserDriverIO(prefix)
-        controller = B07ElectronAnalyserController(drv, energy_source, shutter)
+        drv = B07BSpecsAnalyserDriverIO(prefix)
+        controller = B07BElectronAnalyserController(drv, energy_source, shutter)
         super().__init__(controller, name)

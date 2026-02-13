@@ -33,7 +33,7 @@ P60ElectronAnalyserController = ElectronAnalyserController[
 ]
 
 
-class R4000(
+class P60VGScientaR4000(
     ElectronAnalyserDetector[P60VGScientaAnalyserDriverIO, P60VGScientnaRegion]
 ):
     """Lab specific analyser for P60 lab. It does not have any shutters connected so

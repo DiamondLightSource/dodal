@@ -1,9 +1,9 @@
 from .analyser import (
-    B071ElectronAnalyserController,
-    B071SpecsAnalyserDriverIO,
-    B071SpecsRegion,
-    B071SpecsSequence,
-    SpecsPhoibos,
+    B07CElectronAnalyserController,
+    B07CSpecs150,
+    B07CSpecsAnalyserDriverIO,
+    B07CSpecsRegion,
+    B07CSpecsSequence,
 )
 from .ccmc import (
     ChannelCutMonochromator,
@@ -12,11 +12,11 @@ from .ccmc import (
 from .enums import Grating, LensMode
 
 __all__ = [
-    "B071ElectronAnalyserController",
-    "B071SpecsAnalyserDriverIO",
-    "B071SpecsRegion",
-    "B071SpecsSequence",
-    "SpecsPhoibos",
+    "B07CElectronAnalyserController",
+    "B07CSpecsAnalyserDriverIO",
+    "B07CSpecsRegion",
+    "B07CSpecsSequence",
+    "B07CSpecs150",
     "Grating",
     "LensMode",
     "ChannelCutMonochromator",
