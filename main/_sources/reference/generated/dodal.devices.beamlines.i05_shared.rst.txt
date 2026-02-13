@@ -1,0 +1,35 @@
+dodal.devices.beamlines.i05\_shared
+===================================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.beamlines.i05_shared.rotation_signals
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i05_shared
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

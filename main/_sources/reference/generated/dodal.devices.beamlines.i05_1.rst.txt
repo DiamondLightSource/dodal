@@ -1,0 +1,36 @@
+dodal.devices.beamlines.i05\_1
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i05_1.XYZPolarAzimuthDefocusStage
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i05_1
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

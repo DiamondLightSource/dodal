@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.motors &#8212; dodal 2.0.1.dev18+ga1bcbe906 documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 2.0.1.dev19+gf188f5797 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=222139f3"></script>
+    <script src="../../_static/documentation_options.js?v=e181bf8d"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -510,6 +510,8 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i03.html">dodal.devices.beamlines.i03</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i04.html">dodal.devices.beamlines.i04</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i05.html">dodal.devices.beamlines.i05</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i05_1.html">dodal.devices.beamlines.i05_1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i05_shared.html">dodal.devices.beamlines.i05_shared</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i06_shared.html">dodal.devices.beamlines.i06_shared</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i07.html">dodal.devices.beamlines.i07</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i09.html">dodal.devices.beamlines.i09</a></li>
@@ -1059,7 +1061,7 @@
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.motors.create_axis_perp_to_rotation">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.motors.</span></span><span class="sig-name descname"><span class="pre">create_axis_perp_to_rotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motor_theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Motor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/motors.html#create_axis_perp_to_rotation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.motors.create_axis_perp_to_rotation" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.motors.</span></span><span class="sig-name descname"><span class="pre">create_axis_perp_to_rotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motor_theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motor_j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Motor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SignalRW</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/motors.html#create_axis_perp_to_rotation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.motors.create_axis_perp_to_rotation" title="Link to this definition">#</a></dt>
 <dd><p>Given a signal that controls a motor in a rotation axis and two other
 signals controlling motors on a pair of orthogonal axes, these axes being in the
 rotating frame of reference created by the first axis, create a derived signal
@@ -1079,6 +1081,9 @@ a move here is entirely parallel with the derived axis.</p></li>
 <li><p><strong>motor_j</strong> (<em>Motor</em>) – this is the axis that, when the sample is at 90 deg rotation,
 a move here is entirely parallel with the derived axis.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>

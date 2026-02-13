@@ -1,0 +1,33 @@
+dodal.devices.beamlines.i05\_shared.rotation\_signals
+=====================================================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i05_shared.rotation_signals
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_rotational_ij_component_signals
+   
+   
+
+   
+   
+   

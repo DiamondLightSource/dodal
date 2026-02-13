@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.motors &#8212; dodal 2.0.1.dev18+ga1bcbe906 documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 2.0.1.dev19+gf188f5797 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=222139f3"></script>
+    <script src="../../../_static/documentation_options.js?v=e181bf8d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -811,8 +811,10 @@ window.addEventListener("load", load);
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">derived_signal_rw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalRW</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">derived_signal_rw</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.maths</span><span class="w"> </span><span class="kn">import</span> <span class="n">rotate_clockwise</span><span class="p">,</span> <span class="n">rotate_counter_clockwise</span>
 
 <span class="n">_X</span><span class="p">,</span> <span class="n">_Y</span><span class="p">,</span> <span class="n">_Z</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span>
 
@@ -1177,7 +1179,9 @@ window.addEventListener("load", load);
 
 <div class="viewcode-block" id="create_axis_perp_to_rotation">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.html#dodal.devices.motors.create_axis_perp_to_rotation">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_axis_perp_to_rotation</span><span class="p">(</span><span class="n">motor_theta</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="n">motor_i</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="n">motor_j</span><span class="p">:</span> <span class="n">Motor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_axis_perp_to_rotation</span><span class="p">(</span>
+    <span class="n">motor_theta</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="n">motor_i</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="n">motor_j</span><span class="p">:</span> <span class="n">Motor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a signal that controls a motor in a rotation axis and two other</span>
 <span class="sd">    signals controlling motors on a pair of orthogonal axes, these axes being in the</span>
 <span class="sd">    rotating frame of reference created by the first axis, create a derived signal</span>
@@ -1199,19 +1203,18 @@ window.addEventListener("load", load);
 <span class="sd">            a move here is entirely parallel with the derived axis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span><span class="n">j_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">i_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">rot_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="n">i_component</span> <span class="o">=</span> <span class="n">i_val</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rot_value</span><span class="p">))</span>
-        <span class="n">j_component</span> <span class="o">=</span> <span class="n">j_val</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rot_value</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">i_component</span> <span class="o">+</span> <span class="n">j_component</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span><span class="n">j_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">i_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">rot_deg_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">rotate_clockwise</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rot_deg_value</span><span class="p">),</span> <span class="n">i_val</span><span class="p">,</span> <span class="n">j_val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="n">vertical_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">rot_value</span> <span class="o">=</span> <span class="k">await</span> <span class="n">motor_theta</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="n">i_component</span> <span class="o">=</span> <span class="n">vertical_value</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rot_value</span><span class="p">))</span>
-        <span class="n">j_component</span> <span class="o">=</span> <span class="n">vertical_value</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rot_value</span><span class="p">))</span>
+        <span class="n">rot_deg_value</span> <span class="o">=</span> <span class="k">await</span> <span class="n">motor_theta</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rot_deg_value</span><span class="p">)</span>
+        <span class="n">i_component</span><span class="p">,</span> <span class="n">j_component</span> <span class="o">=</span> <span class="n">rotate_counter_clockwise</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">vertical_value</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
             <span class="n">motor_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">i_component</span><span class="p">),</span>
             <span class="n">motor_j</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">j_component</span><span class="p">),</span>
-            <span class="n">motor_theta</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">rot_value</span><span class="p">),</span>
+            <span class="n">motor_theta</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">rot_deg_value</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
@@ -1219,7 +1222,7 @@ window.addEventListener("load", load);
         <span class="n">_set</span><span class="p">,</span>
         <span class="n">i_val</span><span class="o">=</span><span class="n">motor_i</span><span class="p">,</span>
         <span class="n">j_val</span><span class="o">=</span><span class="n">motor_j</span><span class="p">,</span>
-        <span class="n">rot_value</span><span class="o">=</span><span class="n">motor_theta</span><span class="p">,</span>
+        <span class="n">rot_deg_value</span><span class="o">=</span><span class="n">motor_theta</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 </pre></div>

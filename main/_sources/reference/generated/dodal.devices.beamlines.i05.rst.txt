@@ -16,6 +16,7 @@ dodal.devices.beamlines.i05
 
    ~i05.Grating
    ~i05.PolynomCompoundMotors
+   ~i05.I05Goniometer
 
 
 
