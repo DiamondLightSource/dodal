@@ -36,6 +36,7 @@ class B07CSpecs150(
         shutter: FastShutter | None = None,
         name: str = "",
     ):
-        drv = B07CSpecsAnalyserDriverIO(prefix)
-        controller = B07CElectronAnalyserController(drv, energy_source, shutter)
+        controller = B07CElectronAnalyserController(
+            B07CSpecsAnalyserDriverIO(prefix), energy_source, shutter
+        )
         super().__init__(controller, name)

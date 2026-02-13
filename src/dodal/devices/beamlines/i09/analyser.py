@@ -51,8 +51,10 @@ class I09VGScientaEW4000(
         source_selector: SourceSelector,
         name: str = "",
     ):
-        drv = I09VGScientaAnalyserDriverIO(prefix)
         controller = I09ElectronAnalyserController(
-            drv, dual_energy_source, dual_fast_shutter, source_selector
+            I09VGScientaAnalyserDriverIO(prefix),
+            dual_energy_source,
+            dual_fast_shutter,
+            source_selector,
         )
         super().__init__(controller, name)
