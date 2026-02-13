@@ -45,10 +45,9 @@ def test_i03_beamline_parameters():
     ]
 
 
-def test_get_beamline_parameters_errors_with_no_environment_variable_set():
-    if environ.get("BEAMLINE"):
-        del environ["BEAMLINE"]
-    assert get_beamline_parameters("i03")
+def test_get_beamline_parameters_errors_if_no_filepath_found_for_beamline():
+    with pytest.raises(KeyError):
+        assert get_beamline_parameters("not a key")
 
 
 def test_get_beamline_parameters():
