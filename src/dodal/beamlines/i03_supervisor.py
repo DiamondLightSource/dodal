@@ -19,6 +19,7 @@ devices = DeviceManager()
 def baton() -> Baton:
     return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
 
+
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
