@@ -6,9 +6,9 @@ from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
+from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
-from dodal.device_manager import DeviceManager
 from dodal.devices.turbo_slit import TurboSlit
 from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
@@ -19,10 +19,7 @@ PREFIX = BeamlinePrefix(BL, suffix="P")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-devices = DeviceManager()
 
-
-@devices.fixture
 @cache
 def path_provider() -> PathProvider:
     return StaticVisitPathProvider(
@@ -40,19 +37,19 @@ there.
 """
 
 
-@devices.factory()
+@device_factory()
 def turbo_slit() -> TurboSlit:
     """Turboslit for selecting energy from the polychromator."""
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
 
 
-@devices.factory()
+@device_factory()
 def turbo_slit_x() -> Motor:
     """Turbo slit x motor."""
     return Motor(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
 
 
-@devices.factory()
+@device_factory()
 def turbo_slit_pmac() -> PmacIO:
     """PMac controller using running fly scans with trajectory."""
     motor = turbo_slit_x()
@@ -63,27 +60,27 @@ def turbo_slit_pmac() -> PmacIO:
     )
 
 
-@devices.factory()
-def panda(path_provider: PathProvider) -> HDFPanda:
+@device_factory()
+def panda() -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
-        path_provider=path_provider,
+        path_provider=path_provider(),
     )
 
 
 # Use mock device until motors are reconnected on the beamline
-@devices.factory(mock=True)
+@device_factory(mock=True)
 def alignment_x() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:X")
 
 
 # Use mock device until motors are reconnected on the beamline
-@devices.factory(mock=True)
+@device_factory(mock=True)
 def alignment_y() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:Y")
 
 
-@devices.factory(skip=True)
+@device_factory(skip=True)
 def xspress3() -> Xspress3:
     """16 channels Xspress3 detector."""
     return Xspress3(
