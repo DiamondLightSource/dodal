@@ -8,7 +8,7 @@ from ophyd_async.testing import assert_reading, partial_reading
 from dodal.devices.i19.access_controlled.blueapi_device import HEADERS, HutchState
 from dodal.devices.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
-    FocusingMirrorType,
+    FocusingMirrorName,
 )
 
 
@@ -17,7 +17,7 @@ def eh1_vfm_piezo() -> AccessControlledPiezoActuator:
     with init_devices(mock=True):
         v_piezo = AccessControlledPiezoActuator(
             "",
-            FocusingMirrorType.VFM,
+            FocusingMirrorName.VFM,
             HutchState.EH1,
             "cm12345-1",
             name="mock_vfm_piezo",
@@ -32,7 +32,7 @@ def eh2_hfm_piezo() -> AccessControlledPiezoActuator:
     with init_devices(mock=True):
         h_piezo = AccessControlledPiezoActuator(
             "",
-            FocusingMirrorType.HFM,
+            FocusingMirrorName.HFM,
             HutchState.EH2,
             "cm12345-1",
             name="mock_hfm_piezo",
@@ -45,12 +45,12 @@ def eh2_hfm_piezo() -> AccessControlledPiezoActuator:
 @pytest.mark.parametrize(
     "hutch_name, mirror_type",
     [
-        (HutchState.EH1, FocusingMirrorType.HFM),
-        (HutchState.EH2, FocusingMirrorType.VFM),
+        (HutchState.EH1, FocusingMirrorName.HFM),
+        (HutchState.EH2, FocusingMirrorName.VFM),
     ],
 )
 def test_device_created_without_errors(
-    hutch_name: HutchState, mirror_type: FocusingMirrorType
+    hutch_name: HutchState, mirror_type: FocusingMirrorName
 ):
     test_device = AccessControlledPiezoActuator(
         "", mirror_type, hutch_name, "cm12345-1", "fake_piezo"
