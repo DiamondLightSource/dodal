@@ -7,7 +7,7 @@ from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import StaticVisitPathProvider
+from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.turbo_slit import TurboSlit
 from dodal.devices.xspress3.xspress3 import Xspress3
@@ -28,6 +28,7 @@ def path_provider() -> PathProvider:
     return StaticVisitPathProvider(
         BL,
         Path("/dls/p51/data/2026/cm44254-1/tmp"),
+        client=RemoteDirectoryServiceClient("http://i20-1-control:8088/api"),
     )
 
 
@@ -63,10 +64,10 @@ def turbo_slit_pmac() -> PmacIO:
 
 
 @devices.factory()
-def panda() -> HDFPanda:
+def panda(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
-        path_provider=path_provider(),
+        path_provider=path_provider,
     )
 
 
