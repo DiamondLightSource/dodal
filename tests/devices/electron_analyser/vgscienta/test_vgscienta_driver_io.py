@@ -5,7 +5,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import StrictEnum, get_mock_put, init_devices, set_mock_value
+from ophyd_async.core import StrictEnum, get_mock_put, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -20,14 +20,18 @@ from dodal.devices.beamlines.i09 import (
 from dodal.devices.electron_analyser.base import EnergyMode
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
+    TEST_SEQUENCES,
 )
 
 
 @pytest.fixture
-async def sim_driver() -> I09VGScientaAnalyserDriverIO:
-    async with init_devices(mock=True):
-        sim_driver = I09VGScientaAnalyserDriverIO(prefix="TEST:")
-    return sim_driver
+async def sim_driver(ew4000) -> I09VGScientaAnalyserDriverIO:
+    return ew4000.driver
+
+
+@pytest.fixture
+def sequence(sim_driver: I09VGScientaAnalyserDriverIO):
+    return TEST_SEQUENCES[type(sim_driver)]()
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

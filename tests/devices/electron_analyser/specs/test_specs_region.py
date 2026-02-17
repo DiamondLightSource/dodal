@@ -8,14 +8,14 @@ from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.specs import AcquisitionMode
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
+    TEST_SEQUENCES,
     assert_region_has_expected_values,
-    b07_specs_test_sequence_loader,
 )
 
 
 @pytest.fixture
 def sequence() -> B07BSpecsSequence:
-    return b07_specs_test_sequence_loader()
+    return TEST_SEQUENCES[B07BSpecsSequence]()
 
 
 @pytest.fixture

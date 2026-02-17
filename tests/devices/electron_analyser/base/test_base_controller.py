@@ -1,65 +1,32 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from ophyd_async.core import TriggerInfo, get_mock_put, init_devices
+from ophyd_async.core import TriggerInfo, get_mock_put
 
-from dodal.devices.beamlines.b07.analyser import B07BSpecs150
-from dodal.devices.beamlines.i09.analyser import I09VGScientaEW4000
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
-    DualEnergySource,
-    EnergySource,
-)
-from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
+    GenericElectronAnalyserController,
+    GenericElectronAnalyserDetector,
+    GenericSequence,
 )
-from dodal.devices.fast_shutter import DualFastShutter
-from dodal.devices.selectable_source import SourceSelector
-from tests.devices.electron_analyser.helper_util import TEST_SEQUENCE_REGION_NAMES
+from tests.devices.electron_analyser.helper_util import (
+    TEST_SEQUENCE_REGION_NAMES,
+    TEST_SEQUENCES,
+)
 
 
 @pytest.fixture
-def ew4000(
-    dual_energy_source: DualEnergySource,
-    dual_fast_shutter: DualFastShutter,
-    source_selector: SourceSelector,
-) -> I09VGScientaEW4000:
-    with init_devices(mock=True):
-        ew4000 = I09VGScientaEW4000(
-            "TEST:", dual_energy_source, dual_fast_shutter, source_selector
-        )
-    return ew4000
+def sequence(sim_detector: GenericElectronAnalyserDetector) -> GenericSequence:
+    return TEST_SEQUENCES[type(sim_detector)]()
 
 
 @pytest.fixture
-def specs150(single_energy_source: EnergySource) -> B07BSpecs150:
-    with init_devices(mock=True):
-        specs150 = B07BSpecs150("TEST:", single_energy_source)
-    return specs150
-
-
-@pytest.fixture(params=["ew4000", "specs150"])
 def analyser_controller(
-    request: pytest.FixtureRequest,
-    ew4000: I09VGScientaEW4000,
-    specs150: B07BSpecs150,
-):
-    detectors = [ew4000, specs150]
-    for detector in detectors:
-        if detector.name == request.param:
-            return detector._controller
-
-    raise ValueError(f"Detector with name '{request.param}' not found")
-
-
-@pytest.fixture
-def sim_driver(
-    analyser_controller: ElectronAnalyserController[
-        AbstractAnalyserDriverIO, AbstractBaseRegion
-    ],
-) -> AbstractAnalyserDriverIO:
-    return analyser_controller.driver
+    sim_detector: GenericElectronAnalyserDetector,
+) -> GenericElectronAnalyserController:
+    return sim_detector._controller
 
 
 async def test_controller_prepare_sets_excitation_energy(

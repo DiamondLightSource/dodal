@@ -14,14 +14,14 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
+    TEST_SEQUENCES,
     assert_region_has_expected_values,
-    i09_vgscienta_test_sequence_loader,
 )
 
 
 @pytest.fixture
 def sequence() -> I09VGScientaSequence:
-    return i09_vgscienta_test_sequence_loader()
+    return TEST_SEQUENCES[I09VGScientaSequence]()
 
 
 @pytest.fixture

@@ -2,18 +2,14 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import StrictEnum, init_devices
+from ophyd_async.core import StrictEnum
 
-from dodal.devices.beamlines.b07.analyser import B07BSpecsAnalyserDriverIO
-from dodal.devices.beamlines.i09.analyser import I09VGScientaAnalyserDriverIO
 from dodal.devices.electron_analyser.base import GenericAnalyserDriverIO
 
 
-@pytest.fixture(params=[I09VGScientaAnalyserDriverIO, B07BSpecsAnalyserDriverIO])
-async def sim_driver(request: pytest.FixtureRequest) -> GenericAnalyserDriverIO:
-    async with init_devices(mock=True):
-        sim_driver = request.param(prefix="TEST:")
-    return sim_driver
+@pytest.fixture
+async def sim_driver(sim_detector) -> GenericAnalyserDriverIO:
+    return sim_detector.driver
 
 
 def test_driver_throws_error_with_wrong_lens_mode(

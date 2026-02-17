@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import get_mock_put, init_devices, set_mock_value
+from ophyd_async.core import get_mock_put, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -12,32 +12,33 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.beamlines.b07 import LensMode
-from dodal.devices.beamlines.b07.analyser import B07BSpecsAnalyserDriverIO
-from dodal.devices.beamlines.b07_shared import PsuMode
+from dodal.devices.beamlines.b07.analyser import (
+    B07BSpecsAnalyserDriverIO,
+    B07BSpecsRegion,
+)
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
-from dodal.devices.electron_analyser.specs import (
-    AcquisitionMode,
-    SpecsAnalyserDriverIO,
-    SpecsRegion,
-)
+from dodal.devices.electron_analyser.specs import AcquisitionMode
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
+    TEST_SEQUENCES,
 )
 
 
 @pytest.fixture
-async def sim_driver() -> B07BSpecsAnalyserDriverIO:
-    async with init_devices(mock=True):
-        sim_driver = B07BSpecsAnalyserDriverIO(prefix="TEST:")
-    return sim_driver
+async def sim_driver(b07b_specs150) -> B07BSpecsAnalyserDriverIO:
+    return b07b_specs150.driver
+
+
+@pytest.fixture
+def sequence(sim_driver: B07BSpecsAnalyserDriverIO):
+    return TEST_SEQUENCES[type(sim_driver)]()
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_correctly(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    region: SpecsRegion[LensMode, PsuMode],
+    sim_driver: B07BSpecsAnalyserDriverIO,
+    region: B07BSpecsRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region), wait=True)
@@ -93,8 +94,8 @@ async def test_analyser_sets_region_correctly(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_read_configuration_is_correct(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    region: SpecsRegion[LensMode, PsuMode],
+    sim_driver: B07BSpecsAnalyserDriverIO,
+    region: B07BSpecsRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region), wait=True)
@@ -130,8 +131,8 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_read_is_correct(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    region: SpecsRegion[LensMode, PsuMode],
+    sim_driver: B07BSpecsAnalyserDriverIO,
+    region: B07BSpecsRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region), wait=True)
@@ -153,8 +154,8 @@ async def test_analyser_sets_region_and_read_is_correct(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_specs_analyser_binding_energy_axis(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    region: SpecsRegion[LensMode, PsuMode],
+    sim_driver: B07BSpecsAnalyserDriverIO,
+    region: B07BSpecsRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region))
@@ -175,7 +176,7 @@ async def test_specs_analyser_binding_energy_axis(
 
 
 async def test_specs_analyser_energy_axis(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
+    sim_driver: B07BSpecsAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     start_energy = 1
@@ -191,7 +192,7 @@ async def test_specs_analyser_energy_axis(
 
 
 async def test_specs_analyser_angle_axis(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
+    sim_driver: B07BSpecsAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     max_angle = 21

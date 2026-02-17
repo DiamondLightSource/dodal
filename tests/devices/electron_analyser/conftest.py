@@ -1,25 +1,25 @@
 from typing import Any
 
 import pytest
-from ophyd_async.core import InOut, init_devices
+from ophyd_async.core import InOut, init_devices, set_mock_value
 
-from dodal.devices.beamlines.i09 import Grating
+from dodal.devices.beamlines.b07 import B07BSpecs150
+from dodal.devices.beamlines.i09 import Grating, I09VGScientaEW4000
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import (
-    AbstractAnalyserDriverIO,
     AbstractBaseRegion,
     AbstractBaseSequence,
     DualEnergySource,
     EnergySource,
+    GenericElectronAnalyserDetector,
 )
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
-from tests.devices.electron_analyser.helper_util import DRIVER_TO_TEST_SEQUENCE
 
 
 @pytest.fixture
@@ -71,23 +71,33 @@ def fast_shutter() -> GenericFastShutter:
 
 
 @pytest.fixture
-def dual_fast_shutter(
-    source_selector: SourceSelector,
-) -> DualFastShutter[InOut]:
+def shutter1() -> GenericFastShutter[InOut]:
     with init_devices(mock=True):
         shutter1 = GenericFastShutter[InOut](
             pv="TEST:",
             open_state=InOut.OUT,
             close_state=InOut.IN,
         )
+    return shutter1
 
+
+@pytest.fixture
+def shutter2() -> GenericFastShutter[InOut]:
     with init_devices(mock=True):
         shutter2 = GenericFastShutter[InOut](
             pv="TEST:",
             open_state=InOut.OUT,
             close_state=InOut.IN,
         )
+    return shutter2
 
+
+@pytest.fixture
+def dual_fast_shutter(
+    shutter1: GenericFastShutter[InOut],
+    shutter2: GenericFastShutter[InOut],
+    source_selector: SourceSelector,
+) -> DualFastShutter[InOut]:
     with init_devices(mock=True):
         dual_fast_shutter = DualFastShutter[InOut](
             shutter1,
@@ -98,10 +108,49 @@ def dual_fast_shutter(
 
 
 @pytest.fixture
-def sequence(
-    sim_driver: AbstractAnalyserDriverIO,
-) -> AbstractBaseSequence:
-    return DRIVER_TO_TEST_SEQUENCE[type(sim_driver)]
+async def b07b_specs150(
+    single_energy_source: EnergySource,
+    shutter1: GenericFastShutter,
+) -> B07BSpecs150:
+    with init_devices(mock=True):
+        b07b_specs150 = B07BSpecs150(
+            prefix="TEST:",
+            energy_source=single_energy_source,
+            shutter=shutter1,
+        )
+    # Needed for specs so we don't get division by zero error.
+    set_mock_value(b07b_specs150.driver.slices, 1)
+    return b07b_specs150
+
+
+@pytest.fixture
+async def ew4000(
+    dual_energy_source: DualEnergySource,
+    dual_fast_shutter: DualFastShutter,
+    source_selector: SourceSelector,
+) -> I09VGScientaEW4000:
+    with init_devices(mock=True):
+        ew4000 = I09VGScientaEW4000(
+            prefix="TEST:",
+            dual_energy_source=dual_energy_source,
+            dual_fast_shutter=dual_fast_shutter,
+            source_selector=source_selector,
+        )
+    return ew4000
+
+
+@pytest.fixture(params=["ew4000", "b07b_specs150"])
+def sim_detector(
+    request: pytest.FixtureRequest,
+    ew4000: I09VGScientaEW4000,
+    b07b_specs150: B07BSpecs150,
+) -> GenericElectronAnalyserDetector:
+    detectors = [ew4000, b07b_specs150]
+    for detector in detectors:
+        if detector.name == request.param:
+            return detector
+
+    raise ValueError(f"Detector with name '{request.param}' not found")
 
 
 @pytest.fixture
