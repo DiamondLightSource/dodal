@@ -18,6 +18,7 @@ from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsAnalyserDriverIO,
+    SpecsDetector,
     SpecsRegion,
 )
 from tests.devices.electron_analyser.helper_util import (
@@ -27,7 +28,9 @@ from tests.devices.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-async def sim_driver(b07b_specs150) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
+async def sim_driver(
+    b07b_specs150: SpecsDetector[LensMode, PsuMode],
+) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
     return b07b_specs150.driver
 
 

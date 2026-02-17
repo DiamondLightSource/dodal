@@ -1,6 +1,5 @@
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.beamlines import b07, i09
-from dodal.devices.electron_analyser.base import GenericSequence
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsDetector,
@@ -45,7 +44,7 @@ TEST_SEQUENCES = {
 }
 
 
-def get_test_sequence(key: type) -> GenericSequence:
+def get_test_sequence(key: type):
     for cls in key.__mro__:
         # Check for unscripted class only
         if cls in TEST_SEQUENCES:

@@ -13,7 +13,7 @@ from tests.devices.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-def sequence():
+def sequence() -> SpecsSequence[LensMode, PsuMode]:
     return get_test_sequence(SpecsSequence[LensMode, PsuMode])
 
 

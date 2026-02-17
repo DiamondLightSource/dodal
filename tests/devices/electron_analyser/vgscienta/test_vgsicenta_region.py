@@ -18,7 +18,7 @@ from tests.devices.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-def sequence():
+def sequence() -> VGScientaSequence[LensMode, PsuMode, PassEnergy]:
     return get_test_sequence(VGScientaSequence[LensMode, PsuMode, PassEnergy])
 
 

@@ -17,6 +17,7 @@ from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
+    VGScientaDetector,
     VGScientaRegion,
 )
 from tests.devices.electron_analyser.helper_util import (
@@ -27,7 +28,7 @@ from tests.devices.electron_analyser.helper_util import (
 
 @pytest.fixture
 async def sim_driver(
-    ew4000,
+    ew4000: VGScientaDetector,
 ) -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
     return ew4000.driver
 
