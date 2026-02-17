@@ -1,5 +1,4 @@
 import inspect
-import logging
 from collections.abc import Callable
 from typing import Annotated, Final, TypeVar, cast
 
@@ -13,6 +12,7 @@ from ophyd_async.core import (
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
+from dodal.log import LOGGER
 from dodal.utils import (
     AnyDevice,
     BeamlinePrefix,
@@ -25,9 +25,6 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
-
-
-LOGGER = logging.getLogger(__name__)
 
 
 def set_beamline(beamline: str):
