@@ -1,7 +1,11 @@
 from dodal.beamlines.b07_shared import devices as b07_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.b07 import B07BSpecs150, B07SampleManipulator52B, Grating
+from dodal.devices.beamlines.b07 import (
+    B07BSpecs150,
+    B07SampleManipulator52B,
+    Grating,
+)
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.motors import XYZPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator

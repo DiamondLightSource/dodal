@@ -156,7 +156,7 @@ def sim_detector(
 @pytest.fixture
 def region(
     request: pytest.FixtureRequest,
-    sequence: AbstractBaseSequence,
+    sequence: AbstractBaseSequence[AbstractBaseRegion],
 ) -> AbstractBaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:

@@ -9,7 +9,6 @@ from dodal.devices.beamlines.i09 import (
     I09VGScientaEW4000,
     I09VGScientaSequence,
 )
-from dodal.devices.electron_analyser.base import GenericSequence
 from tests.devices.electron_analyser.test_data import (
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,
@@ -37,7 +36,7 @@ TEST_SEQUENCES = {
 }
 
 
-def get_test_sequence(key: type) -> GenericSequence:
+def get_test_sequence(key: type):
     for cls in key.__mro__:
         # Check for unscripted class only
         if cls in TEST_SEQUENCES:

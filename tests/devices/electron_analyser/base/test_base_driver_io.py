@@ -4,11 +4,16 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum
 
-from dodal.devices.electron_analyser.base import GenericAnalyserDriverIO
+from dodal.devices.electron_analyser.base import (
+    GenericAnalyserDriverIO,
+    GenericElectronAnalyserDetector,
+)
 
 
 @pytest.fixture
-async def sim_driver(sim_detector) -> GenericAnalyserDriverIO:
+async def sim_driver(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> GenericAnalyserDriverIO:
     return sim_detector.driver
 
 
