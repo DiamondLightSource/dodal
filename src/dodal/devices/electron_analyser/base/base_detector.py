@@ -10,7 +10,6 @@ from ophyd_async.core import (
     TriggerInfo,
 )
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
@@ -20,9 +19,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 )
 from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
-    GenericSequence,
     TAbstractBaseRegion,
-    TAbstractBaseSequence,
 )
 
 
@@ -111,6 +108,9 @@ class ElectronAnalyserRegionDetector(
         await super().trigger()
 
 
+# Used in sm-bluesky, but will hopefully be removed along with
+# ElectronAnalyserRegionDetector in future. Blocked by:
+# https://github.com/bluesky/bluesky/pull/1978
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
     GenericAnalyserDriverIO, GenericRegion
 ]
@@ -123,7 +123,7 @@ TElectronAnalyserRegionDetector = TypeVar(
 class ElectronAnalyserDetector(
     BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
     Stageable,
-    Generic[TAbstractBaseSequence, TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """Electron analyser detector with the additional functionality to load a sequence
     file and create a list of temporary ElectronAnalyserRegionDetector objects. These
@@ -132,13 +132,13 @@ class ElectronAnalyserDetector(
 
     def __init__(
         self,
-        sequence_class: type[TAbstractBaseSequence],
         controller: ElectronAnalyserController[
             TAbstractAnalyserDriverIO, TAbstractBaseRegion
         ],
         name: str = "",
     ):
-        self._sequence_class = sequence_class
+        # Save on device so connect works and names it as child
+        self.driver = controller.driver
         super().__init__(controller, name)
 
     @AsyncStatus.wrap
@@ -160,38 +160,24 @@ class ElectronAnalyserDetector(
         """Disarm the detector."""
         await self._controller.disarm()
 
-    def load_sequence(self, filename: str) -> TAbstractBaseSequence:
-        """Load the sequence data from a provided json file into a sequence class.
-
-        Args:
-            filename (str): Path to the sequence file containing the region data.
-
-        Returns:
-            Pydantic model representing the sequence file.
-        """
-        return load_json_file_to_class(self._sequence_class, filename)
-
     def create_region_detector_list(
-        self, filename: str, enabled_only=True
+        self, regions: list[TAbstractBaseRegion]
     ) -> list[
         ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
     ]:
-        """Create a list of detectors equal to the number of regions in a sequence file.
-        Each detector is responsible for setting up a specific region.
+        """This method can hopefully be dropped when this is merged and released.
+        https://github.com/bluesky/bluesky/pull/1978.
+
+        Create a list of detectors equal to the number of regions. Each detector is
+        responsible for setting up a specific region.
 
         Args:
-            filename (str): Path to the sequence file containing the region data.
-            enabled_only (bool, optional): If true, only include the region if enabled
-                is True.
+            regions: The list of regions to give to each region detector.
 
         Returns:
             List of ElectronAnalyserRegionDetector, equal to the number of regions in
-                the sequence file.
+            the sequence file.
         """
-        seq = self.load_sequence(filename)
-        regions: list[TAbstractBaseRegion] = (
-            seq.get_enabled_regions() if enabled_only else seq.regions
-        )
         return [
             ElectronAnalyserRegionDetector[
                 TAbstractAnalyserDriverIO, TAbstractBaseRegion
@@ -201,7 +187,7 @@ class ElectronAnalyserDetector(
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    GenericSequence, GenericAnalyserDriverIO, GenericRegion
+    GenericAnalyserDriverIO, GenericRegion
 ]
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",

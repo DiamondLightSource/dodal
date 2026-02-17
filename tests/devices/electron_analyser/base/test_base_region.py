@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.beamlines import b07, i09
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
@@ -28,10 +27,10 @@ from tests.devices.electron_analyser.helper_util import (
     params=[
         SpecsSequence[b07.LensMode, b07.PsuMode],
         VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    ]
+    ],
 )
 def sequence(request: pytest.FixtureRequest) -> GenericSequence:
-    return load_json_file_to_class(request.param, get_test_sequence(request.param))
+    return get_test_sequence(request.param)
 
 
 @pytest.fixture
