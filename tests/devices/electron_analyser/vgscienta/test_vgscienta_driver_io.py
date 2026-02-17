@@ -13,35 +13,31 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
-from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaAnalyserDriverIO,
-    VGScientaDetector,
-    VGScientaRegion,
+from dodal.devices.beamlines.i09 import (
+    I09VGScientaAnalyserDriverIO,
+    I09VGScientaRegion,
 )
+from dodal.devices.electron_analyser.base import EnergyMode
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
+    TEST_SEQUENCES,
 )
 
 
 @pytest.fixture
-async def sim_driver(
-    ew4000: VGScientaDetector,
-) -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
+async def sim_driver(ew4000) -> I09VGScientaAnalyserDriverIO:
     return ew4000.driver
 
 
 @pytest.fixture
-def sequence(sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]):
-    return get_test_sequence(type(sim_driver))
+def sequence(sim_driver: I09VGScientaAnalyserDriverIO):
+    return TEST_SEQUENCES[type(sim_driver)]()
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_correctly(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    region: VGScientaRegion[LensMode, PassEnergy],
+    sim_driver: I09VGScientaAnalyserDriverIO,
+    region: I09VGScientaRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region), wait=True)
@@ -98,8 +94,8 @@ async def test_analyser_sets_region_correctly(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_read_configuration_is_correct(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    region: VGScientaRegion[LensMode, PassEnergy],
+    sim_driver: I09VGScientaAnalyserDriverIO,
+    region: I09VGScientaRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region), wait=True)
@@ -140,8 +136,8 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_read_is_correct(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    region: VGScientaRegion[LensMode, PassEnergy],
+    sim_driver: I09VGScientaAnalyserDriverIO,
+    region: I09VGScientaRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region), wait=True)
@@ -164,8 +160,8 @@ async def test_analyser_sets_region_and_read_is_correct(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analayser_binding_energy_is_correct(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    region: VGScientaRegion[LensMode, PassEnergy],
+    sim_driver: I09VGScientaAnalyserDriverIO,
+    region: I09VGScientaRegion,
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(sim_driver, region), wait=True)
@@ -187,7 +183,7 @@ async def test_analayser_binding_energy_is_correct(
 
 
 def test_driver_throws_error_with_wrong_pass_energy(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
+    sim_driver: I09VGScientaAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class PassEnergyTestEnum(StrictEnum):
@@ -204,7 +200,7 @@ def test_driver_throws_error_with_wrong_pass_energy(
 
 
 def test_driver_throws_error_with_wrong_detector_mode(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
+    sim_driver: I09VGScientaAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class DetectorModeTestEnum(StrictEnum):

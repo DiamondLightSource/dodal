@@ -2,29 +2,31 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
+from dodal.devices.beamlines.i09 import LensMode, PassEnergy
+from dodal.devices.beamlines.i09.analyser import (
+    I09VGScientaRegion,
+    I09VGScientaSequence,
+)
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     AcquisitionMode,
     DetectorMode,
-    VGScientaRegion,
-    VGScientaSequence,
 )
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
+    TEST_SEQUENCES,
     assert_region_has_expected_values,
-    get_test_sequence,
 )
 
 
 @pytest.fixture
-def sequence() -> VGScientaSequence[LensMode, PsuMode, PassEnergy]:
-    return get_test_sequence(VGScientaSequence[LensMode, PsuMode, PassEnergy])
+def sequence() -> I09VGScientaSequence:
+    return TEST_SEQUENCES[I09VGScientaSequence]()
 
 
 @pytest.fixture
-def expected_region_class() -> type[VGScientaRegion[LensMode, PassEnergy]]:
-    return VGScientaRegion[LensMode, PassEnergy]
+def expected_region_class() -> type[I09VGScientaRegion]:
+    return I09VGScientaRegion
 
 
 @pytest.fixture
@@ -106,7 +108,7 @@ def expected_region_values() -> list[dict[str, Any]]:
 
 
 def test_sequence_get_expected_enabled_region_names(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
+    sequence: I09VGScientaSequence,
     expected_enabled_region_names: list[str],
 ) -> None:
     assert sequence.get_enabled_region_names() == expected_enabled_region_names
@@ -115,7 +117,7 @@ def test_sequence_get_expected_enabled_region_names(
 
 
 def test_file_loads_into_class_with_expected_values(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
+    sequence: I09VGScientaSequence,
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)

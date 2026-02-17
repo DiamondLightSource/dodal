@@ -13,13 +13,13 @@ from dodal.devices.electron_analyser.base import (
 )
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
+    TEST_SEQUENCES,
 )
 
 
 @pytest.fixture
 def sequence(sim_detector: GenericElectronAnalyserDetector) -> GenericSequence:
-    return get_test_sequence(type(sim_detector))
+    return TEST_SEQUENCES[type(sim_detector)]()
 
 
 @pytest.fixture

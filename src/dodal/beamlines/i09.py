@@ -4,10 +4,9 @@ from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i09.enums import LensMode, PassEnergy, PsuMode
+from dodal.devices.beamlines.i09 import I09VGScientaEW4000
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.motors import XYZPolarAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -80,18 +79,15 @@ def dual_fast_shutter(
 # see https://github.com/DiamondLightSource/dodal/issues/1852
 @devices.factory()
 def ew4000(
-    dual_fast_shutter: DualFastShutter,
     dual_energy_source: DualEnergySource,
+    dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
-) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
-    return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
-        energy_source=dual_energy_source,
-        shutter=dual_fast_shutter,
-        source_selector=source_selector,
+) -> I09VGScientaEW4000:
+    return I09VGScientaEW4000(
+        f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+        dual_energy_source,
+        dual_fast_shutter,
+        source_selector,
     )
 
 

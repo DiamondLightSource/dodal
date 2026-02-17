@@ -3,8 +3,8 @@ from typing import Any
 import pytest
 from ophyd_async.core import InOut, init_devices, set_mock_value
 
-from dodal.devices.beamlines import b07, b07_shared, i09
-from dodal.devices.beamlines.i09 import Grating
+from dodal.devices.beamlines.b07 import B07BSpecs150
+from dodal.devices.beamlines.i09 import Grating, I09VGScientaEW4000
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
@@ -17,8 +17,6 @@ from dodal.devices.electron_analyser.base import (
     EnergySource,
     GenericElectronAnalyserDetector,
 )
-from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
@@ -62,6 +60,16 @@ async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySourc
     return dual_energy_source
 
 
+def fast_shutter() -> GenericFastShutter:
+    with init_devices(mock=True):
+        fast_shutter = GenericFastShutter[InOut](
+            pv="TEST:",
+            open_state=InOut.OUT,
+            close_state=InOut.IN,
+        )
+    return fast_shutter
+
+
 @pytest.fixture
 def shutter1() -> GenericFastShutter[InOut]:
     with init_devices(mock=True):
@@ -103,12 +111,10 @@ def dual_fast_shutter(
 async def b07b_specs150(
     single_energy_source: EnergySource,
     shutter1: GenericFastShutter,
-) -> SpecsDetector[b07.LensMode, b07_shared.PsuMode]:
+) -> B07BSpecs150:
     with init_devices(mock=True):
-        b07b_specs150 = SpecsDetector[b07.LensMode, b07_shared.PsuMode](
+        b07b_specs150 = B07BSpecs150(
             prefix="TEST:",
-            lens_mode_type=b07.LensMode,
-            psu_mode_type=b07_shared.PsuMode,
             energy_source=single_energy_source,
             shutter=shutter1,
         )
@@ -122,15 +128,12 @@ async def ew4000(
     dual_energy_source: DualEnergySource,
     dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
-) -> VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy]:
+) -> I09VGScientaEW4000:
     with init_devices(mock=True):
-        ew4000 = VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy](
+        ew4000 = I09VGScientaEW4000(
             prefix="TEST:",
-            lens_mode_type=i09.LensMode,
-            psu_mode_type=i09.PsuMode,
-            pass_energy_type=i09.PassEnergy,
-            energy_source=dual_energy_source,
-            shutter=dual_fast_shutter,
+            dual_energy_source=dual_energy_source,
+            dual_fast_shutter=dual_fast_shutter,
             source_selector=source_selector,
         )
     return ew4000
@@ -139,8 +142,8 @@ async def ew4000(
 @pytest.fixture(params=["ew4000", "b07b_specs150"])
 def sim_detector(
     request: pytest.FixtureRequest,
-    ew4000: VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    b07b_specs150: SpecsDetector[b07.LensMode, b07_shared.PsuMode],
+    ew4000: I09VGScientaEW4000,
+    b07b_specs150: B07BSpecs150,
 ) -> GenericElectronAnalyserDetector:
     detectors = [ew4000, b07b_specs150]
     for detector in detectors:

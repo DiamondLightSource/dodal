@@ -2,7 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.devices.beamlines import b07, b07_shared, i09
+from dodal.devices.beamlines.b07 import B07BSpecsRegion, B07BSpecsSequence
+from dodal.devices.beamlines.i09 import I09VGScientaRegion, I09VGScientaSequence
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     EnergyMode,
@@ -12,25 +13,17 @@ from dodal.devices.electron_analyser.base import (
     to_binding_energy,
     to_kinetic_energy,
 )
-from dodal.devices.electron_analyser.specs import (
-    SpecsRegion,
-    SpecsSequence,
-)
-from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
+from dodal.devices.electron_analyser.specs import SpecsSequence
+from dodal.devices.electron_analyser.vgscienta import VGScientaSequence
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
+    TEST_SEQUENCES,
 )
 
 
-@pytest.fixture(
-    params=[
-        SpecsSequence[b07.LensMode, b07_shared.PsuMode],
-        VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    ],
-)
+@pytest.fixture(params=[B07BSpecsSequence, I09VGScientaSequence])
 def sequence(request: pytest.FixtureRequest) -> GenericSequence:
-    return get_test_sequence(request.param)
+    return TEST_SEQUENCES[request.param]()
 
 
 @pytest.fixture
@@ -38,9 +31,9 @@ def expected_region_class(
     sequence: GenericSequence,
 ) -> type[AbstractBaseRegion]:
     if isinstance(sequence, SpecsSequence):
-        return SpecsRegion[b07.LensMode, b07_shared.PsuMode]
+        return B07BSpecsRegion
     elif isinstance(sequence, VGScientaSequence):
-        return VGScientaRegion[i09.LensMode, i09.PassEnergy]
+        return I09VGScientaRegion
     raise TypeError(f"Unknown sequence type {type(sequence)}")
 
 

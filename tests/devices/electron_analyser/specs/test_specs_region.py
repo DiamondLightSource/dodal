@@ -2,20 +2,20 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.beamlines.b07 import LensMode
+from dodal.devices.beamlines.b07 import B07BSpecsSequence, LensMode
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.specs import AcquisitionMode, SpecsSequence
+from dodal.devices.electron_analyser.specs import AcquisitionMode
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
+    TEST_SEQUENCES,
     assert_region_has_expected_values,
-    get_test_sequence,
 )
 
 
 @pytest.fixture
-def sequence() -> SpecsSequence[LensMode, PsuMode]:
-    return get_test_sequence(SpecsSequence[LensMode, PsuMode])
+def sequence() -> B07BSpecsSequence:
+    return TEST_SEQUENCES[B07BSpecsSequence]()
 
 
 @pytest.fixture
@@ -82,7 +82,7 @@ def expected_region_values() -> list[dict[str, Any]]:
 
 
 def test_sequence_get_expected_enabled_region_names(
-    sequence: SpecsSequence[LensMode, PsuMode],
+    sequence: B07BSpecsSequence,
     expected_enabled_region_names: list[str],
 ) -> None:
     assert sequence.get_enabled_region_names() == expected_enabled_region_names
@@ -91,7 +91,7 @@ def test_sequence_get_expected_enabled_region_names(
 
 
 def test_file_loads_into_class_with_expected_values(
-    sequence: SpecsSequence[LensMode, PsuMode],
+    sequence: B07BSpecsSequence,
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)

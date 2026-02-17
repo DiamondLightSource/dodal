@@ -3,12 +3,9 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.p60 import (
     LabXraySource,
     LabXraySourceReadable,
-    LensMode,
-    PassEnergy,
-    PsuMode,
+    P60VGScientaR4000,
 )
 from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.selectable_source import SourceSelector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -18,12 +15,12 @@ NOTE: Due to p60 not having a CA gateway, PVs are not available remotely and you
 be on the beamline network to access them so a remote `dodal connect p60` will fail.
 """
 
-devices = DeviceManager()
-
 BL = get_beamline_name("p60")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+devices = DeviceManager()
 
 
 @devices.factory()
@@ -42,7 +39,7 @@ def mg_kalpha_source() -> LabXraySourceReadable:
 
 
 @devices.factory()
-def energy_source(
+def dual_energy_source(
     al_kalpha_source: LabXraySourceReadable,
     mg_kalpha_source: LabXraySourceReadable,
     source_selector: SourceSelector,
@@ -57,13 +54,7 @@ def energy_source(
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/P60-13
 @devices.factory()
-def r4000(
-    energy_source: DualEnergySource,
-) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
-    return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
-        energy_source=energy_source,
+def r4000(dual_energy_source: DualEnergySource) -> P60VGScientaR4000:
+    return P60VGScientaR4000(
+        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", dual_energy_source
     )
