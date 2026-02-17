@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.devices.beamlines.b07 import B07BSpecsRegion
-from dodal.devices.beamlines.i09 import I09VGScientaRegion
+from dodal.devices.beamlines.b07 import B07BSpecsRegion, B07BSpecsSequence
+from dodal.devices.beamlines.i09 import I09VGScientaRegion, I09VGScientaSequence
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     EnergyMode,
@@ -21,7 +21,7 @@ from tests.devices.electron_analyser.helper_util import (
 )
 
 
-@pytest.fixture(params=[B07BSpecsRegion, I09VGScientaRegion])
+@pytest.fixture(params=[B07BSpecsSequence, I09VGScientaSequence])
 def sequence(request: pytest.FixtureRequest) -> GenericSequence:
     return TEST_SEQUENCES[request.param]()
 
