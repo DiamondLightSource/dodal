@@ -3,8 +3,7 @@ from typing import Any
 import pytest
 from ophyd_async.core import InOut, init_devices, set_mock_value
 
-import dodal.devices.beamlines.b07 as b07
-import dodal.devices.beamlines.i09 as i09
+from dodal.devices.beamlines import b07, b07_shared, i09
 from dodal.devices.beamlines.i09 import Grating
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
@@ -104,12 +103,12 @@ def dual_fast_shutter(
 async def b07b_specs150(
     single_energy_source: EnergySource,
     shutter1: GenericFastShutter,
-) -> SpecsDetector[b07.LensMode, b07.PsuMode]:
+) -> SpecsDetector[b07.LensMode, b07_shared.PsuMode]:
     with init_devices(mock=True):
-        b07b_specs150 = SpecsDetector[b07.LensMode, b07.PsuMode](
+        b07b_specs150 = SpecsDetector[b07.LensMode, b07_shared.PsuMode](
             prefix="TEST:",
             lens_mode_type=b07.LensMode,
-            psu_mode_type=b07.PsuMode,
+            psu_mode_type=b07_shared.PsuMode,
             energy_source=single_energy_source,
             shutter=shutter1,
         )
@@ -140,8 +139,8 @@ async def ew4000(
 @pytest.fixture(params=["ew4000", "b07b_specs150"])
 def sim_detector(
     request: pytest.FixtureRequest,
-    ew4000: VGScientaDetector,
-    b07b_specs150: SpecsDetector,
+    ew4000: VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy],
+    b07b_specs150: SpecsDetector[b07.LensMode, b07_shared.PsuMode],
 ) -> GenericElectronAnalyserDetector:
     detectors = [ew4000, b07b_specs150]
     for detector in detectors:
@@ -154,7 +153,7 @@ def sim_detector(
 @pytest.fixture
 def region(
     request: pytest.FixtureRequest,
-    sequence: AbstractBaseSequence,
+    sequence: AbstractBaseSequence[AbstractBaseRegion],
 ) -> AbstractBaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:
