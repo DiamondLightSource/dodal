@@ -40,6 +40,7 @@ class VGScientaAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
+        psu_infix: str = "ELEMENT_SET",
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -55,12 +56,13 @@ class VGScientaAnalyserDriverIO(
             self.sensor_max_size_y = epics_signal_r(int, prefix + "MaxSizeY_RBV")
 
         super().__init__(
-            prefix,
-            AcquisitionMode,
-            lens_mode_type,
-            psu_mode_type,
-            pass_energy_type,
-            name,
+            prefix=prefix,
+            acquisition_mode_type=AcquisitionMode,
+            lens_mode_type=lens_mode_type,
+            psu_mode_type=psu_mode_type,
+            pass_energy_type=pass_energy_type,
+            psu_infix=psu_infix,
+            name=name,
         )
 
     @AsyncStatus.wrap
