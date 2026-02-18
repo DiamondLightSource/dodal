@@ -7,6 +7,9 @@ from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import (
+    set_path_provider,
+)
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.turbo_slit import TurboSlit
@@ -27,10 +30,18 @@ devices = DeviceManager()
 def path_provider() -> PathProvider:
     return StaticVisitPathProvider(
         BL,
-        Path("/dls/p51/data/2026/cm44254-1"),
+        Path("/dls/p51/data/2026/cm44254-1/tmp"),
         client=LocalDirectoryServiceClient(),
     )
 
+
+set_path_provider(
+    StaticVisitPathProvider(
+        BL,
+        Path("/dls/p51/data/2026/cm44254-1/tmp"),
+        client=LocalDirectoryServiceClient(),
+    )
+)
 
 """
 NOTE: Due to the CA gateway machine being switched off, PVs are not available remotely
