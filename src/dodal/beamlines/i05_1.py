@@ -3,6 +3,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05.enums import Mj7j8Mirror
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
+from dodal.devices.beamlines.i05_1 import XYZPolarAzimuthDefocusStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -22,3 +23,7 @@ def mj7j8() -> XYZPiezoSwitchingMirror:
         prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
         mirrors=Mj7j8Mirror,
     )
+@devices.factory
+def sm() -> XYZPolarAzimuthDefocusStage:
+    """Sample Manipulator."""
+    return XYZPolarAzimuthDefocusStage(prefix=f"{PREFIX.beamline_prefix}-EA-SM-01:")
