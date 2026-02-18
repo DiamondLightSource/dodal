@@ -1,4 +1,4 @@
-"""Beamline i02-2 is also known as VMXi, or I02I"""
+"""Beamline i02-2 is also known as VMXi, or I02I."""
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager

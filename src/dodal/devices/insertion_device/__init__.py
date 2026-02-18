@@ -2,6 +2,7 @@ from .apple2_controller import (
     MAXIMUM_MOVE_TIME,
     Apple2Controller,
     Apple2EnforceLHMoveController,
+    Apple2Type,
     EnergyMotorConvertor,
 )
 from .apple2_undulator import (
@@ -37,6 +38,7 @@ from .polarisation import InsertionDevicePolarisation
 
 __all__ = [
     "Apple2",
+    "Apple2Type",
     "Apple2Controller",
     "Apple2EnforceLHMoveController",
     "AppleKnotController",

@@ -6,8 +6,8 @@ import pytest
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 
+from dodal.devices.beamlines.i03.dcm import DCM
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
-from dodal.devices.i03.dcm import DCM
 from dodal.devices.undulator import UndulatorInKeV
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,

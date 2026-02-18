@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices import b07, i09
+from dodal.devices.beamlines import b07, i09
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     EnergyMode,

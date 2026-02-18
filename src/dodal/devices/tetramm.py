@@ -75,7 +75,7 @@ class TetrammDriver(NDArrayBaseIO):
 
 
 class TetrammController(DetectorController):
-    """Controller for a TetrAMM current monitor"""
+    """Controller for a TetrAMM current monitor."""
 
     _supported_trigger_types = {
         DetectorTrigger.EDGE_TRIGGER: TetrammTrigger.EXT_TRIGGER,
@@ -164,9 +164,8 @@ class TetrammController(DetectorController):
         sample rate, it will be lowered to the prior multiple ot ensure triggers
         are not missed.
 
-        :param exposure: Desired exposure time.
-        :type exposure: How long to wait for the exposure time and acquire
-            period to be set.
+        Args:
+            exposure (float): Desired exposure time.
         """
         sample_time = await self.driver.sample_time.get_value()
         minimum_samples = self._minimal_values_per_reading[
@@ -189,9 +188,10 @@ class TetrammController(DetectorController):
         Then, it checks that the DetectorState PV is in DEFAULT_GOOD_STATES,
         and otherwise raises a ValueError.
 
-        :returns AsyncStatus:
-            An AsyncStatus that can be awaited to set driver.acquire to True and perform
-            subsequent raising (if applicable) due to detector state.
+        Returns:
+            AsyncStatus: An AsyncStatus that can be awaited to set driver.acquire to
+                True and perform subsequent raising (if applicable) due to detector
+                state.
         """
         status = await set_and_wait_for_value(
             self.driver.acquire,

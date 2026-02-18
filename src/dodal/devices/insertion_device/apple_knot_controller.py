@@ -22,12 +22,11 @@ APPLE_KNOT_MAXIMUM_PHASE_MOTOR_POSITION = 70.0
 
 
 class AppleKnotPathFinder:
-    """
-    Class to find a safe path for AppleKnot undulator moves that avoids the exclusion zone
-    around 0-0 gap-phase. We rely on axis-aligned (manhattan) moves and splitting moves
-    that cross zero phase into two segments via an intermediate point at zero phase and
-    a safe gap value. We ASSUME the exclusion zones are rectangles aligned with the axes
-    in a shape of hanoi tower centered at (0,0).
+    """Class to find a safe path for AppleKnot undulator moves that avoids the exclusion
+    zone around 0-0 gap-phase. We rely on axis-aligned (manhattan) moves and splitting
+    moves that cross zero phase into two segments via an intermediate point at zero
+    phase and a safe gap value. We ASSUME the exclusion zones are rectangles aligned
+    with the axes in a shape of hanoi tower centered at (0,0).
     Gap and phase motors are NOT moved together but instead are moved sequentially.
     Sequential move guarantees safe pass avoiding exslusion zones.
     We can not use asynchronous move of gap and phase because we can not currently rely
@@ -45,8 +44,8 @@ class AppleKnotPathFinder:
     def get_apple_knot_val_path(
         self, start_val: Apple2Val, end_val: Apple2Val
     ) -> tuple[Apple2Val, ...]:
-        """
-        Get a list of Apple2Val representing the path from start to end avoiding exclusion zones.
+        """Get a list of Apple2Val representing the path from start to end avoiding
+        exclusion zones.
         """
         apple_knot_val_path = ()
         # Defensive checks for no movement
@@ -80,9 +79,9 @@ class AppleKnotPathFinder:
     def _apple_knot_manhattan_path(
         self, apple_knot_val_path: tuple[Apple2Val, ...]
     ) -> tuple[Apple2Val, ...]:
-        """
-        Convert a list of Apple2Val into a manhattan path avoiding exclusion zones.
-        Here all moves are done in axis-aligned steps (gap first then phase or vice versa).
+        """Convert a list of Apple2Val into a manhattan path avoiding exclusion zones.
+        Here all moves are done in axis-aligned steps (gap first then phase or vice
+        versa).
         List of points is expanded to include intermediate points as needed so each move
         happens within one sign of gap and phase (including zero phase).
         For convenience we define:phase increase as West-East axis and gap increase
@@ -138,9 +137,8 @@ class AppleKnotPathFinder:
 class AppleKnotController(
     Apple2Controller[Apple2[PhaseAxesType]], Generic[PhaseAxesType]
 ):
-    """
-    Controller for Apple Knot undulator with unique feature of calculating a move path
-    through gap and phase space avoiding the exclusion zone around 0-0 gap-phase.
+    """Controller for Apple Knot undulator with unique feature of calculating a move
+    path through gap and phase space avoiding the exclusion zone around 0-0 gap-phase.
     See https://confluence.diamond.ac.uk/x/vQENAg for more details.
     """
 
@@ -173,8 +171,7 @@ class AppleKnotController(
         self._energy_set(energy)
 
     async def check_top_bottom_phase_match(self) -> None:
-        """
-        Check that the top and bottom phase motors are in sync.
+        """Check that the top and bottom phase motors are in sync.
         Raise an error if they are not within tolerance.
         """
         current_phase_top = float(

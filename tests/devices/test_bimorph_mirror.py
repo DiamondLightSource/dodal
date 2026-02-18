@@ -48,7 +48,7 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
     channel.
 
     Args:
-        mirror: BimorphMirror fixture
+        mirror (BimorphMirror): BimorphMirror fixture.
     """
 
     async def busy_idle():

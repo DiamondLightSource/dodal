@@ -1,15 +1,13 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
-from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
-from dodal.devices.i10_1 import (
+from dodal.devices.beamlines.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
+from dodal.devices.beamlines.i10_1 import (
     ElectromagnetMagnetField,
-    ElectromagnetSR570,
     ElectromagnetStage,
     I10JScalerCard,
 )
-from dodal.devices.motors import XYPitchStage
+from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -63,19 +61,6 @@ def electromagnet_stage() -> ElectromagnetStage:
     )
 
 
-"""I10J Hight Field Magnet Devices"""
-
-
-@devices.factory()
-def high_field_magnet_stage() -> XYPitchStage:
-    return XYPitchStage(
-        prefix=f"{PREFIX.beamline_prefix}-EA-MAG-01:",
-        x_infix="X",
-        y_infix="INSERT:Y",
-        pitch_infix="INSERT:ROTY",
-    )
-
-
 """I10J Electromagnet Measurement Devices"""
 
 
@@ -87,9 +72,16 @@ def electromagnet_scaler_card() -> I10JScalerCard:
 
 
 @devices.factory()
-def electromagnet_sr570() -> ElectromagnetSR570:
-    return ElectromagnetSR570(
-        prefix=f"{PREFIX.beamline_prefix}-DI-IAMP",
+def em_sr570_tey() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-08:",
+    )
+
+
+@devices.factory()
+def em_sr570_fy() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-09:",
     )
 
 
@@ -105,22 +97,22 @@ def electromagnet_sr570_scaler_monitor(
 
 @devices.factory()
 def electromagnet_sr570_scaler_tey(
-    electromagnet_sr570: ElectromagnetSR570,
+    em_sr570_tey: SR570,
     electromagnet_scaler_card: I10JScalerCard,
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
-        current_amp=electromagnet_sr570.ca1,
+        current_amp=em_sr570_tey,
         counter=electromagnet_scaler_card.tey,
     )
 
 
 @devices.factory()
 def electromagnet_sr570_scaler_fy(
-    electromagnet_sr570: ElectromagnetSR570,
+    em_sr570_fy: SR570,
     electromagnet_scaler_card: I10JScalerCard,
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
-        current_amp=electromagnet_sr570.ca2,
+        current_amp=em_sr570_fy,
         counter=electromagnet_scaler_card.fy,
     )
 

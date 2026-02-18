@@ -12,16 +12,16 @@ from dodal.devices.attenuator.filter_selections import (
     I24FilterOneSelections,
     I24FilterTwoSelections,
 )
+from dodal.devices.beamlines.i24.aperture import Aperture
+from dodal.devices.beamlines.i24.beam_center import DetectorBeamCenter
+from dodal.devices.beamlines.i24.beamstop import Beamstop
+from dodal.devices.beamlines.i24.commissioning_jungfrau import CommissioningJungfrau
+from dodal.devices.beamlines.i24.dcm import DCM
+from dodal.devices.beamlines.i24.dual_backlight import DualBacklight
+from dodal.devices.beamlines.i24.focus_mirrors import FocusMirrorsMode
+from dodal.devices.beamlines.i24.pmac import PMAC
+from dodal.devices.beamlines.i24.vgonio import VerticalGoniometer
 from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i24.aperture import Aperture
-from dodal.devices.i24.beam_center import DetectorBeamCenter
-from dodal.devices.i24.beamstop import Beamstop
-from dodal.devices.i24.commissioning_jungfrau import CommissioningJungfrau
-from dodal.devices.i24.dcm import DCM
-from dodal.devices.i24.dual_backlight import DualBacklight
-from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
-from dodal.devices.i24.pmac import PMAC
-from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -148,7 +148,8 @@ def commissioning_jungfrau(
     path_provider: PathProvider,
 ) -> CommissioningJungfrau:
     """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
-    device in place of Odin while the detector is in commissioning."""
+    device in place of Odin while the detector is in commissioning.
+    """
     return CommissioningJungfrau(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",

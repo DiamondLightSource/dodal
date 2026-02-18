@@ -21,10 +21,19 @@ class ElectronAnalyserController(
     ConstantDeadTimeController[TAbstractAnalyserDriverIO],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
-    """
-    Specialised controller for the electron analysers to provide additional setup logic
-    such as selecting the energy source to use from requested region and giving the
-    driver the correct region parameters.
+    """Specialised controller for the electron analysers to provide additional setup
+    logic such as selecting the energy source to use from requested region and giving
+    the driver the correct region parameters.
+
+    Args:
+        driver (TAbstractAnalyserDriverIO): The electron analyser driver to wrap
+            around that holds the PV's.
+        energy_source (AbstractEnergySource): Device that holds the excitation
+            energy and ability to switch between sources.
+        deadtime (float, optional): For a given exposure, what is the safest minimum
+            time between exposures that can be determined without reading signals.
+        image_mode (ADImageMode, optional): The image mode to configure the driver
+            with before measuring.
     """
 
     def __init__(
@@ -36,15 +45,6 @@ class ElectronAnalyserController(
         deadtime: float = 0,
         image_mode: ADImageMode = ADImageMode.SINGLE,
     ):
-        """
-        Parameters:
-            driver: The electron analyser driver to wrap around that holds the PV's.
-            energy_source: Device that holds the excitation energy and ability to switch
-                           between sources.
-            deadtime: For a given exposure, what is the safest minimum time between
-                      exposures that can be determined without reading signals.
-            image_mode: The image mode to configure the driver with before measuring.
-        """
         self.energy_source = energy_source
         self.shutter = shutter
         self.source_selector = source_selector

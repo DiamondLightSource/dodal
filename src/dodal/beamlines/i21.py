@@ -4,9 +4,7 @@ from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i21 import (
-    Grating,
-)
+from dodal.devices.beamlines.i21 import Grating
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
@@ -87,7 +85,7 @@ def id(
 def id_controller(
     id: Apple2[UndulatorPhaseAxes],
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
-    """i21 insertion device controller."""
+    """I21 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=id,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(

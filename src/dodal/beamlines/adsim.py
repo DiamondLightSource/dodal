@@ -25,32 +25,32 @@ Usage Example
 
 Start the simulated beamline by following the epics-containers tutorial at
 https://epics-containers.github.io/main/tutorials/launch_example.html
-And ensure that the signals are visible:
+And ensure that the signals are visible::
 
-```sh
-export EPICS_CA_ADDR_LIST=127.0.0.1:9064
-export EPICS_CA_NAME_SERVERS=127.0.0.1:9064
-export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075
-```
+    sh
+    export EPICS_CA_ADDR_LIST=127.0.0.1:9064
+    export EPICS_CA_NAME_SERVERS=127.0.0.1:9064
+    export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075
 
 How to use the devices in a plan:
-In an ipython terminal run:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-```python
-from bluesky.run_engine import RunEngine
+In an ipython terminal run::
 
-from dodal.beamlines.adsim import devices
-from dodal.plans import count
+    python
+    from bluesky.run_engine import RunEngine
+
+    from dodal.beamlines.adsim import devices
+    from dodal.plans import count
 
 
-run_engine = RunEngine()
+    run_engine = RunEngine()
 
-built = devices.build_and_connect().or_raise()
-d = built["det"]
-s = built["stage"]
+    built = devices.build_and_connect().or_raise()
+    d = built["det"]
+    s = built["stage"]
 
-run_engine(count([d], num=10))
-```
+    run_engine(count([d], num=10))
 """
 
 

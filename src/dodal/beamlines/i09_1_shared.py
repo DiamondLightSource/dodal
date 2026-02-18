@@ -1,13 +1,14 @@
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i09_1_shared import (
+    HardEnergy,
+    HardInsertionDeviceEnergy,
+    calculate_energy_i09_hu,
+    calculate_gap_i09_hu,
+)
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     StationaryCrystal,
-)
-from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
-from dodal.devices.i09_1_shared.hard_undulator_functions import (
-    calculate_energy_i09_hu,
-    calculate_gap_i09_hu,
 )
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.utils import BeamlinePrefix, get_beamline_name

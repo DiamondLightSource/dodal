@@ -25,8 +25,7 @@ from dodal.beamlines import adsim
 from dodal.devices.motors import XThetaStage
 from dodal.plans import count
 
-"""
-System tests that can be run against the containerised IOCs from epics-containers:
+"""System tests that can be run against the containerised IOCs from epics-containers:
 https://github.com/epics-containers/example-services
 
 Check out that repository and using docker or podman deploy the services in the
@@ -40,7 +39,6 @@ Run these system tests, with your EPICS environment configured to talk to the ga
 ```sh
 python -m pytest -m 'requires(instrument="adsim")'
 ```
-
 """
 
 

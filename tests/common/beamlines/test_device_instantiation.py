@@ -18,8 +18,7 @@ def follows_bluesky_protocols(obj: Any) -> bool:
     indirect=True,
 )
 def test_device_creation(module_and_devices_for_beamline):
-    """
-    Ensures that for every beamline all device factories are using valid args
+    """Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
     _, devices, exceptions = module_and_devices_for_beamline
@@ -41,8 +40,8 @@ def test_device_creation(module_and_devices_for_beamline):
     indirect=True,
 )
 def test_devices_are_identical(module_and_devices_for_beamline):
-    """
-    Ensures that for every beamline all device functions prevent duplicate instantiation.
+    """Ensures that for every beamline all device functions prevent duplicate
+    instantiation.
     """
     bl_mod, devices_a, _ = module_and_devices_for_beamline
     if isinstance(getattr(bl_mod, "devices", None), DeviceManager):

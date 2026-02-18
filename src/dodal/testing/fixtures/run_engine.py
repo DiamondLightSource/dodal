@@ -1,6 +1,4 @@
-"""
-Allow external repos to reuse these fixtures so defined in single place.
-"""
+"""Allow external repos to reuse these fixtures so defined in single place."""
 
 import asyncio
 import copy
@@ -46,8 +44,7 @@ async def run_engine(_global_run_engine: RunEngine) -> AsyncGenerator[RunEngine,
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")
 async def _global_run_engine() -> AsyncGenerator[RunEngine, None]:
-    """
-    Obtain a run engine, with its own event loop and thread.
+    """Obtain a run engine, with its own event loop and thread.
 
     On closure of the scope, the run engine is stopped and the event loop closed
     in order to release all resources it consumes.
@@ -102,8 +99,7 @@ def run_engine_documents(run_engine: RunEngine) -> Mapping[str, list[dict]]:
 
 @pytest.fixture(autouse=_ENABLE_FILEHANDLE_LEAK_CHECKS)
 def check_for_filehandle_leaks(request: FixtureRequest):
-    """
-    Test fixture that can be enabled in order to check for leaked filehandles
+    """Test fixture that can be enabled in order to check for leaked filehandles
     (typically caused by a rogue RunEngine instance).
 
     Note that this test is not enabled by default due to imposing a significant

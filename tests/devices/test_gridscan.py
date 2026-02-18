@@ -19,6 +19,10 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
+from dodal.devices.beamlines.i02_1.fast_grid_scan import (
+    ZebraFastGridScanTwoD,
+    ZebraGridScanParamsTwoD,
+)
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
     GridScanInvalidError,
@@ -28,10 +32,6 @@ from dodal.devices.fast_grid_scan import (
     ZebraFastGridScanThreeD,
     ZebraGridScanParamsThreeD,
     set_fast_grid_scan_params,
-)
-from dodal.devices.i02_1.fast_grid_scan import (
-    ZebraFastGridScanTwoD,
-    ZebraGridScanParamsTwoD,
 )
 from dodal.devices.smargon import Smargon
 

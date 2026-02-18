@@ -167,7 +167,7 @@ class EigerOdin(Device):
         return not error_strings, "\n".join(error_strings)
 
     def stop(self) -> StatusBase:
-        """Stop odin manually"""
+        """Stop odin manually."""
         LOGGER.info("Stopping Odin...")
         status = self.file_writer.capture.set(0)
         status &= self.meta.stop_writing.set(1)
