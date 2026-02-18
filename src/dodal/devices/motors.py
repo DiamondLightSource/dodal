@@ -2,8 +2,10 @@ import asyncio
 import math
 from abc import ABC
 
-from ophyd_async.core import StandardReadable, derived_signal_rw
+from ophyd_async.core import SignalRW, StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
+
+from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
 
 _X, _Y, _Z = "X", "Y", "Z"
 
@@ -315,7 +317,9 @@ class YZStage(Stage):
         super().__init__(name)
 
 
-def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Motor):
+def create_axis_perp_to_rotation(
+    motor_theta: Motor, motor_i: Motor, motor_j: Motor
+) -> SignalRW[float]:
     """Given a signal that controls a motor in a rotation axis and two other
     signals controlling motors on a pair of orthogonal axes, these axes being in the
     rotating frame of reference created by the first axis, create a derived signal
@@ -337,19 +341,18 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
             a move here is entirely parallel with the derived axis.
     """
 
-    def _get(j_val: float, i_val: float, rot_value: float) -> float:
-        i_component = i_val * math.cos(math.radians(rot_value))
-        j_component = j_val * math.sin(math.radians(rot_value))
-        return i_component + j_component
+    def _get(j_val: float, i_val: float, rot_deg_value: float) -> float:
+        x, y = rotate_clockwise(math.radians(rot_deg_value), i_val, j_val)
+        return x
 
     async def _set(vertical_value: float) -> None:
-        rot_value = await motor_theta.user_readback.get_value()
-        i_component = vertical_value * math.cos(math.radians(rot_value))
-        j_component = vertical_value * math.sin(math.radians(rot_value))
+        rot_deg_value = await motor_theta.user_readback.get_value()
+        theta = math.radians(rot_deg_value)
+        i_component, j_component = rotate_counter_clockwise(theta, vertical_value, 0.0)
         await asyncio.gather(
             motor_i.set(i_component),
             motor_j.set(j_component),
-            motor_theta.set(rot_value),
+            motor_theta.set(rot_deg_value),
         )
 
     return derived_signal_rw(
@@ -357,5 +360,5 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
         _set,
         i_val=motor_i,
         j_val=motor_j,
-        rot_value=motor_theta,
+        rot_deg_value=motor_theta,
     )
