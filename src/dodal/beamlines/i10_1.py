@@ -8,6 +8,7 @@ from dodal.devices.beamlines.i10_1 import (
     I10JScalerCard,
 )
 from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
+from dodal.devices.motors import XYPitchStage
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -121,4 +122,17 @@ def electromagnet_sr570_scaler_fy(
 def em_temperature_controller() -> Lakeshore336:
     return Lakeshore336(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
+    )
+
+
+"""I10J Hight Field Magnet Devices"""
+
+
+@devices.factory()
+def high_field_magnet_stage() -> XYPitchStage:
+    return XYPitchStage(
+        prefix=f"{PREFIX.beamline_prefix}-EA-MAG-01:",
+        x_infix="X",
+        y_infix="INSERT:Y",
+        pitch_infix="INSERT:ROTY",
     )
