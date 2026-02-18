@@ -10,11 +10,11 @@ from dodal.devices.attenuator.filter_selections import (
     I02_1FilterTwoSelections,
 )
 from dodal.devices.beamlines.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
+from dodal.devices.beamlines.i02_1.flux import Flux
 from dodal.devices.beamlines.i02_1.sample_motors import SampleMotors
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase, StationaryCrystal
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.flux import Flux
-from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.zebra.zebra import Zebra
@@ -91,8 +91,8 @@ def daq_configuration_path() -> str:
 
 
 @devices.factory()
-def s4_slit_gaps() -> S4SlitGaps:
-    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+def s4_slit_gaps() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
 @devices.factory(use_factory_name=False)
@@ -102,7 +102,7 @@ def goniometer() -> SampleMotors:
 
 @devices.factory()
 def flux() -> Flux:
-    return Flux(f"{PREFIX.beamline_prefix}-MO-FLUX-01:")
+    return Flux(f"{PREFIX.beamline_prefix}-EA-FLUX-01:")
 
 
 @devices.factory()
