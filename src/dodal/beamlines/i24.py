@@ -1,8 +1,11 @@
+from functools import cache
+from pathlib import Path
 
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
 from dodal.common.beamlines.beamline_utils import BL
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
@@ -51,6 +54,16 @@ I24_ZEBRA_MAPPING = ZebraMapping(
 PREFIX = BeamlinePrefix(BL)
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticVisitPathProvider(
+        BL,
+        Path("/tmp"),
+        client=LocalDirectoryServiceClient(),
+    )
 
 
 @devices.factory()
