@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.0.1.dev20+gdffe1f8af documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.0.1.dev21+g004332fcd documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=4f35169c"></script>
+    <script src="../../../../../_static/documentation_options.js?v=cabfcd45"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -842,6 +842,8 @@ window.addEventListener("load", load);
 <span class="n">AnyPsuMode</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">SupersetEnum</span> <span class="o">|</span> <span class="n">StrictEnum</span>
 <span class="n">TPsuMode</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TPsuMode&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AnyPsuMode</span><span class="p">)</span>
 
+<span class="n">_PSU</span> <span class="o">=</span> <span class="s2">&quot;PSU_MODE&quot;</span>
+
 
 <div class="viewcode-block" id="AbstractAnalyserDriverIO">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html#dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO">[docs]</a>
@@ -867,8 +869,7 @@ window.addEventListener("load", load);
 <span class="sd">        pass_energy_type (type[TPassEnergy]): Can be enum or float, depending on</span>
 <span class="sd">            electron analyser model. If enum, it determines the available pass</span>
 <span class="sd">            energies for this device.</span>
-<span class="sd">        energy_source: Device that can give us the correct excitation energy (in eV)</span>
-<span class="sd">            and switch sources if applicable.</span>
+<span class="sd">        psu_suffix (str, optional): The psu infix to connect to EPICS. Defaults to PSU_MODE.</span>
 <span class="sd">        name (str, optional): Name of the device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -879,6 +880,7 @@ window.addEventListener("load", load);
         <span class="n">lens_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">],</span>
         <span class="n">psu_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPsuMode</span><span class="p">],</span>
         <span class="n">pass_energy_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPassEnergy</span><span class="p">],</span>
+        <span class="n">psu_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_PSU</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_mode_type</span> <span class="o">=</span> <span class="n">acquisition_mode_type</span>
@@ -919,7 +921,7 @@ window.addEventListener("load", load);
             <span class="p">)</span>
             <span class="c1"># This is used by each electron analyser, however it depends on the electron</span>
             <span class="c1"># analyser type to know if is moved with region settings.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">psu_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PSU_MODE&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">psu_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">psu_suffix</span><span class="p">)</span>
 
         <span class="c1"># This is defined in the parent class, add it as readable configuration.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">acquire_time</span><span class="p">],</span> <span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">)</span>

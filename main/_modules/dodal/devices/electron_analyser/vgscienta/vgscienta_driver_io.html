@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io &#8212; dodal 2.0.1.dev20+gdffe1f8af documentation</title>
+    <title>dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io &#8212; dodal 2.0.1.dev21+g004332fcd documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=4f35169c"></script>
+    <script src="../../../../../_static/documentation_options.js?v=cabfcd45"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -851,6 +851,7 @@ window.addEventListener("load", load);
         <span class="n">lens_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">],</span>
         <span class="n">psu_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPsuMode</span><span class="p">],</span>
         <span class="n">pass_energy_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPassEnergyEnum</span><span class="p">],</span>
+        <span class="n">psu_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ELEMENT_SET&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
@@ -866,12 +867,13 @@ window.addEventListener("load", load);
             <span class="bp">self</span><span class="o">.</span><span class="n">sensor_max_size_y</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MaxSizeY_RBV&quot;</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">prefix</span><span class="p">,</span>
-            <span class="n">AcquisitionMode</span><span class="p">,</span>
-            <span class="n">lens_mode_type</span><span class="p">,</span>
-            <span class="n">psu_mode_type</span><span class="p">,</span>
-            <span class="n">pass_energy_type</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">acquisition_mode_type</span><span class="o">=</span><span class="n">AcquisitionMode</span><span class="p">,</span>
+            <span class="n">lens_mode_type</span><span class="o">=</span><span class="n">lens_mode_type</span><span class="p">,</span>
+            <span class="n">psu_mode_type</span><span class="o">=</span><span class="n">psu_mode_type</span><span class="p">,</span>
+            <span class="n">pass_energy_type</span><span class="o">=</span><span class="n">pass_energy_type</span><span class="p">,</span>
+            <span class="n">psu_suffix</span><span class="o">=</span><span class="n">psu_suffix</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
