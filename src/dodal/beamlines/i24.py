@@ -56,16 +56,6 @@ PREFIX = BeamlinePrefix(BL)
 devices = DeviceManager()
 
 
-@devices.fixture
-@cache
-def path_provider() -> PathProvider:
-    return StaticVisitPathProvider(
-        BL,
-        Path("/tmp"),
-        client=LocalDirectoryServiceClient(),
-    )
-
-
 @devices.factory()
 def attenuator() -> EnumFilterAttenuator:
     return EnumFilterAttenuator(
