@@ -149,15 +149,23 @@ class ModMotor(StandardReadable, Locatable[float]):
         return real_value - self._offset_from_real_value(real_value)
 
     def _offset_from_real_value(self, real_value: float) -> float:
-        return round(real_value / 360) * 360
+        return round(real_value // 360) * 360
 
     async def _current_offset(self):
         real_value = await self._real_motor.user_readback.get_value()
         return self._offset_from_real_value(real_value)
 
-    async def _set_mod_360(self, signal_to_set: SignalRW, modded_value: float):
+    async def _set_mod_360(self, signal_to_set: SignalRW, input_value: float):
         real_value = await self._real_motor.user_readback.get_value()
-        await signal_to_set.set(modded_value + self._offset_from_real_value(real_value))
+        offset = self._offset_from_real_value(real_value)
+        target_value = input_value + offset
+        while target_value - real_value >= 180:
+            target_value -= 360
+        else:
+            while target_value - real_value <= -180:
+                target_value += 360
+
+        await signal_to_set.set(target_value)
 
     async def locate(self) -> Location[float]:
         """Return the current setpoint and readback of the motor."""
