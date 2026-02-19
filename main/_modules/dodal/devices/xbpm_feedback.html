@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.xbpm_feedback &#8212; dodal 2.0.1.dev21+g004332fcd documentation</title>
+    <title>dodal.devices.xbpm_feedback &#8212; dodal 2.0.1.dev22+gec5fc8db2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=cabfcd45"></script>
+    <script src="../../../_static/documentation_options.js?v=61fd087c"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -808,7 +808,14 @@ window.addEventListener("load", load);
                   
   <h1>Source code for dodal.devices.xbpm_feedback</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Triggerable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">Reference</span><span class="p">,</span> <span class="n">StrictEnum</span><span class="p">,</span> <span class="n">observe_value</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Device</span><span class="p">,</span>
+    <span class="n">Reference</span><span class="p">,</span>
+    <span class="n">StrictEnum</span><span class="p">,</span>
+    <span class="n">WatchableAsyncStatus</span><span class="p">,</span>
+    <span class="n">WatcherUpdate</span><span class="p">,</span>
+    <span class="n">observe_value</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.device_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">periodic_reminder</span>
@@ -838,13 +845,22 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">baton</span><span class="p">)</span> <span class="k">if</span> <span class="n">baton</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="nd">@WatchableAsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span> <span class="ow">and</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span><span class="p">()</span><span class="o">.</span><span class="n">commissioning</span><span class="o">.</span><span class="n">get_value</span><span class="p">():</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Commissioning mode enabled, ignoring feedback&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">async</span> <span class="k">with</span> <span class="n">periodic_reminder</span><span class="p">(</span><span class="s2">&quot;Waiting for XBPM&quot;</span><span class="p">):</span>
+                <span class="n">initial</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">async</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">observe_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_stable</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">initial</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">yield</span> <span class="n">WatcherUpdate</span><span class="p">(</span>
+                        <span class="n">current</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span>
+                        <span class="n">target</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_stable</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="p">)</span>
                     <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
                         <span class="k">return</span></div>
 
