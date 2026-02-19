@@ -13,7 +13,8 @@ class SampleMotors(StandardReadable):
         # See https://github.com/DiamondLightSource/mx-bluesky/issues/1212
         # regarding a potential motion issue with omega
         with self.add_children_as_readables():
-            self.x = Motor(f"{prefix}X")
-            self.z = Motor(f"{prefix}Z")
-            self.omega = Motor(f"{prefix}OMEGA")
+            self.x = Motor(f"{prefix}SAMP-01:X")
+            self.z = Motor(f"{prefix}SAMP-01:Z")
+            self.y = Motor(f"{prefix}GONJK-01:HEIGHT")
+            self.omega = Motor(f"{prefix}SAMP-01:OMEGA")
         super().__init__(name=name)

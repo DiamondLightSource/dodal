@@ -98,7 +98,7 @@ def s4_slit_gaps() -> Slits:
 
 @devices.factory(use_factory_name=False)
 def goniometer() -> SampleMotors:
-    return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:", name="gonio")
+    return SampleMotors(f"{PREFIX.beamline_prefix}-MO-", name="gonio")
 
 
 @devices.factory()
