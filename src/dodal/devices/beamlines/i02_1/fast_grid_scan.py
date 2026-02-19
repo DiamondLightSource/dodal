@@ -1,5 +1,5 @@
 from ophyd_async.core import SignalR, derived_signal_r, soft_signal_r_and_setter
-from ophyd_async.epics.core import epics_signal_rw_rbv
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
@@ -20,7 +20,7 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
     """i02-1's EPICS interface for the 2D FGS differs slightly from the standard 3D
     version:
     - No Z steps, Z step sizes, or Y2 start positions, or Z2 start
-    - No scan valid PV - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
+    - Scan valid PV needs to end with RBV
     - No program_number - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     """  # noqa D415
 
@@ -33,6 +33,8 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
         # This signal could be put in the common device if the prefix gets standardised.
         # See https://github.com/DiamondLightSource/mx-bluesky/issues/1203
         self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}EXPOSURE_TIME")
+
+        self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS_RBV")
 
         self._movable_params["dwell_time_ms"] = self.dwell_time_ms
 

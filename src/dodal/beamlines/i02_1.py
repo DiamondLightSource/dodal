@@ -44,6 +44,7 @@ devices = DeviceManager()
     EigerDetector, prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", wait=False
 )
 def eiger(eiger: EigerDetector) -> EigerDetector:
+    eiger.detector_id = 101
     return eiger
 
 
