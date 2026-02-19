@@ -5,6 +5,7 @@ from dodal.devices.beamlines.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
 from dodal.devices.beamlines.i10_1 import (
     ElectromagnetMagnetField,
     ElectromagnetStage,
+    HighFieldMagnet,
     I10JScalerCard,
 )
 from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
@@ -135,4 +136,11 @@ def high_field_magnet_stage() -> XYPitchStage:
         x_infix="X",
         y_infix="INSERT:Y",
         pitch_infix="INSERT:ROTY",
+    )
+
+
+@devices.factory()
+def high_field_magnet() -> HighFieldMagnet:
+    return HighFieldMagnet(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SMC-01:",
     )
