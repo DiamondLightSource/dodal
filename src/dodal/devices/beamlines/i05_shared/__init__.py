@@ -1,4 +1,5 @@
-from dodal.devices.beamlines.i05_shared.apple_knot import (
+from dodal.devices.beamlines.i05_shared.apple_knot_constants import (
+    APPLE_KNOT_EXCLUSION_ZONES,
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
@@ -10,4 +11,5 @@ __all__ = [
     "PolynomCompoundMotors",
     "energy_to_gap_converter",
     "energy_to_phase_converter",
+    "APPLE_KNOT_EXCLUSION_ZONES",
 ]

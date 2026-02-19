@@ -1,4 +1,4 @@
-import numpy.polynomial as poly
+from numpy.polynomial import Polynomial
 
 from dodal.common.maths import Rectangle2D
 from dodal.devices.insertion_device.enum import Pol
@@ -10,7 +10,7 @@ APPLE_KNOT_EXCLUSION_ZONES = (
 )
 
 # Polynomials for energy to gap conversion
-LH_GAP_POLYNOMIAL = poly.Polynomial(
+LH_GAP_POLYNOMIAL = Polynomial(
     [
         12.464,
         1.8417,
@@ -24,7 +24,7 @@ LH_GAP_POLYNOMIAL = poly.Polynomial(
         -4.1724e-18,
     ]
 )
-LV_GAP_POLYNOMIAL = poly.Polynomial(
+LV_GAP_POLYNOMIAL = Polynomial(
     [
         8.7456,
         1.1344,
@@ -38,7 +38,7 @@ LV_GAP_POLYNOMIAL = poly.Polynomial(
         2.3749e-18,
     ]
 )
-C_GAP_POLYNOMIAL = poly.Polynomial(
+C_GAP_POLYNOMIAL = Polynomial(
     [
         9.1763,
         1.4886,
@@ -54,7 +54,7 @@ C_GAP_POLYNOMIAL = poly.Polynomial(
 )
 
 # Polynomial for energy to phase conversion
-C_PHASE_POLYNOMIAL = poly.Polynomial(
+C_PHASE_POLYNOMIAL = Polynomial(
     [
         34.431,
         0.79535,

@@ -1,6 +1,8 @@
 import pytest
 
-from dodal.devices.beamlines.i05_shared.apple_knot import APPLE_KNOT_EXCLUSION_ZONES
+from dodal.devices.beamlines.i05_shared import (
+    APPLE_KNOT_EXCLUSION_ZONES,
+)
 from dodal.devices.insertion_device.apple_knot_controller import AppleKnotPathFinder
 
 

@@ -1,11 +1,9 @@
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05_shared import (
+    APPLE_KNOT_EXCLUSION_ZONES,
     Grating,
     energy_to_gap_converter,
     energy_to_phase_converter,
-)
-from dodal.devices.beamlines.i05_shared.apple_knot import (
-    APPLE_KNOT_EXCLUSION_ZONES,
 )
 from dodal.devices.insertion_device import (
     Apple2,
