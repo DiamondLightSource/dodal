@@ -33,6 +33,8 @@ from dodal.devices.electron_analyser.base.base_util import to_binding_energy
 AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
 TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
+_PSU = "PSU_MODE"
+
 
 class AbstractAnalyserDriverIO(
     ABC,
@@ -56,8 +58,7 @@ class AbstractAnalyserDriverIO(
         pass_energy_type (type[TPassEnergy]): Can be enum or float, depending on
             electron analyser model. If enum, it determines the available pass
             energies for this device.
-        energy_source: Device that can give us the correct excitation energy (in eV)
-            and switch sources if applicable.
+        psu_suffix (str, optional): The psu infix to connect to EPICS. Defaults to PSU_MODE.
         name (str, optional): Name of the device.
     """
 
@@ -68,6 +69,7 @@ class AbstractAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
+        psu_suffix: str = _PSU,
         name: str = "",
     ) -> None:
         self.acquisition_mode_type = acquisition_mode_type
@@ -108,7 +110,7 @@ class AbstractAnalyserDriverIO(
             )
             # This is used by each electron analyser, however it depends on the electron
             # analyser type to know if is moved with region settings.
-            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
+            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + psu_suffix)
 
         # This is defined in the parent class, add it as readable configuration.
         self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
