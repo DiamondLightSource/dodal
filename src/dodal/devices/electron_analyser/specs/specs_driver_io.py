@@ -35,7 +35,7 @@ class SpecsAnalyserDriverIO(
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        psu_infix: str = _PSU,
+        psu_suffix: str = _PSU,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -57,7 +57,7 @@ class SpecsAnalyserDriverIO(
             lens_mode_type=lens_mode_type,
             psu_mode_type=psu_mode_type,
             pass_energy_type=float,
-            psu_infix=psu_infix,
+            psu_suffix=psu_suffix,
             name=name,
         )
 
