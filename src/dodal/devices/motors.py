@@ -14,7 +14,6 @@ from ophyd_async.core import (
     derived_signal_r,
     derived_signal_rw,
 )
-from ophyd_async.core import SignalRW, StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
