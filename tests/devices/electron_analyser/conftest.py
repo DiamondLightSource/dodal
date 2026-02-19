@@ -15,7 +15,6 @@ from dodal.devices.electron_analyser.base import (
     AbstractBaseSequence,
     DualEnergySource,
     EnergySource,
-    GenericElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
@@ -136,20 +135,6 @@ async def ew4000(
     return ew4000
 
 
-@pytest.fixture(params=["ew4000", "b07b_specs150"])
-def sim_detector(
-    request: pytest.FixtureRequest,
-    ew4000: VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    b07b_specs150: SpecsDetector[b07.LensMode, b07_shared.PsuMode],
-) -> GenericElectronAnalyserDetector:
-    detectors = [ew4000, b07b_specs150]
-    for detector in detectors:
-        if detector.name == request.param:
-            return detector
-
-    raise ValueError(f"Detector with name '{request.param}' not found")
-
-
 @pytest.fixture
 def region(
     request: pytest.FixtureRequest,
@@ -159,14 +144,6 @@ def region(
     if region is None:
         raise ValueError("Region " + request.param + " is not found.")
     return region
-
-
-@pytest.fixture
-def expected_region_names(expected_region_values: list[dict[str, Any]]) -> list[str]:
-    names = []
-    for expected_region_value in expected_region_values:
-        names.append(expected_region_value["name"])
-    return names
 
 
 @pytest.fixture
