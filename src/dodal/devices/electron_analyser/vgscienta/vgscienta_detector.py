@@ -35,12 +35,13 @@ class VGScientaDetector(
         source_selector: SourceSelector | None = None,
         name: str = "",
     ):
-        driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
+        # Make attribute of class so connect applies to driver and populates parent.
+        self.driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
             prefix, lens_mode_type, psu_mode_type, pass_energy_type
         )
         controller = ElectronAnalyserController[
             VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
             VGScientaRegion[TLensMode, TPassEnergyEnum],
-        ](driver, energy_source, shutter, source_selector)
+        ](self.driver, energy_source, shutter, source_selector)
 
         super().__init__(controller, name)

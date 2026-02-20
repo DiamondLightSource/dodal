@@ -29,11 +29,12 @@ class SpecsDetector(
         source_selector: SourceSelector | None = None,
         name: str = "",
     ):
-        driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
+        # Make attribute of class so connect applies to driver and populates parent.
+        self.driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
             prefix, lens_mode_type, psu_mode_type
         )
         controller = ElectronAnalyserController[
             SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
-        ](driver, energy_source, shutter, source_selector)
+        ](self.driver, energy_source, shutter, source_selector)
 
         super().__init__(controller, name)

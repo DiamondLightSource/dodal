@@ -14,7 +14,7 @@ from dodal.devices.electron_analyser.base import (
 async def sim_driver(
     sim_detector: GenericElectronAnalyserDetector,
 ) -> GenericAnalyserDriverIO:
-    return sim_detector.driver
+    return sim_detector.driver  # type: ignore
 
 
 def test_driver_throws_error_with_wrong_lens_mode(

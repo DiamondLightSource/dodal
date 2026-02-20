@@ -130,17 +130,6 @@ class ElectronAnalyserDetector(
     will setup configured region settings before data acquisition.
     """
 
-    def __init__(
-        self,
-        controller: ElectronAnalyserController[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ],
-        name: str = "",
-    ):
-        # Save on device so connect works and names it as child
-        self.driver = controller.driver
-        super().__init__(controller, name)
-
     @AsyncStatus.wrap
     async def stage(self) -> None:
         """Prepare the detector for use by ensuring it is idle and ready.
