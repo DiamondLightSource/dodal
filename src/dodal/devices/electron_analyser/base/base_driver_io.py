@@ -19,10 +19,6 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.base.base_region import (
-    AnyAcqMode,
-    AnyLensMode,
-    AnyPassEnergy,
-    GenericRegion,
     TAbstractBaseRegion,
     TAcquisitionMode,
     TLensMode,
@@ -218,9 +214,6 @@ class AbstractAnalyserDriverIO(
         return float(np.sum(spectrum, dtype=np.float64))
 
 
-GenericAnalyserDriverIO = AbstractAnalyserDriverIO[
-    GenericRegion, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
-]
 TAbstractAnalyserDriverIO = TypeVar(
     "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO
 )
