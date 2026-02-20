@@ -20,9 +20,6 @@ dodal.devices.electron\_analyser.base.ElectronAnalyserDetector
       
       
       
-      ~ElectronAnalyserDetector.load_sequence
-      
-      
       
       
       

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.specs.specs_detector &#8212; dodal 2.0.1.dev22+gec5fc8db2 documentation</title>
+    <title>dodal.devices.electron_analyser.specs.specs_detector &#8212; dodal 2.0.1.dev23+gfb60cbaa7 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=61fd087c"></script>
+    <script src="../../../../../_static/documentation_options.js?v=2618988c"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -816,10 +816,7 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.energy_sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractEnergySource</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs.specs_driver_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecsAnalyserDriverIO</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs.specs_region</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SpecsRegion</span><span class="p">,</span>
-    <span class="n">SpecsSequence</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs.specs_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecsRegion</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastShutter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceSelector</span>
 
@@ -828,7 +825,6 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.specs.SpecsDetector.html#dodal.devices.electron_analyser.specs.SpecsDetector">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecsDetector</span><span class="p">(</span>
     <span class="n">ElectronAnalyserDetector</span><span class="p">[</span>
-        <span class="n">SpecsSequence</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">],</span>
         <span class="n">SpecsAnalyserDriverIO</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">],</span>
         <span class="n">SpecsRegion</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">],</span>
     <span class="p">],</span>
@@ -844,18 +840,15 @@ window.addEventListener("load", load);
         <span class="n">source_selector</span><span class="p">:</span> <span class="n">SourceSelector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="c1"># Save to class so takes part with connect()</span>
+        <span class="c1"># Make attribute of class so connect applies to driver and populates parent.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">SpecsAnalyserDriverIO</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">](</span>
             <span class="n">prefix</span><span class="p">,</span> <span class="n">lens_mode_type</span><span class="p">,</span> <span class="n">psu_mode_type</span>
         <span class="p">)</span>
-
         <span class="n">controller</span> <span class="o">=</span> <span class="n">ElectronAnalyserController</span><span class="p">[</span>
             <span class="n">SpecsAnalyserDriverIO</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">],</span> <span class="n">SpecsRegion</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">]</span>
         <span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">energy_source</span><span class="p">,</span> <span class="n">shutter</span><span class="p">,</span> <span class="n">source_selector</span><span class="p">)</span>
 
-        <span class="n">sequence_class</span> <span class="o">=</span> <span class="n">SpecsSequence</span><span class="p">[</span><span class="n">lens_mode_type</span><span class="p">,</span> <span class="n">psu_mode_type</span><span class="p">]</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sequence_class</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 

@@ -24,7 +24,6 @@ dodal.devices.electron\_analyser.specs.SpecsDetector
       
       
       
-      
    
    
 

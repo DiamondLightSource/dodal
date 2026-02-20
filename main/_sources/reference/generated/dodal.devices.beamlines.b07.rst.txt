@@ -17,7 +17,6 @@ dodal.devices.beamlines.b07
    ~b07.B07SampleManipulator52B
    ~b07.Grating
    ~b07.LensMode
-   ~b07.PsuMode
 
 
 
