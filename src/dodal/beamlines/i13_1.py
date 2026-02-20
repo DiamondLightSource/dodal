@@ -85,6 +85,11 @@ def theta_virtual() -> Motor:
     )
 
 
+@device_factory()
+def roll() -> Motor:
+    return Motor(prefix=f"{PREFIX.beamline_prefix}-MO-STAGE-01:ROLL", name="roll")
+
+
 # PI raw motors:
 @device_factory()
 def sample_xyz() -> XYZStage:
