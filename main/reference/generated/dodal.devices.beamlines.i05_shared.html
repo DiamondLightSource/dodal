@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i05_shared &#8212; dodal 2.0.1.dev23+gfb60cbaa7 documentation</title>
+    <title>dodal.devices.beamlines.i05_shared &#8212; dodal 2.0.1.dev24+gfd21a9ece documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=2618988c"></script>
+    <script src="../../_static/documentation_options.js?v=b49c638b"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.beamlines.i05_shared.rotation_signals" href="dodal.devices.beamlines.i05_shared.rotation_signals.html" />
+    <link rel="next" title="dodal.devices.beamlines.i05_shared.Grating" href="dodal.devices.beamlines.i05_shared.Grating.html" />
     <link rel="prev" title="dodal.devices.beamlines.i05_1.XYZPolarAzimuthDefocusStage" href="dodal.devices.beamlines.i05_1.XYZPolarAzimuthDefocusStage.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -997,16 +997,63 @@
                   
   <section id="dodal-devices-beamlines-i05-shared">
 <h1>dodal.devices.beamlines.i05_shared<a class="headerlink" href="#dodal-devices-beamlines-i05-shared" title="Link to this heading">#</a></h1>
-<p class="rubric">Modules</p>
+<p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.beamlines.i05_shared.rotation_signals.html#module-dodal.devices.beamlines.i05_shared.rotation_signals" title="dodal.devices.beamlines.i05_shared.rotation_signals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.beamlines.i05_shared.rotation_signals</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.beamlines.i05_shared.Grating.html#dodal.devices.beamlines.i05_shared.Grating" title="dodal.devices.beamlines.i05_shared.Grating"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Grating</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.beamlines.i05_shared.PolynomCompoundMotors.html#dodal.devices.beamlines.i05_shared.PolynomCompoundMotors" title="dodal.devices.beamlines.i05_shared.PolynomCompoundMotors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PolynomCompoundMotors</span></code></a></p></td>
+<td><p>Compound motor controller that synchronizes the movement of multiple motors based on polynomial relationships.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric" id="module-dodal.devices.beamlines.i05_shared">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.beamlines.i05_shared.energy_to_gap_converter" title="dodal.devices.beamlines.i05_shared.energy_to_gap_converter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">energy_to_gap_converter</span></code></a>(energy, pol)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.beamlines.i05_shared.energy_to_phase_converter" title="dodal.devices.beamlines.i05_shared.energy_to_phase_converter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">energy_to_phase_converter</span></code></a>(energy, pol)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<span class="target" id="module-dodal.devices.beamlines.i05_shared"></span></section>
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i05_shared.energy_to_gap_converter">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.i05_shared.</span></span><span class="sig-name descname"><span class="pre">energy_to_gap_converter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol" title="dodal.devices.insertion_device.enum.Pol"><span class="pre">Pol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i05_shared/apple_knot_constants.html#energy_to_gap_converter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i05_shared.energy_to_gap_converter" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>pol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol" title="dodal.devices.insertion_device.enum.Pol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pol</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i05_shared.energy_to_phase_converter">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.i05_shared.</span></span><span class="sig-name descname"><span class="pre">energy_to_phase_converter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol" title="dodal.devices.insertion_device.enum.Pol"><span class="pre">Pol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i05_shared/apple_knot_constants.html#energy_to_phase_converter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i05_shared.energy_to_phase_converter" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>pol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol" title="dodal.devices.insertion_device.enum.Pol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pol</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 
 
                 </article>
@@ -1028,11 +1075,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.beamlines.i05_shared.rotation_signals.html"
+       href="dodal.devices.beamlines.i05_shared.Grating.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.beamlines.i05_shared.rotation_signals</p>
+        <p class="prev-next-title">dodal.devices.beamlines.i05_shared.Grating</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1046,6 +1093,19 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i05_shared.energy_to_gap_converter"><code class="docutils literal notranslate"><span class="pre">energy_to_gap_converter()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i05_shared.energy_to_phase_converter"><code class="docutils literal notranslate"><span class="pre">energy_to_phase_converter()</span></code></a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

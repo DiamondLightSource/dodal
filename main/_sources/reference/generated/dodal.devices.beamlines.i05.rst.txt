@@ -14,8 +14,6 @@ dodal.devices.beamlines.i05
    :toctree:
    :recursive:
 
-   ~i05.Grating
-   ~i05.PolynomCompoundMotors
    ~i05.I05Goniometer
 
 

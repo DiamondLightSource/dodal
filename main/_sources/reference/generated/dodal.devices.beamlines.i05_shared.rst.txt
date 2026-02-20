@@ -3,17 +3,19 @@ dodal.devices.beamlines.i05\_shared
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.beamlines.i05_shared.rotation_signals
-
-
-
-
+   ~i05_shared.Grating
+   ~i05_shared.PolynomCompoundMotors
 
 
 
@@ -27,6 +29,13 @@ dodal.devices.beamlines.i05\_shared
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      energy_to_gap_converter
+      energy_to_phase_converter
    
    
 
