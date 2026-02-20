@@ -1,8 +1,9 @@
 from asyncio import gather
-from collections.abc import Callable
+from typing import Protocol
 
 from bluesky.protocols import Locatable, Location, Movable
-from numpy import ndarray
+from daq_config_server.client import ConfigServer
+from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -12,33 +13,56 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
-    MAX_ENERGY_COLUMN,
-    MIN_ENERGY_COLUMN,
-)
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 
 
+class EnergyGapConvertor(Protocol):
+    def __call__(
+        self, look_up_table: GenericLookupTable, value: float, order: int
+    ) -> float:
+        """Protocol for a function to provide value conversion using lookup table."""
+        ...
+
+
 class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
-    """Compound device to link hard x-ray undulator gap and order to photon energy.
+    """Compound device to control isertion device energy.
+
+    This device link hard x-ray undulator gap and order to the required photon energy.
     Setting the energy adjusts the undulator gap accordingly.
+
+    Attributes:
+        energy_demand (SignalRW[float]): The energy value that the user wants to set.
+        energy (SignalRW[float]): The actual energy of the insertion device.
     """
 
     def __init__(
         self,
         undulator_order: UndulatorOrder,
         undulator: UndulatorInMm,
-        lut: dict[int, ndarray],
-        gap_to_energy_func: Callable[..., float],
-        energy_to_gap_func: Callable[..., float],
+        config_server: ConfigServer,
+        filepath: str,
+        gap_to_energy_func: EnergyGapConvertor,
+        energy_to_gap_func: EnergyGapConvertor,
         name: str = "",
     ) -> None:
-        self._lut = lut
-        self.gap_to_energy_func = gap_to_energy_func
-        self.energy_to_gap_func = energy_to_gap_func
+        """Initialize the HardInsertionDeviceEnergy device.
+
+        Args:
+            undulator_order (UndulatorOrder): undulator order device.
+            undulator (UndulatorInMm): undulator device for gap control.
+            config_server (ConfigServer): Config server client to retrieve the lookup table.
+            filepath (str): File path to the lookup table on the config server.
+            gap_to_energy_func (EnergyGapConvertor): Function to convert gap to energy using the lookup table.
+            energy_to_gap_func (EnergyGapConvertor): Function to convert energy to gap using the lookup table.
+            name (str, optional): Name for the device. Defaults to empty string.
+        """
         self._undulator_order_ref = Reference(undulator_order)
         self._undulator_ref = Reference(undulator)
+        self._config_server = config_server
+        self._filepath = filepath
+        self._gap_to_energy_func = gap_to_energy_func
+        self._energy_to_gap_func = energy_to_gap_func
 
         self.add_readables([undulator_order, undulator.current_gap])
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -53,37 +77,40 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         super().__init__(name=name)
 
     def _read_energy(self, current_gap: float, current_order: int) -> float:
-        return self.gap_to_energy_func(
-            gap=current_gap,
-            look_up_table=self._lut,
-            order=current_order,
+        _lookup_table = self.get_look_up_table()
+        return self._gap_to_energy_func(
+            look_up_table=_lookup_table, value=current_gap, order=current_order
         )
 
-    async def _set_energy(self, energy: float) -> None:
+    async def _set_energy(self, value: float) -> None:
         current_order = await self._undulator_order_ref().value.get_value()
-        min_energy, max_energy = self._lut[current_order][
-            MIN_ENERGY_COLUMN : MAX_ENERGY_COLUMN + 1
-        ]
-        if not (min_energy <= energy <= max_energy):
-            raise ValueError(
-                f"Requested energy {energy} keV is out of range for harmonic {current_order}: "
-                f"[{min_energy}, {max_energy}] keV"
-            )
-
-        target_gap = self.energy_to_gap_func(
-            photon_energy_kev=energy, look_up_table=self._lut, order=current_order
-        )
+        _lookup_table = self.get_look_up_table()
+        target_gap = self._energy_to_gap_func(_lookup_table, value, current_order)
         await self._undulator_ref().set(target_gap)
+
+    def get_look_up_table(self) -> GenericLookupTable:
+        self._lut: GenericLookupTable = self._config_server.get_file_contents(
+            self._filepath,
+            desired_return_type=GenericLookupTable,
+            reset_cached_result=True,
+        )
+        return self._lut
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
+        """Update energy demand and set energy to a given value in keV.
+
+        Args:
+            value (float): Energy in keV.
+        """
         self.energy_demand.set(value)
         await self.energy.set(value)
 
 
 class HardEnergy(StandardReadable, Locatable[float]):
-    """Energy compound device that provides combined change of both DCM energy and
-    undulator gap accordingly.
+    """Compound energy device.
+
+    This device changes both monochromator and insertion device energy.
     """
 
     def __init__(
@@ -92,6 +119,13 @@ class HardEnergy(StandardReadable, Locatable[float]):
         undulator_energy: HardInsertionDeviceEnergy,
         name: str = "",
     ) -> None:
+        """Initialize the HardEnergy device.
+
+        Args:
+            dcm (DoubleCrystalMonochromatorBase): Double crystal monochromator device.
+            undulator_energy (HardInsertionDeviceEnergy): Hard insertion device control.
+            name (str, optional): name for the device. Defaults to empty.
+        """
         self._dcm_ref = Reference(dcm)
         self._undulator_energy_ref = Reference(undulator_energy)
         self.add_readables([undulator_energy, dcm.energy_in_keV])
