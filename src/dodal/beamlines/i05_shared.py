@@ -1,11 +1,23 @@
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i05.enums import Grating, M3MJ6Mirror
+from dodal.devices.beamlines.i05_shared import (
+    APPLE_KNOT_EXCLUSION_ZONES,
+    Grating,
+    M3MJ6Mirror,
+    energy_to_gap_converter,
+    energy_to_phase_converter,
+)
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
     UndulatorLockedPhaseAxes,
 )
+from dodal.devices.insertion_device.apple_knot_controller import (
+    AppleKnotController,
+    AppleKnotPathFinder,
+)
+from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEnergy
+from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
@@ -65,3 +77,36 @@ def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
         prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
         mirrors=M3MJ6Mirror,
     )
+
+
+@devices.factory()
+def id_controller(
+    id: Apple2[UndulatorLockedPhaseAxes],
+) -> AppleKnotController[UndulatorLockedPhaseAxes]:
+    return AppleKnotController[UndulatorLockedPhaseAxes](
+        apple=id,
+        gap_energy_motor_converter=energy_to_gap_converter,
+        phase_energy_motor_converter=energy_to_phase_converter,
+        path_finder=AppleKnotPathFinder(APPLE_KNOT_EXCLUSION_ZONES),
+    )
+
+
+@devices.factory()
+def id_energy(
+    id_controller: AppleKnotController[UndulatorLockedPhaseAxes],
+) -> InsertionDeviceEnergy:
+    return InsertionDeviceEnergy(id_controller=id_controller)
+
+
+@devices.factory()
+def id_polarisation(
+    id_controller: AppleKnotController[UndulatorLockedPhaseAxes],
+) -> InsertionDevicePolarisation:
+    return InsertionDevicePolarisation(id_controller=id_controller)
+
+
+@devices.factory()
+def energy(
+    id_energy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
+) -> BeamEnergy:
+    return BeamEnergy(id_energy=id_energy, mono=pgm.energy)
