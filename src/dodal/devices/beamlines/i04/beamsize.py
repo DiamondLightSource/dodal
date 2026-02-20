@@ -1,8 +1,8 @@
 from ophyd_async.core import Reference, derived_signal_r
 
-from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.beamlines.i04.transfocator import Transfocator
 from dodal.devices.beamsize.beamsize import BeamsizeBase
+from dodal.devices.mx_phase1.aperturescatterguard import ApertureScatterguard
 
 
 class Beamsize(BeamsizeBase):

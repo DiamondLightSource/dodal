@@ -1,20 +1,20 @@
 import asyncio
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import get_mock_put, init_devices
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.devices.aperturescatterguard import (
+from dodal.devices.mx_phase1.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
-    ApertureValue,
-    load_positions_from_beamline_parameters,
+    ApertureScatterguardConfiguration,
+    load_configuration,
 )
 
 
 @pytest.fixture
-def aperture_positions() -> dict[ApertureValue, AperturePosition]:
-    return load_positions_from_beamline_parameters(
+def ap_sg_configuration() -> ApertureScatterguardConfiguration:
+    return load_configuration(
         GDABeamlineParameters(
             params={
                 "miniap_x_LARGE_APERTURE": 2.389,
@@ -42,6 +42,8 @@ def aperture_positions() -> dict[ApertureValue, AperturePosition]:
                 "miniap_z_MANUAL_LOAD": -10.0,
                 "sg_x_MANUAL_LOAD": -4.7,
                 "sg_y_MANUAL_LOAD": 1.8,
+                "miniap_x_SCIN_MOVE": -4.91,
+                "sg_x_SCIN_MOVE": -4.75,
             }
         )
     )
@@ -64,7 +66,7 @@ def aperture_tolerances():
 
 @pytest.fixture
 async def ap_sg(
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
     aperture_tolerances: AperturePosition,
 ) -> ApertureScatterguard:
     async with init_devices(mock=True):
@@ -72,7 +74,7 @@ async def ap_sg(
             aperture_prefix="-MO-MAPT-01:",
             scatterguard_prefix="-MO-SCAT-01:",
             name="test_ap_sg",
-            loaded_positions=aperture_positions,
+            config=ap_sg_configuration,
             tolerances=aperture_tolerances,
         )
     return ap_sg
@@ -83,10 +85,15 @@ async def set_to_position(
 ):
     aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = position.values
 
+    motors = [
+        aperture_scatterguard.aperture.x,
+        aperture_scatterguard.aperture.y,
+        aperture_scatterguard.aperture.z,
+        aperture_scatterguard.scatterguard.x,
+        aperture_scatterguard.scatterguard.y,
+    ]
     await asyncio.gather(
-        aperture_scatterguard.aperture.x.set(aperture_x),
-        aperture_scatterguard.aperture.y.set(aperture_y),
-        aperture_scatterguard.aperture.z.set(aperture_z),
-        aperture_scatterguard.scatterguard.x.set(scatterguard_x),
-        aperture_scatterguard.scatterguard.y.set(scatterguard_y),
+        *[m.set(value) for m, value in zip(motors, position.values, strict=True)]
     )
+    for signal in [m.user_setpoint for m in motors]:
+        get_mock_put(signal).reset_mock()

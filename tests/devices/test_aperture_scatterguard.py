@@ -6,6 +6,8 @@ from unittest.mock import AsyncMock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
+from bluesky.simulators import RunEngineSimulator, assert_message_and_return_remaining
+from bluesky.utils import MsgGenerator
 from ophyd_async.core import (
     callback_on_mock_put,
     get_mock,
@@ -13,11 +15,13 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.devices.aperturescatterguard import (
+from dodal.devices.mx_phase1.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
+    ApertureScatterguardConfiguration,
     ApertureValue,
     InvalidApertureMoveError,
+    do_with_aperture_scatterguard_in_scin_move_position,
 )
 from tests.devices.conftest import set_to_position
 
@@ -25,9 +29,11 @@ from tests.devices.conftest import set_to_position
 @pytest.fixture
 async def aperture_in_medium_pos(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ) -> AsyncGenerator[ApertureScatterguard, None]:
-    await set_to_position(ap_sg, aperture_positions[ApertureValue.MEDIUM])
+    await set_to_position(
+        ap_sg, ap_sg_configuration.aperture_positions[ApertureValue.MEDIUM]
+    )
 
     set_mock_value(ap_sg.aperture.medium, 1)
 
@@ -175,13 +181,17 @@ async def test_aperture_scatterguard_returns_status_if_within_tolerance(
     await ap_sg._safe_move_whilst_in_beam(pos)
 
 
-def set_underlying_motors(ap_sg: ApertureScatterguard, position: AperturePosition):
+async def set_underlying_motors(
+    ap_sg: ApertureScatterguard,
+    config: ApertureScatterguardConfiguration,
+    aperture: ApertureValue,
+):
     for motor, pos in zip(
         get_all_motors(ap_sg),
-        position.values,
+        dict(config.aperture_positions[aperture]).values(),
         strict=False,
     ):
-        motor.set(pos)
+        await motor.set(pos)
 
 
 @pytest.mark.parametrize(
@@ -194,7 +204,7 @@ def set_underlying_motors(ap_sg: ApertureScatterguard, position: AperturePositio
 )
 async def test_aperture_positions(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
     read_pv: str,
     aperture: ApertureValue,
 ):
@@ -203,19 +213,19 @@ async def test_aperture_positions(
     assert isinstance(reading, dict)
     assert (
         reading[f"{ap_sg.name}-diameter"]["value"]
-        == aperture_positions[aperture].diameter
+        == ap_sg_configuration.aperture_positions[aperture].diameter
     )
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == aperture
 
 
 async def test_aperture_positions_robot_load(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     set_mock_value(ap_sg.aperture.large, 0)
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
-    robot_load = aperture_positions[ApertureValue.OUT_OF_BEAM]
+    robot_load = ap_sg_configuration.aperture_positions[ApertureValue.OUT_OF_BEAM]
     await ap_sg.aperture.y.set(robot_load.aperture_y)
     await ap_sg.aperture.z.set(robot_load.aperture_z)
     reading = await ap_sg.read()
@@ -228,9 +238,9 @@ async def test_aperture_positions_robot_load(
 
 async def test_aperture_positions_robot_load_within_tolerance(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
-    robot_load = aperture_positions[ApertureValue.OUT_OF_BEAM]
+    robot_load = ap_sg_configuration.aperture_positions[ApertureValue.OUT_OF_BEAM]
     robot_load_ap_y = robot_load.aperture_y
     tolerance = ap_sg._tolerances.aperture_y - 0.001
     set_mock_value(ap_sg.aperture.large, 0)
@@ -248,9 +258,9 @@ async def test_aperture_positions_robot_load_within_tolerance(
 
 async def test_aperture_positions_robot_load_outside_tolerance(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
-    robot_load = aperture_positions[ApertureValue.OUT_OF_BEAM]
+    robot_load = ap_sg_configuration.aperture_positions[ApertureValue.OUT_OF_BEAM]
     robot_load_ap_y = robot_load.aperture_y
     tolerance = ap_sg._tolerances.aperture_y + 0.01
     set_mock_value(ap_sg.aperture.large, 0)
@@ -264,12 +274,12 @@ async def test_aperture_positions_robot_load_outside_tolerance(
 
 async def test_aperture_positions_parked(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     set_mock_value(ap_sg.aperture.large, 0)
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
-    parked = aperture_positions[ApertureValue.PARKED]
+    parked = ap_sg_configuration.aperture_positions[ApertureValue.PARKED]
     await ap_sg.aperture.y.set(parked.aperture_y)
     await ap_sg.aperture.z.set(parked.aperture_z)
     reading = await ap_sg.read()
@@ -280,9 +290,9 @@ async def test_aperture_positions_parked(
 
 async def test_aperture_positions_parked_within_tolerance(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
-    parked = aperture_positions[ApertureValue.PARKED]
+    parked = ap_sg_configuration.aperture_positions[ApertureValue.PARKED]
     parked_z = parked.aperture_z
     tolerance = ap_sg._tolerances.aperture_z - 0.01
     set_mock_value(ap_sg.aperture.large, 0)
@@ -298,9 +308,9 @@ async def test_aperture_positions_parked_within_tolerance(
 
 async def test_aperture_positions_parked_outside_tolerance(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
-    parked = aperture_positions[ApertureValue.PARKED]
+    parked = ap_sg_configuration.aperture_positions[ApertureValue.PARKED]
     parked_z = parked.aperture_z
     tolerance = ap_sg._tolerances.aperture_z + 0.01
     set_mock_value(ap_sg.aperture.large, 0)
@@ -325,14 +335,14 @@ async def test_aperture_positions_unsafe(
 
 async def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     reading = await aperture_in_medium_pos.read()
     assert isinstance(reading, dict)
     _assert_position_in_reading(
         reading,
         ApertureValue.MEDIUM,
-        aperture_positions[ApertureValue.MEDIUM],
+        ap_sg_configuration.aperture_positions[ApertureValue.MEDIUM],
         aperture_in_medium_pos.name,
     )
 
@@ -348,14 +358,14 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
 async def test_when_aperture_set_and_device_read_then_position_returned(
     aperture: ApertureValue,
     aperture_in_medium_pos: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     await aperture_in_medium_pos.selected_aperture.set(aperture)
     reading = await aperture_in_medium_pos.read()
     _assert_position_in_reading(
         reading,
         aperture,
-        aperture_positions[aperture],
+        ap_sg_configuration.aperture_positions[aperture],
         aperture_in_medium_pos.name,
     )
 
@@ -363,11 +373,11 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
 async def test_ap_sg_in_runengine(
     aperture_in_medium_pos: ApertureScatterguard,
     run_engine: RunEngine,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     ap = aperture_in_medium_pos.aperture
     sg = aperture_in_medium_pos.scatterguard
-    test_loc = aperture_positions[ApertureValue.SMALL]
+    test_loc = ap_sg_configuration.aperture_positions[ApertureValue.SMALL]
 
     def set_small_readback_pv(value, *args, **kwargs):
         set_mock_value(ap.small, 1)
@@ -413,11 +423,15 @@ async def assert_all_positions_other_than_y(
 
 async def test_given_aperture_out_when_new_aperture_selected_then_aperture_not_moved_in(
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     ap = ap_sg.aperture
-    y_set_point = aperture_positions[ApertureValue.OUT_OF_BEAM].aperture_y
-    z_set_point = aperture_positions[ApertureValue.OUT_OF_BEAM].aperture_z
+    y_set_point = ap_sg_configuration.aperture_positions[
+        ApertureValue.OUT_OF_BEAM
+    ].aperture_y
+    z_set_point = ap_sg_configuration.aperture_positions[
+        ApertureValue.OUT_OF_BEAM
+    ].aperture_z
     ap.y.set(y_set_point)
     ap.z.set(z_set_point)
     set_mock_value(ap.y.user_readback, y_set_point)
@@ -427,18 +441,18 @@ async def test_given_aperture_out_when_new_aperture_selected_then_aperture_not_m
     assert await ap.y.user_setpoint.get_value() == y_set_point
 
     await assert_all_positions_other_than_y(
-        ap_sg, aperture_positions[ApertureValue.SMALL]
+        ap_sg, ap_sg_configuration.aperture_positions[ApertureValue.SMALL]
     )
 
 
 async def test_given_aperture_in_when_new_aperture_set_then_aperture_moved_safely(
     aperture_in_medium_pos: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     aperture_in_medium_pos._safe_move_whilst_in_beam = AsyncMock()
     await aperture_in_medium_pos.prepare(ApertureValue.SMALL)
     aperture_in_medium_pos._safe_move_whilst_in_beam.assert_called_once_with(
-        aperture_positions[ApertureValue.SMALL]
+        ap_sg_configuration.aperture_positions[ApertureValue.SMALL]
     )
 
 
@@ -449,10 +463,10 @@ async def test_given_aperture_in_when_new_aperture_set_then_aperture_moved_safel
 async def test_given_in_and_aperture_selected_when_move_out_then_only_aperture_y_moves(
     selected_aperture: ApertureValue,
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     y_setpoint = ap_sg.aperture.y.user_setpoint
-    aperture_position = aperture_positions[selected_aperture]
+    aperture_position = ap_sg_configuration.aperture_positions[selected_aperture]
     await set_to_position(ap_sg, aperture_position)
 
     assert await y_setpoint.get_value() == aperture_position.aperture_y
@@ -462,7 +476,7 @@ async def test_given_in_and_aperture_selected_when_move_out_then_only_aperture_y
 
     assert (
         await y_setpoint.get_value()
-        == aperture_positions[ApertureValue.OUT_OF_BEAM].aperture_y
+        == ap_sg_configuration.aperture_positions[ApertureValue.OUT_OF_BEAM].aperture_y
     )
 
 
@@ -473,10 +487,10 @@ async def test_given_in_and_aperture_selected_when_move_out_then_only_aperture_y
 async def test_given_out_and_aperture_selected_when_move_in_then_correct_y_selected(
     selected_aperture: ApertureValue,
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
     y_setpoint = ap_sg.aperture.y.user_setpoint
-    aperture_position = aperture_positions[selected_aperture]
+    aperture_position = ap_sg_configuration.aperture_positions[selected_aperture]
     set_mock_value(ap_sg.aperture.z.user_readback, aperture_position.aperture_z)
     await ap_sg.selected_aperture.set(ApertureValue.OUT_OF_BEAM)
 
@@ -499,9 +513,9 @@ async def test_given_out_and_aperture_selected_when_move_in_then_correct_y_selec
 async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_first(
     selected_aperture: ApertureValue,
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
-    parked_position = aperture_positions[ApertureValue.PARKED]
+    parked_position = ap_sg_configuration.aperture_positions[ApertureValue.PARKED]
     set_mock_value(ap_sg.aperture.y.user_readback, parked_position.aperture_y)
     set_mock_value(ap_sg.aperture.z.user_readback, parked_position.aperture_z)
 
@@ -514,7 +528,7 @@ async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_
         selected_aperture, wait=True
     )
     assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
-        aperture_positions[selected_aperture].aperture_z, wait=True
+        ap_sg_configuration.aperture_positions[selected_aperture].aperture_z, wait=True
     )
 
 
@@ -530,9 +544,9 @@ async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_
 async def test_given_parked_and_ap_sg_prepared_when_move_in_then_z_moved_out_first(
     selected_aperture: ApertureValue,
     ap_sg: ApertureScatterguard,
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
 ):
-    parked_position = aperture_positions[ApertureValue.PARKED]
+    parked_position = ap_sg_configuration.aperture_positions[ApertureValue.PARKED]
     set_mock_value(ap_sg.aperture.y.user_readback, parked_position.aperture_y)
     set_mock_value(ap_sg.aperture.z.user_readback, parked_position.aperture_z)
 
@@ -545,7 +559,7 @@ async def test_given_parked_and_ap_sg_prepared_when_move_in_then_z_moved_out_fir
         selected_aperture, wait=True
     )
     assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
-        aperture_positions[selected_aperture].aperture_z, wait=True
+        ap_sg_configuration.aperture_positions[selected_aperture].aperture_z, wait=True
     )
 
 
@@ -569,3 +583,145 @@ async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
 
     with pytest.raises(InvalidApertureMoveError):
         await aperture_in_medium_pos.selected_aperture.set(ApertureValue.SMALL)
+
+
+async def test_get_scin_move_position_returns_expected(
+    aperture_in_medium_pos: ApertureScatterguard,
+    ap_sg_configuration: ApertureScatterguardConfiguration,
+    run_engine: RunEngine,
+):
+    ap_sg = aperture_in_medium_pos
+
+    positions = ap_sg.get_scin_move_position()
+    assert (
+        positions[ap_sg.aperture.x] == ap_sg_configuration.scintillator_move_aperture_x
+    )
+    assert (
+        positions[ap_sg.scatterguard.x]
+        == ap_sg_configuration.scintillator_move_scatterguard_x
+    )
+
+
+def test_do_with_aperture_scatterguard_in_scin_move_position_moves_and_restores_ap_sg(
+    sim_run_engine: RunEngineSimulator,
+    aperture_in_medium_pos: ApertureScatterguard,
+):
+    ap_sg = aperture_in_medium_pos
+
+    def my_plan() -> MsgGenerator:
+        yield from bps.sleep(1.0)
+
+    sim_run_engine.add_read_handler_for(ap_sg.aperture.x.user_readback, 2.384)
+    sim_run_engine.add_read_handler_for(ap_sg.scatterguard.x.user_readback, 5.285)
+    msgs = sim_run_engine.simulate_plan(
+        do_with_aperture_scatterguard_in_scin_move_position(ap_sg, my_plan)
+    )
+
+    msgs = assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.aperture.x
+        and msg.args[0] == -4.91,
+    )
+    msgs = assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.scatterguard.x
+        and msg.args[0] == -4.75,
+    )
+    msgs = assert_message_and_return_remaining(msgs, lambda msg: msg.command == "sleep")
+    msgs = assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.aperture.x
+        and msg.args[0] == 2.384,
+    )
+    assert_message_and_return_remaining(
+        msgs,
+        lambda msg: msg.command == "set"
+        and msg.obj is ap_sg.scatterguard.x
+        and msg.args[0] == 5.285,
+    )
+
+
+def test_do_with_aperture_scatterguard_in_scin_move_position_does_not_restore_on_inner_failure(
+    run_engine: RunEngine,
+    aperture_in_medium_pos: ApertureScatterguard,
+):
+    ap_sg = aperture_in_medium_pos
+
+    def my_plan() -> MsgGenerator:
+        raise AssertionError("simulated exception")
+
+    with pytest.raises(AssertionError):
+        run_engine(do_with_aperture_scatterguard_in_scin_move_position(ap_sg, my_plan))
+
+    get_mock_put(ap_sg.aperture.x.user_setpoint).assert_called_once_with(
+        -4.91, wait=True
+    )
+    get_mock_put(ap_sg.scatterguard.x.user_setpoint).assert_called_once_with(
+        -4.75, wait=True
+    )
+
+
+async def test_set_scin_move_position_raises_not_implemented(
+    aperture_in_medium_pos: ApertureScatterguard,
+):
+    aperture_scatterguard = aperture_in_medium_pos
+    with pytest.raises(
+        NotImplementedError, match="The SCIN_MOVE position cannot be set directly"
+    ):
+        await aperture_scatterguard.selected_aperture.set(ApertureValue.SCIN_MOVE)
+
+
+@pytest.mark.parametrize(
+    "ap_x_offset, sg_x_offset, expected_value",
+    [
+        [-0.0041, 0, ApertureValue.MEDIUM],
+        [-0.0039, 0, ApertureValue.SCIN_MOVE],
+        [0.0041, 0, ApertureValue.MEDIUM],
+        [0, -0.09, ApertureValue.SCIN_MOVE],
+        [0, 0.09, ApertureValue.SCIN_MOVE],
+        [0, 0.11, ApertureValue.MEDIUM],
+        [0, -0.11, ApertureValue.MEDIUM],
+    ],
+)
+async def test_get_selected_position_returns_scin_move(
+    ap_x_offset: float,
+    sg_x_offset: float,
+    expected_value: ApertureValue | None,
+    aperture_in_medium_pos: ApertureScatterguard,
+    ap_sg_configuration: ApertureScatterguardConfiguration,
+):
+    aperture_scatterguard = aperture_in_medium_pos
+    set_mock_value(
+        aperture_scatterguard.aperture.x.user_readback,
+        ap_sg_configuration.scintillator_move_aperture_x + ap_x_offset,
+    )
+
+    set_mock_value(
+        aperture_scatterguard.scatterguard.x.user_readback,
+        ap_sg_configuration.scintillator_move_scatterguard_x + sg_x_offset,
+    )
+
+    assert await aperture_scatterguard.selected_aperture.get_value() == expected_value
+
+
+async def test_set_selected_position_raises_not_implemented_if_currently_in_scin_move_position(
+    aperture_in_medium_pos: ApertureScatterguard,
+    ap_sg_configuration: ApertureScatterguardConfiguration,
+):
+    aperture_scatterguard = aperture_in_medium_pos
+    set_mock_value(
+        aperture_scatterguard.aperture.x.user_readback,
+        ap_sg_configuration.scintillator_move_aperture_x,
+    )
+    set_mock_value(
+        aperture_scatterguard.scatterguard.x.user_readback,
+        ap_sg_configuration.scintillator_move_scatterguard_x,
+    )
+    with pytest.raises(
+        NotImplementedError,
+        match="Cannot move aperture-scatterguard while in SCIN_MOVE position",
+    ):
+        await aperture_scatterguard.selected_aperture.set(ApertureValue.SMALL)

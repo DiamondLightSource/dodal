@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock
 import pytest
 from ophyd_async.core import set_mock_value
 
-from dodal.devices.aperturescatterguard import (
+from dodal.devices.beamlines.i03.beamsize import Beamsize
+from dodal.devices.mx_phase1.aperturescatterguard import (
     ApertureScatterguard,
 )
-from dodal.devices.beamlines.i03.beamsize import Beamsize
 
 
 @pytest.mark.parametrize(
