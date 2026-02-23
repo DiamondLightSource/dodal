@@ -82,7 +82,7 @@ def test_instantiate_v2_function_fake_makes_fake():
         Smargon, "smargon", "", True, True, None
     )
     assert isinstance(fake_smargon, StandardReadable)
-    assert fake_smargon.omega._real_motor.user_setpoint.source.startswith("mock+ca")
+    assert fake_smargon.omega.user_setpoint.source.startswith("mock+ca")
 
 
 @pytest.mark.parametrize(

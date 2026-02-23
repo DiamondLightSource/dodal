@@ -1,4 +1,14 @@
+from typing import NamedTuple, Self
+
 import numpy as np
+from ophyd_async.core import (
+    Array1D,
+    Reference,
+    StandardReadable,
+    StandardReadableFormat,
+    derived_signal_rw,
+)
+from ophyd_async.epics.motor import Motor
 
 
 def step_to_num(start: float, stop: float, step: float) -> tuple[float, float, int]:
@@ -144,3 +154,122 @@ def rotate_clockwise(theta: float, x: float, y: float) -> tuple[float, float]:
 
 def rotate_counter_clockwise(theta: float, x: float, y: float) -> tuple[float, float]:
     return rotate_clockwise(-theta, x, y)
+
+
+MotorOffsetAndPhase = Array1D[np.float32]
+
+
+class AngleWithPhase(NamedTuple):
+    """Represents a point in rotational space which has 0<=phase<360 and
+    offset = n * 360.
+    """
+
+    offset: float
+    phase: float
+
+    @classmethod
+    def from_offset_and_phase(
+        cls, offset_and_phase: MotorOffsetAndPhase
+    ) -> "AngleWithPhase":
+        return cls(offset_and_phase[0], offset_and_phase[1])
+
+    @classmethod
+    def wrap(cls, unwrapped: float) -> "AngleWithPhase":
+        offset = AngleWithPhase.offset_from_unwrapped(unwrapped)
+        return cls(offset, unwrapped - offset)
+
+    def unwrap(self) -> float:
+        return self.offset + self.phase
+
+    def phase_distance(self, other: Self) -> float:
+        max_theta = max(self.phase, other.phase)
+        min_theta = min(self.phase, other.phase)
+        return min(max_theta - min_theta, min_theta + 360 - max_theta)
+
+    @classmethod
+    def offset_from_unwrapped(cls, unwrapped_deg: float) -> float:
+        """Obtain the offset from the corresponding wrapped angle in degrees."""
+        return round(unwrapped_deg // 360) * 360
+
+    def project_to_unwrapped(self, phase_deg: float) -> float:
+        """Return the supplied phase angle projected into the unwrapped space defined by our offset."""
+        return self.offset + phase_deg
+
+
+class RotationalAxis(StandardReadable):
+    def __init__(self, real_motor: Motor, name=""):
+        self._real_motor = Reference(real_motor)
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.offset_and_phase = derived_signal_rw(
+                self._get_motor_offset_and_phase,
+                self._set_motor_offset_and_phase,
+                motor_pos=real_motor,
+            )
+        with self.add_children_as_readables():
+            self.phase = derived_signal_rw(
+                self._get_phase, self._set_phase, offset_and_phase=self.offset_and_phase
+            )
+        super().__init__(name=name)
+
+    def _get_motor_offset_and_phase(self, motor_pos: float) -> MotorOffsetAndPhase:
+        angle = AngleWithPhase.wrap(motor_pos)
+        return np.array([angle.offset, angle.phase])
+
+    async def _set_motor_offset_and_phase(self, value: MotorOffsetAndPhase):
+        await self._real_motor().set(
+            AngleWithPhase.from_offset_and_phase(value).unwrap()
+        )
+
+    def _get_phase(self, offset_and_phase: MotorOffsetAndPhase) -> float:
+        return offset_and_phase[1].item()
+
+    async def _set_phase(self, value: float) -> None:
+        """Set the motor phase to the specified phase value in degrees.
+        The motor will travel via the shortest distance path.
+        """
+        pass
+
+    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
+        """Obtain the shortest distance between theta2 and theta1 in degrees.
+        If the axis is wrapped, this will be the shortest distance in mod360 space (i.e. always <= 180 degrees).
+        If the axis is unwrapped, this will be the distance in absolute (unwrapped) space.
+        """
+        pass
+
+    def get_wrapped_origin(self, unwrapped_deg: float) -> AngleWithPhase:
+        """Obtain an origin in wrapped space that can be used to project phase angles into unwrapped space."""
+        pass
+
+
+class UnwrappedAxis(RotationalAxis):
+    # TODO remove this
+    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
+        return abs(theta2_deg - theta1_deg)
+
+    def get_wrapped_origin(self, unwrapped_deg: float) -> AngleWithPhase:
+        return AngleWithPhase.wrap(0)
+
+    async def _set_phase(self, value: float):
+        await self._real_motor().set(value)
+
+
+class WrappedAxis(RotationalAxis):
+    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
+        return AngleWithPhase.wrap(theta1_deg).phase_distance(
+            AngleWithPhase.wrap(theta2_deg)
+        )
+
+    def get_wrapped_origin(self, unwrapped_deg: float) -> AngleWithPhase:
+        return AngleWithPhase(AngleWithPhase.offset_from_unwrapped(unwrapped_deg), 0)
+
+    async def _set_phase(self, value: float):
+        offset_and_phase = await self.offset_and_phase.get_value()
+        current_position = AngleWithPhase.from_offset_and_phase(offset_and_phase)
+        target_value = value + current_position.offset
+        while target_value - current_position.unwrap() >= 180:
+            target_value -= 360
+        else:
+            while target_value - current_position.unwrap() <= -180:
+                target_value += 360
+
+        await self._real_motor().set(target_value)

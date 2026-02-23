@@ -1,16 +1,17 @@
 import math
 from collections.abc import Generator
 
+import numpy as np
 import pytest
+from bluesky import RunEngine
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
-from ophyd_async.epics.motor import Motor
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.motors import (
-    ModMotor,
     SixAxisGonio,
     XThetaStage,
     XYStage,
+    XYZOmegaStage,
     XYZPitchYawRollStage,
     XYZPolarAzimuthStage,
     XYZPolarAzimuthTiltStage,
@@ -309,6 +310,8 @@ async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
             "gonio-z": partial_reading(0.0),
             "gonio-y": partial_reading(0.0),
             "gonio-x": partial_reading(0.0),
+            "gonio-omega_axis-phase": partial_reading(0.0),
+            "gonio-omega_axis-offset_and_phase": partial_reading(np.array([0, 0])),
         },
     )
 
@@ -363,7 +366,7 @@ async def test_lab_vertical_round_trip(six_axis_gonio: SixAxisGonio, set_point: 
 
 
 @pytest.mark.parametrize(
-    "real_value, expected_value",
+    "real_value, expected_phase",
     [
         [0, 0],
         [0.001, 0.001],
@@ -381,12 +384,13 @@ async def test_lab_vertical_round_trip(six_axis_gonio: SixAxisGonio, set_point: 
         [-10000 * 360 - 0.001, 359.999],
     ],
 )
-async def test_mod_360_read(real_value: float, expected_value: float):
-    motor = ModMotor(Motor("BL03I-MO-SGON-01:OMEGA"))
-    await motor.connect(mock=True)
-    set_mock_value(motor._real_motor.user_readback, real_value)
-    readback_value = await motor.user_readback.get_value()
-    assert math.isclose(readback_value, expected_value, abs_tol=1e-6)
+async def test_mod_360_read(real_value: float, expected_phase):
+    stage = XYZOmegaStage("BL03I-MO-SGON-01:", mod_360_motor=True)
+    await stage.connect(mock=True)
+    set_mock_value(stage.omega.user_readback, real_value)
+    offset, phase = await stage.omega_axis.offset_and_phase.get_value()
+    assert 0 <= expected_phase < 360
+    assert math.isclose(phase, expected_phase, abs_tol=1e-6)
 
 
 @pytest.fixture(
@@ -431,22 +435,22 @@ def values_for_rotation(request):
 
 
 @pytest.fixture()
-async def motor_in_initial_state(values_for_rotation):
+async def stage_in_initial_state(values_for_rotation):
     input_value, current_real_value, expected_real_value = values_for_rotation
 
-    motor = ModMotor(Motor("BL03I-MO-SGON-01:OMEGA"))
-    await motor.connect(mock=True)
-    set_mock_value(motor._real_motor.user_readback, current_real_value)
-    return motor
+    stage = XYZOmegaStage("BL03I-MO-SGON-01:", mod_360_motor=True)
+    await stage.connect(mock=True)
+    set_mock_value(stage.omega.user_readback, current_real_value)
+    return stage
 
 
-async def test_mod_360_write_actual_direction_of_rotation_same_as_apparent_for_moves_apparently_less_than_180(
-    values_for_rotation, motor_in_initial_state
+async def test_mod_360_expected_direction_of_rotation_same_as_apparent_for_moves_apparently_less_than_180(
+    values_for_rotation, stage_in_initial_state
 ):
     input_value, current_real_value, expected_real_value = values_for_rotation
-    motor = motor_in_initial_state
+    stage = stage_in_initial_state
 
-    current_readback = await motor.user_readback.get_value()
+    current_readback = await stage.omega.user_readback.get_value()
     is_no_move = expected_real_value == current_real_value
     is_ge_than_180 = abs(input_value - current_readback) >= 180
     motion_in_same_direction_as_apparent = (input_value < current_readback) == (
@@ -457,20 +461,20 @@ async def test_mod_360_write_actual_direction_of_rotation_same_as_apparent_for_m
     )
 
 
-async def test_mod_360_write_actual_movement_never_more_than_180(
-    values_for_rotation, motor_in_initial_state
+async def test_mod_360_expected_actual_movement_never_more_than_180(
+    values_for_rotation, stage_in_initial_state
 ):
     input_value, current_real_value, expected_real_value = values_for_rotation
     assert abs(expected_real_value - current_real_value) <= 180
 
 
-async def test_mod_360_put_proceeds_as_expected(
-    values_for_rotation, motor_in_initial_state
+async def test_mod_360_unwrap_computes_expected(
+    values_for_rotation, stage_in_initial_state, run_engine: RunEngine
 ):
     input_value, current_real_value, expected_real_value = values_for_rotation
-    motor = motor_in_initial_state
-    real_put = get_mock_put(motor._real_motor.user_setpoint)
-    await motor.user_setpoint.set(input_value)
+    stage = stage_in_initial_state
+    real_put = get_mock_put(stage.omega.user_setpoint)
+    await stage.omega_axis.phase.set(input_value)
     real_put.assert_called_once()
     actual = real_put.mock_calls[0].args[0]
     assert math.isclose(actual, expected_real_value), (

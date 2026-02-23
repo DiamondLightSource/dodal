@@ -7,6 +7,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
+    SignalRW,
     StrictEnum,
     set_and_wait_for_value,
     wait_for_value,
@@ -87,7 +88,7 @@ class Smargon(XYZOmegaStage, Movable):
 
     DEFERRED_MOVE_SET_TIMEOUT = 5
 
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(self, prefix: str, name: str = "", mod_360_motor: bool = False):
         with self.add_children_as_readables():
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
@@ -102,7 +103,18 @@ class Smargon(XYZOmegaStage, Movable):
 
         self.defer_move = epics_signal_rw(DeferMoves, prefix + "CS1:DeferMoves")
 
-        super().__init__(prefix, name, mod_360_motor=True)
+        super().__init__(prefix, name, mod_360_motor=mod_360_motor)
+
+    async def _get_signal_and_check_limit(
+        self, motor_name: str, value: float
+    ) -> SignalRW[float]:
+        if motor_name == "omega":
+            # TODO should we check limit for omega?
+            return self.omega_axis.phase
+        else:
+            axis = getattr(self, motor_name)
+            await axis.check_motor_limit(await axis.user_setpoint.get_value(), value)
+            return axis.user_setpoint
 
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
@@ -114,16 +126,16 @@ class Smargon(XYZOmegaStage, Movable):
         only come back after the motion on that axis finished.
         """
         await self.defer_move.set(DeferMoves.ON)
+        # TODO something something i03 broken smargon serialise moves workaround
         try:
             finished_moving = []
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None and isinstance(new_setpoint, int | float):
-                    axis: Motor = getattr(self, motor_name)
-                    await axis.check_motor_limit(
-                        await axis.user_setpoint.get_value(), new_setpoint
+                    signal = await self._get_signal_and_check_limit(
+                        motor_name, new_setpoint
                     )
                     put_completion = await set_and_wait_for_value(
-                        axis.user_setpoint,
+                        signal,
                         new_setpoint,
                         timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
                         wait_for_set_completion=False,

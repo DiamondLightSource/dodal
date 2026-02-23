@@ -1,22 +1,20 @@
 import asyncio
 import math
 from abc import ABC
-from functools import partial
 
-from bluesky.protocols import Locatable, Location
 from ophyd_async.core import (
-    CALCULATE_TIMEOUT,
-    AsyncStatus,
-    CalculatableTimeout,
     SignalRW,
     StandardReadable,
-    StandardReadableFormat,
-    derived_signal_r,
     derived_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
+from dodal.common.maths import (
+    UnwrappedAxis,
+    WrappedAxis,
+    rotate_clockwise,
+    rotate_counter_clockwise,
+)
 
 _X, _Y, _Z = "X", "Y", "Z"
 
@@ -100,89 +98,6 @@ class XYZThetaStage(XYZStage):
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
-class ModMotor(StandardReadable, Locatable[float]):
-    def __init__(self, real_motor: Motor, name=""):
-        self._real_motor = real_motor
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_readback = derived_signal_r(
-                self._get_mod_360, real_value=self._real_motor.user_readback
-            )
-        with self.add_children_as_readables():
-            self.user_setpoint = derived_signal_rw(
-                self._get_mod_360,
-                partial(self._set_mod_360, self._real_motor.user_setpoint),
-                real_value=self._real_motor.user_setpoint,
-            )
-            self.velocity = derived_signal_rw(
-                self._identity,
-                partial(self._set_value, self._real_motor.velocity),
-                value=self._real_motor.velocity,
-            )
-            self.max_velocity = derived_signal_r(
-                self._identity, value=self._real_motor.max_velocity
-            )
-            self.acceleration_time = derived_signal_r(
-                self._identity, value=self._real_motor.acceleration_time
-            )
-
-        super().__init__(name=name)
-
-    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
-        """Set name of the motor and its children."""
-        super().set_name(name, child_name_separator=child_name_separator)
-        # Readback should be named the same as its parent in read()
-        self.user_readback.set_name(name)
-
-    def _identity(self, value: float) -> float:
-        return value
-
-    async def check_motor_limit(self, abs_start_pos: float, abs_end_pos: float):
-        offset = await self._current_offset()
-        await self._real_motor.check_motor_limit(
-            abs_start_pos + offset, abs_end_pos + offset
-        )
-
-    async def _set_value(self, real_signal: SignalRW, modded_value: float):
-        await real_signal.set(modded_value)
-
-    def _get_mod_360(self, real_value: float) -> float:
-        return real_value - self._offset_from_real_value(real_value)
-
-    def _offset_from_real_value(self, real_value: float) -> float:
-        return round(real_value // 360) * 360
-
-    async def _current_offset(self):
-        real_value = await self._real_motor.user_readback.get_value()
-        return self._offset_from_real_value(real_value)
-
-    async def _set_mod_360(self, signal_to_set: SignalRW, input_value: float):
-        real_value = await self._real_motor.user_readback.get_value()
-        offset = self._offset_from_real_value(real_value)
-        target_value = input_value + offset
-        while target_value - real_value >= 180:
-            target_value -= 360
-        else:
-            while target_value - real_value <= -180:
-                target_value += 360
-
-        await signal_to_set.set(target_value)
-
-    async def locate(self) -> Location[float]:
-        """Return the current setpoint and readback of the motor."""
-        setpoint, readback = await asyncio.gather(
-            self.user_setpoint.get_value(), self.user_readback.get_value()
-        )
-        return Location(setpoint=setpoint, readback=readback)
-
-    @AsyncStatus.wrap
-    async def set(
-        self, value: float, timeout: CalculatableTimeout = CALCULATE_TIMEOUT
-    ) -> Location[float]:
-        offset = await self._current_offset()
-        await self._real_motor.set(value + offset, timeout)
-        return await self.locate()
-
-
 class XYZOmegaStage(XYZStage):
     """Four-axis stage with a standard xyz stage and one axis of rotation: omega."""
 
@@ -198,10 +113,11 @@ class XYZOmegaStage(XYZStage):
     ) -> None:
         with self.add_children_as_readables():
             real_motor = Motor(prefix + omega_infix)
-            if mod_360_motor:
-                self.omega = ModMotor(real_motor)
-            else:
-                self.omega = real_motor
+            self.omega = real_motor
+            self.omega_axis = (
+                WrappedAxis(self.omega) if mod_360_motor else UnwrappedAxis(self.omega)
+            )
+
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
