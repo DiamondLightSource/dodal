@@ -85,6 +85,39 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
     assert await smargon.stub_offsets.to_robot_load.proc.get_value() == 0
 
 
+async def test_set_with_omega_outside_smargon_limit(
+    smargon: Smargon,
+):
+    set_mock_value(smargon.omega.low_limit_travel, -1999)
+    set_mock_value(smargon.omega.high_limit_travel, 1999)
+    set_mock_value(smargon.omega.dial_low_limit_travel, -1999)
+    set_mock_value(smargon.omega.dial_high_limit_travel, 1999)
+    await smargon.omega.set(1999)
+    with pytest.raises(MotorLimitsError):
+        await smargon.set(
+            CombinedMove(
+                x=10,
+                y=20,
+                z=30,
+                omega=200,
+                chi=15,
+                phi=25,
+            )
+        )
+    await smargon.omega.set(-1999)
+    with pytest.raises(MotorLimitsError):
+        await smargon.set(
+            CombinedMove(
+                x=10,
+                y=20,
+                z=30,
+                omega=160,
+                chi=15,
+                phi=25,
+            )
+        )
+
+
 @pytest.mark.parametrize(
     "test_x, test_y, test_z, test_omega, test_chi, test_phi",
     [
