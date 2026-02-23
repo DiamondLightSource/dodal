@@ -7,7 +7,9 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
 
-_X, _Y, _Z = "X", "Y", "Z"
+_X = "X"
+_Y = "Y"
+_Z = "Z"
 
 _OMEGA = "OMEGA"
 _POLAR = "POLAR"
@@ -17,9 +19,9 @@ _TILT = "TILT"
 
 class Stage(StandardReadable, ABC):
     """For these devices, the following co-ordinates are typical but not enforced:
-    - z is horizontal & parallel to the direction of beam travel
+    - z is horizontal & parallel to the direction of synchrotron particle travel (whence the x-rays direction)
     - y is vertical and antiparallel to the force of gravity
-    - x is the cross product of y🞬z
+    - x is the cross product of y with z
 
     Attributes:
         prefix (str): Common part of the EPICS PV for all motors, including ":".
@@ -33,7 +35,7 @@ class Stage(StandardReadable, ABC):
 
 
 class XThetaStage(Stage):
-    """Two-axis stage with an x and a theta motor."""
+    """Two-axis stage with an x motor and a theta motor."""
 
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, theta_infix: str = "A"
@@ -45,7 +47,7 @@ class XThetaStage(Stage):
 
 
 class XYStage(Stage):
-    """A standard two-axis stage with an x and a y motor."""
+    """A standard two-axis stage with an x motor and a y motor."""
 
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, y_infix: str = _Y
@@ -57,7 +59,7 @@ class XYStage(Stage):
 
 
 class XYZStage(XYStage):
-    """A standard three-axis stage with an x, a y, and a z motor."""
+    """A standard three-axis stage with an x motor, a y motor and a z motor."""
 
     def __init__(
         self,
@@ -236,7 +238,7 @@ class XYZPitchYawStage(XYZStage):
 
 
 class XYZPitchYawRollStage(XYZStage):
-    """Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
+    """Six-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
     and roll.
     """
 
@@ -306,7 +308,7 @@ class SixAxisGonioKappaPhi(XYZStage):
 
 
 class YZStage(Stage):
-    """Two-axis stage with an x and a z motor."""
+    """Two-axis stage with an x motor and a y motor."""
 
     def __init__(
         self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z
