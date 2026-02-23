@@ -14,7 +14,7 @@ def load_json_file_to_class(t: type[TBaseModel], file: str) -> TBaseModel:
         file (str): The file to read.
 
     Returns:
-        An instance of type t.
+        An instance of pydantic BaseModel.
     """
     if not isfile(file):
         raise FileNotFoundError(f"Cannot find file {file}")
@@ -53,7 +53,7 @@ class JsonModelLoader(Generic[TBaseModel]):
         """Return a human-readable representation of the JsonModelLoader.
 
         Returns:
-            str: A string describing the configured model type and default file.
+            A string describing the configured model type and default file.
         """
         model_name = self._base_model.__name__
         return (
@@ -68,6 +68,9 @@ class JsonModelLoader(Generic[TBaseModel]):
         Args:
             file (str, optional): The file to load into a pydantic class. If None
             provided, use the configured default_file.
+
+        Returns:
+            An instance of the configurated pydantic base_model type.
         """
         if file is None and self.default_file is not None:
             return load_json_file_to_class(self._base_model, self.default_file)
