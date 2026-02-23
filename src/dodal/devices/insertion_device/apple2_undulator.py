@@ -178,7 +178,7 @@ class UndulatorGap(GapSafeMotorNoStop):
     """
 
     def __init__(self, prefix: str, name: str = ""):
-        self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
+        self.set_move = epics_signal_rw(int, prefix + "BLGSETP", wait=False)
         # Nothing move until this is set to 1 and it will return to 0 when done.
         super().__init__(self.set_move, prefix, name)
 
@@ -254,7 +254,9 @@ class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseValType]):
             self.top_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_outer}")
             self.btm_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_inner}")
         # Nothing move until this is set to 1 and it will return to 0 when done.
-        self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
+        self.set_move = epics_signal_rw(
+            int, f"{prefix}BL{top_outer}" + "MOVE", wait=False
+        )
         self.axes = [self.top_outer, self.btm_inner]
         super().__init__(self.set_move, prefix, name)
 
@@ -336,7 +338,9 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         with self.add_children_as_readables():
             self.jaw_phase = UndulatorPhaseMotor(prefix=f"{prefix}BL{jaw_phase}")
         # Nothing move until this is set to 1 and it will return to 0 when done
-        self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
+        self.set_move = epics_signal_rw(
+            int, f"{prefix}BL{move_pv}" + "MOVE", wait=False
+        )
 
         super().__init__(self.set_move, prefix, name)
 
@@ -397,17 +401,10 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         LOGGER.info(
             f"Moving {self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
-
-        async def initiate_moves():
-            await asyncio.gather(
-                self.gap().set_move.set(value=1, timeout=timeout),
-                self.phase().set_move.set(value=1, timeout=timeout),
-            )
-            LOGGER.info("Gap and phase set_move()s completed.")
-
-        # assign the task to prevent GC killing it
-        self._move_task = asyncio.create_task(initiate_moves())
-
+        await asyncio.gather(
+            self.gap().set_move.set(value=1, timeout=timeout),
+            self.phase().set_move.set(value=1, timeout=timeout),
+        )
         await wait_for_value(
             self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
         )
