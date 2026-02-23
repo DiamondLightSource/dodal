@@ -7,7 +7,6 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
-    SignalRW,
     StrictEnum,
     set_and_wait_for_value,
     wait_for_value,
@@ -15,6 +14,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.maths import AngleWithPhase
 from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 
@@ -105,16 +105,14 @@ class Smargon(XYZOmegaStage, Movable):
 
         super().__init__(prefix, name)
 
-    async def _get_signal_and_check_limit(
-        self, motor_name: str, value: float
-    ) -> SignalRW[float]:
+    async def _get_target_value(self, motor_name: str, value: float):
         if motor_name == "omega":
-            # TODO should we check limit for omega?
-            return self.omega_axis.phase
+            current_angle = AngleWithPhase.from_offset_and_phase(
+                await self.omega_axis.offset_and_phase.get_value()
+            )
+            return current_angle.nearest_to_phase(value).unwrap()
         else:
-            axis = getattr(self, motor_name)
-            await axis.check_motor_limit(await axis.user_setpoint.get_value(), value)
-            return axis.user_setpoint
+            return value
 
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
@@ -131,11 +129,15 @@ class Smargon(XYZOmegaStage, Movable):
             finished_moving = []
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None and isinstance(new_setpoint, int | float):
-                    signal = await self._get_signal_and_check_limit(
+                    new_setpoint = await self._get_target_value(
                         motor_name, new_setpoint
                     )
+                    axis = getattr(self, motor_name)
+                    await axis.check_motor_limit(
+                        await axis.user_setpoint.get_value(), new_setpoint
+                    )
                     put_completion = await set_and_wait_for_value(
-                        signal,
+                        axis.user_setpoint,
                         new_setpoint,
                         timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
                         wait_for_set_completion=False,

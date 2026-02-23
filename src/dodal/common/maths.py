@@ -195,8 +195,24 @@ class AngleWithPhase(NamedTuple):
         """Return the supplied phase angle projected into the unwrapped space defined by our offset."""
         return self.offset + phase_deg
 
+    def nearest_to_phase(self, phase_deg: float) -> "AngleWithPhase":
+        """Return the nearest angle to this one with the specified phase."""
+        phase_deg = phase_deg % 360
+        if phase_deg > self.phase:
+            return (
+                AngleWithPhase(self.offset, phase_deg)
+                if phase_deg - self.phase <= 180
+                else AngleWithPhase(self.offset - 360, phase_deg)
+            )
+        else:
+            return (
+                AngleWithPhase(self.offset, phase_deg)
+                if self.phase - phase_deg <= 180
+                else AngleWithPhase(self.offset + 360, phase_deg)
+            )
 
-class RotationalAxis(StandardReadable):
+
+class WrappedAxis(StandardReadable):
     def __init__(self, real_motor: Motor, name=""):
         self._real_motor = Reference(real_motor)
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -223,41 +239,23 @@ class RotationalAxis(StandardReadable):
     def _get_phase(self, offset_and_phase: MotorOffsetAndPhase) -> float:
         return offset_and_phase[1].item()
 
-    async def _set_phase(self, value: float) -> None:
+    async def _set_phase(self, value: float):
         """Set the motor phase to the specified phase value in degrees.
         The motor will travel via the shortest distance path.
         """
-        pass
+        offset_and_phase = await self.offset_and_phase.get_value()
+        current_position = AngleWithPhase.from_offset_and_phase(offset_and_phase)
+        target_value = current_position.nearest_to_phase(value).unwrap()
+        await self._real_motor().set(target_value)
 
     def distance(self, theta1_deg: float, theta2_deg: float) -> float:
         """Obtain the shortest distance between theta2 and theta1 in degrees.
-        If the axis is wrapped, this will be the shortest distance in mod360 space (i.e. always <= 180 degrees).
-        If the axis is unwrapped, this will be the distance in absolute (unwrapped) space.
+        This will be the shortest distance in mod360 space (i.e. always <= 180 degrees).
         """
-        pass
-
-    def get_wrapped_origin(self, unwrapped_deg: float) -> AngleWithPhase:
-        """Obtain an origin in wrapped space that can be used to project phase angles into unwrapped space."""
-        pass
-
-
-class WrappedAxis(RotationalAxis):
-    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
         return AngleWithPhase.wrap(theta1_deg).phase_distance(
             AngleWithPhase.wrap(theta2_deg)
         )
 
     def get_wrapped_origin(self, unwrapped_deg: float) -> AngleWithPhase:
+        """Obtain an origin in wrapped space that can be used to project phase angles into unwrapped space."""
         return AngleWithPhase(AngleWithPhase.offset_from_unwrapped(unwrapped_deg), 0)
-
-    async def _set_phase(self, value: float):
-        offset_and_phase = await self.offset_and_phase.get_value()
-        current_position = AngleWithPhase.from_offset_and_phase(offset_and_phase)
-        target_value = value + current_position.offset
-        while target_value - current_position.unwrap() >= 180:
-            target_value -= 360
-        else:
-            while target_value - current_position.unwrap() <= -180:
-                target_value += 360
-
-        await self._real_motor().set(target_value)

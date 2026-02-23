@@ -94,8 +94,6 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
         (10, -2000, 30, 5, 15, 25),  # y goes beyond lower limit
         (10, 20, 2000, 5, 15, 25),  # z goes beyond upper limit
         (10, 20, -2000, 5, 15, 25),  # z goes beyond lower limit
-        (10, 20, 30, 2000, 15, 25),  # omega goes beyond upper limit
-        (10, 20, 30, -2000, 15, 25),  # omega goes beyond lower limit
         (10, 20, 30, 5, 2000, 25),  # chi goes beyond upper limit
         (10, 20, 30, 5, -2000, 25),  # chi goes beyond lower limit
         (10, 20, 30, 5, 15, 2000),  # phi goes beyond upper limit
@@ -109,7 +107,6 @@ async def test_given_set_with_value_outside_motor_limit(
         smargon.x,
         smargon.y,
         smargon.z,
-        smargon.omega,
         smargon.chi,
         smargon.phi,
     ]:
