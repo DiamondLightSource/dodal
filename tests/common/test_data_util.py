@@ -23,6 +23,7 @@ def raw_data() -> dict:
 def tmp_file(tmp_path, raw_data: dict) -> str:
     path = tmp_path / "json_loader_test.json"
     test_model = MyModel.model_validate(raw_data)
+    # Setup tmp file for this test by saving the data.
     save_class_to_json_file(test_model, path)
     return str(path)
 
