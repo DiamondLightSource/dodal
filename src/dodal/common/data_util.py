@@ -1,9 +1,9 @@
 from os.path import isfile
-from typing import Generic, TypeVar
+from typing import Protocol, TypeVar
 
 from pydantic import BaseModel
 
-TBaseModel = TypeVar("TBaseModel", bound=BaseModel)
+TBaseModel = TypeVar("TBaseModel", bound=BaseModel, covariant=True)
 
 
 def load_json_file_to_class(t: type[TBaseModel], file: str) -> TBaseModel:
@@ -36,33 +36,18 @@ def save_class_to_json_file(model: BaseModel, file: str) -> None:
         f.write(model.model_dump_json())
 
 
-class JsonModelLoader(Generic[TBaseModel]):
-    """Load a json file into a pre configured pydantic model."""
+class JsonModelLoader(Protocol[TBaseModel]):
+    def __call__(self, file: str | None = None) -> TBaseModel: ...
 
-    def __init__(self, base_model: type[TBaseModel], default_file: str | None = None):
-        """Initialise configuration.
 
-        Args:
-            base_model (type[TBaseModel]): The configured model type to load json files into.
-            default_file (str, optional): Default file to use to load data into base_model.
-        """
-        self._base_model = base_model
-        self.default_file = default_file
+def json_model_loader(
+    model: type[TBaseModel], default_file: str | None = None
+) -> JsonModelLoader[TBaseModel]:
+    """Factory to create a function that loads a json file into a configured pydantic
+    model and with an optional default file to use.
+    """
 
-    def __repr__(self) -> str:
-        """Return a human-readable representation of the JsonModelLoader.
-
-        Returns:
-            A string describing the configured model type and default file.
-        """
-        model_name = self._base_model.__name__
-        return (
-            f"{self.__class__.__name__}("
-            f"base_model={model_name}, "
-            f"default_file={self.default_file!r})"
-        )
-
-    def __call__(self, file: str | None = None) -> TBaseModel:
+    def load_json(file: str | None = default_file) -> TBaseModel:
         """Load a json file and return it is as the configured pydantic model.
 
         Args:
@@ -72,11 +57,11 @@ class JsonModelLoader(Generic[TBaseModel]):
         Returns:
             An instance of the configurated pydantic base_model type.
         """
-        if file is None and self.default_file is not None:
-            return load_json_file_to_class(self._base_model, self.default_file)
-        elif file is not None:
-            return load_json_file_to_class(self._base_model, file)
-        raise RuntimeError(
-            f"{self} has no default file configured and no file was provided when "
-            "trying to load in a model. "
-        )
+        if file is None:
+            raise RuntimeError(
+                f"{model.__name__} loader has no default file configured and no file was "
+                "provided when trying to load in a model. "
+            )
+        return load_json_file_to_class(model, file)
+
+    return load_json
