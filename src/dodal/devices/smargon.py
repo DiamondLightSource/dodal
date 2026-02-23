@@ -88,7 +88,7 @@ class Smargon(XYZOmegaStage, Movable):
 
     DEFERRED_MOVE_SET_TIMEOUT = 5
 
-    def __init__(self, prefix: str, name: str = "", mod_360_motor: bool = False):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
@@ -103,7 +103,7 @@ class Smargon(XYZOmegaStage, Movable):
 
         self.defer_move = epics_signal_rw(DeferMoves, prefix + "CS1:DeferMoves")
 
-        super().__init__(prefix, name, mod_360_motor=mod_360_motor)
+        super().__init__(prefix, name)
 
     async def _get_signal_and_check_limit(
         self, motor_name: str, value: float

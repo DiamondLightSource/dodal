@@ -385,7 +385,7 @@ async def test_lab_vertical_round_trip(six_axis_gonio: SixAxisGonio, set_point: 
     ],
 )
 async def test_mod_360_read(real_value: float, expected_phase):
-    stage = XYZOmegaStage("BL03I-MO-SGON-01:", mod_360_motor=True)
+    stage = XYZOmegaStage("BL03I-MO-SGON-01:")
     await stage.connect(mock=True)
     set_mock_value(stage.omega.user_readback, real_value)
     offset, phase = await stage.omega_axis.offset_and_phase.get_value()
@@ -438,7 +438,7 @@ def values_for_rotation(request):
 async def stage_in_initial_state(values_for_rotation):
     input_value, current_real_value, expected_real_value = values_for_rotation
 
-    stage = XYZOmegaStage("BL03I-MO-SGON-01:", mod_360_motor=True)
+    stage = XYZOmegaStage("BL03I-MO-SGON-01:")
     await stage.connect(mock=True)
     set_mock_value(stage.omega.user_readback, current_real_value)
     return stage

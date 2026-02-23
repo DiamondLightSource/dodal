@@ -241,18 +241,6 @@ class RotationalAxis(StandardReadable):
         pass
 
 
-class UnwrappedAxis(RotationalAxis):
-    # TODO remove this
-    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
-        return abs(theta2_deg - theta1_deg)
-
-    def get_wrapped_origin(self, unwrapped_deg: float) -> AngleWithPhase:
-        return AngleWithPhase.wrap(0)
-
-    async def _set_phase(self, value: float):
-        await self._real_motor().set(value)
-
-
 class WrappedAxis(RotationalAxis):
     def distance(self, theta1_deg: float, theta2_deg: float) -> float:
         return AngleWithPhase.wrap(theta1_deg).phase_distance(
