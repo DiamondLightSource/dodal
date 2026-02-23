@@ -24,7 +24,6 @@ TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 b07_specs_test_sequence_loader = JsonModelLoader[B07BSpecsSequence](
     B07BSpecsSequence, TEST_SPECS_SEQUENCE
 )
-
 i09_vgscienta_test_sequence_loader = JsonModelLoader[I09VGScientaSequence](
     I09VGScientaSequence, TEST_VGSCIENTA_SEQUENCE
 )
