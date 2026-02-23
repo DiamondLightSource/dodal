@@ -12,6 +12,7 @@ from ophyd_async.core import (
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
+from dodal.log import LOGGER
 from dodal.utils import (
     AnyDevice,
     BeamlinePrefix,
@@ -162,6 +163,11 @@ def device_factory(
 def set_path_provider(provider: PathProvider):
     global PATH_PROVIDER
 
+    LOGGER.info(
+        "Setting global path provider to %s (previously %s)",
+        provider,
+        globals().get("PATH_PROVIDER"),
+    )
     PATH_PROVIDER = provider
 
 
@@ -171,6 +177,7 @@ def get_path_provider() -> PathProvider:
 
 def clear_path_provider() -> None:
     global PATH_PROVIDER
+    LOGGER.info("Clearing global path provider: %s", globals().get("PATH_PROVIDER"))
     try:
         del PATH_PROVIDER
     except NameError:

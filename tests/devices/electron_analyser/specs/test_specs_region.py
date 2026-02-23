@@ -2,13 +2,10 @@ from typing import Any
 
 import pytest
 
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.beamlines.b07 import LensMode, PsuMode
+from dodal.devices.beamlines.b07 import LensMode
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.specs import (
-    AcquisitionMode,
-    SpecsSequence,
-)
+from dodal.devices.electron_analyser.specs import AcquisitionMode, SpecsSequence
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
@@ -18,8 +15,7 @@ from tests.devices.electron_analyser.helper_util import (
 
 @pytest.fixture
 def sequence() -> SpecsSequence[LensMode, PsuMode]:
-    seq = SpecsSequence[LensMode, PsuMode]
-    return load_json_file_to_class(seq, get_test_sequence(seq))
+    return get_test_sequence(SpecsSequence[LensMode, PsuMode])
 
 
 @pytest.fixture

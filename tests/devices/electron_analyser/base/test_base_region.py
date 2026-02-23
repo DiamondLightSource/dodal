@@ -2,8 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.beamlines import b07, i09
+from dodal.devices.beamlines import b07, b07_shared, i09
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     EnergyMode,
@@ -26,12 +25,12 @@ from tests.devices.electron_analyser.helper_util import (
 
 @pytest.fixture(
     params=[
-        SpecsSequence[b07.LensMode, b07.PsuMode],
+        SpecsSequence[b07.LensMode, b07_shared.PsuMode],
         VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    ]
+    ],
 )
 def sequence(request: pytest.FixtureRequest) -> GenericSequence:
-    return load_json_file_to_class(request.param, get_test_sequence(request.param))
+    return get_test_sequence(request.param)
 
 
 @pytest.fixture
@@ -39,7 +38,7 @@ def expected_region_class(
     sequence: GenericSequence,
 ) -> type[AbstractBaseRegion]:
     if isinstance(sequence, SpecsSequence):
-        return SpecsRegion[b07.LensMode, b07.PsuMode]
+        return SpecsRegion[b07.LensMode, b07_shared.PsuMode]
     elif isinstance(sequence, VGScientaSequence):
         return VGScientaRegion[i09.LensMode, i09.PassEnergy]
     raise TypeError(f"Unknown sequence type {type(sequence)}")
