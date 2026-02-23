@@ -61,8 +61,7 @@ def test_json_model_loader_with_no_file_or_default_file(
 ) -> None:
     with pytest.raises(
         RuntimeError,
-        match="MyModel loader "
-        "has no default file configured and no file was provided "
+        match="MyModel loader has no default file configured and no file was provided "
         "when trying to load in a model.",
     ):
         load_json_model_no_default()
