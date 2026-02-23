@@ -5,8 +5,8 @@ from dodal.devices.beamlines.b07 import (
     B07SampleManipulator52B,
     Grating,
     LensMode,
-    PsuMode,
 )
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.motors import XYZPolarStage
