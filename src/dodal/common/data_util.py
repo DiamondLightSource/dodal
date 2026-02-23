@@ -1,4 +1,4 @@
-import os
+from os.path import isfile
 from typing import Generic, TypeVar
 
 from pydantic import BaseModel
@@ -6,11 +6,17 @@ from pydantic import BaseModel
 TBaseModel = TypeVar("TBaseModel", bound=BaseModel)
 
 
-def load_json_file_to_class(
-    t: type[TBaseModel],
-    file: str,
-) -> TBaseModel:
-    if not os.path.isfile(file):
+def load_json_file_to_class(t: type[TBaseModel], file: str) -> TBaseModel:
+    """Load json file into a pydantic model class.
+
+    Args:
+        t (type[TBaseModel]): type of model to load a file into to.
+        file (str): The file to read.
+
+    Returns:
+        An instance of type t.
+    """
+    if not isfile(file):
         raise FileNotFoundError(f"Cannot find file {file}")
 
     with open(file) as f:
@@ -20,6 +26,12 @@ def load_json_file_to_class(
 
 
 def save_class_to_json_file(model: BaseModel, file: str) -> None:
+    """Save a pydantic model as a json file.
+
+    Args:
+        model (BaseModel): The pydantic model to save to json file.
+        file (str): The file path to save the model to.
+    """
     with open(file, "w") as f:
         f.write(model.model_dump_json())
 
@@ -27,9 +39,7 @@ def save_class_to_json_file(model: BaseModel, file: str) -> None:
 class JsonModelLoader(Generic[TBaseModel]):
     """Load a json file into a pre configured pydantic model."""
 
-    def __init__(
-        self, base_model: type[TBaseModel], default_file: str | None = None
-    ) -> None:
+    def __init__(self, base_model: type[TBaseModel], default_file: str | None = None):
         """Initialise configuration.
 
         Args:
