@@ -19,7 +19,8 @@ _TILT = "TILT"
 
 class Stage(StandardReadable, ABC):
     """For these devices, the following co-ordinates are typical but not enforced:
-    - z is horizontal & parallel to the direction of synchrotron particle travel (whence the x-rays direction)
+    - z is horizontal & parallel to the direction of synchrotron electrons.
+         ( Usually the x-rays have the same direction: But z is defined by the electrons )
     - y is vertical and antiparallel to the force of gravity
     - x is the cross product of y with z
 
@@ -308,7 +309,7 @@ class SixAxisGonioKappaPhi(XYZStage):
 
 
 class YZStage(Stage):
-    """Two-axis stage with an x motor and a y motor."""
+    """Two-axis stage with a y motor and a z motor."""
 
     def __init__(
         self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z
