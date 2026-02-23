@@ -54,7 +54,6 @@ def test_json_model_loader_with_default_file(
 def test_json_model_loader_with_no_file(
     load_json_model: JsonModelLoader[MyModel], tmp_file: str
 ) -> None:
-    load_json_model.default_file = None
     model = load_json_model(tmp_file)
     assert model.value == "test"
     assert model.number == 3
@@ -73,3 +72,10 @@ def test_json_model_loader_with_no_file_or_default_file(
         ),
     ):
         load_json_model()
+
+
+def test_json_model_loader_raise_error_if_invalid_file(
+    load_json_model: JsonModelLoader[MyModel],
+) -> None:
+    with pytest.raises(FileNotFoundError):
+        load_json_model("sdkgsk")
