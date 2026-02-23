@@ -1,4 +1,4 @@
-from dodal.common.data_util import load_json_file_to_class
+from dodal.common.data_util import JsonModelLoader
 from dodal.devices.beamlines import b07, b07_shared, i09
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
@@ -15,22 +15,19 @@ from tests.devices.electron_analyser.test_data import (
     TEST_VGSCIENTA_SEQUENCE,
 )
 
+B07BSpecsSequence = SpecsSequence[b07.LensMode, b07_shared.PsuMode]
+I09VGScientaSequence = VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy]
+
 TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 
 
-def b07_specs_test_sequence_loader() -> SpecsSequence[b07.LensMode, b07_shared.PsuMode]:
-    return load_json_file_to_class(
-        SpecsSequence[b07.LensMode, b07_shared.PsuMode], TEST_SPECS_SEQUENCE
-    )
+b07_specs_test_sequence_loader = JsonModelLoader[B07BSpecsSequence](
+    B07BSpecsSequence, TEST_SPECS_SEQUENCE
+)
 
-
-def i09_vgscienta_test_sequence_loader() -> VGScientaSequence[
-    i09.LensMode, i09.PsuMode, i09.PassEnergy
-]:
-    return load_json_file_to_class(
-        VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-        TEST_VGSCIENTA_SEQUENCE,
-    )
+i09_vgscienta_test_sequence_loader = JsonModelLoader[I09VGScientaSequence](
+    I09VGScientaSequence, TEST_VGSCIENTA_SEQUENCE
+)
 
 
 # Map to know what function to load in sequence an analyser driver should use.
