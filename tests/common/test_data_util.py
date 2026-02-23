@@ -26,30 +26,30 @@ def tmp_file(tmp_path, raw_data: dict) -> str:
 
 
 @pytest.fixture
-def json_model_loader(tmp_file: str) -> JsonModelLoader[MyModel]:
+def load_model(tmp_file: str) -> JsonModelLoader[MyModel]:
     return JsonModelLoader[MyModel](MyModel, default_file=tmp_file)
 
 
 def test_json_loader_with_default_file(
-    json_model_loader: JsonModelLoader[MyModel],
+    load_model: JsonModelLoader[MyModel],
 ) -> None:
-    model = json_model_loader()
+    model = load_model()
     assert model.value == "test"
     assert model.number == 3
 
 
 def test_json_loader_with_no_file(
-    json_model_loader: JsonModelLoader[MyModel], tmp_file: str
+    load_model: JsonModelLoader[MyModel], tmp_file: str
 ) -> None:
-    json_model_loader.default_file = None
-    model = json_model_loader(tmp_file)
+    load_model.default_file = None
+    model = load_model(tmp_file)
     assert model.value == "test"
     assert model.number == 3
 
 
 def test_json_loader_with_no_file_or_default_file(
-    json_model_loader: JsonModelLoader[MyModel],
+    load_model: JsonModelLoader[MyModel],
 ) -> None:
-    json_model_loader.default_file = None
+    load_model.default_file = None
     with pytest.raises(TypeError):
-        json_model_loader()
+        load_model()
