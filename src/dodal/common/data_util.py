@@ -1,4 +1,4 @@
-from os.path import isfile
+from os.path import isabs, isfile, join, split
 from typing import Protocol, TypeVar
 
 from pydantic import BaseModel
@@ -41,22 +41,30 @@ class JsonModelLoader(Protocol[TBaseModel]):
 
 
 def json_model_loader(
-    model: type[TBaseModel], default_file: str | None = None
+    model: type[TBaseModel],
+    default_file: str | None = None,
 ) -> JsonModelLoader[TBaseModel]:
     """Factory to create a function that loads a json file into a configured pydantic
     model and with an optional default file to use.
     """
+    default_path = None
+    if default_file is not None:
+        default_path, _ = split(default_file)
 
     def load_json(file: str | None = default_file) -> TBaseModel:
         """Load a json file and return it is as the configured pydantic model.
 
         Args:
             file (str, optional): The file to load into a pydantic class. If None
-            provided, use the configured default_file.
+            provided, use the configured default_file. If a relative file path is used,
+            it will be from the configured default file.
 
         Returns:
             An instance of the configurated pydantic base_model type.
         """
+        if file is not None and not isabs(file) and default_path is not None:
+            file = join(default_path, file)
+
         if file is None:
             raise RuntimeError(
                 f"{model.__name__} loader has no default file configured and no file was "

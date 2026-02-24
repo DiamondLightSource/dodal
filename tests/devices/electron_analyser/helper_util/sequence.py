@@ -19,11 +19,11 @@ TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 
 
 load_b07_specs_test_sequence = json_model_loader(
-    SpecsSequence[b07.LensMode, b07_shared.PsuMode], TEST_SPECS_SEQUENCE
+    SpecsSequence[b07.LensMode, b07_shared.PsuMode], default_file=TEST_SPECS_SEQUENCE
 )
 load_i09_vgscienta_test_sequence = json_model_loader(
     VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    TEST_VGSCIENTA_SEQUENCE,
+    default_file=TEST_VGSCIENTA_SEQUENCE,
 )
 
 

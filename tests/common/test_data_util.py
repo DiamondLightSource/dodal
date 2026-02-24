@@ -1,3 +1,5 @@
+from os.path import split
+
 import pytest
 from pydantic import BaseModel
 
@@ -65,10 +67,19 @@ def test_json_model_loader_with_default_file(
     assert model.number == 0
 
 
-def test_json_model_loader_with_file(
+def test_json_model_loader_with_abs_file_path(
     load_json_model_with_default: JsonModelLoader[MyModel], tmp_file: str
 ) -> None:
     model = load_json_model_with_default(tmp_file)
+    assert model.value == "test2"
+    assert model.number == 3
+
+
+def test_json_model_loader_with_relative_file_path(
+    load_json_model_with_default: JsonModelLoader[MyModel], tmp_file: str
+) -> None:
+    path, file = split(tmp_file)
+    model = load_json_model_with_default(file)
     assert model.value == "test2"
     assert model.number == 3
 
