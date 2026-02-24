@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import NamedTuple, Self
 
 import numpy as np
 from ophyd_async.core import (
@@ -181,6 +181,11 @@ class AngleWithPhase(NamedTuple):
     def unwrap(self) -> float:
         return self.offset + self.phase
 
+    def phase_distance(self, other: Self) -> float:
+        max_theta = max(self.phase, other.phase)
+        min_theta = min(self.phase, other.phase)
+        return min(max_theta - min_theta, min_theta + 360 - max_theta)
+
     @classmethod
     def offset_from_unwrapped(cls, unwrapped_deg: float) -> float:
         """Obtain the offset from the corresponding wrapped angle in degrees."""
@@ -238,3 +243,11 @@ class WrappedAxis(StandardReadable):
         current_position = AngleWithPhase.from_offset_and_phase(offset_and_phase)
         target_value = current_position.nearest_to_phase(value).unwrap()
         await self._real_motor().set(target_value)
+
+    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
+        """Obtain the shortest distance between theta2 and theta1 in degrees.
+        This will be the shortest distance in mod360 space (i.e. always <= 180 degrees).
+        """
+        return AngleWithPhase.wrap(theta1_deg).phase_distance(
+            AngleWithPhase.wrap(theta2_deg)
+        )
