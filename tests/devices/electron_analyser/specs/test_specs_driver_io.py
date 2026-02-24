@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import get_mock_put, init_devices, set_mock_value
+from ophyd_async.core import get_mock_put, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -12,28 +12,32 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.beamlines.b07 import LensMode, PsuMode
+from dodal.devices.beamlines.b07 import LensMode
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsAnalyserDriverIO,
+    SpecsDetector,
     SpecsRegion,
 )
-from dodal.testing.electron_analyser import create_driver
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
+    get_test_sequence,
 )
 
 
 @pytest.fixture
-async def sim_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
-    async with init_devices(mock=True):
-        sim_driver = create_driver(
-            SpecsAnalyserDriverIO[LensMode, PsuMode],
-            prefix="TEST:",
-        )
-    return sim_driver
+async def sim_driver(
+    b07b_specs150: SpecsDetector[LensMode, PsuMode],
+) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
+    return b07b_specs150.driver
+
+
+@pytest.fixture
+def sequence(sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode]):
+    return get_test_sequence(type(sim_driver))
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

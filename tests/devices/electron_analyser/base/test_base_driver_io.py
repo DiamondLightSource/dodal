@@ -2,31 +2,19 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import StrictEnum, init_devices
+from ophyd_async.core import StrictEnum
 
-from dodal.devices.beamlines import b07, i09
-from dodal.devices.electron_analyser.base import GenericAnalyserDriverIO
-from dodal.devices.electron_analyser.specs import (
-    SpecsAnalyserDriverIO,
+from dodal.devices.electron_analyser.base import (
+    GenericAnalyserDriverIO,
+    GenericElectronAnalyserDetector,
 )
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaAnalyserDriverIO,
-)
-from dodal.testing.electron_analyser import create_driver
 
 
-@pytest.fixture(
-    params=[
-        VGScientaAnalyserDriverIO[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-        SpecsAnalyserDriverIO[b07.LensMode, b07.PsuMode],
-    ]
-)
+@pytest.fixture
 async def sim_driver(
-    request: pytest.FixtureRequest,
+    sim_detector: GenericElectronAnalyserDetector,
 ) -> GenericAnalyserDriverIO:
-    async with init_devices(mock=True):
-        sim_driver = create_driver(request.param, prefix="TEST:")
-    return sim_driver
+    return sim_detector.driver  # type: ignore
 
 
 def test_driver_throws_error_with_wrong_lens_mode(
