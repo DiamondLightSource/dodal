@@ -53,12 +53,11 @@ def turbo_slit_x() -> Motor:
 
 
 @devices.factory()
-def turbo_slit_pmac() -> PmacIO:
+def turbo_slit_pmac(turbo_slit_x: Motor) -> PmacIO:
     """PMac controller using running fly scans with trajectory."""
-    motor = turbo_slit_x()
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-STEP-06:",
-        raw_motors=[motor],
+        raw_motors=[turbo_slit_x],
         coord_nums=[3],
     )
 
