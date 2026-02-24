@@ -10,7 +10,6 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_w
 
 from dodal.devices.hutch_shutter import (
     ShutterDemand,
-    ShutterNotSafeToOperateError,
     ShutterState,
 )
 
@@ -34,8 +33,8 @@ class ExperimentalShutter(StandardReadable, Movable[ShutterDemand]):
     def __init__(
         self, bl_prefix: str, shtr_infix: str = PSS_SHUTTER_1_SUFFIX, name: str = ""
     ) -> None:
+        self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
         with self.add_children_as_readables():
-            self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
             self.status = epics_signal_r(ShutterState, f"{bl_prefix}{shtr_infix}:STA")
             self.interlock = epics_signal_r(
                 InterlockState, f"{bl_prefix}{shtr_infix}:ILKSTA"
@@ -45,11 +44,6 @@ class ExperimentalShutter(StandardReadable, Movable[ShutterDemand]):
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
         if value == ShutterDemand.OPEN:
-            interlock_state = await self.interlock.get_value()
-            if not interlock_state:
-                raise ShutterNotSafeToOperateError(
-                    "Interlock state unknown - can not open shutter."
-                )
             await self.control.set(ShutterDemand.RESET, wait=True)
             await self.control.set(ShutterDemand.OPEN, wait=True)
             return await wait_for_value(
