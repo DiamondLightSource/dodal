@@ -16,6 +16,11 @@ class MyModel(BaseModel):
     number: float
 
 
+def assert_model(result: MyModel, expected: MyModel) -> None:
+    assert result.value == expected.value
+    assert result.number == expected.number
+
+
 @pytest.fixture
 def default_model() -> MyModel:
     return MyModel(value="test1", number=0)
@@ -51,12 +56,7 @@ def load_json_model_with_default_file_only(
     )
 
 
-def assert_model(result: MyModel, expected: MyModel) -> None:
-    assert result.value == expected.value
-    assert result.number == expected.number
-
-
-def test_json_model_loader_with_configured_default_file(
+def test_json_model_loader_with_configured_default_file_only(
     load_json_model_with_default_file_only: JsonModelLoader[MyModel],
     tmp_file: str,
     other_model: MyModel,
