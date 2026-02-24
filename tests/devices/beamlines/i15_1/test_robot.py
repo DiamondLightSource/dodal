@@ -42,9 +42,9 @@ async def test_puck_program_loaded_before_position_selected(robot: Robot) -> Non
     parent_mock = get_mock(robot)
 
     expected_calls = [
-        call.puck_load_program.put(ANY, wait=True),
-        call.puck_sel.put(ANY, wait=True),
-        call.pos_sel.put(ANY, wait=True),
+        call.puck_load_program.put(ANY),
+        call.puck_sel.put(ANY),
+        call.pos_sel.put(ANY),
     ]
 
     parent_mock.assert_has_calls(expected_calls, any_order=False)
