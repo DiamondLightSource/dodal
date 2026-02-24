@@ -1,4 +1,4 @@
-from dodal.common.data_util import json_model_loader
+from dodal.common.data_util import JsonLoaderConfig, json_model_loader
 from dodal.devices.beamlines import b07, b07_shared, i09
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
@@ -19,11 +19,12 @@ TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 
 
 load_b07_specs_test_sequence = json_model_loader(
-    SpecsSequence[b07.LensMode, b07_shared.PsuMode], default_file=TEST_SPECS_SEQUENCE
+    SpecsSequence[b07.LensMode, b07_shared.PsuMode],
+    JsonLoaderConfig.from_default_file(TEST_SPECS_SEQUENCE),
 )
 load_i09_vgscienta_test_sequence = json_model_loader(
     VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    default_file=TEST_VGSCIENTA_SEQUENCE,
+    JsonLoaderConfig.from_default_file(TEST_VGSCIENTA_SEQUENCE),
 )
 
 

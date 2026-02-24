@@ -40,36 +40,53 @@ class JsonModelLoader(Protocol[TBaseModel]):
     def __call__(self, file: str | None = None) -> TBaseModel: ...
 
 
+class JsonLoaderConfig(BaseModel):
+    default_path: str
+    default_file: str | None
+
+    @classmethod
+    def from_default_file(cls, default_file: str):
+        """Create instance by splitting path from file to set defaults."""
+        default_path, default_file = split(default_file)
+        return cls(default_path=default_path, default_file=default_file)
+
+    @classmethod
+    def from_default_path(cls, default_path: str):
+        """Create instance by only setting a default path."""
+        return cls(default_path=default_path, default_file=None)
+
+    def update_config_from_file(self, new_file: str) -> None:
+        """Update exisiting config to a new default file and path."""
+        self.default_path, self.default_file = split(new_file)
+
+
 def json_model_loader(
-    model: type[TBaseModel],
-    default_file: str | None = None,
+    model: type[TBaseModel], config: JsonLoaderConfig | None = None
 ) -> JsonModelLoader[TBaseModel]:
     """Factory to create a function that loads a json file into a configured pydantic
-    model and with an optional default file to use.
+    model and with optional configuration for default path and file to use.
     """
-    default_path = None
-    if default_file is not None:
-        default_path, _ = split(default_file)
 
-    def load_json(file: str | None = default_file) -> TBaseModel:
+    def load_json(file: str | None = None) -> TBaseModel:
         """Load a json file and return it is as the configured pydantic model.
 
         Args:
             file (str, optional): The file to load into a pydantic class. If None
-            provided, use the configured default_file. If a relative file path is used,
-            it will be from the configured default file.
+            provided, use the default_file from the configuration.
 
         Returns:
             An instance of the configurated pydantic base_model type.
         """
-        if file is not None and not isabs(file) and default_path is not None:
-            file = join(default_path, file)
-
         if file is None:
-            raise RuntimeError(
-                f"{model.__name__} loader has no default file configured and no file was "
-                "provided when trying to load in a model. "
-            )
+            if config is None or config.default_file is None:
+                raise RuntimeError(
+                    f"{model.__name__} loader has no default file configured "
+                    "and no file was provided."
+                )
+            file = config.default_file
+
+        if not isabs(file) and config is not None:
+            file = join(config.default_path, file)
         return load_json_file_to_class(model, file)
 
     return load_json
