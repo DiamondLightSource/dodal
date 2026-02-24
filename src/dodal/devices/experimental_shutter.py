@@ -34,11 +34,12 @@ class ExperimentalShutter(StandardReadable, Movable[ShutterDemand]):
     def __init__(
         self, bl_prefix: str, shtr_infix: str = PSS_SHUTTER_1_SUFFIX, name: str = ""
     ) -> None:
-        self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
-        self.status = epics_signal_r(ShutterState, f"{bl_prefix}{shtr_infix}:STA")
-        self.interlock = epics_signal_r(
-            InterlockState, f"{bl_prefix}{shtr_infix}:ILKSTA"
-        )
+        with self.add_children_as_readables():
+            self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
+            self.status = epics_signal_r(ShutterState, f"{bl_prefix}{shtr_infix}:STA")
+            self.interlock = epics_signal_r(
+                InterlockState, f"{bl_prefix}{shtr_infix}:ILKSTA"
+            )
         super().__init__(name)
 
     @AsyncStatus.wrap
