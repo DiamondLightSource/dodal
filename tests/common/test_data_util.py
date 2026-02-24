@@ -151,9 +151,7 @@ def test_json_model_loader_with_no_config(
     ):
         load_json_model_no_config()
 
-    with pytest.raises(
-        FileNotFoundError,
-    ):
+    with pytest.raises(FileNotFoundError):
         # Test using a relative path fails
         path, file = split(tmp_file)
         load_json_model_no_config(file)
