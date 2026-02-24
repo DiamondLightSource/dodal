@@ -186,10 +186,6 @@ class AngleWithPhase(NamedTuple):
         """Obtain the offset from the corresponding wrapped angle in degrees."""
         return round(unwrapped_deg // 360) * 360
 
-    def project_to_unwrapped(self, phase_deg: float) -> float:
-        """Return the supplied phase angle projected into the unwrapped space defined by our offset."""
-        return self.offset + phase_deg
-
     def nearest_to_phase(self, phase_deg: float) -> "AngleWithPhase":
         """Return the nearest angle to this one with the specified phase."""
         phase_deg = phase_deg % 360
