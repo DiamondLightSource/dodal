@@ -93,11 +93,11 @@ async def test_puck_picked_then_beam_placed(robot: Robot) -> None:
 
     calls = parent_mock.mock_calls
 
-    puck_program_loaded = calls.index(call.puck_load_program.put(ANY, wait=True))
-    puck_picked = calls.index(call.puck_pick.put(ANY, wait=True))
+    puck_program_loaded = calls.index(call.puck_load_program.put(ANY))
+    puck_picked = calls.index(call.puck_pick.put(ANY))
 
-    beam_program_loaded = calls.index(call.beam_load_program.put(ANY, wait=True))
-    beam_placed = calls.index(call.beam_place.put(ANY, wait=True))
+    beam_program_loaded = calls.index(call.beam_load_program.put(ANY))
+    beam_placed = calls.index(call.beam_place.put(ANY))
 
     assert puck_program_loaded < puck_picked < beam_program_loaded < beam_placed
 
