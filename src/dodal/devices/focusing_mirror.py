@@ -60,7 +60,7 @@ class SingleMirrorVoltage(Device):
 
     def __init__(self, prefix: str, name: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
-        self._setpoint_v = epics_signal_rw(int, prefix + "D")
+        self._setpoint_v = epics_signal_rw(int, prefix + "D", wait=False)
         self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
         super().__init__(name=name)
 
