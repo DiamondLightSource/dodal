@@ -16,7 +16,7 @@ devices.include(i05_shared_devices)
 
 
 @devices.factory()
-def exp_shutter() -> ExperimentalShutter:
+def nano_shutter() -> ExperimentalShutter:
     return ExperimentalShutter(f"{PREFIX.beamline_prefix}")
 
 
