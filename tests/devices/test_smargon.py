@@ -134,34 +134,34 @@ async def test_given_set_with_value_outside_motor_limit(
 async def test_given_set_with_single_value_then_that_motor_moves(smargon: Smargon):
     await smargon.set(CombinedMove(x=10))
 
-    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10)
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 
 async def test_given_set_with_none_then_that_motor_does_not_move(smargon: Smargon):
     await smargon.set(CombinedMove(x=10, y=None))
 
-    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10)
     get_mock_put(smargon.y.user_setpoint).assert_not_called()
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 
 async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
     await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
 
-    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
-    get_mock_put(smargon.y.user_setpoint).assert_called_once_with(20, wait=True)
-    get_mock_put(smargon.z.user_setpoint).assert_called_once_with(30, wait=True)
-    get_mock_put(smargon.omega.user_setpoint).assert_called_once_with(5, wait=True)
-    get_mock_put(smargon.chi.user_setpoint).assert_called_once_with(15, wait=True)
-    get_mock_put(smargon.phi.user_setpoint).assert_called_once_with(25, wait=True)
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10)
+    get_mock_put(smargon.y.user_setpoint).assert_called_once_with(20)
+    get_mock_put(smargon.z.user_setpoint).assert_called_once_with(30)
+    get_mock_put(smargon.omega.user_setpoint).assert_called_once_with(5)
+    get_mock_put(smargon.chi.user_setpoint).assert_called_once_with(15)
+    get_mock_put(smargon.phi.user_setpoint).assert_called_once_with(25)
 
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 
@@ -178,19 +178,19 @@ async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smarg
     await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
 
     assert len(parent.mock_calls) == 8
-    assert parent.mock_calls[0] == call.defer_move(DeferMoves.ON, wait=True)
+    assert parent.mock_calls[0] == call.defer_move(DeferMoves.ON)
     parent.assert_has_calls(
         [
-            call.x(10, wait=True),
-            call.y(20, wait=True),
-            call.z(30, wait=True),
-            call.omega(5, wait=True),
-            call.chi(15, wait=True),
-            call.phi(25, wait=True),
+            call.x(10),
+            call.y(20),
+            call.z(30),
+            call.omega(5),
+            call.chi(15),
+            call.phi(25),
         ],
         any_order=True,
     )
-    assert parent.mock_calls[-1] == call.defer_move(DeferMoves.OFF, wait=True)
+    assert parent.mock_calls[-1] == call.defer_move(DeferMoves.OFF)
 
 
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
@@ -201,7 +201,7 @@ async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon
         await smargon.set(CombinedMove(x=10))
 
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 
