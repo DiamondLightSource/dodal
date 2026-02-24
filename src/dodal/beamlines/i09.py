@@ -8,7 +8,7 @@ from dodal.devices.beamlines.i09.enums import LensMode, PassEnergy, PsuMode
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.experimental_shutter import ExperimentalShutter
+from dodal.devices.experimental_shutter import PSS_SHUTTER_2_SUFFIX, ExperimentalShutter
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.motors import XYZPolarAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -36,17 +36,17 @@ def synchrotron() -> Synchrotron:
 
 @devices.factory()
 def psi2() -> ExperimentalShutter:
-    return ExperimentalShutter(I_PREFIX.beamline_prefix, "-PS-SHTR-02")
+    return ExperimentalShutter(I_PREFIX.beamline_prefix, PSS_SHUTTER_2_SUFFIX)
 
 
 @devices.factory()
 def psj1() -> ExperimentalShutter:
-    return ExperimentalShutter(J_PREFIX.beamline_prefix, "-PS-SHTR-01")
+    return ExperimentalShutter(J_PREFIX.beamline_prefix)
 
 
 @devices.factory()
 def psj2() -> ExperimentalShutter:
-    return ExperimentalShutter(J_PREFIX.beamline_prefix, "-PS-SHTR-02")
+    return ExperimentalShutter(J_PREFIX.beamline_prefix, PSS_SHUTTER_2_SUFFIX)
 
 
 @devices.factory()

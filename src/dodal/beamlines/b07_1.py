@@ -25,7 +25,7 @@ devices.include(b07_shared_devices)
 
 
 @devices.factory()
-def exp_shutter() -> ExperimentalShutter:
+def expt_shutter() -> ExperimentalShutter:
     return ExperimentalShutter(f"{C_PREFIX.beamline_prefix}")
 
 

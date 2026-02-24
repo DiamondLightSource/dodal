@@ -14,6 +14,9 @@ from dodal.devices.hutch_shutter import (
     ShutterState,
 )
 
+PSS_SHUTTER_1_SUFFIX = "-PS-SHTR-01"
+PSS_SHUTTER_2_SUFFIX = "-PS-SHTR-02"
+
 
 class InterlockState(StrictEnum):
     FAILED = "Failed"
@@ -29,7 +32,7 @@ class ExperimentalShutter(StandardReadable, Movable[ShutterDemand]):
     """
 
     def __init__(
-        self, bl_prefix: str, shtr_infix: str = "-PS-SHTR-01", name: str = ""
+        self, bl_prefix: str, shtr_infix: str = PSS_SHUTTER_1_SUFFIX, name: str = ""
     ) -> None:
         self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
         self.status = epics_signal_r(ShutterState, f"{bl_prefix}{shtr_infix}:STA")
