@@ -36,6 +36,11 @@ class SourceSelector(StandardReadable, Movable[SelectedSource]):
             )
         super().__init__(name)
 
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        """Set name of the device and its children."""
+        super().set_name(name, child_name_separator=child_name_separator)
+        self.selected_source.set_name(name)
+
     @AsyncStatus.wrap
     async def set(self, value: SelectedSource):
         await self.selected_source.set(value)

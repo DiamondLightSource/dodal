@@ -71,6 +71,11 @@ class GenericFastShutter(
             self.shutter_state = epics_signal_rw(type(self.open_state), pv)
         super().__init__(name)
 
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        """Set name of the device and its children."""
+        super().set_name(name, child_name_separator=child_name_separator)
+        self.shutter_state.set_name(name)
+
 
 class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTypesT]):
     """A fast shutter device that handles the positions of two other fast shutters. The
@@ -153,3 +158,8 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
         )
         await inactive_shutter.set(inactive_shutter.close_state)
         await active_shutter.set(value)
+
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        """Set name of the device and its children."""
+        super().set_name(name, child_name_separator=child_name_separator)
+        self.shutter_state.set_name(name)

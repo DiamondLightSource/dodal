@@ -31,9 +31,7 @@ async def test_shutter_set_open_close_without_knowing_enum_values(
 
 
 async def test_shutter_read(shutter1: GenericFastShutter) -> None:
-    await assert_reading(
-        shutter1, {f"{shutter1.name}-shutter_state": partial_reading(InOut.IN)}
-    )
+    await assert_reading(shutter1, {shutter1.name: partial_reading(InOut.IN)})
 
 
 @pytest.fixture
@@ -139,7 +137,7 @@ async def test_dual_fast_shutter_read(
     )
     await assert_reading(
         dual_fast_shutter,
-        {f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN)}
+        {dual_fast_shutter.name: partial_reading(InOut.IN)}
         | shutter1_read
         | shutter2_read
         | source_selector_read,
