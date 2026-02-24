@@ -56,7 +56,7 @@ class JsonLoaderConfig(BaseModel):
         return cls(default_path=default_path, default_file=None)
 
     def update_config_from_file(self, new_file: str) -> None:
-        """Update exisiting config to a new default file and path."""
+        """Update exisiting config by splitting path from file to set new defaults."""
         self.default_path, self.default_file = split(new_file)
 
 
@@ -72,7 +72,7 @@ def json_model_loader(
 
         Args:
             file (str, optional): The file to load into a pydantic class. If None
-            provided, use the default_file from the configuration.
+            provided, use the default_file from the config.
 
         Returns:
             An instance of the configurated pydantic base_model type.
