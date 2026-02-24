@@ -8,6 +8,7 @@ from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
     J09_PHASE_POLY_DEG_COLUMNS,
 )
+from dodal.devices.experimental_shutter import ExperimentalShutter
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
@@ -31,8 +32,14 @@ PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
 
 BL = get_beamline_name("i09-2-shared")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
+K_PREFIX = BeamlinePrefix(BL, suffix="K")
 
 devices = DeviceManager()
+
+
+@devices.factory()
+def psk1() -> ExperimentalShutter:
+    return ExperimentalShutter(K_PREFIX.beamline_prefix)
 
 
 @devices.factory()
