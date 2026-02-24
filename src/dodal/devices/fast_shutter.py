@@ -67,7 +67,7 @@ class GenericFastShutter(
     ):
         self.open_state = open_state
         self.close_state = close_state
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_state = epics_signal_rw(type(self.open_state), pv)
         super().__init__(name)
 
@@ -109,7 +109,7 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
         self._shutter2_ref = Reference(shutter2)
         self._selected_shutter_ref = Reference(selected_source)
 
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_state = derived_signal_rw(
                 self._read_shutter_state,
                 self._set_shutter_state,

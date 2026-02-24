@@ -1,7 +1,13 @@
 from typing import TypeVar
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum, soft_signal_rw
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    StandardReadableFormat,
+    StrictEnum,
+    soft_signal_rw,
+)
 
 
 class SelectedSource(StrictEnum):
@@ -30,7 +36,7 @@ class SourceSelector(StandardReadable, Movable[SelectedSource]):
     """
 
     def __init__(self, name: str = ""):
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.selected_source = soft_signal_rw(
                 SelectedSource, SelectedSource.SOURCE1
             )
