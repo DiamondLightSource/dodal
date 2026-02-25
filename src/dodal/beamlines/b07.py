@@ -9,7 +9,11 @@ from dodal.devices.beamlines.b07 import (
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.experimental_shutter import PSS_SHUTTER_2_SUFFIX, ExperimentalShutter
+from dodal.devices.hutch_shutter import (
+    EXP_SHUTTER_2_INFIX,
+    HutchInterlock,
+    HutchShutter,
+)
 from dodal.devices.motors import XYZPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.log import set_beamline as set_log_beamline
@@ -25,13 +29,19 @@ devices.include(b07_shared_devices)
 
 
 @devices.factory()
-def pss_shutter1() -> ExperimentalShutter:
-    return ExperimentalShutter(f"{B_PREFIX.beamline_prefix}")
+def pss_shutter1() -> HutchShutter:
+    return HutchShutter(
+        HutchInterlock(B_PREFIX.beamline_prefix), B_PREFIX.beamline_prefix
+    )
 
 
 @devices.factory()
-def pss_shutter2() -> ExperimentalShutter:
-    return ExperimentalShutter(f"{B_PREFIX.beamline_prefix}", PSS_SHUTTER_2_SUFFIX)
+def pss_shutter2() -> HutchShutter:
+    return HutchShutter(
+        HutchInterlock(B_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
+        B_PREFIX.beamline_prefix,
+        EXP_SHUTTER_2_INFIX,
+    )
 
 
 @devices.factory()
@@ -49,7 +59,7 @@ def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
 
 # CAM:IMAGE will fail to connect outside the beamline network,
 # see https://github.com/DiamondLightSource/dodal/issues/1852
-@devices.factory()
+@devices.factory(skip=True)
 def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{B_PREFIX.beamline_prefix}-EA-DET-01:CAM:",

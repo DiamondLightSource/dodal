@@ -2,7 +2,7 @@ from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05 import I05Goniometer
-from dodal.devices.experimental_shutter import ExperimentalShutter
+from dodal.devices.hutch_shutter import HutchInterlock, HutchShutter
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -17,8 +17,8 @@ devices.include(i05_shared_devices)
 
 
 @devices.factory()
-def hr_shutter() -> ExperimentalShutter:
-    return ExperimentalShutter(f"{PREFIX.beamline_prefix}")
+def hr_shutter() -> HutchShutter:
+    return HutchShutter(HutchInterlock(PREFIX.beamline_prefix), PREFIX.beamline_prefix)
 
 
 @devices.factory()

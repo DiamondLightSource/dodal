@@ -6,11 +6,16 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.hutch_shutter import (
+    HutchInterlock,
+    HutchInterlockPSS,
     HutchShutter,
+    InterlockState,
     ShutterDemand,
     ShutterNotSafeToOperateError,
     ShutterState,
@@ -18,9 +23,23 @@ from dodal.devices.hutch_shutter import (
 
 
 @pytest.fixture
-async def fake_shutter() -> HutchShutter:
-    shutter = HutchShutter("", name="fake_shutter")
-    await shutter.connect(mock=True)
+async def interlock_pss() -> HutchInterlockPSS:
+    async with init_devices(mock=True):
+        interlock_pss = HutchInterlockPSS(bl_prefix="TEST")
+    return interlock_pss
+
+
+@pytest.fixture
+async def interlock() -> HutchInterlock:
+    async with init_devices(mock=True):
+        interlock_pss = HutchInterlock(bl_prefix="TEST")
+    return interlock_pss
+
+
+@pytest.fixture
+async def fake_shutter(interlock_pss: HutchInterlockPSS) -> HutchShutter:
+    async with init_devices(mock=True):
+        shutter = HutchShutter(interlock=interlock_pss, bl_prefix="TEST")
 
     def set_status(value: ShutterDemand, *args, **kwargs):
         value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
@@ -33,6 +52,68 @@ async def fake_shutter() -> HutchShutter:
 
 def test_shutter_can_be_created(fake_shutter: HutchShutter):
     assert isinstance(fake_shutter, HutchShutter)
+
+
+async def test_interlock_pss_readable(interlock_pss: HutchInterlockPSS):
+    await assert_reading(
+        interlock_pss,
+        {
+            f"{interlock_pss.name}-status": partial_reading(0.0),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "readback, expected_state",
+    [
+        (0.0, True),
+        (1.0, False),
+        (7.0, False),
+    ],
+)
+async def test_interlock_pss_shutter_safe_to_operate_logic(
+    interlock_pss: HutchInterlockPSS,
+    readback: float,
+    expected_state: bool,
+):
+    set_mock_value(interlock_pss.status, readback)
+    assert await interlock_pss.shutter_safe_to_operate() is expected_state
+
+
+async def test_interlock_readable(interlock: HutchInterlock):
+    await assert_reading(
+        interlock,
+        {
+            f"{interlock.name}-status": partial_reading(InterlockState.FAILED),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "readback, expected_state",
+    [
+        (InterlockState.DISARMED, False),
+        (InterlockState.OK, True),
+        (InterlockState.FAILED, True),
+    ],
+)
+async def test_interlock_shutter_safe_to_operate_logic(
+    interlock: HutchInterlock,
+    readback: float,
+    expected_state: bool,
+):
+    set_mock_value(interlock.status, readback)
+    assert await interlock.shutter_safe_to_operate() is expected_state
+
+
+async def test_shutter_readable(fake_shutter: HutchShutter):
+    await assert_reading(
+        fake_shutter,
+        {
+            f"{fake_shutter.interlock.name}-status": partial_reading(0.0),
+            f"{fake_shutter.name}-status": partial_reading(ShutterState.FAULT),
+        },
+    )
 
 
 async def test_shutter_raises_error_on_set_if_hutch_not_interlocked_on_open(
@@ -77,12 +158,8 @@ async def test_shutter_operations(
     run_engine(bps.abs_set(fake_shutter, demand, wait=True))
 
     assert await fake_shutter.status.get_value() == expected_state
-
-    call_list = []
-    for i in expected_calls:
-        call_list.append(call(i, wait=True))
     mock_shutter_control = get_mock_put(fake_shutter.control)
-    mock_shutter_control.assert_has_calls(call_list)
+    mock_shutter_control.assert_has_calls([call(i, wait=True) for i in expected_calls])
 
 
 @patch("dodal.devices.hutch_shutter.LOGGER")

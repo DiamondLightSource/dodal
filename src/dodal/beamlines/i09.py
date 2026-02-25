@@ -8,8 +8,12 @@ from dodal.devices.beamlines.i09.enums import LensMode, PassEnergy, PsuMode
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.experimental_shutter import PSS_SHUTTER_2_SUFFIX, ExperimentalShutter
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
+from dodal.devices.hutch_shutter import (
+    EXP_SHUTTER_2_INFIX,
+    HutchInterlock,
+    HutchShutter,
+)
 from dodal.devices.motors import XYZPolarAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
@@ -35,18 +39,29 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def psi2() -> ExperimentalShutter:
-    return ExperimentalShutter(I_PREFIX.beamline_prefix, PSS_SHUTTER_2_SUFFIX)
+def psi2() -> HutchShutter:
+    return HutchShutter(
+        HutchInterlock(I_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
+        I_PREFIX.beamline_prefix,
+        EXP_SHUTTER_2_INFIX,
+    )
 
 
 @devices.factory()
-def psj1() -> ExperimentalShutter:
-    return ExperimentalShutter(J_PREFIX.beamline_prefix)
+def psj1() -> HutchShutter:
+    return HutchShutter(
+        HutchInterlock(J_PREFIX.beamline_prefix),
+        J_PREFIX.beamline_prefix,
+    )
 
 
 @devices.factory()
-def psj2() -> ExperimentalShutter:
-    return ExperimentalShutter(J_PREFIX.beamline_prefix, PSS_SHUTTER_2_SUFFIX)
+def psj2() -> HutchShutter:
+    return HutchShutter(
+        HutchInterlock(J_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
+        J_PREFIX.beamline_prefix,
+        EXP_SHUTTER_2_INFIX,
+    )
 
 
 @devices.factory()

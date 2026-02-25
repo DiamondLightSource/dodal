@@ -8,7 +8,7 @@ from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
     J09_PHASE_POLY_DEG_COLUMNS,
 )
-from dodal.devices.experimental_shutter import ExperimentalShutter
+from dodal.devices.hutch_shutter import HutchInterlock, HutchShutter
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
@@ -38,8 +38,10 @@ devices = DeviceManager()
 
 
 @devices.factory()
-def psk1() -> ExperimentalShutter:
-    return ExperimentalShutter(K_PREFIX.beamline_prefix)
+def psk1() -> HutchShutter:
+    return HutchShutter(
+        HutchInterlock(K_PREFIX.beamline_prefix), K_PREFIX.beamline_prefix
+    )
 
 
 @devices.factory()
