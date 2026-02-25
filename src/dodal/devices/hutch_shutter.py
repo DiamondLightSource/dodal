@@ -20,7 +20,7 @@ HUTCH_SAFE_FOR_OPERATIONS = 0  # Hutch is locked and can't be entered
 PSS_SHUTTER_SUFFIX = "-PS-IOC-01:M14:LOP"
 EXP_SHUTTER_1_INFIX = "-PS-SHTR-01"
 EXP_SHUTTER_2_INFIX = "-PS-SHTR-02"
-INTERLOCK_SUFFIX = ":ILKSTA"
+EXP_INTERLOCK_SUFFIX = ":ILKSTA"
 
 # Enable to allow testing when the beamline is down, do not change in production!
 TEST_MODE = False
@@ -59,6 +59,20 @@ class BaseHutchInterlock(ABC, StandardReadable):
     status: SignalR[float | EnumTypes]
     bl_prefix: str
 
+    def __init__(
+        self,
+        signal_type: type[EnumTypes] | type[float],
+        bl_prefix: str,
+        interlock_infix: str,
+        interlock_suffix: str,
+        name: str = "",
+    ) -> None:
+        self.bl_prefix = bl_prefix
+        pv_address = f"{bl_prefix}{interlock_infix}{interlock_suffix}"
+        with self.add_children_as_readables():
+            self.status = epics_signal_r(signal_type, pv_address)
+        super().__init__(name)
+
     @abstractmethod
     async def shutter_safe_to_operate(self) -> bool:
         """Abstract method to define if interlock allows shutter to operate."""
@@ -71,15 +85,16 @@ class HutchInterlock(BaseHutchInterlock):
         self,
         bl_prefix: str,
         shtr_infix: str = EXP_SHUTTER_1_INFIX,
-        interlock_suffix: str = INTERLOCK_SUFFIX,
+        interlock_suffix: str = EXP_INTERLOCK_SUFFIX,
         name: str = "",
     ) -> None:
-        self.bl_prefix = bl_prefix
-        with self.add_children_as_readables():
-            self.status = epics_signal_r(
-                InterlockState, f"{bl_prefix}{shtr_infix}{interlock_suffix}"
-            )
-        super().__init__(name)
+        super().__init__(
+            signal_type=InterlockState,
+            bl_prefix=bl_prefix,
+            interlock_infix=shtr_infix,
+            interlock_suffix=interlock_suffix,
+            name=name,
+        )
 
     async def shutter_safe_to_operate(self) -> bool:
         _status = await self.status.get_value()
@@ -96,12 +111,13 @@ class HutchInterlockPSS(BaseHutchInterlock):
         interlock_suffix: str = PSS_SHUTTER_SUFFIX,
         name: str = "",
     ) -> None:
-        self.bl_prefix = bl_prefix
-        with self.add_children_as_readables():
-            self.status = epics_signal_r(
-                float, f"{bl_prefix}{shtr_infix}{interlock_suffix}"
-            )
-        super().__init__(name)
+        super().__init__(
+            signal_type=float,
+            bl_prefix=bl_prefix,
+            interlock_infix=shtr_infix,
+            interlock_suffix=interlock_suffix,
+            name=name,
+        )
 
     # TODO replace with read
     # See https://github.com/DiamondLightSource/dodal/issues/651
