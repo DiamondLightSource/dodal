@@ -50,7 +50,7 @@ class SnapshotWithGrid(MJPG):
         )
 
         path = path_join(directory_str, f"{filename_str}_outer_overlay.{IMG_FORMAT}")
-        await self.last_path_outer.set(path, wait=True)
+        await self.last_path_outer.set(path)
         LOGGER.info(f"Saving grid outer edge at {path}")
         await asyncio_save_image(image, path)
 
@@ -59,6 +59,6 @@ class SnapshotWithGrid(MJPG):
         )
 
         path = path_join(directory_str, f"{filename_str}_grid_overlay.{IMG_FORMAT}")
-        await self.last_path_full_overlay.set(path, wait=True)
+        await self.last_path_full_overlay.set(path)
         LOGGER.info(f"Saving full grid overlay at {path}")
         await asyncio_save_image(image, path)
