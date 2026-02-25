@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import StrEnum
 
 from ophyd_async.core import (
     StandardReadable,
@@ -9,13 +9,13 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 
 
-class Prefix(str, Enum):
+class Prefix(StrEnum):
     STATUS = "CS-CS-MSTAT-01:"
     TOP_UP = "SR-CS-FILL-01:"
     SIGNAL = "SR-DI-DCCT-01:"
 
 
-class Suffix(str, Enum):
+class Suffix(StrEnum):
     SIGNAL = "SIGNAL"
     MODE = "MODE"
     USER_COUNTDOWN = "USERCOUNTDN"
