@@ -35,8 +35,8 @@ def test_image_array():
     )
 
 
-@patch("dodal.devices.beamlines.i04.beam_centre.cv2.threshold")
-@patch("dodal.devices.beamlines.i04.beam_centre.convert_to_gray_and_blur")
+@patch("dodal.devices.beamlines.oav.beam_centre.beam_centre.cv2.threshold")
+@patch("dodal.devices.beamlines.oav.beam_centre.beam_centre.convert_to_gray_and_blur")
 async def test_convert_image_to_binary_calls_threshold_twice(
     mock_convert, mock_threshold
 ):
@@ -60,8 +60,8 @@ async def test_convert_image_to_binary_calls_threshold_twice(
     assert second_call_args[1] == 147
 
 
-@patch("dodal.devices.beamlines.i04.beam_centre.cv2.findContours")
-@patch("dodal.devices.beamlines.i04.beam_centre.cv2.fitEllipse")
+@patch("dodal.devices.beamlines.oav.beam_centre.beam_centre.cv2.findContours")
+@patch("dodal.devices.beamlines.oav.beam_centre.beam_centre.cv2.fitEllipse")
 async def test_fit_ellipse_good_params(
     fit_ellipse: MagicMock,
     find_contours_mock: MagicMock,
@@ -95,7 +95,7 @@ async def test_fit_ellipse_raises_error_if_not_enough_image_points(
         ],  # 4 points (square)
     ],
 )
-@patch("dodal.devices.beamlines.i04.beam_centre.cv2.findContours")
+@patch("dodal.devices.beamlines.oav.beam_centre.beam_centre.cv2.findContours")
 async def test_fit_ellipse_raises_error_if_not_enough_contour_points(
     find_contours_mock: MagicMock,
     centre_device: CentreEllipseMethod,
@@ -108,8 +108,10 @@ async def test_fit_ellipse_raises_error_if_not_enough_contour_points(
         await centre_device.trigger()
 
 
-@patch("dodal.devices.beamlines.i04.beam_centre.CentreEllipseMethod._fit_ellipse")
-@patch("dodal.devices.beamlines.i04.beam_centre.convert_image_to_binary")
+@patch(
+    "dodal.devices.beamlines.oav.beam_centre.beam_centre.CentreEllipseMethod._fit_ellipse"
+)
+@patch("dodal.devices.beamlines.oav.beam_centre.beam_centre.convert_image_to_binary")
 async def test_trigger_converts_to_binary_then_finds_ellipse(
     mock_convert_to_binary: MagicMock,
     mock_fit_ellipse: MagicMock,
