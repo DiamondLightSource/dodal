@@ -92,12 +92,15 @@ class HutchInterlockPSS(BaseHutchInterlock):
     def __init__(
         self,
         bl_prefix: str,
+        shtr_infix: str = "",
         interlock_suffix: str = PSS_SHUTTER_SUFFIX,
         name: str = "",
     ) -> None:
         self.bl_prefix = bl_prefix
         with self.add_children_as_readables():
-            self.status = epics_signal_r(float, bl_prefix + interlock_suffix)
+            self.status = epics_signal_r(
+                float, f"{bl_prefix}{shtr_infix}{interlock_suffix}"
+            )
         super().__init__(name)
 
     # TODO replace with read
