@@ -39,9 +39,7 @@ devices = DeviceManager()
 
 @devices.factory()
 def psk1() -> HutchShutter:
-    return HutchShutter(
-        HutchInterlock(K_PREFIX.beamline_prefix), K_PREFIX.beamline_prefix
-    )
+    return HutchShutter(HutchInterlock(K_PREFIX.beamline_prefix))
 
 
 @devices.factory()

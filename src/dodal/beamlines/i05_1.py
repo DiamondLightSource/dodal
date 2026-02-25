@@ -17,7 +17,7 @@ devices.include(i05_shared_devices)
 
 @devices.factory()
 def nano_shutter() -> HutchShutter:
-    return HutchShutter(HutchInterlock(PREFIX.beamline_prefix), PREFIX.beamline_prefix)
+    return HutchShutter(HutchInterlock(PREFIX.beamline_prefix))
 
 
 @devices.factory

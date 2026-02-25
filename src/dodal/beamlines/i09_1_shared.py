@@ -22,9 +22,7 @@ devices = DeviceManager()
 
 @devices.factory()
 def psi1() -> HutchShutter:
-    return HutchShutter(
-        HutchInterlock(I_PREFIX.beamline_prefix), I_PREFIX.beamline_prefix
-    )
+    return HutchShutter(HutchInterlock(I_PREFIX.beamline_prefix))
 
 
 @devices.factory()

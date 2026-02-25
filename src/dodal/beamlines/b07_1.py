@@ -26,9 +26,7 @@ devices.include(b07_shared_devices)
 
 @devices.factory()
 def pss_shutter1() -> HutchShutter:
-    return HutchShutter(
-        HutchInterlock(C_PREFIX.beamline_prefix), C_PREFIX.beamline_prefix
-    )
+    return HutchShutter(HutchInterlock(C_PREFIX.beamline_prefix))
 
 
 @devices.factory()

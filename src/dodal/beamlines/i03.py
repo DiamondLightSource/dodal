@@ -266,9 +266,7 @@ def sample_shutter() -> ZebraShutter:
 
 @devices.factory()
 def hutch_shutter() -> HutchShutter:
-    return HutchShutter(
-        HutchInterlockPSS(PREFIX.beamline_prefix), PREFIX.beamline_prefix
-    )
+    return HutchShutter(HutchInterlockPSS(PREFIX.beamline_prefix))
 
 
 @devices.factory()

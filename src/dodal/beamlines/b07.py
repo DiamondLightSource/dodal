@@ -30,17 +30,14 @@ devices.include(b07_shared_devices)
 
 @devices.factory()
 def pss_shutter1() -> HutchShutter:
-    return HutchShutter(
-        HutchInterlock(B_PREFIX.beamline_prefix), B_PREFIX.beamline_prefix
-    )
+    return HutchShutter(HutchInterlock(B_PREFIX.beamline_prefix))
 
 
 @devices.factory()
 def pss_shutter2() -> HutchShutter:
     return HutchShutter(
         HutchInterlock(B_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
-        B_PREFIX.beamline_prefix,
-        EXP_SHUTTER_2_INFIX,
+        shtr_infix=EXP_SHUTTER_2_INFIX,
     )
 
 

@@ -22,9 +22,7 @@ devices = DeviceManager()
 @devices.factory()
 def shutter() -> HutchShutter:
     """Real experiment shutter device for I19."""
-    return HutchShutter(
-        HutchInterlockPSS(PREFIX.beamline_prefix), PREFIX.beamline_prefix
-    )
+    return HutchShutter(HutchInterlockPSS(PREFIX.beamline_prefix))
 
 
 @devices.factory()

@@ -57,6 +57,7 @@ EnumTypesT = TypeVar("EnumTypesT", bound=EnumTypes)
 
 class BaseHutchInterlock(ABC, StandardReadable):
     status: SignalR[float | EnumTypes]
+    bl_prefix: str
 
     @abstractmethod
     async def shutter_safe_to_operate(self) -> bool:
@@ -64,7 +65,7 @@ class BaseHutchInterlock(ABC, StandardReadable):
 
 
 class HutchInterlock(BaseHutchInterlock):
-    """Device to check the interlock status of the hutch using  ILKSTA pv suffix."""
+    """Device to check interlock status of the hutch using ILKSTA shutter pv suffix."""
 
     def __init__(
         self,
@@ -73,6 +74,7 @@ class HutchInterlock(BaseHutchInterlock):
         interlock_suffix: str = INTERLOCK_SUFFIX,
         name: str = "",
     ) -> None:
+        self.bl_prefix = bl_prefix
         with self.add_children_as_readables():
             self.status = epics_signal_r(
                 InterlockState, f"{bl_prefix}{shtr_infix}{interlock_suffix}"
@@ -93,6 +95,7 @@ class HutchInterlockPSS(BaseHutchInterlock):
         interlock_suffix: str = PSS_SHUTTER_SUFFIX,
         name: str = "",
     ) -> None:
+        self.bl_prefix = bl_prefix
         with self.add_children_as_readables():
             self.status = epics_signal_r(float, bl_prefix + interlock_suffix)
         super().__init__(name)
@@ -127,10 +130,12 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
     def __init__(
         self,
         interlock: BaseHutchInterlock,
-        bl_prefix: str,
+        bl_prefix: str = "",
         shtr_infix: str = EXP_SHUTTER_1_INFIX,
         name: str = "",
     ) -> None:
+        if not bl_prefix:
+            bl_prefix = interlock.bl_prefix
         self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
         with self.add_children_as_readables():
             self.status = epics_signal_r(ShutterState, f"{bl_prefix}{shtr_infix}:STA")

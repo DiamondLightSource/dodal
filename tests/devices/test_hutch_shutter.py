@@ -39,7 +39,7 @@ async def interlock() -> HutchInterlock:
 @pytest.fixture
 async def fake_shutter(interlock_pss: HutchInterlockPSS) -> HutchShutter:
     async with init_devices(mock=True):
-        shutter = HutchShutter(interlock=interlock_pss, bl_prefix="TEST")
+        shutter = HutchShutter(interlock=interlock_pss)
 
     def set_status(value: ShutterDemand, *args, **kwargs):
         value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
@@ -159,7 +159,7 @@ async def test_shutter_operations(
 
     assert await fake_shutter.status.get_value() == expected_state
     mock_shutter_control = get_mock_put(fake_shutter.control)
-    mock_shutter_control.assert_has_calls([call(i, wait=True) for i in expected_calls])
+    mock_shutter_control.assert_has_calls([call(i) for i in expected_calls])
 
 
 @patch("dodal.devices.hutch_shutter.LOGGER")

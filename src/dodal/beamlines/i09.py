@@ -42,25 +42,20 @@ def synchrotron() -> Synchrotron:
 def psi2() -> HutchShutter:
     return HutchShutter(
         HutchInterlock(I_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
-        I_PREFIX.beamline_prefix,
-        EXP_SHUTTER_2_INFIX,
+        shtr_infix=EXP_SHUTTER_2_INFIX,
     )
 
 
 @devices.factory()
 def psj1() -> HutchShutter:
-    return HutchShutter(
-        HutchInterlock(J_PREFIX.beamline_prefix),
-        J_PREFIX.beamline_prefix,
-    )
+    return HutchShutter(HutchInterlock(J_PREFIX.beamline_prefix))
 
 
 @devices.factory()
 def psj2() -> HutchShutter:
     return HutchShutter(
         HutchInterlock(J_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
-        J_PREFIX.beamline_prefix,
-        EXP_SHUTTER_2_INFIX,
+        shtr_infix=EXP_SHUTTER_2_INFIX,
     )
 
 
