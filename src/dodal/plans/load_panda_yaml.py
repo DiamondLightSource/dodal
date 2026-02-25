@@ -1,6 +1,6 @@
 from ophyd_async.core import YamlSettingsProvider
-from ophyd_async.fastcs.panda import HDFPanda
-from ophyd_async.plan_stubs import apply_panda_settings, retrieve_settings
+from ophyd_async.fastcs.panda import HDFPanda, apply_panda_settings
+from ophyd_async.plan_stubs import retrieve_settings
 
 
 def load_panda_from_yaml(yaml_directory: str, yaml_file_name: str, panda: HDFPanda):
