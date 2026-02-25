@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
 
-from dodal.devices.beamlines.i04.beam_centre import (
+from dodal.devices.oav.beam_centre.beam_centre import (
     CentreEllipseMethod,
     convert_image_to_binary,
     get_roi,
