@@ -2,10 +2,18 @@ import asyncio
 import math
 from abc import ABC
 
-from ophyd_async.core import SignalRW, StandardReadable, derived_signal_rw
+from ophyd_async.core import (
+    SignalRW,
+    StandardReadable,
+    derived_signal_rw,
+)
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
+from dodal.common.maths import (
+    WrappedAxis,
+    rotate_clockwise,
+    rotate_counter_clockwise,
+)
 
 _X, _Y, _Z = "X", "Y", "Z"
 
@@ -102,7 +110,10 @@ class XYZOmegaStage(XYZStage):
         omega_infix: str = _OMEGA,
     ) -> None:
         with self.add_children_as_readables():
-            self.omega = Motor(prefix + omega_infix)
+            real_motor = Motor(prefix + omega_infix)
+            self.omega = real_motor
+            self.omega_axis = WrappedAxis(self.omega)
+
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
