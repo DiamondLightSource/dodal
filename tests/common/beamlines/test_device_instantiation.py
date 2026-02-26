@@ -12,6 +12,7 @@ def follows_bluesky_protocols(obj: Any) -> bool:
     return any(isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
 
 
+# @pytest.mark.timeout(10)
 @pytest.mark.parametrize(
     "module_and_devices_for_beamline",
     set(all_beamline_modules()),

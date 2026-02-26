@@ -73,9 +73,7 @@ def path_provider():
 
 @devices.factory()
 def stage() -> XThetaStage:
-    return XThetaStage(
-        f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
-    )
+    return XThetaStage(f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x="M1", theta="M2")
 
 
 @devices.factory()

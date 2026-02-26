@@ -8,7 +8,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
-from dodal.devices.motors import SixAxisGonio
+from dodal.devices.motors import XYZOmegaKappaPhiStage
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.positioner import Positioner1D
 from dodal.devices.zebra.zebra import Zebra
@@ -73,8 +73,8 @@ def shutter() -> ZebraShutter:
 
 
 @devices.factory()
-def gonio() -> SixAxisGonio:
-    return SixAxisGonio(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
+def gonio() -> XYZOmegaKappaPhiStage:
+    return XYZOmegaKappaPhiStage(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
 
 
 @devices.factory()
