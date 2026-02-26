@@ -6,7 +6,6 @@ from dodal.devices.beamlines import b07, b07_shared, i09
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     EnergyMode,
-    GenericRegion,
     GenericSequence,
     TAbstractBaseRegion,
     to_binding_energy,
@@ -93,7 +92,7 @@ def test_region_kinetic_and_binding_energy(
 @pytest.mark.parametrize("copy", [True, False])
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
-    region: GenericRegion, field: str, copy: bool
+    region: AbstractBaseRegion, field: str, copy: bool
 ) -> None:
     excitation_energy = 100
     conversion_func_map = {
@@ -135,7 +134,7 @@ def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
 
 @pytest.mark.parametrize("copy", [True, False])
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-def test_region_prepare_for_epics(region: GenericRegion, copy: bool) -> None:
+def test_region_prepare_for_epics(region: AbstractBaseRegion, copy: bool) -> None:
     # Patch switch_energy_mode so we can spy on if it was called while also returning
     # true function return value
     with patch.object(

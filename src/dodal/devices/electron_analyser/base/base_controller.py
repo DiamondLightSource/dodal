@@ -5,11 +5,11 @@ from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.base.base_driver_io import (
-    GenericAnalyserDriverIO,
+    AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
-    GenericRegion,
+    AbstractBaseRegion,
     TAbstractBaseRegion,
 )
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
@@ -77,7 +77,7 @@ class ElectronAnalyserController(
 
 
 GenericElectronAnalyserController = ElectronAnalyserController[
-    GenericAnalyserDriverIO, GenericRegion
+    AbstractAnalyserDriverIO, AbstractBaseRegion
 ]
 TElectronAnalyserController = TypeVar(
     "TElectronAnalyserController", bound=ElectronAnalyserController

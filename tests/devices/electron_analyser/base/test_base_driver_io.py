@@ -5,7 +5,7 @@ from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum
 
 from dodal.devices.electron_analyser.base import (
-    GenericAnalyserDriverIO,
+    AbstractAnalyserDriverIO,
     GenericElectronAnalyserDetector,
 )
 
@@ -13,12 +13,12 @@ from dodal.devices.electron_analyser.base import (
 @pytest.fixture
 async def sim_driver(
     sim_detector: GenericElectronAnalyserDetector,
-) -> GenericAnalyserDriverIO:
+) -> AbstractAnalyserDriverIO:
     return sim_detector.driver  # type: ignore
 
 
 def test_driver_throws_error_with_wrong_lens_mode(
-    sim_driver: GenericAnalyserDriverIO,
+    sim_driver: AbstractAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class LensModeTestEnum(StrictEnum):
@@ -31,7 +31,7 @@ def test_driver_throws_error_with_wrong_lens_mode(
 
 
 def test_driver_throws_error_with_wrong_acquisition_mode(
-    sim_driver: GenericAnalyserDriverIO,
+    sim_driver: AbstractAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class AcquisitionModeTestEnum(StrictEnum):
@@ -44,7 +44,7 @@ def test_driver_throws_error_with_wrong_acquisition_mode(
 
 
 def test_driver_throws_error_with_wrong_psu_mode(
-    sim_driver: GenericAnalyserDriverIO,
+    sim_driver: AbstractAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class PsuModeTestEnum(StrictEnum):

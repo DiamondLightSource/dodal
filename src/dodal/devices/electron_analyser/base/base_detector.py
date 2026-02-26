@@ -14,11 +14,11 @@ from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
 from dodal.devices.electron_analyser.base.base_driver_io import (
-    GenericAnalyserDriverIO,
+    AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
-    GenericRegion,
+    AbstractBaseRegion,
     TAbstractBaseRegion,
 )
 
@@ -78,7 +78,7 @@ class BaseElectronAnalyserDetector(
 
 
 GenericBaseElectronAnalyserDetector = BaseElectronAnalyserDetector[
-    GenericAnalyserDriverIO, GenericRegion
+    AbstractAnalyserDriverIO, AbstractBaseRegion
 ]
 
 
@@ -112,7 +112,7 @@ class ElectronAnalyserRegionDetector(
 # ElectronAnalyserRegionDetector in future. Blocked by:
 # https://github.com/bluesky/bluesky/pull/1978
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
-    GenericAnalyserDriverIO, GenericRegion
+    AbstractAnalyserDriverIO, AbstractBaseRegion
 ]
 TElectronAnalyserRegionDetector = TypeVar(
     "TElectronAnalyserRegionDetector",
@@ -176,7 +176,7 @@ class ElectronAnalyserDetector(
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    GenericAnalyserDriverIO, GenericRegion
+    AbstractAnalyserDriverIO, AbstractBaseRegion
 ]
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",
