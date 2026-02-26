@@ -6,7 +6,6 @@ from dodal.devices.beamlines.i10 import (
     I10Diagnostic5ADet,
     I10Slits,
     I10SlitsDrainCurrent,
-    PiezoMirror,
 )
 from dodal.devices.beamlines.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
 from dodal.devices.beamlines.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
@@ -16,6 +15,7 @@ from dodal.devices.beamlines.i10.rasor.rasor_motors import (
     PaStage,
 )
 from dodal.devices.beamlines.i10.rasor.rasor_scaler_cards import RasorScalerCard1
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.motors import XYStage, XYZStage
 from dodal.devices.temperture_controller import (
@@ -34,8 +34,8 @@ devices.include(i10_shared_devices)
 
 
 @devices.factory()
-def focusing_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
+def focusing_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
 
 
 """Optic slits"""

@@ -2,9 +2,11 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05_shared import (
     APPLE_KNOT_EXCLUSION_ZONES,
     Grating,
+    M3MJ6Mirror,
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
+from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
@@ -16,6 +18,7 @@ from dodal.devices.insertion_device.apple_knot_controller import (
 )
 from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEnergy
 from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
+from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -60,6 +63,20 @@ def id(
 ) -> Apple2[UndulatorLockedPhaseAxes]:
     """i05 insertion device."""
     return Apple2[UndulatorLockedPhaseAxes](id_gap=id_gap, id_phase=id_phase)
+
+
+@devices.factory()
+def m1_collimating_mirror() -> XYZPitchYawRollStage:
+    return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+
+
+# will connect after https://jira.diamond.ac.uk/browse/I05-731
+@devices.factory(skip=True)
+def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
+    return XYZPiezoSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
+        mirrors=M3MJ6Mirror,
+    )
 
 
 @devices.factory()
