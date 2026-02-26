@@ -19,8 +19,8 @@ _TILT = "TILT"
 
 class Stage(StandardReadable, ABC):
     """For these devices, the following co-ordinates are typical but not enforced:
-    - z is horizontal & parallel to the direction of synchrotron electrons.
-         ( Usually the x-rays have the same direction: But z is defined by the electrons )
+    - z is tangential to the electrons (as they orbit inside the synchrotron);
+          the x-rays are generated in that tangential direction: But z is defined by the electrons.
     - y is vertical and antiparallel to the force of gravity
     - x is the cross product of y with z
 
