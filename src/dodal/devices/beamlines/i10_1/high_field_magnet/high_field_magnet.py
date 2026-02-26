@@ -15,7 +15,6 @@ from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     Callback,
-    FlyMotorInfo,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -23,11 +22,13 @@ from ophyd_async.core import (
     WatchableAsyncStatus,
     WatcherUpdate,
     derived_signal_r,
+    error_if_none,
     observe_value,
     set_and_wait_for_other_value,
     soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
+from pydantic import BaseModel, Field
 
 
 class HighFieldMangetSweepTypes(StrictEnum):
@@ -49,6 +50,16 @@ class HighFieldMagnetStatusRBV(SubsetEnum):
     CLAMPED = "Clamped"
 
 
+class FlyMagInfo(BaseModel):
+    """Minimal set of information required to fly a high field magnet."""
+
+    start_position: float = Field(frozen=True)
+
+    end_position: float = Field(frozen=True)
+
+    sweep_rate: float = Field(frozen=True, gt=0)
+
+
 class HighFieldMagnet(
     StandardReadable,
     Locatable[float],
@@ -61,10 +72,10 @@ class HighFieldMagnet(
         self, prefix: str, field_tolerance: float = 0.01, name: str = ""
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.sweeprate = epics_signal_rw(
+            self.sweep_rate = epics_signal_rw(
                 float,
-                read_pv=prefix + "RBV:FIELDSWEEPRATE",
-                write_pv=prefix + "SET:FIELDSWEEPRATE",
+                read_pv=prefix + "RBV:FIELDsweep_rate",
+                write_pv=prefix + "SET:FIELDsweep_rate",
             )
             self.sweep_type = epics_signal_rw(
                 HighFieldMangetSweepTypes,
@@ -99,7 +110,7 @@ class HighFieldMagnet(
 
         self._set_success = True
 
-        self._fly_info: FlyMotorInfo | None = None
+        self._fly_info: FlyMagInfo | None = None
 
         self._fly_status: WatchableAsyncStatus | None = None
 
@@ -143,17 +154,17 @@ class HighFieldMagnet(
         self._set_success = True
         (
             old_position,
-            sweeprate,
+            sweep_rate,
             ramp_up_time,
         ) = await asyncio.gather(
-            self.user_setpoint.get_value(),
-            self.sweeprate.get_value(),
+            self.user_readback.get_value(),
+            self.sweep_rate.get_value(),
             self.ramp_up_time.get_value(),
         )
 
         try:
             timeout = (
-                abs((new_position - old_position) / sweeprate)
+                abs((new_position - old_position) / sweep_rate)
                 + 2 * ramp_up_time
                 + DEFAULT_TIMEOUT
             )
@@ -180,51 +191,26 @@ class HighFieldMagnet(
                 name=self.name,
             )
         if not self._set_success:
-            raise RuntimeError("Field was stopped")
+            raise RuntimeError("Field changewas stopped")
 
-    # @AsyncStatus.wrap
-    # async def prepare(self, value: FlyMotorInfo):
-    #     """Move to the beginning of a suitable run-up distance ready for a fly scan."""
-    #     self._fly_info = value
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMagInfo) -> None:
+        """Move to the beginning of a suitable run-up distance ready for a fly scan."""
+        self._fly_info = value
 
-    #     # Velocity, at which motor travels from start_position to end_position, in motor
-    #     # egu/s.
-    #     max_speed, egu = await asyncio.gather(
-    #         self.max_velocity.get_value(), self.motor_egu.get_value()
-    #     )
-    #     if abs(value.velocity) > max_speed:
-    #         raise MotorLimitsError(
-    #             f"Velocity {abs(value.velocity)} {egu}/s was requested for a motor "
-    #             f" with max speed of {max_speed} {egu}/s"
-    #         )
+        await self.set(value.start_position)
 
-    #     acceleration_time = await self.ramp_up_time.get_value()
-    #     ramp_up_start_pos = value.ramp_up_start_pos(acceleration_time)
-    #     ramp_down_end_pos = value.ramp_down_end_pos(acceleration_time)
+        # Set velocity we will be using for the fly scan
+        await self.sweep_rate.set(abs(value.sweep_rate))
 
-    #     await self.check_motor_limit(ramp_up_start_pos, ramp_down_end_pos)
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        fly_info = error_if_none(
+            self._fly_info, "Magnet must be prepared before attempting to kickoff"
+        )
 
-    #     # move to prepare position at maximum velocity
-    #     await self.velocity.set(abs(max_speed))
-    #     await self.set(ramp_up_start_pos)
+        self._fly_status = self.set(fly_info.end_position)
 
-    #     # Set velocity we will be using for the fly scan
-    #     await self.velocity.set(abs(value.velocity))
-
-    # @AsyncStatus.wrap
-    # async def kickoff(self):
-    #     """Begin moving motor from prepared position to final position."""
-    #     fly_info = error_if_none(
-    #         self._fly_info, "Motor must be prepared before attempting to kickoff"
-    #     )
-
-    #     acceleration_time = await self.acceleration_time.get_value()
-    #     self._fly_status = self.set(
-    #         fly_info.ramp_down_end_pos(acceleration_time),
-    #         timeout=fly_info.timeout,
-    #     )
-
-    # def complete(self) -> WatchableAsyncStatus:
-    #     """Mark as complete once motor reaches completed position."""
-    #     fly_status = error_if_none(self._fly_status, "kickoff not called")
-    #     return fly_status
+    def complete(self) -> WatchableAsyncStatus:
+        fly_status = error_if_none(self._fly_status, "kickoff not called")
+        return fly_status
