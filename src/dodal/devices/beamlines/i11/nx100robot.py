@@ -123,7 +123,7 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
             LOGGER.info(f"Robot already at position {sample_location}")
         else:
             await self.clear_sample(table_in=False)
-            await self.next_sample_position.set(sample_location, wait=True)
+            await self.next_sample_position.set(sample_location)
             await self.load_sample(sample_location)
             await self.current_sample_position.set(sample_location)
 
