@@ -61,6 +61,20 @@ async def test_stop_success(high_field_magnet: HighFieldMagnet):
     assert await high_field_magnet.user_setpoint.get_value() == 1.5
 
 
+async def test_set_raises_runtime_error_when_stopped(high_field_magnet):
+    """Test that set() raises RuntimeError when _set_success is False."""
+    set_mock_value(high_field_magnet.user_readback, 0.0)
+    set_mock_value(high_field_magnet.sweep_rate, 1.0)
+    set_mock_value(high_field_magnet.ramp_up_time, 1.0)
+
+    # Set _set_success to False to simulate a stopped operation
+    high_field_magnet._set_success = False
+
+    with pytest.raises(RuntimeError, match="Field changewas stopped"):
+        status = high_field_magnet.set(5.0)
+        await status
+
+
 async def test_subscribe_and_clear_sub(high_field_magnet: HighFieldMagnet):
     """Test subscribe_reading and clear_sub for callbacks."""
     readings = []
