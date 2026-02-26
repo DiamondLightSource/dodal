@@ -19,7 +19,6 @@ HUTCH_SAFE_FOR_OPERATIONS = 0  # Hutch is locked and can't be entered
 PSS_SHUTTER_SUFFIX = "-PS-IOC-01:M14:LOP"
 EXP_SHUTTER_1_INFIX = "-PS-SHTR-01"
 EXP_SHUTTER_2_INFIX = "-PS-SHTR-02"
-EXP_INTERLOCK_SUFFIX = ":ILKSTA"
 
 # Enable to allow testing when the beamline is down, do not change in production!
 TEST_MODE = False
@@ -56,7 +55,6 @@ class BaseHutchInterlock(ABC, StandardReadable):
         interlock_suffix: str,
         name: str = "",
     ) -> None:
-        self.bl_prefix = bl_prefix
         pv_address = f"{bl_prefix}{interlock_infix}{interlock_suffix}"
         with self.add_children_as_readables():
             self.status = epics_signal_r(signal_type, pv_address)
@@ -100,9 +98,11 @@ class HutchInterlock(BaseHutchInterlock):
 class HutchShutter(StandardReadable, Movable[ShutterDemand]):
     """Device to operate the hutch shutter.
 
-    When a demand is sent, the device should first check the hutch status
-    and raise an error if it's not interlocked (searched and locked), meaning it's not
-    safe to operate the shutter.
+    When a demand is sent and interlock given, the device should first check the hutch
+    status and raise an error if it's not interlocked (searched and locked), meaning
+    it's not safe to operate the shutter. When no interlock specified, the shutter
+    can be operated without checking the hutch status relying on default shutter
+    interlock (:ILKSTA).
 
     If the requested shutter position is "Open", the shutter control PV should first
     go to "Reset" and then move to "Open". This is because before opening the hutch
