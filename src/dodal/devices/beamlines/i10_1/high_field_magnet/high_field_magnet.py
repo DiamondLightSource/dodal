@@ -169,7 +169,7 @@ class HighFieldMagnet(
                 + DEFAULT_TIMEOUT
             )
         except ZeroDivisionError as error:
-            msg = "Mover has zero velocity"
+            msg = "Magnet has zero sweep_rate."
             raise ValueError(msg) from error
 
         move_status = AsyncStatus(
@@ -200,7 +200,6 @@ class HighFieldMagnet(
 
         await self.set(value.start_position)
 
-        # Set velocity we will be using for the fly scan
         await self.sweep_rate.set(abs(value.sweep_rate))
 
     @AsyncStatus.wrap
