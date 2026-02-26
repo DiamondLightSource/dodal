@@ -10,14 +10,12 @@ from dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet import (
 
 @pytest.fixture
 async def high_field_magnet() -> HighFieldMagnet:
-    """Create a HighFieldMagnet device with mock signals."""
     async with init_devices(mock=True):
         magnet = HighFieldMagnet(prefix="TEST:")
     return magnet
 
 
 async def test_within_tolerance_when_in_range(high_field_magnet: HighFieldMagnet):
-    """Test _within_tolerance returns True when readback is within tolerance of setpoint."""
     result = high_field_magnet._within_tolerance(
         setpoint=10.0, readback=10.005, tolerance=0.01
     )
@@ -25,7 +23,6 @@ async def test_within_tolerance_when_in_range(high_field_magnet: HighFieldMagnet
 
 
 async def test_within_tolerance_when_outside_range(high_field_magnet: HighFieldMagnet):
-    """Test _within_tolerance returns False when readback exceeds tolerance."""
     result = high_field_magnet._within_tolerance(
         setpoint=10.0, readback=10.02, tolerance=0.01
     )
@@ -35,7 +32,6 @@ async def test_within_tolerance_when_outside_range(high_field_magnet: HighFieldM
 async def test_within_tolerance_with_negative_tolerance(
     high_field_magnet: HighFieldMagnet,
 ):
-    """Test _within_tolerance handles negative tolerance correctly."""
     result = high_field_magnet._within_tolerance(
         setpoint=10.0, readback=9.995, tolerance=-0.01
     )
@@ -43,7 +39,6 @@ async def test_within_tolerance_with_negative_tolerance(
 
 
 async def test_locate(high_field_magnet: HighFieldMagnet):
-    """Test locate() returns current setpoint and readback."""
     set_mock_value(high_field_magnet.user_setpoint, 5.0)
     set_mock_value(high_field_magnet.user_readback, 5.0)
 
@@ -53,7 +48,6 @@ async def test_locate(high_field_magnet: HighFieldMagnet):
 
 
 async def test_stop_success(high_field_magnet: HighFieldMagnet):
-    """Test stop() sets success and updates setpoint to readback."""
     set_mock_value(high_field_magnet.user_readback, 7.5)
     set_mock_value(high_field_magnet.user_readback, 1.5)
     await high_field_magnet.stop()
@@ -62,12 +56,11 @@ async def test_stop_success(high_field_magnet: HighFieldMagnet):
 
 
 async def test_set_raises_runtime_error_when_stopped(high_field_magnet):
-    """Test that set() raises RuntimeError when _set_success is False."""
+
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 1.0)
     set_mock_value(high_field_magnet.ramp_up_time, 1.0)
 
-    # Set _set_success to False to simulate a stopped operation
     high_field_magnet._set_success = False
 
     with pytest.raises(RuntimeError, match="Field changewas stopped"):
@@ -88,12 +81,10 @@ async def test_subscribe_and_clear_sub(high_field_magnet: HighFieldMagnet):
 
     high_field_magnet.clear_sub(callback)
 
-    # Verify subscription was cleared by checking behavior after clear
     assert callable(callback)
 
 
 async def test_set_raises_on_zero_sweep_rate(high_field_magnet: HighFieldMagnet):
-    """Test that set() raises ValueError when sweep_rate is zero."""
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 0.0)
 
@@ -103,7 +94,6 @@ async def test_set_raises_on_zero_sweep_rate(high_field_magnet: HighFieldMagnet)
 
 
 async def test_set_calculates_correct_timeout(high_field_magnet: HighFieldMagnet):
-    """Test that set() calculates timeout based on sweep_rate and ramp_up_time."""
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 1.0)
     set_mock_value(high_field_magnet.ramp_up_time, 1.0)
@@ -115,7 +105,6 @@ async def test_set_calculates_correct_timeout(high_field_magnet: HighFieldMagnet
 
 
 async def test_set_returns_watchable_async_status(high_field_magnet: HighFieldMagnet):
-    """Test that set() returns a WatchableAsyncStatus."""
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 1.0)
 
@@ -124,7 +113,6 @@ async def test_set_returns_watchable_async_status(high_field_magnet: HighFieldMa
 
 
 async def test_prepare(high_field_magnet: HighFieldMagnet):
-    """Test prepare() sets fly_info and moves to start position."""
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 1.0)
 
@@ -136,14 +124,12 @@ async def test_prepare(high_field_magnet: HighFieldMagnet):
 
 
 async def test_kickoff_without_prepare_raises(high_field_magnet: HighFieldMagnet):
-    """Test that kickoff() raises error if prepare() wasn't called."""
     with pytest.raises(RuntimeError, match="Magnet must be prepared"):
         status = high_field_magnet.kickoff()
         await status
 
 
 async def test_kickoff_after_prepare(high_field_magnet: HighFieldMagnet):
-    """Test kickoff() starts a set operation to end_position after prepare."""
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 1.0)
 
@@ -157,13 +143,11 @@ async def test_kickoff_after_prepare(high_field_magnet: HighFieldMagnet):
 
 
 async def test_complete_without_kickoff_raises(high_field_magnet: HighFieldMagnet):
-    """Test that complete() raises error if kickoff() wasn't called."""
     with pytest.raises(RuntimeError, match="kickoff not called"):
         high_field_magnet.complete()
 
 
 async def test_complete_after_kickoff(high_field_magnet: HighFieldMagnet):
-    """Test complete() returns the fly_status from kickoff."""
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 1.0)
 
@@ -180,7 +164,6 @@ async def test_complete_after_kickoff(high_field_magnet: HighFieldMagnet):
 
 
 async def test_read(high_field_magnet: HighFieldMagnet):
-    """Test read() returns current setpoint and readback."""
     set_mock_value(high_field_magnet.user_setpoint, 5.0)
     set_mock_value(high_field_magnet.user_readback, 5.0)
     await assert_reading(
