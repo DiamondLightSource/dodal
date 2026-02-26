@@ -89,13 +89,13 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
                     raise ShutterNotSafeToOperateError(
                         "The hutch has not been locked, not operating shutter."
                     )
-                await self.control.set(ShutterDemand.RESET, wait=True)
-                await self.control.set(value, wait=True)
+                await self.control.set(ShutterDemand.RESET)
+                await self.control.set(value)
                 return await wait_for_value(
                     self.status, match=ShutterState.OPEN, timeout=DEFAULT_TIMEOUT
                 )
             else:
-                await self.control.set(value, wait=True)
+                await self.control.set(value)
                 return await wait_for_value(
                     self.status, match=ShutterState.CLOSED, timeout=DEFAULT_TIMEOUT
                 )

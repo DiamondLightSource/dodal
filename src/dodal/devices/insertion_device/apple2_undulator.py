@@ -151,7 +151,7 @@ class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {new_position} with timeout = {timeout}")
 
-        await self.set_move.set(value=1, wait=True, timeout=timeout)
+        await self.set_move.set(value=1, timeout=timeout)
         move_status = AsyncStatus(
             wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
         )
@@ -398,9 +398,10 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             f"Moving {self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
         await asyncio.gather(
-            self.gap().set_move.set(value=1, wait=False, timeout=timeout),
-            self.phase().set_move.set(value=1, wait=False, timeout=timeout),
+            self.gap().set_move.set(value=1, timeout=timeout),
+            self.phase().set_move.set(value=1, timeout=timeout),
         )
+
         await wait_for_value(
             self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
         )

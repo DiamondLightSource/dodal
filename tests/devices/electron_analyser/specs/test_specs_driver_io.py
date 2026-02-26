@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import get_mock_put, init_devices, set_mock_value
+from ophyd_async.core import get_mock_put, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -12,28 +12,32 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.beamlines.b07 import LensMode, PsuMode
+from dodal.devices.beamlines.b07 import LensMode
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsAnalyserDriverIO,
+    SpecsDetector,
     SpecsRegion,
 )
-from dodal.testing.electron_analyser import create_driver
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
+    get_test_sequence,
 )
 
 
 @pytest.fixture
-async def sim_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
-    async with init_devices(mock=True):
-        sim_driver = create_driver(
-            SpecsAnalyserDriverIO[LensMode, PsuMode],
-            prefix="TEST:",
-        )
-    return sim_driver
+async def sim_driver(
+    b07b_specs150: SpecsDetector[LensMode, PsuMode],
+) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
+    return b07b_specs150.driver
+
+
+@pytest.fixture
+def sequence(sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode]):
+    return get_test_sequence(type(sim_driver))
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -42,55 +46,35 @@ async def test_analyser_sets_region_correctly(
     region: SpecsRegion[LensMode, PsuMode],
     run_engine: RunEngine,
 ) -> None:
-    run_engine(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region))
 
-    get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
-    get_mock_put(sim_driver.energy_mode).assert_called_once_with(
-        region.energy_mode, wait=True
-    )
+    get_mock_put(sim_driver.region_name).assert_called_once_with(region.name)
+    get_mock_put(sim_driver.energy_mode).assert_called_once_with(region.energy_mode)
     get_mock_put(sim_driver.acquisition_mode).assert_called_once_with(
-        region.acquisition_mode, wait=True
+        region.acquisition_mode
     )
-    get_mock_put(sim_driver.lens_mode).assert_called_once_with(
-        region.lens_mode, wait=True
-    )
-    get_mock_put(sim_driver.low_energy).assert_called_once_with(
-        region.low_energy, wait=True
-    )
+    get_mock_put(sim_driver.lens_mode).assert_called_once_with(region.lens_mode)
+    get_mock_put(sim_driver.low_energy).assert_called_once_with(region.low_energy)
     if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
         get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-            region.centre_energy, wait=True
+            region.centre_energy
         )
     else:
         get_mock_put(sim_driver.centre_energy).assert_not_called()
 
-    get_mock_put(sim_driver.high_energy).assert_called_once_with(
-        region.high_energy, wait=True
-    )
-    get_mock_put(sim_driver.pass_energy).assert_called_once_with(
-        region.pass_energy, wait=True
-    )
-    get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
-    get_mock_put(sim_driver.acquire_time).assert_called_once_with(
-        region.acquire_time, wait=True
-    )
-    get_mock_put(sim_driver.iterations).assert_called_once_with(
-        region.iterations, wait=True
-    )
+    get_mock_put(sim_driver.high_energy).assert_called_once_with(region.high_energy)
+    get_mock_put(sim_driver.pass_energy).assert_called_once_with(region.pass_energy)
+    get_mock_put(sim_driver.slices).assert_called_once_with(region.slices)
+    get_mock_put(sim_driver.acquire_time).assert_called_once_with(region.acquire_time)
+    get_mock_put(sim_driver.iterations).assert_called_once_with(region.iterations)
 
     if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-        get_mock_put(sim_driver.energy_step).assert_called_once_with(
-            region.energy_step, wait=True
-        )
+        get_mock_put(sim_driver.energy_step).assert_called_once_with(region.energy_step)
     else:
         get_mock_put(sim_driver.energy_step).assert_not_called()
 
-    get_mock_put(sim_driver.psu_mode).assert_called_once_with(
-        region.psu_mode, wait=True
-    )
-    get_mock_put(sim_driver.snapshot_values).assert_called_once_with(
-        region.values, wait=True
-    )
+    get_mock_put(sim_driver.psu_mode).assert_called_once_with(region.psu_mode)
+    get_mock_put(sim_driver.snapshot_values).assert_called_once_with(region.values)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -99,7 +83,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
     region: SpecsRegion[LensMode, PsuMode],
     run_engine: RunEngine,
 ) -> None:
-    run_engine(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region))
 
     prefix = sim_driver.name + "-"
 
@@ -136,8 +120,7 @@ async def test_analyser_sets_region_and_read_is_correct(
     region: SpecsRegion[LensMode, PsuMode],
     run_engine: RunEngine,
 ) -> None:
-    run_engine(bps.mv(sim_driver, region), wait=True)
-
+    run_engine(bps.mv(sim_driver, region))
     spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
     expected_total_intensity = np.sum(spectrum)
     set_mock_value(sim_driver.spectrum, spectrum)
