@@ -51,7 +51,7 @@ class HighFieldMagnetStatusRBV(SubsetEnum):
 
 
 class FlyMagInfo(BaseModel):
-    """Minimal set of information required to fly a high field magnet."""
+    """Minimal set of information required to fly high field magnet."""
 
     start_position: float = Field(frozen=True)
 
@@ -91,7 +91,7 @@ class HighFieldMagnet(
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.user_readback = epics_signal_r(float, prefix + "RBV:DEMANDFIELD")
 
-        self.set_move = epics_signal_w(
+        self.set_mode = epics_signal_w(
             HighFieldMagnetStatus,
             write_pv=prefix + "SET:ACTIVITY",
         )
