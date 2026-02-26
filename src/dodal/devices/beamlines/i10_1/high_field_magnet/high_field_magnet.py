@@ -135,7 +135,7 @@ class HighFieldMagnet(
     async def stop(self, success=False):
         self._set_success = success
         await self.user_readback.get_value()
-        await self.user_setpoint.set(await self.user_readback.get_value(), wait=False)
+        await self.user_setpoint.set(await self.user_readback.get_value())
 
     def subscribe_reading(self, function: Callback[dict[str, Reading[float]]]) -> None:
         self.user_readback.subscribe_reading(function)
