@@ -2,7 +2,7 @@ from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05_1 import XYZPolarAzimuthDefocusStage
-from dodal.devices.hutch_shutter import HutchInterlock, HutchShutter
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -17,7 +17,7 @@ devices.include(i05_shared_devices)
 
 @devices.factory()
 def nano_shutter() -> HutchShutter:
-    return HutchShutter(HutchInterlock(PREFIX.beamline_prefix))
+    return HutchShutter(PREFIX.beamline_prefix)
 
 
 @devices.factory

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from math import isclose
-from typing import TypeVar
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -45,16 +44,6 @@ class ShutterState(StrictEnum):
     CLOSING = "Closing"
 
 
-class InterlockState(StrictEnum):
-    FAILED = "Failed"
-    RUN_ILKS_OK = "Run Ilks Ok"
-    OK = "OK"
-    DISARMED = "Disarmed"
-
-
-EnumTypesT = TypeVar("EnumTypesT", bound=EnumTypes)
-
-
 class BaseHutchInterlock(ABC, StandardReadable):
     status: SignalR[float | EnumTypes]
     bl_prefix: str
@@ -79,29 +68,6 @@ class BaseHutchInterlock(ABC, StandardReadable):
 
 
 class HutchInterlock(BaseHutchInterlock):
-    """Device to check interlock status of the hutch using ILKSTA shutter pv suffix."""
-
-    def __init__(
-        self,
-        bl_prefix: str,
-        shtr_infix: str = EXP_SHUTTER_1_INFIX,
-        interlock_suffix: str = EXP_INTERLOCK_SUFFIX,
-        name: str = "",
-    ) -> None:
-        super().__init__(
-            signal_type=InterlockState,
-            bl_prefix=bl_prefix,
-            interlock_infix=shtr_infix,
-            interlock_suffix=interlock_suffix,
-            name=name,
-        )
-
-    async def shutter_safe_to_operate(self) -> bool:
-        _status = await self.status.get_value()
-        return _status != InterlockState.DISARMED
-
-
-class HutchInterlockPSS(BaseHutchInterlock):
     """Device to check the interlock status of the hutch using PSS pv."""
 
     def __init__(
@@ -148,30 +114,22 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
 
     def __init__(
         self,
-        interlock: BaseHutchInterlock,
-        bl_prefix: str = "",
+        bl_prefix: str,
+        interlock: BaseHutchInterlock | None = None,
         shtr_infix: str = EXP_SHUTTER_1_INFIX,
         name: str = "",
     ) -> None:
-        if not bl_prefix:
-            bl_prefix = interlock.bl_prefix
+        self.interlock = interlock
         self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
         with self.add_children_as_readables():
             self.status = epics_signal_r(ShutterState, f"{bl_prefix}{shtr_infix}:STA")
-            self.interlock = interlock
-
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
         if not TEST_MODE:
             if value == ShutterDemand.OPEN:
-                interlock_state = await self.interlock.shutter_safe_to_operate()
-                if not interlock_state:
-                    # If not in test mode, fail. If in test mode, the optics hutch may be open.
-                    raise ShutterNotSafeToOperateError(
-                        "The hutch has not been locked, not operating shutter."
-                    )
+                await self._check_interlock()
                 await self.control.set(ShutterDemand.RESET)
                 await self.control.set(value)
                 return await wait_for_value(
@@ -186,3 +144,12 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
             LOGGER.warning(
                 "Running in test mode, will not operate the experiment shutter."
             )
+
+    async def _check_interlock(self):
+        if self.interlock is not None:
+            interlock_state = await self.interlock.shutter_safe_to_operate()
+            if not interlock_state:
+                # If not in test mode, fail. If in test mode, the optics hutch may be open.
+                raise ShutterNotSafeToOperateError(
+                    "The hutch has not been locked, not operating shutter."
+                )

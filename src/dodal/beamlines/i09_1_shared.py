@@ -10,7 +10,7 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.hutch_shutter import HutchInterlock, HutchShutter
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -22,7 +22,7 @@ devices = DeviceManager()
 
 @devices.factory()
 def psi1() -> HutchShutter:
-    return HutchShutter(HutchInterlock(I_PREFIX.beamline_prefix))
+    return HutchShutter(I_PREFIX.beamline_prefix)
 
 
 @devices.factory()

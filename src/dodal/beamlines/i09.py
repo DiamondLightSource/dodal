@@ -11,7 +11,6 @@ from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.hutch_shutter import (
     EXP_SHUTTER_2_INFIX,
-    HutchInterlock,
     HutchShutter,
 )
 from dodal.devices.motors import XYZPolarAzimuthStage
@@ -41,20 +40,20 @@ def synchrotron() -> Synchrotron:
 @devices.factory()
 def psi2() -> HutchShutter:
     return HutchShutter(
-        HutchInterlock(I_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
+        bl_prefix=I_PREFIX.beamline_prefix,
         shtr_infix=EXP_SHUTTER_2_INFIX,
     )
 
 
 @devices.factory()
 def psj1() -> HutchShutter:
-    return HutchShutter(HutchInterlock(J_PREFIX.beamline_prefix))
+    return HutchShutter(J_PREFIX.beamline_prefix)
 
 
 @devices.factory()
 def psj2() -> HutchShutter:
     return HutchShutter(
-        HutchInterlock(J_PREFIX.beamline_prefix, EXP_SHUTTER_2_INFIX),
+        bl_prefix=J_PREFIX.beamline_prefix,
         shtr_infix=EXP_SHUTTER_2_INFIX,
     )
 
