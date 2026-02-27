@@ -1,9 +1,9 @@
 import itertools
 from collections.abc import Mapping
-from typing import Annotated, TypeVar
+from typing import Annotated, Any, TypeVar
 
 import bluesky.plan_stubs as bps
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Readable, Stoppable
 from bluesky.utils import MsgGenerator
 
 """Wrappers for Bluesky built-in plan stubs with type hinting."""
@@ -14,7 +14,7 @@ T = TypeVar("T")
 
 
 def set_absolute(
-    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = True
 ) -> MsgGenerator:
     """Set a device, wrapper for `bp.abs_set`.
 
@@ -36,7 +36,7 @@ def set_absolute(
 
 
 def set_relative(
-    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = True
 ) -> MsgGenerator:
     """Change a device, wrapper for `bp.rel_set`.
 
@@ -131,3 +131,27 @@ def wait(
         Iterator[MsgGenerator]: Bluesky messages.
     """
     return (yield from bps.wait(group, timeout=timeout))
+
+
+def rd(readable: Readable) -> MsgGenerator[Any]:
+    """Reads a single-value non-triggered object, wrapper for `bp.rd`.
+
+    Args:
+        readable (Readable): The device to be read
+
+    Returns:
+        Iterator[MsgGenerator]: Bluesky messages
+    """
+    return (yield from bps.rd(readable))
+
+
+def stop(stoppable: Stoppable) -> MsgGenerator:
+    """Stop a device, wrapper for `bp.stop`.
+
+    Args:
+        stoppable (Stoppable): Device to be stopped
+
+    Returns:
+        Iterator[MsgGenerator]: Bluesky messages
+    """
+    return (yield from bps.stop(stoppable))
