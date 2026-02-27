@@ -42,15 +42,15 @@ async def test_puck_program_loaded_before_position_selected(robot: Robot) -> Non
     parent_mock = get_mock(robot)
 
     expected_calls = [
-        call.puck_load_program.put(ANY, wait=True),
-        call.puck_sel.put(ANY, wait=True),
-        call.pos_sel.put(ANY, wait=True),
+        call.puck_load_program.put(ANY),
+        call.puck_sel.put(ANY),
+        call.pos_sel.put(ANY),
     ]
 
     parent_mock.assert_has_calls(expected_calls, any_order=False)
 
-    get_mock_put(robot.puck_sel).assert_called_once_with(1, wait=True)
-    get_mock_put(robot.pos_sel).assert_called_once_with(2, wait=True)
+    get_mock_put(robot.puck_sel).assert_called_once_with(1)
+    get_mock_put(robot.pos_sel).assert_called_once_with(2)
 
 
 async def test_given_wrong_puck_program_gets_loaded_robot_times_out(robot: Robot):
@@ -93,11 +93,11 @@ async def test_puck_picked_then_beam_placed(robot: Robot) -> None:
 
     calls = parent_mock.mock_calls
 
-    puck_program_loaded = calls.index(call.puck_load_program.put(ANY, wait=True))
-    puck_picked = calls.index(call.puck_pick.put(ANY, wait=True))
+    puck_program_loaded = calls.index(call.puck_load_program.put(ANY))
+    puck_picked = calls.index(call.puck_pick.put(ANY))
 
-    beam_program_loaded = calls.index(call.beam_load_program.put(ANY, wait=True))
-    beam_placed = calls.index(call.beam_place.put(ANY, wait=True))
+    beam_program_loaded = calls.index(call.beam_load_program.put(ANY))
+    beam_placed = calls.index(call.beam_place.put(ANY))
 
     assert puck_program_loaded < puck_picked < beam_program_loaded < beam_placed
 

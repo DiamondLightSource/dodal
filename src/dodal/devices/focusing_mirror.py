@@ -60,7 +60,7 @@ class SingleMirrorVoltage(Device):
 
     def __init__(self, prefix: str, name: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
-        self._setpoint_v = epics_signal_rw(int, prefix + "D")
+        self._setpoint_v = epics_signal_rw(int, prefix + "D", wait=False)
         self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
         super().__init__(name=name)
 
@@ -96,7 +96,7 @@ class SingleMirrorVoltage(Device):
         )
         # discard the current value (OK) so we can await a subsequent change
         await anext(demand_accepted_iterator)
-        set_status = setpoint_v.set(value, wait=False)
+        set_status = setpoint_v.set(value)
 
         # The set should always change to SLEW regardless of whether we are
         # already at the set point, then change back to OK/FAIL depending on

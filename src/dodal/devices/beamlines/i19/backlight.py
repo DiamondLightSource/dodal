@@ -16,4 +16,4 @@ class BacklightPosition(StandardReadable, Movable[InOutUpper]):
 
     @AsyncStatus.wrap
     async def set(self, value: InOutUpper):
-        await self.position.set(value, wait=True)
+        await self.position.set(value)
