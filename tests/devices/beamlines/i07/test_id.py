@@ -24,6 +24,11 @@ async def id(harmonic: UndulatorOrder) -> InsertionDevice:
     return id
 
 
+@pytest.fixture(autouse=True)
+def set_beamline_env_variable(monkeypatch):
+    monkeypatch.setenv("BEAMLINE", "i07")
+
+
 @pytest.mark.parametrize(
     "energy_kev, gap",
     [(14, 5.81), (15, 6.25)],

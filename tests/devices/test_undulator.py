@@ -1,10 +1,11 @@
 from collections.abc import Generator
-from unittest.mock import AsyncMock, patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv
+from daq_config_server.models import UndulatorEnergyGapLookupTable
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
@@ -61,6 +62,11 @@ def undulator_in_commissioning_mode(
 ) -> Generator[UndulatorInKeV, None, None]:
     set_mock_value(undulator.baton_ref().commissioning, True)  # type: ignore
     yield undulator
+
+
+@pytest.fixture(autouse=True)
+def set_beamline_env_variable(monkeypatch):
+    monkeypatch.setenv("BEAMLINE", "test")
 
 
 async def test_undulator_mm_config_default_parameters(undulator_in_mm: UndulatorInMm):
@@ -151,13 +157,12 @@ async def test_when_gap_access_is_disabled_set_then_error_is_raised(
         await undulator.set(5)
 
 
-@patch(
-    "dodal.devices.undulator.energy_distance_table",
-    AsyncMock(return_value=np.array([[0, 10], [10, 20]])),
-)
 async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_mode_enabled(
     undulator_in_commissioning_mode: UndulatorInKeV,
 ):
+    undulator_in_commissioning_mode.config_server.get_file_contents = MagicMock(
+        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10, 20]])
+    )
     set_mock_value(
         undulator_in_commissioning_mode.gap_access, EnabledDisabledUpper.DISABLED
     )
@@ -168,13 +173,12 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
     ).assert_not_called()
 
 
-@patch(
-    "dodal.devices.undulator.energy_distance_table",
-    AsyncMock(return_value=np.array([[0, 10], [10000, 20]])),
-)
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
     undulator: UndulatorInKeV,
 ):
+    undulator.config_server.get_file_contents = MagicMock(
+        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10000, 20]])
+    )
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)
 

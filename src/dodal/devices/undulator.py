@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
+from daq_config_server.models import UndulatorEnergyGapLookupTable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -15,11 +16,12 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
+from dodal.utils import get_beamline_name
 
 from .baton import Baton
-from .util.lookup_tables import energy_distance_table
 
 
 class AccessError(Exception):
@@ -179,6 +181,8 @@ class UndulatorInKeV(BaseUndulator):
         baton: Baton | None = None,
         name: str = "",
     ) -> None:
+        self.config_server = get_config_client(get_beamline_name())
+
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         super().__init__(
             prefix=prefix,
@@ -207,14 +211,16 @@ class UndulatorInKeV(BaseUndulator):
         """Get a 2d np.array from lookup table that converts energies to undulator gap
         distance.
         """
-        energy_to_distance_table: np.ndarray = await energy_distance_table(
-            self.id_gap_lookup_table_path
+        energy_to_distance_table = self.config_server.get_file_contents(
+            self.id_gap_lookup_table_path,
+            UndulatorEnergyGapLookupTable,
+            reset_cached_result=True,
         )
 
         # Use the lookup table to get the undulator gap associated with this dcm energy
         return _get_gap_for_energy(
             energy_kev * 1000,
-            energy_to_distance_table,
+            np.array(energy_to_distance_table.rows),
         )
 
 
