@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
-from daq_config_server.client import ConfigServer
 from daq_config_server.models import UndulatorEnergyGapLookupTable
 from numpy import ndarray
 from ophyd_async.core import (
@@ -17,8 +16,10 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
+from dodal.utils import get_beamline_name
 
 from .baton import Baton
 
@@ -180,7 +181,7 @@ class UndulatorInKeV(BaseUndulator):
         baton: Baton | None = None,
         name: str = "",
     ) -> None:
-        self.config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+        self.config_server = get_config_client(get_beamline_name())
 
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         super().__init__(
@@ -210,7 +211,6 @@ class UndulatorInKeV(BaseUndulator):
         """Get a 2d np.array from lookup table that converts energies to undulator gap
         distance.
         """
-
         energy_to_distance_table = self.config_server.get_file_contents(
             self.id_gap_lookup_table_path,
             UndulatorEnergyGapLookupTable,
