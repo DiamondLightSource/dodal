@@ -9,7 +9,7 @@ from dodal.devices.beamlines.b07_1 import (
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.motors import XYZPolarAzimuthStage
+from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -54,13 +54,13 @@ def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
 
 
 @devices.factory()
-def sm() -> XYZPolarAzimuthStage:
+def sm() -> XYZAzimuthPolarStage:
     """Sample manipulator."""
-    return XYZPolarAzimuthStage(
+    return XYZAzimuthPolarStage(
         f"{C_PREFIX.beamline_prefix}-EA-SM-01:",
         x_infix="XP",
         y_infix="YP",
         z_infix="ZP",
-        polar_infix="ROTA",
         azimuth_infix="ROTB",
+        polar_infix="ROTA",
     )

@@ -1,6 +1,3 @@
-from dodal.devices.beamlines.i05_shared.rotation_signals import (
-    create_rotational_ij_component_signals,
-)
 from dodal.devices.motors import (
     _AZIMUTH,
     _POLAR,
@@ -8,13 +5,14 @@ from dodal.devices.motors import (
     _X,
     _Y,
     _Z,
-    XYZPolarAzimuthTiltStage,
+    XYZAzimuthTiltPolarStage,
+    create_rotational_ij_component_signals,
 )
 
 
-class I05Goniometer(XYZPolarAzimuthTiltStage):
+class I05Goniometer(XYZAzimuthTiltPolarStage):
     """Six-physical-axis stage with a standard xyz translational stage and three axis of
-    rotation: polar, azimuth, and tilt.
+    rotation: azimuth, tilt and polar.
 
     In addition, it defines two virtual translational axes derived signals, `perp` and
     `long`, which form a rotated Cartesian frame within the x-y plane.
@@ -36,9 +34,9 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
         x_infix: str = _X,
         y_infix: str = _Y,
         z_infix: str = _Z,
-        polar_infix: str = _POLAR,
         azimuth_infix: str = _AZIMUTH,
         tilt_infix: str = _TILT,
+        polar_infix: str = _POLAR,
         rotation_angle_deg: float = 50.0,
         name: str = "",
     ):
@@ -50,9 +48,9 @@ class I05Goniometer(XYZPolarAzimuthTiltStage):
             x_infix=x_infix,
             y_infix=y_infix,
             z_infix=z_infix,
-            polar_infix=polar_infix,
             azimuth_infix=azimuth_infix,
             tilt_infix=tilt_infix,
+            polar_infix=polar_infix,
         )
 
         with self.add_children_as_readables():

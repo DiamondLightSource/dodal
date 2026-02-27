@@ -9,7 +9,7 @@ from dodal.devices.beamlines.b07 import (
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.motors import XYZPolarStage
+from dodal.devices.motors import XYZAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -54,8 +54,8 @@ def sm52b() -> B07SampleManipulator52B:
 
 
 @devices.factory()
-def sm21b() -> XYZPolarStage:
-    """Sample manipulator. NOTE: The polar attribute is equivalent to GDA roty."""
-    return XYZPolarStage(
-        prefix=f"{B_PREFIX.beamline_prefix}-EA-SM-21:", polar_infix="ROTY"
+def sm21b() -> XYZAzimuthStage:
+    """Sample manipulator. NOTE: The azimuth attribute is equivalent to GDA roty."""
+    return XYZAzimuthStage(
+        prefix=f"{B_PREFIX.beamline_prefix}-EA-SM-21:", azimuth_infix="ROTY"
     )
