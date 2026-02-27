@@ -1,10 +1,16 @@
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import set_mock_value
 
 from dodal.plans.verify_undulator_gap import verify_undulator_gap
 from tests.plans.conftest import UndulatorGapCheckDevices
+
+
+@pytest.fixture(autouse=True)
+def set_beamline_env_variable(monkeypatch):
+    monkeypatch.setenv("BEAMLINE", "test")
 
 
 @patch("dodal.devices.undulator.BaseUndulator._set_gap", new_callable=AsyncMock)

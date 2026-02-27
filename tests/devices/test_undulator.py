@@ -64,6 +64,11 @@ def undulator_in_commissioning_mode(
     yield undulator
 
 
+@pytest.fixture(autouse=True)
+def set_beamline_env_variable(monkeypatch):
+    monkeypatch.setenv("BEAMLINE", "test")
+
+
 async def test_undulator_mm_config_default_parameters(undulator_in_mm: UndulatorInMm):
     await assert_configuration(
         undulator_in_mm,
@@ -152,13 +157,11 @@ async def test_when_gap_access_is_disabled_set_then_error_is_raised(
         await undulator.set(5)
 
 
-@patch("dodal.devices.undulator.ConfigServer.get_file_contents")
 async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_mode_enabled(
-    mock_get_file_contents: MagicMock,
     undulator_in_commissioning_mode: UndulatorInKeV,
 ):
-    mock_get_file_contents.return_value = UndulatorEnergyGapLookupTable(
-        rows=[[0, 10], [10, 20]]
+    undulator_in_commissioning_mode.config_server.get_file_contents = MagicMock(
+        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10, 20]])
     )
     set_mock_value(
         undulator_in_commissioning_mode.gap_access, EnabledDisabledUpper.DISABLED
@@ -170,13 +173,11 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
     ).assert_not_called()
 
 
-@patch("dodal.devices.undulator.ConfigServer.get_file_contents")
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
-    mock_get_file_contents: MagicMock,
     undulator: UndulatorInKeV,
 ):
-    mock_get_file_contents.return_value = UndulatorEnergyGapLookupTable(
-        rows=[[0, 10], [10000, 20]]
+    undulator.config_server.get_file_contents = MagicMock(
+        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10000, 20]])
     )
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)

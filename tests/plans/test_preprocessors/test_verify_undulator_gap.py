@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
+import pytest
 from bluesky.run_engine import RunEngine
 
 from dodal.plans.preprocessors.verify_undulator_gap import (
@@ -10,6 +11,11 @@ from dodal.plans.preprocessors.verify_undulator_gap import (
 from tests.plans.conftest import UndulatorGapCheckDevices
 
 RUN_KEY = "test_run"
+
+
+@pytest.fixture(autouse=True)
+def set_beamline_env_variable(monkeypatch):
+    monkeypatch.setenv("BEAMLINE", "test")
 
 
 @patch("dodal.plans.verify_undulator_gap.verify_undulator_gap")
