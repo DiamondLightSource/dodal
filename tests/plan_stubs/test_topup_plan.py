@@ -26,6 +26,10 @@ async def synchrotron() -> Synchrotron:
 
 @patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
+@patch(
+    "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
+    {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
+)
 def test_when_topup_before_end_of_collection_wait(
     fake_sleep: MagicMock,
     fake_wait: MagicMock,

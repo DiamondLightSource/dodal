@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from math import inf
+from typing import Any
 
 from bluesky.protocols import Preparable
 from ophyd_async.core import (
@@ -14,7 +15,6 @@ from ophyd_async.core import (
 )
 from pydantic import BaseModel, Field
 
-from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperture import Aperture
 from dodal.devices.motors import XYStage
 
@@ -65,7 +65,7 @@ class AperturePosition(BaseModel):
 
     @staticmethod
     def tolerances_from_gda_params(
-        params: GDABeamlineParameters,
+        params: dict[str, Any],
     ) -> AperturePosition:
         return AperturePosition(
             aperture_x=params["miniap_x_tolerance"],
@@ -79,7 +79,7 @@ class AperturePosition(BaseModel):
     def from_gda_params(
         name: _GDAParamApertureValue,
         diameter: float,
-        params: GDABeamlineParameters,
+        params: dict[str, Any],
     ) -> AperturePosition:
         return AperturePosition(
             aperture_x=params[f"miniap_x_{name.value}"],
@@ -109,7 +109,7 @@ class ApertureValue(StrictEnum):
 
 
 def load_positions_from_beamline_parameters(
-    params: GDABeamlineParameters,
+    params: dict[str, Any],
 ) -> dict[ApertureValue, AperturePosition]:
     return {
         ApertureValue.OUT_OF_BEAM: AperturePosition.from_gda_params(

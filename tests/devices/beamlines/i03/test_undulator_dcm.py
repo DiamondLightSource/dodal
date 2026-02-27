@@ -19,6 +19,16 @@ from tests.devices.test_daq_configuration.lookup import (
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
+from tests.test_data import TEST_BEAMLINE_PARAMETERS_TXT
+
+
+@pytest.fixture(autouse=True)
+def patch_beamline_parameter_paths():
+    with patch(
+        "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
+        {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
+    ):
+        yield
 
 
 @pytest.fixture(autouse=True)
