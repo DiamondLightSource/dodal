@@ -12,6 +12,7 @@ from ophyd_async.core import (
     StandardReadable,
     TriggerInfo,
     observe_value,
+    soft_signal_r_and_setter,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
@@ -110,10 +111,15 @@ class CommissioningJungfrau(
         writer_prefix: str,
         path_provider: PathProvider,
         name="",
+        detector_id=124,
     ):
         self.drv = JungfrauDriverIO(prefix)
         writer = JungfrauCommissioningWriter(writer_prefix, path_provider)
         controller = JungfrauController(self.drv)
+        self.ispyb_detector_id, _ = soft_signal_r_and_setter(
+            int,
+            initial_value=detector_id,
+        )
         super().__init__(controller, writer, name=name)
 
     @AsyncStatus.wrap
