@@ -191,7 +191,7 @@ class HighFieldMagnet(
                 name=self.name,
             )
         if not self._set_success:
-            raise RuntimeError("Field changewas stopped")
+            raise RuntimeError("Field change was stopped")
 
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMagInfo) -> None:

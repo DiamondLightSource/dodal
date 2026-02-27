@@ -1,6 +1,10 @@
 import pytest
-from ophyd_async.core import AsyncStatus, init_devices, set_mock_value
-from ophyd_async.testing import assert_reading
+from ophyd_async.core import (
+    AsyncStatus,
+    init_devices,
+    set_mock_value,
+)
+from ophyd_async.testing import assert_reading, wait_for_pending_wakeups
 
 from dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet import (
     FlyMagInfo,
@@ -55,16 +59,19 @@ async def test_stop_success(high_field_magnet: HighFieldMagnet):
     assert await high_field_magnet.user_setpoint.get_value() == 1.5
 
 
-async def test_set_raises_runtime_error_when_stopped(high_field_magnet):
-
-    set_mock_value(high_field_magnet.user_readback, 0.0)
+async def test_set_raises_runtime_error_when_stopped(
+    high_field_magnet: HighFieldMagnet,
+):
+    set_mock_value(high_field_magnet.user_readback, -5.0)
     set_mock_value(high_field_magnet.sweep_rate, 1.0)
     set_mock_value(high_field_magnet.ramp_up_time, 1.0)
+    status = high_field_magnet.set(5.0)
 
-    high_field_magnet._set_success = False
-
-    with pytest.raises(RuntimeError, match="Field changewas stopped"):
-        status = high_field_magnet.set(5.0)
+    assert status is not None
+    with pytest.raises(RuntimeError, match="Field change was stopped"):
+        await wait_for_pending_wakeups()
+        await high_field_magnet.stop(success=False)
+        set_mock_value(high_field_magnet.user_readback, 5.0)
         await status
 
 
