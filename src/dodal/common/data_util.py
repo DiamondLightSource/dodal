@@ -1,5 +1,5 @@
 from os.path import isabs, isfile, join, split
-from typing import Protocol, TypeVar
+from typing import Protocol, Self, TypeVar
 
 from pydantic import BaseModel
 
@@ -45,13 +45,13 @@ class JsonLoaderConfig(BaseModel):
     default_file: str | None
 
     @classmethod
-    def from_default_file(cls, default_file: str):
+    def from_default_file(cls, default_file: str) -> Self:
         """Create instance by splitting path from file to set defaults."""
         default_path, default_file = split(default_file)
         return cls(default_path=default_path, default_file=default_file)
 
     @classmethod
-    def from_default_path(cls, default_path: str):
+    def from_default_path(cls, default_path: str) -> Self:
         """Create instance by only setting a default path."""
         return cls(default_path=default_path, default_file=None)
 
