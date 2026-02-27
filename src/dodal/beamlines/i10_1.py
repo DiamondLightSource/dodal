@@ -7,7 +7,14 @@ from dodal.devices.beamlines.i10_1 import (
     ElectromagnetStage,
     I10JScalerCard,
 )
-from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
+from dodal.devices.current_amplifiers import (
+    SR570,
+    CurrentAmpDet,
+    Femto3xxGainTable,
+    Femto3xxGainToCurrentTable,
+    Femto3xxRaiseTime,
+    FemtoDDPCA,
+)
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -121,4 +128,61 @@ def electromagnet_sr570_scaler_fy(
 def em_temperature_controller() -> Lakeshore336:
     return Lakeshore336(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
+    )
+
+
+"""I10J HighField Magnet Measurement Devices"""
+
+
+@devices.factory()
+def hfm_femto_1() -> FemtoDDPCA:
+    return FemtoDDPCA(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-01:",
+        suffix="GAIN",
+        gain_table=Femto3xxGainTable,
+        gain_to_current_table=Femto3xxGainToCurrentTable,
+        raise_timetable=Femto3xxRaiseTime,
+    )
+
+
+@devices.factory()
+def hfm_femto_2() -> FemtoDDPCA:
+    return FemtoDDPCA(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-02:",
+        suffix="GAIN",
+        gain_table=Femto3xxGainTable,
+        gain_to_current_table=Femto3xxGainToCurrentTable,
+        raise_timetable=Femto3xxRaiseTime,
+    )
+
+
+@devices.factory()
+def hfm_femto3() -> FemtoDDPCA:
+    return FemtoDDPCA(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-03:",
+        suffix="GAIN",
+        gain_table=Femto3xxGainTable,
+        gain_to_current_table=Femto3xxGainToCurrentTable,
+        raise_timetable=Femto3xxRaiseTime,
+    )
+
+
+@devices.factory()
+def hfm_sr570_tey() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-04:",
+    )
+
+
+@devices.factory()
+def hfm_sr570_diode_1() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-05:",
+    )
+
+
+@devices.factory()
+def hfm_sr570_diode_2() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-06:",
     )
