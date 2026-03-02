@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.motors.Stage &#8212; dodal 2.0.1.dev28+g36d3bf0cd documentation</title>
+    <title>dodal.devices.motors.Stage &#8212; dodal 2.0.1.dev29+ge70315c70 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=c15b4745"></script>
+    <script src="../../_static/documentation_options.js?v=7ee81006"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1001,9 +1001,14 @@
 <dt class="sig sig-object py" id="dodal.devices.motors.Stage">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.motors.</span></span><span class="sig-name descname"><span class="pre">Stage</span></span><a class="reference internal" href="../../_modules/dodal/devices/motors.html#Stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.motors.Stage" title="Link to this definition">#</a></dt>
 <dd><p>For these devices, the following co-ordinates are typical but not enforced:
-- z is horizontal &amp; parallel to the direction of beam travel
-- y is vertical and antiparallel to the force of gravity
-- x is the cross product of y🞬z</p>
+- z is tangential to the electrons (as they orbit inside the synchrotron);</p>
+<blockquote>
+<div><p>the x-rays are generated in that tangential direction: But z is defined by the electrons.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>y is vertical and antiparallel to the force of gravity</p></li>
+<li><p>x is the cross product of y with z</p></li>
+</ul>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.motors.Stage.prefix">
 <span class="sig-name descname"><span class="pre">prefix</span></span><a class="headerlink" href="#dodal.devices.motors.Stage.prefix" title="Link to this definition">#</a></dt>
