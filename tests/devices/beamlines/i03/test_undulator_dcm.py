@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from daq_config_server.client import ConfigServer
 from daq_config_server.models import UndulatorEnergyGapLookupTable
 from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
