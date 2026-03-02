@@ -119,10 +119,10 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
         shtr_infix: str = EXP_SHUTTER_1_INFIX,
         name: str = "",
     ) -> None:
-        self.interlock = interlock
         self.control = epics_signal_w(ShutterDemand, f"{bl_prefix}{shtr_infix}:CON")
         with self.add_children_as_readables():
             self.status = epics_signal_r(ShutterState, f"{bl_prefix}{shtr_infix}:STA")
+            self.interlock = interlock
         super().__init__(name)
 
     @AsyncStatus.wrap

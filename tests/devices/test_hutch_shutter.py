@@ -72,11 +72,14 @@ async def test_interlock_shutter_safe_to_operate_logic(
 
 
 async def test_shutter_readable(fake_shutter_int: HutchShutter):
+    result = {
+        f"{fake_shutter_int.name}-status": partial_reading(ShutterState.FAULT),
+    }
+    if fake_shutter_int.interlock:
+        result[f"{fake_shutter_int.interlock.name}-status"] = partial_reading(0.0)
     await assert_reading(
         fake_shutter_int,
-        {
-            f"{fake_shutter_int.name}-status": partial_reading(ShutterState.FAULT),
-        },
+        result,
     )
 
 
