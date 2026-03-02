@@ -58,7 +58,7 @@ async def test_pmac_home(fake_pmac: PMAC, run_engine: RunEngine):
 
 
 async def test_set_pmac_string_for_laser(fake_pmac: PMAC, run_engine: RunEngine):
-    run_engine(bps.abs_set(fake_pmac.laser, LaserSettings.LASER_1_ON))
+    run_engine(bps.abs_set(fake_pmac.laser, LaserSettings.LASER_1_ON, wait=True))
 
     assert await fake_pmac.pmac_string.get_value() == " M712=1 M711=1"
 
@@ -143,7 +143,7 @@ async def test_abort_program(mock_sleep, fake_pmac: PMAC, run_engine: RunEngine)
     mock_pmac_string = get_mock_put(fake_pmac.pmac_string)
     mock_pmac_string.assert_has_calls(
         [
-            call("A", wait=True),
-            call("P2401=0", wait=True),
+            call("A"),
+            call("P2401=0"),
         ]
     )
