@@ -103,7 +103,7 @@ async def test_insertion_device_energy_prepare_success(
     mock_id_energy.set.assert_awaited_once_with(energy=750)
     get_mock_put(
         mock_id_controller.apple2().gap().user_setpoint
-    ).assert_awaited_once_with(str(ramp_up_start), wait=True)
+    ).assert_awaited_once_with(str(ramp_up_start))
 
     assert await mock_id_controller.apple2().gap().velocity.get_value() == abs(velocity)
 
