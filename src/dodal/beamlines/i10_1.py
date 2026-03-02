@@ -35,6 +35,16 @@ def mirror6_sr570() -> SR570:
 
 
 @devices.factory()
+def i10j_sr570_scaler_monitor(
+    mirror6_sr570: SR570,
+    electromagnet_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=mirror6_sr570, counter=electromagnet_scaler_card.mon
+    )
+
+
+@devices.factory()
 def slits() -> I10JSlits:
     return I10JSlits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-")
 
@@ -89,16 +99,6 @@ def em_sr570_tey() -> SR570:
 def em_sr570_fy() -> SR570:
     return SR570(
         prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-09:",
-    )
-
-
-@devices.factory()
-def electromagnet_sr570_scaler_monitor(
-    mirror6_sr570: SR570,
-    electromagnet_scaler_card: I10JScalerCard,
-) -> CurrentAmpDet:
-    return CurrentAmpDet(
-        current_amp=mirror6_sr570, counter=electromagnet_scaler_card.mon
     )
 
 
@@ -185,4 +185,44 @@ def hfm_sr570_diode_1() -> SR570:
 def hfm_sr570_diode_2() -> SR570:
     return SR570(
         prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-06:",
+    )
+
+
+@devices.factory()
+def hfm_scaler_card() -> I10JScalerCard:
+    return I10JScalerCard(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SCLR-01:SCALERJ2",
+    )
+
+
+@devices.factory()
+def hfm_sr570_scaler_tey(
+    hfm_sr570_tey: SR570,
+    hfm_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=hfm_sr570_tey,
+        counter=hfm_scaler_card.tey,
+    )
+
+
+@devices.factory()
+def hfm_sr570_scaler_diode_1(
+    hfm_sr570_diode_1: SR570,
+    hfm_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=hfm_sr570_diode_1,
+        counter=hfm_scaler_card.fy,
+    )
+
+
+@devices.factory()
+def hfm_sr570_scaler_diode_2(
+    hfm_sr570_diode_2: SR570,
+    hfm_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=hfm_sr570_diode_2,
+        counter=hfm_scaler_card.fy2,
     )
