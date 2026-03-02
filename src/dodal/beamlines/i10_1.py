@@ -134,6 +134,9 @@ def em_temperature_controller() -> Lakeshore336:
 """I10J HighField Magnet Measurement Devices"""
 
 
+"""Current Amplifiers."""
+
+
 @devices.factory()
 def hfm_femto_1() -> FemtoDDPCA:
     return FemtoDDPCA(
@@ -188,6 +191,7 @@ def hfm_sr570_diode_2() -> SR570:
     )
 
 
+# Scaler Cards
 @devices.factory()
 def hfm_scaler_card() -> I10JScalerCard:
     return I10JScalerCard(
@@ -195,6 +199,7 @@ def hfm_scaler_card() -> I10JScalerCard:
     )
 
 
+# Photon detectors CurrentAmpDet Combinations.
 @devices.factory()
 def hfm_sr570_scaler_tey(
     hfm_sr570_tey: SR570,
