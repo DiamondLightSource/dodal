@@ -14,7 +14,7 @@ def harmonic() -> UndulatorOrder:
 
 
 @pytest.fixture
-async def id(harmonic: UndulatorOrder) -> InsertionDevice:
+async def id(harmonic: UndulatorOrder, set_beamline_env_variable) -> InsertionDevice:
     async with init_devices(mock=True):
         id = InsertionDevice(
             "ID-01",
