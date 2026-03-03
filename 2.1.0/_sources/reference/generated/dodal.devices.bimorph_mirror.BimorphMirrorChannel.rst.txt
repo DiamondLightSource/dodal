@@ -1,0 +1,52 @@
+dodal.devices.bimorph\_mirror.BimorphMirrorChannel
+==================================================
+
+.. currentmodule:: dodal.devices.bimorph_mirror
+
+.. autoclass:: BimorphMirrorChannel
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BimorphMirrorChannel.target_voltage
+      
+      
+      ~BimorphMirrorChannel.output_voltage
+      
+      
+      ~BimorphMirrorChannel.status
+      
+      
+      ~BimorphMirrorChannel.shift
+      
+   
+   

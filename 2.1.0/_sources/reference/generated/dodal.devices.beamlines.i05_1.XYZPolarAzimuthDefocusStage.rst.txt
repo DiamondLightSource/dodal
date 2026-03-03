@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i05\_1.XYZPolarAzimuthDefocusStage
+==========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i05_1
+
+.. autoclass:: XYZPolarAzimuthDefocusStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

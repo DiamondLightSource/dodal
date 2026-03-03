@@ -1,0 +1,58 @@
+dodal.devices.motors
+====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~motors.SixAxisGonio
+   ~motors.SixAxisGonioKappaPhi
+   ~motors.Stage
+   ~motors.XThetaStage
+   ~motors.XYPhiStage
+   ~motors.XYPitchStage
+   ~motors.XYRollStage
+   ~motors.XYStage
+   ~motors.XYZOmegaStage
+   ~motors.XYZPitchYawRollStage
+   ~motors.XYZPitchYawStage
+   ~motors.XYZPolarAzimuthStage
+   ~motors.XYZPolarAzimuthTiltStage
+   ~motors.XYZPolarStage
+   ~motors.XYZStage
+   ~motors.XYZThetaStage
+   ~motors.YZStage
+
+
+
+
+.. automodule:: dodal.devices.motors
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_axis_perp_to_rotation
+   
+   
+
+   
+   
+   

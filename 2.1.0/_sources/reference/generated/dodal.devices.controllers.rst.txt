@@ -1,0 +1,36 @@
+dodal.devices.controllers
+=========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~controllers.ConstantDeadTimeController
+
+
+
+
+.. automodule:: dodal.devices.controllers
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,46 @@
+dodal.devices.undulator.UndulatorOrder
+======================================
+
+.. currentmodule:: dodal.devices.undulator
+
+.. autoclass:: UndulatorOrder
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~UndulatorOrder.locate
+      
+      
+      
+      
+      ~UndulatorOrder.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

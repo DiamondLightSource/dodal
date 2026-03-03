@@ -1,0 +1,42 @@
+dodal.devices.attenuator.filter\_selections
+===========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.attenuator
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~filter_selections.I02_1FilterFourSelections
+   ~filter_selections.I02_1FilterOneSelections
+   ~filter_selections.I02_1FilterThreeSelections
+   ~filter_selections.I02_1FilterTwoSelections
+   ~filter_selections.I24FilterOneSelections
+   ~filter_selections.I24FilterTwoSelections
+   ~filter_selections.P99FilterSelections
+
+
+
+
+.. automodule:: dodal.devices.attenuator.filter_selections
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

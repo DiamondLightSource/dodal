@@ -1,0 +1,36 @@
+dodal.devices.attenuator.filter
+===============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.attenuator
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~filter.FilterMotor
+
+
+
+
+.. automodule:: dodal.devices.attenuator.filter
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

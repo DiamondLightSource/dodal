@@ -1,0 +1,40 @@
+dodal.devices.common\_dcm.DoubleCrystalMonochromatorWithDSpacing
+================================================================
+
+.. currentmodule:: dodal.devices.common_dcm
+
+.. autoclass:: DoubleCrystalMonochromatorWithDSpacing
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

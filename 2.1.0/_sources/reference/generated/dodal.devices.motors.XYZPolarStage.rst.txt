@@ -1,0 +1,40 @@
+dodal.devices.motors.XYZPolarStage
+==================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZPolarStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

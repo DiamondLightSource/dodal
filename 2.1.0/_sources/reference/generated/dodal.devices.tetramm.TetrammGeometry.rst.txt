@@ -1,0 +1,78 @@
+dodal.devices.tetramm.TetrammGeometry
+=====================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammGeometry
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammGeometry.DIAMOND
+      
+      
+      ~TetrammGeometry.SQUARE
+      
+   
+   

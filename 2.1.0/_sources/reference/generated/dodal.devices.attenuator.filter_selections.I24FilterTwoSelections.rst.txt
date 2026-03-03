@@ -1,0 +1,102 @@
+dodal.devices.attenuator.filter\_selections.I24FilterTwoSelections
+==================================================================
+
+.. currentmodule:: dodal.devices.attenuator.filter_selections
+
+.. autoclass:: I24FilterTwoSelections
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I24FilterTwoSelections.EMPTY
+      
+      
+      ~I24FilterTwoSelections.AL100
+      
+      
+      ~I24FilterTwoSelections.AL200
+      
+      
+      ~I24FilterTwoSelections.AL300
+      
+      
+      ~I24FilterTwoSelections.AL400
+      
+      
+      ~I24FilterTwoSelections.AL500
+      
+      
+      ~I24FilterTwoSelections.AL600
+      
+      
+      ~I24FilterTwoSelections.AL700
+      
+      
+      ~I24FilterTwoSelections.AL800
+      
+      
+      ~I24FilterTwoSelections.AL900
+      
+   
+   

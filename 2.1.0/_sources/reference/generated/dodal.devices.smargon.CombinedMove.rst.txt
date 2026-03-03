@@ -1,0 +1,54 @@
+dodal.devices.smargon.CombinedMove
+==================================
+
+.. currentmodule:: dodal.devices.smargon
+
+.. autoclass:: CombinedMove
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~CombinedMove.x
+      
+      
+      ~CombinedMove.y
+      
+      
+      ~CombinedMove.z
+      
+      
+      ~CombinedMove.omega
+      
+      
+      ~CombinedMove.phi
+      
+      
+      ~CombinedMove.chi
+      
+   
+   
