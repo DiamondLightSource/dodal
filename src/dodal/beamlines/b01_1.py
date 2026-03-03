@@ -4,7 +4,7 @@ from pathlib import Path
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import NDROIStatIO
-from ophyd_async.epics.pmac import PmacIO
+from ophyd_async.epics.pmac import PmacIO, PmacTrajectoryTriggerLogic
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -137,3 +137,13 @@ def pmac(sample_stage: XYZStage) -> PmacIO:
         raw_motors=[sample_stage.y, sample_stage.x],
         coord_nums=[1],
     )
+
+
+@devices.factory()
+def pmac_trigger_logic(pmac: PmacIO) -> PmacTrajectoryTriggerLogic:
+    """The trigger logic for the Power PMAC.
+
+    Returns:
+        PmacTrajectoryTriggerLogic.
+    """
+    return PmacTrajectoryTriggerLogic(pmac)
