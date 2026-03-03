@@ -30,7 +30,7 @@ LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
 
 
 @pytest.fixture
-async def undulator() -> UndulatorInKeV:
+async def undulator(set_beamline_env_variable) -> UndulatorInKeV:
     async with init_devices(mock=True):
         baton = Baton("BATON-01")
         undulator = UndulatorInKeV(
@@ -62,11 +62,6 @@ def undulator_in_commissioning_mode(
 ) -> Generator[UndulatorInKeV, None, None]:
     set_mock_value(undulator.baton_ref().commissioning, True)  # type: ignore
     yield undulator
-
-
-@pytest.fixture(autouse=True)
-def set_beamline_env_variable(monkeypatch):
-    monkeypatch.setenv("BEAMLINE", "test")
 
 
 async def test_undulator_mm_config_default_parameters(undulator_in_mm: UndulatorInMm):
@@ -114,7 +109,7 @@ async def test_configuration_includes_configuration_fields(undulator: UndulatorI
     )
 
 
-async def test_poles_not_propagated_if_not_supplied():
+async def test_poles_not_propagated_if_not_supplied(set_beamline_env_variable):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
@@ -126,7 +121,7 @@ async def test_poles_not_propagated_if_not_supplied():
     assert "undulator-poles" not in (await undulator.read_configuration())
 
 
-async def test_length_not_propagated_if_not_supplied():
+async def test_length_not_propagated_if_not_supplied(set_beamline_env_variable):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
