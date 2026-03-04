@@ -75,7 +75,7 @@ async def puck_detect(
         "dodal.devices.beamlines.i15_1.puck_detector.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
-            puck_detect = PuckDetect(url)
+            puck_detect = PuckDetect(url, 1)
         yield puck_detect
 
 
@@ -131,6 +131,14 @@ async def test_given_unexpected_state_found_at_position_1_when_triggered_then_se
     "data_coro", ['{"result": {"1": "Lid", "2": "None"}}'], indirect=True
 )
 async def test_given_more_states_than_expected_when_triggered_then_sensible_error(
+    puck_detect: PuckDetect,
+):
+    with pytest.raises(ValueError):
+        await puck_detect.trigger()
+
+
+@pytest.mark.parametrize("data_coro", [full_test_json], indirect=True)
+async def test_given_full_test_json_when_triggered_then_positions_set_as_expected(
     test_client: TestClient,
     server_port: int,
 ):
@@ -143,16 +151,8 @@ async def test_given_more_states_than_expected_when_triggered_then_sensible_erro
         "dodal.devices.beamlines.i15_1.puck_detector.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
-            puck_detect = PuckDetect(url, 1)
+            puck_detect = PuckDetect(url, 20)
 
-    with pytest.raises(ValueError):
-        await puck_detect.trigger()
-
-
-@pytest.mark.parametrize("data_coro", [full_test_json], indirect=True)
-async def test_given_full_test_json_when_triggered_then_positions_set_as_expected(
-    puck_detect: PuckDetect,
-):
     await puck_detect.trigger()
     assert await puck_detect.puck_states[1].get_value() == PuckState.PUCK
     assert await puck_detect.puck_states[2].get_value() == PuckState.LID
