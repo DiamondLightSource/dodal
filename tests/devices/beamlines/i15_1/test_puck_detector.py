@@ -11,6 +11,32 @@ from ophyd_async.core import init_devices
 
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect, PuckState
 
+full_test_json = """{
+  "result": {
+    "1": "Puck",
+    "2": "Lid",
+    "3": "None",
+    "4": "None",
+    "5": "None",
+    "6": "None",
+    "7": "None",
+    "8": "None",
+    "9": "None",
+    "10": "None",
+    "11": "Lid",
+    "12": "None",
+    "13": "Puck",
+    "14": "Puck",
+    "15": "None",
+    "16": "None",
+    "17": "None",
+    "18": "None",
+    "19": "None",
+    "20": "None"
+  }
+}
+"""
+
 
 @pytest.fixture
 def data_coro(request) -> AsyncMock:
@@ -73,10 +99,63 @@ async def test_given_malformed_json_when_triggered_then_error_raised(
 async def test_given_nothing_found_at_position_1_when_triggered_then_position_1_set_to_nothing(
     puck_detect: PuckDetect,
 ):
-    # Not working
     await puck_detect.trigger()
-    puck_1_state = await puck_detect.puck_states[1].get_value()
-    assert puck_1_state == PuckState.NO_PUCK
+    assert await puck_detect.puck_states[1].get_value() == PuckState.NO_PUCK
 
 
-# {"result":{"1":"Puck","2":"Lid","3":"None","4":"None","5":"None","6":"None","7":"None","8":"None","9":"None","10":"None","11":"None","12":"None","13":"None","14":"None","15":"None","16":"None","17":"None","18":"None","19":"None","20":"None"}}
+@pytest.mark.parametrize("data_coro", ['{"result": {"1": "Puck"}}'], indirect=True)
+async def test_given_puck_found_at_position_1_when_triggered_then_position_1_set_to_puck(
+    puck_detect: PuckDetect,
+):
+    await puck_detect.trigger()
+    assert await puck_detect.puck_states[1].get_value() == PuckState.PUCK
+
+
+@pytest.mark.parametrize("data_coro", ['{"result": {"1": "Lid"}}'], indirect=True)
+async def test_given_lid_found_at_position_1_when_triggered_then_position_1_set_to_lid(
+    puck_detect: PuckDetect,
+):
+    await puck_detect.trigger()
+    assert await puck_detect.puck_states[1].get_value() == PuckState.LID
+
+
+@pytest.mark.parametrize("data_coro", ['{"result": {"1": "Unknown"}}'], indirect=True)
+async def test_given_unexpected_state_found_at_position_1_when_triggered_then_sensible_error(
+    puck_detect: PuckDetect,
+):
+    with pytest.raises(ValueError):
+        await puck_detect.trigger()
+
+
+@pytest.mark.parametrize(
+    "data_coro", ['{"result": {"1": "Lid", "2": "None"}}'], indirect=True
+)
+async def test_given_more_states_than_expected_when_triggered_then_sensible_error(
+    test_client: TestClient,
+    server_port: int,
+):
+    url = f"http://127.0.0.1:{server_port}/result"
+
+    def get_session(raise_for_status: bool) -> ClientSession:
+        return test_client.session
+
+    with patch(
+        "dodal.devices.beamlines.i15_1.puck_detector.ClientSession", new=get_session
+    ):
+        async with init_devices(mock=True):
+            puck_detect = PuckDetect(url, 1)
+
+    with pytest.raises(ValueError):
+        await puck_detect.trigger()
+
+
+@pytest.mark.parametrize("data_coro", [full_test_json], indirect=True)
+async def test_given_full_test_json_when_triggered_then_positions_set_as_expected(
+    puck_detect: PuckDetect,
+):
+    await puck_detect.trigger()
+    assert await puck_detect.puck_states[1].get_value() == PuckState.PUCK
+    assert await puck_detect.puck_states[2].get_value() == PuckState.LID
+    assert await puck_detect.puck_states[3].get_value() == PuckState.NO_PUCK
+    assert await puck_detect.puck_states[10].get_value() == PuckState.NO_PUCK
+    assert await puck_detect.puck_states[14].get_value() == PuckState.PUCK

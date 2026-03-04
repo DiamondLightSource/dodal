@@ -18,11 +18,18 @@ class PuckState(StrictEnum):
 
 
 class PuckDetect(StandardReadable):
-    def __init__(self, puck_detect_url: str, name: str = "") -> None:
+    def __init__(
+        self, puck_detect_url: str, number_of_pucks: int = 20, name: str = ""
+    ) -> None:
         self.url = puck_detect_url
+        self.number_of_pucks = number_of_pucks
 
         states, self._setters = zip(
-            *[soft_signal_r_and_setter(PuckState) for _ in range(20)], strict=True
+            *[
+                soft_signal_r_and_setter(PuckState, initial_value=PuckState.NO_PUCK)
+                for _ in range(number_of_pucks)
+            ],
+            strict=True,
         )
 
         # States are 1 indexed to match the convention from the detection code
@@ -37,4 +44,10 @@ class PuckDetect(StandardReadable):
             async with session.get(self.url) as response:
                 raw_data = await response.read()
                 data = json.loads(raw_data)
-                self._setters[0](PuckState(data["result"]["1"]))
+                results = data["result"]
+                if len(results) != self.number_of_pucks:
+                    raise ValueError(
+                        f"Puck detect camera returned {len(results)} results but expected {self.number_of_pucks}"
+                    )
+                for puck_idx, puck_state in data["result"].items():
+                    self._setters[int(puck_idx) - 1](PuckState(puck_state))
