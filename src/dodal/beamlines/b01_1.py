@@ -144,6 +144,6 @@ def pmac_trigger_logic(pmac: PmacIO) -> PmacTrajectoryTriggerLogic:
     """The trigger logic for the Power PMAC.
 
     Returns:
-        PmacTrajectoryTriggerLogic.
+        PmacTrajectoryTriggerLogic: Flyable device for Power PMAC flyscanning.
     """
     return PmacTrajectoryTriggerLogic(pmac)
