@@ -1,5 +1,5 @@
 from asyncio import sleep
-from enum import Enum, IntEnum
+from enum import IntEnum, StrEnum
 
 from bluesky.protocols import Flyable, Movable, Triggerable
 from ophyd_async.core import (
@@ -27,7 +27,7 @@ class ScanState(IntEnum):
     DONE = 0
 
 
-class LaserSettings(str, Enum):
+class LaserSettings(StrEnum):
     """PMAC strings to switch laser on and off.
     Note. On the PMAC, M-variables usually have to do with position compare
     set up.
@@ -42,7 +42,7 @@ class LaserSettings(str, Enum):
     LASER_2_OFF = " M812=0 M811=1"
 
 
-class EncReset(str, Enum):
+class EncReset(StrEnum):
     """PMAC strings for position compare on encoder channels in the controller.
 
     For example, for ENC5::
@@ -72,7 +72,7 @@ class PMACStringMove(Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self.signal_ref().set(self.cmd_string, wait=True)
+        await self.signal_ref().set(self.cmd_string)
 
 
 class PMACStringLaser(Device, Movable[LaserSettings]):
@@ -147,7 +147,7 @@ class ProgramRunner(Device, Flyable):
         wait for the scan status PV to go to 1.
         """
         prog_num_str = await self._get_prog_number_string()
-        await self._signal_ref().set(prog_num_str, wait=True)
+        await self._signal_ref().set(prog_num_str)
         await wait_for_value(
             self._status_ref(),
             ScanState.RUNNING,
@@ -185,9 +185,9 @@ class ProgramAbort(Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self._signal_ref().set("A", wait=True)
+        await self._signal_ref().set("A")
         await sleep(1.0)  # TODO Check with scientist what this sleep is really for.
-        await self._signal_ref().set("P2401=0", wait=True)
+        await self._signal_ref().set("P2401=0")
         await wait_for_value(
             self._status_ref(),
             ScanState.DONE,
