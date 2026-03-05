@@ -206,7 +206,7 @@ commands = [
     [
         "pytest",
         "-m",
-        "not requires(instrument=\"i04\")",
+        "not requires(instrument=\"i04\") and not requires(instrument=\"i15-1\")",
         "--cov-report",
         "xml:system_cov.xml",
         "--timeout=10",
