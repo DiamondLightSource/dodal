@@ -39,8 +39,8 @@ full_test_json = """{
 
 
 @pytest.fixture
-def mock_response(response) -> AsyncMock:
-    body = getattr(response, "param", "{}")
+def mock_response(request) -> AsyncMock:
+    body = getattr(request, "param", "{}")
     return AsyncMock(return_value=Response(body=body))
 
 
