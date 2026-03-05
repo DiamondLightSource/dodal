@@ -4,6 +4,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05 import I05Goniometer
 from dodal.devices.beamlines.i05_shared import M4M5Mirror
 from dodal.devices.common_mirror import XYZSwitchingMirror
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -24,6 +25,11 @@ def m4m5() -> XYZSwitchingMirror:
         prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
         mirrors=M4M5Mirror,
     )
+
+
+@devices.factory()
+def hr_shutter() -> HutchShutter:
+    return HutchShutter(PREFIX.beamline_prefix)
 
 
 @devices.factory()
