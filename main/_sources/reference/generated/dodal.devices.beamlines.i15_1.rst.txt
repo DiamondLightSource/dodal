@@ -9,6 +9,7 @@ dodal.devices.beamlines.i15\_1
    :toctree:
    :recursive:
 
+   dodal.devices.beamlines.i15_1.puck_detector
    dodal.devices.beamlines.i15_1.robot
 
 
