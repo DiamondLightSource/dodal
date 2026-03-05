@@ -6,6 +6,7 @@ from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
+from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
@@ -164,3 +165,8 @@ def robot() -> Robot:
         robot_prefix=f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
         current_sample_prefix=f"{PREFIX.beamline_prefix}-EA-LOC-01:",
     )
+
+
+@devices.factory()
+def puck_detect() -> PuckDetect:
+    return PuckDetect("https://i15-1-cam3-processing.diamond.ac.uk/result")
