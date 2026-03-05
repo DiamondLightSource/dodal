@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.hutch_shutter &#8212; dodal 2.1.1.dev1+gca3a97f91 documentation</title>
+    <title>dodal.devices.hutch_shutter &#8212; dodal 2.1.1.dev2+g55b94f659 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=9bd287c4"></script>
+    <script src="../../../_static/documentation_options.js?v=6134bd7e"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -877,10 +877,15 @@ window.addEventListener("load", load);</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.hutch_shutter</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">EnumTypes</span><span class="p">,</span>
+    <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
@@ -890,7 +895,9 @@ window.addEventListener("load", load);</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="n">HUTCH_SAFE_FOR_OPERATIONS</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Hutch is locked and can&#39;t be entered</span>
-
+<span class="n">PSS_SHUTTER_SUFFIX</span> <span class="o">=</span> <span class="s2">&quot;-PS-IOC-01:M14:LOP&quot;</span>
+<span class="n">EXP_SHUTTER_1_INFIX</span> <span class="o">=</span> <span class="s2">&quot;-PS-SHTR-01&quot;</span>
+<span class="n">EXP_SHUTTER_2_INFIX</span> <span class="o">=</span> <span class="s2">&quot;-PS-SHTR-02&quot;</span>
 
 <span class="c1"># Enable to allow testing when the beamline is down, do not change in production!</span>
 <span class="n">TEST_MODE</span> <span class="o">=</span> <span class="kc">False</span>
@@ -921,14 +928,53 @@ window.addEventListener("load", load);</script>
 
 
 
+<div class="viewcode-block" id="BaseHutchInterlock">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.BaseHutchInterlock.html#dodal.devices.hutch_shutter.BaseHutchInterlock">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseHutchInterlock</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="n">EnumTypes</span><span class="p">]</span>
+    <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">signal_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">EnumTypes</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">interlock_infix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">interlock_suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pv_address</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">interlock_infix</span><span class="si">}{</span><span class="n">interlock_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">signal_type</span><span class="p">,</span> <span class="n">pv_address</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BaseHutchInterlock.shutter_safe_to_operate">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.BaseHutchInterlock.html#dodal.devices.hutch_shutter.BaseHutchInterlock.shutter_safe_to_operate">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutter_safe_to_operate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract method to define if interlock allows shutter to operate.&quot;&quot;&quot;</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="HutchInterlock">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.HutchInterlock.html#dodal.devices.hutch_shutter.HutchInterlock">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">HutchInterlock</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to check the interlock status of the hutch.&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HutchInterlock</span><span class="p">(</span><span class="n">BaseHutchInterlock</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to check the interlock status of the hutch using PSS pv.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">bl_prefix</span> <span class="o">+</span> <span class="s2">&quot;-PS-IOC-01:M14:LOP&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">interlock_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">PSS_SHUTTER_SUFFIX</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">signal_type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">bl_prefix</span><span class="o">=</span><span class="n">bl_prefix</span><span class="p">,</span>
+            <span class="n">interlock_infix</span><span class="o">=</span><span class="n">shtr_infix</span><span class="p">,</span>
+            <span class="n">interlock_suffix</span><span class="o">=</span><span class="n">interlock_suffix</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># TODO replace with read</span>
     <span class="c1"># See https://github.com/DiamondLightSource/dodal/issues/651</span>
@@ -941,7 +987,7 @@ window.addEventListener("load", load);</script>
 <span class="sd">        shutter should not be in use.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">interlock_state</span> <span class="o">==</span> <span class="n">HUTCH_SAFE_FOR_OPERATIONS</span></div>
+        <span class="k">return</span> <span class="n">isclose</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">interlock_state</span><span class="p">),</span> <span class="n">HUTCH_SAFE_FOR_OPERATIONS</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">)</span></div>
 </div>
 
 
@@ -951,37 +997,38 @@ window.addEventListener("load", load);</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">HutchShutter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ShutterDemand</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to operate the hutch shutter.</span>
 
-<span class="sd">    When a demand is sent, the device should first check the hutch status</span>
-<span class="sd">    and raise an error if it&#39;s not interlocked (searched and locked), meaning it&#39;s not</span>
-<span class="sd">    safe to operate the shutter.</span>
+<span class="sd">    When a demand is sent and interlock given, the device should first check the hutch</span>
+<span class="sd">    status and raise an error if it&#39;s not interlocked (searched and locked), meaning</span>
+<span class="sd">    it&#39;s not safe to operate the shutter. When no interlock specified, the shutter</span>
+<span class="sd">    can be operated without checking the hutch status relying on default shutter</span>
+<span class="sd">    interlock (:ILKSTA).</span>
 
 <span class="sd">    If the requested shutter position is &quot;Open&quot;, the shutter control PV should first</span>
 <span class="sd">    go to &quot;Reset&quot; and then move to &quot;Open&quot;. This is because before opening the hutch</span>
-<span class="sd">    shutter, the interlock status PV (`-PS-SHTR-01:ILKSTA`) will show as `failed` until</span>
-<span class="sd">    the hutch shutter is reset. This will set the interlock status to `OK`, allowing</span>
-<span class="sd">    for shutter operations. Until this step is done, the hutch shutter can&#39;t be opened.</span>
-<span class="sd">    The reset is not needed for closing the shutter.</span>
+<span class="sd">    shutter, the interlock status will show as `failed` until the hutch shutter is</span>
+<span class="sd">    reset. This will set the interlock status to `OK`, allowing for shutter operations.</span>
+<span class="sd">    Until this step is done, the hutch shutter can&#39;t be opened. The reset is not needed</span>
+<span class="sd">    for closing the shutter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CON&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ShutterState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STA&quot;</span><span class="p">)</span>
-
-        <span class="n">bl_prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span> <span class="o">=</span> <span class="n">HutchInterlock</span><span class="p">(</span><span class="n">bl_prefix</span><span class="p">)</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">interlock</span><span class="p">:</span> <span class="n">BaseHutchInterlock</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EXP_SHUTTER_1_INFIX</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">shtr_infix</span><span class="si">}</span><span class="s2">:CON&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ShutterState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">shtr_infix</span><span class="si">}</span><span class="s2">:STA&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span> <span class="o">=</span> <span class="n">interlock</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ShutterDemand</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">ShutterDemand</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
-                <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span><span class="o">.</span><span class="n">shutter_safe_to_operate</span><span class="p">()</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">interlock_state</span><span class="p">:</span>
-                    <span class="c1"># If not in test mode, fail. If in test mode, the optics hutch may be open.</span>
-                    <span class="k">raise</span> <span class="n">ShutterNotSafeToOperateError</span><span class="p">(</span>
-                        <span class="s2">&quot;The hutch has not been locked, not operating shutter.&quot;</span>
-                    <span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_interlock</span><span class="p">()</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="o">.</span><span class="n">RESET</span><span class="p">)</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                 <span class="k">return</span> <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
@@ -995,7 +1042,16 @@ window.addEventListener("load", load);</script>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;Running in test mode, will not operate the experiment shutter.&quot;</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_interlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span><span class="o">.</span><span class="n">shutter_safe_to_operate</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">interlock_state</span><span class="p">:</span>
+                <span class="c1"># If not in test mode, fail. If in test mode, the optics hutch may be open.</span>
+                <span class="k">raise</span> <span class="n">ShutterNotSafeToOperateError</span><span class="p">(</span>
+                    <span class="s2">&quot;The hutch has not been locked, not operating shutter.&quot;</span>
+                <span class="p">)</span></div>
 
 </pre></div>
 

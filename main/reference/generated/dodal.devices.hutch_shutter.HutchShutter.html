@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.hutch_shutter.HutchShutter &#8212; dodal 2.1.1.dev1+gca3a97f91 documentation</title>
+    <title>dodal.devices.hutch_shutter.HutchShutter &#8212; dodal 2.1.1.dev2+g55b94f659 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=9bd287c4"></script>
+    <script src="../../_static/documentation_options.js?v=6134bd7e"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -675,6 +675,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.hutch_shutter.html">dodal.devices.hutch_shutter</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.BaseHutchInterlock.html">dodal.devices.hutch_shutter.BaseHutchInterlock</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.HutchInterlock.html">dodal.devices.hutch_shutter.HutchInterlock</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.hutch_shutter.HutchShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterDemand.html">dodal.devices.hutch_shutter.ShutterDemand</a></li>
@@ -1001,19 +1002,23 @@
 <dt class="sig sig-object py" id="dodal.devices.hutch_shutter.HutchShutter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.hutch_shutter.</span></span><span class="sig-name descname"><span class="pre">HutchShutter</span></span><a class="reference internal" href="../../_modules/dodal/devices/hutch_shutter.html#HutchShutter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.hutch_shutter.HutchShutter" title="Link to this definition">#</a></dt>
 <dd><p>Device to operate the hutch shutter.</p>
-<p>When a demand is sent, the device should first check the hutch status
-and raise an error if it’s not interlocked (searched and locked), meaning it’s not
-safe to operate the shutter.</p>
+<p>When a demand is sent and interlock given, the device should first check the hutch
+status and raise an error if it’s not interlocked (searched and locked), meaning
+it’s not safe to operate the shutter. When no interlock specified, the shutter
+can be operated without checking the hutch status relying on default shutter
+interlock (:ILKSTA).</p>
 <p>If the requested shutter position is “Open”, the shutter control PV should first
 go to “Reset” and then move to “Open”. This is because before opening the hutch
-shutter, the interlock status PV (<code class="xref any docutils literal notranslate"><span class="pre">-PS-SHTR-01:ILKSTA</span></code>) will show as <code class="xref any docutils literal notranslate"><span class="pre">failed</span></code> until
-the hutch shutter is reset. This will set the interlock status to <code class="xref any docutils literal notranslate"><span class="pre">OK</span></code>, allowing
-for shutter operations. Until this step is done, the hutch shutter can’t be opened.
-The reset is not needed for closing the shutter.</p>
+shutter, the interlock status will show as <code class="xref any docutils literal notranslate"><span class="pre">failed</span></code> until the hutch shutter is
+reset. This will set the interlock status to <code class="xref any docutils literal notranslate"><span class="pre">OK</span></code>, allowing for shutter operations.
+Until this step is done, the hutch shutter can’t be opened. The reset is not needed
+for closing the shutter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>bl_prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>interlock</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.hutch_shutter.BaseHutchInterlock.html#dodal.devices.hutch_shutter.BaseHutchInterlock" title="dodal.devices.hutch_shutter.BaseHutchInterlock"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseHutchInterlock</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>shtr_infix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'-PS-SHTR-01'</span></code>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 </ul>
 </dd>

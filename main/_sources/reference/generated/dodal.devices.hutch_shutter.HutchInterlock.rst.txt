@@ -39,5 +39,11 @@ dodal.devices.hutch\_shutter.HutchInterlock
       
       
       
+      
+      ~HutchInterlock.status
+      
+      
+      ~HutchInterlock.bl_prefix
+      
    
    

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.hutch_shutter &#8212; dodal 2.1.1.dev1+gca3a97f91 documentation</title>
+    <title>dodal.devices.hutch_shutter &#8212; dodal 2.1.1.dev2+g55b94f659 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=9bd287c4"></script>
+    <script src="../../_static/documentation_options.js?v=6134bd7e"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.hutch_shutter.HutchInterlock" href="dodal.devices.hutch_shutter.HutchInterlock.html" />
+    <link rel="next" title="dodal.devices.hutch_shutter.BaseHutchInterlock" href="dodal.devices.hutch_shutter.BaseHutchInterlock.html" />
     <link rel="prev" title="dodal.devices.focusing_mirror.SingleMirrorVoltage" href="dodal.devices.focusing_mirror.SingleMirrorVoltage.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -675,6 +675,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.hutch_shutter</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.BaseHutchInterlock.html">dodal.devices.hutch_shutter.BaseHutchInterlock</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.HutchInterlock.html">dodal.devices.hutch_shutter.HutchInterlock</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.HutchShutter.html">dodal.devices.hutch_shutter.HutchShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterDemand.html">dodal.devices.hutch_shutter.ShutterDemand</a></li>
@@ -997,16 +998,19 @@
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.HutchInterlock.html#dodal.devices.hutch_shutter.HutchInterlock" title="dodal.devices.hutch_shutter.HutchInterlock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HutchInterlock</span></code></a></p></td>
-<td><p>Device to check the interlock status of the hutch.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.HutchShutter.html#dodal.devices.hutch_shutter.HutchShutter" title="dodal.devices.hutch_shutter.HutchShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HutchShutter</span></code></a></p></td>
-<td><p>Device to operate the hutch shutter.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterDemand.html#dodal.devices.hutch_shutter.ShutterDemand" title="dodal.devices.hutch_shutter.ShutterDemand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ShutterDemand</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.BaseHutchInterlock.html#dodal.devices.hutch_shutter.BaseHutchInterlock" title="dodal.devices.hutch_shutter.BaseHutchInterlock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseHutchInterlock</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterState.html#dodal.devices.hutch_shutter.ShutterState" title="dodal.devices.hutch_shutter.ShutterState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ShutterState</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.HutchInterlock.html#dodal.devices.hutch_shutter.HutchInterlock" title="dodal.devices.hutch_shutter.HutchInterlock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HutchInterlock</span></code></a></p></td>
+<td><p>Device to check the interlock status of the hutch using PSS pv.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.HutchShutter.html#dodal.devices.hutch_shutter.HutchShutter" title="dodal.devices.hutch_shutter.HutchShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HutchShutter</span></code></a></p></td>
+<td><p>Device to operate the hutch shutter.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterDemand.html#dodal.devices.hutch_shutter.ShutterDemand" title="dodal.devices.hutch_shutter.ShutterDemand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ShutterDemand</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterState.html#dodal.devices.hutch_shutter.ShutterState" title="dodal.devices.hutch_shutter.ShutterState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ShutterState</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1043,11 +1047,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.hutch_shutter.HutchInterlock.html"
+       href="dodal.devices.hutch_shutter.BaseHutchInterlock.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.hutch_shutter.HutchInterlock</p>
+        <p class="prev-next-title">dodal.devices.hutch_shutter.BaseHutchInterlock</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
