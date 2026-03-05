@@ -39,8 +39,8 @@ full_test_json = """{
 
 
 @pytest.fixture
-def data_coro(request) -> AsyncMock:
-    body = getattr(request, "param", "{}")
+def mock_response(response) -> AsyncMock:
+    body = getattr(response, "param", "{}")
     return AsyncMock(return_value=Response(body=body))
 
 
@@ -51,10 +51,10 @@ def server_port() -> int:
 
 @pytest.fixture
 async def test_client(
-    data_coro: AsyncMock, server_port: int
+    mock_response: AsyncMock, server_port: int
 ) -> AsyncGenerator[TestClient]:
     app = Application()
-    app.router.add_get("/result", handler=data_coro)
+    app.router.add_get("/result", handler=mock_response)
     client = TestClient(server=TestServer(app, port=server_port))
     await client.start_server()
     yield client
@@ -87,7 +87,7 @@ async def test_given_web_page_not_accessible_when_triggered_then_error_raised():
         await puck_detect.trigger()
 
 
-@pytest.mark.parametrize("data_coro", ["{1}"], indirect=True)
+@pytest.mark.parametrize("mock_response", ["{1}"], indirect=True)
 async def test_given_malformed_json_when_triggered_then_error_raised(
     puck_detect: PuckDetect,
 ):
@@ -95,7 +95,7 @@ async def test_given_malformed_json_when_triggered_then_error_raised(
         await puck_detect.trigger()
 
 
-@pytest.mark.parametrize("data_coro", ['{"result": {"1": "None"}}'], indirect=True)
+@pytest.mark.parametrize("mock_response", ['{"result": {"1": "None"}}'], indirect=True)
 async def test_given_nothing_found_at_position_1_when_triggered_then_position_1_set_to_nothing(
     puck_detect: PuckDetect,
 ):
@@ -103,7 +103,7 @@ async def test_given_nothing_found_at_position_1_when_triggered_then_position_1_
     assert await puck_detect.puck_states[1].get_value() == PuckState.NO_PUCK
 
 
-@pytest.mark.parametrize("data_coro", ['{"result": {"1": "Puck"}}'], indirect=True)
+@pytest.mark.parametrize("mock_response", ['{"result": {"1": "Puck"}}'], indirect=True)
 async def test_given_puck_found_at_position_1_when_triggered_then_position_1_set_to_puck(
     puck_detect: PuckDetect,
 ):
@@ -111,7 +111,7 @@ async def test_given_puck_found_at_position_1_when_triggered_then_position_1_set
     assert await puck_detect.puck_states[1].get_value() == PuckState.PUCK
 
 
-@pytest.mark.parametrize("data_coro", ['{"result": {"1": "Lid"}}'], indirect=True)
+@pytest.mark.parametrize("mock_response", ['{"result": {"1": "Lid"}}'], indirect=True)
 async def test_given_lid_found_at_position_1_when_triggered_then_position_1_set_to_lid(
     puck_detect: PuckDetect,
 ):
@@ -119,7 +119,9 @@ async def test_given_lid_found_at_position_1_when_triggered_then_position_1_set_
     assert await puck_detect.puck_states[1].get_value() == PuckState.LID
 
 
-@pytest.mark.parametrize("data_coro", ['{"result": {"1": "Unknown"}}'], indirect=True)
+@pytest.mark.parametrize(
+    "mock_response", ['{"result": {"1": "Unknown"}}'], indirect=True
+)
 async def test_given_unexpected_state_found_at_position_1_when_triggered_then_sensible_error(
     puck_detect: PuckDetect,
 ):
@@ -128,7 +130,7 @@ async def test_given_unexpected_state_found_at_position_1_when_triggered_then_se
 
 
 @pytest.mark.parametrize(
-    "data_coro", ['{"result": {"1": "Lid", "2": "None"}}'], indirect=True
+    "mock_response", ['{"result": {"1": "Lid", "2": "None"}}'], indirect=True
 )
 async def test_given_more_states_than_expected_when_triggered_then_sensible_error(
     puck_detect: PuckDetect,
@@ -137,7 +139,7 @@ async def test_given_more_states_than_expected_when_triggered_then_sensible_erro
         await puck_detect.trigger()
 
 
-@pytest.mark.parametrize("data_coro", [full_test_json], indirect=True)
+@pytest.mark.parametrize("mock_response", [full_test_json], indirect=True)
 async def test_given_full_test_json_when_triggered_then_positions_set_as_expected(
     test_client: TestClient,
     server_port: int,
