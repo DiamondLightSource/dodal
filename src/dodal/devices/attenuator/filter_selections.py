@@ -1,4 +1,4 @@
-from ophyd_async.core import SubsetEnum
+from ophyd_async.core import StrictEnum, SubsetEnum
 
 
 class P99FilterSelections(SubsetEnum):
@@ -70,6 +70,15 @@ class I02_1FilterFourSelections(SubsetEnum):  # noqa: N801
     TI300 = "Ti300"
     TI400 = "Ti400"
     TI500 = "Ti500"
+
+
+class I19FilterOneSelections(StrictEnum):
+    AIR1 = "Empty"
+    AL = "Al"
+    AIR3 = "Empty"
+    AU = "Au"
+    AIR5 = "Empty"
+    FE = "Fe"
 
 
 class I24FilterOneSelections(SubsetEnum):
