@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 2.1.1.dev5+gf3705ff68 documentation</title>
+    <title>Device Standards &#8212; dodal 2.1.1.dev6+gcf192dad4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2879b7f7"></script>
+    <script src="../_static/documentation_options.js?v=dec1c776"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1045,7 +1045,7 @@ the device_factory decorator.</p>
 </section>
 <section id="pv-suffixes">
 <h2>PV Suffixes<a class="headerlink" href="#pv-suffixes" title="Link to this heading">#</a></h2>
-<p>In general devices should contain only the PV suffixes that are generic for any instance of the device e.g.</p>
+<p>Devices should only contain only the PV suffixes that are generic for any instance of the device e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
     <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
         <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -1065,13 +1065,8 @@ the device_factory decorator.</p>
     <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;BLXXI&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This is so that a new device on say <code class="docutils literal notranslate"><span class="pre">-MO-DCM-02</span></code> can be easily created.</p>
-</section>
-<section id="beamline-prefix">
-<h2>Beamline Prefix<a class="headerlink" href="#beamline-prefix" title="Link to this heading">#</a></h2>
-<p>Most devices have a beamline-specific prefix such as BL03I however some devices do not. In such cases when calling
-<code class="docutils literal notranslate"><span class="pre">device_instantiation()</span></code> you can specify <code class="docutils literal notranslate"><span class="pre">bl_prefix=False</span></code> to ensure that the beamline prefix is not automatically
-prepended.</p>
+<p>This is so that a new device on say <code class="docutils literal notranslate"><span class="pre">-MO-DCM-02</span></code> can be easily created. By convention the prefixes passed
+into the device should contain the trailing colon.</p>
 </section>
 <section id="use-of-signals">
 <h2>Use of signals<a class="headerlink" href="#use-of-signals" title="Link to this heading">#</a></h2>
@@ -1223,7 +1218,6 @@ based on this and so this has the issues listed above. Instead you should make s
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#device-best-practices">Device Best Practices</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defaulting-names">Defaulting Names</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pv-suffixes">PV Suffixes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#beamline-prefix">Beamline Prefix</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-of-signals">Use of signals</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#holding-state">Holding State</a></li>
 </ul>
