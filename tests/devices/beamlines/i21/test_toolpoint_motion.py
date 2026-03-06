@@ -12,8 +12,8 @@ from ophyd_async.testing import assert_reading, partial_reading
 from dodal.devices.beamlines.i21 import (
     I21SampleManipulatorStage,
     ToolPointMotion,
-    UVWMotorPositions,
-    XYZMotorPositions,
+    UVWTiltAzimuthMotorPositions,
+    XYZTiltAzimuthMotorPositions,
 )
 from dodal.devices.beamlines.i21.toolpoint_motion import (
     DEFAULT_AXES_ZERO,
@@ -37,7 +37,7 @@ def uvw(smp: I21SampleManipulatorStage) -> ToolPointMotion:
 
 
 def expected_uvw_read(
-    pos: XYZMotorPositions, zero: tuple[float, float, float]
+    pos: XYZTiltAzimuthMotorPositions, zero: tuple[float, float, float]
 ) -> tuple[float, float, float]:
     dx, dy, dz = pos.x - zero[0], pos.y - zero[1], pos.z - zero[2]
     azimuth, tilt = radians(pos.azimuth_deg), radians(pos.tilt_deg)
@@ -64,7 +64,9 @@ def test_uvw_to_xyz_math_matches_legacy():
     u, v, w = 1.2, -3.4, 5.6
     tilt, azimuth = 30.0, 10.0
 
-    uvw = UVWMotorPositions(u=u, v=v, w=w, tilt_deg=tilt, azimuth_deg=azimuth)
+    uvw = UVWTiltAzimuthMotorPositions(
+        u=u, v=v, w=w, tilt_deg=tilt, azimuth_deg=azimuth
+    )
 
     expected_xyz = uvw_to_xyz(uvw, zero)
 
@@ -88,7 +90,9 @@ def test_xyz_to_uvw_math_matches_legacy():
 
     x, y, z = 12.3, -4.5, 6.7
     tilt, azimuth = 30.0, 10.0
-    xyz = XYZMotorPositions(x=x, y=y, z=z, tilt_deg=tilt, azimuth_deg=azimuth)
+    xyz = XYZTiltAzimuthMotorPositions(
+        x=x, y=y, z=z, tilt_deg=tilt, azimuth_deg=azimuth
+    )
 
     expected_uvw = xyz_to_uvw(xyz, zero)
 
@@ -120,7 +124,7 @@ async def test_uvw_read(uvw: ToolPointMotion) -> None:
         smp.azimuth.set(azimuth_deg),
         smp.tilt.set(tilt_deg),
     )
-    xyz_pos = XYZMotorPositions(
+    xyz_pos = XYZTiltAzimuthMotorPositions(
         x=x, y=y, z=z, tilt_deg=tilt_deg, azimuth_deg=azimuth_deg
     )
     expected_uvw = xyz_to_uvw(xyz_pos, zero=uvw._zero)
@@ -192,7 +196,7 @@ async def test_uvw_axis_set(
 
 
 async def test_uvw_set(uvw: ToolPointMotion) -> None:
-    pos = UVWMotorPositions(u=10, v=20, w=30, tilt_deg=40, azimuth_deg=50)
+    pos = UVWTiltAzimuthMotorPositions(u=10, v=20, w=30, tilt_deg=40, azimuth_deg=50)
     await uvw.set(pos)
 
     await assert_reading(
@@ -219,8 +223,12 @@ async def test_uvw_check_motor_limits_calls_all_motors(
     smp.tilt.check_motor_limit = AsyncMock()
     smp.azimuth.check_motor_limit = AsyncMock()
 
-    start = XYZMotorPositions(x=1.0, y=2.0, z=3.0, tilt_deg=10.0, azimuth_deg=20.0)
-    end = XYZMotorPositions(x=4.0, y=5.0, z=6.0, tilt_deg=30.0, azimuth_deg=40.0)
+    start = XYZTiltAzimuthMotorPositions(
+        x=1.0, y=2.0, z=3.0, tilt_deg=10.0, azimuth_deg=20.0
+    )
+    end = XYZTiltAzimuthMotorPositions(
+        x=4.0, y=5.0, z=6.0, tilt_deg=30.0, azimuth_deg=40.0
+    )
 
     await uvw.check_motor_limits(start, end)
 
@@ -239,8 +247,12 @@ async def test_check_motor_limits_raises_on_failure(
     set_mock_value(uvw.smp_ref().z.high_limit_travel, 500)
     set_mock_value(uvw.smp_ref().z.dial_high_limit_travel, 500)
 
-    start = XYZMotorPositions(x=0.0, y=0.0, z=0.0, tilt_deg=0.0, azimuth_deg=0.0)
-    end = XYZMotorPositions(x=1.0, y=1.0, z=600, tilt_deg=5.0, azimuth_deg=5.0)
+    start = XYZTiltAzimuthMotorPositions(
+        x=0.0, y=0.0, z=0.0, tilt_deg=0.0, azimuth_deg=0.0
+    )
+    end = XYZTiltAzimuthMotorPositions(
+        x=1.0, y=1.0, z=600, tilt_deg=5.0, azimuth_deg=5.0
+    )
 
     with pytest.raises(MotorLimitsError):
         await uvw.check_motor_limits(start, end)
