@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i11 &#8212; dodal 2.1.1.dev6+gcf192dad4 documentation</title>
+    <title>dodal.beamlines.i11 &#8212; dodal 2.1.1.dev7+gb4cb8db61 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=dec1c776"></script>
+    <script src="../../../_static/documentation_options.js?v=b2df5e72"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -892,6 +892,7 @@ window.addEventListener("load", load);</script>
     <span class="n">AutotunedCyberstarBlower</span><span class="p">,</span>
     <span class="n">CyberstarBlower</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i11.dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DCM</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i11.diff_stages</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DiffractometerBase</span><span class="p">,</span>
     <span class="n">DiffractometerStage</span><span class="p">,</span>
@@ -1021,6 +1022,14 @@ window.addEventListener("load", load);</script>
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">slits_5</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Slits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Slits</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-AL-SLITS-05:&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dcm</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">DCM</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">DCM</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-DCM-01:&quot;</span><span class="p">,</span>
+        <span class="n">xtal_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-DCM-01:&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
                 </article>
