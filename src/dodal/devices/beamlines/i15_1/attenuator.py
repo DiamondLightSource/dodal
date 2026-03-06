@@ -1,4 +1,10 @@
-from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    StandardReadableFormat,
+    StrictEnum,
+)
 from ophyd_async.epics.core import epics_signal_rw
 
 
@@ -22,7 +28,7 @@ class AttenuatorPositions(StrictEnum):
             ) from e
 
 
-class Attenuator(StandardReadable):
+class Attenuator(StandardReadable, Movable[float | AttenuatorPositions]):
     """A device to change the attenuation of the beam.
 
     This can be done by doing:
@@ -38,8 +44,8 @@ class Attenuator(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self._positioner = epics_signal_rw(
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.transmission = epics_signal_rw(
                 AttenuatorPositions, f"{prefix}MP1:SELECT"
             )
         super().__init__(name)
@@ -52,4 +58,4 @@ class Attenuator(StandardReadable):
         """
         if isinstance(value, float) or isinstance(value, int):
             value = AttenuatorPositions.from_float(value)
-        await self._positioner.set(value)
+        await self.transmission.set(value)

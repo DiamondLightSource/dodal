@@ -175,4 +175,4 @@ def puck_detect() -> PuckDetect:
 
 @devices.factory()
 def attenuator() -> Attenuator:
-    return Attenuator("BL15J-OP-ATTN-02:")
+    return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
