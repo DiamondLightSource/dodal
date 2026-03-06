@@ -135,7 +135,7 @@ class XYZAzimuthStage(XYZStage):
 
 
 class XYZAzimuthPolarStage(XYZAzimuthStage):
-    """Four-axis stage with a standard xyz stage and two axis of rotation: azimuth
+    """Five-axis stage with a standard xyz stage and two axis of rotation: azimuth
     and polar.
     """
 
