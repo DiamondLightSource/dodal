@@ -37,13 +37,15 @@ class ReadOnlyAttenuator(StandardReadable):
 
 class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     """The attenuator will insert filters into the beam to reduce its transmission.
-    In this attenuator, each filter can be in one of two states: IN or OUT
+    In this attenuator, each filter can be in one of two states: IN or OUT.
 
     This device should be set with:
+
         yield from bps.set(attenuator, desired_transmission)
 
     Where desired_transmission is fraction e.g. 0-1. When the actual_transmission is
-    read from the device it is also fractional"""
+    read from the device it is also fractional
+    """
 
     def __init__(self, prefix: str, num_filters: int, name: str = ""):
         self._calculated_filter_states: DeviceVector[SignalR[int]] = DeviceVector(
@@ -72,11 +74,10 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     async def set(self, value: float):
         """Set the transmission to the fractional (0-1) value given.
 
-        The attenuator IOC will then insert filters to reach the desired transmission for
-        the current beamline energy, the set will only complete when they have all been
-        applied.
+        The attenuator IOC will then insert filters to reach the desired transmission
+        for the current beamline energy, the set will only complete when they have all
+        been applied.
         """
-
         LOGGER.debug("Using current energy ")
         await self._use_current_energy.trigger()
         LOGGER.info(f"Setting desired transmission to {value}")
@@ -110,7 +111,8 @@ ENUM_ATTENUATOR_SETTLE_TIME_S = 0.15
 class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     """The attenuator will insert filters into the beam to reduce its transmission.
 
-    This device is currently working, but feature incomplete. See https://github.com/DiamondLightSource/dodal/issues/972
+    This device is currently working, but feature incomplete. See
+    https://github.com/DiamondLightSource/dodal/issues/972
 
     In this attenuator, the state of a filter corresponds to the selected material,
     e.g Ag50, in contrast to being either 'IN' or 'OUT'; see BinaryFilterAttenuator.
@@ -141,11 +143,10 @@ class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     async def set(self, value: float):
         """Set the transmission to the fractional (0-1) value given.
 
-        The attenuator IOC will then insert filters to reach the desired transmission for
-        the current beamline energy, the set will only complete when they have all been
-        applied.
+        The attenuator IOC will then insert filters to reach the desired transmission
+        for the current beamline energy, the set will only complete when they have all
+        been applied.
         """
-
         # auto move should normally be on, but check here incase it was manually turned off
         await self._auto_move_on_desired_transmission_set.set(YesNo.YES)
 

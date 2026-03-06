@@ -20,9 +20,8 @@ class V2FGain(StrictEnum):
 
 
 class QDV2F(StandardReadable):
-    """
-    A Quantum Detectors V2F low noise voltage to frequency converter.
-    Two channel V2F - 50mHz
+    """A Quantum Detectors V2F low noise voltage to frequency converter.
+    Two channel V2F - 50mHz.
     """
 
     def __init__(

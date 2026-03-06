@@ -3,9 +3,13 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DetectorTrigger, TriggerInfo
+from ophyd_async.core import (
+    DetectorTrigger,
+    TriggerInfo,
+    callback_on_mock_put,
+    set_mock_value,
+)
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.plans.configure_arm_trigger_and_disarm_detector import (
     configure_arm_trigger_and_disarm_detector,

@@ -12,7 +12,13 @@ from dodal.log import LOGGER
 
 
 class SnapshotWithGrid(MJPG):
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_size_pv: str = "ArraySize1_RBV",
+        y_size_pv: str = "ArraySize2_RBV",
+    ) -> None:
         with self.add_children_as_readables():
             self.top_left_x = soft_signal_rw(float)
             self.top_left_y = soft_signal_rw(float)
@@ -23,7 +29,7 @@ class SnapshotWithGrid(MJPG):
             self.last_path_outer = soft_signal_rw(str)
             self.last_path_full_overlay = soft_signal_rw(str)
 
-        super().__init__(prefix, name)
+        super().__init__(prefix, name, x_size_pv, y_size_pv)
 
     async def post_processing(self, image: Image):
         # Save an unmodified image with no suffix
@@ -44,7 +50,7 @@ class SnapshotWithGrid(MJPG):
         )
 
         path = path_join(directory_str, f"{filename_str}_outer_overlay.{IMG_FORMAT}")
-        await self.last_path_outer.set(path, wait=True)
+        await self.last_path_outer.set(path)
         LOGGER.info(f"Saving grid outer edge at {path}")
         await asyncio_save_image(image, path)
 
@@ -53,6 +59,6 @@ class SnapshotWithGrid(MJPG):
         )
 
         path = path_join(directory_str, f"{filename_str}_grid_overlay.{IMG_FORMAT}")
-        await self.last_path_full_overlay.set(path, wait=True)
+        await self.last_path_full_overlay.set(path)
         LOGGER.info(f"Saving full grid overlay at {path}")
         await asyncio_save_image(image, path)

@@ -1,10 +1,25 @@
+from collections.abc import AsyncGenerator
+
 import pytest
 from bluesky import RunEngine
 from bluesky.utils import MsgGenerator
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
-from dodal.common.beamlines.commissioning_mode import read_commissioning_mode
+from dodal.common.beamlines.commissioning_mode import (
+    read_commissioning_mode,
+    set_commissioning_signal,
+)
 from dodal.devices.baton import Baton
+
+
+@pytest.fixture
+async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
+    async with init_devices(mock=True):
+        baton = Baton("BATON-01")
+    set_commissioning_signal(baton.commissioning)
+    set_mock_value(baton.commissioning, True)
+    yield baton
+    set_commissioning_signal(None)
 
 
 @pytest.mark.parametrize("mode", [True, False])

@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections.abc import Mapping
 from typing import Any
 from unittest.mock import ANY
 
@@ -120,15 +120,14 @@ async def test_lakeshore_read(
     await assert_reading(lakeshore, expected_reading, full_match=False)
 
 
-async def test_lakeshore_hints_with_count(lakeshore: Lakeshore, run_engine: RunEngine):
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    run_engine(count([lakeshore]), capture_emitted)
+async def test_lakeshore_hints_with_count(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    lakeshore: Lakeshore,
+):
+    run_engine(count([lakeshore]))
     for i in range(1, 5):
         assert (
-            docs["descriptor"][0]["hints"]["lakeshore"]["fields"][i - 1]
+            run_engine_documents["descriptor"][0]["hints"]["lakeshore"]["fields"][i - 1]
             == f"lakeshore-readback-{i}"
         )

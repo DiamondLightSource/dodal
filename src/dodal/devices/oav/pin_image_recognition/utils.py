@@ -1,17 +1,24 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import auto
 from typing import Final
 
 import cv2
 import numpy as np
+from ophyd_async.core import StrictEnum
 
 from dodal.log import LOGGER
 
 
-class ScanDirections(Enum):
-    FORWARD = 1
-    REVERSE = -1
+class ScanDirections(StrictEnum):
+    FORWARD = auto()
+    REVERSE = auto()
+
+
+"""
+See https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html
+for description of functions below.
+"""
 
 
 def identity(*args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
@@ -94,9 +101,7 @@ NONE_VALUE: Final[int] = -1
 
 @dataclass
 class SampleLocation:
-    """
-    Holder type for results from sample detection.
-    """
+    """Holder type for results from sample detection."""
 
     tip_x: int | None
     tip_y: int | None
@@ -105,10 +110,34 @@ class SampleLocation:
 
 
 class MxSampleDetect:
+    """Configures sample detection parameters.
+
+    Args:
+        preprocess (Callable): A preprocessing function applied to the array after
+            conversion to grayscale. See implementations of common functions above
+            for predefined conversions. Defaults to a no-op (i.e. no preprocessing).
+
+        for open and close operations, please read:
+            https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
+
+        open_ksize (int, optional): Kernel size for "open" operation, if set to zero
+            then ignore "open" operation.
+        open_iterations (int, optional): Number of iterations for "open" operation.
+        canny_upper (int, optional): Upper threshold for canny edge detection.
+        canny_lower (int, optional): Lower threshold for canny edge detection.
+        close_ksize (int, optional): Kernel size for "close" operation.
+        close_iterations (int, optional): Number of iterations for "close" operation.
+        scan_direction (ScanDirections, optional): ScanDirections.FORWARD for
+            left-to-right, ScanDirections.REVERSE for right-to-left.
+        min_tip_height (int, optional): Minimum height of pin tip.
+    """
+
     def __init__(
         self,
         *,
         preprocess: Callable[[np.ndarray], np.ndarray] = lambda arr: arr,
+        open_ksize: int = 0,
+        open_iterations: int = 5,
         canny_upper: int = 100,
         canny_lower: int = 50,
         close_ksize: int = 5,
@@ -116,22 +145,9 @@ class MxSampleDetect:
         scan_direction: ScanDirections = ScanDirections.FORWARD,
         min_tip_height: int = 5,
     ):
-        """
-        Configures sample detection parameters.
-
-        Args:
-            preprocess: A preprocessing function applied to the array after conversion to grayscale.
-                See implementations of common functions above for predefined conversions
-                Defaults to a no-op (i.e. no preprocessing)
-            canny_upper: upper threshold for canny edge detection
-            canny_lower: lower threshold for canny edge detection
-            close_ksize: kernel size for "close" operation
-            close_iterations: number of iterations for "close" operation
-            scan_direction: ScanDirections.FORWARD for left-to-right, ScanDirections.REVERSE for right-to-left
-            min_tip_height: minimum height of pin tip
-        """
-
         self.preprocess = preprocess
+        self.open_ksize = open_ksize
+        self.open_iterations = open_iterations
         self.canny_upper = canny_upper
         self.canny_lower = canny_lower
         self.close_ksize = close_ksize
@@ -148,8 +164,14 @@ class MxSampleDetect:
             assert arr.ndim == 2
             gray_arr = arr
 
+        # Remove Noises if open set to non-zero
+        if self.open_ksize == 0:
+            open_arr = gray_arr
+        else:
+            open_arr = open_morph(self.open_ksize, self.open_iterations)(gray_arr)
+
         # Preprocess the array. (Use the greyscale one.)
-        pp_arr = self.preprocess(gray_arr)
+        pp_arr = self.preprocess(open_arr)
 
         # Find some edges.
         edge_arr = cv2.Canny(pp_arr, self.canny_upper, self.canny_lower)
@@ -163,17 +185,16 @@ class MxSampleDetect:
     def _first_and_last_nonzero_by_columns(
         arr: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Finds the indexes of the first & last non-zero values by column in a 2d array.
+        """Finds the indexes of the first & last non-zero values by column in a 2d array.
 
         Outputs will contain NONE_VALUE if no non-zero values exist in a column.
 
-        i.e. for input:
-        [
-            [0, 0, 0, 1],
-            [1, 1, 0, 0],
-            [0, 1, 0, 1],
-        ]
+        i.e. for input::
+            [
+                [0, 0, 0, 1],
+                [1, 1, 0, 0],
+                [0, 1, 0, 1],
+            ]
 
         first_nonzero will be: [1, 1, NONE_VALUE, 0]
         last_nonzero will be [1, 2, NONE_VALUE, 2]
@@ -191,7 +212,7 @@ class MxSampleDetect:
         return first_nonzero, last_nonzero
 
     def _locate_sample(self, edge_arr: np.ndarray) -> SampleLocation:
-        height, width = edge_arr.shape
+        edge_height, edge_width = edge_arr.shape
 
         top, bottom = MxSampleDetect._first_and_last_nonzero_by_columns(edge_arr)
 
@@ -215,28 +236,30 @@ class MxSampleDetect:
 
         # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
         if self.scan_direction == ScanDirections.FORWARD:
+            x_step = -1
             start_column = int(column_indices_with_non_narrow_widths[0])
         else:
+            x_step = 1
             start_column = int(column_indices_with_non_narrow_widths[-1])
 
         x = start_column
 
         # Move backwards to where there were no edges at all...
         while top[x] != NONE_VALUE:
-            x += -self.scan_direction.value
-            if x == -1 or x == width:
+            x += x_step
+            if (x_step < 0 and x < 0) or (x_step > 0 and x >= edge_width):
                 # (In this case the sample is off the edge of the picture.)
                 LOGGER.warning(
                     "pin-tip detection: Pin tip may be outside image area - assuming at edge."
                 )
                 break
-        x += self.scan_direction.value  # ...and forward one step. x is now at the tip.
+        x -= x_step  # ...and forward one step. x is now at the tip.
 
         tip_x = x
         tip_y = int(round(0.5 * (top[x] + bottom[x])))
 
         # clear edges to the left (right) of the tip.
-        if self.scan_direction.value == 1:
+        if self.scan_direction == ScanDirections.FORWARD:
             top[:x] = NONE_VALUE
             bottom[:x] = NONE_VALUE
         else:

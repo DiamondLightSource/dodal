@@ -13,8 +13,9 @@ class CollimationTable(StandardReadable):
     There are 2 physical horizontal motors 1 upstream, 1 downstream. These provide yaw.
 
     Table motion is disabled by an object being within the laser curtain area and can be
-    overridden by use of the dead man's handle device or locking the hutch. The effect of
-    these disabling systems is to cut power to the motors - signal for this is crate_power
+    overridden by use of the dead man's handle device or locking the hutch. The effect
+    of these disabling systems is to cut power to the motors - signal for this is
+    `crate_power`.
     """
 
     def __init__(self, prefix: str, name: str = ""):

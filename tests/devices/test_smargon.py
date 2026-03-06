@@ -4,20 +4,17 @@ from unittest.mock import MagicMock, call
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices, observe_value
-from ophyd_async.epics.motor import MotorLimitsException
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.core import get_mock_put, init_devices, observe_value, set_mock_value
+from ophyd_async.epics.motor import MotorLimitsError
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon("")
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
 
 
 def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
@@ -108,20 +105,20 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
 async def test_given_set_with_value_outside_motor_limit(
     smargon: Smargon, test_x, test_y, test_z, test_omega, test_chi, test_phi
 ):
-    set_mock_value(smargon.x.low_limit_travel, -1999)
-    set_mock_value(smargon.y.low_limit_travel, -1999)
-    set_mock_value(smargon.z.low_limit_travel, -1999)
-    set_mock_value(smargon.omega.low_limit_travel, -1999)
-    set_mock_value(smargon.chi.low_limit_travel, -1999)
-    set_mock_value(smargon.phi.low_limit_travel, -1999)
-    set_mock_value(smargon.x.high_limit_travel, 1999)
-    set_mock_value(smargon.y.high_limit_travel, 1999)
-    set_mock_value(smargon.z.high_limit_travel, 1999)
-    set_mock_value(smargon.omega.high_limit_travel, 1999)
-    set_mock_value(smargon.chi.high_limit_travel, 1999)
-    set_mock_value(smargon.phi.high_limit_travel, 1999)
+    for motor in [
+        smargon.x,
+        smargon.y,
+        smargon.z,
+        smargon.omega,
+        smargon.chi,
+        smargon.phi,
+    ]:
+        set_mock_value(motor.low_limit_travel, -1999)
+        set_mock_value(motor.high_limit_travel, 1999)
+        set_mock_value(motor.dial_low_limit_travel, -1999)
+        set_mock_value(motor.dial_high_limit_travel, 1999)
 
-    with pytest.raises(MotorLimitsException):
+    with pytest.raises(MotorLimitsError):
         await smargon.set(
             CombinedMove(
                 x=test_x,
@@ -137,34 +134,34 @@ async def test_given_set_with_value_outside_motor_limit(
 async def test_given_set_with_single_value_then_that_motor_moves(smargon: Smargon):
     await smargon.set(CombinedMove(x=10))
 
-    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10)
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 
 async def test_given_set_with_none_then_that_motor_does_not_move(smargon: Smargon):
     await smargon.set(CombinedMove(x=10, y=None))
 
-    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10)
     get_mock_put(smargon.y.user_setpoint).assert_not_called()
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 
 async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
     await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
 
-    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
-    get_mock_put(smargon.y.user_setpoint).assert_called_once_with(20, wait=True)
-    get_mock_put(smargon.z.user_setpoint).assert_called_once_with(30, wait=True)
-    get_mock_put(smargon.omega.user_setpoint).assert_called_once_with(5, wait=True)
-    get_mock_put(smargon.chi.user_setpoint).assert_called_once_with(15, wait=True)
-    get_mock_put(smargon.phi.user_setpoint).assert_called_once_with(25, wait=True)
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10)
+    get_mock_put(smargon.y.user_setpoint).assert_called_once_with(20)
+    get_mock_put(smargon.z.user_setpoint).assert_called_once_with(30)
+    get_mock_put(smargon.omega.user_setpoint).assert_called_once_with(5)
+    get_mock_put(smargon.chi.user_setpoint).assert_called_once_with(15)
+    get_mock_put(smargon.phi.user_setpoint).assert_called_once_with(25)
 
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 
@@ -181,19 +178,19 @@ async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smarg
     await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
 
     assert len(parent.mock_calls) == 8
-    assert parent.mock_calls[0] == call.defer_move(DeferMoves.ON, wait=True)
+    assert parent.mock_calls[0] == call.defer_move(DeferMoves.ON)
     parent.assert_has_calls(
         [
-            call.x(10, wait=True),
-            call.y(20, wait=True),
-            call.z(30, wait=True),
-            call.omega(5, wait=True),
-            call.chi(15, wait=True),
-            call.phi(25, wait=True),
+            call.x(10),
+            call.y(20),
+            call.z(30),
+            call.omega(5),
+            call.chi(15),
+            call.phi(25),
         ],
         any_order=True,
     )
-    assert parent.mock_calls[-1] == call.defer_move(DeferMoves.OFF, wait=True)
+    assert parent.mock_calls[-1] == call.defer_move(DeferMoves.OFF)
 
 
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
@@ -204,7 +201,7 @@ async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon
         await smargon.set(CombinedMove(x=10))
 
     get_mock_put(smargon.defer_move).assert_has_calls(
-        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+        [call(DeferMoves.ON), call(DeferMoves.OFF)]
     )
 
 

@@ -33,19 +33,23 @@ Xtal_2 = TypeVar("Xtal_2", bound=StationaryCrystal)
 
 
 class DoubleCrystalMonochromatorBase(StandardReadable, Generic[Xtal_1, Xtal_2]):
-    """
-    Base device for the double crystal monochromator (DCM), used to select the energy of the beam.
+    """Base device for the double crystal monochromator (DCM), used to select the energy
+    of the beam.
 
-    Features common across all DCM's should include virtual motors to set energy/wavelength and contain two crystals,
-    each of which can be movable. Some DCM's contain crystals with roll motors, and some contain crystals with roll and pitch motors.
-    This base device accounts for all combinations of this.
+    Features common across all DCM's should include virtual motors to set
+    energy/wavelength and contain two crystals, each of which can be movable. Some DCM's
+    contain crystals with roll motors, and some contain crystals with roll and pitch
+    motors. This base device accounts for all combinations of this.
 
-    This device should act as a parent for beamline-specific DCM's which do not match the standard EPICS interface, it provides
-    only energy and the crystal configuration.  Most beamlines should use DoubleCrystalMonochromator instead
+    This device should act as a parent for beamline-specific DCM's which do not match
+    the standard EPICS interface, it provides only energy and the crystal configuration.
+    Most beamlines should use DoubleCrystalMonochromator instead.
 
-    Bluesky plans using DCM's should be typed to specify which types of crystals are required. For example, a plan
-    which only requires one crystal which can roll should be typed
-    'def my_plan(dcm: DoubleCrystalMonochromatorBase[RollCrystal, StationaryCrystal])`
+    Bluesky plans using DCM's should be typed to specify which types of crystals are
+    required. For example, a plan which only requires one crystal which can roll should
+    be typed::
+
+        def my_plan(dcm: DoubleCrystalMonochromatorBase[RollCrystal,StationaryCrystal])
     """
 
     def __init__(
@@ -53,9 +57,9 @@ class DoubleCrystalMonochromatorBase(StandardReadable, Generic[Xtal_1, Xtal_2]):
     ) -> None:
         with self.add_children_as_readables():
             # Virtual motor PV's which set the physical motors so that the DCM produces requested energy
-            self.energy_in_kev = Motor(prefix + "ENERGY")
-            self.energy_in_ev = derived_signal_r(
-                self._convert_keV_to_eV, energy_signal=self.energy_in_kev.user_readback
+            self.energy_in_keV = Motor(prefix + "ENERGY")
+            self.energy_in_eV = derived_signal_r(
+                self._convert_keV_to_eV, energy_signal=self.energy_in_keV.user_readback
             )
 
             self._make_crystals(prefix, xtal_1, xtal_2)
@@ -78,17 +82,23 @@ class DoubleCrystalMonochromatorBase(StandardReadable, Generic[Xtal_1, Xtal_2]):
 class DoubleCrystalMonochromator(
     DoubleCrystalMonochromatorBase, Generic[Xtal_1, Xtal_2]
 ):
-    """
-    Common device for the double crystal monochromator (DCM), used to select the energy of the beam.
+    """Common device for the double crystal monochromator (DCM), used to select the
+    energy of the beam.
 
-    Features common across all DCM's should include virtual motors to set energy/wavelength and contain two crystals,
-    each of which can be movable. Some DCM's contain crystals with roll motors, and some contain crystals with roll and pitch motors.
+    Features common across all DCM's should include virtual motors to set
+    energy/wavelength and contain two crystals, each of which can be movable. Some DCM's
+    contain crystals with roll motors, and some contain crystals with roll and pitch
+    motors.
     This base device accounts for all combinations of this.
 
-    This device should act as a parent for beamline-specific DCM's, in which any other missing signals can be added.
+    This device should act as a parent for beamline-specific DCM's, in which any other
+    missing signals can be added.
 
-    Bluesky plans using DCM's should be typed to specify which types of crystals are required. For example, a plan which only
-    requires one crystal which can roll should be typed 'def my_plan(dcm: DoubleCrystalMonochromator[RollCrystal, StationaryCrystal])`
+    Bluesky plans using DCM's should be typed to specify which types of crystals are
+    required. For example, a plan which only requires one crystal which can roll should
+    be typed::
+
+        def my_plan(dcm: DoubleCrystalMonochromator[RollCrystal, StationaryCrystal])
     """
 
     def __init__(
@@ -109,9 +119,9 @@ class DoubleCrystalMonochromator(
 class DoubleCrystalMonochromatorWithDSpacing(
     DoubleCrystalMonochromator, Generic[Xtal_1, Xtal_2]
 ):
-    """
-    Adds crystal D-spacing metadata to the DoubleCrystalMonochromator class.  This should be used in preference to the
-    DoubleCrystalMonochromator on beamlines which have a "DSPACING:RBV" pv on their DCM.
+    """Adds crystal D-spacing metadata to the DoubleCrystalMonochromator class.  This
+    should be used in preference to the DoubleCrystalMonochromator on beamlines which
+    have a "DSPACING:RBV" pv on their DCM.
     """
 
     def __init__(

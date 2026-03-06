@@ -1,11 +1,8 @@
 from ophyd_async.epics.adsimdetector import SimDetector
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    get_path_provider,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
+from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -14,6 +11,8 @@ BL = "adsim"
 PREFIX = BeamlinePrefix("t01")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+devices = DeviceManager()
 
 
 """
@@ -26,56 +25,64 @@ Usage Example
 
 Start the simulated beamline by following the epics-containers tutorial at
 https://epics-containers.github.io/main/tutorials/launch_example.html
-And ensure that the signals are visible:
+And ensure that the signals are visible::
 
-```sh
-export EPICS_CA_ADDR_LIST=127.0.0.1:9064
-export EPICS_CA_NAME_SERVERS=127.0.0.1:9064
-export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075
-```
+    sh
+    export EPICS_CA_ADDR_LIST=127.0.0.1:9064
+    export EPICS_CA_NAME_SERVERS=127.0.0.1:9064
+    export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075
 
 How to use the devices in a plan:
-In an ipython terminal run:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-```python
-from pathlib import Path
+In an ipython terminal run::
 
-from bluesky.run_engine import RunEngine
-from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
+    python
+    from bluesky.run_engine import RunEngine
 
-from dodal.beamlines.adsim import det, stage
-from dodal.common.beamlines.beamline_utils import set_path_provider
-from dodal.plans import count
+    from dodal.beamlines.adsim import devices
+    from dodal.plans import count
 
 
-set_path_provider(
-    StaticPathProvider(
-        UUIDFilenameProvider(),
-        "/tmp", # The directory for `det` to write to- may be mounted as a volume
-    )
-)
+    run_engine = RunEngine()
 
-run_engine = RunEngine()
-d = det(connect_immediately=True)
-s = stage(connect_immediately=True)
-run_engine(count([d], num=10))
-```
+    built = devices.build_and_connect().or_raise()
+    d = built["det"]
+    s = built["stage"]
 
+    run_engine(count([d], num=10))
 """
 
 
-@device_factory()
+@devices.fixture
+def path_provider():
+    # This fixture is only used if a path_provider is not passed to the device
+    # manager when the devices are built.
+    #
+    # When used via blueAPI with numtracker enabled, it will take priority and
+    # the path provider here will not be created.
+    from pathlib import Path
+
+    from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
+
+    return StaticPathProvider(
+        UUIDFilenameProvider(),
+        Path("/tmp"),  # The directory for `det` to write to- may be mounted as a volume
+    )
+
+
+@devices.factory()
 def stage() -> XThetaStage:
     return XThetaStage(
         f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
     )
 
 
-@device_factory()
-def det() -> SimDetector:
+@devices.factory()
+def det(path_provider) -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=DET_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )

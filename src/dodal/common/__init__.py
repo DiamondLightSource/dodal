@@ -1,6 +1,6 @@
 from .coordination import group_uuid, inject
 from .enums import EnabledDisabledUpper, InOutUpper, OnOffUpper
-from .maths import in_micros, step_to_num
+from .maths import Rectangle2D, in_micros, step_to_num
 from .types import MsgGenerator, PlanGenerator
 
 __all__ = [
@@ -13,4 +13,5 @@ __all__ = [
     "MsgGenerator",
     "PlanGenerator",
     "step_to_num",
+    "Rectangle2D",
 ]

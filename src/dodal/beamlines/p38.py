@@ -15,14 +15,14 @@ from dodal.common.crystal_metadata import (
     make_crystal_metadata_from_material,
 )
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.beamlines.i22.dcm import DCM
+from dodal.devices.beamlines.i22.fswitch import FSwitch
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import DCM
-from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -157,8 +157,8 @@ def dcm() -> DCM:
 
 
 @device_factory(mock=True)
-def undulator() -> Undulator:
-    return Undulator(
+def undulator() -> UndulatorInKeV:
+    return UndulatorInKeV(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         poles=80,
         length=2.0,
@@ -198,7 +198,7 @@ def linkam() -> Linkam3:
 
 @device_factory()
 def ppump() -> WatsonMarlow323Pump:
-    """Peristaltic Pump"""
+    """Peristaltic Pump."""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
 
 

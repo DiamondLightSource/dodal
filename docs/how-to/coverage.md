@@ -1,7 +1,7 @@
 
 # How to check code coverage
 
-Code coverage is reported to the command line and to a `cov.xml` file by the command `tox -e tests`. The file is uploaded to the Codecov service in CI.
+Code coverage is reported to the command line and to a `cov.xml` file by the command `uv run tox -e tests`. The file is uploaded to the Codecov service in CI.
 
 If you are using VSCode IDE, you can also check code coverage by right-clicking on the test icon and selecting `Run with coverage`. This will re-run the test and highlight line numbers in your file:
 - Green = covered by tests

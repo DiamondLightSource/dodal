@@ -1,18 +1,20 @@
 import asyncio
-from unittest.mock import ANY, DEFAULT, patch
+from unittest.mock import DEFAULT, patch
 
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
+from ophyd_async.core import (
+    SignalR,
     callback_on_mock_put,
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
 
 from dodal.devices.focusing_mirror import (
+    FocusingMirrorWithPiezo,
     FocusingMirrorWithStripes,
     MirrorStripe,
     MirrorStripeConfiguration,
@@ -128,7 +130,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
 
     run_engine(bps.abs_set(mirror_voltage_with_set, 100, wait=True))
 
-    mock_put.assert_called_with(100, wait=ANY)
+    mock_put.assert_called_with(100)
 
 
 def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_slew(
@@ -154,7 +156,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_sle
 
     run_engine(plan())
 
-    mock_put.assert_called_with(100, wait=ANY)
+    mock_put.assert_called_with(100)
 
 
 def test_mirror_set_voltage_set_rejected_when_not_ok(
@@ -253,3 +255,13 @@ async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expe
     with init_devices(mock=True):
         device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")
     assert device.energy_to_stripe(energy_kev) == expected_config
+
+
+async def test_focusing_mirror_with_piezo():
+    with init_devices(mock=True):
+        device = FocusingMirrorWithPiezo(prefix="-OP-VFM-01:", name="vfm")
+    assert isinstance(device.piezo_rbv, SignalR)
+
+    await device.piezo.set(3.795)
+
+    assert await device.piezo.get_value() == 3.795

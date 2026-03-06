@@ -25,9 +25,7 @@ def _get_element_as_float(node: Element, element_name: str) -> float:
 
 
 class OAVParameters:
-    """
-    The parameters to set up the OAV depending on the context.
-    """
+    """The parameters to set up the OAV depending on the context."""
 
     def __init__(
         self,
@@ -45,8 +43,7 @@ class OAVParameters:
 
     @staticmethod
     def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
-        """
-        Loads the json from the specified file, and returns a dict with all the
+        """Loads the json from the specified file, and returns a dict with all the
         individual top-level k-v pairs, and one with all the subdicts.
         """
         with open(filename) as f:
@@ -92,16 +89,16 @@ class OAVParameters:
         self.preprocess_K_size: int = update(
             "preProcessKSize", int
         )  # length scale for blur preprocessing
+        self.preprocess_iter: int = update("preProcessIteration", int, default=5)
         self.detection_script_filename: str = update("filename", str)
-        self.close_ksize: int = update("close_ksize", int, default=11)
+        self.open_ksize: int = update("open_ksize", int, default=0)
+        self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
         self.direction: int = update("direction", int)
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
     def get_max_tip_distance_in_pixels(self, microns_per_pixel: float) -> float:
-        """
-        Get the maximum tip distance in pixels.
-        """
+        """Get the maximum tip distance in pixels."""
         return self.max_tip_distance / microns_per_pixel
 
 
@@ -152,7 +149,7 @@ class OAVConfig(OAVConfigBase[ZoomParams]):
 
 
 class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
-    """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
+    """Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}
     with information about microns per pixels and crosshairs.
     """
 

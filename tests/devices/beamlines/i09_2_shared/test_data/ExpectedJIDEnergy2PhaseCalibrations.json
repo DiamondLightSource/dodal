@@ -1,0 +1,57 @@
+{
+    "lh": {
+        "energy_entries": [
+            {
+                "min_energy": 0.104,
+                "max_energy": 1.2,
+                "poly": [
+                    0
+                ]
+            }
+        ]
+    },
+    "lv": {
+        "energy_entries": [
+            {
+                "min_energy": 0.22,
+                "max_energy": 1.0,
+                "poly": [
+                    24.0
+                ]
+            }
+        ]
+    },
+    "pc": {
+        "energy_entries": [
+            {
+                "min_energy": 0.145,
+                "max_energy": 1.2,
+                "poly": [
+                    15
+                ]
+            }
+        ]
+    },
+    "nc": {
+        "energy_entries": [
+            {
+                "min_energy": 0.145,
+                "max_energy": 1.2,
+                "poly": [
+                    -15
+                ]
+            }
+        ]
+    },
+    "lh3": {
+        "energy_entries": [
+            {
+                "min_energy": 0.7,
+                "max_energy": 2.0,
+                "poly": [
+                    0
+                ]
+            }
+        ]
+    }
+}

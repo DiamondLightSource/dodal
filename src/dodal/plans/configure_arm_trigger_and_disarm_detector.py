@@ -12,7 +12,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.fastcs.eiger import EigerDetector
 
-from dodal.beamlines.i03 import fastcs_eiger, set_path_provider
+from dodal.beamlines.i03 import fastcs_eiger
 from dodal.devices.detector import DetectorParams
 from dodal.log import LOGGER, do_default_logging_setup
 
@@ -76,7 +76,6 @@ def set_cam_pvs(
     yield from bps.abs_set(
         eiger.drv.detector.frame_time, detector_params.exposure_time_s, group=group
     )
-    yield from bps.abs_set(eiger.drv.detector.nexpi, 1, group=group)
 
     if wait:
         yield from bps.wait(group)
@@ -134,20 +133,24 @@ def set_mx_settings_pvs(
         detector_params.detector_distance
     )
 
-    yield from bps.abs_set(eiger.drv.detector.beam_center_x, beam_x_pixels, group)
-    yield from bps.abs_set(eiger.drv.detector.beam_center_y, beam_y_pixels, group)
+    yield from bps.abs_set(eiger.drv.detector.beam_center_x, beam_x_pixels, group=group)
+    yield from bps.abs_set(eiger.drv.detector.beam_center_y, beam_y_pixels, group=group)
     yield from bps.abs_set(
-        eiger.drv.detector.detector_distance, detector_params.detector_distance, group
+        eiger.drv.detector.detector_distance,
+        detector_params.detector_distance,
+        group=group,
     )
 
     yield from bps.abs_set(
-        eiger.drv.detector.omega_start, detector_params.omega_start, group
+        eiger.drv.detector.omega_start, detector_params.omega_start, group=group
     )
     yield from bps.abs_set(
-        eiger.drv.detector.omega_increment, detector_params.omega_increment, group
+        eiger.drv.detector.omega_increment, detector_params.omega_increment, group=group
     )
     yield from bps.abs_set(
-        eiger.drv.detector.photon_energy, detector_params.expected_energy_ev, group
+        eiger.drv.detector.photon_energy,
+        detector_params.expected_energy_ev,
+        group=group,
     )
 
     if wait:
@@ -163,9 +166,7 @@ if __name__ == "__main__":
         PurePath("/dls/i03/data/2025/cm40607-2/test_new_eiger/"),
     )
 
-    set_path_provider(path_provider)
-
-    eiger = fastcs_eiger(connect_immediately=True)
+    eiger = fastcs_eiger.build(connect_immediately=True, path_provider=path_provider)
     run_engine(
         configure_arm_trigger_and_disarm_detector(
             eiger=eiger,

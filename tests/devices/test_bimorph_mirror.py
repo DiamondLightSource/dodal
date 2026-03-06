@@ -4,8 +4,13 @@ from typing import Any
 from unittest.mock import ANY, call, patch
 
 import pytest
-from ophyd_async.core import init_devices, walk_rw_signals
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
+from ophyd_async.core import (
+    callback_on_mock_put,
+    get_mock_put,
+    init_devices,
+    set_mock_value,
+    walk_rw_signals,
+)
 
 from dodal.devices.bimorph_mirror import (
     BimorphMirror,
@@ -43,7 +48,7 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
     channel.
 
     Args:
-        mirror: BimorphMirror fixture
+        mirror (BimorphMirror): BimorphMirror fixture.
     """
 
     async def busy_idle():
@@ -60,12 +65,11 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
 
     def callback_function(
         channel: BimorphMirrorChannel,
-    ) -> Callable[[float, bool], None]:
+    ) -> Callable[[float], None]:
         def output_voltage_propogation_and_status(
             value: float,
-            wait: bool = False,
         ):
-            channel.output_voltage.set(value, wait=wait)
+            channel.output_voltage.set(value)
             asyncio.create_task(busy_idle())
 
         return output_voltage_propogation_and_status

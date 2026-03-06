@@ -1,19 +1,14 @@
 import math
 
 import pytest
-from ophyd_async.core import init_devices
 
 from dodal.beamlines import aithre
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 def goniometer() -> Goniometer:
-    with init_devices(mock=True):
-        gonio = aithre.goniometer(connect_immediately=True, mock=True)
-    patch_all_motors(gonio)
-    return gonio
+    return aithre.goniometer.build(connect_immediately=True, mock=True)
 
 
 @pytest.mark.parametrize(

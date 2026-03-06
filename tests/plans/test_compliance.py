@@ -8,9 +8,8 @@ from bluesky.utils import MsgGenerator
 from dodal import plan_stubs, plans
 from dodal.common.types import PlanGenerator
 
-"""
-Bluesky distinguishes between `plans`: complete experimental proceedures, which open and
-close data collection runs, and which may be part of a larger plan that collect data
+"""Bluesky distinguishes between `plans`: complete experimental proceedures, which open
+and close data collection runs, and which may be part of a larger plan that collect data
 multiple times, but may also be run alone to collect data, and `plan_stubs`: which
 do not create & complete data collection runs and are either isolated behaviours or
 building blocks for plans.

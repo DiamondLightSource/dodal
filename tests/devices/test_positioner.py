@@ -1,7 +1,8 @@
 import pytest
-from ophyd_async.core import StrictEnum, init_devices
-from ophyd_async.testing import (
+from ophyd_async.core import (
+    StrictEnum,
     get_mock_put,
+    init_devices,
 )
 
 from dodal.devices.positioner import Positioner1D, create_positioner
@@ -32,5 +33,5 @@ async def test_positioner_fail_wrong_value(mock_positioner: Positioner1D[Positio
 async def test_positioner_set_success(mock_positioner: Positioner1D):
     await mock_positioner.set(Positions.TEST_1)
     get_mock_put(mock_positioner.stage_position).assert_awaited_once_with(
-        Positions.TEST_1, wait=True
+        Positions.TEST_1
     )

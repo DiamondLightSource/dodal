@@ -12,6 +12,7 @@ from ophyd_async.core import (
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
+from dodal.log import LOGGER
 from dodal.utils import (
     AnyDevice,
     BeamlinePrefix,
@@ -93,15 +94,17 @@ def device_instantiation(
     define lists of devices in beamline files. Additional keyword arguments are passed
     directly to the device constructor.
 
-    Arguments:
-        device_factory: Callable    the device class
-        name: str                   the name for ophyd
-        prefix: str                 the PV prefix for the most (usually all) components
-        wait: bool                  whether to run .wait_for_connection()
-        fake: bool                  whether to fake with ophyd.sim
-        post_create: Callable       (optional) a function to be run on the device after
-                                    creation
-        bl_prefix: bool             if true, add the beamline prefix when instantiating
+    Args:
+        device_factory (Callable): The device class.
+        name (str): The name for ophyd.
+        prefix (str): The PV prefix for the most (usually all) components.
+        wait (bool): Whether to run .wait_for_connection().
+        fake (bool): Whether to fake with ophyd.sim.
+        post_create (Callable): (optional) a function to be run on the device after
+            creation.
+        bl_prefix (bool): If true, add the beamline prefix when instantiating.
+        **kwargs: Arguments passed on to every device factory.
+
     Returns:
         The instance of the device.
     """
@@ -160,6 +163,11 @@ def device_factory(
 def set_path_provider(provider: PathProvider):
     global PATH_PROVIDER
 
+    LOGGER.info(
+        "Setting global path provider to %s (previously %s)",
+        provider,
+        globals().get("PATH_PROVIDER"),
+    )
     PATH_PROVIDER = provider
 
 
@@ -169,6 +177,7 @@ def get_path_provider() -> PathProvider:
 
 def clear_path_provider() -> None:
     global PATH_PROVIDER
+    LOGGER.info("Clearing global path provider: %s", globals().get("PATH_PROVIDER"))
     try:
         del PATH_PROVIDER
     except NameError:

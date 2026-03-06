@@ -64,7 +64,14 @@ def test_instantiating_different_device_with_same_name():
 
 def test_instantiate_v1_function_fake_makes_fake():
     eiger: EigerDetector = beamline_utils.device_instantiation(
-        EigerDetector, "eiger", "", True, True, None
+        EigerDetector,
+        "eiger",
+        "",
+        True,
+        True,
+        None,
+        beamline="test",
+        ispyb_detector_id=0,
     )
     assert isinstance(eiger, Device)
     assert isinstance(eiger.stale_params, FakeEpicsSignal)
@@ -191,7 +198,14 @@ def test_skip():
 
 def test_clear_devices_destroys_ophyd_v1_devices():
     dev1 = beamline_utils.device_instantiation(
-        EigerDetector, "eiger", "", True, True, None
+        EigerDetector,
+        "eiger",
+        "",
+        True,
+        True,
+        None,
+        beamline="test",
+        ispyb_detector_id=0,
     )
     dev1.destroy = MagicMock()
 
@@ -202,7 +216,14 @@ def test_clear_devices_destroys_ophyd_v1_devices():
 
 def test_clear_device_destroys_ophyd_v1_device():
     dev1 = beamline_utils.device_instantiation(
-        EigerDetector, "eiger", "", True, True, None
+        EigerDetector,
+        "eiger",
+        "",
+        True,
+        True,
+        None,
+        beamline="test",
+        ispyb_detector_id=0,
     )
     dev1.destroy = MagicMock()
 
