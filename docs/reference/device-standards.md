@@ -59,7 +59,7 @@ When a device is named in this way, all of its child devices are named appropria
 
 ## PV Suffixes
 
-In general devices should contain only the PV suffixes that are generic for any instance of the device e.g.
+In general devices should always contain only the PV suffixes that are generic for any instance of the device e.g.
 
 ```python
 
@@ -83,13 +83,8 @@ is preferred over
     MyDevice("BLXXI")
 ```
 
-This is so that a new device on say ``-MO-DCM-02`` can be easily created.
-
-## Beamline Prefix
-
-Most devices have a beamline-specific prefix such as BL03I however some devices do not. In such cases when calling
-`device_instantiation()` you can specify `bl_prefix=False` to ensure that the beamline prefix is not automatically
-prepended.
+This is so that a new device on say ``-MO-DCM-02`` can be easily created. By convention the prefixes passed
+into the device should contain the trailing colon.
 
 ## Use of signals
 
