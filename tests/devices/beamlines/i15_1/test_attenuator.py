@@ -29,7 +29,7 @@ async def test_given_an_attenuator_device_setting_a_valid_position_enum_sets_thi
     attenuator,
 ):
     await attenuator.set(AttenuatorPositions.TRANS_0_001)
-    get_mock_put(attenuator._positioner.stage_position).assert_called_once_with(
+    get_mock_put(attenuator._positioner).assert_called_once_with(
         AttenuatorPositions.TRANS_0_001
     )
 
@@ -38,7 +38,7 @@ async def test_given_an_attenuator_device_setting_a_valid_float_sets_this_to_the
     attenuator,
 ):
     await attenuator.set(10)
-    get_mock_put(attenuator._positioner.stage_position).assert_called_once_with(
+    get_mock_put(attenuator._positioner).assert_called_once_with(
         AttenuatorPositions.TRANS_10
     )
 
@@ -49,4 +49,4 @@ async def test_given_an_attenuator_device_setting_an_invalid_float_raises_and_do
     with pytest.raises(ValueError) as e:
         await attenuator.set(2)
     assert "100%, 50%," in e.value.args[0]
-    get_mock_put(attenuator._positioner.stage_position).assert_not_called()
+    get_mock_put(attenuator._positioner).assert_not_called()

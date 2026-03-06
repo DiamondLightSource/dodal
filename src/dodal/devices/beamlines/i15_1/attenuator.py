@@ -1,6 +1,5 @@
 from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
-
-from dodal.devices.positioner import create_positioner
+from ophyd_async.epics.core import epics_signal_rw
 
 
 class AttenuatorPositions(StrictEnum):
@@ -39,9 +38,10 @@ class Attenuator(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self._positioner = create_positioner(
-            AttenuatorPositions, prefix, positioner_pv_suffix="MP1:SELECT"
-        )
+        with self.add_children_as_readables():
+            self._positioner = epics_signal_rw(
+                AttenuatorPositions, f"{prefix}MP1:SELECT"
+            )
         super().__init__(name)
 
     @AsyncStatus.wrap
