@@ -59,7 +59,7 @@ When a device is named in this way, all of its child devices are named appropria
 
 ## PV Suffixes
 
-In general devices should always contain only the PV suffixes that are generic for any instance of the device e.g.
+Devices should only contain only the PV suffixes that are generic for any instance of the device e.g.
 
 ```python
 
