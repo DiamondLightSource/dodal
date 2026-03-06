@@ -75,16 +75,25 @@ dodal.devices.synchrotron.Suffix
       ~Suffix.MODE
       
       
-      ~Suffix.USER_COUNTDOWN
+      ~Suffix.USERCOUNTDOWN
       
       
-      ~Suffix.BEAM_ENERGY
+      ~Suffix.BEAMENERGY
       
       
       ~Suffix.COUNTDOWN
       
       
-      ~Suffix.END_COUNTDOWN
+      ~Suffix.STACOUNTDN
+      
+      
+      ~Suffix.ENDCOUNTDOWN
+      
+      
+      ~Suffix.TOPUPSTATE
+      
+      
+      ~Suffix.FILLPERIOD
       
    
    

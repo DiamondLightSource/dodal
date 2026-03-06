@@ -18,6 +18,7 @@ dodal.devices.synchrotron
    ~synchrotron.Suffix
    ~synchrotron.Synchrotron
    ~synchrotron.SynchrotronMode
+   ~synchrotron.TopUpState
 
 
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.synchrotron &#8212; dodal 2.1.1.dev4+gb5add110d documentation</title>
+    <title>dodal.devices.synchrotron &#8212; dodal 2.1.1.dev5+gf3705ff68 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=67b54f37"></script>
+    <script src="../../../_static/documentation_options.js?v=2879b7f7"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -902,10 +902,13 @@ window.addEventListener("load", load);</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">Suffix</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
     <span class="n">SIGNAL</span> <span class="o">=</span> <span class="s2">&quot;SIGNAL&quot;</span>
     <span class="n">MODE</span> <span class="o">=</span> <span class="s2">&quot;MODE&quot;</span>
-    <span class="n">USER_COUNTDOWN</span> <span class="o">=</span> <span class="s2">&quot;USERCOUNTDN&quot;</span>
-    <span class="n">BEAM_ENERGY</span> <span class="o">=</span> <span class="s2">&quot;BEAMENERGY&quot;</span>
+    <span class="n">USERCOUNTDOWN</span> <span class="o">=</span> <span class="s2">&quot;USERCOUNTDN&quot;</span>
+    <span class="n">BEAMENERGY</span> <span class="o">=</span> <span class="s2">&quot;BEAMENERGY&quot;</span>
     <span class="n">COUNTDOWN</span> <span class="o">=</span> <span class="s2">&quot;COUNTDOWN&quot;</span>
-    <span class="n">END_COUNTDOWN</span> <span class="o">=</span> <span class="s2">&quot;ENDCOUNTDN&quot;</span></div>
+    <span class="n">STACOUNTDN</span> <span class="o">=</span> <span class="s2">&quot;STACOUNTDN&quot;</span>
+    <span class="n">ENDCOUNTDOWN</span> <span class="o">=</span> <span class="s2">&quot;ENDCOUNTDN&quot;</span>
+    <span class="n">TOPUPSTATE</span> <span class="o">=</span> <span class="s2">&quot;TOPUPSTATE&quot;</span>
+    <span class="n">FILLPERIOD</span> <span class="o">=</span> <span class="s2">&quot;FILLPERIOD&quot;</span></div>
 
 
 
@@ -923,20 +926,71 @@ window.addEventListener("load", load);</script>
 
 
 
+<div class="viewcode-block" id="TopUpState">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.synchrotron.TopUpState.html#dodal.devices.synchrotron.TopUpState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TopUpState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">OFF</span> <span class="o">=</span> <span class="s2">&quot;Off&quot;</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="s2">&quot;Running&quot;</span>
+    <span class="n">STOPPING</span> <span class="o">=</span> <span class="s2">&quot;Stopping&quot;</span>
+    <span class="n">FAILED</span> <span class="o">=</span> <span class="s2">&quot;Failed&quot;</span>
+    <span class="n">NO_PROCESS</span> <span class="o">=</span> <span class="s2">&quot;No process&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="Synchrotron">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.synchrotron.Synchrotron.html#dodal.devices.synchrotron.Synchrotron">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Synchrotron</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A StandardReadable device that represents a synchrotron facility, providing</span>
+<span class="sd">    access to various synchrotron parameters and operational status.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        signal_prefix (str, optional): Beamline part of PV. Defaults to Prefix.SIGNAL.</span>
+<span class="sd">        status_prefix (str, optional): Status part of PV. Defaults to Prefix.STATUS.</span>
+<span class="sd">        topup_prefix (str, optional): Top-up part of PV. Defaults to Prefix.TOP_UP.</span>
+<span class="sd">        name (str, optional): Name of the device. Defaults to an empty string.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        current (SignalR[float]): Read-only signal for the synchrotron ring current.</span>
+<span class="sd">            Standard optional field in NXsource component of nexus file.</span>
+<span class="sd">        energy (SignalR[float]): Read-only signal for the synchrotron ring energy.</span>
+<span class="sd">            Standard optional field in NXsource component of nexus file.</span>
+<span class="sd">        probe (SignalR[str]): Read-only signal for the probe type. Defaults to</span>
+<span class="sd">            ``&quot;x-ray&quot;``. Standard optional field in NXsource component of nexus file.</span>
+<span class="sd">        type (SignalR[str]): Read-only signal for the synchrotron type. Defaults to</span>
+<span class="sd">            ``&quot;Synchrotron X-ray Source&quot;``. Standard optional field in NXsource</span>
+<span class="sd">            component of nexus file.</span>
+<span class="sd">        synchrotron_mode (SignalR[SynchrotronMode]): current state of the synchrotron</span>
+<span class="sd">            ring. Standard optional field ``&quot;mode&quot;`` in NXsource component of nexus file.</span>
+<span class="sd">        machine_user_countdown (SignalR[float]): If current mode in user, counts down</span>
+<span class="sd">            the number of seconds until the end of the current period.</span>
+<span class="sd">        top_up_start_countdown (SignalR[float]): counter that runs to zero at the start</span>
+<span class="sd">            of TopUp and remains there until the fill is complete when it resets to time</span>
+<span class="sd">            before next TopUp fill. Used in data acquisition to avoid beam intensity</span>
+<span class="sd">            change during topup.</span>
+<span class="sd">        top_up_countdown (SignalR[float]): counter that runs to zero at the start</span>
+<span class="sd">            of TopUp fill and is reset immediately to the time to next TopUp fill once</span>
+<span class="sd">            TopUp starts.</span>
+<span class="sd">        top_up_end_countdown (SignalR[float]): counter that runs to zero at the end of</span>
+<span class="sd">            TopUp fill and resets immediately to an estimate of the time before the end</span>
+<span class="sd">            of the next TopUp fill. Used in data acquisition to avoid beam intensity</span>
+<span class="sd">            change during topup.</span>
+<span class="sd">        fill_period (signalR[float]): time between TopUp (in minutes).Used in data</span>
+<span class="sd">            acquisition to monitor synchrotron state.</span>
+<span class="sd">        top_up_state (signalR[TopUpState]): tracks whether TopUp is currently running or</span>
+<span class="sd">            not. If it is anything other than Running or Stopping TopUp isn&#39;t active so</span>
+<span class="sd">            will not disturb the beam. Used in data acquisition to confirm TopUp state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">signal_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Prefix</span><span class="o">.</span><span class="n">SIGNAL</span><span class="p">,</span>
+        <span class="n">status_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Prefix</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span>
+        <span class="n">topup_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Prefix</span><span class="o">.</span><span class="n">TOP_UP</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">signal_prefix</span><span class="o">=</span><span class="n">Prefix</span><span class="o">.</span><span class="n">SIGNAL</span><span class="p">,</span>
-        <span class="n">status_prefix</span><span class="o">=</span><span class="n">Prefix</span><span class="o">.</span><span class="n">STATUS</span><span class="p">,</span>
-        <span class="n">topup_prefix</span><span class="o">=</span><span class="n">Prefix</span><span class="o">.</span><span class="n">TOP_UP</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">signal_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">SIGNAL</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">status_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">BEAM_ENERGY</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">status_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">BEAMENERGY</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">probe</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="s2">&quot;x-ray&quot;</span><span class="p">)</span>
@@ -947,15 +1001,17 @@ window.addEventListener("load", load);</script>
                 <span class="n">SynchrotronMode</span><span class="p">,</span> <span class="n">status_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">MODE</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">machine_user_countdown</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-            <span class="nb">float</span><span class="p">,</span> <span class="n">status_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">USER_COUNTDOWN</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="n">status_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">USERCOUNTDOWN</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">top_up_start_countdown</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
             <span class="nb">float</span><span class="p">,</span> <span class="n">topup_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">COUNTDOWN</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_up_countdown</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">topup_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">STACOUNTDN</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">top_up_end_countdown</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-            <span class="nb">float</span><span class="p">,</span> <span class="n">topup_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">END_COUNTDOWN</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="n">topup_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">ENDCOUNTDOWN</span>
         <span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">fill_period</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">topup_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">FILLPERIOD</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_up_state</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">TopUpState</span><span class="p">,</span> <span class="n">topup_prefix</span> <span class="o">+</span> <span class="n">Suffix</span><span class="o">.</span><span class="n">TOPUPSTATE</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>

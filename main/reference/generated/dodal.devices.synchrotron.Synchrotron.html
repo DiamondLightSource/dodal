@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.synchrotron.Synchrotron &#8212; dodal 2.1.1.dev4+gb5add110d documentation</title>
+    <title>dodal.devices.synchrotron.Synchrotron &#8212; dodal 2.1.1.dev5+gf3705ff68 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=67b54f37"></script>
+    <script src="../../_static/documentation_options.js?v=2879b7f7"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -827,6 +827,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.synchrotron.Suffix.html">dodal.devices.synchrotron.Suffix</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.synchrotron.Synchrotron</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.synchrotron.SynchrotronMode.html">dodal.devices.synchrotron.SynchrotronMode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.synchrotron.TopUpState.html">dodal.devices.synchrotron.TopUpState</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.temperture_controller.html">dodal.devices.temperture_controller</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1001,11 +1002,157 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.synchrotron.</span></span><span class="sig-name descname"><span class="pre">Synchrotron</span></span><a class="reference internal" href="../../_modules/dodal/devices/synchrotron.html#Synchrotron"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>A StandardReadable device that represents a synchrotron facility, providing
+access to various synchrotron parameters and operational status.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Beamline part of PV. Defaults to Prefix.SIGNAL.</p></li>
+<li><p><strong>status_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Status part of PV. Defaults to Prefix.STATUS.</p></li>
+<li><p><strong>topup_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Top-up part of PV. Defaults to Prefix.TOP_UP.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the device. Defaults to an empty string.</p></li>
+</ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.current">
+<span class="sig-name descname"><span class="pre">current</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.current" title="Link to this definition">#</a></dt>
+<dd><p>Read-only signal for the synchrotron ring current.
+Standard optional field in NXsource component of nexus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.energy">
+<span class="sig-name descname"><span class="pre">energy</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.energy" title="Link to this definition">#</a></dt>
+<dd><p>Read-only signal for the synchrotron ring energy.
+Standard optional field in NXsource component of nexus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.probe">
+<span class="sig-name descname"><span class="pre">probe</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.probe" title="Link to this definition">#</a></dt>
+<dd><p>Read-only signal for the probe type. Defaults to
+<code class="docutils literal notranslate"><span class="pre">&quot;x-ray&quot;</span></code>. Standard optional field in NXsource component of nexus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.type" title="Link to this definition">#</a></dt>
+<dd><p>Read-only signal for the synchrotron type. Defaults to
+<code class="docutils literal notranslate"><span class="pre">&quot;Synchrotron</span> <span class="pre">X-ray</span> <span class="pre">Source&quot;</span></code>. Standard optional field in NXsource
+component of nexus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.synchrotron_mode">
+<span class="sig-name descname"><span class="pre">synchrotron_mode</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.synchrotron_mode" title="Link to this definition">#</a></dt>
+<dd><p>current state of the synchrotron
+ring. Standard optional field <code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;</span></code> in NXsource component of nexus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference internal" href="dodal.devices.synchrotron.SynchrotronMode.html#dodal.devices.synchrotron.SynchrotronMode" title="dodal.devices.synchrotron.SynchrotronMode">SynchrotronMode</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.machine_user_countdown">
+<span class="sig-name descname"><span class="pre">machine_user_countdown</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.machine_user_countdown" title="Link to this definition">#</a></dt>
+<dd><p>If current mode in user, counts down
+the number of seconds until the end of the current period.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.top_up_start_countdown">
+<span class="sig-name descname"><span class="pre">top_up_start_countdown</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.top_up_start_countdown" title="Link to this definition">#</a></dt>
+<dd><p>counter that runs to zero at the start
+of TopUp and remains there until the fill is complete when it resets to time
+before next TopUp fill. Used in data acquisition to avoid beam intensity
+change during topup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.top_up_countdown">
+<span class="sig-name descname"><span class="pre">top_up_countdown</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.top_up_countdown" title="Link to this definition">#</a></dt>
+<dd><p>counter that runs to zero at the start
+of TopUp fill and is reset immediately to the time to next TopUp fill once
+TopUp starts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.top_up_end_countdown">
+<span class="sig-name descname"><span class="pre">top_up_end_countdown</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.top_up_end_countdown" title="Link to this definition">#</a></dt>
+<dd><p>counter that runs to zero at the end of
+TopUp fill and resets immediately to an estimate of the time before the end
+of the next TopUp fill. Used in data acquisition to avoid beam intensity
+change during topup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalR[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.fill_period">
+<span class="sig-name descname"><span class="pre">fill_period</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.fill_period" title="Link to this definition">#</a></dt>
+<dd><p>time between TopUp (in minutes).Used in data
+acquisition to monitor synchrotron state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>signalR[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.synchrotron.Synchrotron.top_up_state">
+<span class="sig-name descname"><span class="pre">top_up_state</span></span><a class="headerlink" href="#dodal.devices.synchrotron.Synchrotron.top_up_state" title="Link to this definition">#</a></dt>
+<dd><p>tracks whether TopUp is currently running or
+not. If it is anything other than Running or Stopping TopUp isn’t active so
+will not disturb the beam. Used in data acquisition to confirm TopUp state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>signalR[<a class="reference internal" href="dodal.devices.synchrotron.TopUpState.html#dodal.devices.synchrotron.TopUpState" title="dodal.devices.synchrotron.TopUpState">TopUpState</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
@@ -1069,7 +1216,20 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron"><code class="docutils literal notranslate"><span class="pre">Synchrotron</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron"><code class="docutils literal notranslate"><span class="pre">Synchrotron</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.current"><code class="docutils literal notranslate"><span class="pre">Synchrotron.current</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.energy"><code class="docutils literal notranslate"><span class="pre">Synchrotron.energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.probe"><code class="docutils literal notranslate"><span class="pre">Synchrotron.probe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.type"><code class="docutils literal notranslate"><span class="pre">Synchrotron.type</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.synchrotron_mode"><code class="docutils literal notranslate"><span class="pre">Synchrotron.synchrotron_mode</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.machine_user_countdown"><code class="docutils literal notranslate"><span class="pre">Synchrotron.machine_user_countdown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.top_up_start_countdown"><code class="docutils literal notranslate"><span class="pre">Synchrotron.top_up_start_countdown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.top_up_countdown"><code class="docutils literal notranslate"><span class="pre">Synchrotron.top_up_countdown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.top_up_end_countdown"><code class="docutils literal notranslate"><span class="pre">Synchrotron.top_up_end_countdown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.fill_period"><code class="docutils literal notranslate"><span class="pre">Synchrotron.fill_period</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.synchrotron.Synchrotron.top_up_state"><code class="docutils literal notranslate"><span class="pre">Synchrotron.top_up_state</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
