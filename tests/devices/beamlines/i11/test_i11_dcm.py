@@ -1,11 +1,12 @@
 import bluesky.plans as bp
 import pytest
 from bluesky.run_engine import RunEngine
-from dodal.devices.i11.dcm import DCM
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_emitted,
 )
+
+from dodal.devices.beamlines.i11.dcm import DCM
 
 
 @pytest.fixture
