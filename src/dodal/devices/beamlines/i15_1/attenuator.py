@@ -54,7 +54,7 @@ class Attenuator(StandardReadable, Movable[float | AttenuatorPositions]):
     async def set(self, value: float | AttenuatorPositions):
         """Change the transmission to the specified percentage.
 
-        Will raise an error if the percentage is not possible.
+        Will raise ValueError if the percentage is not possible.
         """
         if isinstance(value, float) or isinstance(value, int):
             value = AttenuatorPositions.from_float(value)
