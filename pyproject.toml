@@ -31,7 +31,7 @@ dependencies = [
     "pyzmq==27.1.0",
     "deepdiff",
     "daq-config-server>=v1.1.2",       # For getting Configuration settings.
-    "mysql-connector-python == 9.5.0", # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
+    "mysql-connector-python ==9.6.0", # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
 ]
 
 dynamic = ["version"]
