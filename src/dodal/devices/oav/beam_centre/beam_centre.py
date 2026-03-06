@@ -146,6 +146,7 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         ellipse_fit = self._fit_ellipse(roi_binary)
         roi_centre_x = ellipse_fit[0][0]
         roi_centre_y = ellipse_fit[0][1]
+        LOGGER.info(f"Beam centre founf at ({roi_centre_x}, {roi_centre_y})")
         # convert back to full screen image coords and set beam centre
         self._center_x_val_setter(roi_centre_x + top_left_corner[0])
         self._center_y_val_setter(roi_centre_y + top_left_corner[1])
