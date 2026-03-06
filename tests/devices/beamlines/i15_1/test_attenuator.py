@@ -10,7 +10,9 @@ from dodal.devices.beamlines.i15_1.attenuator import Attenuator, AttenuatorPosit
     [
         [100, AttenuatorPositions.TRANS_100],
         [10, AttenuatorPositions.TRANS_10],
+        [1, AttenuatorPositions.TRANS_1],
         [0.1, AttenuatorPositions.TRANS_0_1],
+        [0.01, AttenuatorPositions.TRANS_0_01],
         [0.001, AttenuatorPositions.TRANS_0_001],
     ],
 )
@@ -47,7 +49,9 @@ async def test_given_an_attenuator_device_setting_a_valid_position_enum_sets_thi
     [
         [100, AttenuatorPositions.TRANS_100],
         [10, AttenuatorPositions.TRANS_10],
+        [1, AttenuatorPositions.TRANS_1],
         [0.1, AttenuatorPositions.TRANS_0_1],
+        [0.01, AttenuatorPositions.TRANS_0_01],
         [0.001, AttenuatorPositions.TRANS_0_001],
     ],
 )
