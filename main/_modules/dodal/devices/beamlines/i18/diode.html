@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i18.diode &#8212; dodal 2.1.1.dev3+g9baf92f5e documentation</title>
+    <title>dodal.devices.beamlines.i18.diode &#8212; dodal 2.1.1.dev4+gb5add110d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=9b60fefc"></script>
+    <script src="../../../../../_static/documentation_options.js?v=67b54f37"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -929,7 +929,7 @@ window.addEventListener("load", load);</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;B:DIODE:I&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">positioner_a</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span>
                 <span class="n">FilterAValues</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;A:MP&quot;</span><span class="p">,</span> <span class="n">positioner_pv_suffix</span><span class="o">=</span><span class="s2">&quot;:SELECT&quot;</span>
-            <span class="p">)</span>  <span class="c1"># more complex, will be fixed on Tuesday 20.05.2025</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">positioner_b</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span>
                 <span class="n">FilterBValues</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;B:MP&quot;</span><span class="p">,</span> <span class="n">positioner_pv_suffix</span><span class="o">=</span><span class="s2">&quot;:SELECT&quot;</span>
             <span class="p">)</span>
