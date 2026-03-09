@@ -21,11 +21,16 @@ def toolpoint_rotation_matrix(tilt_deg: float, azimuth_deg: float) -> np.ndarray
     tilt = radians(tilt_deg)
     azimuth = radians(azimuth_deg)
 
+    sin_azimuth = sin(azimuth)
+    sin_tilt = sin(tilt)
+    cos_azimuth = cos(azimuth)
+    cos_tilt = cos(tilt)
+
     return np.array(
         [
-            [cos(tilt), sin(tilt) * sin(azimuth), sin(tilt) * cos(azimuth)],
-            [0.0, cos(azimuth), -sin(azimuth)],
-            [-sin(tilt), cos(tilt) * sin(azimuth), cos(tilt) * cos(azimuth)],
+            [cos_tilt, sin_tilt * sin_azimuth, sin_tilt * cos_azimuth],
+            [0.0, cos_azimuth, -sin_azimuth],
+            [-sin_tilt, cos_tilt * sin_azimuth, cos_tilt * cos_azimuth],
         ]
     )
 
