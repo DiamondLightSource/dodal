@@ -133,20 +133,24 @@ def set_mx_settings_pvs(
         detector_params.detector_distance
     )
 
-    yield from bps.abs_set(eiger.drv.detector.beam_center_x, beam_x_pixels, group)
-    yield from bps.abs_set(eiger.drv.detector.beam_center_y, beam_y_pixels, group)
+    yield from bps.abs_set(eiger.drv.detector.beam_center_x, beam_x_pixels, group=group)
+    yield from bps.abs_set(eiger.drv.detector.beam_center_y, beam_y_pixels, group=group)
     yield from bps.abs_set(
-        eiger.drv.detector.detector_distance, detector_params.detector_distance, group
+        eiger.drv.detector.detector_distance,
+        detector_params.detector_distance,
+        group=group,
     )
 
     yield from bps.abs_set(
-        eiger.drv.detector.omega_start, detector_params.omega_start, group
+        eiger.drv.detector.omega_start, detector_params.omega_start, group=group
     )
     yield from bps.abs_set(
-        eiger.drv.detector.omega_increment, detector_params.omega_increment, group
+        eiger.drv.detector.omega_increment, detector_params.omega_increment, group=group
     )
     yield from bps.abs_set(
-        eiger.drv.detector.photon_energy, detector_params.expected_energy_ev, group
+        eiger.drv.detector.photon_energy,
+        detector_params.expected_energy_ev,
+        group=group,
     )
 
     if wait:

@@ -1,14 +1,15 @@
 from dodal.beamlines.b07_shared import devices as b07_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.b07 import PsuMode
 from dodal.devices.beamlines.b07_1 import (
     ChannelCutMonochromator,
     Grating,
     LensMode,
 )
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.motors import XYZPolarAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.log import set_beamline as set_log_beamline
@@ -21,6 +22,11 @@ set_utils_beamline(BL)
 
 devices = DeviceManager()
 devices.include(b07_shared_devices)
+
+
+@devices.factory()
+def pss_shutter1() -> HutchShutter:
+    return HutchShutter(C_PREFIX.beamline_prefix)
 
 
 @devices.factory()
