@@ -167,10 +167,10 @@ def test_rotation_preserves_length():
     theta = 1.234
 
     x_rot, y_rot = rotate_clockwise(theta, x, y)
-    original_length = x**2 + y**2
-    rotated_length = x_rot**2 + y_rot**2
+    original = x**2 + y**2
+    rotated = x_rot**2 + y_rot**2
 
-    assert rotated_length == pytest.approx(original_length)
+    assert rotated == pytest.approx(original)
 
 
 def test_do_rotation_matches_manual_matrix_multiply() -> None:
