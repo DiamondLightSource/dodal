@@ -1,4 +1,4 @@
-from math import pi, sqrt
+from math import pi
 
 import numpy as np
 import pytest
@@ -167,19 +167,21 @@ def test_rotation_preserves_length():
     theta = 1.234
 
     x_rot, y_rot = rotate_clockwise(theta, x, y)
-    original_length = sqrt(x**2 + y**2)
-    rotated_length = sqrt(x_rot**2 + y_rot**2)
+    original = x**2 + y**2
+    rotated = x_rot**2 + y_rot**2
 
-    assert rotated_length == pytest.approx(original_length)
+    assert rotated == pytest.approx(original)
 
 
 def test_do_rotation_matches_manual_matrix_multiply() -> None:
     x, y = 1.2, -0.4
     theta = 0.5
+    cos_theta = np.cos(theta)
+    sin_theta = np.sin(theta)
     rotation_matrix = np.array(
         [
-            [np.cos(theta), -np.sin(theta)],
-            [np.sin(theta), np.cos(theta)],
+            [cos_theta, -sin_theta],
+            [sin_theta, cos_theta],
         ]
     )
     x_new, y_new = do_rotation(x, y, rotation_matrix)
