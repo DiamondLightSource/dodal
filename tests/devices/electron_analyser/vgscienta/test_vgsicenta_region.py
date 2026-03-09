@@ -2,7 +2,6 @@ from typing import Any
 
 import pytest
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
@@ -20,8 +19,7 @@ from tests.devices.electron_analyser.helper_util import (
 
 @pytest.fixture
 def sequence() -> VGScientaSequence[LensMode, PsuMode, PassEnergy]:
-    seq = VGScientaSequence[LensMode, PsuMode, PassEnergy]
-    return load_json_file_to_class(seq, get_test_sequence(seq))
+    return get_test_sequence(VGScientaSequence[LensMode, PsuMode, PassEnergy])
 
 
 @pytest.fixture

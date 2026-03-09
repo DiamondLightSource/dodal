@@ -34,7 +34,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.hutch_shutter import HutchInterlock, HutchShutter
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -203,9 +203,9 @@ def pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def smargon() -> Smargon:
-    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", name="gonio")
 
 
 @devices.factory()
@@ -266,7 +266,7 @@ def sample_shutter() -> ZebraShutter:
 
 @devices.factory()
 def hutch_shutter() -> HutchShutter:
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+    return HutchShutter(PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix))
 
 
 @devices.factory()

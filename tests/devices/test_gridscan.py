@@ -510,7 +510,6 @@ async def test_gridscan_prepare_writes_values_and_checks_readback(
             if len(put.mock_calls) > 0:
                 put.assert_called_once_with(
                     grid_scan_params.__dict__[signal_names_to_param_names[signal.name]],
-                    wait=True,
                 )
                 break
             await asyncio.sleep(0.01)
@@ -546,7 +545,7 @@ async def test_gridscan_prepare_checks_validity_after_writes(
         mock_put = getattr(parent, key)
         while len(mock_put.mock_calls) == 0:
             await asyncio.sleep(0.1)
-        mock_put.assert_called_with(grid_scan_params.__dict__[key], wait=True)
+        mock_put.assert_called_with(grid_scan_params.__dict__[key])
     assert not status.done
 
     for signal, expected_value in valid_state.items():

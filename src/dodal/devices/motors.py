@@ -2,10 +2,14 @@ import asyncio
 import math
 from abc import ABC
 
-from ophyd_async.core import StandardReadable, derived_signal_rw
+from ophyd_async.core import SignalRW, StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
-_X, _Y, _Z = "X", "Y", "Z"
+from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
+
+_X = "X"
+_Y = "Y"
+_Z = "Z"
 
 _OMEGA = "OMEGA"
 _POLAR = "POLAR"
@@ -15,9 +19,10 @@ _TILT = "TILT"
 
 class Stage(StandardReadable, ABC):
     """For these devices, the following co-ordinates are typical but not enforced:
-    - z is horizontal & parallel to the direction of beam travel
+    - z is tangential to the electrons (as they orbit inside the synchrotron);
+          the x-rays are generated in that tangential direction: But z is defined by the electrons.
     - y is vertical and antiparallel to the force of gravity
-    - x is the cross product of y🞬z
+    - x is the cross product of y with z
 
     Attributes:
         prefix (str): Common part of the EPICS PV for all motors, including ":".
@@ -31,7 +36,7 @@ class Stage(StandardReadable, ABC):
 
 
 class XThetaStage(Stage):
-    """Two-axis stage with an x and a theta motor."""
+    """Two-axis stage with an x motor and a theta motor."""
 
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, theta_infix: str = "A"
@@ -43,7 +48,7 @@ class XThetaStage(Stage):
 
 
 class XYStage(Stage):
-    """A standard two-axis stage with an x and a y motor."""
+    """A standard two-axis stage with an x motor and a y motor."""
 
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, y_infix: str = _Y
@@ -55,7 +60,7 @@ class XYStage(Stage):
 
 
 class XYZStage(XYStage):
-    """A standard three-axis stage with an x, a y, and a z motor."""
+    """A standard three-axis stage with an x motor, a y motor and a z motor."""
 
     def __init__(
         self,
@@ -234,7 +239,7 @@ class XYZPitchYawStage(XYZStage):
 
 
 class XYZPitchYawRollStage(XYZStage):
-    """Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
+    """Six-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
     and roll.
     """
 
@@ -275,7 +280,7 @@ class SixAxisGonio(XYZOmegaStage):
         with self.add_children_as_readables():
             self.kappa = Motor(prefix + kappa_infix)
             self.phi = Motor(prefix + phi_infix)
-        super().__init__(prefix, name, x_infix, y_infix, z_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix, omega_infix)
 
         self.vertical_in_lab_space = create_axis_perp_to_rotation(
             self.omega, self.y, self.z
@@ -304,7 +309,7 @@ class SixAxisGonioKappaPhi(XYZStage):
 
 
 class YZStage(Stage):
-    """Two-axis stage with an x and a z motor."""
+    """Two-axis stage with a y motor and a z motor."""
 
     def __init__(
         self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z
@@ -315,7 +320,9 @@ class YZStage(Stage):
         super().__init__(name)
 
 
-def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Motor):
+def create_axis_perp_to_rotation(
+    motor_theta: Motor, motor_i: Motor, motor_j: Motor
+) -> SignalRW[float]:
     """Given a signal that controls a motor in a rotation axis and two other
     signals controlling motors on a pair of orthogonal axes, these axes being in the
     rotating frame of reference created by the first axis, create a derived signal
@@ -337,19 +344,18 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
             a move here is entirely parallel with the derived axis.
     """
 
-    def _get(j_val: float, i_val: float, rot_value: float) -> float:
-        i_component = i_val * math.cos(math.radians(rot_value))
-        j_component = j_val * math.sin(math.radians(rot_value))
-        return i_component + j_component
+    def _get(j_val: float, i_val: float, rot_deg_value: float) -> float:
+        x, y = rotate_clockwise(math.radians(rot_deg_value), i_val, j_val)
+        return x
 
     async def _set(vertical_value: float) -> None:
-        rot_value = await motor_theta.user_readback.get_value()
-        i_component = vertical_value * math.cos(math.radians(rot_value))
-        j_component = vertical_value * math.sin(math.radians(rot_value))
+        rot_deg_value = await motor_theta.user_readback.get_value()
+        theta = math.radians(rot_deg_value)
+        i_component, j_component = rotate_counter_clockwise(theta, vertical_value, 0.0)
         await asyncio.gather(
             motor_i.set(i_component),
             motor_j.set(j_component),
-            motor_theta.set(rot_value),
+            motor_theta.set(rot_deg_value),
         )
 
     return derived_signal_rw(
@@ -357,5 +363,5 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
         _set,
         i_val=motor_i,
         j_val=motor_j,
-        rot_value=motor_theta,
+        rot_deg_value=motor_theta,
     )
