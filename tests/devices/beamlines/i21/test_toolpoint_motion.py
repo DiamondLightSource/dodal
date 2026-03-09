@@ -41,20 +41,20 @@ def expected_uvw_read(
 ) -> tuple[float, float, float]:
     dx, dy, dz = pos.x - zero[0], pos.y - zero[1], pos.z - zero[2]
     azimuth, tilt = radians(pos.azimuth_deg), radians(pos.tilt_deg)
+
+    sin_azimuth = sin(azimuth)
+    cos_azimuth = cos(azimuth)
+    sin_tilt = sin(tilt)
+    cos_tilt = cos(tilt)
+
     expected_v = (
-        dx * sin(tilt) * sin(azimuth)
-        + dy * cos(azimuth)
-        + dz * cos(tilt) * sin(azimuth)
+        dx * sin_tilt * sin_azimuth + dy * cos_azimuth + dz * cos_tilt * sin_azimuth
     )
     expected_v = (
-        dx * sin(tilt) * sin(azimuth)
-        + dy * cos(azimuth)
-        + dz * cos(tilt) * sin(azimuth)
+        dx * sin_tilt * sin_azimuth + dy * cos_azimuth + dz * cos_tilt * sin_azimuth
     )
     expected_w = (
-        dx * cos(azimuth) * sin(tilt)
-        - dy * sin(azimuth)
-        + dz * cos(tilt) * cos(azimuth)
+        dx * cos_azimuth * sin_tilt - dy * sin_azimuth + dz * cos_tilt * cos_azimuth
     )
     return expected_v, expected_v, expected_w
 
