@@ -1,11 +1,12 @@
 from enum import Enum
 
-from daq_config_server.client import ConfigServer
-from daq_config_server.models import DetectorXYLookupTable
+from daq_config_server.models.lookup_tables import DetectorXYLookupTable
 
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.devices.util.lookup_tables import (
     linear_extrapolation_lut,
 )
+from dodal.utils import get_beamline_name
 
 
 class Axis(Enum):
@@ -16,7 +17,7 @@ class Axis(Enum):
 class DetectorDistanceToBeamXYConverter:
     def __init__(self, lookup_file: str):
         self.lookup_file: str = lookup_file
-        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+        config_server = get_config_client(get_beamline_name())
 
         lookup_table_columns: list = config_server.get_file_contents(
             lookup_file, DetectorXYLookupTable
