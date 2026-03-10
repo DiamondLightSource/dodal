@@ -46,11 +46,11 @@ def ienergy_order() -> UndulatorOrder:
 
 @devices.factory()
 def iidenergy(
-    ienergy_order: UndulatorOrder, iundulator: UndulatorInMm
+    ienergy_order: UndulatorOrder, iid: UndulatorInMm
 ) -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
         undulator_order=ienergy_order,
-        undulator=iundulator,
+        undulator=iid,
         lut={},  # ToDo https://github.com/DiamondLightSource/sm-bluesky/issues/239
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
@@ -60,9 +60,9 @@ def iidenergy(
 @devices.factory()
 def ienergy(
     dcm: DoubleCrystalMonochromatorWithDSpacing,
-    iundulator_energy: HardInsertionDeviceEnergy,
+    iidenergy: HardInsertionDeviceEnergy,
 ) -> HardEnergy:
     return HardEnergy(
         dcm=dcm,
-        undulator_energy=iundulator_energy,
+        undulator_energy=iidenergy,
     )
