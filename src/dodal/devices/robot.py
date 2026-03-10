@@ -135,7 +135,9 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         super().__init__(name=name)
 
     async def beamline_status_or_error(
-        self, expected_state: BeamlineStatus, sample_location: SampleLocation = None
+        self,
+        expected_state: BeamlineStatus,
+        sample_location: SampleLocation | None = None,
     ):
         """This co-routine will finish when either the beamline reaches the specified
         state or the robot gives an error (whichever happens first). In the case where
@@ -158,18 +160,21 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         async def wait_for_expected_state():
             await wait_for_value(self.beamline_disabled, expected_state.value, None)
 
-        async def wait_for_puck():
-            await wait_for_value(self.current_puck, sample_location.puck, None)
+        async def wait_for_puck(_sample_location: SampleLocation):
+            await wait_for_value(self.current_puck, _sample_location.puck, None)
 
-        async def wait_for_pin():
-            await wait_for_value(self.current_pin, sample_location.pin, None)
+        async def wait_for_pin(_sample_location: SampleLocation):
+            await wait_for_value(self.current_pin, _sample_location.pin, None)
 
         check_for_error_task = Task(raise_if_error())
         tasks = [
             (Task(wait_for_expected_state())),
         ]
         if sample_location:
-            tasks += [Task(wait_for_puck()), Task(wait_for_pin())]
+            tasks += [
+                Task(wait_for_puck(sample_location)),
+                Task(wait_for_pin(sample_location)),
+            ]
         check_for_completion_conditions = asyncio.create_task(
             asyncio.wait(tasks, return_when=ALL_COMPLETED)
         )
@@ -210,7 +215,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         await self._wait_for_beamline_enabled_after_load_or_unload(sample_location)
 
     async def _wait_for_beamline_enabled_after_load_or_unload(
-        self, sample_location: SampleLocation = None
+        self, sample_location: SampleLocation
     ):
         if await self.beamline_disabled.get_value() == BeamlineStatus.ENABLED.value:
             LOGGER.info(WAIT_FOR_BEAMLINE_DISABLE_MSG)
