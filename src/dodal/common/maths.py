@@ -133,10 +133,12 @@ def do_rotation(x: float, y: float, rotation_matrix: np.ndarray) -> tuple[float,
 
 
 def rotate_clockwise(theta: float, x: float, y: float) -> tuple[float, float]:
+    cos_theta = np.cos(theta)
+    sin_theta = np.sin(theta)
     rotation_matrix = np.array(
         [
-            [np.cos(theta), np.sin(theta)],
-            [-np.sin(theta), np.cos(theta)],
+            [cos_theta, sin_theta],
+            [-sin_theta, cos_theta],
         ]
     )
     return do_rotation(x, y, rotation_matrix)
