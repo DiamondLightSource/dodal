@@ -101,7 +101,7 @@ def jidenergy(
 
 
 @devices.factory()
-def polarisation(
+def jpolarisation(
     jidcontroller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
 ) -> InsertionDevicePolarisation:
     return InsertionDevicePolarisation(id_controller=jidcontroller)

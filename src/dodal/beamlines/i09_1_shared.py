@@ -40,16 +40,16 @@ def iundulator() -> UndulatorInMm:
 
 
 @devices.factory()
-def harmonics() -> UndulatorOrder:
+def iharmonics() -> UndulatorOrder:
     return UndulatorOrder()
 
 
 @devices.factory()
 def iundulator_energy(
-    harmonics: UndulatorOrder, iundulator: UndulatorInMm
+    iharmonics: UndulatorOrder, iundulator: UndulatorInMm
 ) -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
-        undulator_order=harmonics,
+        undulator_order=iharmonics,
         undulator=iundulator,
         lut={},  # ToDo https://github.com/DiamondLightSource/sm-bluesky/issues/239
         gap_to_energy_func=calculate_energy_i09_hu,
