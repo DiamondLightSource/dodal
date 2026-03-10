@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from daq_config_server.client import ConfigServer
+from daq_config_server.app.client import ConfigClient
 from ophyd_async.core import (
     init_devices,
     set_mock_value,
@@ -21,8 +21,8 @@ from dodal.devices.insertion_device.apple2_undulator import (
 
 
 @pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock_config_client = ConfigServer()
+def mock_config_client() -> ConfigClient:
+    mock_config_client = ConfigClient()
 
     mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
 

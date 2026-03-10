@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from daq_config_server.client import ConfigServer
+from daq_config_server.app.client import ConfigClient
 
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09.enums import Grating
@@ -25,7 +25,7 @@ from dodal.devices.insertion_device.lookup_table_models import LookupTableColumn
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-J09_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+J09_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
 PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"

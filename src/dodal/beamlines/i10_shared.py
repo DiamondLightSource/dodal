@@ -7,7 +7,7 @@ idd == id1,    idu == id2.
 
 from pathlib import Path
 
-from daq_config_server.client import ConfigServer
+from daq_config_server.app.client import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -86,7 +86,7 @@ def switching_mirror() -> PiezoMirror:
 
 """ID"""
 
-I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+I10_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 

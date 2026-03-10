@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from daq_config_server.client import ConfigServer
+from daq_config_server.app.client import ConfigClient
 
 from dodal.devices.insertion_device.enum import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
@@ -62,7 +62,7 @@ class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
 
     def __init__(
         self,
-        config_client: ConfigServer,
+        config_client: ConfigClient,
         lut_config: LookupTableColumnConfig,
         path: Path,
     ):
