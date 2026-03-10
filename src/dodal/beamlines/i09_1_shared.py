@@ -45,7 +45,7 @@ def harmonics() -> UndulatorOrder:
 
 
 @devices.factory()
-def hu_id_energy(
+def undulator_energy(
     harmonics: UndulatorOrder, undulator: UndulatorInMm
 ) -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
@@ -58,7 +58,7 @@ def hu_id_energy(
 
 
 @devices.factory()
-def hu_energy(
+def ienergy(
     dcm: DoubleCrystalMonochromatorWithDSpacing, hu_id_energy: HardInsertionDeviceEnergy
 ) -> HardEnergy:
     return HardEnergy(
