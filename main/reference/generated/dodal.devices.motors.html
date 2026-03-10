@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.motors &#8212; dodal 2.1.1.dev12+g7913c366f documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 2.1.1.dev13+g118226cd3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=cba62e86"></script>
+    <script src="../../_static/documentation_options.js?v=3791828d"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -730,12 +730,13 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYPitchStage.html">dodal.devices.motors.XYPitchStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYRollStage.html">dodal.devices.motors.XYRollStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYStage.html">dodal.devices.motors.XYStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZAzimuthPolarStage.html">dodal.devices.motors.XYZAzimuthPolarStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZAzimuthStage.html">dodal.devices.motors.XYZAzimuthStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZAzimuthTiltPolarStage.html">dodal.devices.motors.XYZAzimuthTiltPolarStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZAzimuthTiltStage.html">dodal.devices.motors.XYZAzimuthTiltStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZOmegaStage.html">dodal.devices.motors.XYZOmegaStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPitchYawRollStage.html">dodal.devices.motors.XYZPitchYawRollStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPitchYawStage.html">dodal.devices.motors.XYZPitchYawStage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthStage.html">dodal.devices.motors.XYZPolarAzimuthStage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthTiltStage.html">dodal.devices.motors.XYZPolarAzimuthTiltStage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPolarStage.html">dodal.devices.motors.XYZPolarStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZStage.html">dodal.devices.motors.XYZStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZThetaStage.html">dodal.devices.motors.XYZThetaStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.YZStage.html">dodal.devices.motors.YZStage</a></li>
@@ -1023,6 +1024,18 @@
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYStage.html#dodal.devices.motors.XYStage" title="dodal.devices.motors.XYStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYStage</span></code></a></p></td>
 <td><p>A standard two-axis stage with an x motor and a y motor.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZAzimuthPolarStage.html#dodal.devices.motors.XYZAzimuthPolarStage" title="dodal.devices.motors.XYZAzimuthPolarStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZAzimuthPolarStage</span></code></a></p></td>
+<td><p>Five-axis stage with a standard xyz stage and two axis of rotation: azimuth and polar.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZAzimuthStage.html#dodal.devices.motors.XYZAzimuthStage" title="dodal.devices.motors.XYZAzimuthStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZAzimuthStage</span></code></a></p></td>
+<td><p>Four-axis stage with a standard xyz stage and one axis of rotation: azimuth.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZAzimuthTiltPolarStage.html#dodal.devices.motors.XYZAzimuthTiltPolarStage" title="dodal.devices.motors.XYZAzimuthTiltPolarStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZAzimuthTiltPolarStage</span></code></a></p></td>
+<td><p>Six-axis stage with a standard xyz stage and three axis of rotation: azimuth, tilt and polar.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZAzimuthTiltStage.html#dodal.devices.motors.XYZAzimuthTiltStage" title="dodal.devices.motors.XYZAzimuthTiltStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZAzimuthTiltStage</span></code></a></p></td>
+<td><p>Five-axis stage with a standard xyz stage and two axis of rotation: azimuth and tilt.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZOmegaStage.html#dodal.devices.motors.XYZOmegaStage" title="dodal.devices.motors.XYZOmegaStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZOmegaStage</span></code></a></p></td>
 <td><p>Four-axis stage with a standard xyz stage and one axis of rotation: omega.</p></td>
 </tr>
@@ -1032,22 +1045,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPitchYawStage.html#dodal.devices.motors.XYZPitchYawStage" title="dodal.devices.motors.XYZPitchYawStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPitchYawStage</span></code></a></p></td>
 <td><p>Five-axis stage with a standard xyz stage and two axes of rotation: pitch and yaw.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthStage.html#dodal.devices.motors.XYZPolarAzimuthStage" title="dodal.devices.motors.XYZPolarAzimuthStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPolarAzimuthStage</span></code></a></p></td>
-<td><p>Five-axis stage with a standard xyz stage and two axis of rotation: polar and azimuth.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthTiltStage.html#dodal.devices.motors.XYZPolarAzimuthTiltStage" title="dodal.devices.motors.XYZPolarAzimuthTiltStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPolarAzimuthTiltStage</span></code></a></p></td>
-<td><p>Six-axis stage with a standard xyz stage and three axis of rotation: polar, azimuth and tilt.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPolarStage.html#dodal.devices.motors.XYZPolarStage" title="dodal.devices.motors.XYZPolarStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPolarStage</span></code></a></p></td>
-<td><p>Four-axis stage with a standard xyz stage and one axis of rotation: polar.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZStage.html#dodal.devices.motors.XYZStage" title="dodal.devices.motors.XYZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZStage</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZStage.html#dodal.devices.motors.XYZStage" title="dodal.devices.motors.XYZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZStage</span></code></a></p></td>
 <td><p>A standard three-axis stage with an x motor, a y motor and a z motor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZThetaStage.html#dodal.devices.motors.XYZThetaStage" title="dodal.devices.motors.XYZThetaStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZThetaStage</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZThetaStage.html#dodal.devices.motors.XYZThetaStage" title="dodal.devices.motors.XYZThetaStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZThetaStage</span></code></a></p></td>
 <td><p>Four-axis stage with a standard xyz stage and one axis of rotation: theta.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.YZStage.html#dodal.devices.motors.YZStage" title="dodal.devices.motors.YZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YZStage</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.YZStage.html#dodal.devices.motors.YZStage" title="dodal.devices.motors.YZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YZStage</span></code></a></p></td>
 <td><p>Two-axis stage with a y motor and a z motor.</p></td>
 </tr>
 </tbody>
@@ -1058,6 +1062,9 @@
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.motors.create_axis_perp_to_rotation" title="dodal.devices.motors.create_axis_perp_to_rotation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_axis_perp_to_rotation</span></code></a>(motor_theta, ...)</p></td>
 <td><p>Given a signal that controls a motor in a rotation axis and two other signals controlling motors on a pair of orthogonal axes, these axes being in the rotating frame of reference created by the first axis, create a derived signal that is a projection of the two axes in the non-rotating frame of reference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.motors.create_rotational_ij_component_signals" title="dodal.devices.motors.create_rotational_ij_component_signals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_rotational_ij_component_signals</span></code></a>(...)</p></td>
+<td><p>Create virtual i/j signals representing a Cartesian coordinate frame that is rotated by a given angle relative to the underlying equipment axes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1087,6 +1094,41 @@ a move here is entirely parallel with the derived axis.</p></li>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.devices.motors.create_rotational_ij_component_signals">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.motors.</span></span><span class="sig-name descname"><span class="pre">create_rotational_ij_component_signals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i_read</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SignalR</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_read</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SignalR</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_write</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Movable</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_write</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Movable</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SignalR</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clockwise_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">SignalRW</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SignalRW</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/motors.html#create_rotational_ij_component_signals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.motors.create_rotational_ij_component_signals" title="Link to this definition">#</a></dt>
+<dd><p>Create virtual i/j signals representing a Cartesian coordinate frame
+that is rotated by a given angle relative to the underlying equipment axes.</p>
+<p>The returned signals expose the position of the system in a <em>rotated frame
+of reference</em> (e.g. the sample or stage frame), while transparently mapping
+reads and writes onto the real i/j signals in the fixed equipment (lab) frame.</p>
+<p>From the user’s point of view, i and j behave like ordinary orthogonal
+Cartesian axes attached to the rotating object. Internally, all reads apply
+a rotation to the real motor positions, and all writes apply the inverse
+rotation so that the requested motion is achieved in the rotated frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i_read</strong> (<em>SignalR</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>) – SignalR representing the i motor readback.</p></li>
+<li><p><strong>j_read</strong> (<em>SignalR</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>) – representing the j motor readback.</p></li>
+<li><p><strong>i_write</strong> (<em>Movable</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>) – object for setting the i position.</p></li>
+<li><p><strong>j_write</strong> (<em>Movable</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>) – object for setting the j position.</p></li>
+<li><p><strong>angle_deg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>SignalR</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>) – Rotation angle in degrees.</p></li>
+<li><p><strong>clockwise_frame</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If True, the rotated frame is using a
+clockwise rotation; otherwise, a counter-clockwise rotation is used. Default
+is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>], <code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[SignalRW[float], SignalRW[float]] Two virtual read/write signals
+corresponding to the rotated i and j components.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1141,6 +1183,7 @@ a move here is entirely parallel with the derived axis.</p></li>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.motors.create_axis_perp_to_rotation"><code class="docutils literal notranslate"><span class="pre">create_axis_perp_to_rotation()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.motors.create_rotational_ij_component_signals"><code class="docutils literal notranslate"><span class="pre">create_rotational_ij_component_signals()</span></code></a></li>
 </ul>
   </nav></div>
 

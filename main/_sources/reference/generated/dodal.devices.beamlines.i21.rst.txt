@@ -15,6 +15,10 @@ dodal.devices.beamlines.i21
    :recursive:
 
    ~i21.Grating
+   ~i21.I21SampleManipulatorStage
+   ~i21.ToolPointMotion
+   ~i21.UVWTiltAzimuthMotorPositions
+   ~i21.XYZTiltAzimuthMotorPositions
 
 
 

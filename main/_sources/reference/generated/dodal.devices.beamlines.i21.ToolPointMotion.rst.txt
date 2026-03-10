@@ -1,0 +1,46 @@
+dodal.devices.beamlines.i21.ToolPointMotion
+===========================================
+
+.. currentmodule:: dodal.devices.beamlines.i21
+
+.. autoclass:: ToolPointMotion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~ToolPointMotion.check_motor_limits
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ToolPointMotion.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

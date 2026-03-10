@@ -22,12 +22,13 @@ dodal.devices.motors
    ~motors.XYPitchStage
    ~motors.XYRollStage
    ~motors.XYStage
+   ~motors.XYZAzimuthPolarStage
+   ~motors.XYZAzimuthStage
+   ~motors.XYZAzimuthTiltPolarStage
+   ~motors.XYZAzimuthTiltStage
    ~motors.XYZOmegaStage
    ~motors.XYZPitchYawRollStage
    ~motors.XYZPitchYawStage
-   ~motors.XYZPolarAzimuthStage
-   ~motors.XYZPolarAzimuthTiltStage
-   ~motors.XYZPolarStage
    ~motors.XYZStage
    ~motors.XYZThetaStage
    ~motors.YZStage
@@ -50,6 +51,7 @@ dodal.devices.motors
    .. autosummary::
    
       create_axis_perp_to_rotation
+      create_rotational_ij_component_signals
    
    
 

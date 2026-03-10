@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.motors &#8212; dodal 2.1.1.dev12+g7913c366f documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 2.1.1.dev13+g118226cd3 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=cba62e86"></script>
+    <script src="../../../_static/documentation_options.js?v=3791828d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -880,8 +880,16 @@ window.addEventListener("load", load);</script>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">radians</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalRW</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">derived_signal_rw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">maybe_await</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SignalR</span><span class="p">,</span>
+    <span class="n">SignalRW</span><span class="p">,</span>
+    <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">derived_signal_rw</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.maths</span><span class="w"> </span><span class="kn">import</span> <span class="n">rotate_clockwise</span><span class="p">,</span> <span class="n">rotate_counter_clockwise</span>
@@ -1006,10 +1014,10 @@ window.addEventListener("load", load);</script>
 
 
 
-<div class="viewcode-block" id="XYZPolarStage">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPolarStage.html#dodal.devices.motors.XYZPolarStage">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">XYZPolarStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Four-axis stage with a standard xyz stage and one axis of rotation: polar.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="XYZAzimuthStage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZAzimuthStage.html#dodal.devices.motors.XYZAzimuthStage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">XYZAzimuthStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Four-axis stage with a standard xyz stage and one axis of rotation: azimuth.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1018,19 +1026,19 @@ window.addEventListener("load", load);</script>
         <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
         <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
         <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
-        <span class="n">polar_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_POLAR</span><span class="p">,</span>
+        <span class="n">azimuth_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_AZIMUTH</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">polar</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">polar_infix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">azimuth</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">azimuth_infix</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="XYZPolarAzimuthStage">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPolarAzimuthStage.html#dodal.devices.motors.XYZPolarAzimuthStage">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">XYZPolarAzimuthStage</span><span class="p">(</span><span class="n">XYZPolarStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Five-axis stage with a standard xyz stage and two axis of rotation: polar and</span>
-<span class="sd">    azimuth.</span>
+<div class="viewcode-block" id="XYZAzimuthPolarStage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZAzimuthPolarStage.html#dodal.devices.motors.XYZAzimuthPolarStage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">XYZAzimuthPolarStage</span><span class="p">(</span><span class="n">XYZAzimuthStage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Five-axis stage with a standard xyz stage and two axis of rotation: azimuth</span>
+<span class="sd">    and polar.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1040,20 +1048,20 @@ window.addEventListener("load", load);</script>
         <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
         <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
         <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
-        <span class="n">polar_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_POLAR</span><span class="p">,</span>
         <span class="n">azimuth_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_AZIMUTH</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">polar_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_POLAR</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">azimuth</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">azimuth_infix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">,</span> <span class="n">polar_infix</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polar</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">polar_infix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">,</span> <span class="n">azimuth_infix</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="XYZPolarAzimuthTiltStage">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPolarAzimuthTiltStage.html#dodal.devices.motors.XYZPolarAzimuthTiltStage">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">XYZPolarAzimuthTiltStage</span><span class="p">(</span><span class="n">XYZPolarAzimuthStage</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Six-axis stage with a standard xyz stage and three axis of rotation: polar,</span>
-<span class="sd">    azimuth and tilt.</span>
+<div class="viewcode-block" id="XYZAzimuthTiltStage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZAzimuthTiltStage.html#dodal.devices.motors.XYZAzimuthTiltStage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">XYZAzimuthTiltStage</span><span class="p">(</span><span class="n">XYZAzimuthStage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Five-axis stage with a standard xyz stage and two axis of rotation: azimuth and</span>
+<span class="sd">    tilt.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1063,14 +1071,37 @@ window.addEventListener("load", load);</script>
         <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
         <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
         <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
-        <span class="n">polar_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_POLAR</span><span class="p">,</span>
         <span class="n">azimuth_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_AZIMUTH</span><span class="p">,</span>
         <span class="n">tilt_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_TILT</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tilt</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">tilt_infix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">,</span> <span class="n">azimuth_infix</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="XYZAzimuthTiltPolarStage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZAzimuthTiltPolarStage.html#dodal.devices.motors.XYZAzimuthTiltPolarStage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">XYZAzimuthTiltPolarStage</span><span class="p">(</span><span class="n">XYZAzimuthTiltStage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Six-axis stage with a standard xyz stage and three axis of rotation: azimuth,</span>
+<span class="sd">    tilt and polar.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
+        <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
+        <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
+        <span class="n">azimuth_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_AZIMUTH</span><span class="p">,</span>
+        <span class="n">tilt_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_TILT</span><span class="p">,</span>
+        <span class="n">polar_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_POLAR</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polar</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">polar_infix</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">,</span> <span class="n">polar_infix</span><span class="p">,</span> <span class="n">azimuth_infix</span>
+            <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">,</span> <span class="n">azimuth_infix</span><span class="p">,</span> <span class="n">tilt_infix</span>
         <span class="p">)</span></div>
 
 
@@ -1296,6 +1327,87 @@ window.addEventListener("load", load);</script>
         <span class="n">i_val</span><span class="o">=</span><span class="n">motor_i</span><span class="p">,</span>
         <span class="n">j_val</span><span class="o">=</span><span class="n">motor_j</span><span class="p">,</span>
         <span class="n">rot_deg_value</span><span class="o">=</span><span class="n">motor_theta</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_angle_deg</span><span class="p">(</span><span class="n">angle_deg</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">angle_deg</span><span class="p">,</span> <span class="n">SignalR</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">angle_deg</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">angle_deg</span>
+
+
+<div class="viewcode-block" id="create_rotational_ij_component_signals">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.html#dodal.devices.motors.create_rotational_ij_component_signals">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_rotational_ij_component_signals</span><span class="p">(</span>
+    <span class="n">i_read</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">j_read</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">i_write</span><span class="p">:</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">j_write</span><span class="p">:</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">angle_deg</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">clockwise_frame</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create virtual i/j signals representing a Cartesian coordinate frame</span>
+<span class="sd">    that is rotated by a given angle relative to the underlying equipment axes.</span>
+
+<span class="sd">    The returned signals expose the position of the system in a *rotated frame</span>
+<span class="sd">    of reference* (e.g. the sample or stage frame), while transparently mapping</span>
+<span class="sd">    reads and writes onto the real i/j signals in the fixed equipment (lab) frame.</span>
+
+<span class="sd">    From the user&#39;s point of view, i and j behave like ordinary orthogonal</span>
+<span class="sd">    Cartesian axes attached to the rotating object. Internally, all reads apply</span>
+<span class="sd">    a rotation to the real motor positions, and all writes apply the inverse</span>
+<span class="sd">    rotation so that the requested motion is achieved in the rotated frame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        i_read (SignalR[float]): SignalR representing the i motor readback.</span>
+<span class="sd">        j_read (SignalR[float]): representing the j motor readback.</span>
+<span class="sd">        i_write (Movable[float]): object for setting the i position.</span>
+<span class="sd">        j_write (Movable[float]): object for setting the j position.</span>
+<span class="sd">        angle_deg (float | SignalR[float]): Rotation angle in degrees.</span>
+<span class="sd">        clockwise_frame (boolean, optional): If True, the rotated frame is using a</span>
+<span class="sd">            clockwise rotation; otherwise, a counter-clockwise rotation is used. Default</span>
+<span class="sd">            is True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[SignalRW[float], SignalRW[float]] Two virtual read/write signals</span>
+<span class="sd">        corresponding to the rotated i and j components.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rotate</span> <span class="o">=</span> <span class="n">rotate_clockwise</span> <span class="k">if</span> <span class="n">clockwise_frame</span> <span class="k">else</span> <span class="n">rotate_counter_clockwise</span>
+    <span class="n">inverse_rotate</span> <span class="o">=</span> <span class="n">rotate_counter_clockwise</span> <span class="k">if</span> <span class="n">clockwise_frame</span> <span class="k">else</span> <span class="n">rotate_clockwise</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_read_rotated</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="n">i_read</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="n">j_read</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="n">_get_angle_deg</span><span class="p">(</span><span class="n">angle_deg</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="n">rotate</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">),</span> <span class="n">ang</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_write_rotated</span><span class="p">(</span><span class="n">i_rot</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j_rot</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ang</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">i_new</span><span class="p">,</span> <span class="n">j_new</span> <span class="o">=</span> <span class="n">inverse_rotate</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">i_rot</span><span class="p">,</span> <span class="n">j_rot</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="n">maybe_await</span><span class="p">(</span><span class="n">i_write</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">i_new</span><span class="p">)),</span>
+            <span class="n">maybe_await</span><span class="p">(</span><span class="n">j_write</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">j_new</span><span class="p">)),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_i</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ang</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotate</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_i</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">i_rot</span><span class="p">,</span> <span class="n">j_rot</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_read_rotated</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">_write_rotated</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">j_rot</span><span class="p">,</span> <span class="n">ang</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_j</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ang</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotate</span><span class="p">(</span><span class="n">radians</span><span class="p">(</span><span class="n">ang</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_j</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">i_rot</span><span class="p">,</span> <span class="n">j_rot</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_read_rotated</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">_write_rotated</span><span class="p">(</span><span class="n">i_rot</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">ang</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">derived_signal_rw</span><span class="p">(</span><span class="n">_read_i</span><span class="p">,</span> <span class="n">_set_i</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i_read</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j_read</span><span class="p">,</span> <span class="n">ang</span><span class="o">=</span><span class="n">angle_deg</span><span class="p">),</span>
+        <span class="n">derived_signal_rw</span><span class="p">(</span><span class="n">_read_j</span><span class="p">,</span> <span class="n">_set_j</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i_read</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j_read</span><span class="p">,</span> <span class="n">ang</span><span class="o">=</span><span class="n">angle_deg</span><span class="p">),</span>
     <span class="p">)</span></div>
 
 </pre></div>
