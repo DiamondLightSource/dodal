@@ -1,5 +1,7 @@
 """Beamline i02-1 is also known as VMXm, or I02J."""
 
+from dodal.devices.beamlines.i02_1.sample_motors import SampleMotors
+
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
@@ -11,9 +13,9 @@ from dodal.devices.attenuator.filter_selections import (
 )
 from dodal.devices.beamlines.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
 from dodal.devices.beamlines.i02_1.flux import Flux
-from dodal.devices.beamlines.i02_1.sample_motors import SampleMotors
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase, StationaryCrystal
 from dodal.devices.eiger import EigerDetector
+from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import UndulatorInKeV
@@ -97,8 +99,15 @@ def s4_slit_gaps() -> Slits:
 
 
 @devices.factory(use_factory_name=False)
-def goniometer() -> SampleMotors:
-    return SampleMotors(f"{PREFIX.beamline_prefix}-MO-", name="gonio")
+def goniometer() -> XYZOmegaStage:
+    return XYZOmegaStage(
+        f"{PREFIX.beamline_prefix}-MO-",
+        x_infix="SAMP-01:X",
+        y_infix="GONJK-01:HEIGHT",
+        z_infix="SAMP-01:Z",
+        omega_infix="SAMP-01:OMEGA",
+        name="gonio",
+    )
 
 
 @devices.factory()
