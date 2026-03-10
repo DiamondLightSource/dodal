@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.1.1.dev13+g118226cd3 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.1.1.dev14+gbe55b4e2d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=3791828d"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9ac875b8"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -913,11 +913,15 @@ window.addEventListener("load", load);</script>
 
 
 
+<span class="n">SAMPLE_LOCATION_EMPTY</span> <span class="o">=</span> <span class="n">SampleLocation</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="ProgramNames">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.ProgramNames.html#dodal.devices.beamlines.i15_1.robot.ProgramNames">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ProgramNames</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
     <span class="n">PUCK</span> <span class="o">=</span> <span class="s2">&quot;PUCK.MB6&quot;</span>
-    <span class="n">BEAM</span> <span class="o">=</span> <span class="s2">&quot;BEAM.MB6&quot;</span></div>
+    <span class="n">BEAM</span> <span class="o">=</span> <span class="s2">&quot;BEAM.MB6&quot;</span>
+    <span class="n">SPINNER</span> <span class="o">=</span> <span class="s2">&quot;MOTOR.MB6&quot;</span></div>
 
 
 
@@ -954,6 +958,11 @@ window.addEventListener("load", load);</script>
             <span class="n">device</span><span class="o">.</span><span class="n">beam_load_program</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">set_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">BEAM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="p">)</span>
 
+        <span class="n">callback_on_mock_put</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">spinner_load_program</span><span class="p">,</span>
+            <span class="n">partial</span><span class="p">(</span><span class="n">set_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">SPINNER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">)</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">program_running</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
             <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_program_running</span><span class="p">():</span>
                 <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span> <span class="n">ProgramRunning</span><span class="o">.</span><span class="n">PROGRAM_RUNNING</span><span class="p">)</span>
@@ -965,7 +974,13 @@ window.addEventListener("load", load);</script>
             <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">_program_running</span><span class="p">())</span>
 
         <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">puck_pick</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
-        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">beam_place</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span></div>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">puck_place</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
+
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">beam_place</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">beam_pick</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
+
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">spinner_off</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">spinner_on</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span></div>
 
 
 
@@ -1015,8 +1030,8 @@ window.addEventListener("load", load);</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">beam_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">BEAM:ACTION1.PROC&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beam_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">BEAM:LOAD.PROC&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION0.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_place</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION1.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_off</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION0.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spinner_on</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION1.PROC&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spinner_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:LOAD.PROC&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">servo_off</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">SOFF.PROC&quot;</span><span class="p">)</span>
@@ -1051,22 +1066,14 @@ window.addEventListener("load", load);</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">program_name</span><span class="p">,</span> <span class="n">program_name</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">PROGRAM_LOADED_TIMEOUT</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Robot.set">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.Robot.html#dodal.devices.beamlines.i15_1.robot.Robot.set">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a sample load from the specified sample location.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            value (SampleLocation): the sample location</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_program_and_wait_for_loaded</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">puck_load_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">PUCK</span>
         <span class="p">)</span>
 
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">puck</span><span class="p">),</span>
-            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">position</span><span class="p">),</span>
+            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span><span class="p">,</span> <span class="n">location</span><span class="o">.</span><span class="n">puck</span><span class="p">),</span>
+            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span><span class="p">,</span> <span class="n">location</span><span class="o">.</span><span class="n">position</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_pick</span><span class="p">)</span>
@@ -1078,9 +1085,57 @@ window.addEventListener("load", load);</script>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beam_place</span><span class="p">)</span>
 
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">puck</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">puck</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">position</span><span class="p">),</span>
-        <span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">puck</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">puck</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">position</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_unload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_program_and_wait_for_loaded</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spinner_load_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">SPINNER</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spinner_off</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_program_and_wait_for_loaded</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_load_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">BEAM</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beam_pick</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_program_and_wait_for_loaded</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">puck_load_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">PUCK</span>
+        <span class="p">)</span>
+
+        <span class="n">current_puck</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">puck</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">current_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span><span class="p">,</span> <span class="n">current_puck</span><span class="p">),</span>
+            <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span><span class="p">,</span> <span class="n">current_position</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_place</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">puck</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Robot.set">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.Robot.html#dodal.devices.beamlines.i15_1.robot.Robot.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a sample load from the specified sample location or a sample unload</span>
+<span class="sd">        if SAMPLE_LOCATION_EMPTY is specified.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (SampleLocation): the sample location to load to or</span>
+<span class="sd">                                    SAMPLE_LOCATION_EMPTY to unload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">SAMPLE_LOCATION_EMPTY</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unload</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

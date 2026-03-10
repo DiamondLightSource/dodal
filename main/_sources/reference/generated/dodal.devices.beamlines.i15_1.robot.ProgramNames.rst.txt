@@ -74,5 +74,8 @@ dodal.devices.beamlines.i15\_1.robot.ProgramNames
       
       ~ProgramNames.BEAM
       
+      
+      ~ProgramNames.SPINNER
+      
    
    

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i15_1.robot.Robot &#8212; dodal 2.1.1.dev13+g118226cd3 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot.Robot &#8212; dodal 2.1.1.dev14+gbe55b4e2d documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=3791828d"></script>
+    <script src="../../_static/documentation_options.js?v=9ac875b8"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1023,7 +1023,7 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.beamlines.i15_1.robot.Robot.set" title="dodal.devices.beamlines.i15_1.robot.Robot.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
-<td><p>Perform a sample load from the specified sample location.</p></td>
+<td><p>Perform a sample load from the specified sample location or a sample unload if SAMPLE_LOCATION_EMPTY is specified.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1046,10 +1046,12 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.beamlines.i15_1.robot.Robot.set">
 <span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.beamlines.i15_1.robot.SampleLocation.html#dodal.devices.beamlines.i15_1.robot.SampleLocation" title="dodal.devices.beamlines.i15_1.robot.SampleLocation"><span class="pre">SampleLocation</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i15_1/robot.html#Robot.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i15_1.robot.Robot.set" title="Link to this definition">#</a></dt>
-<dd><p>Perform a sample load from the specified sample location.</p>
+<dd><p>Perform a sample load from the specified sample location or a sample unload
+if SAMPLE_LOCATION_EMPTY is specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<a class="reference internal" href="dodal.devices.beamlines.i15_1.robot.SampleLocation.html#dodal.devices.beamlines.i15_1.robot.SampleLocation" title="dodal.devices.beamlines.i15_1.robot.SampleLocation"><em>SampleLocation</em></a>) – the sample location</p>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference internal" href="dodal.devices.beamlines.i15_1.robot.SampleLocation.html#dodal.devices.beamlines.i15_1.robot.SampleLocation" title="dodal.devices.beamlines.i15_1.robot.SampleLocation"><em>SampleLocation</em></a>) – the sample location to load to or
+SAMPLE_LOCATION_EMPTY to unload</p>
 </dd>
 </dl>
 </dd></dl>
