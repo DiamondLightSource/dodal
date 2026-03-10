@@ -6,7 +6,7 @@ from ophyd_async.core import init_devices
 from ophyd_async.epics.motor import Motor
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.beamlines.i05 import PolynomCompoundMotors
+from dodal.devices.beamlines.i05_shared import PolynomCompoundMotors
 
 
 @pytest.fixture

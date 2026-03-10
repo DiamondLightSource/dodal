@@ -11,6 +11,6 @@ def assert_region_has_expected_values(
     actual_values = r.__dict__
     diff = DeepDiff(expected_region_values, actual_values)
     if diff:
-        raise AssertionError(f"Region does not match expected values:\n{diff}")
+        raise AssertionError(f"Region {r.name} does not match expected values:\n{diff}")
     for key in expected_region_values.keys():
         assert actual_values.get(key) is not None

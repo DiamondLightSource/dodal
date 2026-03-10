@@ -7,17 +7,13 @@ from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserD
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
-from dodal.devices.electron_analyser.specs.specs_region import (
-    SpecsRegion,
-    SpecsSequence,
-)
+from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
 from dodal.devices.fast_shutter import FastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
 class SpecsDetector(
     ElectronAnalyserDetector[
-        SpecsSequence[TLensMode, TPsuMode],
         SpecsAnalyserDriverIO[TLensMode, TPsuMode],
         SpecsRegion[TLensMode, TPsuMode],
     ],
@@ -33,15 +29,12 @@ class SpecsDetector(
         source_selector: SourceSelector | None = None,
         name: str = "",
     ):
-        # Save to class so takes part with connect()
+        # Make attribute of class so connect applies to driver and populates parent.
         self.driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
             prefix, lens_mode_type, psu_mode_type
         )
-
         controller = ElectronAnalyserController[
             SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
         ](self.driver, energy_source, shutter, source_selector)
 
-        sequence_class = SpecsSequence[lens_mode_type, psu_mode_type]
-
-        super().__init__(sequence_class, controller, name)
+        super().__init__(controller, name)

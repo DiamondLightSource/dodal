@@ -23,7 +23,7 @@ class BacklightPositioner(StandardReadable):
 
     @AsyncStatus.wrap
     async def set(self, value: BacklightPositions):
-        await self.pos_level.set(value, wait=True)
+        await self.pos_level.set(value)
 
 
 class DualBacklight(StandardReadable):
@@ -54,6 +54,6 @@ class DualBacklight(StandardReadable):
     async def set(self, value: BacklightPositions):
         await self.backlight_position.set(value)
         if value == BacklightPositions.OUT:
-            await self.backlight_state.set(OnOffUpper.OFF, wait=True)
+            await self.backlight_state.set(OnOffUpper.OFF)
         else:
-            await self.backlight_state.set(OnOffUpper.ON, wait=True)
+            await self.backlight_state.set(OnOffUpper.ON)
