@@ -24,7 +24,6 @@ EXP_SHUTTER_2_INFIX = "-PS-SHTR-02"
 TEST_MODE = False
 # will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754
 
-
 class ShutterNotSafeToOperateError(Exception):
     pass
 
@@ -95,11 +94,15 @@ class HutchInterlock(BaseHutchInterlock):
         return isclose(float(interlock_state), HUTCH_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
 
 
-class BaseHutchShutter(StandardReadable, Movable[ShutterDemand]):
+class BaseHutchShutter(ABC, StandardReadable, Movable[ShutterDemand]):
     """Device to operate the hutch shutter.
 
     Base class for HutchShutters - extended by some that do not use an interlock
     and by others that do.  See child classes for details
+
+    Attributes:
+        control: An writeable EPICS signal to drive the shutter state changes
+        status: A readable EPICS signal to read the present shutter state
     """
 
     def __init__(
@@ -112,6 +115,7 @@ class BaseHutchShutter(StandardReadable, Movable[ShutterDemand]):
             self.status = epics_signal_r(ShutterState, f"{bl_shutter_prefix}:STA")
         super().__init__(name)
 
+
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
         if TEST_MODE:
@@ -119,14 +123,22 @@ class BaseHutchShutter(StandardReadable, Movable[ShutterDemand]):
         else:
             if value == ShutterDemand.OPEN:
                 await self._pre_open_shutter_actions()
-            await self._shutter_action(value)
+                required_match: ShutterState = ShutterState.OPEN
+            else:
+                required_match: ShutterState = ShutterState.CLOSED
+            await self._shutter_action(value=value, required_match=required_match)
 
-    async def _shutter_action(self, value: ShutterDemand):
-        await self.control.set(value)
-        return await wait_for_value(self.status, match=value, timeout=DEFAULT_TIMEOUT)
 
+    @abstractmethod
     async def _pre_open_shutter_actions(self):
-        pass  # implemented in child class
+
+
+    async def _shutter_action(
+        self, value: ShutterDemand, required_match: ShutterState
+    ):
+        await self.control.set(value)
+        await wait_for_value(self.status, match=required_match, timeout=DEFAULT_TIMEOUT)
+
 
     def _test_mode_set(self):
         LOGGER.warning("Running in test mode, will not operate the experiment shutter.")
@@ -171,6 +183,9 @@ class InterlockedHutchShutter(BaseHutchShutter):
     reset. The reset will set the interlock status to `OK`, allowing for shutter operations.
     Until this step is done, the hutch shutter can't be opened. The reset is not needed
     for closing the shutter.
+
+    Attributes:
+        interlock : Hutch PSS based interlock status checker
     """
 
     def __init__(
