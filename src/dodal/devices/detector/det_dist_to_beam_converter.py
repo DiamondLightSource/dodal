@@ -17,9 +17,9 @@ class Axis(Enum):
 class DetectorDistanceToBeamXYConverter:
     def __init__(self, lookup_file: str):
         self.lookup_file: str = lookup_file
-        config_server = get_config_client(get_beamline_name())
+        config_client = get_config_client(get_beamline_name())
 
-        lookup_table_columns: list = config_server.get_file_contents(
+        lookup_table_columns: list = config_client.get_file_contents(
             lookup_file, DetectorXYLookupTable
         ).columns
         self._d_to_x = linear_extrapolation_lut(
