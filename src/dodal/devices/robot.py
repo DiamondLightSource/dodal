@@ -70,6 +70,21 @@ class ErrorStatus(Device):
             raise RobotLoadError(int(error_code), error_string) from raise_from
 
 
+# Error codes that we do special things on
+class RobotErrorCode(IntEnum):
+    NO_ERROR = 0
+    SAMPLE_POSITION_NOT_READY = 9
+    NO_PIN_ERROR_CODE = 25
+    LIGHT_CURTAIN_TRIPPED = 40
+
+    @classmethod
+    def is_retryable(cls, error_code):
+        return error_code in {
+            RobotErrorCode.SAMPLE_POSITION_NOT_READY,
+            RobotErrorCode.LIGHT_CURTAIN_TRIPPED,
+        }
+
+
 class BartRobot(StandardReadable, Movable[SampleLocation]):
     """The sample changing robot."""
 
@@ -78,11 +93,6 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
 
     # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
-
-    # Error codes that we do special things on
-    NO_ERROR = 0
-    NO_PIN_ERROR_CODE = 25
-    LIGHT_CURTAIN_TRIPPED = 40
 
     # How far the gonio position can be out before loading will fail
     LOAD_TOLERANCE_MM = 0.02
@@ -140,7 +150,9 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
 
         async def raise_if_error():
             await wait_for_value(
-                self.prog_error.code, lambda value: value != self.NO_ERROR, None
+                self.prog_error.code,
+                lambda value: value != RobotErrorCode.NO_ERROR,
+                None,
             )
             error_code = await self.prog_error.code.get_value()
             error_msg = await self.prog_error.str.get_value()
@@ -171,8 +183,11 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             raise
 
     async def _load_pin_and_puck(self, sample_location: SampleLocation):
-        if await self.controller_error.code.get_value() == self.LIGHT_CURTAIN_TRIPPED:
-            LOGGER.info("Light curtain tripped, trying again")
+        error_code = await self.controller_error.code.get_value()
+        if RobotErrorCode.is_retryable(error_code):
+            LOGGER.info(
+                f"Clearing error code {RobotErrorCode(error_code)._name_} from previous load/unload attempt, trying again"
+            )
             await self.reset.trigger()
         LOGGER.info(f"Loading pin {sample_location}")
         if await self.program_running.get_value():

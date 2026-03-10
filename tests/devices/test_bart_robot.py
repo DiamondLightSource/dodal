@@ -20,6 +20,7 @@ from dodal.devices.robot import (
     BartRobot,
     BeamlineStatus,
     PinMounted,
+    RobotErrorCode,
     RobotLoadError,
     SampleLocation,
 )
@@ -213,10 +214,16 @@ async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
     mock_wait_for.assert_awaited_once_with(ANY, timeout=0.02)
 
 
-async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_still_throw_if_error_not_cleared():
+@pytest.mark.parametrize(
+    "error_code",
+    [RobotErrorCode.LIGHT_CURTAIN_TRIPPED, RobotErrorCode.SAMPLE_POSITION_NOT_READY],
+)
+async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_still_throw_if_error_not_cleared(
+    error_code: RobotErrorCode,
+):
     device = await _get_bart_robot()
     _set_fast_robot_timeouts(device)
-    set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
+    set_mock_value(device.controller_error.code, error_code)
 
     with pytest.raises(RobotLoadError) as e:
         await device.set(SampleLocation(1, 2))
@@ -232,12 +239,17 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
     )
 
 
+@pytest.mark.parametrize(
+    "error_code",
+    [RobotErrorCode.LIGHT_CURTAIN_TRIPPED, RobotErrorCode.SAMPLE_POSITION_NOT_READY],
+)
 @patch("dodal.devices.robot.LOGGER.info")
 async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_continue_if_error_cleared(
     mock_log_info: MagicMock,
+    error_code: RobotErrorCode,
 ):
     device = await _get_bart_robot()
-    set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
+    set_mock_value(device.controller_error.code, error_code)
 
     callback_on_mock_put(
         device.reset,
