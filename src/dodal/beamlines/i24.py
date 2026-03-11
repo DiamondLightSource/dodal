@@ -22,6 +22,7 @@ from dodal.devices.beamlines.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.beamlines.i24.pmac import PMAC
 from dodal.devices.beamlines.i24.vgonio import VerticalGoniometer
 from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.jungfrau import Jungfrau
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -89,9 +90,9 @@ def backlight() -> DualBacklight:
     return DualBacklight(prefix=PREFIX.beamline_prefix)
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:")
+    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:", name="det_stage")
 
 
 @devices.factory()
@@ -102,9 +103,9 @@ def dcm() -> DCM:
     )
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def pmac() -> PMAC:
-    return PMAC(PREFIX.beamline_prefix)
+    return PMAC(PREFIX.beamline_prefix, name="PMAC")
 
 
 @devices.factory()
@@ -115,9 +116,9 @@ def oav() -> OAVBeamCentreFile:
     )
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def vgonio() -> VerticalGoniometer:
-    return VerticalGoniometer(f"{PREFIX.beamline_prefix}-MO-VGON-01:")
+    return VerticalGoniometer(f"{PREFIX.beamline_prefix}-MO-VGON-01:", name="gonio")
 
 
 @devices.factory()
@@ -128,9 +129,9 @@ def zebra() -> Zebra:
     )
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def shutter() -> HutchShutter:
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:", name="hutch_shutter")
 
 
 @devices.factory()
@@ -141,6 +142,20 @@ def focus_mirrors() -> FocusMirrorsMode:
 @devices.factory()
 def eiger_beam_center() -> DetectorBeamCenter:
     return DetectorBeamCenter(f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:", "eiger_bc")
+
+
+# @devices.factory()
+# def jungfrau(
+#     path_provider: PathProvider,
+# ) -> Jungfrau:
+#     """Get the Jungfrau 9M device."""
+#     return Jungfrau(
+#         prefix=f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
+#         drv_suffix="",
+#         hdf_suffix="OD:",
+#         path_provider=AutoMaxIncrementingPathProvider(path_provider),
+#         odin_nodes=36,
+#     )
 
 
 @devices.factory()

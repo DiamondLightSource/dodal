@@ -82,8 +82,16 @@ class JungfrauCommissioningWriter(DetectorWriter, StandardReadable):
     async def observe_indices_written(
         self, timeout: float
     ) -> AsyncGenerator[int, None]:
-        timeout = timeout * 4  # This filewriter is very slow
+        timeout = timeout * 20  # This filewriter is very slow
+        val = await self.frame_counter.get_value()
+        LOGGER.info(f"initial observe indices frame counter val is {val}")
+        LOGGER.info(f"reading observe indices...")
+        val = await self.frame_counter.get_value()
+        LOGGER.info(f"read of frame counter after set is {val}")
         async for num_captured in observe_value(self.frame_counter, timeout):
+            LOGGER.info(f"observe val update on frame counter val is {num_captured}")
+            val = await self.frame_counter.get_value()
+
             yield num_captured // (self._exposures_per_event)
 
     async def get_indices_written(self) -> int:
