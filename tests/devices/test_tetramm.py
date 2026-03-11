@@ -39,7 +39,7 @@ async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
     set_mock_value(tetramm.driver.num_channels, TetrammChannels.FOUR)
     set_mock_value(tetramm.driver.sample_time, 10e-6)
 
-    async def sample_time_from_values(value: int, _: bool):
+    async def sample_time_from_values(value: int):
         # https://millenia.cars.aps.anl.gov/software/epics/quadEMDoc.html
         # "The sample time on the TetrAMM is controlled by the following equation:
         # 10 microseconds * ValuesPerRead.""
