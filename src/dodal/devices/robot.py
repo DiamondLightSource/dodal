@@ -71,17 +71,28 @@ class ErrorStatus(Device):
 
 
 # Error codes that we do special things on
-class RobotErrorCode(IntEnum):
+class ProgErrorCode(IntEnum):
     NO_ERROR = 0
     SAMPLE_POSITION_NOT_READY = 9
     NO_PIN_ERROR_CODE = 25
+
+    @classmethod
+    def is_retryable(cls, error_code):
+        return error_code in {
+            ProgErrorCode.NO_ERROR,
+            ProgErrorCode.SAMPLE_POSITION_NOT_READY,
+        }
+
+
+class ControllerErrorCode(IntEnum):
+    NO_ERROR = 0
     LIGHT_CURTAIN_TRIPPED = 40
 
     @classmethod
     def is_retryable(cls, error_code):
         return error_code in {
-            RobotErrorCode.SAMPLE_POSITION_NOT_READY,
-            RobotErrorCode.LIGHT_CURTAIN_TRIPPED,
+            ControllerErrorCode.NO_ERROR,
+            ControllerErrorCode.LIGHT_CURTAIN_TRIPPED,
         }
 
 
@@ -148,21 +159,32 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         there is an error a RobotLoadError error is raised.
         """
 
-        async def raise_if_error():
+        async def raise_if_prog_error():
             await wait_for_value(
                 self.prog_error.code,
-                lambda value: value != RobotErrorCode.NO_ERROR,
+                lambda value: value != ProgErrorCode.NO_ERROR,
                 None,
             )
             error_code = await self.prog_error.code.get_value()
             error_msg = await self.prog_error.str.get_value()
             raise RobotLoadError(error_code, error_msg)
 
+        async def raise_if_ctl_error():
+            await wait_for_value(
+                self.controller_error.code,
+                lambda value: value != ControllerErrorCode.NO_ERROR,
+                None,
+            )
+            error_code = await self.controller_error.code.get_value()
+            error_msg = await self.controller_error.str.get_value()
+            raise RobotLoadError(error_code, error_msg)
+
         async def wait_for_expected_state():
             await wait_for_value(self.beamline_disabled, expected_state.value, None)
 
         tasks = [
-            (Task(raise_if_error())),
+            (Task(raise_if_prog_error())),
+            (Task(raise_if_ctl_error())),
             (Task(wait_for_expected_state())),
         ]
         try:
@@ -182,13 +204,32 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
 
             raise
 
-    async def _load_pin_and_puck(self, sample_location: SampleLocation):
-        error_code = await self.controller_error.code.get_value()
-        if RobotErrorCode.is_retryable(error_code):
-            LOGGER.info(
-                f"Clearing error code {RobotErrorCode(error_code)._name_} from previous load/unload attempt, trying again"
-            )
+    async def _check_errors_and_clear_if_retryable(self):
+        ctl_err_code = await self.controller_error.code.get_value()
+        prog_err_code = await self.prog_error.code.get_value()
+        if (
+            ctl_err_code != ControllerErrorCode.NO_ERROR
+            or prog_err_code != ProgErrorCode.NO_ERROR
+        ):
+            ctl_err_msg = await self.controller_error.str.get_value()
+            prog_err_msg = await self.prog_error.str.get_value()
+            if ctl_err_code != ControllerErrorCode.NO_ERROR:
+                LOGGER.info(
+                    f"Detected error from previous load/unload attempt controller_error {ctl_err_code}:{ctl_err_msg}"
+                )
+            if prog_err_code != ControllerErrorCode.NO_ERROR:
+                LOGGER.info(
+                    f"Detected error from previous load/unload attempt prog_error {prog_err_code}:{prog_err_msg}"
+                )
+            if not ProgErrorCode.is_retryable(prog_err_code):
+                raise RobotLoadError(prog_err_code, prog_err_msg)
+            if not ControllerErrorCode.is_retryable(ctl_err_code):
+                raise RobotLoadError(ctl_err_code, ctl_err_msg)
+
+            LOGGER.info("Errors are retryable, resetting errors and trying again")
             await self.reset.trigger()
+
+    async def _load_pin_and_puck(self, sample_location: SampleLocation):
         LOGGER.info(f"Loading pin {sample_location}")
         if await self.program_running.get_value():
             LOGGER.info(
@@ -225,6 +266,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 sample.
         """
         try:
+            await self._check_errors_and_clear_if_retryable()
             if value != SAMPLE_LOCATION_EMPTY:
                 await wait_for(
                     self._load_pin_and_puck(value),
