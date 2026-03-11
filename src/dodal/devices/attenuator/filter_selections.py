@@ -73,12 +73,12 @@ class I02_1FilterFourSelections(SubsetEnum):  # noqa: N801
 
 
 class I19FilterOneSelections(StrictEnum):
-    AIR1 = "Empty"
-    AL = "Al"
-    AIR3 = "Empty"
-    AU = "Au"
-    AIR5 = "Empty"
-    FE = "Fe"
+    AIR1 = "1 - "
+    AL = "2 - Al"
+    AIR3 = "3 - "
+    AU = "4 - Au"
+    AIR5 = "5 - "
+    FE = "6 - Fe"
 
 
 class I24FilterOneSelections(SubsetEnum):
