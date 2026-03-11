@@ -305,7 +305,7 @@ async def test_robot_load_resets_prog_error_and_succeeds_if_error_cleared(
 
 
 async def test_robot_unload_resets_controller_error_and_succeeds_if_error_cleared(
-    robot_for_unload: BartRobot,
+    robot_for_unload,
 ):
     device, trigger_complete, drying_complete = robot_for_unload
     trigger_complete.set()
@@ -320,7 +320,7 @@ async def test_robot_unload_resets_controller_error_and_succeeds_if_error_cleare
 
 
 async def test_robot_unload_resets_prog_error_and_succeeds_if_error_cleared(
-    robot_for_unload: BartRobot,
+    robot_for_unload,
 ):
     device, trigger_complete, drying_complete = robot_for_unload
     trigger_complete.set()
