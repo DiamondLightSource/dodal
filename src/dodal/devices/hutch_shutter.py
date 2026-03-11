@@ -24,6 +24,7 @@ EXP_SHUTTER_2_INFIX = "-PS-SHTR-02"
 TEST_MODE = False
 # will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754
 
+
 class ShutterNotSafeToOperateError(Exception):
     pass
 
@@ -115,7 +116,6 @@ class BaseHutchShutter(ABC, StandardReadable, Movable[ShutterDemand]):
             self.status = epics_signal_r(ShutterState, f"{bl_shutter_prefix}:STA")
         super().__init__(name)
 
-
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
         if TEST_MODE:
@@ -128,17 +128,13 @@ class BaseHutchShutter(ABC, StandardReadable, Movable[ShutterDemand]):
                 required_match: ShutterState = ShutterState.CLOSED
             await self._shutter_action(value=value, required_match=required_match)
 
-
     @abstractmethod
     async def _pre_open_shutter_actions(self):
+        """Provides internal implementation of pre-requisite steps that support opening of the shutter."""
 
-
-    async def _shutter_action(
-        self, value: ShutterDemand, required_match: ShutterState
-    ):
+    async def _shutter_action(self, value: ShutterDemand, required_match: ShutterState):
         await self.control.set(value)
         await wait_for_value(self.status, match=required_match, timeout=DEFAULT_TIMEOUT)
-
 
     def _test_mode_set(self):
         LOGGER.warning("Running in test mode, will not operate the experiment shutter.")
@@ -164,9 +160,10 @@ class HutchShutter(BaseHutchShutter):
         shtr_infix: str = EXP_SHUTTER_1_INFIX,
         name: str = "",
     ) -> None:
-        super().__init__(name, f"{bl_prefix}{shtr_infix}")
+        super().__init__(f"{bl_prefix}{shtr_infix}", name)
 
     async def _pre_open_shutter_actions(self):
+        """Required by parent class API - resets the shutter prior to opening."""
         await self.control.set(ShutterDemand.RESET)
 
 
@@ -197,13 +194,19 @@ class InterlockedHutchShutter(BaseHutchShutter):
     ) -> None:
         with self.add_children_as_readables():
             self.interlock = interlock
-        super().__init__(name, f"{bl_prefix}{shtr_infix}")
+        super().__init__(f"{bl_prefix}{shtr_infix}", name)
 
     async def _pre_open_shutter_actions(self):
+        """Required by parent class API - checks interlock, then resets the shutter prior to opening."""
         await self._check_interlock()
         await self.control.set(ShutterDemand.RESET)
 
     async def _check_interlock(self):
+        """Disrupts shutter opening if the interlock is not in a safe to operate state.
+
+        Raises:
+             ShutterNotSafeToOperateError - whereby an unhappy interlock will veto any attempt to open the shutter.
+        """
         interlock_state = await self.interlock.shutter_safe_to_operate()
         if not interlock_state:
             raise ShutterNotSafeToOperateError(
