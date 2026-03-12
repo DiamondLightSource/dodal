@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.hutch_shutter &#8212; dodal 2.1.1.dev19+gad1213bad documentation</title>
+    <title>dodal.devices.hutch_shutter &#8212; dodal 2.1.1.dev20+ge4914d5c5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=3e518971"></script>
+    <script src="../../../_static/documentation_options.js?v=208b889d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -992,21 +992,66 @@ window.addEventListener("load", load);</script>
 
 
 
-<div class="viewcode-block" id="HutchShutter">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.HutchShutter.html#dodal.devices.hutch_shutter.HutchShutter">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">HutchShutter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ShutterDemand</span><span class="p">]):</span>
+<div class="viewcode-block" id="BaseHutchShutter">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.BaseHutchShutter.html#dodal.devices.hutch_shutter.BaseHutchShutter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseHutchShutter</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ShutterDemand</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to operate the hutch shutter.</span>
 
-<span class="sd">    When a demand is sent and interlock given, the device should first check the hutch</span>
-<span class="sd">    status and raise an error if it&#39;s not interlocked (searched and locked), meaning</span>
-<span class="sd">    it&#39;s not safe to operate the shutter. When no interlock specified, the shutter</span>
-<span class="sd">    can be operated without checking the hutch status relying on default shutter</span>
-<span class="sd">    interlock (:ILKSTA).</span>
+<span class="sd">    Base class for HutchShutters - extended by some that do not use an interlock</span>
+<span class="sd">    and by others that do.  See child classes for details</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        control: An writeable EPICS signal to drive the shutter state changes</span>
+<span class="sd">        status: A readable EPICS signal to read the present shutter state</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">bl_shutter_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_shutter_prefix</span><span class="si">}</span><span class="s2">:CON&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ShutterState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_shutter_prefix</span><span class="si">}</span><span class="s2">:STA&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ShutterDemand</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">TEST_MODE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_test_mode_set</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">ShutterDemand</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_open_shutter_actions</span><span class="p">()</span>
+                <span class="n">required_match</span><span class="p">:</span> <span class="n">ShutterState</span> <span class="o">=</span> <span class="n">ShutterState</span><span class="o">.</span><span class="n">OPEN</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">required_match</span><span class="p">:</span> <span class="n">ShutterState</span> <span class="o">=</span> <span class="n">ShutterState</span><span class="o">.</span><span class="n">CLOSED</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutter_action</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">required_match</span><span class="o">=</span><span class="n">required_match</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_pre_open_shutter_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provides internal implementation of pre-requisite steps that support opening of the shutter.&quot;&quot;&quot;</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_shutter_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ShutterDemand</span><span class="p">,</span> <span class="n">required_match</span><span class="p">:</span> <span class="n">ShutterState</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="n">required_match</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_test_mode_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Running in test mode, will not operate the experiment shutter.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="HutchShutter">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.HutchShutter.html#dodal.devices.hutch_shutter.HutchShutter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HutchShutter</span><span class="p">(</span><span class="n">BaseHutchShutter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to operate the hutch shutter.</span>
+
+<span class="sd">    When a demand is sent, the shutter can be operated without checking</span>
+<span class="sd">    the hutch status, instead relying on default shutter interlock (:ILKSTA).</span>
 
 <span class="sd">    If the requested shutter position is &quot;Open&quot;, the shutter control PV should first</span>
 <span class="sd">    go to &quot;Reset&quot; and then move to &quot;Open&quot;. This is because before opening the hutch</span>
 <span class="sd">    shutter, the interlock status will show as `failed` until the hutch shutter is</span>
-<span class="sd">    reset. This will set the interlock status to `OK`, allowing for shutter operations.</span>
+<span class="sd">    reset. The reset will set the interlock status to `OK`, allowing for shutter operations.</span>
 <span class="sd">    Until this step is done, the hutch shutter can&#39;t be opened. The reset is not needed</span>
 <span class="sd">    for closing the shutter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1014,44 +1059,64 @@ window.addEventListener("load", load);</script>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">interlock</span><span class="p">:</span> <span class="n">BaseHutchInterlock</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EXP_SHUTTER_1_INFIX</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">shtr_infix</span><span class="si">}</span><span class="s2">:CON&quot;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ShutterState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">shtr_infix</span><span class="si">}</span><span class="s2">:STA&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span> <span class="o">=</span> <span class="n">interlock</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">shtr_infix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ShutterDemand</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">ShutterDemand</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_interlock</span><span class="p">()</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="o">.</span><span class="n">RESET</span><span class="p">)</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-                <span class="k">return</span> <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="n">ShutterState</span><span class="o">.</span><span class="n">OPEN</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-                <span class="k">return</span> <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="n">ShutterState</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span>
-                <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Running in test mode, will not operate the experiment shutter.&quot;</span>
-            <span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_pre_open_shutter_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Required by parent class API - resets the shutter prior to opening.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="o">.</span><span class="n">RESET</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="InterlockedHutchShutter">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.InterlockedHutchShutter.html#dodal.devices.hutch_shutter.InterlockedHutchShutter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InterlockedHutchShutter</span><span class="p">(</span><span class="n">BaseHutchShutter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to operate the hutch shutter.  With an interlock.</span>
+
+<span class="sd">    When a demand is sent the device should first check the hutch status and</span>
+<span class="sd">    raise an error if it&#39;s not interlocked (searched and locked), as not interlocked</span>
+<span class="sd">    means it&#39;s not safe to operate the shutter.</span>
+
+<span class="sd">    If the requested shutter position is &quot;Open&quot;, the shutter control PV should first</span>
+<span class="sd">    go to &quot;Reset&quot; and then move to &quot;Open&quot;. This is because before opening the hutch</span>
+<span class="sd">    shutter, the interlock status will show as `failed` until the hutch shutter is</span>
+<span class="sd">    reset. The reset will set the interlock status to `OK`, allowing for shutter operations.</span>
+<span class="sd">    Until this step is done, the hutch shutter can&#39;t be opened. The reset is not needed</span>
+<span class="sd">    for closing the shutter.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        interlock : Hutch PSS based interlock status checker</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">interlock</span><span class="p">:</span> <span class="n">BaseHutchInterlock</span><span class="p">,</span>
+        <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EXP_SHUTTER_1_INFIX</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span> <span class="o">=</span> <span class="n">interlock</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">shtr_infix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_pre_open_shutter_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Required by parent class API - checks interlock, then resets the shutter prior to opening.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_interlock</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="o">.</span><span class="n">RESET</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_interlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span><span class="o">.</span><span class="n">shutter_safe_to_operate</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">interlock_state</span><span class="p">:</span>
-                <span class="c1"># If not in test mode, fail. If in test mode, the optics hutch may be open.</span>
-                <span class="k">raise</span> <span class="n">ShutterNotSafeToOperateError</span><span class="p">(</span>
-                    <span class="s2">&quot;The hutch has not been locked, not operating shutter.&quot;</span>
-                <span class="p">)</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Disrupts shutter opening if the interlock is not in a safe to operate state.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">             ShutterNotSafeToOperateError - whereby an unhappy interlock will veto any attempt to open the shutter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span><span class="o">.</span><span class="n">shutter_safe_to_operate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">interlock_state</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ShutterNotSafeToOperateError</span><span class="p">(</span>
+                <span class="s2">&quot;The hutch has not been locked, not operating shutter.&quot;</span>
+            <span class="p">)</span></div>
 
 </pre></div>
 

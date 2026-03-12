@@ -15,8 +15,10 @@ dodal.devices.hutch\_shutter
    :recursive:
 
    ~hutch_shutter.BaseHutchInterlock
+   ~hutch_shutter.BaseHutchShutter
    ~hutch_shutter.HutchInterlock
    ~hutch_shutter.HutchShutter
+   ~hutch_shutter.InterlockedHutchShutter
    ~hutch_shutter.ShutterDemand
    ~hutch_shutter.ShutterState
 

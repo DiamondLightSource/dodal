@@ -21,8 +21,6 @@ dodal.devices.hutch\_shutter.HutchShutter
       
       
       
-      ~HutchShutter.set
-      
       
       
       
