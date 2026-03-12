@@ -7,6 +7,8 @@ from yarl import URL
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_path_provider
+from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -34,7 +36,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.hutch_shutter import HutchInterlock, HutchShutter
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -85,7 +87,9 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return PandASubpathProvider()
+    provider = PandASubpathProvider()
+    set_path_provider(provider)
+    return provider
 
 
 @devices.fixture
@@ -266,7 +270,7 @@ def sample_shutter() -> ZebraShutter:
 
 @devices.factory()
 def hutch_shutter() -> HutchShutter:
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+    return HutchShutter(PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix))
 
 
 @devices.factory()
@@ -333,7 +337,9 @@ def qbpm() -> QBPM:
 
 @devices.factory()
 def baton() -> Baton:
-    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    _baton = Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    set_commissioning_signal(_baton.commissioning)
+    return _baton
 
 
 @devices.factory()
