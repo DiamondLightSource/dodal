@@ -206,7 +206,7 @@ def idu(
 
 
 @devices.factory()
-def idu_controller(idd: I10Apple2) -> I10Apple2Controller:
+def idu_controller(idu: I10Apple2) -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     source = Source(column="Source", value="idu")
     idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
@@ -220,7 +220,7 @@ def idu_controller(idd: I10Apple2) -> I10Apple2Controller:
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(
-        apple2=idd,
+        apple2=idu,
         gap_energy_motor_lut=idu_gap_energy_motor_lut,
         phase_energy_motor_lut=idu_phase_energy_motor_lut,
     )
