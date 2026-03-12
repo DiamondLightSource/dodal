@@ -66,6 +66,28 @@ async def robot_for_load():
         yield device
 
 
+@pytest.fixture()
+async def robot_for_load_with_prog_error(
+    robot_for_load: BartRobot,
+):
+    device = robot_for_load
+    with patch("dodal.devices.robot.LOGGER.info") as mock_log_info:
+        mock_log_info.side_effect = partial(_prog_error_on_unload_log_messages, device)
+        yield device
+
+
+@pytest.fixture()
+async def robot_for_load_with_controller_error(
+    robot_for_load: BartRobot,
+):
+    device = robot_for_load
+    with patch("dodal.devices.robot.LOGGER.info") as mock_log_info:
+        mock_log_info.side_effect = partial(
+            _controller_error_on_unload_log_messages, device
+        )
+        yield device
+
+
 def clear_errors(device: BartRobot, *args, **kwargs):
     set_mock_value(device.controller_error.code, 0)
     set_mock_value(device.prog_error.code, 0)
@@ -166,9 +188,17 @@ def _set_beamline_enabled_on_log_messages(device: BartRobot, msg: str):
         set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
 
 
-def _error_on_unload_log_messages(device: BartRobot, msg: str):
+def _prog_error_on_unload_log_messages(device: BartRobot, msg: str):
     if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
-        set_mock_value(device.prog_error.code, 40)
+        set_mock_value(device.prog_error.code, ProgErrorCode.SAMPLE_POSITION_NOT_READY)
+        set_mock_value(device.prog_error.str, "Test error")
+
+
+def _controller_error_on_unload_log_messages(device: BartRobot, msg: str):
+    if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
+        set_mock_value(
+            device.prog_error.code, ControllerErrorCode.LIGHT_CURTAIN_TRIPPED
+        )
         set_mock_value(device.prog_error.str, "Test error")
 
 
@@ -178,17 +208,6 @@ async def set_with_happy_path(
 ) -> AsyncStatus:
     """Mocks the logic that the robot would do on a successful load."""
     mock_log_info.side_effect = partial(_set_beamline_enabled_on_log_messages, device)
-    set_mock_value(device.program_running, False)
-    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
-    status = device.set(SampleLocation(15, 10))
-    return status
-
-
-async def set_with_unhappy_path(
-    device: BartRobot, mock_log_info: MagicMock
-) -> AsyncStatus:
-    """Mocks the logic that the robot would do on a successful load."""
-    mock_log_info.side_effect = partial(_error_on_unload_log_messages, device)
     set_mock_value(device.program_running, False)
     set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     status = device.set(SampleLocation(15, 10))
@@ -397,14 +416,25 @@ async def test_unloading_the_robot_times_out_if_drying_takes_too_long(robot_for_
     assert isinstance(exc_info.value.__cause__, TimeoutError)
 
 
-@patch("dodal.devices.robot.LOGGER.info")
-async def test_moving_the_robot_will_raise_if_error_during_unload(
-    mock_log_info: MagicMock,
+async def test_moving_the_robot_will_raise_if_prog_error_during_unload(
+    robot_for_load_with_prog_error: BartRobot,
 ):
-    device = await _get_bart_robot()
+    device = robot_for_load_with_prog_error
 
     with pytest.raises(RobotLoadError) as exc_info:
-        await (await set_with_unhappy_path(device, mock_log_info))
+        await device.set(SampleLocation(15, 10))
 
-    assert exc_info.value.error_code == 40
+    assert exc_info.value.error_code == ProgErrorCode.SAMPLE_POSITION_NOT_READY
+    assert exc_info.value.error_string == "Test error"
+
+
+async def test_moving_the_robot_will_raise_if_controller_error_during_unload(
+    robot_for_load_with_controller_error: BartRobot,
+):
+    device = robot_for_load_with_controller_error
+
+    with pytest.raises(RobotLoadError) as exc_info:
+        await device.set(SampleLocation(15, 10))
+
+    assert exc_info.value.error_code == ControllerErrorCode.LIGHT_CURTAIN_TRIPPED
     assert exc_info.value.error_string == "Test error"
