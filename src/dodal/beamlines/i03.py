@@ -7,6 +7,8 @@ from yarl import URL
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_path_provider
+from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -85,7 +87,9 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return PandASubpathProvider()
+    provider = PandASubpathProvider()
+    set_path_provider(provider)
+    return provider
 
 
 @devices.fixture
@@ -333,7 +337,9 @@ def qbpm() -> QBPM:
 
 @devices.factory()
 def baton() -> Baton:
-    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    _baton = Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    set_commissioning_signal(_baton.commissioning)
+    return _baton
 
 
 @devices.factory()

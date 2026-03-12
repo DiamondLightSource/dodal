@@ -31,9 +31,13 @@ class SampleLocation:
     position: int
 
 
+SAMPLE_LOCATION_EMPTY = SampleLocation(-1, -1)
+
+
 class ProgramNames(StrEnum):
     PUCK = "PUCK.MB6"
     BEAM = "BEAM.MB6"
+    SPINNER = "MOTOR.MB6"
 
 
 class ProgramRunning(StrictEnum):
@@ -61,6 +65,11 @@ class MockRobot(DeviceMock["Robot"]):
             device.beam_load_program, partial(set_program, ProgramNames.BEAM.value)
         )
 
+        callback_on_mock_put(
+            device.spinner_load_program,
+            partial(set_program, ProgramNames.SPINNER.value),
+        )
+
         def program_running(*_, **__):
             async def _program_running():
                 set_mock_value(device.program_running, ProgramRunning.PROGRAM_RUNNING)
@@ -72,7 +81,13 @@ class MockRobot(DeviceMock["Robot"]):
             asyncio.create_task(_program_running())
 
         callback_on_mock_put(device.puck_pick, program_running)
+        callback_on_mock_put(device.puck_place, program_running)
+
         callback_on_mock_put(device.beam_place, program_running)
+        callback_on_mock_put(device.beam_pick, program_running)
+
+        callback_on_mock_put(device.spinner_off, program_running)
+        callback_on_mock_put(device.spinner_on, program_running)
 
 
 @default_mock_class(MockRobot)
@@ -119,8 +134,8 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         self.beam_place = epics_signal_x(f"{robot_prefix}BEAM:ACTION1.PROC")
         self.beam_load_program = epics_signal_x(f"{robot_prefix}BEAM:LOAD.PROC")
 
-        self.spinner_pick = epics_signal_x(f"{robot_prefix}MOTOR:ACTION0.PROC")
-        self.spinner_place = epics_signal_x(f"{robot_prefix}MOTOR:ACTION1.PROC")
+        self.spinner_off = epics_signal_x(f"{robot_prefix}MOTOR:ACTION0.PROC")
+        self.spinner_on = epics_signal_x(f"{robot_prefix}MOTOR:ACTION1.PROC")
         self.spinner_load_program = epics_signal_x(f"{robot_prefix}MOTOR:LOAD.PROC")
 
         self.servo_off = epics_signal_x(f"{robot_prefix}SOFF.PROC")
@@ -155,20 +170,14 @@ class Robot(StandardReadable, Movable[SampleLocation]):
             self.program_name, program_name.value, timeout=self.PROGRAM_LOADED_TIMEOUT
         )
 
-    @AsyncStatus.wrap
-    async def set(self, value: SampleLocation):
-        """Perform a sample load from the specified sample location.
-
-        Args:
-            value (SampleLocation): the sample location
-        """
+    async def _load(self, location: SampleLocation):
         await self._load_program_and_wait_for_loaded(
             self.puck_load_program, ProgramNames.PUCK
         )
 
         await asyncio.gather(
-            set_and_wait_for_value(self.puck_sel, value.puck),
-            set_and_wait_for_value(self.pos_sel, value.position),
+            set_and_wait_for_value(self.puck_sel, location.puck),
+            set_and_wait_for_value(self.pos_sel, location.position),
         )
 
         await self._trigger_program_and_wait_for_complete(self.puck_pick)
@@ -180,6 +189,52 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         await self._trigger_program_and_wait_for_complete(self.beam_place)
 
         await asyncio.gather(
-            self.current_sample.puck.set(value.puck),
-            self.current_sample.position.set(value.position),
+            self.current_sample.puck.set(location.puck),
+            self.current_sample.position.set(location.position),
         )
+
+    async def _unload(self):
+        await self._load_program_and_wait_for_loaded(
+            self.spinner_load_program, ProgramNames.SPINNER
+        )
+
+        await self._trigger_program_and_wait_for_complete(self.spinner_off)
+
+        await self._load_program_and_wait_for_loaded(
+            self.beam_load_program, ProgramNames.BEAM
+        )
+
+        await self._trigger_program_and_wait_for_complete(self.beam_pick)
+
+        await self._load_program_and_wait_for_loaded(
+            self.puck_load_program, ProgramNames.PUCK
+        )
+
+        current_puck = await self.current_sample.puck.get_value()
+        current_position = await self.current_sample.position.get_value()
+
+        await asyncio.gather(
+            set_and_wait_for_value(self.puck_sel, current_puck),
+            set_and_wait_for_value(self.pos_sel, current_position),
+        )
+
+        await self._trigger_program_and_wait_for_complete(self.puck_place)
+
+        await asyncio.gather(
+            self.current_sample.puck.set(0),
+            self.current_sample.position.set(0),
+        )
+
+    @AsyncStatus.wrap
+    async def set(self, value: SampleLocation):
+        """Perform a sample load from the specified sample location or a sample unload
+        if SAMPLE_LOCATION_EMPTY is specified.
+
+        Args:
+            value (SampleLocation): the sample location to load to or
+                                    SAMPLE_LOCATION_EMPTY to unload
+        """
+        if value == SAMPLE_LOCATION_EMPTY:
+            await self._unload()
+        else:
+            await self._load(value)
