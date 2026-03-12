@@ -29,6 +29,14 @@ async def interlock() -> HutchInterlock:
     return interlock
 
 
+def _apply_status_setter(abstract_shutter: BaseHutchShutter):
+    def set_status(value: ShutterDemand, *args, **kwargs):
+        value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
+        set_mock_value(abstract_shutter.status, value_sta)
+
+    callback_on_mock_put(abstract_shutter.control, set_status)
+
+
 @pytest.fixture
 async def fake_interlocked_shutter(
     interlock: HutchInterlock,
@@ -38,11 +46,7 @@ async def fake_interlocked_shutter(
             bl_prefix="TEST", interlock=interlock
         )
 
-    def set_status(value: ShutterDemand, *args, **kwargs):
-        value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
-        set_mock_value(interlocked_shutter.status, value_sta)
-
-    callback_on_mock_put(interlocked_shutter.control, set_status)
+    _apply_status_setter(interlocked_shutter)
 
     return interlocked_shutter
 
@@ -52,12 +56,7 @@ async def fake_shutter_without_interlock() -> HutchShutter:
     async with init_devices(mock=True):
         shutter = HutchShutter(bl_prefix="TEST")
 
-    def set_status(value: ShutterDemand, *args, **kwargs):
-        value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
-        set_mock_value(shutter.status, value_sta)
-
-    callback_on_mock_put(shutter.control, set_status)
-
+    _apply_status_setter(shutter)
     return shutter
 
 

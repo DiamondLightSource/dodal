@@ -141,7 +141,7 @@ class BaseHutchShutter(ABC, StandardReadable, Movable[ShutterDemand]):
 
 
 class HutchShutter(BaseHutchShutter):
-    """Device to operate the hutch shutter.  Without an interlock.
+    """Device to operate the hutch shutter.
 
     When a demand is sent, the shutter can be operated without checking
     the hutch status, instead relying on default shutter interlock (:ILKSTA).
