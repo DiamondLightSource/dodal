@@ -144,32 +144,32 @@ def eiger_beam_center() -> DetectorBeamCenter:
     return DetectorBeamCenter(f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:", "eiger_bc")
 
 
-# @devices.factory()
-# def jungfrau(
-#     path_provider: PathProvider,
-# ) -> Jungfrau:
-#     """Get the Jungfrau 9M device."""
-#     return Jungfrau(
-#         prefix=f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
-#         drv_suffix="",
-#         hdf_suffix="OD:",
-#         path_provider=AutoMaxIncrementingPathProvider(path_provider),
-#         odin_nodes=36,
-#     )
-
-
 @devices.factory()
-def commissioning_jungfrau(
+def jungfrau(
     path_provider: PathProvider,
-) -> CommissioningJungfrau:
-    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
-    device in place of Odin while the detector is in commissioning.
-    """
-    return CommissioningJungfrau(
-        f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
-        f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
-        AutoMaxIncrementingPathProvider(path_provider),
+) -> Jungfrau:
+    """Get the Jungfrau 9M device."""
+    return Jungfrau(
+        prefix=f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
+        drv_suffix="",
+        hdf_suffix="OD:",
+        path_provider=AutoMaxIncrementingPathProvider(path_provider),
+        odin_nodes=36,
     )
+
+
+# @devices.factory()
+# def commissioning_jungfrau(
+#     path_provider: PathProvider,
+# ) -> CommissioningJungfrau:
+#     """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
+#     device in place of Odin while the detector is in commissioning.
+#     """
+#     return CommissioningJungfrau(
+#         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
+#         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
+#         AutoMaxIncrementingPathProvider(path_provider),
+#     )
 
 
 @devices.factory()
