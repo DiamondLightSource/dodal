@@ -87,6 +87,7 @@ class BeamlinePrefix:
         self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix
         self.beamline_prefix = f"BL{self.ixx[1:3]}{self.suffix}"
         self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
+        self.frontend_prefix = f"FE{self.ixx[1:3]}{self.suffix}"
 
 
 T = TypeVar("T", bound=AnyDevice)
