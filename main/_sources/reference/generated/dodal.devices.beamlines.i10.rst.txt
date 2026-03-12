@@ -17,7 +17,6 @@ dodal.devices.beamlines.i10
    ~i10.I10Diagnostic
    ~i10.I10Diagnostic5ADet
    ~i10.I10PneumaticStage
-   ~i10.PiezoMirror
    ~i10.I10Slits
    ~i10.I10SlitsDrainCurrent
    ~i10.I10SharedDiagnostic
