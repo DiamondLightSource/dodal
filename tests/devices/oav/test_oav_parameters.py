@@ -9,9 +9,9 @@ from dodal.devices.oav.oav_parameters import (
     ZoomParams,
     ZoomParamsCrosshair,
 )
-from tests.devices.oav.test_data import TEST_OAV_CENTRING_JSON
-from tests.test_data import (
+from tests.devices.oav.test_data import (
     TEST_DISPLAY_CONFIG,
+    TEST_OAV_CENTRING_JSON,
     TEST_OAV_ZOOM_LEVELS,
 )
 

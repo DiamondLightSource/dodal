@@ -5,7 +5,7 @@ from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile, OAVBeamCentrePV
 from dodal.devices.oav.oav_parameters import OAVConfig, OAVConfigBeamCentre
-from tests.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVELS
+from tests.devices.oav.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVELS
 
 
 @pytest.fixture

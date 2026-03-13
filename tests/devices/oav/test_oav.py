@@ -12,10 +12,7 @@ from dodal.devices.oav.oav_detector import (
     OAVConfigBeamCentre,
     ZoomController,
 )
-from tests.test_data import (
-    TEST_DISPLAY_CONFIG,
-    TEST_OAV_ZOOM_LEVELS,
-)
+from tests.devices.oav.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVELS
 
 
 @pytest.fixture()

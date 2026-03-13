@@ -640,7 +640,7 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.1.2"
+version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -655,9 +655,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/1e/37373402723769ced976215ffb1716353d89c0772d5bec8116d9f981d095/daq_config_server-1.1.2.tar.gz", hash = "sha256:2f8c9e43a41534d90512be7ecab37de0fdf33d4b00a6b61bd04e3c82d886062f", size = 126067, upload-time = "2026-01-12T11:28:21.034Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/78/98b706a3e630452fe308e180faed618eecbfe0d5f14261a2a2400dde64e3/daq_config_server-1.2.0.tar.gz", hash = "sha256:33f83537b63c3ea42adaa35a108492616601e16d27b2dd7ef44fd3fd41e504ff", size = 213224, upload-time = "2026-03-03T15:39:56.308Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/9f/b8df9fad0b1005e95460ee92092a1da33c282c158336bc23bd7635981f29/daq_config_server-1.1.2-py3-none-any.whl", hash = "sha256:c2bca297feb01a51883e3df7d6ade11af9a3f311602e5584320b1e12881cf636", size = 29273, upload-time = "2026-01-12T11:28:19.635Z" },
+    { url = "https://files.pythonhosted.org/packages/87/ea/1bc90a539a987245142fa1b18fa5add3f6ca169da2b6f84375fce78d276a/daq_config_server-1.2.0-py3-none-any.whl", hash = "sha256:81473a26723d7b2cc55369899ad8e22df4c4ad3e4e3f51f0151fd67048844642", size = 29701, upload-time = "2026-03-03T15:39:55.238Z" },
 ]
 
 [[package]]
