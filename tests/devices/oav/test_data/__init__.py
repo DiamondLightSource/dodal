@@ -9,7 +9,9 @@ OAV_SNAPSHOT_TEST_PNG = join(TEST_DATA_PATH, "oav_snapshot_test.png")
 OAV_SNAPSHOT_EXPECTED_PNG = join(TEST_DATA_PATH, "oav_snapshot_expected.png")
 
 __all__ = [
+    "TEST_OAV_CENTRING_JSON",
+    "TEST_DISPLAY_CONFIG",
+    "TEST_OAV_ZOOM_LEVELS",
     "OAV_SNAPSHOT_EXPECTED_PNG",
     "OAV_SNAPSHOT_TEST_PNG",
-    "TEST_OAV_CENTRING_JSON",
 ]
