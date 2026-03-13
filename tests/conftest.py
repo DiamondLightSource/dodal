@@ -8,9 +8,7 @@ from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import (
-    PathProvider,
-)
+from ophyd_async.core import PathProvider
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.beamlines.beamline_utils import clear_path_provider
@@ -30,17 +28,16 @@ from dodal.utils import (
     make_all_devices,
 )
 from tests.devices.beamlines.i10.test_data import LOOKUP_TABLE_PATH
+from tests.devices.oav.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVELS
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_data import TEST_LUT_TXT
 from tests.test_data import (
     I04_BEAMLINE_PARAMETERS,
-    TEST_DISPLAY_CONFIG,
-    TEST_OAV_ZOOM_LEVELS_XML,
 )
 
 MOCK_PATHS = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
-    ("ZOOM_PARAMS_FILE", TEST_OAV_ZOOM_LEVELS_XML),
+    ("ZOOM_PARAMS_FILE", TEST_OAV_ZOOM_LEVELS),
     ("DISPLAY_CONFIG", TEST_DISPLAY_CONFIG),
     ("LOOK_UPTABLE_DIR", LOOKUP_TABLE_PATH),
 ]
