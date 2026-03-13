@@ -1,8 +1,7 @@
 from abc import abstractmethod
 from collections import ChainMap
 from dataclasses import dataclass
-from typing import Any, Generic, Literal, TypedDict, TypeVar
-from xml.etree import ElementTree
+from typing import Any, Generic, TypeVar
 from xml.etree.ElementTree import Element
 
 from daq_config_server.client import ConfigServer
