@@ -99,7 +99,7 @@ def daq_configuration_path() -> str:
 
 @devices.factory()
 def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters()
+    params = get_beamline_parameters(BL)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -120,7 +120,7 @@ def attenuator() -> BinaryFilterAttenuator:
 def beamstop() -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(),
+        beamline_parameters=get_beamline_parameters(BL),
     )
 
 
@@ -354,7 +354,7 @@ def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(),
+        get_beamline_parameters(BL),
     )
 
 
