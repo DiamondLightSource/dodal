@@ -15,7 +15,6 @@ from dodal.devices.beamlines.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
     I10SharedSlitsDrainCurrent,
-    PiezoMirror,
 )
 from dodal.devices.beamlines.i10.i10_apple2 import (
     I10Apple2,
@@ -25,6 +24,7 @@ from dodal.devices.beamlines.i10.i10_apple2 import (
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.beamlines.i10.i10_setting_data import I10Grating
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,
@@ -63,8 +63,8 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def first_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+def first_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @devices.factory()
@@ -80,8 +80,8 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def switching_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+def switching_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 """ID"""
