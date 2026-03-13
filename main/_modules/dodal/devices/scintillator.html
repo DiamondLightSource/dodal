@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.scintillator &#8212; dodal 2.1.1.dev20+ge4914d5c5 documentation</title>
+    <title>dodal.devices.scintillator &#8212; dodal 2.1.1.dev21+g8d1478372 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=208b889d"></script>
+    <script src="../../../_static/documentation_options.js?v=4fbee132"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -878,11 +878,11 @@ window.addEventListener("load", load);</script>
                   
   <h1>Source code for dodal.devices.scintillator</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Reference</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span><span class="p">,</span> <span class="n">derived_signal_rw</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">GDABeamlineParameters</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.aperturescatterguard</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApertureScatterguard</span><span class="p">,</span> <span class="n">ApertureValue</span>
 
 
@@ -913,7 +913,7 @@ window.addEventListener("load", load);</script>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">aperture_scatterguard</span><span class="p">:</span> <span class="n">Reference</span><span class="p">[</span><span class="n">ApertureScatterguard</span><span class="p">],</span>
-        <span class="n">beamline_parameters</span><span class="p">:</span> <span class="n">GDABeamlineParameters</span><span class="p">,</span>
+        <span class="n">beamline_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
