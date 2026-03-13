@@ -56,10 +56,10 @@ async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
 def supported_trigger_info() -> TriggerInfo:
     return TriggerInfo(
         number_of_events=1,
-        trigger=DetectorTrigger.CONSTANT_GATE,
+        trigger=DetectorTrigger.EXTERNAL_LEVEL,
         deadtime=1e-4,
         livetime=1,
-        exposure_timeout=None,
+        exposure_timeout=0.0,
     )
 
 
@@ -98,7 +98,7 @@ async def test_set_invalid_exposure_for_number_of_values_per_reading(
         await tetramm_controller.prepare(
             TriggerInfo(
                 number_of_events=0,
-                trigger=DetectorTrigger.EDGE_TRIGGER,
+                trigger=DetectorTrigger.EXTERNAL_EDGE,
                 livetime=4e-5,
             )
         )
@@ -115,9 +115,8 @@ async def test_arm_raises_value_error_for_invalid_trigger_type(
     trigger_type: DetectorTrigger,
 ):
     accepted_types = [
-        "EDGE_TRIGGER",
-        "CONSTANT_GATE",
-        "VARIABLE_GATE",
+        "EXTERNAL_EDGE",
+        "EXTERNAL_LEVEL",
     ]
     with pytest.raises(
         TypeError,
@@ -140,8 +139,8 @@ async def test_arm_raises_value_error_for_invalid_trigger_type(
 @pytest.mark.parametrize(
     "trigger_type",
     [
-        DetectorTrigger.EDGE_TRIGGER,
-        DetectorTrigger.CONSTANT_GATE,
+        DetectorTrigger.EXTERNAL_EDGE,
+        DetectorTrigger.EXTERNAL_LEVEL,
     ],
 )
 async def test_arm_sets_signals_correctly_given_valid_inputs(
@@ -167,7 +166,7 @@ async def test_disarm_disarms_driver(
     await tetramm.prepare(
         TriggerInfo(
             number_of_events=0,
-            trigger=DetectorTrigger.EDGE_TRIGGER,
+            trigger=DetectorTrigger.EXTERNAL_EDGE,
             livetime=VALID_TEST_EXPOSURE_TIME,
             deadtime=VALID_TEST_DEADTIME,
         )
@@ -192,10 +191,9 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
         await tetramm.prepare(
             TriggerInfo(
                 number_of_events=5,
-                trigger=DetectorTrigger.EDGE_TRIGGER,
+                trigger=DetectorTrigger.EXTERNAL_EDGE,
                 deadtime=1.0 / 100_000.0,
                 livetime=VALID_TEST_EXPOSURE_TIME,
-                exposure_timeout=None,
             )
         )
 
@@ -206,10 +204,9 @@ async def test_prepare_arms_tetramm(
     await tetramm.prepare(
         TriggerInfo(
             number_of_events=5,
-            trigger=DetectorTrigger.EDGE_TRIGGER,
+            trigger=DetectorTrigger.EXTERNAL_EDGE,
             deadtime=0.1,
             livetime=VALID_TEST_EXPOSURE_TIME,
-            exposure_timeout=None,
         )
     )
     await assert_armed(tetramm.driver)
@@ -255,7 +252,7 @@ async def test_stage_sets_up_accurate_describe_output(
 async def test_error_if_armed_without_exposure(tetramm_controller: TetrammController):
     with pytest.raises(ValueError):
         await tetramm_controller.prepare(
-            TriggerInfo(number_of_events=10, trigger=DetectorTrigger.CONSTANT_GATE)
+            TriggerInfo(number_of_events=10, trigger=DetectorTrigger.EXTERNAL_LEVEL)
         )
 
 
@@ -266,7 +263,7 @@ async def test_tetramm_controller(
     await tetramm_controller.prepare(
         TriggerInfo(
             number_of_events=1,
-            trigger=DetectorTrigger.CONSTANT_GATE,
+            trigger=DetectorTrigger.EXTERNAL_LEVEL,
             livetime=VALID_TEST_EXPOSURE_TIME,
             deadtime=VALID_TEST_DEADTIME,
         )
@@ -294,7 +291,7 @@ async def test_tetramm_prepare_when_freerunning(tetramm_controller: TetrammContr
     await tetramm_controller.prepare(
         TriggerInfo(
             number_of_events=1,
-            trigger=DetectorTrigger.CONSTANT_GATE,
+            trigger=DetectorTrigger.EXTERNAL_LEVEL,
             livetime=VALID_TEST_EXPOSURE_TIME,
             deadtime=VALID_TEST_DEADTIME,
         )

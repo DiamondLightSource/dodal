@@ -51,8 +51,8 @@ def d3() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         path_provider=get_path_provider(),
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix="DET:",
+        writer_suffix=HDF5_SUFFIX,
     )
 
 
@@ -62,8 +62,8 @@ def d11() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
         path_provider=get_path_provider(),
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix="DET:",
+        writer_suffix=HDF5_SUFFIX,
     )
 
 
@@ -72,8 +72,8 @@ def d12() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-04:",
         path_provider=get_path_provider(),
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix="DET:",
+        writer_suffix=HDF5_SUFFIX,
     )
 
 

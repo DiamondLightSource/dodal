@@ -6,7 +6,7 @@ from bluesky.protocols import StreamAsset
 from event_model import DataKey  # type: ignore
 from ophyd_async.core import (
     AsyncStatus,
-    DetectorWriter,
+    DetectorDataLogic,
     PathProvider,
     StandardDetector,
     StandardReadable,
@@ -16,13 +16,14 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
+from ophyd_async.fastcs.jungfrau import JungfrauDriverIO
 from ophyd_async.fastcs.jungfrau._controller import JungfrauController
 from ophyd_async.fastcs.jungfrau._signals import JungfrauDriverIO
 
 from dodal.log import LOGGER
 
 
-class JungfrauCommissioningWriter(DetectorWriter, StandardReadable):
+class JungfrauCommissioningWriter(DetectorDataLogic, StandardReadable):
     """Implementation of the temporary filewriter used for Jungfrau commissioning on i24.
 
     The PVs on this device are responsible for writing files of a specified name

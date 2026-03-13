@@ -83,8 +83,8 @@ class NXSasPilatus(PilatusDetector):
         self,
         prefix: str,
         path_provider: PathProvider,
-        drv_suffix: str,
-        fileio_suffix: str,
+        driver_suffix: str,
+        writer_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
         plugins: dict[str, NDPluginBaseIO] | None = None,
@@ -98,8 +98,8 @@ class NXSasPilatus(PilatusDetector):
         super().__init__(
             prefix,
             path_provider,
-            drv_suffix=drv_suffix,
-            fileio_suffix=fileio_suffix,
+            driver_suffix=driver_suffix,
+            writer_suffix=writer_suffix,
             name=name,
         )
         self._metadata_holder = metadata_holder
@@ -128,8 +128,8 @@ class NXSasOAV(AravisDetector):
         self,
         prefix: str,
         path_provider: PathProvider,
-        drv_suffix: str,
-        fileio_suffix: str,
+        driver_suffix: str,
+        writer_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
     ):
@@ -142,8 +142,8 @@ class NXSasOAV(AravisDetector):
         super().__init__(
             prefix,
             path_provider,
-            drv_suffix=drv_suffix,
-            fileio_suffix=fileio_suffix,
+            driver_suffix=driver_suffix,
+            writer_suffix=writer_suffix,
             name=name,
         )
         self._metadata_holder = metadata_holder

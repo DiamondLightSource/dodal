@@ -16,11 +16,10 @@ from dodal.devices.beamlines.i13_1.merlin import Merlin
 @pytest.fixture
 def one_shot_trigger_info() -> TriggerInfo:
     return TriggerInfo(
-        exposure_timeout=None,
         number_of_events=1,
         trigger=DetectorTrigger.INTERNAL,
         deadtime=0.0,
-        livetime=None,
+        livetime=0.0,
     )
 
 
@@ -48,7 +47,7 @@ async def test_trigger(
     await merlin.prepare(one_shot_trigger_info)
     await merlin._controller.arm()
 
-    assert await merlin.drv.acquire.get_value()
+    assert await merlin.driver.acquire.get_value()
 
     await merlin._controller.wait_for_idle()
 
@@ -59,8 +58,8 @@ async def test_can_collect(
     one_shot_trigger_info: TriggerInfo,
 ):
     set_mock_value(merlin.hdf.file_path_exists, True)
-    set_mock_value(merlin.drv.array_size_x, 10)
-    set_mock_value(merlin.drv.array_size_y, 20)
+    set_mock_value(merlin.driver.array_size_x, 10)
+    set_mock_value(merlin.driver.array_size_y, 20)
     set_mock_value(merlin.hdf.num_frames_chunks, 1)
 
     await merlin.stage()
@@ -89,8 +88,8 @@ async def test_can_collect(
 
 async def test_can_decribe_collect(merlin: Merlin, one_shot_trigger_info: TriggerInfo):
     set_mock_value(merlin.hdf.file_path_exists, True)
-    set_mock_value(merlin.drv.array_size_x, 10)
-    set_mock_value(merlin.drv.array_size_y, 20)
+    set_mock_value(merlin.driver.array_size_x, 10)
+    set_mock_value(merlin.driver.array_size_y, 20)
 
     assert (await merlin.describe_collect()) == {}
     await merlin.stage()

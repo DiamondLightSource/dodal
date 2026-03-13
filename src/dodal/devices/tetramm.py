@@ -5,7 +5,6 @@ from typing import Annotated as A
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
-    DatasetDescriber,
     DetectorController,
     DetectorTrigger,
     PathProvider,
@@ -19,9 +18,10 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.adcore import (
-    ADHDFWriter,
+    ADHDFDataLogic,
     NDArrayBaseIO,
-    NDFileHDFIO,
+    NDArrayDescription,
+    NDFileHDF5IO,
     NDPluginBaseIO,
 )
 from ophyd_async.epics.core import PvSuffix, epics_signal_r, stop_busy_record
@@ -78,9 +78,9 @@ class TetrammController(DetectorController):
     """Controller for a TetrAMM current monitor."""
 
     _supported_trigger_types = {
-        DetectorTrigger.EDGE_TRIGGER: TetrammTrigger.EXT_TRIGGER,
-        DetectorTrigger.CONSTANT_GATE: TetrammTrigger.EXT_TRIGGER,
-        DetectorTrigger.VARIABLE_GATE: TetrammTrigger.EXT_TRIGGER,
+        DetectorTrigger.EXTERNAL_EDGE: TetrammTrigger.EXT_TRIGGER,
+        DetectorTrigger.EXTERNAL_LEVEL: TetrammTrigger.EXT_TRIGGER,
+        DetectorTrigger.EXTERNAL_LEVEL: TetrammTrigger.EXT_TRIGGER,
     }
     """"On the TetrAMM ASCII mode requires a minimum value of ValuesPerRead of 500,
     [...] binary mode the minimum value of ValuesPerRead is 5."
@@ -90,7 +90,7 @@ class TetrammController(DetectorController):
     """The TetrAMM always digitizes at 100 kHz"""
     _base_sample_rate: int = 100_000
 
-    def __init__(self, driver: TetrammDriver, file_io: NDFileHDFIO) -> None:
+    def __init__(self, driver: TetrammDriver, file_io: NDFileHDF5IO) -> None:
         self.driver = driver
         self._file_io = file_io
         self._arm_status: AsyncStatus | None = None
@@ -122,7 +122,7 @@ class TetrammController(DetectorController):
 
         await asyncio.gather(
             self.set_exposure(trigger_info.livetime),
-            self._file_io.num_capture.set(trigger_info.total_number_of_exposures),
+            self._file_io.num_capture.set(trigger_info.number_of_exposures),
         )
 
         # raise an error if asked to trigger faster than the max.
@@ -154,7 +154,7 @@ class TetrammController(DetectorController):
         # We can't use caput callback as we already used it in arm() and we can't have
         # 2 or they will deadlock. Therefore must use stop_busy_record
         LOGGER.info("Disarming TetrAMM")
-        await stop_busy_record(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
+        await stop_busy_record(self.driver.acquire, timeout=DEFAULT_TIMEOUT)
 
     async def set_exposure(self, exposure: float) -> None:
         """Set the exposure time and acquire period.
@@ -208,7 +208,7 @@ class TetrammController(DetectorController):
         return AsyncStatus(complete_acquisition())
 
 
-class TetrammDatasetDescriber(DatasetDescriber):
+class TetrammDatasetDescriber(NDArrayDescription):
     def __init__(self, driver: TetrammDriver) -> None:
         self._driver = driver
 
@@ -235,7 +235,7 @@ class TetrammDetector(StandardDetector):
         type: str | None = None,
     ):
         self.driver = TetrammDriver(prefix + drv_suffix)
-        self.file_io = NDFileHDFIO(prefix + fileio_suffix)
+        self.file_io = NDFileHDF5IO(prefix + fileio_suffix)
         controller = TetrammController(self.driver, self.file_io)
 
         self.current1 = epics_signal_r(float, prefix + "Cur1:MeanValue_RBV")
@@ -251,7 +251,7 @@ class TetrammDetector(StandardDetector):
         self.pos_x = epics_signal_r(float, prefix + "PosX:MeanValue_RBV")
         self.pos_y = epics_signal_r(float, prefix + "PosY:MeanValue_RBV")
 
-        writer = ADHDFWriter(
+        writer = ADHDFDataLogic(
             fileio=self.file_io,
             path_provider=path_provider,
             dataset_describer=TetrammDatasetDescriber(self.driver),

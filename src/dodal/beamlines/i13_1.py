@@ -42,8 +42,8 @@ def sample_xyz_lab_fa_stage() -> XYZStage:
 def side_camera() -> AravisDetector:
     return AravisDetector(
         prefix=f"{PREFIX}-OP-FLOAT-03:",
-        drv_suffix="CAM:",
-        fileio_suffix="HDF5:",
+        driver_suffix="CAM:",
+        writer_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 

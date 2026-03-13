@@ -29,7 +29,7 @@ async def i11_mythen() -> Mythen3:
             prefix="BL11I-EA-DET-07:",
             path_provider=get_path_provider(),
             drv_suffix="DET",
-            fileio_suffix="HDF:",
+            writer_suffix="HDF:",
         )
 
     return i11_mythen
@@ -59,7 +59,7 @@ async def test_mythen_prepare_when_det_trig_internal(i11_mythen: Mythen3) -> Non
 async def test_mythen_prepare_when_det_trig_external(i11_mythen: Mythen3) -> None:
     trigger_info = TriggerInfo(
         number_of_events=1,
-        trigger=DetectorTrigger.CONSTANT_GATE,
+        trigger=DetectorTrigger.EXTERNAL_LEVEL,
         deadtime=1,
         livetime=10.0,
         exposure_timeout=30.0,
@@ -75,7 +75,7 @@ async def test_mythen_prepare_when_det_trig_external(i11_mythen: Mythen3) -> Non
 async def test_mythen_prepare_when_continous_exposure(i11_mythen: Mythen3) -> None:
     trigger_info = TriggerInfo(
         number_of_events=0,
-        trigger=DetectorTrigger.CONSTANT_GATE,
+        trigger=DetectorTrigger.EXTERNAL_LEVEL,
         deadtime=1,
         livetime=10.0,
         exposure_timeout=30.0,
