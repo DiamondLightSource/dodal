@@ -227,9 +227,18 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
     get_mock_put(device.load).assert_called_once()
 
 
-async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
+async def test_waiting_for_beamline_status_raises_error_when_prog_error():
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
+    set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
+    status = device.beamline_status_or_error(BeamlineStatus.ENABLED)
+    with pytest.raises(RobotLoadError):
+        await status
+
+
+async def test_waiting_for_beamline_status_raises_error_when_controller_error():
+    device = await _get_bart_robot()
+    set_mock_value(device.controller_error.code, 25)
     set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
     status = device.beamline_status_or_error(BeamlineStatus.ENABLED)
     with pytest.raises(RobotLoadError):
