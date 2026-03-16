@@ -1,26 +1,22 @@
-from typing import TypeVar
+from typing import Generic, TypeVar
 
-from ophyd_async.core import DetectorTriggerLogic, SignalDict
-from ophyd_async.epics.adcore import ADBaseIO, ADImageMode, prepare_exposures
+from ophyd_async.core import DetectorTriggerLogic
+from ophyd_async.epics.adcore import (
+    ADBaseIO,
+    ADImageMode,
+    prepare_exposures,
+)
 
 ADBaseIOT = TypeVar("ADBaseIOT", bound=ADBaseIO)
 
 
-class ConstantDeadTimeTriggerLogic(DetectorTriggerLogic):
-    """DetectorTriggerLogic with a configured constant deadtime."""
-
+class ConfigurableImageModeTriggerLogic(DetectorTriggerLogic, Generic[ADBaseIOT]):
     def __init__(
-        self,
-        driver: ADBaseIO,
-        deadtime: float,
-        image_mode: ADImageMode = ADImageMode.MULTIPLE,
+        self, driver: ADBaseIOT, image_mode: ADImageMode = ADImageMode.MULTIPLE
     ):
-        # super().__init__(driver, image_mode=image_mode)
         self.driver = driver
-        self.deadtime = deadtime
-
-    def get_deadtime(self, config_values: SignalDict) -> float:
-        return self.deadtime
+        self.image_mode = image_mode
 
     async def prepare_internal(self, num: int, livetime: float, deadtime: float):
+        await self.driver.image_mode.set(self.image_mode)
         await prepare_exposures(self.driver, num, livetime, deadtime)
