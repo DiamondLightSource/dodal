@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from daq_config_server.app.client import ConfigClient
+from daq_config_server import ConfigClient
 
 from dodal.devices.insertion_device.enum import Pol
 from dodal.devices.insertion_device.lookup_table_models import (

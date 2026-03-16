@@ -2,7 +2,7 @@ from pathlib import Path
 from unittest.mock import call
 
 import pytest
-from daq_config_server.app.client import ConfigClient
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     get_mock_put,
     init_devices,

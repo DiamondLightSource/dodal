@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from daq_config_server.app.client import ConfigClient
+from daq_config_server import ConfigClient
 from numpy import linspace, poly1d
 from ophyd_async.core import (
     callback_on_mock_put,

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from daq_config_server.app.client import ConfigClient
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     init_devices,
     set_mock_value,

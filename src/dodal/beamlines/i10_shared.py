@@ -7,7 +7,7 @@ idd == id1,    idu == id2.
 
 from pathlib import Path
 
-from daq_config_server.app.client import ConfigClient
+from daq_config_server import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager

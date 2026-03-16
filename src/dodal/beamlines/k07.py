@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from daq_config_server.app.client import ConfigClient
+from daq_config_server import ConfigClient
 from ophyd_async.core import StrictEnum
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline

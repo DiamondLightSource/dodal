@@ -1,6 +1,6 @@
 from functools import cache
 
-from daq_config_server.app.client import ConfigClient
+from daq_config_server import ConfigClient
 
 BEAMLINE_CONFIG_SERVER_ENDPOINTS = {
     "i03": "https://i03-daq-config.diamond.ac.uk",
