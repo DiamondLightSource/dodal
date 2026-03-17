@@ -2,6 +2,7 @@ from ophyd_async.core import Reference
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
@@ -60,6 +61,7 @@ DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
 
 BL = get_beamline_name("i04")
+CONFIG_CLIENT = get_config_client(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -182,6 +184,7 @@ def daq_configuration_path() -> str:
 def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        config_client=CONFIG_CLIENT,
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )

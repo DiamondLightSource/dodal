@@ -8,6 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
@@ -28,6 +29,7 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i18")
+CONFIG_CLIENT = get_config_client(BL)
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -54,7 +56,7 @@ def synchrotron() -> Synchrotron:
 
 @device_factory()
 def undulator() -> UndulatorInKeV:
-    return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+    return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:", CONFIG_CLIENT)
 
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180

@@ -9,6 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
@@ -29,6 +30,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("p38")
 PREFIX = BeamlinePrefix(BL)
+CONFIG_CLIENT = get_config_client(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -160,6 +162,7 @@ def dcm() -> DCM:
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        CONFIG_CLIENT,
         poles=80,
         length=2.0,
     )

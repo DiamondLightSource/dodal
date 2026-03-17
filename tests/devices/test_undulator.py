@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv
+from daq_config_server.client import ConfigServer
 from daq_config_server.models import UndulatorEnergyGapLookupTable
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
@@ -35,6 +36,7 @@ async def undulator(set_beamline_env_variable) -> UndulatorInKeV:
         baton = Baton("BATON-01")
         undulator = UndulatorInKeV(
             "UND-01",
+            ConfigServer(""),
             name="undulator",
             poles=80,
             length=2.0,
@@ -113,6 +115,7 @@ async def test_poles_not_propagated_if_not_supplied(set_beamline_env_variable):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
+            ConfigServer(""),
             name="undulator",
             length=2.0,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -125,6 +128,7 @@ async def test_length_not_propagated_if_not_supplied(set_beamline_env_variable):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
+            ConfigServer(""),
             name="undulator",
             poles=80,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,

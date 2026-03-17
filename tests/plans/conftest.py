@@ -3,6 +3,7 @@ from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import pytest
+from daq_config_server.client import ConfigServer
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 
@@ -25,6 +26,7 @@ async def mock_undulator_and_dcm(set_beamline_env_variable) -> UndulatorGapCheck
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "",
+            ConfigServer(""),
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )
         dcm = DCM("")
