@@ -1,7 +1,8 @@
 from math import isclose
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+from daq_config_server.client import ConfigServer
 from daq_config_server.models import DetectorXYLookupTable
 
 from dodal.devices.detector.det_dist_to_beam_converter import (
@@ -16,12 +17,12 @@ LOOKUP_TABLE_TEST_VALUES = DetectorXYLookupTable(rows=[[100.0, 150.0, 160.0], [2
 
 
 @pytest.fixture
-def fake_converter():
-    with patch(
-        "dodal.devices.detector.det_dist_to_beam_converter.ConfigServer.get_file_contents",
-        return_value=LOOKUP_TABLE_TEST_VALUES,
-    ):
-        yield DetectorDistanceToBeamXYConverter("test.txt")
+def fake_converter(tmp_path, set_beamline_env_variable):
+    lookup_table_path = tmp_path / "test.txt"
+    with open(lookup_table_path, "w") as f:
+        f.write(LOOKUP_TABLE_TEST_VALUES.model_dump_json())
+
+    yield DetectorDistanceToBeamXYConverter(lookup_table_path)
 
 
 @pytest.mark.parametrize(
