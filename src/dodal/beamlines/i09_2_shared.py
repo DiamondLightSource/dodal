@@ -8,6 +8,7 @@ from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
     J09_PHASE_POLY_DEG_COLUMNS,
 )
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
@@ -31,8 +32,14 @@ PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
 
 BL = get_beamline_name("i09-2-shared")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
+K_PREFIX = BeamlinePrefix(BL, suffix="K")
 
 devices = DeviceManager()
+
+
+@devices.factory()
+def psk1() -> HutchShutter:
+    return HutchShutter(K_PREFIX.beamline_prefix)
 
 
 @devices.factory()
@@ -44,12 +51,12 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def jid_gap() -> UndulatorGap:
+def jgap() -> UndulatorGap:
     return UndulatorGap(prefix=f"{J_PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def jid_phase() -> UndulatorPhaseAxes:
+def jphase() -> UndulatorPhaseAxes:
     return UndulatorPhaseAxes(
         prefix=f"{J_PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="PUO",
@@ -60,15 +67,13 @@ def jid_phase() -> UndulatorPhaseAxes:
 
 
 @devices.factory()
-def jid(
-    jid_gap: UndulatorGap, jid_phase: UndulatorPhaseAxes
-) -> Apple2[UndulatorPhaseAxes]:
+def jid(jgap: UndulatorGap, jphase: UndulatorPhaseAxes) -> Apple2[UndulatorPhaseAxes]:
     """I09 soft x-ray insertion device."""
-    return Apple2[UndulatorPhaseAxes](id_gap=jid_gap, id_phase=jid_phase)
+    return Apple2[UndulatorPhaseAxes](id_gap=jgap, id_phase=jphase)
 
 
 @devices.factory()
-def jid_controller(
+def jidcontroller(
     jid: Apple2[UndulatorPhaseAxes],
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """J09 insertion device controller."""
@@ -89,22 +94,22 @@ def jid_controller(
 
 
 @devices.factory()
-def jid_energy(
-    jid_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
+def jidenergy(
+    jidcontroller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
 ) -> InsertionDeviceEnergy:
-    return InsertionDeviceEnergy(id_controller=jid_controller)
+    return InsertionDeviceEnergy(id_controller=jidcontroller)
 
 
 @devices.factory()
-def jid_polarisation(
-    jid_controller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
+def jpolarisation(
+    jidcontroller: Apple2EnforceLHMoveController[UndulatorPhaseAxes],
 ) -> InsertionDevicePolarisation:
-    return InsertionDevicePolarisation(id_controller=jid_controller)
+    return InsertionDevicePolarisation(id_controller=jidcontroller)
 
 
 @devices.factory()
-def energy_jid(
-    jid_energy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
+def jenergy(
+    jidenergy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     """Beam energy."""
-    return BeamEnergy(id_energy=jid_energy, mono=pgm.energy)
+    return BeamEnergy(id_energy=jidenergy, mono=pgm.energy)

@@ -7,7 +7,7 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     HutchAccessControl,
 )
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
-from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -20,9 +20,11 @@ devices = DeviceManager()
 
 
 @devices.factory()
-def shutter() -> HutchShutter:
+def shutter() -> InterlockedHutchShutter:
     """Real experiment shutter device for I19."""
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+    return InterlockedHutchShutter(
+        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+    )
 
 
 @devices.factory()
