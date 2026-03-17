@@ -46,14 +46,13 @@ def test_if_path_provided_check_is_dir(tmp_path: Path):
 
 
 @patch(
-    "dodal.devices.detector.det_dist_to_beam_converter.ConfigServer",
+    "dodal.devices.detector.detector.get_config_client",
 )
 @patch(
     "dodal.devices.detector.det_dist_to_beam_converter.linear_extrapolation_lut",
-    MagicMock(),
 )
 def test_correct_det_dist_to_beam_converter_path_passed_in(
-    mocked_config_server, tmp_path: Path
+    mock_lut, mock_get_config_client, set_beamline_env_variable, tmp_path
 ):
     params = DetectorParams(
         expected_energy_ev=100,

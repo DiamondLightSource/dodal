@@ -1,5 +1,5 @@
 from math import isclose
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock
 
 import pytest
 from daq_config_server.client import ConfigServer
@@ -22,7 +22,7 @@ def fake_converter(tmp_path, set_beamline_env_variable):
     with open(lookup_table_path, "w") as f:
         f.write(LOOKUP_TABLE_TEST_VALUES.model_dump_json())
 
-    yield DetectorDistanceToBeamXYConverter(lookup_table_path)
+    yield DetectorDistanceToBeamXYConverter(lookup_table_path, ConfigServer(""))
 
 
 @pytest.mark.parametrize(
