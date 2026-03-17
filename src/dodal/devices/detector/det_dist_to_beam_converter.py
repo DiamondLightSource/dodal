@@ -1,6 +1,6 @@
 from enum import Enum
 
-from daq_config_server.models.lookup_tables import DetectorXYLookupTable
+from daq_config_server.models import DetectorXYLookupTable
 
 from dodal.common.beamlines.config_client import get_config_client
 from dodal.devices.util.lookup_tables import (
