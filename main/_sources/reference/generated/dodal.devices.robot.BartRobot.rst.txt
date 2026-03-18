@@ -45,9 +45,6 @@ dodal.devices.robot.BartRobot
       ~BartRobot.CRYO_MODE_WARM
       
       
-      ~BartRobot.LIGHT_CURTAIN_TRIPPED
-      
-      
       ~BartRobot.LOAD_TIMEOUT
       
       
@@ -55,12 +52,6 @@ dodal.devices.robot.BartRobot
       
       
       ~BartRobot.NOT_BUSY_TIMEOUT
-      
-      
-      ~BartRobot.NO_ERROR
-      
-      
-      ~BartRobot.NO_PIN_ERROR_CODE
       
       
       

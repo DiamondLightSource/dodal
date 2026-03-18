@@ -43,8 +43,5 @@ dodal.devices.aithre\_lasershaping.laser\_robot.LaserRobot
       
       
       
-      
-      
-      
    
    

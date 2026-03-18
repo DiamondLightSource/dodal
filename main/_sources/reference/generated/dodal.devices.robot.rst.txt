@@ -16,8 +16,10 @@ dodal.devices.robot
 
    ~robot.BartRobot
    ~robot.BeamlineStatus
+   ~robot.ControllerErrorCode
    ~robot.ErrorStatus
    ~robot.PinMounted
+   ~robot.ProgErrorCode
    ~robot.SampleLocation
 
 
