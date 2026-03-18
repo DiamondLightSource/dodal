@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_16M_SIZE,
     DetectorSize,
@@ -14,7 +15,7 @@ from dodal.devices.detector.det_dist_to_beam_converter import (
     Axis,
     DetectorDistanceToBeamXYConverter,
 )
-from dodal.utils import get_run_number
+from dodal.utils import get_beamline_name, get_run_number
 
 
 class TriggerMode(Enum):
@@ -54,7 +55,9 @@ class DetectorParams(BaseModel):
 
     @cached_property
     def beam_xy_converter(self) -> DetectorDistanceToBeamXYConverter:
-        return DetectorDistanceToBeamXYConverter(self.det_dist_to_beam_converter_path)
+        return DetectorDistanceToBeamXYConverter(
+            self.det_dist_to_beam_converter_path, get_config_client(get_beamline_name())
+        )
 
     @property
     def run_number(self) -> int:

@@ -15,7 +15,7 @@ from tests.devices.detector.test_data import (
 
 
 @pytest.fixture(scope="function")
-def detector_params(request, tmp_path: Path):
+def detector_params(request, tmp_path: Path, set_beamline_env_variable):
     return DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,

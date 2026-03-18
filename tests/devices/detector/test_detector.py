@@ -46,14 +46,13 @@ def test_if_path_provided_check_is_dir(tmp_path: Path):
 
 
 @patch(
-    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
+    "dodal.devices.detector.detector.get_config_client",
 )
 @patch(
     "dodal.devices.detector.det_dist_to_beam_converter.linear_extrapolation_lut",
-    MagicMock(),
 )
 def test_correct_det_dist_to_beam_converter_path_passed_in(
-    mocked_parse_table, tmp_path: Path
+    mock_lut, mock_get_config_client, set_beamline_env_variable, tmp_path
 ):
     params = DetectorParams(
         expected_energy_ev=100,
@@ -73,10 +72,7 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(
     assert params.beam_xy_converter.lookup_file == "a fake directory"
 
 
-@patch(
-    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
-)
-def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
+def test_run_number_correct_when_not_specified(tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,
@@ -94,10 +90,7 @@ def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
     assert params.run_number == 1
 
 
-@patch(
-    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
-)
-def test_run_number_correct_when_specified(mocked_parse_table, tmp_path):
+def test_run_number_correct_when_specified(tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,

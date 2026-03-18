@@ -8,9 +8,7 @@ from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import (
-    PathProvider,
-)
+from ophyd_async.core import PathProvider
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.beamlines.beamline_utils import clear_path_provider
@@ -156,7 +154,7 @@ def mock_beamline_module_filepaths(bl_name: str, bl_module: ModuleType):
 
 
 @pytest.fixture
-def eiger_params(tmp_path: Path) -> DetectorParams:
+def eiger_params(tmp_path: Path, set_beamline_env_variable) -> DetectorParams:
     return DetectorParams(
         expected_energy_ev=100.0,
         exposure_time_s=1.0,
@@ -177,3 +175,8 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
 @pytest.fixture(autouse=True)
 def clear_cache():
     get_config_client.cache_clear()
+
+
+@pytest.fixture
+def set_beamline_env_variable(monkeypatch):
+    monkeypatch.setenv("BEAMLINE", "test")
