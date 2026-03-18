@@ -54,6 +54,9 @@ dodal.devices.robot.BartRobot
       ~BartRobot.NOT_BUSY_TIMEOUT
       
       
+      ~BartRobot.NO_PIN_LOCATION
+      
+      
       
       
       
