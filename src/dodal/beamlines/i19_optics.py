@@ -111,6 +111,7 @@ def hfm() -> FocusingMirrorWithPiezo:
     return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
 
 
+@devices.factory()
 def shutter() -> InterlockedHutchShutter:
     """Device factory for the I19 optics hutch shutter device.
 
