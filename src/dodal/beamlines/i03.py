@@ -36,7 +36,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.hutch_shutter import HutchInterlock, HutchShutter
+from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -99,7 +99,7 @@ def daq_configuration_path() -> str:
 
 @devices.factory()
 def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters()
+    params = get_beamline_parameters(BL)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -120,7 +120,7 @@ def attenuator() -> BinaryFilterAttenuator:
 def beamstop() -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(),
+        beamline_parameters=get_beamline_parameters(BL),
     )
 
 
@@ -269,8 +269,10 @@ def sample_shutter() -> ZebraShutter:
 
 
 @devices.factory()
-def hutch_shutter() -> HutchShutter:
-    return HutchShutter(PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix))
+def hutch_shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+    )
 
 
 @devices.factory()
@@ -352,7 +354,7 @@ def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(),
+        get_beamline_parameters(BL),
     )
 
 
