@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.k07 &#8212; dodal 2.1.1.dev21+g8d1478372 documentation</title>
+    <title>dodal.beamlines.k07 &#8212; dodal 2.1.1.dev22+g7aebba209 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=4fbee132"></script>
+    <script src="../../../_static/documentation_options.js?v=269db74b"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -882,7 +882,7 @@ window.addEventListener("load", load);</script>
   <h1>Source code for dodal.beamlines.k07</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigServer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrictEnum</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
@@ -905,7 +905,7 @@ window.addEventListener("load", load);</script>
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
 
 
-<span class="n">K07_CONF_CLIENT</span> <span class="o">=</span> <span class="n">ConfigServer</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://daq-config.diamond.ac.uk&quot;</span><span class="p">)</span>
+<span class="n">K07_CONF_CLIENT</span> <span class="o">=</span> <span class="n">ConfigClient</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://daq-config.diamond.ac.uk&quot;</span><span class="p">)</span>
 
 <span class="n">LOOK_UPTABLE_DIR</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/k07/software/gda/workspace_git/gda-diamond.git/configurations/k07/lookupTables/&quot;</span>
 <span class="n">GAP_LOOKUP_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;JIDEnergy2GapCalibrations.csv&quot;</span>
