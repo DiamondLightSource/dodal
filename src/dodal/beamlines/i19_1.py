@@ -15,6 +15,7 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
 )
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
+from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -58,6 +59,14 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 @devices.factory()
 def beamstop() -> BeamStop:
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
+
+
+@devices.factory()
+def beam_centre() -> CentreEllipseMethod:
+    return CentreEllipseMethod(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
+        overlay_channel=7,
+    )
 
 
 @devices.fixture
