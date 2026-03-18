@@ -20,12 +20,6 @@ dodal.beamlines.i19\_optics
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      shutter
-   
    
 
    
