@@ -217,7 +217,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 LOGGER.info(
                     f"Detected error from previous load/unload attempt controller_error {ctl_err_code}:{ctl_err_msg}"
                 )
-            if prog_err_code != ControllerErrorCode.NO_ERROR:
+            if prog_err_code != ProgErrorCode.NO_ERROR:
                 LOGGER.info(
                     f"Detected error from previous load/unload attempt prog_error {prog_err_code}:{prog_err_msg}"
                 )
