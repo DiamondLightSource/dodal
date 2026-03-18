@@ -640,8 +640,8 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.2.1.dev3+g4dec48c6b"
-source = { git = "https://github.com/DiamondLightSource/daq-config-server.git?rev=main#4dec48c6b1604a3fbb108f2ec4fed2e9f8779b95" }
+version = "1.3.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
     { name = "fastapi" },
@@ -654,6 +654,10 @@ dependencies = [
     { name = "urllib3" },
     { name = "uvicorn" },
     { name = "xmltodict" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a7/bd/1ea542f1fbbea91f0ef364e81c3908e2caba2c675be079878362261b0fb4/daq_config_server-1.3.0.tar.gz", hash = "sha256:2533a1dc930c146d1c91b063fbf6ab02b9629ca24a04bca7494870bd22586222", size = 224108, upload-time = "2026-03-18T09:37:24.495Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c8/37/91d8f279d88d56e94ead0aeb13015bdfb990473dca644fbde9543d4afe96/daq_config_server-1.3.0-py3-none-any.whl", hash = "sha256:fedf70bd19b02bd213228f3473f8c3f2695b99b96ff4a713b95a4e3fec9c180d", size = 30795, upload-time = "2026-03-18T09:37:23.125Z" },
 ]
 
 [[package]]
@@ -757,7 +761,7 @@ requires-dist = [
     { name = "aiohttp" },
     { name = "bluesky", specifier = ">=1.14.5" },
     { name = "click" },
-    { name = "daq-config-server", git = "https://github.com/DiamondLightSource/daq-config-server.git?rev=main" },
+    { name = "daq-config-server", specifier = ">=1.3.0" },
     { name = "deepdiff" },
     { name = "graypy" },
     { name = "mysql-connector-python", specifier = "==9.5.0" },
