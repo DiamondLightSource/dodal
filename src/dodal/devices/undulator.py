@@ -3,8 +3,10 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
-from daq_config_server.client import ConfigServer
-from daq_config_server.models import UndulatorEnergyGapLookupTable
+from daq_config_server import ConfigClient
+from daq_config_server.models.lookup_tables.insertion_device import (
+    UndulatorEnergyGapLookupTable,
+)
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -173,7 +175,7 @@ class UndulatorInKeV(BaseUndulator):
     def __init__(
         self,
         prefix: str,
-        config_client: ConfigServer,
+        config_client: ConfigClient,
         id_gap_lookup_table_path: str = os.devnull,
         poles: int | None = None,
         length: float | None = None,

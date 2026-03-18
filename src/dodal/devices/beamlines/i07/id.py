@@ -1,5 +1,5 @@
 import numpy as np
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 
 from dodal.devices.undulator import UndulatorInKeV, UndulatorOrder
 from dodal.devices.util.lookup_tables import energy_distance_table
@@ -14,7 +14,7 @@ class InsertionDevice(UndulatorInKeV):
         self,
         prefix: str,
         harmonic: UndulatorOrder,
-        config_client: ConfigServer,
+        config_client: ConfigClient,
         id_gap_lookup_table_path: str = "/dls_sw/i07/software/gda/config/lookupTables/"
         + "IIDCalibrationTable.txt",
         name: str = "",

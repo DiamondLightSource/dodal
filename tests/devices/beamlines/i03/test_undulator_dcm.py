@@ -3,8 +3,10 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from daq_config_server.client import ConfigServer
-from daq_config_server.models import UndulatorEnergyGapLookupTable
+from daq_config_server import ConfigClient
+from daq_config_server.models.lookup_tables.insertion_device import (
+    UndulatorEnergyGapLookupTable,
+)
 from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
 from dodal.common.enums import EnabledDisabledUpper
@@ -50,7 +52,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
         baton = Baton("BATON-01:")
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigServer(""),
+            ConfigClient(""),
             name="undulator",
             poles=80,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
