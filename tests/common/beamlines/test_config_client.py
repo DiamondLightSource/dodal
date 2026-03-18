@@ -21,7 +21,7 @@ def test_by_default_get_config_client_uses_centrally_deployed_config_server(
         ("default", "https://daq-config.diamond.ac.uk"),
     ],
 )
-@patch("dodal.common.beamlines.config_client.ConfigServer")
+@patch("dodal.common.beamlines.config_client.ConfigClient")
 def test_get_config_client_uses_correct_url_for_each_beamline(
     mock_config_client: MagicMock, beamline: str, expected_url: str
 ):
