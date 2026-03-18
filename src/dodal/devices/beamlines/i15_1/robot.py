@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 from functools import partial
 
 from bluesky.protocols import Movable
@@ -27,8 +27,22 @@ from ophyd_async.epics.core import (
 
 @dataclass
 class SampleLocation:
+    MAX_PUCK = 20
+    MAX_POSITION = 22
+
     puck: int
     position: int
+
+    def __post_init__(self):
+        if not (1 <= self.puck <= self.MAX_PUCK or self.puck == -1):
+            raise ValueError(
+                f"Puck must be between 1 and {self.MAX_PUCK}, got {self.puck}"
+            )
+
+        if not (1 <= self.position <= self.MAX_POSITION or self.position == -1):
+            raise ValueError(
+                f"position must be between 1 and {self.MAX_POSITION}, got {self.position}"
+            )
 
 
 SAMPLE_LOCATION_EMPTY = SampleLocation(-1, -1)
@@ -38,6 +52,11 @@ class ProgramNames(StrEnum):
     PUCK = "PUCK.MB6"
     BEAM = "BEAM.MB6"
     SPINNER = "MOTOR.MB6"
+
+
+class ErrorCodes(IntEnum):
+    NO_SAMPLE = 9030
+    OK = 0
 
 
 class ProgramRunning(StrictEnum):
@@ -181,6 +200,14 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
         await self._trigger_program_and_wait_for_complete(self.puck_pick)
+
+        if (
+            int(await self.controller_err_code.get_value())
+            == ErrorCodes.NO_SAMPLE.value
+        ):
+            raise ValueError(
+                f"Robot load failed, no sample found at puck {location.puck}, position {location.position}"
+            )
 
         await self._load_program_and_wait_for_loaded(
             self.beam_load_program, ProgramNames.BEAM
