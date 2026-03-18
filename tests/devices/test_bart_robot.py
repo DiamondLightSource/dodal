@@ -19,7 +19,9 @@ from dodal.devices.robot import (
     WAIT_FOR_BEAMLINE_ENABLE_MSG,
     BartRobot,
     BeamlineStatus,
+    ControllerErrorCode,
     PinMounted,
+    ProgErrorCode,
     RobotLoadError,
     SampleLocation,
 )
@@ -48,8 +50,47 @@ async def robot_for_unload():
         asyncio.create_task(finish_later())
 
     get_mock_put(device.unload).side_effect = fake_unload
-    # device.unload.trigger = AsyncMock(side_effect=fake_unload)
+    callback_on_mock_put(device.reset, partial(clear_errors, device))
     return device, trigger_complete, drying_complete
+
+
+@pytest.fixture()
+async def robot_for_load():
+    device = await _get_bart_robot()
+    set_mock_value(device.program_running, False)
+    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
+    with patch("dodal.devices.robot.LOGGER.info") as mock_log_info:
+        mock_log_info.side_effect = partial(
+            _set_beamline_enabled_on_log_messages, device
+        )
+        yield device
+
+
+@pytest.fixture()
+async def robot_for_load_with_prog_error(
+    robot_for_load: BartRobot,
+):
+    device = robot_for_load
+    with patch("dodal.devices.robot.LOGGER.info") as mock_log_info:
+        mock_log_info.side_effect = partial(_prog_error_on_unload_log_messages, device)
+        yield device
+
+
+@pytest.fixture()
+async def robot_for_load_with_controller_error(
+    robot_for_load: BartRobot,
+):
+    device = robot_for_load
+    with patch("dodal.devices.robot.LOGGER.info") as mock_log_info:
+        mock_log_info.side_effect = partial(
+            _controller_error_on_unload_log_messages, device
+        )
+        yield device
+
+
+def clear_errors(device: BartRobot, *args, **kwargs):
+    set_mock_value(device.controller_error.code, 0)
+    set_mock_value(device.prog_error.code, 0)
 
 
 async def _get_bart_robot() -> BartRobot:
@@ -57,7 +98,8 @@ async def _get_bart_robot() -> BartRobot:
     device.LOAD_TIMEOUT = 1  # type: ignore
     device.NOT_BUSY_TIMEOUT = 1  # type: ignore
     await device.connect(mock=True)
-    # set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
+
+    callback_on_mock_put(device.reset, partial(clear_errors, device))
     return device
 
 
@@ -146,9 +188,17 @@ def _set_beamline_enabled_on_log_messages(device: BartRobot, msg: str):
         set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
 
 
-def _error_on_unload_log_messages(device: BartRobot, msg: str):
+def _prog_error_on_unload_log_messages(device: BartRobot, msg: str):
     if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
-        set_mock_value(device.prog_error.code, 40)
+        set_mock_value(device.prog_error.code, ProgErrorCode.SAMPLE_POSITION_NOT_READY)
+        set_mock_value(device.prog_error.str, "Test error")
+
+
+def _controller_error_on_unload_log_messages(device: BartRobot, msg: str):
+    if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
+        set_mock_value(
+            device.prog_error.code, ControllerErrorCode.LIGHT_CURTAIN_TRIPPED
+        )
         set_mock_value(device.prog_error.str, "Test error")
 
 
@@ -158,17 +208,6 @@ async def set_with_happy_path(
 ) -> AsyncStatus:
     """Mocks the logic that the robot would do on a successful load."""
     mock_log_info.side_effect = partial(_set_beamline_enabled_on_log_messages, device)
-    set_mock_value(device.program_running, False)
-    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
-    status = device.set(SampleLocation(15, 10))
-    return status
-
-
-async def set_with_unhappy_path(
-    device: BartRobot, mock_log_info: MagicMock
-) -> AsyncStatus:
-    """Mocks the logic that the robot would do on a successful load."""
-    mock_log_info.side_effect = partial(_error_on_unload_log_messages, device)
     set_mock_value(device.program_running, False)
     set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     status = device.set(SampleLocation(15, 10))
@@ -188,9 +227,18 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
     get_mock_put(device.load).assert_called_once()
 
 
-async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
+async def test_waiting_for_beamline_status_raises_error_when_prog_error():
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
+    set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
+    status = device.beamline_status_or_error(BeamlineStatus.ENABLED)
+    with pytest.raises(RobotLoadError):
+        await status
+
+
+async def test_waiting_for_beamline_status_raises_error_when_controller_error():
+    device = await _get_bart_robot()
+    set_mock_value(device.controller_error.code, 25)
     set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
     status = device.beamline_status_or_error(BeamlineStatus.ENABLED)
     with pytest.raises(RobotLoadError):
@@ -213,38 +261,45 @@ async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
     mock_wait_for.assert_awaited_once_with(ANY, timeout=0.02)
 
 
-async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_still_throw_if_error_not_cleared():
-    device = await _get_bart_robot()
-    _set_fast_robot_timeouts(device)
-    set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
-
-    with pytest.raises(RobotLoadError) as e:
-        await device.set(SampleLocation(1, 2))
-        assert e.value.error_code == 40
-
-    get_mock(device).assert_has_calls(
-        [
-            call.reset.put(None),
-            call.next_puck.put(ANY),
-            call.next_pin.put(ANY),
-            call.load.put(None),
-        ]
-    )
-
-
-@patch("dodal.devices.robot.LOGGER.info")
-async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_continue_if_error_cleared(
-    mock_log_info: MagicMock,
+@pytest.mark.parametrize(
+    "sample_location", [SAMPLE_LOCATION_EMPTY, SampleLocation(1, 2)]
+)
+async def test_moving_the_robot_will_reset_controller_error_and_throw_if_error_not_cleared(
+    sample_location: SampleLocation,
 ):
     device = await _get_bart_robot()
-    set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
-
-    callback_on_mock_put(
-        device.reset,
-        lambda *_, **__: set_mock_value(device.controller_error.code, 0),
+    _set_fast_robot_timeouts(device)
+    set_mock_value(
+        device.controller_error.code, ControllerErrorCode.LIGHT_CURTAIN_TRIPPED.value
     )
 
-    await (await set_with_happy_path(device, mock_log_info))
+    with pytest.raises(RobotLoadError) as e:
+        await device.set(sample_location)
+        assert e.value.error_code == 40
+
+    expected_load_unload_calls = (
+        [call.reset.put(None), call.unload.put(None)]
+        if sample_location is SAMPLE_LOCATION_EMPTY
+        else [
+            call.reset.put(None),
+            call.next_puck.put(ANY),
+            call.next_pin.put(ANY),
+            call.load.put(None),
+        ]
+    )
+    get_mock(device).assert_has_calls(expected_load_unload_calls)
+
+
+async def test_robot_load_resets_controller_error_and_succeeds_if_error_cleared(
+    robot_for_load: BartRobot,
+):
+    device = robot_for_load
+    _set_fast_robot_timeouts(device)
+    set_mock_value(
+        device.controller_error.code, ControllerErrorCode.LIGHT_CURTAIN_TRIPPED.value
+    )
+
+    await device.set(SampleLocation(1, 2))
 
     get_mock(device).assert_has_calls(
         [
@@ -254,6 +309,82 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
             call.load.put(None),
         ]
     )
+
+
+async def test_robot_load_resets_prog_error_and_succeeds_if_error_cleared(
+    robot_for_load: BartRobot,
+):
+    device = robot_for_load
+    _set_fast_robot_timeouts(device)
+    set_mock_value(
+        device.prog_error.code, ProgErrorCode.SAMPLE_POSITION_NOT_READY.value
+    )
+
+    await device.set(SampleLocation(1, 2))
+
+    get_mock(device).assert_has_calls(
+        [
+            call.reset.put(None),
+            call.next_puck.put(ANY),
+            call.next_pin.put(ANY),
+            call.load.put(None),
+        ]
+    )
+
+
+async def test_robot_unload_resets_controller_error_and_succeeds_if_error_cleared(
+    robot_for_unload,
+):
+    device, trigger_complete, drying_complete = robot_for_unload
+    trigger_complete.set()
+    drying_complete.set()
+    set_mock_value(
+        device.controller_error.code, ControllerErrorCode.LIGHT_CURTAIN_TRIPPED.value
+    )
+
+    await device.set(SAMPLE_LOCATION_EMPTY)
+
+    get_mock(device).assert_has_calls([call.reset.put(None), call.unload.put(None)])
+
+
+async def test_robot_unload_resets_prog_error_and_succeeds_if_error_cleared(
+    robot_for_unload,
+):
+    device, trigger_complete, drying_complete = robot_for_unload
+    trigger_complete.set()
+    drying_complete.set()
+    set_mock_value(
+        device.prog_error.code, ProgErrorCode.SAMPLE_POSITION_NOT_READY.value
+    )
+
+    await device.set(SAMPLE_LOCATION_EMPTY)
+
+    get_mock(device).assert_has_calls([call.reset.put(None), call.unload.put(None)])
+
+
+async def test_robot_load_does_not_reset_if_prog_error_or_controller_error_not_retryable(
+    robot_for_load,
+):
+    robot = robot_for_load
+    set_mock_value(robot.prog_error.code, 123)
+    set_mock_value(
+        robot.controller_error.code, ControllerErrorCode.LIGHT_CURTAIN_TRIPPED.value
+    )
+
+    with pytest.raises(RobotLoadError) as e:
+        await robot.set(SampleLocation(1, 2))
+
+    get_mock_put(robot.reset).assert_not_called()
+    assert e.value.error_code == 123
+
+    set_mock_value(robot.prog_error.code, ProgErrorCode.SAMPLE_POSITION_NOT_READY)
+    set_mock_value(robot.controller_error.code, 123)
+
+    with pytest.raises(RobotLoadError):
+        await robot.set(SampleLocation(1, 2))
+
+    get_mock_put(robot.reset).assert_not_called()
+    assert e.value.error_code == 123
 
 
 async def test_unloading_the_robot_waits_for_drying_to_complete(robot_for_unload):
@@ -294,14 +425,25 @@ async def test_unloading_the_robot_times_out_if_drying_takes_too_long(robot_for_
     assert isinstance(exc_info.value.__cause__, TimeoutError)
 
 
-@patch("dodal.devices.robot.LOGGER.info")
-async def test_moving_the_robot_will_raise_if_error_during_unload(
-    mock_log_info: MagicMock,
+async def test_moving_the_robot_will_raise_if_prog_error_during_unload(
+    robot_for_load_with_prog_error: BartRobot,
 ):
-    device = await _get_bart_robot()
+    device = robot_for_load_with_prog_error
 
     with pytest.raises(RobotLoadError) as exc_info:
-        await (await set_with_unhappy_path(device, mock_log_info))
+        await device.set(SampleLocation(15, 10))
 
-    assert exc_info.value.error_code == 40
+    assert exc_info.value.error_code == ProgErrorCode.SAMPLE_POSITION_NOT_READY
+    assert exc_info.value.error_string == "Test error"
+
+
+async def test_moving_the_robot_will_raise_if_controller_error_during_unload(
+    robot_for_load_with_controller_error: BartRobot,
+):
+    device = robot_for_load_with_controller_error
+
+    with pytest.raises(RobotLoadError) as exc_info:
+        await device.set(SampleLocation(15, 10))
+
+    assert exc_info.value.error_code == ControllerErrorCode.LIGHT_CURTAIN_TRIPPED
     assert exc_info.value.error_string == "Test error"
