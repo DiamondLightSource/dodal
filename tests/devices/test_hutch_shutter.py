@@ -12,8 +12,10 @@ from ophyd_async.core import (
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.hutch_shutter import (
+    BaseHutchShutter,
     HutchInterlock,
     HutchShutter,
+    InterlockedHutchShutter,
     ShutterDemand,
     ShutterNotSafeToOperateError,
     ShutterState,
@@ -27,25 +29,48 @@ async def interlock() -> HutchInterlock:
     return interlock
 
 
-@pytest.fixture
-async def fake_shutter_int(interlock: HutchInterlock) -> HutchShutter:
-    async with init_devices(mock=True):
-        shutter = HutchShutter(bl_prefix="TEST", interlock=interlock)
-
+def _apply_status_setter(abstract_shutter: BaseHutchShutter):
     def set_status(value: ShutterDemand, *args, **kwargs):
         value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
-        set_mock_value(shutter.status, value_sta)
+        set_mock_value(abstract_shutter.status, value_sta)
 
-    callback_on_mock_put(shutter.control, set_status)
+    callback_on_mock_put(abstract_shutter.control, set_status)
 
+
+@pytest.fixture
+async def fake_interlocked_shutter(
+    interlock: HutchInterlock,
+) -> InterlockedHutchShutter:
+    async with init_devices(mock=True):
+        interlocked_shutter = InterlockedHutchShutter(
+            bl_prefix="TEST", interlock=interlock
+        )
+
+    _apply_status_setter(interlocked_shutter)
+
+    return interlocked_shutter
+
+
+@pytest.fixture
+async def fake_shutter_without_interlock() -> HutchShutter:
+    async with init_devices(mock=True):
+        shutter = HutchShutter(bl_prefix="TEST")
+
+    _apply_status_setter(shutter)
     return shutter
 
 
-def test_shutter_can_be_created(fake_shutter_int: HutchShutter):
-    assert isinstance(fake_shutter_int, HutchShutter)
+def test_shutter_can_be_created(fake_shutter_without_interlock: HutchShutter):
+    assert isinstance(fake_shutter_without_interlock, BaseHutchShutter)
 
 
-async def test_interlock_readable(interlock: HutchInterlock):
+def test_interlocked_shutter_can_be_created(
+    fake_interlocked_shutter: InterlockedHutchShutter,
+):
+    assert isinstance(fake_interlocked_shutter, BaseHutchShutter)
+
+
+async def test_interlock_is_readable(interlock: HutchInterlock):
     await assert_reading(
         interlock,
         {
@@ -62,7 +87,7 @@ async def test_interlock_readable(interlock: HutchInterlock):
         (7.0, False),
     ],
 )
-async def test_interlock_shutter_safe_to_operate_logic(
+async def test_hutch_interlock_safe_to_operate_logic(
     interlock: HutchInterlock,
     readback: float,
     expected_state: bool,
@@ -71,48 +96,66 @@ async def test_interlock_shutter_safe_to_operate_logic(
     assert await interlock.shutter_safe_to_operate() is expected_state
 
 
-async def test_shutter_readable(fake_shutter_int: HutchShutter):
+async def test_shutter_readable(fake_shutter_without_interlock: HutchShutter):
     result = {
-        f"{fake_shutter_int.name}-status": partial_reading(ShutterState.FAULT),
+        f"{fake_shutter_without_interlock.name}-status": partial_reading(
+            ShutterState.FAULT
+        ),
     }
-    if fake_shutter_int.interlock:
-        result[f"{fake_shutter_int.interlock.name}-status"] = partial_reading(0.0)
     await assert_reading(
-        fake_shutter_int,
+        fake_shutter_without_interlock,
         result,
     )
 
 
-async def test_shutter_raises_error_on_set_if_hutch_not_interlocked_on_open(
-    fake_shutter_int: HutchShutter,
+async def test_interlocked_shutter_readable(
+    fake_interlocked_shutter: InterlockedHutchShutter,
+):
+    result = {
+        f"{fake_interlocked_shutter.name}-status": partial_reading(ShutterState.FAULT),
+    }
+    result[f"{fake_interlocked_shutter.interlock.name}-status"] = partial_reading(0.0)
+    await assert_reading(
+        fake_interlocked_shutter,
+        result,
+    )
+
+
+async def test_interlocked_shutter_raises_error_on_open_if_hutch_not_locked(
+    fake_interlocked_shutter: InterlockedHutchShutter,
     interlock: HutchInterlock,
 ):
-    set_mock_value(interlock.status, 1)
+    set_mock_value(interlock.status, 1)  # hutch is unlocked
     assert await interlock.shutter_safe_to_operate() is False
 
     with pytest.raises(ShutterNotSafeToOperateError):
-        await fake_shutter_int.set(ShutterDemand.OPEN)
+        await fake_interlocked_shutter.set(ShutterDemand.OPEN)
 
 
-async def test_shutter_does_not_raise_error_on_set_if_no_interlocked_on_open(
-    fake_shutter_int: HutchShutter,
+async def test_interlocked_shutter_does_not_error_on_close_even_if_hutch_not_locked(
+    fake_interlocked_shutter: InterlockedHutchShutter,
+    interlock: HutchInterlock,
 ):
-    fake_shutter_int.interlock = None
-    await fake_shutter_int.set(ShutterDemand.OPEN)
-    mock_shutter_control = get_mock_put(fake_shutter_int.control)
+    set_mock_value(interlock.status, 1)  # hutch is unlocked
+    assert await interlock.shutter_safe_to_operate() is False
+
+    await fake_interlocked_shutter.set(ShutterDemand.CLOSE)
+
+
+async def test_shutter_without_interlock_does_not_raise_error_on_open(
+    fake_shutter_without_interlock: HutchShutter,
+):
+    await fake_shutter_without_interlock.set(ShutterDemand.OPEN)
+    mock_shutter_control = get_mock_put(fake_shutter_without_interlock.control)
     mock_shutter_control.assert_has_calls(
         [call(i) for i in [ShutterDemand.RESET, ShutterDemand.OPEN]]
     )
 
 
-async def test_shutter_does_not_error_on_close_even_if_hutch_not_interlocked(
-    fake_shutter_int: HutchShutter,
-    interlock: HutchInterlock,
+async def test_shutter_without_interlock_does_not_error_on_close(
+    fake_shutter_without_interlock: HutchShutter,
 ):
-    set_mock_value(interlock.status, 1)
-    assert await interlock.shutter_safe_to_operate() is False
-
-    await fake_shutter_int.set(ShutterDemand.CLOSE)
+    await fake_shutter_without_interlock.set(ShutterDemand.CLOSE)
 
 
 @pytest.mark.parametrize(
@@ -126,40 +169,136 @@ async def test_shutter_does_not_error_on_close_even_if_hutch_not_interlocked(
         (ShutterDemand.CLOSE, [ShutterDemand.CLOSE], ShutterState.CLOSED),
     ],
 )
-async def test_shutter_operations(
+async def test_interlocked_shutter_operations(
     demand: ShutterDemand,
     expected_calls: list,
     expected_state: ShutterState,
-    fake_shutter_int: HutchShutter,
+    fake_interlocked_shutter: HutchShutter,
     interlock: HutchInterlock,
     run_engine: RunEngine,
 ):
-    set_mock_value(interlock.status, 0)
+    set_mock_value(interlock.status, 0)  # hutch is locked
 
-    run_engine(bps.abs_set(fake_shutter_int, demand, wait=True))
+    run_engine(bps.abs_set(fake_interlocked_shutter, demand, wait=True))
 
-    assert await fake_shutter_int.status.get_value() == expected_state
-    mock_shutter_control = get_mock_put(fake_shutter_int.control)
+    assert await fake_interlocked_shutter.status.get_value() == expected_state
+    mock_shutter_control = get_mock_put(fake_interlocked_shutter.control)
+    mock_shutter_control.assert_has_calls([call(i) for i in expected_calls])
+
+
+@pytest.mark.parametrize(
+    "demand, expected_calls, expected_state",
+    [
+        (
+            ShutterDemand.OPEN,
+            [ShutterDemand.RESET, ShutterDemand.OPEN],
+            ShutterState.OPEN,
+        ),
+        (ShutterDemand.CLOSE, [ShutterDemand.CLOSE], ShutterState.CLOSED),
+    ],
+)
+async def test_shutter_without_interlock_operations(
+    demand: ShutterDemand,
+    expected_calls: list,
+    expected_state: ShutterState,
+    fake_shutter_without_interlock: HutchShutter,
+    run_engine: RunEngine,
+):
+    run_engine(bps.abs_set(fake_shutter_without_interlock, demand, wait=True))
+
+    assert await fake_shutter_without_interlock.status.get_value() == expected_state
+    mock_shutter_control = get_mock_put(fake_shutter_without_interlock.control)
     mock_shutter_control.assert_has_calls([call(i) for i in expected_calls])
 
 
 @patch("dodal.devices.hutch_shutter.LOGGER")
 @patch("dodal.devices.hutch_shutter.TEST_MODE")
-async def test_shutter_does_not_operate_in_test_mode(
+async def test_that_in_test_mode_interlocked_shutter_logs_warning_when_shutter_open_attempted(
     patch_test_mode,
     patch_log,
-    fake_shutter_int: HutchShutter,
+    fake_interlocked_shutter: InterlockedHutchShutter,
     interlock: HutchInterlock,
     run_engine: RunEngine,
 ):
     patch_test_mode.return_value = True
-    set_mock_value(interlock.status, 1)  # Optics hutch open
-    set_mock_value(fake_shutter_int.status, ShutterState.CLOSED)
+    set_mock_value(interlock.status, 1)  # hutch is unlocked
+    set_mock_value(fake_interlocked_shutter.status, ShutterState.CLOSED)
 
-    run_engine(bps.abs_set(fake_shutter_int, ShutterDemand.OPEN, wait=True))
+    run_engine(bps.abs_set(fake_interlocked_shutter, ShutterDemand.OPEN, wait=True))
 
     # Assert shutter state didn't change and warning was logged
     patch_log.warning.assert_called_once_with(
         "Running in test mode, will not operate the experiment shutter."
     )
-    assert await fake_shutter_int.status.get_value() == ShutterState.CLOSED
+
+
+@patch("dodal.devices.hutch_shutter.TEST_MODE")
+async def test_that_in_test_mode_that_interlocked_shutter_does_not_talk_to_shutter_control_when_hutch_unlocked(
+    patch_test_mode,
+    fake_interlocked_shutter: InterlockedHutchShutter,
+    interlock: HutchInterlock,
+    run_engine: RunEngine,
+):
+    patch_test_mode.return_value = True
+    set_mock_value(interlock.status, 1)  # hutch is unlocked
+    set_mock_value(fake_interlocked_shutter.status, ShutterState.CLOSED)
+
+    run_engine(bps.abs_set(fake_interlocked_shutter, ShutterDemand.OPEN, wait=True))
+
+    mock_shutter_control = get_mock_put(fake_interlocked_shutter.control)
+    mock_shutter_control.assert_not_called()
+
+
+@patch("dodal.devices.hutch_shutter.TEST_MODE")
+async def test_that_in_test_mode_that_interlocked_shutter_does_not_talk_to_shutter_control_even_if_hutch_locked(
+    patch_test_mode,
+    fake_interlocked_shutter: InterlockedHutchShutter,
+    interlock: HutchInterlock,
+    run_engine: RunEngine,
+):
+    patch_test_mode.return_value = True
+    set_mock_value(interlock.status, 0)  # hutch is locked
+    set_mock_value(fake_interlocked_shutter.status, ShutterState.CLOSED)
+
+    run_engine(bps.abs_set(fake_interlocked_shutter, ShutterDemand.OPEN, wait=True))
+
+    mock_shutter_control = get_mock_put(fake_interlocked_shutter.control)
+    mock_shutter_control.assert_not_called()
+
+
+@patch("dodal.devices.hutch_shutter.LOGGER")
+@patch("dodal.devices.hutch_shutter.TEST_MODE")
+async def test_that_in_test_mode_closed_shutter_without_interlock_logs_warning(
+    patch_test_mode,
+    patch_log,
+    fake_shutter_without_interlock: HutchShutter,
+    run_engine: RunEngine,
+):
+    patch_test_mode.return_value = True
+    set_mock_value(fake_shutter_without_interlock.status, ShutterState.CLOSED)
+
+    run_engine(
+        bps.abs_set(fake_shutter_without_interlock, ShutterDemand.OPEN, wait=True)
+    )
+
+    # Assert shutter state didn't change and warning was logged
+    patch_log.warning.assert_called_once_with(
+        "Running in test mode, will not operate the experiment shutter."
+    )
+
+
+@patch("dodal.devices.hutch_shutter.TEST_MODE")
+async def test_that_in_test_mode_closed_shutter_without_interlock_does_not_talk_to_shutter_control(
+    patch_test_mode,
+    fake_shutter_without_interlock: HutchShutter,
+    run_engine: RunEngine,
+):
+    patch_test_mode.return_value = True
+    set_mock_value(fake_shutter_without_interlock.status, ShutterState.CLOSED)
+
+    run_engine(
+        bps.abs_set(fake_shutter_without_interlock, ShutterDemand.OPEN, wait=True)
+    )
+
+    mock_shutter_control = get_mock_put(fake_shutter_without_interlock.control)
+    mock_shutter_control.assert_not_called()

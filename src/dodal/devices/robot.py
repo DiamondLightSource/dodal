@@ -70,6 +70,32 @@ class ErrorStatus(Device):
             raise RobotLoadError(int(error_code), error_string) from raise_from
 
 
+# Error codes that we do special things on
+class ProgErrorCode(IntEnum):
+    NO_ERROR = 0
+    SAMPLE_POSITION_NOT_READY = 9
+    NO_PIN_ERROR_CODE = 25
+
+    @classmethod
+    def is_retryable(cls, error_code: int) -> bool:
+        return error_code in {
+            ProgErrorCode.NO_ERROR,
+            ProgErrorCode.SAMPLE_POSITION_NOT_READY,
+        }
+
+
+class ControllerErrorCode(IntEnum):
+    NO_ERROR = 0
+    LIGHT_CURTAIN_TRIPPED = 40
+
+    @classmethod
+    def is_retryable(cls, error_code: int) -> bool:
+        return error_code in {
+            ControllerErrorCode.NO_ERROR,
+            ControllerErrorCode.LIGHT_CURTAIN_TRIPPED,
+        }
+
+
 class BartRobot(StandardReadable, Movable[SampleLocation]):
     """The sample changing robot."""
 
@@ -78,11 +104,6 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
 
     # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
-
-    # Error codes that we do special things on
-    NO_ERROR = 0
-    NO_PIN_ERROR_CODE = 25
-    LIGHT_CURTAIN_TRIPPED = 40
 
     # How far the gonio position can be out before loading will fail
     LOAD_TOLERANCE_MM = 0.02
@@ -149,12 +170,24 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             wait.
         """
 
-        async def raise_if_error():
+        async def raise_if_prog_error():
             await wait_for_value(
-                self.prog_error.code, lambda value: value != self.NO_ERROR, None
+                self.prog_error.code,
+                lambda value: value != ProgErrorCode.NO_ERROR,
+                None,
             )
             error_code = await self.prog_error.code.get_value()
             error_msg = await self.prog_error.str.get_value()
+            raise RobotLoadError(error_code, error_msg)
+
+        async def raise_if_ctl_error():
+            await wait_for_value(
+                self.controller_error.code,
+                lambda value: value != ControllerErrorCode.NO_ERROR,
+                None,
+            )
+            error_code = await self.controller_error.code.get_value()
+            error_msg = await self.controller_error.str.get_value()
             raise RobotLoadError(error_code, error_msg)
 
         async def wait_for_expected_state():
@@ -166,7 +199,8 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         async def wait_for_pin(_sample_location: SampleLocation):
             await wait_for_value(self.current_pin, _sample_location.pin, None)
 
-        check_for_error_task = Task(raise_if_error())
+        check_for_prog_error_task = Task(raise_if_prog_error())
+        check_for_ctl_error_task = Task(raise_if_ctl_error())
         tasks = [
             (Task(wait_for_expected_state())),
         ]
@@ -180,7 +214,11 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         )
         try:
             finished, unfinished = await asyncio.wait(
-                [check_for_error_task, check_for_completion_conditions],
+                [
+                    check_for_prog_error_task,
+                    check_for_ctl_error_task,
+                    check_for_completion_conditions,
+                ],
                 return_when=FIRST_COMPLETED,
             )
             for task in unfinished:
@@ -192,13 +230,36 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             # in the current task, when it propagates to here we should cancel all pending tasks before bubbling up
             for task in tasks:
                 task.cancel()
-            check_for_error_task.cancel()
+            check_for_prog_error_task.cancel()
+            check_for_ctl_error_task.cancel()
             raise
 
-    async def _load_pin_and_puck(self, sample_location: SampleLocation):
-        if await self.controller_error.code.get_value() == self.LIGHT_CURTAIN_TRIPPED:
-            LOGGER.info("Light curtain tripped, trying again")
+    async def _check_errors_and_clear_if_retryable(self):
+        ctl_err_code = await self.controller_error.code.get_value()
+        prog_err_code = await self.prog_error.code.get_value()
+        if (
+            ctl_err_code != ControllerErrorCode.NO_ERROR
+            or prog_err_code != ProgErrorCode.NO_ERROR
+        ):
+            ctl_err_msg = await self.controller_error.str.get_value()
+            prog_err_msg = await self.prog_error.str.get_value()
+            if ctl_err_code != ControllerErrorCode.NO_ERROR:
+                LOGGER.info(
+                    f"Detected error from previous load/unload attempt controller_error {ctl_err_code}:{ctl_err_msg}"
+                )
+            if prog_err_code != ProgErrorCode.NO_ERROR:
+                LOGGER.info(
+                    f"Detected error from previous load/unload attempt prog_error {prog_err_code}:{prog_err_msg}"
+                )
+            if not ProgErrorCode.is_retryable(prog_err_code):
+                raise RobotLoadError(prog_err_code, prog_err_msg)
+            if not ControllerErrorCode.is_retryable(ctl_err_code):
+                raise RobotLoadError(ctl_err_code, ctl_err_msg)
+
+            LOGGER.info("Errors are retryable, resetting errors and trying again")
             await self.reset.trigger()
+
+    async def _load_pin_and_puck(self, sample_location: SampleLocation):
         LOGGER.info(f"Loading pin {sample_location}")
         if await self.program_running.get_value():
             LOGGER.info(
@@ -237,6 +298,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 sample.
         """
         try:
+            await self._check_errors_and_clear_if_retryable()
             if value != SAMPLE_LOCATION_EMPTY:
                 await wait_for(
                     self._load_pin_and_puck(value),
