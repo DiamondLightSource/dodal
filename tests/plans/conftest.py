@@ -22,7 +22,7 @@ class UndulatorGapCheckDevices:
 
 
 @pytest.fixture
-async def mock_undulator_and_dcm(set_beamline_env_variable) -> UndulatorGapCheckDevices:
+async def mock_undulator_and_dcm() -> UndulatorGapCheckDevices:
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "",

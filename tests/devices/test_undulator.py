@@ -33,7 +33,7 @@ LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
 
 
 @pytest.fixture
-async def undulator(set_beamline_env_variable) -> UndulatorInKeV:
+async def undulator() -> UndulatorInKeV:
     async with init_devices(mock=True):
         baton = Baton("BATON-01")
         undulator = UndulatorInKeV(
@@ -113,7 +113,7 @@ async def test_configuration_includes_configuration_fields(undulator: UndulatorI
     )
 
 
-async def test_poles_not_propagated_if_not_supplied(set_beamline_env_variable):
+async def test_poles_not_propagated_if_not_supplied():
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
@@ -126,7 +126,7 @@ async def test_poles_not_propagated_if_not_supplied(set_beamline_env_variable):
     assert "undulator-poles" not in (await undulator.read_configuration())
 
 
-async def test_length_not_propagated_if_not_supplied(set_beamline_env_variable):
+async def test_length_not_propagated_if_not_supplied():
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
