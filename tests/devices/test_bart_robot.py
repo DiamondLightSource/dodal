@@ -182,7 +182,6 @@ def robot_which_succeeds(
             _enable_beamline_and_update_pin,
             _beamline_disable,
         )
-        # set_mock_value(bart_robot.beamline_disabled, BeamlineStatus.ENABLED.value)
         yield bart_robot
 
 
