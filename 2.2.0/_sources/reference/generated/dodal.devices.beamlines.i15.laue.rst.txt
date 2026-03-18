@@ -1,0 +1,36 @@
+dodal.devices.beamlines.i15.laue
+================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i15
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~laue.LaueMonochrometer
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i15.laue
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,69 @@
+dodal.devices.electron\_analyser.vgscienta.VGScientaSequence
+============================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta
+
+.. autoclass:: VGScientaSequence
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~VGScientaSequence.model_config
+      
+      
+      
+      
+      
+      ~VGScientaSequence.psu_mode
+      
+      
+      ~VGScientaSequence.regions
+      
+      
+      ~VGScientaSequence.version
+      
+   
+   

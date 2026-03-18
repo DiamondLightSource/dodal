@@ -1,0 +1,33 @@
+dodal.beamlines.i22
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i22
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      path_provider
+   
+   
+
+   
+   
+   

@@ -1,0 +1,49 @@
+dodal.devices.hutch\_shutter.BaseHutchInterlock
+===============================================
+
+.. currentmodule:: dodal.devices.hutch_shutter
+
+.. autoclass:: BaseHutchInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BaseHutchInterlock.shutter_safe_to_operate
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BaseHutchInterlock.status
+      
+      
+      ~BaseHutchInterlock.bl_prefix
+      
+   
+   

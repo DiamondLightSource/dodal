@@ -1,0 +1,46 @@
+dodal.devices.smargon
+=====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~smargon.CombinedMove
+   ~smargon.DeferMoves
+   ~smargon.Smargon
+   ~smargon.StubOffsets
+   ~smargon.StubPosition
+
+
+
+
+.. automodule:: dodal.devices.smargon
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      approx_equal_to
+   
+   
+
+   
+   
+   
