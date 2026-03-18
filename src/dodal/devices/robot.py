@@ -77,7 +77,7 @@ class ProgErrorCode(IntEnum):
     NO_PIN_ERROR_CODE = 25
 
     @classmethod
-    def is_retryable(cls, error_code):
+    def is_retryable(cls, error_code: int):
         return error_code in {
             ProgErrorCode.NO_ERROR,
             ProgErrorCode.SAMPLE_POSITION_NOT_READY,
@@ -89,7 +89,7 @@ class ControllerErrorCode(IntEnum):
     LIGHT_CURTAIN_TRIPPED = 40
 
     @classmethod
-    def is_retryable(cls, error_code):
+    def is_retryable(cls, error_code: int):
         return error_code in {
             ControllerErrorCode.NO_ERROR,
             ControllerErrorCode.LIGHT_CURTAIN_TRIPPED,
