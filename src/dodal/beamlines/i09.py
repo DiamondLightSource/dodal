@@ -11,6 +11,7 @@ from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
+from dodal.devices.pause_plan_device import PausePlanDevice
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
@@ -126,3 +127,24 @@ def lakeshore() -> Lakeshore336:
 def smpm() -> XYZAzimuthPolarStage:
     """Sample Manipulator."""
     return XYZAzimuthPolarStage(prefix=f"{I_PREFIX.beamline_prefix}-MO-SMPM-01:")
+
+
+@devices.factory()
+def checkbeam(
+    synchrotron: Synchrotron, dual_fast_shutter: DualFastShutter
+) -> PausePlanDevice:
+    async def _close_shutters():
+        await dual_fast_shutter.set(dual_fast_shutter.close_state)
+
+    async def _open_shutters():
+        await dual_fast_shutter.set(dual_fast_shutter.open_state)
+
+    checkbeam = PausePlanDevice(
+        signals_to_condition={
+            synchrotron.current: lambda rc: rc > 190,
+            synchrotron.top_up_start_countdown: lambda topup: topup < 5,
+        },
+        callable_when_paused=_close_shutters,
+        callable_on_resume=_open_shutters,
+    )
+    return checkbeam
