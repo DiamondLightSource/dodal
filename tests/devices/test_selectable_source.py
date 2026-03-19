@@ -28,11 +28,7 @@ async def test_source_selector_set(
 async def test_source_selector_read(source_selector: SourceSelector) -> None:
     await assert_reading(
         source_selector,
-        {
-            f"{source_selector.name}-selected_source": partial_reading(
-                SelectedSource.SOURCE1
-            )
-        },
+        {source_selector.name: partial_reading(SelectedSource.SOURCE1)},
     )
 
 
