@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from dodal.common.beamlines.config_client import get_config_client
 
 
@@ -11,22 +13,20 @@ def test_by_default_get_config_client_uses_centrally_deployed_config_server(
     mock_config_client.assert_called_once_with(url="https://daq-config.diamond.ac.uk")
 
 
+@pytest.mark.parametrize(
+    "beamline, expected_url",
+    [
+        ("i03", "https://i03-daq-config.diamond.ac.uk"),
+        ("i04", "https://i04-daq-config.diamond.ac.uk"),
+        ("default", "https://daq-config.diamond.ac.uk"),
+    ],
+)
 @patch("dodal.common.beamlines.config_client.ConfigClient")
-def test_get_config_client_uses_i03_beamline_cluster_server_for_i03(
-    mock_config_client: MagicMock,
+def test_get_config_client_uses_correct_url_for_each_beamline(
+    mock_config_client: MagicMock, beamline: str, expected_url: str
 ):
-    get_config_client("i03")
-    mock_config_client.assert_called_once_with(
-        url="https://i03-daq-config.diamond.ac.uk"
-    )
-
-
-@patch("dodal.common.beamlines.config_client.ConfigClient")
-def test_get_config_client_uses_centrally_deployed_config_server_for_i04(
-    mock_config_client: MagicMock,
-):
-    get_config_client("i04")
-    mock_config_client.assert_called_once_with(url="https://daq-config.diamond.ac.uk")
+    get_config_client(beamline)
+    mock_config_client.assert_called_once_with(url=expected_url)
 
 
 @patch("dodal.common.beamlines.config_client.ConfigClient")
@@ -45,7 +45,9 @@ def test_get_config_client_resets_cache_if_called_with_same_beamline(
 ):
     assert mock_config_client.assert_not_called
     get_config_client("i04")
-    mock_config_client.assert_called_once_with(url="https://daq-config.diamond.ac.uk")
+    mock_config_client.assert_called_once_with(
+        url="https://i04-daq-config.diamond.ac.uk"
+    )
     get_config_client("i03")
     assert mock_config_client.call_count == 2
     mock_config_client.assert_called_with(url="https://i03-daq-config.diamond.ac.uk")

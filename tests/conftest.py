@@ -177,3 +177,8 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
 @pytest.fixture(autouse=True)
 def clear_cache():
     get_config_client.cache_clear()
+
+
+@pytest.fixture
+def set_beamline_env_variable(monkeypatch):
+    monkeypatch.setenv("BEAMLINE", "test")

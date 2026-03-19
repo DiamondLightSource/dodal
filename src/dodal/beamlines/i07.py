@@ -1,4 +1,5 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i07.dcm import DCM
 from dodal.devices.beamlines.i07.id import InsertionDevice
@@ -35,5 +36,6 @@ def id(harmonic: UndulatorOrder) -> InsertionDevice:
     return InsertionDevice(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         harmonic,
+        get_config_client(BL),
         id_gap_lookup_table_path="/dls_sw/i07/software/gda/config/lookupTables/IIDCalibrationTable.txt",
     )

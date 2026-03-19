@@ -9,6 +9,7 @@ from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -226,6 +227,7 @@ def synchrotron() -> Synchrotron:
 def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        config_client=get_config_client(BL),
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )

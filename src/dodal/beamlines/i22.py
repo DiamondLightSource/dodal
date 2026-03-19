@@ -12,6 +12,7 @@ from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
@@ -181,6 +182,7 @@ def dcm() -> DCM:
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        config_client=get_config_client(BL),
         id_gap_lookup_table_path="/dls_sw/i22/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
         poles=80,
         length=2.0,
