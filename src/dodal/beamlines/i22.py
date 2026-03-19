@@ -40,7 +40,6 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i22")
 PREFIX = BeamlinePrefix(BL)
-CONFIG_CLIENT = get_config_client(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -183,7 +182,7 @@ def dcm() -> DCM:
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        config_client=CONFIG_CLIENT,
+        config_client=get_config_client(BL),
         id_gap_lookup_table_path="/dls_sw/i22/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
         poles=80,
         length=2.0,

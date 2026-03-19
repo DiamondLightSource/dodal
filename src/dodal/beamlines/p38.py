@@ -30,7 +30,6 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("p38")
 PREFIX = BeamlinePrefix(BL)
-CONFIG_CLIENT = get_config_client(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -162,7 +161,7 @@ def dcm() -> DCM:
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        CONFIG_CLIENT,
+        get_config_client(BL),
         poles=80,
         length=2.0,
     )

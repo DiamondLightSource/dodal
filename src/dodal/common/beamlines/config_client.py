@@ -10,6 +10,8 @@ BEAMLINE_CONFIG_SERVER_ENDPOINTS = {
 
 @cache
 def get_config_client(beamline: str) -> ConfigClient:
+    print(beamline)
+    print(BEAMLINE_CONFIG_SERVER_ENDPOINTS)
     url = BEAMLINE_CONFIG_SERVER_ENDPOINTS.get(
         beamline, "https://daq-config.diamond.ac.uk"
     )

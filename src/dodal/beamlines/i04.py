@@ -61,7 +61,6 @@ DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
 
 BL = get_beamline_name("i04")
-CONFIG_CLIENT = get_config_client(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -184,7 +183,7 @@ def daq_configuration_path() -> str:
 def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        config_client=CONFIG_CLIENT,
+        config_client=get_config_client(BL),
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )

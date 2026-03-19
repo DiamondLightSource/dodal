@@ -72,7 +72,6 @@ DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
 
 BL = get_beamline_name("i03")
-CONFIG_CLIENT = get_config_client(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -228,7 +227,7 @@ def synchrotron() -> Synchrotron:
 def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        config_client=CONFIG_CLIENT,
+        config_client=get_config_client(BL),
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )
