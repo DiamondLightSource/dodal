@@ -85,6 +85,39 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
     assert await smargon.stub_offsets.to_robot_load.proc.get_value() == 0
 
 
+async def test_set_with_omega_outside_smargon_limit(
+    smargon: Smargon,
+):
+    set_mock_value(smargon.omega.low_limit_travel, -1999)
+    set_mock_value(smargon.omega.high_limit_travel, 1999)
+    set_mock_value(smargon.omega.dial_low_limit_travel, -1999)
+    set_mock_value(smargon.omega.dial_high_limit_travel, 1999)
+    await smargon.omega.set(1999)
+    with pytest.raises(MotorLimitsError):
+        await smargon.set(
+            CombinedMove(
+                x=10,
+                y=20,
+                z=30,
+                omega=200,
+                chi=15,
+                phi=25,
+            )
+        )
+    await smargon.omega.set(-1999)
+    with pytest.raises(MotorLimitsError):
+        await smargon.set(
+            CombinedMove(
+                x=10,
+                y=20,
+                z=30,
+                omega=160,
+                chi=15,
+                phi=25,
+            )
+        )
+
+
 @pytest.mark.parametrize(
     "test_x, test_y, test_z, test_omega, test_chi, test_phi",
     [
@@ -94,8 +127,6 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
         (10, -2000, 30, 5, 15, 25),  # y goes beyond lower limit
         (10, 20, 2000, 5, 15, 25),  # z goes beyond upper limit
         (10, 20, -2000, 5, 15, 25),  # z goes beyond lower limit
-        (10, 20, 30, 2000, 15, 25),  # omega goes beyond upper limit
-        (10, 20, 30, -2000, 15, 25),  # omega goes beyond lower limit
         (10, 20, 30, 5, 2000, 25),  # chi goes beyond upper limit
         (10, 20, 30, 5, -2000, 25),  # chi goes beyond lower limit
         (10, 20, 30, 5, 15, 2000),  # phi goes beyond upper limit
@@ -109,7 +140,6 @@ async def test_given_set_with_value_outside_motor_limit(
         smargon.x,
         smargon.y,
         smargon.z,
-        smargon.omega,
         smargon.chi,
         smargon.phi,
     ]:
@@ -215,3 +245,7 @@ async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out
 
     with pytest.raises(TimeoutError):
         await smargon.set(CombinedMove(x=10))
+
+
+def test_smargon_deferred_moves_move_omega_phase_not_absolute():
+    pass

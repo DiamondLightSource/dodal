@@ -14,6 +14,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.maths import AngleWithPhase
 from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 
@@ -104,6 +105,15 @@ class Smargon(XYZOmegaStage, Movable):
 
         super().__init__(prefix, name)
 
+    async def _get_target_value(self, motor_name: str, value: float):
+        if motor_name == "omega":
+            current_angle = AngleWithPhase.from_offset_and_phase(
+                await self.omega_axis.offset_and_phase.get_value()
+            )
+            return current_angle.nearest_to_phase(value).unwrap()
+        else:
+            return value
+
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
         """This will move all motion together in a deferred move.
@@ -114,11 +124,15 @@ class Smargon(XYZOmegaStage, Movable):
         only come back after the motion on that axis finished.
         """
         await self.defer_move.set(DeferMoves.ON)
+        # TODO something something i03 broken smargon serialise moves workaround
         try:
             finished_moving = []
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None and isinstance(new_setpoint, int | float):
-                    axis: Motor = getattr(self, motor_name)
+                    new_setpoint = await self._get_target_value(
+                        motor_name, new_setpoint
+                    )
+                    axis = getattr(self, motor_name)
                     await axis.check_motor_limit(
                         await axis.user_setpoint.get_value(), new_setpoint
                     )
