@@ -1,9 +1,8 @@
 from typing import Generic, TypeVar
 
-from ophyd_async.core import TriggerInfo
+from ophyd_async.core import DetectorTriggerLogic, TriggerInfo
 from ophyd_async.epics.adcore import ADImageMode
 
-from dodal.devices.controllers import ConstantDeadTimeTriggerLogic
 from dodal.devices.electron_analyser.base.base_driver_io import (
     GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
@@ -18,7 +17,7 @@ from dodal.devices.selectable_source import SourceSelector
 
 
 class ElectronAnalyserController(
-    ConstantDeadTimeTriggerLogic[TAbstractAnalyserDriverIO],
+    DetectorTriggerLogic,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """Specialised controller for the electron analysers to provide additional setup
@@ -42,13 +41,12 @@ class ElectronAnalyserController(
         energy_source: AbstractEnergySource,
         shutter: FastShutter | None = None,
         source_selector: SourceSelector | None = None,
-        deadtime: float = 0,
-        image_mode: ADImageMode = ADImageMode.SINGLE,
     ):
         self.energy_source = energy_source
         self.shutter = shutter
         self.source_selector = source_selector
-        super().__init__(driver, deadtime, image_mode)
+        self.driver = driver
+        # super().__init__(driver, deadtime, image_mode)
 
     async def setup_with_region(self, region: TAbstractBaseRegion) -> None:
         """Logic to set the driver with a region."""
@@ -69,11 +67,10 @@ class ElectronAnalyserController(
         # axis calculation.
         excitation_energy = await self.energy_source.energy.get_value()
         await self.driver.cached_excitation_energy.set(excitation_energy)
+        await self.driver.image_mode.set(ADImageMode.SINGLE)
 
         if self.shutter is not None:
             await self.shutter.set(self.shutter.open_state)
-
-        await super().prepare(trigger_info)
 
 
 GenericElectronAnalyserController = ElectronAnalyserController[

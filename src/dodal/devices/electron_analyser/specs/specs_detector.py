@@ -1,9 +1,12 @@
 from typing import Generic
 
-from dodal.devices.electron_analyser.base.base_controller import (
-    ElectronAnalyserController,
+from dodal.devices.electron_analyser.base.base_detector import (
+    ADArmLogic,
+    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserDetector,
+    RegionLogic,
+    ShutterCoordinatorADArmLogic,
 )
-from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
@@ -33,8 +36,19 @@ class SpecsDetector(
         self.driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
             prefix, lens_mode_type, psu_mode_type
         )
-        controller = ElectronAnalyserController[
-            SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
-        ](self.driver, energy_source, shutter, source_selector)
+        region_logic = RegionLogic(self.driver, energy_source, source_selector)
+        arm_logic = (
+            ShutterCoordinatorADArmLogic(self.driver, shutter)
+            if shutter is not None
+            else ADArmLogic(self.driver)
+        )
+        trigger_logic = ElectronAnalayserTriggerLogic(
+            self.driver, {self.driver.lens_mode, self.driver.pass_energy}
+        )
 
-        super().__init__(controller, name)
+        super().__init__(
+            region_logic=region_logic,
+            arm_logic=arm_logic,
+            trigger_logic=trigger_logic,
+            name=name,
+        )
