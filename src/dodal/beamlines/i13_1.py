@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.admerlin import MerlinDetector
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -9,7 +10,6 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.beamlines.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -42,17 +42,17 @@ def sample_xyz_lab_fa_stage() -> XYZStage:
 def side_camera() -> AravisDetector:
     return AravisDetector(
         prefix=f"{PREFIX}-OP-FLOAT-03:",
-        drv_suffix="CAM:",
-        fileio_suffix="HDF5:",
+        driver_suffix="CAM:",
+        writer_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 
 
 @device_factory()
-def merlin() -> Merlin:
-    return Merlin(
+def merlin() -> MerlinDetector:
+    return MerlinDetector(
         prefix=f"{PREFIX}-EA-DET-04:",
-        drv_suffix="CAM:",
-        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
+        driver_suffix="CAM:",
+        writer_suffix="HDF5:",
     )

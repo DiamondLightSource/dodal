@@ -3,7 +3,7 @@ from typing import Generic, TypeVar
 from ophyd_async.core import TriggerInfo
 from ophyd_async.epics.adcore import ADImageMode
 
-from dodal.devices.controllers import ConstantDeadTimeController
+from dodal.devices.controllers import ConstantDeadTimeTriggerLogic
 from dodal.devices.electron_analyser.base.base_driver_io import (
     GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
@@ -18,7 +18,7 @@ from dodal.devices.selectable_source import SourceSelector
 
 
 class ElectronAnalyserController(
-    ConstantDeadTimeController[TAbstractAnalyserDriverIO],
+    ConstantDeadTimeTriggerLogic[TAbstractAnalyserDriverIO],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """Specialised controller for the electron analysers to provide additional setup
