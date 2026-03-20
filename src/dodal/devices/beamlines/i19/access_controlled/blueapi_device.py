@@ -1,6 +1,6 @@
 import asyncio
 import json
-from enum import Enum
+from enum import StrEnum
 from typing import TypeVar
 
 from aiohttp import ClientSession
@@ -15,7 +15,7 @@ HEADERS = {"Accept": "application/json", "Content-Type": "application/json"}
 D = TypeVar("D")
 
 
-class HutchState(str, Enum):
+class HutchState(StrEnum):
     EH1 = "EH1"
     EH2 = "EH2"
 

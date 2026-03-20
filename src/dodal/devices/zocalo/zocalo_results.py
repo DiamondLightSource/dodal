@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import Generator, Sequence
-from enum import Enum
+from enum import StrEnum
 from queue import Empty, Queue
 from typing import Any, TypedDict
 
@@ -32,13 +32,13 @@ class NoZocaloSubscriptionError(Exception):
     pass
 
 
-class SortKeys(str, Enum):
+class SortKeys(StrEnum):
     max_count = "max_count"
     total_count = "total_count"
     n_voxels = "n_voxels"
 
 
-class ZocaloSource(str, Enum):
+class ZocaloSource(StrEnum):
     CPU = "CPU"
     GPU = "GPU"
 

@@ -10,6 +10,7 @@ from dodal.devices.beamlines.i11.cyberstar_blower import (
     AutotunedCyberstarBlower,
     CyberstarBlower,
 )
+from dodal.devices.beamlines.i11.dcm import DCM
 from dodal.devices.beamlines.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
@@ -136,3 +137,11 @@ def slits_4() -> Slits:
 @devices.factory()
 def slits_5() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
+
+
+@devices.factory()
+def dcm() -> DCM:
+    return DCM(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
+    )

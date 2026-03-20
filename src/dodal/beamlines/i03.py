@@ -7,6 +7,8 @@ from yarl import URL
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_path_provider
+from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -34,7 +36,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -85,7 +87,9 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return PandASubpathProvider()
+    provider = PandASubpathProvider()
+    set_path_provider(provider)
+    return provider
 
 
 @devices.fixture
@@ -95,7 +99,7 @@ def daq_configuration_path() -> str:
 
 @devices.factory()
 def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters()
+    params = get_beamline_parameters(BL)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -116,7 +120,7 @@ def attenuator() -> BinaryFilterAttenuator:
 def beamstop() -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(),
+        beamline_parameters=get_beamline_parameters(BL),
     )
 
 
@@ -265,8 +269,10 @@ def sample_shutter() -> ZebraShutter:
 
 
 @devices.factory()
-def hutch_shutter() -> HutchShutter:
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+def hutch_shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+    )
 
 
 @devices.factory()
@@ -333,7 +339,9 @@ def qbpm() -> QBPM:
 
 @devices.factory()
 def baton() -> Baton:
-    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    _baton = Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    set_commissioning_signal(_baton.commissioning)
+    return _baton
 
 
 @devices.factory()
@@ -346,7 +354,7 @@ def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(),
+        get_beamline_parameters(BL),
     )
 
 

@@ -20,6 +20,7 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -33,6 +34,11 @@ LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/co
 
 
 @devices.factory()
+def psi1() -> HutchShutter:
+    return HutchShutter(I_PREFIX.beamline_prefix)
+
+
+@devices.factory()
 def dcm() -> DoubleCrystalMonochromatorWithDSpacing[
     PitchAndRollCrystal, StationaryCrystal
 ]:
@@ -42,22 +48,22 @@ def dcm() -> DoubleCrystalMonochromatorWithDSpacing[
 
 
 @devices.factory()
-def undulator() -> UndulatorInMm:
+def iid() -> UndulatorInMm:
     return UndulatorInMm(prefix=f"{I_PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def harmonics() -> UndulatorOrder:
+def ienergy_order() -> UndulatorOrder:
     return UndulatorOrder()
 
 
 @devices.factory()
-def hu_id_energy(
-    harmonics: UndulatorOrder, undulator: UndulatorInMm
+def iidenergy(
+    ienergy_order: UndulatorOrder, iid: UndulatorInMm
 ) -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
-        undulator_order=harmonics,
-        undulator=undulator,
+        undulator_order=ienergy_order,
+        undulator=iid,
         config_server=I09_1_CONF_CLIENT,
         filepath=LOOK_UPTABLE_FILE,
         gap_to_energy_func=calculate_energy_i09_hu,
@@ -66,10 +72,11 @@ def hu_id_energy(
 
 
 @devices.factory()
-def hu_energy(
-    dcm: DoubleCrystalMonochromatorWithDSpacing, hu_id_energy: HardInsertionDeviceEnergy
+def ienergy(
+    dcm: DoubleCrystalMonochromatorWithDSpacing,
+    iidenergy: HardInsertionDeviceEnergy,
 ) -> HardEnergy:
     return HardEnergy(
         dcm=dcm,
-        undulator_energy=hu_id_energy,
+        undulator_energy=iidenergy,
     )
