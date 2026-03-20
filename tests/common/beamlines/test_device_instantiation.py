@@ -1,3 +1,4 @@
+import inspect
 from typing import Any
 
 import pytest
@@ -63,3 +64,37 @@ def test_devices_are_identical(module_and_devices_for_beamline):
     assert len(non_identical_names) == 0, (
         f"{non_identical_number_of_devices}/{total_number_of_devices} devices were not identical: {non_identical_names}"
     )
+
+
+@pytest.mark.parametrize(
+    "module_and_devices_for_beamline",
+    set(all_beamline_modules()),
+    indirect=True,
+)
+def test_all_functions_in_beamline_modules_are_devices_or_fixtures(
+    module_and_devices_for_beamline,
+):
+    module, _, _ = module_and_devices_for_beamline
+    devices: DeviceManager | None = getattr(module, "devices", None)
+
+    def func_is_device(func) -> bool:
+        return hasattr(func, "_devices_decorator")
+
+    def func_is_fixture(func) -> bool:
+        if not devices:
+            return False
+        return (
+            func.__name__ in devices._fixtures
+            and devices._fixtures[func.__name__] is func
+        )
+
+    functions_in_module = [
+        (name, func)
+        for name, func in inspect.getmembers(module, inspect.isfunction)
+        if func.__module__ == module.__name__
+    ]
+
+    for name, func in functions_in_module:
+        assert func_is_device(func) or func_is_fixture(func), (
+            f"Function '{name}' in module '{module.__file__}' is not a device or a fixture!"
+        )
