@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock
 
 import pytest
-from daq_config_server.client import ConfigServer
-from daq_config_server.models.converters.lookup_tables import GenericLookupTable
+from daq_config_server import ConfigClient
+from daq_config_server.models.lookup_tables import GenericLookupTable
 
 from dodal.devices.beamlines.i09_1_shared.hard_undulator_functions import (
     I09_HU_UNDULATOR_LUT_COLUMN_NAMES,
@@ -31,8 +31,8 @@ lut = GenericLookupTable(
 
 
 @pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock_config_client = ConfigServer()
+def mock_config_client() -> ConfigClient:
+    mock_config_client = ConfigClient()
     mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
 
     def my_side_effect(file_path, desired_return_type, reset_cached_result):

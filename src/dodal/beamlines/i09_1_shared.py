@@ -1,4 +1,4 @@
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09_1_shared import (
@@ -29,7 +29,7 @@ I_PREFIX = BeamlinePrefix(BL, suffix="I")
 
 devices = DeviceManager()
 
-I09_1_CONF_CLIENT = ConfigServer()
+I09_1_CONF_CLIENT = ConfigClient()
 LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/configurations/i09-1-shared/lookupTables/IIDCalibrationTable.txt"
 
 

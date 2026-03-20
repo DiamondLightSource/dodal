@@ -2,8 +2,8 @@ from asyncio import gather
 from typing import Protocol
 
 from bluesky.protocols import Locatable, Location, Movable
-from daq_config_server.client import ConfigServer
-from daq_config_server.models.converters.lookup_tables import GenericLookupTable
+from daq_config_server import ConfigClient
+from daq_config_server.models.lookup_tables import GenericLookupTable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -40,7 +40,7 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         self,
         undulator_order: UndulatorOrder,
         undulator: UndulatorInMm,
-        config_server: ConfigServer,
+        config_server: ConfigClient,
         filepath: str,
         gap_to_energy_func: EnergyGapConvertor,
         energy_to_gap_func: EnergyGapConvertor,

@@ -1,5 +1,5 @@
 import numpy as np
-from daq_config_server.models.converters.lookup_tables import GenericLookupTable
+from daq_config_server.models.lookup_tables import GenericLookupTable
 
 from dodal.log import LOGGER
 

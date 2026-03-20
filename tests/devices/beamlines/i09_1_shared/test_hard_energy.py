@@ -3,7 +3,7 @@ import re
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_reading,
@@ -51,7 +51,7 @@ async def undulator_in_mm() -> UndulatorInMm:
 
 @pytest.fixture
 async def hu_id_energy(
-    mock_config_client: ConfigServer,
+    mock_config_client: ConfigClient,
     undulator_order: UndulatorOrder,
     undulator_in_mm: UndulatorInMm,
 ) -> HardInsertionDeviceEnergy:
