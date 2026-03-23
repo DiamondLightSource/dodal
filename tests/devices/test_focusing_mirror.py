@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import DEFAULT, patch
+from unittest.mock import DEFAULT, MagicMock, call, patch
 
 import pytest
 from bluesky import plan_stubs as bps
@@ -243,6 +243,19 @@ def test_mirror_populates_voltage_channels():
     assert len(mirror_voltages.horizontal_voltages) == 14
     assert len(mirror_voltages.vertical_voltages) == 8
     assert isinstance(mirror_voltages.horizontal_voltages[0], SingleMirrorVoltage)
+
+
+def test_mirror_voltages_reads_lookup_table_from_config_client():
+    mock_client = MagicMock()
+    mock_client.get_file_contents = MagicMock()
+    with init_devices(mock=True):
+        mirror_voltages = MirrorVoltages(
+            "", "", daq_configuration_path="", config_client=mock_client
+        )
+    _ = mirror_voltages.voltage_lookup_table
+    mock_client.get_file_contents.assert_called_once_with(
+        "/json/mirrorFocus.json", dict
+    )
 
 
 @pytest.mark.parametrize(
