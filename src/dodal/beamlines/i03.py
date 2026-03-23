@@ -151,10 +151,11 @@ def vfm() -> FocusingMirrorWithStripes:
 
 
 @devices.factory()
-def mirror_voltages() -> MirrorVoltages:
+def mirror_voltages(config_client: ConfigClient) -> MirrorVoltages:
     return MirrorVoltages(
         prefix=f"{PREFIX.beamline_prefix}-MO-PSU-01:",
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
+        config_client=config_client,
     )
 
 
@@ -246,12 +247,16 @@ def undulator(
 
 @devices.factory()
 def undulator_dcm(
-    undulator: UndulatorInKeV, dcm: DCM, daq_configuration_path: str
+    undulator: UndulatorInKeV,
+    dcm: DCM,
+    daq_configuration_path: str,
+    config_client: ConfigClient,
 ) -> UndulatorDCM:
     return UndulatorDCM(
         undulator=undulator,
         dcm=dcm,
         daq_configuration_path=daq_configuration_path,
+        config_client=config_client,
     )
 
 

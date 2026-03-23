@@ -5,6 +5,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     SignalR,
     callback_on_mock_put,
@@ -236,7 +237,9 @@ def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
 
 def test_mirror_populates_voltage_channels():
     with init_devices(mock=True):
-        mirror_voltages = MirrorVoltages("", "", daq_configuration_path="")
+        mirror_voltages = MirrorVoltages(
+            "", "", daq_configuration_path="", config_client=ConfigClient("")
+        )
     assert len(mirror_voltages.horizontal_voltages) == 14
     assert len(mirror_voltages.vertical_voltages) == 8
     assert isinstance(mirror_voltages.horizontal_voltages[0], SingleMirrorVoltage)

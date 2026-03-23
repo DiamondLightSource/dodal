@@ -1,5 +1,6 @@
 from typing import TypedDict
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -118,9 +119,16 @@ class SingleMirrorVoltage(Device):
 
 class MirrorVoltages(StandardReadable):
     def __init__(
-        self, prefix: str, name: str = "", *args, daq_configuration_path: str, **kwargs
+        self,
+        prefix: str,
+        name: str = "",
+        *args,
+        daq_configuration_path: str,
+        config_client: ConfigClient,
+        **kwargs,
     ):
-        self.voltage_lookup_table_path = (
+        self.config_client = config_client
+        self._voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
         )
 
@@ -129,6 +137,12 @@ class MirrorVoltages(StandardReadable):
             self.vertical_voltages = self._channels_in_range(prefix, 14, 22)
 
         super().__init__(*args, name=name, **kwargs)
+
+    @property
+    def voltage_lookup_table(self) -> dict:
+        return self.config_client.get_file_contents(
+            self._voltage_lookup_table_path, dict
+        )
 
     def _channels_in_range(self, prefix, start_idx, end_idx):
         return DeviceVector(

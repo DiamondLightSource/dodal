@@ -70,6 +70,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             undulator,
             dcm,
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
+            config_client=ConfigClient(""),
             name="undulator_dcm",
         )
     return undulator_dcm
@@ -87,11 +88,11 @@ def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
         == TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT
     )
     assert (
-        fake_undulator_dcm.pitch_energy_table_path
+        fake_undulator_dcm._pitch_energy_table_path
         == BEAMLINE_ENERGY_DCM_PITCH_CONVERTER_TXT
     )
     assert (
-        fake_undulator_dcm.roll_energy_table_path
+        fake_undulator_dcm._roll_energy_table_path
         == BEAMLINE_ENERGY_DCM_ROLL_CONVERTER_TXT
     )
 
