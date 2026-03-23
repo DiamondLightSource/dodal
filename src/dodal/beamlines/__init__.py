@@ -3,10 +3,6 @@ from collections.abc import Iterable, Mapping
 from functools import lru_cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
-
-from dodal.common.beamlines.beamline_utils import set_config_client
-
 # Where beamline names (per the ${BEAMLINE} environment variable don't always
 # match up, we have to map between them bidirectionally). The most common use case is
 # beamlines with a "-"" in the name such as "i19-1", which is not valid in a Python

@@ -7,6 +7,10 @@ from daq_config_server import ConfigClient
 from daq_config_server.models.lookup_tables.insertion_device import (
     UndulatorEnergyGapLookupTable,
 )
+from daq_config_server.models.lookup_tables.mx_lut_models import (
+    BeamlinePitchLookupTable,
+    BeamlineRollLookupTable,
+)
 from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
 from dodal.common.beamlines.beamline_utils import set_config_client
@@ -274,3 +278,35 @@ async def test_dcm_offset_only_set_when_outside_of_tolerance(
     await fake_undulator_dcm.set(5.0)
 
     offset_put.assert_not_called()
+
+
+def test_undulator_dcm_pitch_energy_table(fake_undulator_dcm: UndulatorDCM):
+    assert fake_undulator_dcm.pitch_energy_table == BeamlinePitchLookupTable(
+        rows=[
+            [19.24347, -0.79775],
+            [16.40949, -0.78679],
+            [14.31123, -0.77838],
+            [12.69287, -0.77276],
+            [11.40555, -0.77276],
+            [10.35662, -0.77031],
+            [9.48522, -0.76693],
+            [8.95826, -0.76387],
+            [8.74953, -0.76387],
+            [8.1202, -0.76387],
+            [7.57556, -0.76354],
+            [7.0995, -0.76166],
+            [6.67997, -0.76044],
+            [6.30732, -0.75953],
+            [5.97411, -0.75845],
+            [5.67434, -0.75796],
+            [5.40329, -0.75789],
+            [5.157, -0.75551],
+            [4.93218, -0.75513],
+        ]
+    )
+
+
+def test_undulator_dcm_roll_energy_table(fake_undulator_dcm: UndulatorDCM):
+    assert fake_undulator_dcm.roll_energy_table == BeamlineRollLookupTable(
+        rows=[[26.4095, -0.2799], [6.3075, -0.2799]]
+    )

@@ -201,7 +201,7 @@ def get_config_client() -> ConfigClient:
 
 def clear_config_client() -> None:
     global CONFIG_CLIENT
-    LOGGER.info(f"Clearing global path provider: {globals().get('CONFIG_CLIENT')}")
+    LOGGER.info(f"Clearing global config client: {globals().get('CONFIG_CLIENT')}")
     try:
         del CONFIG_CLIENT
     except NameError:
