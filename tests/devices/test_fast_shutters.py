@@ -170,7 +170,10 @@ async def test_dual_fast_shutter_read(
     )
     await assert_reading(
         dual_fast_shutter,
-        {f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN)}
+        {
+            f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN),
+            f"{dual_fast_shutter.name}-open": partial_reading(False),
+        }
         | shutter1_read
         | shutter2_read
         | source_selector_read,
