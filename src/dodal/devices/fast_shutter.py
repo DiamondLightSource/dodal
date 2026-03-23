@@ -49,11 +49,12 @@ class GenericFastShutter(StandardReadable, Movable[EnumTypesT], Generic[EnumType
     ):
         self.open_state = open_state
         self.close_state = close_state
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_state = self._create_shutter_state()
-            self.open = derived_signal_rw(
-                self._read_open, self._set_open, shutter_state=self.shutter_state
-            )
+
+        self.open = derived_signal_rw(
+            self._read_open, self._set_open, shutter_state=self.shutter_state
+        )
         super().__init__(name)
 
     @abstractmethod

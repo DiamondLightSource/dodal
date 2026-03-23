@@ -41,18 +41,18 @@ async def test_shutter_read(shutter1: FastShutter) -> None:
         shutter1,
         {
             f"{shutter1.name}-shutter_state": partial_reading(InOut.OUT),
-            f"{shutter1.name}-open": partial_reading(True),
         },
     )
+    assert await shutter1.open.get_value()
 
     await shutter1.set(shutter1.close_state)
     await assert_reading(
         shutter1,
         {
             f"{shutter1.name}-shutter_state": partial_reading(InOut.IN),
-            f"{shutter1.name}-open": partial_reading(False),
         },
     )
+    assert not await shutter1.open.get_value()
 
 
 async def test_shutter_unknown_state(shutter1: FastShutter) -> None:
@@ -185,7 +185,6 @@ async def test_dual_fast_shutter_read(
         dual_fast_shutter,
         {
             f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN),
-            f"{dual_fast_shutter.name}-open": partial_reading(False),
         }
         | shutter1_read
         | shutter2_read
