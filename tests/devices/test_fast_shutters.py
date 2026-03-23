@@ -36,8 +36,22 @@ async def test_shutter_set_open_close_without_knowing_enum_values(
 
 
 async def test_shutter_read(shutter1: FastShutter) -> None:
+    await shutter1.set(shutter1.open_state)
     await assert_reading(
-        shutter1, {f"{shutter1.name}-shutter_state": partial_reading(InOut.IN)}
+        shutter1,
+        {
+            f"{shutter1.name}-shutter_state": partial_reading(InOut.OUT),
+            f"{shutter1.name}-open": partial_reading(True),
+        },
+    )
+
+    await shutter1.set(shutter1.close_state)
+    await assert_reading(
+        shutter1,
+        {
+            f"{shutter1.name}-shutter_state": partial_reading(InOut.IN),
+            f"{shutter1.name}-open": partial_reading(False),
+        },
     )
 
 
