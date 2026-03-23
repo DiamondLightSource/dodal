@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import DEFAULT, MagicMock, call, patch
+from unittest.mock import DEFAULT, MagicMock, patch
 
 import pytest
 from bluesky import plan_stubs as bps
