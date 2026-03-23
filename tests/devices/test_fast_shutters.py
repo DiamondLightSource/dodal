@@ -55,6 +55,19 @@ async def test_shutter_read(shutter1: FastShutter) -> None:
     )
 
 
+async def test_shutter_unknown_state(shutter1: FastShutter) -> None:
+    await shutter1.set(shutter1.close_state)
+    shutter1.close_state = "Unknown"
+
+    with pytest.raises(
+        ValueError,
+        match='shutter1 shutter_state is at position "In". Cannot determine if shutter '
+        'is open or closed as it doesn\'t match the configured open_state "Out" or '
+        'close_state "Unknown".',
+    ):
+        await shutter1.open.get_value()
+
+
 @pytest.fixture
 def shutter2() -> FastShutter[InOut]:
     with init_devices(mock=True):

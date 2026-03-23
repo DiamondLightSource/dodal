@@ -70,9 +70,10 @@ class GenericFastShutter(StandardReadable, Movable[EnumTypesT], Generic[EnumType
             return False
         else:
             raise ValueError(
-                f"{self.name} has shutter_state {shutter_state} cannot determine if"
-                " shutter is open or closed as it doesn't match the configured "
-                "open_state {self.open_state} or close_state {self.close_state}"
+                f'{self.name} shutter_state is at position "{shutter_state}". Cannot '
+                "determine if shutter is open or closed as it doesn't match the "
+                f'configured open_state "{self.open_state}" or close_state '
+                f'"{self.close_state}".'
             )
 
     @AsyncStatus.wrap
