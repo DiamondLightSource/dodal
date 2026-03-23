@@ -151,7 +151,6 @@ class DualFastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
         super().__init__(shutter1.open_state, shutter1.close_state, name)
 
     def _create_shutter_state(self) -> SignalRW[EnumTypesT]:
-
         return derived_signal_rw(
             self._read_shutter_state,
             self._set_shutter_state,
