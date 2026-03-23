@@ -6,14 +6,14 @@ from bluesky import plan_stubs as bps
 from ophyd_async.core import InOut, OnOff, init_devices
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
+from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.selectable_source import SelectedSource, SourceSelector
 
 
 @pytest.fixture
-def shutter1() -> GenericFastShutter[InOut]:
+def shutter1() -> FastShutter[InOut]:
     with init_devices(mock=True):
-        shutter1 = GenericFastShutter[InOut](
+        shutter1 = FastShutter[InOut](
             pv="TEST:",
             open_state=InOut.OUT,
             close_state=InOut.IN,
@@ -22,24 +22,29 @@ def shutter1() -> GenericFastShutter[InOut]:
 
 
 async def test_shutter_set_open_close_without_knowing_enum_values(
-    shutter1: GenericFastShutter, run_engine: RunEngine
+    shutter1: FastShutter, run_engine: RunEngine
 ) -> None:
     run_engine(bps.mv(shutter1, shutter1.open_state), wait=True)
     assert await shutter1.shutter_state.get_value() == InOut.OUT
     run_engine(bps.mv(shutter1, shutter1.close_state), wait=True)
     assert await shutter1.shutter_state.get_value() == InOut.IN
 
+    run_engine(bps.mv(shutter1.open, True))
+    assert await shutter1.shutter_state.get_value() == InOut.OUT
+    run_engine(bps.mv(shutter1.open, False))
+    assert await shutter1.shutter_state.get_value() == InOut.IN
 
-async def test_shutter_read(shutter1: GenericFastShutter) -> None:
+
+async def test_shutter_read(shutter1: FastShutter) -> None:
     await assert_reading(
         shutter1, {f"{shutter1.name}-shutter_state": partial_reading(InOut.IN)}
     )
 
 
 @pytest.fixture
-def shutter2() -> GenericFastShutter[InOut]:
+def shutter2() -> FastShutter[InOut]:
     with init_devices(mock=True):
-        shutter2 = GenericFastShutter[InOut](
+        shutter2 = FastShutter[InOut](
             pv="TEST:",
             open_state=InOut.OUT,
             close_state=InOut.IN,
@@ -56,8 +61,8 @@ def source_selector() -> SourceSelector:
 
 @pytest.fixture
 def dual_fast_shutter(
-    shutter1: GenericFastShutter[InOut],
-    shutter2: GenericFastShutter[InOut],
+    shutter1: FastShutter[InOut],
+    shutter2: FastShutter[InOut],
     source_selector: SourceSelector,
 ) -> DualFastShutter[InOut]:
     with init_devices(mock=True):
@@ -70,8 +75,8 @@ def dual_fast_shutter(
 
 
 async def test_dual_fast_shutter_read_shutter_state(
-    shutter1: GenericFastShutter,
-    shutter2: GenericFastShutter,
+    shutter1: FastShutter,
+    shutter2: FastShutter,
     dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
     run_engine: RunEngine,
@@ -89,8 +94,8 @@ async def test_dual_fast_shutter_read_shutter_state(
 
 
 async def test_dual_fast_shutter_set_shutter_state(
-    shutter1: GenericFastShutter,
-    shutter2: GenericFastShutter,
+    shutter1: FastShutter,
+    shutter2: FastShutter,
     dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
     run_engine: RunEngine,
@@ -100,8 +105,14 @@ async def test_dual_fast_shutter_set_shutter_state(
     run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.open_state))
     assert await shutter2.shutter_state.get_value() == shutter2.open_state
     assert await shutter1.shutter_state.get_value() == shutter1.close_state
-
     run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.close_state))
+    assert await shutter2.shutter_state.get_value() == shutter2.close_state
+    assert await shutter1.shutter_state.get_value() == shutter1.close_state
+
+    run_engine(bps.mv(dual_fast_shutter.open, True))
+    assert await shutter2.shutter_state.get_value() == shutter2.open_state
+    assert await shutter1.shutter_state.get_value() == shutter1.close_state
+    run_engine(bps.mv(dual_fast_shutter.open, False))
     assert await shutter2.shutter_state.get_value() == shutter2.close_state
     assert await shutter1.shutter_state.get_value() == shutter1.close_state
 
@@ -110,15 +121,21 @@ async def test_dual_fast_shutter_set_shutter_state(
     run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.open_state))
     assert await shutter1.shutter_state.get_value() == shutter1.open_state
     assert await shutter2.shutter_state.get_value() == shutter2.close_state
+    run_engine(bps.mv(dual_fast_shutter.open, True))
+    assert await shutter1.shutter_state.get_value() == shutter1.open_state
+    assert await shutter2.shutter_state.get_value() == shutter2.close_state
 
     run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.close_state))
+    assert await shutter1.shutter_state.get_value() == shutter1.close_state
+    assert await shutter2.shutter_state.get_value() == shutter2.close_state
+    run_engine(bps.mv(dual_fast_shutter.open, False))
     assert await shutter1.shutter_state.get_value() == shutter1.close_state
     assert await shutter2.shutter_state.get_value() == shutter2.close_state
 
 
 def test_dual_fast_shutter_open_close_states_are_correct(
-    shutter1: GenericFastShutter,
-    shutter2: GenericFastShutter,
+    shutter1: FastShutter,
+    shutter2: FastShutter,
     dual_fast_shutter: DualFastShutter,
 ) -> None:
     assert dual_fast_shutter.open_state == shutter1.open_state
@@ -130,8 +147,8 @@ def test_dual_fast_shutter_open_close_states_are_correct(
 
 async def test_dual_fast_shutter_read(
     dual_fast_shutter: DualFastShutter,
-    shutter1: GenericFastShutter,
-    shutter2: GenericFastShutter,
+    shutter1: FastShutter,
+    shutter2: FastShutter,
     source_selector: SourceSelector,
 ) -> None:
     shutter1_read, shutter2_read, source_selector_read = await asyncio.gather(
@@ -148,8 +165,8 @@ async def test_dual_fast_shutter_read(
 
 async def test_dual_fast_shutter_read_configuration(
     dual_fast_shutter: DualFastShutter,
-    shutter1: GenericFastShutter,
-    shutter2: GenericFastShutter,
+    shutter1: FastShutter,
+    shutter2: FastShutter,
 ) -> None:
     await assert_configuration(
         dual_fast_shutter,
@@ -165,11 +182,11 @@ async def test_dual_fast_shutter_read_configuration(
 
 
 async def test_dual_fast_shutter_raises_error_if_shutters_have_different_open_close_states(
-    shutter1: GenericFastShutter,
+    shutter1: FastShutter,
     source_selector: SourceSelector,
 ) -> None:
     with init_devices(mock=True):
-        other_shutter = GenericFastShutter(
+        other_shutter = FastShutter(
             pv="TEST:", open_state=OnOff.ON, close_state=OnOff.OFF
         )
 
