@@ -1,6 +1,7 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     PathProvider,
     StaticPathProvider,
@@ -12,7 +13,7 @@ from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.config_client import get_config_client
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
@@ -51,6 +52,14 @@ devices = DeviceManager()
 @cache
 def path_provider() -> PathProvider:
     return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient()
+    set_config_client(client)
+    return client
 
 
 @devices.factory()
@@ -179,10 +188,10 @@ def dcm() -> DCM:
 
 
 @devices.factory()
-def undulator() -> UndulatorInKeV:
+def undulator(config_client: ConfigClient) -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        config_client=get_config_client(BL),
+        config_client=config_client,
         id_gap_lookup_table_path="/dls_sw/i22/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
         poles=80,
         length=2.0,

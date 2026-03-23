@@ -1,15 +1,17 @@
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
+    get_config_client,
     get_path_provider,
+    set_config_client,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
@@ -45,6 +47,8 @@ set_path_provider(
         client=LocalDirectoryServiceClient(),
     )
 )
+
+set_config_client(ConfigClient())
 
 
 @device_factory()
@@ -161,7 +165,7 @@ def dcm() -> DCM:
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        get_config_client(BL),
+        get_config_client(),
         poles=80,
         length=2.0,
     )

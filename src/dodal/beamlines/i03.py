@@ -1,5 +1,6 @@
 from functools import cache
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
@@ -7,9 +8,8 @@ from yarl import URL
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.beamline_utils import set_path_provider
+from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
-from dodal.common.beamlines.config_client import get_config_client
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -70,6 +70,7 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
+I03_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i03")
 set_log_beamline(BL)
@@ -91,6 +92,14 @@ def path_provider() -> PathProvider:
     provider = PandASubpathProvider()
     set_path_provider(provider)
     return provider
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient(I03_CONFIG_SERVER_ENDPOINT)
+    set_config_client(client)
+    return client
 
 
 @devices.fixture
@@ -224,10 +233,12 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
+def undulator(
+    baton: Baton, daq_configuration_path: str, config_client: ConfigClient
+) -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        config_client=get_config_client(BL),
+        config_client=config_client,
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )

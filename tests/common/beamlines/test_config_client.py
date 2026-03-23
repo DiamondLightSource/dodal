@@ -1,41 +1,32 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from daq_config_server import ConfigClient
 
-from dodal.common.beamlines.config_client import get_config_client
-
-
-@patch("dodal.common.beamlines.config_client.ConfigClient")
-def test_by_default_get_config_client_uses_centrally_deployed_config_server(
-    mock_config_client: MagicMock,
-):
-    get_config_client("")
-    mock_config_client.assert_called_once_with(url="https://daq-config.diamond.ac.uk")
+from dodal.beamlines import i03, i04
+from dodal.common.beamlines.beamline_utils import get_config_client
 
 
 @pytest.mark.parametrize(
-    "beamline, expected_url",
+    "client, expected_url",
     [
-        ("i03", "https://i03-daq-config.diamond.ac.uk"),
-        ("i04", "https://i04-daq-config.diamond.ac.uk"),
-        ("default", "https://daq-config.diamond.ac.uk"),
+        (i03.config_client(), "https://i03-daq-config.diamond.ac.uk"),
+        (i04.config_client(), "https://i04-daq-config.diamond.ac.uk"),
     ],
 )
-@patch("dodal.common.beamlines.config_client.ConfigClient")
-def test_get_config_client_uses_correct_url_for_each_beamline(
-    mock_config_client: MagicMock, beamline: str, expected_url: str
+def test_config_client_has_correct_url_for_each_beamline(
+    client: ConfigClient, expected_url: str
 ):
-    get_config_client(beamline)
-    mock_config_client.assert_called_once_with(url=expected_url)
+    assert client._url == expected_url
 
 
 @patch("dodal.common.beamlines.config_client.ConfigClient")
 def test_get_config_client_caches_if_called_with_same_beamline(
     mock_config_client: MagicMock,
 ):
-    get_config_client("i04")
+    get_config_client()
     mock_config_client.assert_called_once()
-    get_config_client("i04")
+    get_config_client()
     mock_config_client.assert_called_once()
 
 
@@ -44,10 +35,10 @@ def test_get_config_client_resets_cache_if_called_with_same_beamline(
     mock_config_client: MagicMock,
 ):
     assert mock_config_client.assert_not_called
-    get_config_client("i04")
+    get_config_client()
     mock_config_client.assert_called_once_with(
         url="https://i04-daq-config.diamond.ac.uk"
     )
-    get_config_client("i03")
+    get_config_client()
     assert mock_config_client.call_count == 2
     mock_config_client.assert_called_with(url="https://i03-daq-config.diamond.ac.uk")

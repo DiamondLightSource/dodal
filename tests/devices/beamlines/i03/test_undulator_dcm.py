@@ -9,6 +9,7 @@ from daq_config_server.models.lookup_tables.insertion_device import (
 )
 from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.baton import Baton
 from dodal.devices.beamlines.i03.dcm import DCM
@@ -44,6 +45,11 @@ def flush_event_loop_on_finish():
     if pending_tasks := asyncio.all_tasks(event_loop):
         LOGGER.warning(f"Waiting for pending tasks to complete {pending_tasks}")
         event_loop.run_until_complete(asyncio.gather(*pending_tasks))
+
+
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(ConfigClient("test"))
 
 
 @pytest.fixture
