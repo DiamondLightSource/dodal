@@ -1,5 +1,6 @@
 from typing import Any
 
+import numpy as np
 import pytest
 from ophyd_async.core import InOut, init_devices, set_mock_value
 
@@ -132,6 +133,8 @@ async def ew4000(
             shutter=dual_fast_shutter,
             source_selector=source_selector,
         )
+    energy_axis = [1, 2, 3, 4, 5]
+    set_mock_value(ew4000.driver.energy_axis, np.array(energy_axis, dtype=float))
     return ew4000
 
 
