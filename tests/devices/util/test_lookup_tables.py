@@ -1,8 +1,12 @@
+import numpy as np
 import pytest
+from daq_config_server import ConfigClient
+from daq_config_server.models.lookup_tables.insertion_device import (
+    UndulatorEnergyGapLookupTable,
+)
 from pytest import mark
 
 from dodal.devices.util.lookup_tables import (
-    energy_distance_table,
     linear_extrapolation_lut,
     linear_interpolation_lut,
     parse_lookup_table,
@@ -18,7 +22,12 @@ from tests.devices.util.test_data import (
 
 
 async def test_energy_to_distance_table_correct_format():
-    table = await energy_distance_table(TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT)
+    config_server = ConfigClient("")
+    table = np.array(
+        config_server.get_file_contents(
+            TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT, UndulatorEnergyGapLookupTable
+        ).rows
+    )
     assert table[0][0] == 5700
     assert table[49][1] == 6.264
     assert table.shape == (50, 2)
