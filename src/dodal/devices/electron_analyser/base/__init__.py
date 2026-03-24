@@ -1,12 +1,12 @@
-from .base_controller import (
-    ElectronAnalyserController,
-    GenericElectronAnalyserController,
-)
+# from .base_controller import (
+#     ElectronAnalyserController,
+#     GenericElectronAnalyserController,
+# )
 from .base_detector import (
     # BaseElectronAnalyserDetector,
     ElectronAnalyserDetector,
     # ElectronAnalyserRegionDetector,
-    GenericBaseElectronAnalyserDetector,
+    GenericElectronAnalyserDetector,
     # GenericElectronAnalyserDetector,
     # GenericElectronAnalyserRegionDetector,
 )
@@ -30,12 +30,12 @@ from .base_util import to_binding_energy, to_kinetic_energy
 from .energy_sources import AbstractEnergySource, DualEnergySource, EnergySource
 
 __all__ = [
-    "ElectronAnalyserController",
-    "GenericElectronAnalyserController",
+    # "ElectronAnalyserController",
+    # "GenericElectronAnalyserController",
     # "BaseElectronAnalyserDetector",
     "ElectronAnalyserDetector",
     # "ElectronAnalyserRegionDetector",
-    "GenericBaseElectronAnalyserDetector",
+    "GenericElectronAnalyserDetector",
     # "GenericElectronAnalyserDetector",
     # "GenericElectronAnalyserRegionDetector",
     "AbstractAnalyserDriverIO",

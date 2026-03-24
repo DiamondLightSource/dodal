@@ -1,19 +1,14 @@
-from typing import Any, Generic
+from typing import Generic
 
 from ophyd_async.core import (
     AsyncStatus,
     DetectorArmLogic,
     DetectorTriggerLogic,
-    SignalDict,
-    SignalR,
     StandardDetector,
     error_if_none,
 )
-from ophyd_async.epics.adcore import ADArmLogic, ADImageMode
 
-from dodal.devices.electron_analyser.base import TAbstractAnalyserDriverIO
 from dodal.devices.electron_analyser.base.base_driver_io import (
-    AbstractAnalyserDriverIO,
     GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
@@ -21,89 +16,7 @@ from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
     TAbstractBaseRegion,
 )
-from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
-from dodal.devices.fast_shutter import FastShutter
-from dodal.devices.selectable_source import SourceSelector
-
-
-async def _get_value(value: SignalR[bool] | bool) -> bool:
-    return await value.get_value() if isinstance(value, SignalR) else value
-
-
-class ShutterCoordinatorADArmLogic(ADArmLogic, Generic[TAbstractAnalyserDriverIO]):
-    """Or we do this inside a plan?"""
-
-    def __init__(
-        self,
-        driver: TAbstractAnalyserDriverIO,
-        shutter: FastShutter,
-        close_shutter_idle: SignalR[bool] | bool = True,
-        close_shutter_disarm: SignalR[bool] | bool = True,
-    ):
-        self._shutter = shutter
-        self._close_shutter_idle = close_shutter_idle
-        self._close_shutter_disarm = close_shutter_disarm
-        super().__init__(driver)
-
-    async def arm(self):
-        # Open shutter before data collection
-        self._shutter.set(self._shutter.open_state)
-        await super().arm()
-
-    async def wait_for_idle(self):
-        await super().wait_for_idle()
-        # Optionally close shutters between regions
-        if await _get_value(self._close_shutter_idle):
-            self._shutter.set(self._shutter.close_state)
-
-    async def disarm(self):
-        await super().disarm()
-        if await _get_value(self._close_shutter_disarm):
-            self._shutter.set(self._shutter.close_state)
-
-
-class ElectronAnalayserTriggerLogic(
-    DetectorTriggerLogic, Generic[TAbstractAnalyserDriverIO]
-):
-    def __init__(
-        self, driver: TAbstractAnalyserDriverIO, config_sigs: set[SignalR[Any]]
-    ):
-        self._driver = driver
-        self._config_sigs = self._config_sigs
-
-    def config_sigs(self) -> set[SignalR[Any]]:
-        """Return the signals that should appear in read_configuration."""
-        return self._config_sigs
-
-    def get_deadtime(self, config_values: SignalDict) -> float:
-        return 0.0
-
-    async def prepare_internal(self, num: int, livetime: float, deadtime: float):
-        # set image mode, anything else?
-        await self._driver.image_mode.set(ADImageMode.SINGLE)
-
-
-class RegionLogic:
-    """Logic for wrapping electron analyser driver to correctly set region data."""
-
-    def __init__(
-        self,
-        driver: AbstractAnalyserDriverIO,
-        energy_source: AbstractEnergySource,
-        source_selector: SourceSelector | None = None,
-    ):
-        self._driver = driver
-        self._energy_source = energy_source
-        self._source_selector = source_selector
-
-    async def setup_with_region(self, region: TAbstractBaseRegion) -> None:
-        """Logic to correctly wrap the driver with a region."""
-        if self._source_selector is not None:
-            await self._source_selector.set(region.excitation_energy_source)
-
-        excitation_energy = await self._energy_source.energy.get_value()
-        epics_region = region.prepare_for_epics(excitation_energy)
-        await self._driver.set(epics_region)
+from dodal.devices.electron_analyser.base.detector_logic import RegionLogic
 
 
 class ElectronAnalyserDetector(
@@ -129,7 +42,7 @@ class ElectronAnalyserDetector(
 
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion) -> None:
-        """Method so detector can be configured with regions from plans."""
+        """Configure detector with regions from plans."""
         await self._region_logic.setup_with_region(region)
 
     def create_region_detector_list(
@@ -163,6 +76,6 @@ class ElectronAnalyserDetector(
         ]
 
 
-GenericBaseElectronAnalyserDetector = ElectronAnalyserDetector[
+GenericElectronAnalyserDetector = ElectronAnalyserDetector[
     GenericAnalyserDriverIO, GenericRegion
 ]

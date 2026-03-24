@@ -1,13 +1,13 @@
 from typing import Generic
 
-from dodal.devices.electron_analyser.base.base_detector import (
+from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
+from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.base.detector_logic import (
     ADArmLogic,
     ElectronAnalayserTriggerLogic,
-    ElectronAnalyserDetector,
     RegionLogic,
     ShutterCoordinatorADArmLogic,
 )
-from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion

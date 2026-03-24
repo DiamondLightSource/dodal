@@ -2,13 +2,14 @@ from typing import Generic
 
 from ophyd_async.epics.adcore import ADArmLogic
 
-from dodal.devices.electron_analyser.base.base_detector import (
+from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
+from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.base.detector_logic import (
+    ADArmLogic,
     ElectronAnalayserTriggerLogic,
-    ElectronAnalyserDetector,
     RegionLogic,
     ShutterCoordinatorADArmLogic,
 )
-from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
     VGScientaAnalyserDriverIO,
