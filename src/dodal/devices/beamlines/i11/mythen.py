@@ -9,10 +9,10 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.adcore import (
     ADArmLogic,
+    ADBaseIO,
     ADImageMode,
     ADWriterType,
     AreaDetector,
-    NDArrayBaseIO,
 )
 from ophyd_async.epics.core import PvSuffix
 
@@ -45,14 +45,8 @@ class Mythen3DetectorState(StrictEnum):
     ABORTED = "Aborted"
 
 
-class Mythen3Driver(NDArrayBaseIO):
-    acquire_time: A[SignalRW[float], PvSuffix.rbv("AcquireTime")]
-    acquire_period: A[SignalRW[float], PvSuffix.rbv("AcquirePeriod")]
-    num_images: A[SignalRW[int], PvSuffix.rbv("NumImages")]
-    image_mode: A[SignalRW[ADImageMode], PvSuffix.rbv("ImageMode")]
-
+class Mythen3Driver(ADBaseIO):
     # Non-specific PV's but with mythen3 specific values
-    detector_state: A[SignalRW[Mythen3DetectorState], PvSuffix("DetectorState_RBV")]
     trigger_mode: A[SignalRW[Mythen3TriggerMode], PvSuffix.rbv("TriggerMode")]
 
     # mythen3 specific PV's
@@ -170,18 +164,6 @@ class Mythen3(AreaDetector[Mythen3Driver]):
     ):
         self.driver = Mythen3Driver(prefix + drv_suffix)
 
-        # self.writer = writer_cls.with_io(
-        #     prefix,
-        #     path_provider,
-        #     dataset_source=self.driver,
-        #     fileio_suffix=fileio_suffix,
-        # )
-
-        # super().__init__(
-        #     controller=self.controller,
-        #     writer=self.writer,
-        #     name=name,
-        # )  # plugins=plugins # config_sigs=config_sigs
         super().__init__(
             prefix=prefix,
             driver=self.driver,
