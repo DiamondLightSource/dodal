@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 )
 from dodal.devices.electron_analyser.base.base_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
-from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
@@ -25,7 +25,7 @@ class ShutterCoordinatorADArmLogic(ADArmLogic, Generic[TAbstractAnalyserDriverIO
     def __init__(
         self,
         driver: TAbstractAnalyserDriverIO,
-        shutter: FastShutter,
+        shutter: GenericFastShutter,
         close_shutter_idle: SignalR[bool] | None = None,
     ):
         self._shutter = shutter

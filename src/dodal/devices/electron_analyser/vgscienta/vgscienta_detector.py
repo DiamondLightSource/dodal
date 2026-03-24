@@ -19,7 +19,7 @@ from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
     TPassEnergyEnum,
     VGScientaRegion,
 )
-from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
@@ -37,7 +37,7 @@ class VGScientaDetector(
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
         energy_source: AbstractEnergySource,
-        shutter: FastShutter | None = None,
+        shutter: GenericFastShutter | None = None,
         source_selector: SourceSelector | None = None,
         name: str = "",
     ):

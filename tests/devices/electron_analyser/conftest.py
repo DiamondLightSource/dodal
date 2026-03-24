@@ -19,7 +19,7 @@ from dodal.devices.electron_analyser.base import (
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
+from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 
@@ -63,9 +63,9 @@ async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySourc
 
 
 @pytest.fixture
-def shutter1() -> GenericFastShutter[InOut]:
+def shutter1() -> FastShutter[InOut]:
     with init_devices(mock=True):
-        shutter1 = GenericFastShutter[InOut](
+        shutter1 = FastShutter[InOut](
             pv="TEST:",
             open_state=InOut.OUT,
             close_state=InOut.IN,
@@ -74,9 +74,9 @@ def shutter1() -> GenericFastShutter[InOut]:
 
 
 @pytest.fixture
-def shutter2() -> GenericFastShutter[InOut]:
+def shutter2() -> FastShutter[InOut]:
     with init_devices(mock=True):
-        shutter2 = GenericFastShutter[InOut](
+        shutter2 = FastShutter[InOut](
             pv="TEST:",
             open_state=InOut.OUT,
             close_state=InOut.IN,
@@ -86,8 +86,8 @@ def shutter2() -> GenericFastShutter[InOut]:
 
 @pytest.fixture
 def dual_fast_shutter(
-    shutter1: GenericFastShutter[InOut],
-    shutter2: GenericFastShutter[InOut],
+    shutter1: FastShutter[InOut],
+    shutter2: FastShutter[InOut],
     source_selector: SourceSelector,
 ) -> DualFastShutter[InOut]:
     with init_devices(mock=True):
@@ -102,7 +102,7 @@ def dual_fast_shutter(
 @pytest.fixture
 async def b07b_specs150(
     single_energy_source: EnergySource,
-    shutter1: GenericFastShutter,
+    shutter1: FastShutter,
 ) -> SpecsDetector[b07.LensMode, b07_shared.PsuMode]:
     with init_devices(mock=True):
         b07b_specs150 = SpecsDetector[b07.LensMode, b07_shared.PsuMode](
