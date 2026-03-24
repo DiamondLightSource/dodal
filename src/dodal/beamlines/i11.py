@@ -50,7 +50,7 @@ def mythen3(path_provider: PathProvider) -> Mythen3:
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-07:",
         path_provider=path_provider,
         drv_suffix=DET_SUFFIX,
-        fileio_suffix="HDF:",
+        writer_suffix="HDF:",
     )
 
 
