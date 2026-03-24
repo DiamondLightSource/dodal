@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.undulator &#8212; dodal 2.2.1.dev2+g789df0a42 documentation</title>
+    <title>dodal.devices.undulator &#8212; dodal 2.2.1.dev3+g976798dad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7dfb9eb"></script>
+    <script src="../../../_static/documentation_options.js?v=2f713a69"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -882,6 +882,10 @@ window.addEventListener("load", load);</script>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Locatable</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models.lookup_tables.insertion_device</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">UndulatorEnergyGapLookupTable</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
@@ -898,7 +902,6 @@ window.addEventListener("load", load);</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.baton</span><span class="w"> </span><span class="kn">import</span> <span class="n">Baton</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.util.lookup_tables</span><span class="w"> </span><span class="kn">import</span> <span class="n">energy_distance_table</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">AccessError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -1062,6 +1065,7 @@ window.addEventListener("load", load);</script>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
         <span class="n">id_gap_lookup_table_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span>
         <span class="n">poles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1069,6 +1073,8 @@ window.addEventListener("load", load);</script>
         <span class="n">baton</span><span class="p">:</span> <span class="n">Baton</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_server</span> <span class="o">=</span> <span class="n">config_client</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span> <span class="o">=</span> <span class="n">id_gap_lookup_table_path</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
@@ -1100,14 +1106,16 @@ window.addEventListener("load", load);</script>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a 2d np.array from lookup table that converts energies to undulator gap</span>
 <span class="sd">        distance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">energy_to_distance_table</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="k">await</span> <span class="n">energy_distance_table</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span>
+        <span class="n">energy_to_distance_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_server</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span><span class="p">,</span>
+            <span class="n">UndulatorEnergyGapLookupTable</span><span class="p">,</span>
+            <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># Use the lookup table to get the undulator gap associated with this dcm energy</span>
         <span class="k">return</span> <span class="n">_get_gap_for_energy</span><span class="p">(</span>
             <span class="n">energy_kev</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
-            <span class="n">energy_to_distance_table</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">energy_to_distance_table</span><span class="o">.</span><span class="n">rows</span><span class="p">),</span>
         <span class="p">)</span></div>
 
 

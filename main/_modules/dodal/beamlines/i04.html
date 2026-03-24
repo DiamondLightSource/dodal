@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i04 &#8212; dodal 2.2.1.dev2+g789df0a42 documentation</title>
+    <title>dodal.beamlines.i04 &#8212; dodal 2.2.1.dev3+g976798dad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7dfb9eb"></script>
+    <script src="../../../_static/documentation_options.js?v=2f713a69"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -880,10 +880,14 @@ window.addEventListener("load", load);</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.beamlines.i04</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Reference</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Reference</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_beamline_parameters</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_config_client</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.aperturescatterguard</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AperturePosition</span><span class="p">,</span>
@@ -939,7 +943,7 @@ window.addEventListener("load", load);</script>
 <span class="n">ZOOM_PARAMS_FILE</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i04/software/bluesky/scratch/jCameraManZoomLevels.xml&quot;</span>
 <span class="n">DISPLAY_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i04/software/bluesky/scratch/display.configuration&quot;</span>
 <span class="n">DAQ_CONFIGURATION_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i04/software/daq_configuration&quot;</span>
-
+<span class="n">I04_CONFIG_SERVER_ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;https://i04-daq-config.diamond.ac.uk&quot;</span>
 
 <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;i04&quot;</span><span class="p">)</span>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
@@ -952,6 +956,17 @@ window.addEventListener("load", load);</script>
 <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="config_client">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.config_client">[docs]</a>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">fixture</span>
+<span class="nd">@cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">config_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ConfigClient</span><span class="p">:</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">ConfigClient</span><span class="p">(</span><span class="n">I04_CONFIG_SERVER_ENDPOINT</span><span class="p">)</span>
+    <span class="n">set_config_client</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">client</span></div>
+
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">use_factory_name</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1064,9 +1079,12 @@ window.addEventListener("load", load);</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">undulator</span><span class="p">(</span><span class="n">baton</span><span class="p">:</span> <span class="n">Baton</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorInKeV</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">undulator</span><span class="p">(</span>
+    <span class="n">baton</span><span class="p">:</span> <span class="n">Baton</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorInKeV</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">UndulatorInKeV</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
         <span class="n">id_gap_lookup_table_path</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">daq_configuration_path</span><span class="si">}</span><span class="s2">/lookup/BeamLine_Undulator_toGap.txt&quot;</span><span class="p">,</span>
         <span class="n">baton</span><span class="o">=</span><span class="n">baton</span><span class="p">,</span>
     <span class="p">)</span>

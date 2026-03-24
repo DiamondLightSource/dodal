@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i07.id &#8212; dodal 2.2.1.dev2+g789df0a42 documentation</title>
+    <title>dodal.devices.beamlines.i07.id &#8212; dodal 2.2.1.dev3+g976798dad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=a7dfb9eb"></script>
+    <script src="../../../../../_static/documentation_options.js?v=2f713a69"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -878,6 +878,7 @@ window.addEventListener("load", load);</script>
                   
   <h1>Source code for dodal.devices.beamlines.i07.id</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">UndulatorInKeV</span><span class="p">,</span> <span class="n">UndulatorOrder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.util.lookup_tables</span><span class="w"> </span><span class="kn">import</span> <span class="n">energy_distance_table</span>
@@ -894,11 +895,12 @@ window.addEventListener("load", load);</script>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">harmonic</span><span class="p">:</span> <span class="n">UndulatorOrder</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
         <span class="n">id_gap_lookup_table_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i07/software/gda/config/lookupTables/&quot;</span>
         <span class="o">+</span> <span class="s2">&quot;IIDCalibrationTable.txt&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">id_gap_lookup_table_path</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">config_client</span><span class="p">,</span> <span class="n">id_gap_lookup_table_path</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">harmonic</span> <span class="o">=</span> <span class="n">harmonic</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_gap_to_match_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>

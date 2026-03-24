@@ -20,6 +20,12 @@ dodal.beamlines.i07
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+   
    
 
    
