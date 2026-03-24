@@ -86,21 +86,6 @@ def undulator_in_commissioning_mode(fake_undulator_dcm: UndulatorDCM):
     yield fake_undulator_dcm
 
 
-def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
-    assert (
-        fake_undulator_dcm.undulator_ref().id_gap_lookup_table_path
-        == TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT
-    )
-    assert (
-        fake_undulator_dcm._pitch_energy_table_path
-        == BEAMLINE_ENERGY_DCM_PITCH_CONVERTER_TXT
-    )
-    assert (
-        fake_undulator_dcm._roll_energy_table_path
-        == BEAMLINE_ENERGY_DCM_ROLL_CONVERTER_TXT
-    )
-
-
 async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
     assert fake_undulator_dcm.dcm_fixed_offset_mm == 25.6
 

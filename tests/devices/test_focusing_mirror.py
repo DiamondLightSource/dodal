@@ -24,6 +24,7 @@ from dodal.devices.focusing_mirror import (
     SingleMirrorVoltage,
 )
 from dodal.log import LOGGER
+from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 
 
 def mirror_voltage_with_set_to_value(
@@ -238,7 +239,10 @@ def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
 def test_mirror_populates_voltage_channels():
     with init_devices(mock=True):
         mirror_voltages = MirrorVoltages(
-            "", "", daq_configuration_path="", config_client=ConfigClient("")
+            "",
+            "",
+            daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
+            config_client=ConfigClient(""),
         )
     assert len(mirror_voltages.horizontal_voltages) == 14
     assert len(mirror_voltages.vertical_voltages) == 8

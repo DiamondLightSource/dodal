@@ -43,14 +43,15 @@ class UndulatorDCM(StandardReadable, Movable[float]):
         self.undulator_ref = Reference(undulator)
         self.dcm_ref = Reference(dcm)
 
-        self.config_client = config_client
-        # These attributes are just used by hyperion for lookup purposes
-        self._pitch_energy_table_path = (
-            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
+        self.pitch_energy_table = config_client.get_file_contents(
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt",
+            desired_return_type=BeamlinePitchLookupTable,
         )
-        self._roll_energy_table_path = (
-            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
+        self.roll_energy_table = config_client.get_file_contents(
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt",
+            desired_return_type=BeamlineRollLookupTable,
         )
+
         # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
         # Nb this parameter is misleadingly named to confuse you
         beamline_params_path = daq_configuration_path + "/domain/beamlineParameters"
@@ -59,18 +60,6 @@ class UndulatorDCM(StandardReadable, Movable[float]):
         )["DCM_Perp_Offset_FIXED"]
 
         super().__init__(name)
-
-    @property
-    def pitch_energy_table(self) -> BeamlinePitchLookupTable:
-        return self.config_client.get_file_contents(
-            self._pitch_energy_table_path, desired_return_type=BeamlinePitchLookupTable
-        )
-
-    @property
-    def roll_energy_table(self) -> BeamlineRollLookupTable:
-        return self.config_client.get_file_contents(
-            self._roll_energy_table_path, desired_return_type=BeamlineRollLookupTable
-        )
 
     @AsyncStatus.wrap
     async def set(self, value: float):
