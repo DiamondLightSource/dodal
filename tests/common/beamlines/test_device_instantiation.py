@@ -1,15 +1,22 @@
 from typing import Any
 
 import pytest
+from daq_config_server import ConfigClient
 from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
     return any(isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
+
+
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(ConfigClient("test"))
 
 
 @pytest.mark.parametrize(
