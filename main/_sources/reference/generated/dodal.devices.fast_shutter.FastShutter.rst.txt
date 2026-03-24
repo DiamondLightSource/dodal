@@ -13,7 +13,16 @@ dodal.devices.fast\_shutter.FastShutter
    .. autosummary::
    
       
-      ~FastShutter.set
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       
    
    
@@ -25,13 +34,8 @@ dodal.devices.fast\_shutter.FastShutter
    .. autosummary::
    
       
-      ~FastShutter.open_state
       
       
-      ~FastShutter.close_state
-      
-      
-      ~FastShutter.shutter_state
       
    
    

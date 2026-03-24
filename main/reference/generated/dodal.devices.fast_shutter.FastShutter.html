@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_shutter.FastShutter &#8212; dodal 2.2.1.dev1+ga039d7353 documentation</title>
+    <title>dodal.devices.fast_shutter.FastShutter &#8212; dodal 2.2.1.dev2+g789df0a42 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=77d8d708"></script>
+    <script src="../../_static/documentation_options.js?v=a7dfb9eb"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1013,40 +1013,29 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.fast_shutter.FastShutter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.fast_shutter.</span></span><span class="sig-name descname"><span class="pre">FastShutter</span></span><a class="reference internal" href="../../_modules/dodal/devices/fast_shutter.html#FastShutter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_shutter.FastShutter" title="Link to this definition">#</a></dt>
-<dd><p>Enum device specialised for a fast shutter with configured open_state and
-close_state so it is generic enough to be used with any device or plan without
-knowing the specific enum to use.</p>
-<p>For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="n">shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">shutter</span><span class="o">.</span><span class="n">open_state</span><span class="p">)</span>
-<span class="k">await</span> <span class="n">shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">shutter</span><span class="o">.</span><span class="n">close_state</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>OR:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run_engine</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">shutter</span><span class="p">,</span> <span class="n">shutter</span><span class="o">.</span><span class="n">open_state</span><span class="p">))</span>
-<span class="n">run_engine</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">shutter</span><span class="p">,</span> <span class="n">shutter</span><span class="o">.</span><span class="n">close_state</span><span class="p">))</span>
-</pre></div>
-</div>
+<dd><p>Implementation of fast shutter that connects to an epics pv. This pv is an enum that
+controls the open and close state of the shutter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The pv to connect to the shutter device.</p></li>
+<li><p><strong>open_state</strong> (<em>EnumTypesT</em>) – The enum value that corresponds with opening the
+shutter.</p></li>
+<li><p><strong>close_state</strong> (<em>EnumTypesT</em>) – The enum value that corresponds with closing the
+shutter.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the shutter.</p></li>
+</ul>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(state)</p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_state</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">close_state</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutter_state</span></code></p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>

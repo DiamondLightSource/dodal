@@ -21,6 +21,8 @@ dodal.devices.fast\_shutter.GenericFastShutter
       
       
       
+      ~GenericFastShutter.set
+      
       
       
       
@@ -36,15 +38,6 @@ dodal.devices.fast\_shutter.GenericFastShutter
       
       
       
-      
-      
-      ~GenericFastShutter.open_state
-      
-      
-      ~GenericFastShutter.close_state
-      
-      
-      ~GenericFastShutter.shutter_state
       
    
    

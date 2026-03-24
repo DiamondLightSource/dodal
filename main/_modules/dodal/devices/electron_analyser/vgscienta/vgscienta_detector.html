@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.vgscienta.vgscienta_detector &#8212; dodal 2.2.1.dev1+ga039d7353 documentation</title>
+    <title>dodal.devices.electron_analyser.vgscienta.vgscienta_detector &#8212; dodal 2.2.1.dev2+g789df0a42 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=77d8d708"></script>
+    <script src="../../../../../_static/documentation_options.js?v=a7dfb9eb"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -892,7 +892,7 @@ window.addEventListener("load", load);</script>
     <span class="n">TPassEnergyEnum</span><span class="p">,</span>
     <span class="n">VGScientaRegion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastShutter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericFastShutter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceSelector</span>
 
 
@@ -912,7 +912,7 @@ window.addEventListener("load", load);</script>
         <span class="n">psu_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPsuMode</span><span class="p">],</span>
         <span class="n">pass_energy_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPassEnergyEnum</span><span class="p">],</span>
         <span class="n">energy_source</span><span class="p">:</span> <span class="n">AbstractEnergySource</span><span class="p">,</span>
-        <span class="n">shutter</span><span class="p">:</span> <span class="n">FastShutter</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">shutter</span><span class="p">:</span> <span class="n">GenericFastShutter</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">source_selector</span><span class="p">:</span> <span class="n">SourceSelector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
