@@ -8,7 +8,7 @@ from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
-from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
@@ -25,7 +25,7 @@ class SpecsDetector(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         energy_source: AbstractEnergySource,
-        shutter: FastShutter | None = None,
+        shutter: GenericFastShutter | None = None,
         source_selector: SourceSelector | None = None,
         name: str = "",
     ):
