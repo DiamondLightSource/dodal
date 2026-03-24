@@ -17,10 +17,6 @@ from dodal.devices.fast_shutter import FastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
-async def _get_value(value: SignalR[bool] | bool) -> bool:
-    return await value.get_value() if isinstance(value, SignalR) else value
-
-
 class ShutterCoordinatorADArmLogic(ADArmLogic, Generic[TAbstractAnalyserDriverIO]):
     """Extends the arm logic to coordinate opening shutters before acqusition with
     optional configuration of when to close.
