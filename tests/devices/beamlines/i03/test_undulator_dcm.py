@@ -21,10 +21,6 @@ from dodal.devices.beamlines.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, UndulatorInKeV
 from dodal.log import LOGGER
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
-from tests.devices.test_daq_configuration.lookup import (
-    BEAMLINE_ENERGY_DCM_PITCH_CONVERTER_TXT,
-    BEAMLINE_ENERGY_DCM_ROLL_CONVERTER_TXT,
-)
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
