@@ -1,6 +1,6 @@
 from typing import Any
 
-from dodal.common.beamlines.config_client import get_config_client
+from dodal.common.beamlines.beamline_utils import get_config_client
 
 BEAMLINE_PARAMETER_PATHS = {
     "i03": "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters",
@@ -22,5 +22,5 @@ def get_beamline_parameters(beamline: str) -> dict[str, Any]:
         raise KeyError(
             "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
         )
-    config_client = get_config_client(beamline)
+    config_client = get_config_client()
     return config_client.get_file_contents(beamline_param_path, dict)
