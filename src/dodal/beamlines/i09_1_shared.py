@@ -35,22 +35,22 @@ def dcm() -> DoubleCrystalMonochromatorWithDSpacing[
 
 
 @devices.factory()
-def undulator() -> UndulatorInMm:
+def iid() -> UndulatorInMm:
     return UndulatorInMm(prefix=f"{I_PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def harmonics() -> UndulatorOrder:
+def ienergy_order() -> UndulatorOrder:
     return UndulatorOrder()
 
 
 @devices.factory()
-def hu_id_energy(
-    harmonics: UndulatorOrder, undulator: UndulatorInMm
+def iidenergy(
+    ienergy_order: UndulatorOrder, iid: UndulatorInMm
 ) -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
-        undulator_order=harmonics,
-        undulator=undulator,
+        undulator_order=ienergy_order,
+        undulator=iid,
         lut={},  # ToDo https://github.com/DiamondLightSource/sm-bluesky/issues/239
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
@@ -58,10 +58,11 @@ def hu_id_energy(
 
 
 @devices.factory()
-def hu_energy(
-    dcm: DoubleCrystalMonochromatorWithDSpacing, hu_id_energy: HardInsertionDeviceEnergy
+def ienergy(
+    dcm: DoubleCrystalMonochromatorWithDSpacing,
+    iidenergy: HardInsertionDeviceEnergy,
 ) -> HardEnergy:
     return HardEnergy(
         dcm=dcm,
-        undulator_energy=hu_id_energy,
+        undulator_energy=iidenergy,
     )
