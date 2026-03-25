@@ -156,7 +156,7 @@ def mock_beamline_module_filepaths(bl_name: str, bl_module: ModuleType):
 
 
 @pytest.fixture
-def eiger_params(tmp_path: Path, set_beamline_env_variable) -> DetectorParams:
+def eiger_params(tmp_path: Path) -> DetectorParams:
     return DetectorParams(
         expected_energy_ev=100.0,
         exposure_time_s=1.0,

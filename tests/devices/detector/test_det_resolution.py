@@ -3,8 +3,10 @@ from unittest import mock
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
+from daq_config_server import ConfigClient
 from numpy import isclose
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_resolution import (
     resolution,
@@ -14,8 +16,13 @@ from tests.devices.detector.test_data import (
 )
 
 
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(ConfigClient("test"))
+
+
 @pytest.fixture(scope="function")
-def detector_params(request, tmp_path: Path, set_beamline_env_variable):
+def detector_params(request, tmp_path: Path):
     return DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,

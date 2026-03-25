@@ -1,7 +1,7 @@
 from enum import Enum
 
-from daq_config_server.client import ConfigServer
-from daq_config_server.models import DetectorXYLookupTable
+from daq_config_server import ConfigClient
+from daq_config_server.models.lookup_tables import DetectorXYLookupTable
 
 from dodal.devices.util.lookup_tables import (
     linear_extrapolation_lut,
@@ -14,7 +14,7 @@ class Axis(Enum):
 
 
 class DetectorDistanceToBeamXYConverter:
-    def __init__(self, lookup_file: str, config_client: ConfigServer):
+    def __init__(self, lookup_file: str, config_client: ConfigClient):
         self.lookup_file: str = lookup_file
 
         lookup_table_columns: list = config_client.get_file_contents(
