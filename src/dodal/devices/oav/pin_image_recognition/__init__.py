@@ -30,8 +30,7 @@ class InvalidPinError(Exception):
 
 
 class PinTipDetection(StandardReadable):
-    """
-    A device which will read from an on-axis view and calculate the location of the
+    """A device which will read from an on-axis view and calculate the location of the
     pin-tip (in pixels) of that frame.
 
     Used for pin tip centring workflow.
@@ -42,7 +41,8 @@ class PinTipDetection(StandardReadable):
     If no tip is found it will return {INVALID_POSITION}. However, it will also
     occasionally give incorrect data. Therefore, it is recommended that you trigger
     this device, which will attempt to find a pin within {validity_timeout} seconds if
-    no tip is found after this time it will not error but instead return {INVALID_POSITION}.
+    no tip is found after this time it will not error but instead return
+    {INVALID_POSITION}.
     """
 
     INVALID_POSITION = np.array([np.iinfo(np.int32).min, np.iinfo(np.int32).min])
@@ -72,7 +72,7 @@ class PinTipDetection(StandardReadable):
         self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
         self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
         self.scan_direction = soft_signal_rw(
-            int, ScanDirections.FORWARD.value, name="scan_direction"
+            ScanDirections, ScanDirections.FORWARD, name="scan_direction"
         )
         self.min_tip_height = soft_signal_rw(int, 5, name="min_tip_height")
         self.validity_timeout = soft_signal_rw(float, 5.0, name="validity_timeout")
@@ -98,9 +98,7 @@ class PinTipDetection(StandardReadable):
         self._bottom_edge_setter(results.edge_bottom)
 
     async def _get_tip_and_edge_data(self, array_data: np.ndarray) -> SampleLocation:
-        """
-        Gets the location of the pin tip and the top and bottom edges.
-        """
+        """Gets the location of the pin tip and the top and bottom edges."""
         preprocess_key = await self.preprocess_operation.get_value()
         preprocess_iter = await self.preprocess_iterations.get_value()
         preprocess_ksize = await self.preprocess_ksize.get_value()
@@ -113,12 +111,6 @@ class PinTipDetection(StandardReadable):
             LOGGER.error("Invalid preprocessing function, using identity")
             preprocess_func = identity()
 
-        direction = (
-            ScanDirections.FORWARD
-            if await self.scan_direction.get_value() == 0
-            else ScanDirections.REVERSE
-        )
-
         sample_detection = MxSampleDetect(
             preprocess=preprocess_func,
             canny_lower=await self.canny_lower_threshold.get_value(),
@@ -127,7 +119,7 @@ class PinTipDetection(StandardReadable):
             open_iterations=await self.open_iterations.get_value(),
             close_ksize=await self.close_ksize.get_value(),
             close_iterations=await self.close_iterations.get_value(),
-            scan_direction=direction,
+            scan_direction=await self.scan_direction.get_value(),
             min_tip_height=await self.min_tip_height.get_value(),
         )
 

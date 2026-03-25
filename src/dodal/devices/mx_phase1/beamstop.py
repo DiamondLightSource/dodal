@@ -1,5 +1,6 @@
 import asyncio
 from math import isclose
+from typing import Any
 
 from ophyd_async.core import (
     StandardReadable,
@@ -8,14 +9,11 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-
 _BEAMSTOP_OUT_DELTA_Y_MM = -2
 
 
 class BeamstopPositions(StrictEnum):
-    """
-    Beamstop positions.
+    """Beamstop positions.
     GDA supports Standard/High/Low resolution positions, as well as parked and
     robot load however all 3 resolution positions are the same. We also
     do not use the robot load position in Hyperion.
@@ -35,8 +33,7 @@ class BeamstopPositions(StrictEnum):
 
 
 class Beamstop(StandardReadable):
-    """
-    Beamstop for I03 and I04.
+    """Beamstop for I03 and I04.
 
     Attributes:
         x: beamstop x position in mm
@@ -48,7 +45,7 @@ class Beamstop(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        beamline_parameters: GDABeamlineParameters,
+        beamline_parameters: dict[str, Any],
         name: str = "",
     ):
         with self.add_children_as_readables():

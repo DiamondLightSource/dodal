@@ -10,7 +10,6 @@ from ophyd_async.core import (
     TriggerInfo,
 )
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
@@ -20,9 +19,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 )
 from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
-    GenericSequence,
     TAbstractBaseRegion,
-    TAbstractBaseSequence,
 )
 
 
@@ -33,9 +30,8 @@ class BaseElectronAnalyserDetector(
     AsyncConfigurable,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
-    """
-    Detector for data acquisition of electron analyser. Can only acquire using settings
-    already configured for the device.
+    """Detector for data acquisition of electron analyser. Can only acquire using
+    settings already configured for the device.
 
     If possible, this should be changed to inherit from a StandardDetector. Currently,
     StandardDetector forces you to use a file writer which doesn't apply here.
@@ -90,9 +86,8 @@ class ElectronAnalyserRegionDetector(
     BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
-    """
-    Extends electron analyser detector to configure specific region settings before data
-    acquisition. It is designed to only exist inside a plan.
+    """Extends electron analyser detector to configure specific region settings before
+    data acquisition. It is designed to only exist inside a plan.
     """
 
     def __init__(
@@ -113,6 +108,9 @@ class ElectronAnalyserRegionDetector(
         await super().trigger()
 
 
+# Used in sm-bluesky, but will hopefully be removed along with
+# ElectronAnalyserRegionDetector in future. Blocked by:
+# https://github.com/bluesky/bluesky/pull/1978
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
     GenericAnalyserDriverIO, GenericRegion
 ]
@@ -125,29 +123,16 @@ TElectronAnalyserRegionDetector = TypeVar(
 class ElectronAnalyserDetector(
     BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
     Stageable,
-    Generic[TAbstractBaseSequence, TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
+    """Electron analyser detector with the additional functionality to load a sequence
+    file and create a list of temporary ElectronAnalyserRegionDetector objects. These
+    will setup configured region settings before data acquisition.
     """
-    Electron analyser detector with the additional functionality to load a sequence file
-    and create a list of temporary ElectronAnalyserRegionDetector objects. These will
-    setup configured region settings before data acquisition.
-    """
-
-    def __init__(
-        self,
-        sequence_class: type[TAbstractBaseSequence],
-        controller: ElectronAnalyserController[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ],
-        name: str = "",
-    ):
-        self._sequence_class = sequence_class
-        super().__init__(controller, name)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        """
-        Prepare the detector for use by ensuring it is idle and ready.
+        """Prepare the detector for use by ensuring it is idle and ready.
 
         This method asynchronously stages the detector by first disarming the controller
         to ensure the detector is not actively acquiring data, then invokes the driver's
@@ -164,39 +149,24 @@ class ElectronAnalyserDetector(
         """Disarm the detector."""
         await self._controller.disarm()
 
-    def load_sequence(self, filename: str) -> TAbstractBaseSequence:
-        """
-        Load the sequence data from a provided json file into a sequence class.
-
-        Args:
-            filename: Path to the sequence file containing the region data.
-
-        Returns:
-            Pydantic model representing the sequence file.
-        """
-        return load_json_file_to_class(self._sequence_class, filename)
-
     def create_region_detector_list(
-        self, filename: str, enabled_only=True
+        self, regions: list[TAbstractBaseRegion]
     ) -> list[
         ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
     ]:
-        """
-        Create a list of detectors equal to the number of regions in a sequence file.
-        Each detector is responsible for setting up a specific region.
+        """This method can hopefully be dropped when this is merged and released.
+        https://github.com/bluesky/bluesky/pull/1978.
+
+        Create a list of detectors equal to the number of regions. Each detector is
+        responsible for setting up a specific region.
 
         Args:
-            filename:     Path to the sequence file containing the region data.
-            enabled_only: If true, only include the region if enabled is True.
+            regions: The list of regions to give to each region detector.
 
         Returns:
             List of ElectronAnalyserRegionDetector, equal to the number of regions in
             the sequence file.
         """
-        seq = self.load_sequence(filename)
-        regions: list[TAbstractBaseRegion] = (
-            seq.get_enabled_regions() if enabled_only else seq.regions
-        )
         return [
             ElectronAnalyserRegionDetector[
                 TAbstractAnalyserDriverIO, TAbstractBaseRegion
@@ -206,7 +176,7 @@ class ElectronAnalyserDetector(
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    GenericSequence, GenericAnalyserDriverIO, GenericRegion
+    GenericAnalyserDriverIO, GenericRegion
 ]
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",

@@ -29,7 +29,7 @@ class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
         await self.polarisation().set(pol, timeout=MAXIMUM_MOVE_TIME)
 
     async def locate(self) -> Location[Pol]:
-        """Return the current polarisation"""
+        """Return the current polarisation."""
         setpoint, readback = await asyncio.gather(
             self.polarisation_setpoint().get_value(), self.polarisation().get_value()
         )

@@ -53,7 +53,7 @@ def _assert_patched_ap_sg_has_call(
         position.values,
         strict=False,
     ):
-        get_mock_put(motor.user_setpoint).assert_called_with(pos, wait=True)
+        get_mock_put(motor.user_setpoint).assert_called_with(pos)
 
 
 def _assert_position_in_reading(
@@ -80,11 +80,11 @@ async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_u
 
     parent_mock.assert_has_calls(
         [
-            call.scatterguard.x.user_setpoint.put(5.3375, wait=True),
-            call.scatterguard.y.user_setpoint.put(-3.55, wait=True),
-            call.aperture.x.user_setpoint.put(2.43, wait=True),
-            call.aperture.y.user_setpoint.put(48.974, wait=True),
-            call.aperture.z.user_setpoint.put(15.8, wait=True),
+            call.scatterguard.x.user_setpoint.put(5.3375),
+            call.scatterguard.y.user_setpoint.put(-3.55),
+            call.aperture.x.user_setpoint.put(2.43),
+            call.aperture.y.user_setpoint.put(48.974),
+            call.aperture.z.user_setpoint.put(15.8),
         ]
     )
 
@@ -98,7 +98,7 @@ async def test_aperture_unsafe_move(
         aperture_z=5.6,
         scatterguard_x=7.8,
         scatterguard_y=9.0,
-        radius=0,
+        diameter=0,
     )
     ap_sg = aperture_in_medium_pos
     await ap_sg._set_raw_unsafe(pos)
@@ -120,7 +120,7 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
             aperture_z=15.8,
             scatterguard_x=5.25,
             scatterguard_y=4.43,
-            radius=100,
+            diameter=100,
         ),
     )
 
@@ -202,7 +202,8 @@ async def test_aperture_positions(
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
     assert (
-        reading[f"{ap_sg.name}-radius"]["value"] == aperture_positions[aperture].radius
+        reading[f"{ap_sg.name}-diameter"]["value"]
+        == aperture_positions[aperture].diameter
     )
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == aperture
 
@@ -219,7 +220,7 @@ async def test_aperture_positions_robot_load(
     await ap_sg.aperture.z.set(robot_load.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert (
         reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
@@ -239,7 +240,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     await ap_sg.aperture.z.set(robot_load.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert (
         reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
@@ -273,7 +274,7 @@ async def test_aperture_positions_parked(
     await ap_sg.aperture.z.set(parked.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.PARKED
 
 
@@ -291,7 +292,7 @@ async def test_aperture_positions_parked_within_tolerance(
     await ap_sg.aperture.z.set(parked_z + tolerance)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.PARKED
 
 
@@ -389,7 +390,7 @@ async def test_ap_sg_in_runengine(
         await aperture_in_medium_pos.selected_aperture.get_value()
         == ApertureValue.SMALL
     )
-    assert await aperture_in_medium_pos.radius.get_value() == 20
+    assert await aperture_in_medium_pos.diameter.get_value() == 20
 
 
 async def test_ap_sg_descriptor(
@@ -509,11 +510,9 @@ async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_
 
     await ap_sg.selected_aperture.set(selected_aperture)
 
-    assert parent_mock.method_calls[0] == call.selected_aperture.put(
-        selected_aperture, wait=True
-    )
+    assert parent_mock.method_calls[0] == call.selected_aperture.put(selected_aperture)
     assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
-        aperture_positions[selected_aperture].aperture_z, wait=True
+        aperture_positions[selected_aperture].aperture_z
     )
 
 
@@ -540,11 +539,9 @@ async def test_given_parked_and_ap_sg_prepared_when_move_in_then_z_moved_out_fir
 
     await ap_sg.prepare(selected_aperture)
 
-    assert parent_mock.method_calls[0] == call.selected_aperture.put(
-        selected_aperture, wait=True
-    )
+    assert parent_mock.method_calls[0] == call.selected_aperture.put(selected_aperture)
     assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
-        aperture_positions[selected_aperture].aperture_z, wait=True
+        aperture_positions[selected_aperture].aperture_z
     )
 
 

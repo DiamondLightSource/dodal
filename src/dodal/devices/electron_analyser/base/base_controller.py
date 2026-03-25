@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.base.base_region import (
     TAbstractBaseRegion,
 )
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
-from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
@@ -21,30 +21,30 @@ class ElectronAnalyserController(
     ConstantDeadTimeController[TAbstractAnalyserDriverIO],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
-    """
-    Specialised controller for the electron analysers to provide additional setup logic
-    such as selecting the energy source to use from requested region and giving the
-    driver the correct region parameters.
+    """Specialised controller for the electron analysers to provide additional setup
+    logic such as selecting the energy source to use from requested region and giving
+    the driver the correct region parameters.
+
+    Args:
+        driver (TAbstractAnalyserDriverIO): The electron analyser driver to wrap
+            around that holds the PV's.
+        energy_source (AbstractEnergySource): Device that holds the excitation
+            energy and ability to switch between sources.
+        deadtime (float, optional): For a given exposure, what is the safest minimum
+            time between exposures that can be determined without reading signals.
+        image_mode (ADImageMode, optional): The image mode to configure the driver
+            with before measuring.
     """
 
     def __init__(
         self,
         driver: TAbstractAnalyserDriverIO,
         energy_source: AbstractEnergySource,
-        shutter: FastShutter | None = None,
+        shutter: GenericFastShutter | None = None,
         source_selector: SourceSelector | None = None,
         deadtime: float = 0,
         image_mode: ADImageMode = ADImageMode.SINGLE,
     ):
-        """
-        Parameters:
-            driver: The electron analyser driver to wrap around that holds the PV's.
-            energy_source: Device that holds the excitation energy and ability to switch
-                           between sources.
-            deadtime: For a given exposure, what is the safest minimum time between
-                      exposures that can be determined without reading signals.
-            image_mode: The image mode to configure the driver with before measuring.
-        """
         self.energy_source = energy_source
         self.shutter = shutter
         self.source_selector = source_selector

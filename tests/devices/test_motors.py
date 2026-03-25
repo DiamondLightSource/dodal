@@ -9,6 +9,9 @@ from dodal.devices.motors import (
     SixAxisGonio,
     XThetaStage,
     XYStage,
+    XYZAzimuthStage,
+    XYZAzimuthTiltPolarStage,
+    XYZAzimuthTiltStage,
     XYZPitchYawRollStage,
     XYZThetaStage,
 )
@@ -19,6 +22,27 @@ async def xyzt_stage() -> XYZThetaStage:
     async with init_devices(mock=True):
         xyzt_stage = XYZThetaStage("")
     return xyzt_stage
+
+
+@pytest.fixture
+async def xyza_stage() -> XYZAzimuthStage:
+    async with init_devices(mock=True):
+        xyza_stage = XYZAzimuthStage("")
+    return xyza_stage
+
+
+@pytest.fixture
+async def xyzat_stage() -> XYZAzimuthTiltStage:
+    async with init_devices(mock=True):
+        xyzat_stage = XYZAzimuthTiltStage("")
+    return xyzat_stage
+
+
+@pytest.fixture
+async def xyzatp_stage() -> XYZAzimuthTiltPolarStage:
+    async with init_devices(mock=True):
+        xyzatp_stage = XYZAzimuthTiltPolarStage("")
+    return xyzatp_stage
 
 
 @pytest.fixture
@@ -43,10 +67,7 @@ async def xyzpyr_stage() -> XYZPitchYawRollStage:
 
 
 async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
-    """
-    Test setting x and y positions on the Table using the ophyd_async mock tools.
-    """
-
+    """Test setting x and y positions on the Table using the ophyd_async mock tools."""
     await assert_reading(
         xyzt_stage,
         {
@@ -73,9 +94,7 @@ async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
 
 
 async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
-    """
-    Test setting x and y positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting x and y positions on the Table using the ophyd_async mock tools."""
     await assert_reading(
         xyzt_stage,
         {
@@ -104,6 +123,108 @@ async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
 
 
 @pytest.mark.parametrize(
+    "x, y, z, azimuth",
+    [
+        (0, 0, 0, 0),
+        (1.23, 2.40, 0.0, 0.0),
+        (1.23, 2.40, 3.51, 24.0),
+    ],
+)
+async def test_setting_xyza_position_table(
+    xyza_stage: XYZAzimuthStage,
+    x: float,
+    y: float,
+    z: float,
+    azimuth: float,
+):
+    set_mock_value(xyza_stage.x.user_readback, x)
+    set_mock_value(xyza_stage.y.user_readback, y)
+    set_mock_value(xyza_stage.z.user_readback, z)
+    set_mock_value(xyza_stage.azimuth.user_readback, azimuth)
+
+    await assert_reading(
+        xyza_stage,
+        {
+            "xyza_stage-x": partial_reading(x),
+            "xyza_stage-y": partial_reading(y),
+            "xyza_stage-z": partial_reading(z),
+            "xyza_stage-azimuth": partial_reading(azimuth),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "x, y, z, azimuth, tilt",
+    [
+        (0, 0, 0, 0, 0),
+        (1.23, 2.40, 0.0, 0.0, 0),
+        (1.23, 2.40, 3.51, 24.0, 1.0),
+    ],
+)
+async def test_setting_xyzat_position_table(
+    xyzat_stage: XYZAzimuthTiltStage,
+    x: float,
+    y: float,
+    z: float,
+    azimuth: float,
+    tilt: float,
+):
+    set_mock_value(xyzat_stage.x.user_readback, x)
+    set_mock_value(xyzat_stage.y.user_readback, y)
+    set_mock_value(xyzat_stage.z.user_readback, z)
+    set_mock_value(xyzat_stage.azimuth.user_readback, azimuth)
+    set_mock_value(xyzat_stage.tilt.user_readback, tilt)
+
+    await assert_reading(
+        xyzat_stage,
+        {
+            "xyzat_stage-x": partial_reading(x),
+            "xyzat_stage-y": partial_reading(y),
+            "xyzat_stage-z": partial_reading(z),
+            "xyzat_stage-azimuth": partial_reading(azimuth),
+            "xyzat_stage-tilt": partial_reading(tilt),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "x, y, z, azimuth, tilt, polar",
+    [
+        (0, 0, 0, 0, 0, 0),
+        (1.23, 2.40, 0.0, 0.0, 0.0, 0.0),
+        (1.23, 2.40, 3.51, 24.0, 1.0, 2.0),
+    ],
+)
+async def test_setting_xyzatp_position_table(
+    xyzatp_stage: XYZAzimuthTiltPolarStage,
+    x: float,
+    y: float,
+    z: float,
+    azimuth: float,
+    tilt: float,
+    polar: float,
+) -> None:
+    set_mock_value(xyzatp_stage.x.user_readback, x)
+    set_mock_value(xyzatp_stage.y.user_readback, y)
+    set_mock_value(xyzatp_stage.z.user_readback, z)
+    set_mock_value(xyzatp_stage.polar.user_readback, polar)
+    set_mock_value(xyzatp_stage.azimuth.user_readback, azimuth)
+    set_mock_value(xyzatp_stage.tilt.user_readback, tilt)
+
+    await assert_reading(
+        xyzatp_stage,
+        {
+            "xyzatp_stage-x": partial_reading(x),
+            "xyzatp_stage-y": partial_reading(y),
+            "xyzatp_stage-z": partial_reading(z),
+            "xyzatp_stage-azimuth": partial_reading(azimuth),
+            "xyzatp_stage-tilt": partial_reading(tilt),
+            "xyzatp_stage-polar": partial_reading(polar),
+        },
+    )
+
+
+@pytest.mark.parametrize(
     "x, y, z, pitch, yaw, roll",
     [
         (0, 0, 0, 0, 0, 0),
@@ -120,9 +241,7 @@ async def test_setting_xyzpyr_position_table(
     yaw: float,
     roll: float,
 ):
-    """
-    Test setting positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting positions on the Table using the ophyd_async mock tools."""
     # Call set to update the position
     set_mock_value(xyzpyr_stage.x.user_readback, x)
     set_mock_value(xyzpyr_stage.y.user_readback, y)
@@ -144,11 +263,8 @@ async def test_setting_xyzpyr_position_table(
     )
 
 
-async def test_setting(xy_stage: XYStage):
-    """
-    Test setting x and y positions on the XYStage using ophyd_async mock tools.
-    """
-
+async def test_setting_xy_stage(xy_stage: XYStage):
+    """Test setting x and y positions on the XYStage using ophyd_async mock tools."""
     await assert_reading(
         xy_stage,
         {"xy_stage-x": partial_reading(0.0), "xy_stage-y": partial_reading(0.0)},

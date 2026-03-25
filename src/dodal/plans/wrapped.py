@@ -18,8 +18,8 @@ Non-serialisable fields are ignored when they are optional
 https://github.com/DiamondLightSource/blueapi/issues/711
 
 We may also need other adjustments for UI purposes, e.g.
-Forcing uniqueness or orderedness of Readables
-Limits and metadata (e.g. units)
+    - Forcing uniqueness or orderedness of Readables.
+    - Limits and metadata (e.g. units).
 """
 
 
@@ -47,7 +47,8 @@ def count(
 ) -> MsgGenerator:
     """Reads from a number of devices.
     Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable
-    parameters and metadata."""
+    parameters and metadata.
+    """
     if isinstance(delay, Sequence):
         assert len(delay) == num - 1, (
             f"Number of delays given must be {num - 1}: was given {len(delay)}"

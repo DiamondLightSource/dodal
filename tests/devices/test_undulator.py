@@ -1,10 +1,14 @@
 from collections.abc import Generator
-from unittest.mock import AsyncMock, patch
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv
+from daq_config_server import ConfigClient
+from daq_config_server.models.lookup_tables.insertion_device import (
+    UndulatorEnergyGapLookupTable,
+)
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
@@ -34,6 +38,7 @@ async def undulator() -> UndulatorInKeV:
         baton = Baton("BATON-01")
         undulator = UndulatorInKeV(
             "UND-01",
+            ConfigClient(""),
             name="undulator",
             poles=80,
             length=2.0,
@@ -112,6 +117,7 @@ async def test_poles_not_propagated_if_not_supplied():
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
+            ConfigClient(""),
             name="undulator",
             length=2.0,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -124,6 +130,7 @@ async def test_length_not_propagated_if_not_supplied():
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
+            ConfigClient(""),
             name="undulator",
             poles=80,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -151,13 +158,12 @@ async def test_when_gap_access_is_disabled_set_then_error_is_raised(
         await undulator.set(5)
 
 
-@patch(
-    "dodal.devices.undulator.energy_distance_table",
-    AsyncMock(return_value=np.array([[0, 10], [10, 20]])),
-)
 async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_mode_enabled(
     undulator_in_commissioning_mode: UndulatorInKeV,
 ):
+    undulator_in_commissioning_mode.config_server.get_file_contents = MagicMock(
+        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10, 20]])
+    )
     set_mock_value(
         undulator_in_commissioning_mode.gap_access, EnabledDisabledUpper.DISABLED
     )
@@ -168,26 +174,21 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
     ).assert_not_called()
 
 
-@patch(
-    "dodal.devices.undulator.energy_distance_table",
-    AsyncMock(return_value=np.array([[0, 10], [10000, 20]])),
-)
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
     undulator: UndulatorInKeV,
 ):
+    undulator.config_server.get_file_contents = MagicMock(
+        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10000, 20]])
+    )
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)
 
-    get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
-        15.0, wait=True
-    )
+    get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(15.0)
 
 
 async def test_undulator_mm_move(undulator_in_mm: UndulatorInMm):
     await undulator_in_mm.set(10.0)
-    get_mock_put(undulator_in_mm.gap_motor.user_setpoint).assert_called_once_with(
-        10.0, wait=True
-    )
+    get_mock_put(undulator_in_mm.gap_motor.user_setpoint).assert_called_once_with(10.0)
 
 
 async def test_order_read(

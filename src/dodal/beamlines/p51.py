@@ -1,0 +1,99 @@
+from functools import cache
+from pathlib import Path
+
+from ophyd_async.core import PathProvider
+from ophyd_async.epics.motor import Motor
+from ophyd_async.epics.pmac import PmacIO
+from ophyd_async.fastcs.panda import HDFPanda
+
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
+from dodal.device_manager import DeviceManager
+from dodal.devices.turbo_slit import TurboSlit
+from dodal.devices.xspress3.xspress3 import Xspress3
+from dodal.log import set_beamline as set_log_beamline
+from dodal.utils import BeamlinePrefix, get_beamline_name
+
+BL = get_beamline_name("p51")
+PREFIX = BeamlinePrefix(BL, suffix="P")
+set_log_beamline(BL)
+set_utils_beamline(BL)
+
+devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticVisitPathProvider(
+        BL,
+        Path("/dls/p51/data/2026/cm44254-1"),
+        client=RemoteDirectoryServiceClient("http://i20-1-control:8088/api"),
+    )
+
+
+"""
+NOTE: Due to the CA gateway machine being switched off, PVs are not available remotely
+and you need to be on the beamline network to access them.
+The simplest way to do this is to `ssh i20-1-ws001` and run dodal connect p51 from
+there.
+"""
+
+
+@devices.factory()
+def turbo_slit() -> TurboSlit:
+    """Turboslit for selecting energy from the polychromator."""
+    return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
+
+
+@devices.factory()
+def turbo_slit_x() -> Motor:
+    """Turbo slit x motor."""
+    return Motor(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
+
+
+@devices.factory()
+def turbo_slit_pmac(turbo_slit_x: Motor) -> PmacIO:
+    """PMac controller using running fly scans with trajectory."""
+    return PmacIO(
+        prefix=f"{PREFIX.beamline_prefix}-MO-STEP-06:",
+        raw_motors=[turbo_slit_x],
+        coord_nums=[3],
+    )
+
+
+@devices.factory()
+def panda1(path_provider: PathProvider) -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
+        path_provider=path_provider,
+    )
+
+
+@devices.factory()
+def panda2(path_provider: PathProvider) -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=path_provider,
+    )
+
+
+# Use mock device until motors are reconnected on the beamline
+@devices.factory(mock=True)
+def alignment_x() -> Motor:
+    return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:X")
+
+
+# Use mock device until motors are reconnected on the beamline
+@devices.factory(mock=True)
+def alignment_y() -> Motor:
+    return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:Y")
+
+
+@devices.factory(skip=True)
+def xspress3() -> Xspress3:
+    """16 channels Xspress3 detector."""
+    return Xspress3(
+        f"{PREFIX.beamline_prefix}-EA-DET-03:",
+        num_channels=16,
+    )

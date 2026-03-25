@@ -1,4 +1,4 @@
-from dodal.common.beamlines.beamline_utils import device_factory
+from dodal.device_manager import DeviceManager
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
 from dodal.devices.aithre_lasershaping.laser_robot import LaserRobot
 from dodal.devices.oav.oav_detector import NullZoomController, OAVBeamCentreFile
@@ -11,7 +11,10 @@ DISPLAY_CONFIG = "/dls_sw/i23/software/aithre/aithre_display.configuration"
 PREFIX = "LA18L"
 
 
-@device_factory()
+devices = DeviceManager()
+
+
+@devices.factory()
 def goniometer() -> Goniometer:
     return Goniometer(
         f"{PREFIX}-MO-LSR-01:",
@@ -22,12 +25,12 @@ def goniometer() -> Goniometer:
     )
 
 
-@device_factory()
+@devices.factory()
 def robot() -> LaserRobot:
     return LaserRobot(f"{PREFIX}-MO-ROBOT-01:")
 
 
-@device_factory()
+@devices.factory()
 def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
     config = (
         params

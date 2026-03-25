@@ -1,10 +1,13 @@
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
+    get_config_client,
     get_path_provider,
+    set_config_client,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -12,13 +15,13 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
+from dodal.devices.beamlines.i18.diode import Diode
+from dodal.devices.beamlines.i18.kb_mirror import KBMirror
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     RollCrystal,
 )
-from dodal.devices.i18.diode import Diode
-from dodal.devices.i18.kb_mirror import KBMirror
 from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -46,6 +49,8 @@ set_path_provider(
     )
 )
 
+set_config_client(ConfigClient())
+
 
 @device_factory()
 def synchrotron() -> Synchrotron:
@@ -54,14 +59,15 @@ def synchrotron() -> Synchrotron:
 
 @device_factory()
 def undulator() -> UndulatorInKeV:
-    return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+    return UndulatorInKeV(
+        f"{PREFIX.insertion_prefix}-MO-SERVC-01:", get_config_client()
+    )
 
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180
 @device_factory(skip=True)
 def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
-    """
-    A double crystal monocromator device, used to select the beam energy.
+    """A double crystal monocromator device, used to select the beam energy.
 
     Once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
     calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml

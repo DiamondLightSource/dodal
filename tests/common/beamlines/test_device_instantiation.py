@@ -1,9 +1,11 @@
 from typing import Any
 
 import pytest
+from daq_config_server import ConfigClient
 from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
@@ -12,14 +14,18 @@ def follows_bluesky_protocols(obj: Any) -> bool:
     return any(isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
 
 
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(ConfigClient("test"))
+
+
 @pytest.mark.parametrize(
     "module_and_devices_for_beamline",
     set(all_beamline_modules()),
     indirect=True,
 )
 def test_device_creation(module_and_devices_for_beamline):
-    """
-    Ensures that for every beamline all device factories are using valid args
+    """Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
     _, devices, exceptions = module_and_devices_for_beamline
@@ -41,8 +47,8 @@ def test_device_creation(module_and_devices_for_beamline):
     indirect=True,
 )
 def test_devices_are_identical(module_and_devices_for_beamline):
-    """
-    Ensures that for every beamline all device functions prevent duplicate instantiation.
+    """Ensures that for every beamline all device functions prevent duplicate
+    instantiation.
     """
     bl_mod, devices_a, _ = module_and_devices_for_beamline
     if isinstance(getattr(bl_mod, "devices", None), DeviceManager):

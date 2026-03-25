@@ -1,4 +1,5 @@
-from typing import Generic, Protocol, TypeVar
+from abc import abstractmethod
+from typing import Generic, TypeVar
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -18,35 +19,80 @@ from dodal.devices.selectable_source import SelectedSource, get_obj_from_selecte
 EnumTypesT = TypeVar("EnumTypesT", bound=EnumTypes)
 
 
-class FastShutter(Movable[EnumTypesT], Protocol, Generic[EnumTypesT]):
-    """
-    Enum device specialised for a fast shutter with configured open_state and
+class GenericFastShutter(StandardReadable, Movable[EnumTypesT], Generic[EnumTypesT]):
+    """Enum device specialised for a fast shutter with configured open_state and
     close_state so it is generic enough to be used with any device or plan without
     knowing the specific enum to use.
 
-    For example:
+    For example::
+
         await shutter.set(shutter.open_state)
         await shutter.set(shutter.close_state)
-    OR
+
+        await shutter.open.set(True)
+        await shutter.open.set(False)
+
+    OR::
+
         run_engine(bps.mv(shutter, shutter.open_state))
         run_engine(bps.mv(shutter, shutter.close_state))
+
+        run_engine(bps.mv(shutter.open, True))
+        run_engine(bps.mv(shutter.open, False))
     """
 
-    open_state: EnumTypesT
-    close_state: EnumTypesT
-    shutter_state: SignalRW[EnumTypesT]
+    def __init__(
+        self,
+        open_state: EnumTypesT,
+        close_state: EnumTypesT,
+        name: str = "",
+    ):
+        self.open_state = open_state
+        self.close_state = close_state
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.shutter_state = self._create_shutter_state()
+
+        self.open = derived_signal_rw(
+            self._read_open, self._set_open, shutter_state=self.shutter_state
+        )
+        super().__init__(name)
+
+    @abstractmethod
+    def _create_shutter_state(self) -> SignalRW[EnumTypesT]:
+        """Method to implement on how to create the shutter state."""
+
+    async def _set_open(self, open: bool) -> None:
+        await self.set(self.open_state if open else self.close_state)
+
+    def _read_open(self, shutter_state: EnumTypesT) -> bool:
+        if shutter_state == self.open_state:
+            return True
+        elif shutter_state == self.close_state:
+            return False
+        else:
+            raise ValueError(
+                f'{self.name} shutter_state is at position "{shutter_state}". Cannot '
+                "determine if shutter is open or closed as it doesn't match the "
+                f'configured open_state "{self.open_state}" or close_state '
+                f'"{self.close_state}".'
+            )
 
     @AsyncStatus.wrap
     async def set(self, state: EnumTypesT):
         await self.shutter_state.set(state)
 
 
-class GenericFastShutter(
-    StandardReadable, FastShutter[EnumTypesT], Generic[EnumTypesT]
-):
-    """
-    Implementation of fast shutter that connects to an epics pv. This pv is an enum that
+class FastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
+    """Implementation of fast shutter that connects to an epics pv. This pv is an enum that
     controls the open and close state of the shutter.
+
+    Args:
+        pv (str): The pv to connect to the shutter device.
+        open_state (EnumTypesT): The enum value that corresponds with opening the
+            shutter.
+        close_state (EnumTypesT): The enum value that corresponds with closing the
+            shutter.
+        name (str, optional): The name of the shutter.
     """
 
     def __init__(
@@ -56,26 +102,27 @@ class GenericFastShutter(
         close_state: EnumTypesT,
         name: str = "",
     ):
-        """
-        Arguments:
-            pv: The pv to connect to the shutter device.
-            open_state: The enum value that corresponds with opening the shutter.
-            close_state: The enum value that corresponds with closing the shutter.
-        """
-        self.open_state = open_state
-        self.close_state = close_state
-        with self.add_children_as_readables():
-            self.shutter_state = epics_signal_rw(type(self.open_state), pv)
-        super().__init__(name)
+        self._pv = pv
+        super().__init__(open_state, close_state, name)
+
+    def _create_shutter_state(self):
+        return epics_signal_rw(type(self.open_state), self._pv)
 
 
-class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTypesT]):
-    """
-    A fast shutter device that handles the positions of two other fast shutters. The
+class DualFastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
+    """A fast shutter device that handles the positions of two other fast shutters. The
     "active" shutter is the one that corrosponds to the selected_shutter signal. For
     example, active shutter is shutter1 if selected_source is at SelectedSource.SOURCE1
     and vise versa for shutter2 and SelectedSource.SOURCE2. Whenever a move is done on
     this device, the inactive shutter is always set to the close_state.
+
+    Args:
+        shutter1 (GenericFastShutter): Active shutter that corrosponds to
+            SelectedSource.SOURCE1.
+        shutter2 (GenericFastShutter): Active shutter that corrosponds to
+            SelectedSource.SOURCE2.
+        selected_source (SignalRW): Signal that decides the active shutter.
+        name (str, optional): Name of this device.
     """
 
     def __init__(
@@ -85,30 +132,12 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
         selected_source: SignalRW[SelectedSource],
         name: str = "",
     ):
-        """
-        Arguments:
-            shutter1: Active shutter that corrosponds to SelectedSource.SOURCE1.
-            shutter2: Active shutter that corrosponds to SelectedSource.SOURCE2.
-            selected_source: Signal that decides the active shutter.
-            name: Name of this device.
-        """
         self._validate_shutter_states(shutter1.open_state, shutter2.open_state)
         self._validate_shutter_states(shutter1.close_state, shutter2.close_state)
-        self.open_state = shutter1.open_state
-        self.close_state = shutter1.close_state
 
         self._shutter1_ref = Reference(shutter1)
         self._shutter2_ref = Reference(shutter2)
         self._selected_shutter_ref = Reference(selected_source)
-
-        with self.add_children_as_readables():
-            self.shutter_state = derived_signal_rw(
-                self._read_shutter_state,
-                self._set_shutter_state,
-                selected_shutter=selected_source,
-                shutter1=shutter1.shutter_state,
-                shutter2=shutter2.shutter_state,
-            )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.shutter1_device_name, _ = soft_signal_r_and_setter(
@@ -120,7 +149,16 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
 
         self.add_readables([shutter1, shutter2, selected_source])
 
-        super().__init__(name)
+        super().__init__(shutter1.open_state, shutter1.close_state, name)
+
+    def _create_shutter_state(self) -> SignalRW[EnumTypesT]:
+        return derived_signal_rw(
+            self._read_shutter_state,
+            self._set_shutter_state,
+            selected_shutter=self._selected_shutter_ref(),
+            shutter1=self._shutter1_ref().shutter_state,
+            shutter2=self._shutter2_ref().shutter_state,
+        )
 
     def _validate_shutter_states(self, state1: EnumTypesT, state2: EnumTypesT) -> None:
         if state1 is not state2:

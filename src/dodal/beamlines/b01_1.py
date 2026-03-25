@@ -1,24 +1,24 @@
+from functools import cache
 from pathlib import Path
 
-from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import NDROIStatIO
+from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    get_path_provider,
-    set_path_provider,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
-BL = "c01"
-PREFIX = BeamlinePrefix(BL)
+BL = "b01-1"
+# TODO: Remove need for `suffix`
+# https://github.com/DiamondLightSource/dodal/issues/1916
+PREFIX = BeamlinePrefix(BL, suffix="C")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -32,34 +32,49 @@ See the IOC status here:
 https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSync=&health=&namespace=&cluster=&labels=
 """
 
-# This should be removed when the DeviceManager is adopted
-try:
-    get_path_provider()
-except NameError:
-    # If one hasn't already been set, use a default to stop things crashing
-    set_path_provider(StaticPathProvider(UUIDFilenameProvider(), Path("/tmp")))
+devices = DeviceManager()
 
 
-@device_factory()
-def panda() -> HDFPanda:
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
+
+
+@devices.factory()
+def pandabrick(path_provider: PathProvider) -> HDFPanda:
+    """Provides encoder information for triggering.
+
+    Returns:
+        HDFPanda: The HDF5-based device for syncing pmac
+        encoder information with detector triggering.
+    """
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-MO-PPANDA-01:",
+        path_provider=path_provider,
+    )
+
+
+@devices.factory()
+def pandabox(path_provider: PathProvider) -> HDFPanda:
     """Provides triggering of the detectors.
 
     Returns:
         HDFPanda: The HDF5-based detector trigger device.
     """
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-MO-PPANDA-01:",
-        path_provider=get_path_provider(),
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=path_provider,
     )
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
-def spectroscopy_detector() -> AravisDetector:
+@devices.factory()
+def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
     """The Manta camera for the spectroscopy experiment.
 
     Looks at the spectroscopy screen and visualises light
@@ -72,7 +87,7 @@ def spectroscopy_detector() -> AravisDetector:
     pv_prefix = f"{PREFIX.beamline_prefix}-DI-DCAM-02:"
     return AravisDetector(
         pv_prefix,
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
         plugins={
@@ -81,8 +96,8 @@ def spectroscopy_detector() -> AravisDetector:
     )
 
 
-@device_factory()
-def imaging_detector() -> AravisDetector:
+@devices.factory()
+def imaging_detector(path_provider: PathProvider) -> AravisDetector:
     """The Mako camera for the imaging experiment.
 
     Looks at the on-axis viewing screen.
@@ -92,13 +107,13 @@ def imaging_detector() -> AravisDetector:
     """
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )
 
 
-@device_factory()
+@devices.factory()
 def sample_stage() -> XYZStage:
     """An XYZ stage holding the sample.
 
@@ -107,4 +122,18 @@ def sample_stage() -> XYZStage:
     """
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+    )
+
+
+@devices.factory()
+def pmac(sample_stage: XYZStage) -> PmacIO:
+    """A Power PMAC.
+
+    Returns:
+        PmacIO: IO interface for the Power PMAC.
+    """
+    return PmacIO(
+        prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+        raw_motors=[sample_stage.y, sample_stage.x],
+        coord_nums=[1],
     )

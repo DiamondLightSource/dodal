@@ -1,5 +1,6 @@
 from functools import cache
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
@@ -7,6 +8,8 @@ from yarl import URL
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
+from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -17,6 +20,10 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
+from dodal.devices.beamlines.i03 import Beamstop
+from dodal.devices.beamlines.i03.beamsize import Beamsize
+from dodal.devices.beamlines.i03.dcm import DCM
+from dodal.devices.beamlines.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.collimation_table import CollimationTable
 from dodal.devices.cryostream import (
     CryoStreamGantry,
@@ -30,11 +37,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i03 import Beamstop
-from dodal.devices.i03.beamsize import Beamsize
-from dodal.devices.i03.dcm import DCM
-from dodal.devices.i03.undulator_dcm import UndulatorDCM
+from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -67,6 +70,7 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
+I03_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i03")
 set_log_beamline(BL)
@@ -85,7 +89,17 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return PandASubpathProvider()
+    provider = PandASubpathProvider()
+    set_path_provider(provider)
+    return provider
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient(I03_CONFIG_SERVER_ENDPOINT)
+    set_config_client(client)
+    return client
 
 
 @devices.fixture
@@ -95,7 +109,7 @@ def daq_configuration_path() -> str:
 
 @devices.factory()
 def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters()
+    params = get_beamline_parameters(BL)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -116,7 +130,7 @@ def attenuator() -> BinaryFilterAttenuator:
 def beamstop() -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(),
+        beamline_parameters=get_beamline_parameters(BL),
     )
 
 
@@ -137,10 +151,11 @@ def vfm() -> FocusingMirrorWithStripes:
 
 
 @devices.factory()
-def mirror_voltages() -> MirrorVoltages:
+def mirror_voltages(config_client: ConfigClient) -> MirrorVoltages:
     return MirrorVoltages(
         prefix=f"{PREFIX.beamline_prefix}-MO-PSU-01:",
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
+        config_client=config_client,
     )
 
 
@@ -203,9 +218,9 @@ def pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def smargon() -> Smargon:
-    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", name="gonio")
 
 
 @devices.factory()
@@ -219,9 +234,12 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
+def undulator(
+    baton: Baton, daq_configuration_path: str, config_client: ConfigClient
+) -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )
@@ -229,12 +247,16 @@ def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
 
 @devices.factory()
 def undulator_dcm(
-    undulator: UndulatorInKeV, dcm: DCM, daq_configuration_path: str
+    undulator: UndulatorInKeV,
+    dcm: DCM,
+    daq_configuration_path: str,
+    config_client: ConfigClient,
 ) -> UndulatorDCM:
     return UndulatorDCM(
         undulator=undulator,
         dcm=dcm,
         daq_configuration_path=daq_configuration_path,
+        config_client=config_client,
     )
 
 
@@ -265,8 +287,10 @@ def sample_shutter() -> ZebraShutter:
 
 
 @devices.factory()
-def hutch_shutter() -> HutchShutter:
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+def hutch_shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+    )
 
 
 @devices.factory()
@@ -333,7 +357,9 @@ def qbpm() -> QBPM:
 
 @devices.factory()
 def baton() -> Baton:
-    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    _baton = Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    set_commissioning_signal(_baton.commissioning)
+    return _baton
 
 
 @devices.factory()
@@ -346,7 +372,7 @@ def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(),
+        get_beamline_parameters(BL),
     )
 
 

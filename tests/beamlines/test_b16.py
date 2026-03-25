@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
-from dodal.devices.b16.detector import software_triggered_tiff_area_detector
+from dodal.devices.beamlines.b16.detector import software_triggered_tiff_area_detector
 
 
 def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
@@ -9,13 +9,19 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
     default_deadtime = 0.0
 
     with (
-        patch("dodal.devices.b16.detector.ADTIFFWriter.with_io") as mock_writer_with_io,
-        patch("dodal.devices.b16.detector.AreaDetector") as mock_area_detector,
         patch(
-            "dodal.devices.b16.detector.ConstantDeadTimeController"
+            "dodal.devices.beamlines.b16.detector.ADTIFFWriter.with_io"
+        ) as mock_writer_with_io,
+        patch(
+            "dodal.devices.beamlines.b16.detector.AreaDetector"
+        ) as mock_area_detector,
+        patch(
+            "dodal.devices.beamlines.b16.detector.ConstantDeadTimeController"
         ) as mock_controller,
-        patch("dodal.devices.b16.detector.get_path_provider") as mock_get_path_provider,
-        patch("dodal.devices.b16.detector.ADBaseIO") as mock_adbase_io,
+        patch(
+            "dodal.devices.beamlines.b16.detector.get_path_provider"
+        ) as mock_get_path_provider,
+        patch("dodal.devices.beamlines.b16.detector.ADBaseIO") as mock_adbase_io,
     ):
         mock_writer = MagicMock(name="Writer")
         mock_writer_with_io.return_value = mock_writer
