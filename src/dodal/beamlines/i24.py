@@ -1,9 +1,10 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
-from dodal.common.beamlines.beamline_utils import BL
+from dodal.common.beamlines.beamline_utils import BL, set_config_client
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
@@ -64,6 +65,14 @@ def path_provider() -> PathProvider:
         Path("/tmp"),
         client=LocalDirectoryServiceClient(),
     )
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient()
+    set_config_client(client)
+    return client
 
 
 @devices.factory()
