@@ -8,9 +8,7 @@ from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import (
-    PathProvider,
-)
+from ophyd_async.core import PathProvider
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.beamlines.beamline_utils import (
