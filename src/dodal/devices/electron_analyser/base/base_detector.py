@@ -28,25 +28,27 @@ class ElectronAnalyserDetector(
     StandardDetector,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
-    """Detector for data acquisition of electron analyser."""
+    """Detector for data acquisition of electron analyser. Can be configured with
+    region data via set method.
+    """
 
     def __init__(
         self,
         arm_logic: DetectorArmLogic,
         trigger_logic: DetectorTriggerLogic,
         region_logic: RegionLogic,
-        # ToDo - Add data logic
         name: str = "",
     ):
-        self.add_detector_logics(arm_logic, trigger_logic)
-        self._region_logic = region_logic
         self.binding_energy_axis = derived_signal_r(
             self._calculate_binding_energy_axis,
             "eV",
-            energy_axis=self._region_logic.driver.energy_axis,
-            excitation_energy=self._region_logic.energy_source.energy,
-            energy_mode=self._region_logic.driver.energy_mode,
+            energy_axis=region_logic.driver.energy_axis,
+            excitation_energy=region_logic.energy_source.energy,
+            energy_mode=region_logic.driver.energy_mode,
         )
+        self._region_logic = region_logic
+        # ToDo - Add data logic
+        self.add_detector_logics(arm_logic, trigger_logic)
         self.add_config_signals(self.binding_energy_axis)
         super().__init__(name)
 
