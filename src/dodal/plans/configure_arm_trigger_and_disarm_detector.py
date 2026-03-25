@@ -34,15 +34,15 @@ def configure_arm_trigger_and_disarm_detector(
     yield from change_roi_mode(eiger, detector_params, wait=True)
     LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
     start = time.time()
-    yield from bps.abs_set(eiger.odin.num_frames_chunks, 1, wait=True)
+    yield from bps.abs_set(eiger.od.fp.process_frames_per_block, 1, wait=True)
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
     start = time.time()
     yield from bps.abs_set(
-        eiger.drv.detector.photon_energy, detector_params.expected_energy_ev, wait=True
+        eiger.detector.photon_energy, detector_params.expected_energy_ev, wait=True
     )
     LOGGER.info(f"Setting Photon Energy: {time.time() - start}s")
     start = time.time()
-    yield from bps.abs_set(eiger.drv.detector.ntrigger, 1, wait=True)
+    yield from bps.abs_set(eiger.detector.ntrigger, 1, wait=True)
     LOGGER.info(f"Setting Number of Triggers: {time.time() - start}s")
     start = time.time()
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
@@ -54,7 +54,7 @@ def configure_arm_trigger_and_disarm_detector(
     yield from bps.kickoff(eiger, wait=True)
     LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
     start = time.time()
-    yield from bps.trigger(eiger.drv.detector.trigger, wait=True)
+    yield from bps.trigger(eiger.detector.trigger, wait=True)
     LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.complete(eiger, wait=True)
@@ -71,10 +71,10 @@ def set_cam_pvs(
     group="cam_pvs",
 ):
     yield from bps.abs_set(
-        eiger.drv.detector.count_time, detector_params.exposure_time_s, group=group
+        eiger.detector.count_time, detector_params.exposure_time_s, group=group
     )
     yield from bps.abs_set(
-        eiger.drv.detector.frame_time, detector_params.exposure_time_s, group=group
+        eiger.detector.frame_time, detector_params.exposure_time_s, group=group
     )
 
     if wait:
@@ -94,30 +94,30 @@ def change_roi_mode(
     )
 
     yield from bps.abs_set(
-        eiger.drv.detector.roi_mode,
+        eiger.detector.roi_mode,
         "4M" if detector_params.use_roi_mode else "disabled",
         group=group,
     )
     yield from bps.abs_set(
-        eiger.odin.image_height,
+        eiger.od.fp.data_dims_0,
         detector_dimensions.height,
         group=group,
     )
     yield from bps.abs_set(
-        eiger.odin.image_width,
+        eiger.od.fp.data_dims_1,
         detector_dimensions.width,
         group=group,
     )
-    yield from bps.abs_set(
-        eiger.odin.num_row_chunks,
-        detector_dimensions.height,
-        group=group,
-    )
-    yield from bps.abs_set(
-        eiger.odin.num_col_chunks,
-        detector_dimensions.width,
-        group=group,
-    )
+    # yield from bps.abs_set(
+    #     eiger.odin.num_row_chunks,
+    #     detector_dimensions.height,
+    #     group=group,
+    # )
+    # yield from bps.abs_set(
+    #     eiger.odin.num_col_chunks,
+    #     detector_dimensions.width,
+    #     group=group,
+    # )
 
     if wait:
         yield from bps.wait(group)
@@ -133,22 +133,22 @@ def set_mx_settings_pvs(
         detector_params.detector_distance
     )
 
-    yield from bps.abs_set(eiger.drv.detector.beam_center_x, beam_x_pixels, group=group)
-    yield from bps.abs_set(eiger.drv.detector.beam_center_y, beam_y_pixels, group=group)
+    yield from bps.abs_set(eiger.detector.beam_center_x, beam_x_pixels, group=group)
+    yield from bps.abs_set(eiger.detector.beam_center_y, beam_y_pixels, group=group)
     yield from bps.abs_set(
-        eiger.drv.detector.detector_distance,
+        eiger.detector.detector_distance,
         detector_params.detector_distance,
         group=group,
     )
 
     yield from bps.abs_set(
-        eiger.drv.detector.omega_start, detector_params.omega_start, group=group
+        eiger.detector.omega_start, detector_params.omega_start, group=group
     )
     yield from bps.abs_set(
-        eiger.drv.detector.omega_increment, detector_params.omega_increment, group=group
+        eiger.detector.omega_increment, detector_params.omega_increment, group=group
     )
     yield from bps.abs_set(
-        eiger.drv.detector.photon_energy,
+        eiger.detector.photon_energy,
         detector_params.expected_energy_ev,
         group=group,
     )
