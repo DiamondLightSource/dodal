@@ -1,7 +1,6 @@
 from functools import cache
 from pathlib import Path
 
-from dodal.devices.beamlines.i24.commissioning_jungfrau import CommissioningJungfrau
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 from ophyd_async.fastcs.jungfrau import JungfrauDetector
 
