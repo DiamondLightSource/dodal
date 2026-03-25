@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 from numpy import linspace, poly1d
 from ophyd_async.core import (
     callback_on_mock_put,
@@ -85,7 +85,7 @@ async def mock_id(
 
 @pytest.fixture
 def mock_i10_gap_energy_motor_lookup_idu(
-    mock_config_client: ConfigServer,
+    mock_config_client: ConfigClient,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
@@ -96,7 +96,7 @@ def mock_i10_gap_energy_motor_lookup_idu(
 
 @pytest.fixture
 def mock_i10_phase_energy_motor_lookup_idu(
-    mock_config_client: ConfigServer,
+    mock_config_client: ConfigClient,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
@@ -107,7 +107,7 @@ def mock_i10_phase_energy_motor_lookup_idu(
 
 @pytest.fixture
 def mock_i10_gap_energy_motor_lookup_idd(
-    mock_config_client: ConfigServer,
+    mock_config_client: ConfigClient,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
@@ -118,7 +118,7 @@ def mock_i10_gap_energy_motor_lookup_idd(
 
 @pytest.fixture
 def mock_i10_phase_energy_motor_lookup_idd(
-    mock_config_client: ConfigServer,
+    mock_config_client: ConfigClient,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
