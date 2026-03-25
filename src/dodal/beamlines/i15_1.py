@@ -1,12 +1,17 @@
+from functools import cache
+
+from daq_config_server import ConfigClient
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
 from dodal.devices.beamlines.i15_1.attenuator import Attenuator
+from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
@@ -28,6 +33,14 @@ to one or more Bluesky Protocols.
 """
 
 
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient()
+    set_config_client(client)
+    return client
+
+
 @devices.factory()
 def att_y() -> NumberedTripleAxisStage:
     return NumberedTripleAxisStage(
@@ -44,15 +57,15 @@ def base_y() -> Motor:
 
 
 @devices.factory()
-def blower_y() -> Motor:
+def blower_y() -> Blower:
     """Same motor as blowerZ."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
+    return Blower(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE", config_client())
 
 
 @devices.factory()
-def blower_z() -> Motor:
+def blower_z() -> Blower:
     """Same motor as blowerY."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
+    return Blower(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE", config_client())
 
 
 @devices.factory()
