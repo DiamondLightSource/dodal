@@ -6,13 +6,13 @@ from dodal.devices.beamlines.i15_1.motor_with_safe_position import MotorWithSafe
 XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
 
 
-class Blower(MotorWithSafePosition):
+class Cobra(MotorWithSafePosition):
     def __init__(self, prefix: str, config_client: ConfigClient):
         self.config = config_client.get_file_contents(
             XPDF_PARAMETERS_FILEPATH,
             desired_return_type=RobotLoadDevicesConfiguration,
             force_parser=RobotLoadDevicesConfiguration.from_xpdf_parameters,
-        ).blower
+        ).cobra
         super().__init__(prefix)
 
     @property
