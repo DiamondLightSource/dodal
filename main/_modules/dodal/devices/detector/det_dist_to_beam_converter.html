@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.detector.det_dist_to_beam_converter &#8212; dodal 2.2.1.dev5+g14b2a0345 documentation</title>
+    <title>dodal.devices.detector.det_dist_to_beam_converter &#8212; dodal 2.2.1.dev6+g856994d96 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=51dee371"></script>
+    <script src="../../../../_static/documentation_options.js?v=7c425bce"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -879,9 +879,11 @@ window.addEventListener("load", load);</script>
   <h1>Source code for dodal.devices.detector.det_dist_to_beam_converter</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models.lookup_tables</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorXYLookupTable</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.util.lookup_tables</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">linear_extrapolation_lut</span><span class="p">,</span>
-    <span class="n">parse_lookup_table</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -893,9 +895,12 @@ window.addEventListener("load", load);</script>
 <div class="viewcode-block" id="DetectorDistanceToBeamXYConverter">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.detector.DetectorDistanceToBeamXYConverter.html#dodal.devices.detector.DetectorDistanceToBeamXYConverter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DetectorDistanceToBeamXYConverter</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lookup_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lookup_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lookup_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">lookup_file</span>
-        <span class="n">lookup_table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">parse_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_file</span><span class="p">)</span>
+
+        <span class="n">lookup_table_columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
+            <span class="n">lookup_file</span><span class="p">,</span> <span class="n">DetectorXYLookupTable</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_d_to_x</span> <span class="o">=</span> <span class="n">linear_extrapolation_lut</span><span class="p">(</span>
             <span class="n">lookup_table_columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lookup_table_columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="p">)</span>
