@@ -122,15 +122,17 @@ class PLCShutterInterlock(BaseHutchInterlock):
 
     # TODO replace with read
     # See https://github.com/DiamondLightSource/dodal/issues/651
-    # TODO check if shutter only opens when Ilks are "OK"
+    # TODO check if shutter only opens when Ilks are "OK" or if "Run Ilks Ok" is also healthy
     async def shutter_safe_to_operate(self) -> bool:
-        """If the status value is 0, hutch has been searched and locked and it is safe \
-        to operate the shutter.
-        If the status value is not 0 (usually set to 7), the hutch is open and the \
-        shutter should not be in use.
+        """If the status value is OK, shutter is safe to operate.
+
+        If the status value is not OK (Failed or Disarmed), the shutter cannot be
+        operated.
         """
         interlock_state = await self.status.get_value()
-        return interlock_state == InterlockState.OK
+        return (interlock_state == InterlockState.OK) | (
+            interlock_state == InterlockState.RUN_ILKS_OK
+        )
 
 
 class BaseHutchShutter(ABC, StandardReadable, Movable[ShutterDemand]):
