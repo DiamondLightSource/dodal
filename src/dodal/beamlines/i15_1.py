@@ -23,6 +23,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i15-1")  # Default used when not on a live beamline
 PREFIX = BeamlinePrefix(BL, suffix="J")
+XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 

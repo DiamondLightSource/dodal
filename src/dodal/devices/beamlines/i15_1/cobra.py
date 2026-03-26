@@ -1,20 +1,29 @@
 from daq_config_server import ConfigClient
-from daq_config_server.models.i15_1.xpdf_parameters import RobotLoadDevicesConfiguration
+from daq_config_server.models.i15_1.xpdf_parameters import (
+    RobotLoadDeviceConfiguration,
+    RobotLoadDevicesConfiguration,
+)
 
-from dodal.devices.beamlines.i15_1.motor_with_safe_position import MotorWithSafePosition
+from dodal.devices.beamlines.i15_1.blower import XPDF_PARAMETERS_FILEPATH
+from dodal.devices.beamlines.i15_1.temperature_controller import TemperatureController
 
-XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
 
-
-class Cobra(MotorWithSafePosition):
+class Cobra(TemperatureController):
     def __init__(self, prefix: str, config_client: ConfigClient):
-        self.config = config_client.get_file_contents(
+        self.config_client = config_client
+        super().__init__(prefix)
+
+    def get_config(self) -> RobotLoadDeviceConfiguration:
+        return self.config_client.get_file_contents(
             XPDF_PARAMETERS_FILEPATH,
             desired_return_type=RobotLoadDevicesConfiguration,
             force_parser=RobotLoadDevicesConfiguration.from_xpdf_parameters,
         ).cobra
-        super().__init__(prefix)
 
     @property
     def _safe_position(self) -> float:
-        return self.config.safe_position
+        return self.get_config().safe_position
+
+    @property
+    def _beam_position(self) -> float:
+        return self.get_config().beam_position
