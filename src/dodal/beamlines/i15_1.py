@@ -13,6 +13,7 @@ from dodal.devices.beamlines.i15.rail import Rail
 from dodal.devices.beamlines.i15_1.attenuator import Attenuator
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
+from dodal.devices.beamlines.i15_1.cryostream import Cryostream
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
@@ -195,5 +196,9 @@ def attenuator() -> Attenuator:
 
 @devices.factory()
 def cobra() -> Cobra:
-    """Same motor as blowerZ."""
-    return Cobra(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE", config_client())
+    return Cobra(f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X", config_client())
+
+
+@devices.factory()
+def cryostream() -> Cryostream:
+    return Cryostream(f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X", config_client())

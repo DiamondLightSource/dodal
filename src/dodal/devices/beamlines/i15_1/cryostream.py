@@ -8,7 +8,7 @@ from dodal.beamlines.i15_1 import XPDF_PARAMETERS_FILEPATH
 from dodal.devices.beamlines.i15_1.temperature_controller import TemperatureController
 
 
-class Blower(TemperatureController):
+class Cryostream(TemperatureController):
     def __init__(self, prefix: str, config_client: ConfigClient):
         self.config_client = config_client
         super().__init__(prefix)
@@ -18,7 +18,7 @@ class Blower(TemperatureController):
             XPDF_PARAMETERS_FILEPATH,
             desired_return_type=TemperatureControllersConfig,
             force_parser=TemperatureControllersConfig.from_xpdf_parameters,
-        ).blower
+        ).cryostream
 
     @property
     def _safe_position(self) -> float:

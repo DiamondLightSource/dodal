@@ -1,7 +1,7 @@
 from daq_config_server import ConfigClient
 from daq_config_server.models.i15_1.xpdf_parameters import (
-    RobotLoadDeviceConfiguration,
-    RobotLoadDevicesConfiguration,
+    TemperatureControllerParams,
+    TemperatureControllersConfig,
 )
 
 from dodal.devices.beamlines.i15_1.blower import XPDF_PARAMETERS_FILEPATH
@@ -13,11 +13,11 @@ class Cobra(TemperatureController):
         self.config_client = config_client
         super().__init__(prefix)
 
-    def get_config(self) -> RobotLoadDeviceConfiguration:
+    def get_config(self) -> TemperatureControllerParams:
         return self.config_client.get_file_contents(
             XPDF_PARAMETERS_FILEPATH,
-            desired_return_type=RobotLoadDevicesConfiguration,
-            force_parser=RobotLoadDevicesConfiguration.from_xpdf_parameters,
+            desired_return_type=TemperatureControllersConfig,
+            force_parser=TemperatureControllersConfig.from_xpdf_parameters,
         ).cobra
 
     @property
