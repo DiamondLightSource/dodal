@@ -4,18 +4,18 @@ from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllersConfig,
 )
 
-from dodal.beamlines.i15_1 import XPDF_PARAMETERS_FILEPATH
 from dodal.devices.beamlines.i15_1.temperature_controller import TemperatureController
 
 
 class Cryostream(TemperatureController):
-    def __init__(self, prefix: str, config_client: ConfigClient):
+    def __init__(self, prefix: str, config_client: ConfigClient, xpdf_parameters_path):
         self.config_client = config_client
+        self.xpdf_parameters_path = xpdf_parameters_path
         super().__init__(prefix)
 
     def get_config(self) -> TemperatureControllerParams:
         return self.config_client.get_file_contents(
-            XPDF_PARAMETERS_FILEPATH,
+            self.xpdf_parameters_path,
             desired_return_type=TemperatureControllersConfig,
             force_parser=TemperatureControllersConfig.from_xpdf_parameters,
         ).cryostream

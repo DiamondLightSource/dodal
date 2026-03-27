@@ -65,21 +65,21 @@ def base_y() -> Motor:
 
 
 @devices.factory()
-def blower_y() -> Blower:
+def blower_y(config_client: ConfigClient) -> Blower:
     """Same motor as blowerZ."""
     return Blower(
         f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
-        config_client(),
+        config_client,
         XPDF_PARAMETERS_FILEPATH,
     )
 
 
 @devices.factory()
-def blower_z() -> Blower:
+def blower_z(config_client: ConfigClient) -> Blower:
     """Same motor as blowerY."""
     return Blower(
         f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
-        config_client(),
+        config_client,
         XPDF_PARAMETERS_FILEPATH,
     )
 
@@ -208,20 +208,23 @@ def attenuator() -> Attenuator:
 
 
 @devices.factory()
-def cobra() -> Cobra:
+def cobra(config_client: ConfigClient) -> Cobra:
     return Cobra(
         f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
-        config_client(),
+        config_client,
         XPDF_PARAMETERS_FILEPATH,
     )
 
 
 @devices.factory()
-def cryostream() -> Cryostream:
+def cryostream(config_client: ConfigClient) -> Cryostream:
     return Cryostream(
         f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
-        config_client(),
+        config_client,
         XPDF_PARAMETERS_FILEPATH,
+    )
+
+
 def hutch_interlock() -> HutchInterlock:
     return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
 
