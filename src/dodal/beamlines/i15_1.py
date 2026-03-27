@@ -16,6 +16,11 @@ from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
+from dodal.devices.hutch_shutter import (
+    HutchInterlock,
+    InterlockedHutchShutter,
+    PLCShutterInterlock,
+)
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -217,4 +222,15 @@ def cryostream() -> Cryostream:
         f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
         config_client(),
         XPDF_PARAMETERS_FILEPATH,
+def hutch_interlock() -> HutchInterlock:
+    return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
+
+
+@devices.factory()
+def hutch_shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        bl_prefix=PREFIX.beamline_prefix,
+        interlock=PLCShutterInterlock(
+            bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
+        ),
     )
