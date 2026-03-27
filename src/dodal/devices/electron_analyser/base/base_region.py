@@ -64,7 +64,7 @@ def energy_mode_validation(data: dict) -> dict:
     return data
 
 
-class AbstractBaseRegion(
+class BaseRegion(
     ABC,
     JavaToPythonModel,
     Generic[TAcquisitionMode, TLensMode, TPassEnergy],
@@ -168,14 +168,14 @@ class AbstractBaseRegion(
         return energy_mode_validation(data)
 
 
-GenericRegion = AbstractBaseRegion[AnyAcqMode, AnyLensMode, AnyPassEnergy]
-TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
+GenericRegion = BaseRegion[AnyAcqMode, AnyLensMode, AnyPassEnergy]
+TBaseRegion = TypeVar("TBaseRegion", bound=BaseRegion)
 
 
-class AbstractBaseSequence(
+class BaseSequence(
     ABC,
     JavaToPythonModel,
-    Generic[TAbstractBaseRegion],
+    Generic[TBaseRegion],
 ):
     """Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to
@@ -183,9 +183,9 @@ class AbstractBaseSequence(
     """
 
     version: float = 0.1  # If file format changes within prod, increment this number!
-    regions: list[TAbstractBaseRegion] = Field(default_factory=lambda: [])
+    regions: list[TBaseRegion] = Field(default_factory=lambda: [])
 
-    def get_enabled_regions(self) -> list[TAbstractBaseRegion]:
+    def get_enabled_regions(self) -> list[TBaseRegion]:
         return [r for r in self.regions if r.enabled]
 
     def get_region_names(self) -> list[str]:
@@ -194,9 +194,9 @@ class AbstractBaseSequence(
     def get_enabled_region_names(self) -> list[str]:
         return [r.name for r in self.get_enabled_regions()]
 
-    def get_region_by_name(self, name: str) -> TAbstractBaseRegion | None:
+    def get_region_by_name(self, name: str) -> TBaseRegion | None:
         return next((region for region in self.regions if region.name == name), None)
 
 
-GenericSequence = AbstractBaseSequence[GenericRegion]
-TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)
+GenericSequence = BaseSequence[GenericRegion]
+TBaseSequence = TypeVar("TBaseSequence", bound=BaseSequence)

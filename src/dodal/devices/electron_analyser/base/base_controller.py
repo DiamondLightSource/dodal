@@ -10,7 +10,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 )
 from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
-    TAbstractBaseRegion,
+    TBaseRegion,
 )
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.fast_shutter import GenericFastShutter
@@ -19,7 +19,7 @@ from dodal.devices.selectable_source import SourceSelector
 
 class ElectronAnalyserController(
     ConstantDeadTimeController[TAbstractAnalyserDriverIO],
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Specialised controller for the electron analysers to provide additional setup
     logic such as selecting the energy source to use from requested region and giving
@@ -50,7 +50,7 @@ class ElectronAnalyserController(
         self.source_selector = source_selector
         super().__init__(driver, deadtime, image_mode)
 
-    async def setup_with_region(self, region: TAbstractBaseRegion) -> None:
+    async def setup_with_region(self, region: TBaseRegion) -> None:
         """Logic to set the driver with a region."""
         if self.source_selector is not None:
             await self.source_selector.set(region.excitation_energy_source)

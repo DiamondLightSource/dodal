@@ -11,8 +11,8 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
+    BaseRegion,
+    BaseSequence,
     DualEnergySource,
     EnergySource,
 )
@@ -138,8 +138,8 @@ async def ew4000(
 @pytest.fixture
 def region(
     request: pytest.FixtureRequest,
-    sequence: AbstractBaseSequence[AbstractBaseRegion],
-) -> AbstractBaseRegion:
+    sequence: BaseSequence[BaseRegion],
+) -> BaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:
         raise ValueError("Region " + request.param + " is not found.")

@@ -4,8 +4,8 @@ from ophyd_async.core import StrictEnum
 from pydantic import Field, field_validator
 
 from dodal.devices.electron_analyser.base.base_region import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
+    BaseRegion,
+    BaseSequence,
     TLensMode,
     TPsuMode,
 )
@@ -18,7 +18,7 @@ TPassEnergyEnum = TypeVar("TPassEnergyEnum", bound=StrictEnum)
 
 
 class VGScientaRegion(
-    AbstractBaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
+    BaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
     Generic[TLensMode, TPassEnergyEnum],
 ):
     # Override defaults of base region class
@@ -56,7 +56,7 @@ class VGScientaRegion(
 
 
 class VGScientaSequence(
-    AbstractBaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
+    BaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
     Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
     psu_mode: TPsuMode = Field(alias="element_set")
