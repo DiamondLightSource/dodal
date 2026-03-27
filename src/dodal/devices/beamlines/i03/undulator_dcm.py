@@ -11,7 +11,6 @@ from ophyd_async.core import AsyncStatus, Reference, StandardReadable
 from dodal.devices.beamlines.i03.dcm import DCM
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import LOGGER
-from dodal.utils import get_beamline_name
 
 ENERGY_TIMEOUT_S: float = 30.0
 
