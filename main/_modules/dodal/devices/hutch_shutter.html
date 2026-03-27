@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.hutch_shutter &#8212; dodal 2.2.1.dev6+g856994d96 documentation</title>
+    <title>dodal.devices.hutch_shutter &#8212; dodal 2.2.1.dev7+g196af4f92 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=7c425bce"></script>
+    <script src="../../../_static/documentation_options.js?v=f2f1f2b2"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -928,6 +928,16 @@ window.addEventListener("load", load);</script>
 
 
 
+<div class="viewcode-block" id="InterlockState">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.InterlockState.html#dodal.devices.hutch_shutter.InterlockState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InterlockState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">FAILED</span> <span class="o">=</span> <span class="s2">&quot;Failed&quot;</span>
+    <span class="n">RUN_ILKS_OK</span> <span class="o">=</span> <span class="s2">&quot;Run Ilks Ok&quot;</span>
+    <span class="n">OK</span> <span class="o">=</span> <span class="s2">&quot;OK&quot;</span>
+    <span class="n">DISARMED</span> <span class="o">=</span> <span class="s2">&quot;Disarmed&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="BaseHutchInterlock">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.BaseHutchInterlock.html#dodal.devices.hutch_shutter.BaseHutchInterlock">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseHutchInterlock</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">):</span>
@@ -988,6 +998,47 @@ window.addEventListener("load", load);</script>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">isclose</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">interlock_state</span><span class="p">),</span> <span class="n">HUTCH_SAFE_FOR_OPERATIONS</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PLCShutterInterlock">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.PLCShutterInterlock.html#dodal.devices.hutch_shutter.PLCShutterInterlock">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PLCShutterInterlock</span><span class="p">(</span><span class="n">BaseHutchInterlock</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to check the interlock state of the shutter using PLC pv.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">interlock_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EXP_SHUTTER_1_INFIX</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">signal_type</span><span class="o">=</span><span class="n">InterlockState</span><span class="p">,</span>
+            <span class="n">bl_prefix</span><span class="o">=</span><span class="n">bl_prefix</span><span class="p">,</span>
+            <span class="n">interlock_infix</span><span class="o">=</span><span class="n">shtr_infix</span><span class="p">,</span>
+            <span class="n">interlock_suffix</span><span class="o">=</span><span class="n">interlock_suffix</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># TODO replace with read</span>
+    <span class="c1"># See https://github.com/DiamondLightSource/dodal/issues/651</span>
+<div class="viewcode-block" id="PLCShutterInterlock.shutter_safe_to_operate">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.PLCShutterInterlock.html#dodal.devices.hutch_shutter.PLCShutterInterlock.shutter_safe_to_operate">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutter_safe_to_operate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If the status value is OK or Run Ilk OK, shutter is open or safe to operate.</span>
+
+<span class="sd">        If the status value is &quot;OK&quot;, valve or shutter is open and interlocks are OK to</span>
+<span class="sd">        operate. If the status value is &quot;Run Ilks Ok&quot;, the opening action can be</span>
+<span class="sd">        started. If the status value is not OK (&quot;Failed&quot; or &quot;Disarmed&quot;), interlocks have</span>
+<span class="sd">        failed and the shutter cannot be operated. Disarmed status applies only to fast</span>
+<span class="sd">        shutters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">interlock_state</span> <span class="o">==</span> <span class="n">InterlockState</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
+            <span class="n">interlock_state</span> <span class="o">==</span> <span class="n">InterlockState</span><span class="o">.</span><span class="n">RUN_ILKS_OK</span>
+        <span class="p">)</span></div>
 </div>
 
 

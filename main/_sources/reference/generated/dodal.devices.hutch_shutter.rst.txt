@@ -18,7 +18,9 @@ dodal.devices.hutch\_shutter
    ~hutch_shutter.BaseHutchShutter
    ~hutch_shutter.HutchInterlock
    ~hutch_shutter.HutchShutter
+   ~hutch_shutter.InterlockState
    ~hutch_shutter.InterlockedHutchShutter
+   ~hutch_shutter.PLCShutterInterlock
    ~hutch_shutter.ShutterDemand
    ~hutch_shutter.ShutterState
 
