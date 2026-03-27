@@ -182,7 +182,6 @@ class BaseSequence(
     hold.
     """
 
-    version: float = 0.1  # If file format changes within prod, increment this number!
     regions: list[TBaseRegion] = Field(default_factory=lambda: [])
 
     def get_enabled_regions(self) -> list[TBaseRegion]:
