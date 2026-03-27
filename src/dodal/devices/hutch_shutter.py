@@ -124,10 +124,13 @@ class PLCShutterInterlock(BaseHutchInterlock):
     # See https://github.com/DiamondLightSource/dodal/issues/651
     # TODO check if shutter only opens when Ilks are "OK" or if "Run Ilks Ok" is also healthy
     async def shutter_safe_to_operate(self) -> bool:
-        """If the status value is OK, shutter is safe to operate.
+        """If the status value is OK or Run Ilk OK, shutter is open or safe to operate.
 
-        If the status value is not OK (Failed or Disarmed), the shutter cannot be
-        operated.
+        If the status value is "OK", valve or shutter is open and interlocks are OK to
+        operate. If the status value is "Run Ilks Ok", the opening action can be
+        started. If the status value is not OK ("Failed" or "Disarmed"), interlocks have
+        failed and the shutter cannot be operated. Disarmed status applies only to fast
+        shutters.
         """
         interlock_state = await self.status.get_value()
         return (interlock_state == InterlockState.OK) | (
