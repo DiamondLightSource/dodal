@@ -62,13 +62,21 @@ def base_y() -> Motor:
 @devices.factory()
 def blower_y() -> Blower:
     """Same motor as blowerZ."""
-    return Blower(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE", config_client())
+    return Blower(
+        f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
+        config_client(),
+        XPDF_PARAMETERS_FILEPATH,
+    )
 
 
 @devices.factory()
 def blower_z() -> Blower:
     """Same motor as blowerY."""
-    return Blower(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE", config_client())
+    return Blower(
+        f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
+        config_client(),
+        XPDF_PARAMETERS_FILEPATH,
+    )
 
 
 @devices.factory()
@@ -196,9 +204,17 @@ def attenuator() -> Attenuator:
 
 @devices.factory()
 def cobra() -> Cobra:
-    return Cobra(f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X", config_client())
+    return Cobra(
+        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
+        config_client(),
+        XPDF_PARAMETERS_FILEPATH,
+    )
 
 
 @devices.factory()
 def cryostream() -> Cryostream:
-    return Cryostream(f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X", config_client())
+    return Cryostream(
+        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
+        config_client(),
+        XPDF_PARAMETERS_FILEPATH,
+    )

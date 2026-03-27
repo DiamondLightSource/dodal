@@ -1,6 +1,11 @@
 from abc import abstractmethod
 
-from ophyd_async.core import StandardReadable, StrictEnum, derived_signal_rw
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    StrictEnum,
+)
 from ophyd_async.epics.motor import Motor
 
 
@@ -9,14 +14,10 @@ class TemperatureControllerPosition(StrictEnum):
     BEAM = "Beam"
 
 
-class TemperatureController(StandardReadable):
+class TemperatureController(StandardReadable, Movable[TemperatureControllerPosition]):
     def __init__(self, prefix: str):
-        self.motor = Motor(prefix=prefix)
-        self.position = derived_signal_rw(
-            self._get_position,
-            self._set_position,
-            current_position=self.motor,
-        )
+        with self.add_children_as_readables():
+            self.motor = Motor(prefix=prefix)
         super().__init__(prefix)
 
     @property
@@ -27,18 +28,9 @@ class TemperatureController(StandardReadable):
     @abstractmethod
     def _beam_position(self) -> float: ...
 
-    def _get_position(self, current_position: float) -> TemperatureControllerPosition:
-        if current_position == self._safe_position:
-            return TemperatureControllerPosition.SAFE
-        elif current_position == self._beam_position:
-            return TemperatureControllerPosition.BEAM
-        raise ValueError(
-            f"Device's position {current_position} is not {TemperatureControllerPosition.SAFE}: "
-            f"{self._safe_position} or {TemperatureControllerPosition.BEAM}: {self._beam_position}"
-        )
-
-    async def _set_position(self, position: TemperatureControllerPosition):
-        if position == TemperatureControllerPosition.SAFE:
+    @AsyncStatus.wrap
+    async def set(self, value: TemperatureControllerPosition):
+        if value == TemperatureControllerPosition.SAFE:
             await self.motor.set(self._safe_position)
-        elif position == TemperatureControllerPosition.BEAM:
+        elif value == TemperatureControllerPosition.BEAM:
             await self.motor.set(self._beam_position)
