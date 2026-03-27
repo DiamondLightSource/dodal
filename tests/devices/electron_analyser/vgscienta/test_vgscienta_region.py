@@ -115,9 +115,8 @@ def test_load_sequence_using_alias_field_names_has_expected_values(
     sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
-    assert len(sequence.regions) == len(expected_region_values)
-    for i, r in enumerate(sequence.regions):
-        assert_region_has_expected_values(r, expected_region_values[i])
+    for i, r in zip(sequence.regions, expected_region_values, strict=True):
+        assert_region_has_expected_values(i, r)
 
 
 def test_region_loads_using_field_names_has_expected_values(
