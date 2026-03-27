@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 from xml.etree.ElementTree import Element
 
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 from daq_config_server.models import DisplayConfig
 
 # GDA currently assumes this aspect ratio for the OAV window size.
@@ -35,7 +35,7 @@ class OAVParameters:
     ):
         self.oav_config_json: str = oav_config_json
         self.context = context
-        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+        config_server = ConfigClient(url="https://daq-config.diamond.ac.uk")
 
         self.global_params, self.context_dicts = self.load_json(
             config_server, self.oav_config_json
@@ -47,7 +47,7 @@ class OAVParameters:
 
     @staticmethod
     def load_json(
-        config_server: ConfigServer, filename: str
+        config_server: ConfigClient, filename: str
     ) -> tuple[dict[str, Any], dict[str, dict]]:
         """Loads the specified file from the config server, and returns a dict with all the
         individual top-level k-v pairs, and one with all the subdicts.
@@ -125,7 +125,7 @@ class OAVConfigBase(Generic[ParamType]):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
 
     def _get_zoom_params(self, zoom_params_file: str) -> dict:
-        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+        config_server = ConfigClient(url="https://daq-config.diamond.ac.uk")
         return config_server.get_file_contents(zoom_params_file, dict)[
             "JCameraManSettings"
         ]
@@ -170,7 +170,7 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
         super().__init__(zoom_params_file)
 
     def _get_display_config(self, display_config_file: str) -> DisplayConfig:
-        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+        config_server = ConfigClient(url="https://daq-config.diamond.ac.uk")
         return config_server.get_file_contents(display_config_file, DisplayConfig)
 
     def _read_display_config(self) -> dict:

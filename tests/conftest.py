@@ -11,8 +11,10 @@ import pytest
 from ophyd_async.core import PathProvider
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
-from dodal.common.beamlines.beamline_utils import clear_path_provider
-from dodal.common.beamlines.config_client import get_config_client
+from dodal.common.beamlines.beamline_utils import (
+    clear_config_client,
+    clear_path_provider,
+)
 from dodal.common.visit import (
     DirectoryServiceClient,
     LocalDirectoryServiceClient,
@@ -172,5 +174,6 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
 
 
 @pytest.fixture(autouse=True)
-def clear_cache():
-    get_config_client.cache_clear()
+def reset_config_client():
+    yield
+    clear_config_client()
