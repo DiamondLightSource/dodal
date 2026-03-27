@@ -640,7 +640,7 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.3.0"
+version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -655,9 +655,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a7/bd/1ea542f1fbbea91f0ef364e81c3908e2caba2c675be079878362261b0fb4/daq_config_server-1.3.0.tar.gz", hash = "sha256:2533a1dc930c146d1c91b063fbf6ab02b9629ca24a04bca7494870bd22586222", size = 224108, upload-time = "2026-03-18T09:37:24.495Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c3/18/282dfb53acf238416b1c6031dc6530a87a3ef75ce298a6d21db7d661ad3b/daq_config_server-1.3.1.tar.gz", hash = "sha256:0fd447ad2902ee789c459bdcb39fa7902b5529dd2102ab48c29aaaa8ae84ae9d", size = 226549, upload-time = "2026-03-26T13:31:08.725Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c8/37/91d8f279d88d56e94ead0aeb13015bdfb990473dca644fbde9543d4afe96/daq_config_server-1.3.0-py3-none-any.whl", hash = "sha256:fedf70bd19b02bd213228f3473f8c3f2695b99b96ff4a713b95a4e3fec9c180d", size = 30795, upload-time = "2026-03-18T09:37:23.125Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/32/1f70fbc87f440b5cd9bdb61e9b7a713d5bd802275a66491a130e10814a79/daq_config_server-1.3.1-py3-none-any.whl", hash = "sha256:af01dc381492b0bffb42f71daf238252710347f4aba5105e0dba5945806b2320", size = 31579, upload-time = "2026-03-26T13:31:07.621Z" },
 ]
 
 [[package]]
@@ -761,7 +761,7 @@ requires-dist = [
     { name = "aiohttp" },
     { name = "bluesky", specifier = ">=1.14.5" },
     { name = "click" },
-    { name = "daq-config-server", specifier = ">=1.3.0" },
+    { name = "daq-config-server", specifier = ">=1.3.1" },
     { name = "deepdiff" },
     { name = "graypy" },
     { name = "mysql-connector-python", specifier = "==9.5.0" },
