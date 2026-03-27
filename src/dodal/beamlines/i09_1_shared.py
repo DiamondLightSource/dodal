@@ -1,5 +1,6 @@
 from daq_config_server import ConfigClient
 
+from dodal.common.beamlines.beamline_utils import get_config_client, set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09_1_shared import (
     HardEnergy,
@@ -29,7 +30,7 @@ I_PREFIX = BeamlinePrefix(BL, suffix="I")
 
 devices = DeviceManager()
 
-I09_1_CONF_CLIENT = ConfigClient()
+set_config_client(ConfigClient())
 LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/configurations/i09-1-shared/lookupTables/IIDCalibrationTable.txt"
 
 
@@ -64,7 +65,7 @@ def iidenergy(
     return HardInsertionDeviceEnergy(
         undulator_order=ienergy_order,
         undulator=iid,
-        config_server=I09_1_CONF_CLIENT,
+        config_server=get_config_client(),
         filepath=LOOK_UPTABLE_FILE,
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,

@@ -26,7 +26,7 @@ class EnergyGapConvertor(Protocol):
 
 
 class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
-    """Compound device to control isertion device energy.
+    """Compound device to control insertion device energy.
 
     This device link hard x-ray undulator gap and order to the required photon energy.
     Setting the energy adjusts the undulator gap accordingly.
