@@ -1,4 +1,3 @@
-import uuid
 from typing import Generic, TypeVar
 
 from ophyd_async.core import StrictEnum
@@ -32,7 +31,6 @@ class VGScientaRegion(
     acquire_time: float = Field(default=1.0, alias="step_time")
     energy_step: float = Field(default=200.0)
     # Specific to this class
-    id: str = Field(default=str(uuid.uuid4()), alias="region_id")
     total_steps: float = 13.0
     total_time: float = 13.0
     min_x: int = Field(alias="first_x_channel", default=1)

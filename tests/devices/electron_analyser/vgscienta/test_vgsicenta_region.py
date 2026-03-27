@@ -33,7 +33,6 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region",
             "enabled": True,
-            "id": "_aQOmgPsmEe6w2YUF3bV-LA",
             "lens_mode": LensMode.ANGULAR56,
             "pass_energy": PassEnergy.E5,
             "slices": 1,
@@ -57,7 +56,6 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region1",
             "enabled": False,
-            "id": "_aQOmgPsmEe6w2YUF3GV-LL",
             "lens_mode": LensMode.ANGULAR45,
             "pass_energy": PassEnergy.E10,
             "slices": 10,
@@ -81,7 +79,6 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region2",
             "enabled": True,
-            "id": "_NAVc8ExAEfCC6ZXV-LTq8A",
             "lens_mode": LensMode.ANGULAR45VUV,
             "pass_energy": PassEnergy.E20,
             "slices": 5,
