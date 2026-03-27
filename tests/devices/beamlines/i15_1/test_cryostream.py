@@ -9,6 +9,10 @@ from dodal.devices.beamlines.i15_1.cryostream import Cryostream
 from dodal.devices.beamlines.i15_1.temperature_controller import (
     TemperatureControllerPosition,
 )
+from tests.test_data import TEST_XPDF_LOCAL_PARAMETERS
+
+SAFE_POSITION = 0.0
+BEAM_POSITION = 450.0
 
 
 @pytest.fixture
@@ -18,8 +22,8 @@ async def cryostream() -> Cryostream:
 
     def mock_config():
         return TemperatureControllerParams(
-            beam_position=450.9,
-            safe_position=0.0,
+            beam_position=BEAM_POSITION,
+            safe_position=SAFE_POSITION,
             settle_time=600,
             tolerance=0.5,
             units="K",
@@ -34,17 +38,33 @@ async def cryostream() -> Cryostream:
     return mock_cryostream
 
 
-def test_cryostream_gets_safe_value_from_config(cryostream: Cryostream):
-    expected_safe_position = 0.0
-    assert cryostream.get_config().safe_position == expected_safe_position
-    assert cryostream._safe_position == expected_safe_position
+def test_cryostream_gets_safe_and_beam_values_from_config(cryostream: Cryostream):
+    assert cryostream.get_config().safe_position == SAFE_POSITION
+    assert cryostream._safe_position == SAFE_POSITION
+    assert cryostream.get_config().beam_position == BEAM_POSITION
+    assert cryostream._beam_position == BEAM_POSITION
 
 
 async def test_cryostream_moves_to_safe_value_when_set(cryostream: Cryostream):
     await cryostream.set(TemperatureControllerPosition.SAFE)
-    get_mock_put(cryostream.motor.user_setpoint).assert_called_once_with(0.0)
+    get_mock_put(cryostream.motor.user_setpoint).assert_called_once_with(SAFE_POSITION)
 
 
 async def test_cryostream_moves_to_beam_value_when_set(cryostream: Cryostream):
     await cryostream.set(TemperatureControllerPosition.BEAM)
-    get_mock_put(cryostream.motor.user_setpoint).assert_called_once_with(450.9)
+    get_mock_put(cryostream.motor.user_setpoint).assert_called_once_with(BEAM_POSITION)
+
+
+def test_cryostream_config_client_reads_config_file_successfully():
+    cryostream = Cryostream("", ConfigClient(""), TEST_XPDF_LOCAL_PARAMETERS)
+    assert cryostream.get_config() == TemperatureControllerParams(
+        beam_position=469.9,
+        safe_position=0.0,
+        settle_time=600,
+        tolerance=0.5,
+        units="K",
+        ramp_units="/h",
+        use_calibration=True,
+        use_fast_cool=None,
+        calibration_file="cryostream_cal_2025-01-23.txt",
+    )
