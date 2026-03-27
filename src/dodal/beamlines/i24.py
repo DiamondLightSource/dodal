@@ -1,9 +1,10 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
-from dodal.common.beamlines.beamline_utils import BL
+from dodal.common.beamlines.beamline_utils import BL, set_config_client
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
@@ -45,6 +46,7 @@ DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+set_config_client(ConfigClient())
 
 I24_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
