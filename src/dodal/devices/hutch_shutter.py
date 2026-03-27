@@ -122,7 +122,6 @@ class PLCShutterInterlock(BaseHutchInterlock):
 
     # TODO replace with read
     # See https://github.com/DiamondLightSource/dodal/issues/651
-    # TODO check if shutter only opens when Ilks are "OK" or if "Run Ilks Ok" is also healthy
     async def shutter_safe_to_operate(self) -> bool:
         """If the status value is OK or Run Ilk OK, shutter is open or safe to operate.
 
