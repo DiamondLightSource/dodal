@@ -14,7 +14,7 @@ from dodal.devices.beamlines.i09 import (
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
+from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -80,8 +80,8 @@ def dual_energy_source(
 
 
 @devices.factory()
-def fsi1() -> GenericFastShutter[InOut]:
-    return GenericFastShutter[InOut](
+def fsi1() -> FastShutter[InOut]:
+    return FastShutter[InOut](
         f"{I_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL",
         open_state=InOut.OUT,
         close_state=InOut.IN,
@@ -89,8 +89,8 @@ def fsi1() -> GenericFastShutter[InOut]:
 
 
 @devices.factory()
-def fsj1() -> GenericFastShutter[InOut]:
-    return GenericFastShutter[InOut](
+def fsj1() -> FastShutter[InOut]:
+    return FastShutter[InOut](
         f"{J_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL",
         open_state=InOut.OUT,
         close_state=InOut.IN,
@@ -99,7 +99,7 @@ def fsj1() -> GenericFastShutter[InOut]:
 
 @devices.factory()
 def dual_fast_shutter(
-    fsi1: GenericFastShutter, fsj1: GenericFastShutter, source_selector: SourceSelector
+    fsi1: FastShutter, fsj1: FastShutter, source_selector: SourceSelector
 ) -> DualFastShutter[InOut]:
     return DualFastShutter[InOut](fsi1, fsj1, source_selector.selected_source)
 
