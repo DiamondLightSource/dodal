@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Generic, Self, TypeAlias, TypeVar
 
 from ophyd_async.core import StrictEnum, SupersetEnum
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.base.base_util import (
@@ -72,6 +72,8 @@ class AbstractBaseRegion(
     """Generic region model that holds the data. Specialised region models should
     inherit this to extend functionality. All energy units are assumed to be in eV.
     """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     name: str = "New_region"
     enabled: bool = False

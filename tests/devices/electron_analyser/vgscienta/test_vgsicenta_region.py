@@ -105,7 +105,7 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_sequence_get_expected_enabled_region_names(
+def test_load_sequence_using_alias_field_names_has_expected_enabled_region_names(
     sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     expected_enabled_region_names: list[str],
 ) -> None:
@@ -114,10 +114,18 @@ def test_sequence_get_expected_enabled_region_names(
         assert region.name == expected_enabled_region_names[i]
 
 
-def test_file_loads_into_class_with_expected_values(
+def test_load_sequence_using_alias_field_names_has_expected_values(
     sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)
     for i, r in enumerate(sequence.regions):
         assert_region_has_expected_values(r, expected_region_values[i])
+
+
+def test_region_loads_using_field_names_has_expected_values(
+    expected_region_values: list[dict[str, Any]],
+) -> None:
+    for expected_region in expected_region_values:
+        r = VGScientaRegion[LensMode, PassEnergy].model_validate(expected_region)
+        assert_region_has_expected_values(r, expected_region)
