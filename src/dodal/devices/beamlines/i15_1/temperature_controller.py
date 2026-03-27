@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from ophyd_async.core import StrictEnum, derived_signal_rw
+from ophyd_async.core import StandardReadable, StrictEnum, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
 
@@ -9,12 +9,13 @@ class TemperatureControllerPosition(StrictEnum):
     BEAM = "Beam"
 
 
-class TemperatureController(Motor):
+class TemperatureController(StandardReadable):
     def __init__(self, prefix: str):
+        self.motor = Motor(prefix=prefix)
         self.position = derived_signal_rw(
             self._get_position,
             self._set_position,
-            current_position=self,
+            current_position=self.motor,
         )
         super().__init__(prefix)
 
@@ -26,7 +27,7 @@ class TemperatureController(Motor):
     @abstractmethod
     def _beam_position(self) -> float: ...
 
-    def _get_position(self, current_position) -> TemperatureControllerPosition:
+    def _get_position(self, current_position: float) -> TemperatureControllerPosition:
         if current_position == self._safe_position:
             return TemperatureControllerPosition.SAFE
         elif current_position == self._beam_position:
@@ -38,6 +39,6 @@ class TemperatureController(Motor):
 
     async def _set_position(self, position: TemperatureControllerPosition):
         if position == TemperatureControllerPosition.SAFE:
-            await self.set(self._safe_position)
+            await self.motor.set(self._safe_position)
         elif position == TemperatureControllerPosition.BEAM:
-            await self.set(self._beam_position)
+            await self.motor.set(self._beam_position)
