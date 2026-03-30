@@ -34,7 +34,7 @@ def configure_arm_trigger_and_disarm_detector(
     yield from change_roi_mode(eiger, detector_params, wait=True)
     LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
     start = time.time()
-    yield from bps.abs_set(eiger.od.fp.process_frames_per_block, 1, wait=True)
+    yield from bps.abs_set(eiger.od.fp.data_chunks_0, 1, wait=True)
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
     start = time.time()
     yield from bps.abs_set(
@@ -108,16 +108,16 @@ def change_roi_mode(
         detector_dimensions.width,
         group=group,
     )
-    # yield from bps.abs_set(
-    #     eiger.odin.num_row_chunks,
-    #     detector_dimensions.height,
-    #     group=group,
-    # )
-    # yield from bps.abs_set(
-    #     eiger.odin.num_col_chunks,
-    #     detector_dimensions.width,
-    #     group=group,
-    # )
+    yield from bps.abs_set(
+        eiger.od.fp.data_chunks_1,
+        detector_dimensions.height,
+        group=group,
+    )
+    yield from bps.abs_set(
+        eiger.od.fp.data_chunks_2,
+        detector_dimensions.width,
+        group=group,
+    )
 
     if wait:
         yield from bps.wait(group)
