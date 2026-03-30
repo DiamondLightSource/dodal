@@ -1,3 +1,7 @@
+from functools import cache
+
+from daq_config_server import ConfigClient
+
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
@@ -48,6 +52,12 @@ DISPLAY_CONFIG = "/dls_sw/i19-1/software/bluesky/display.configuration"
 devices = DeviceManager()
 
 
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    return ConfigClient()
+
+
 @devices.factory()
 def attenuator_motor_squad() -> AttenuatorMotorSquad:
     return AttenuatorMotorSquad(
@@ -62,7 +72,7 @@ def beamstop() -> BeamStop:
 
 @devices.fixture
 def oav_config() -> OAVConfigBeamCentre:
-    return OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG)
+    return OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client())
 
 
 @devices.factory()

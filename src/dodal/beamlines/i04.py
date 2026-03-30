@@ -216,18 +216,22 @@ def zebra() -> Zebra:
 
 
 @devices.factory()
-def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
+def oav(
+    config_client: ConfigClient, params: OAVConfig | None = None
+) -> OAVBeamCentrePV:
     return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfig(ZOOM_PARAMS_FILE),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE, config_client),
     )
 
 
 @devices.factory()
-def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
+def oav_full_screen(
+    config_client: ConfigClient, params: OAVConfig | None = None
+) -> OAVBeamCentrePV:
     return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfig(ZOOM_PARAMS_FILE),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE, config_client),
         overlay_channel=3,
         mjpeg_prefix="XTAL",
     )

@@ -205,11 +205,13 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
 
 @devices.factory()
 def oav(
+    config_client: ConfigClient,
     params: OAVConfigBeamCentre | None = None,
 ) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params
+        or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
 

@@ -121,12 +121,8 @@ ParamType = TypeVar("ParamType", bound="ZoomParams")
 
 
 class OAVConfigBase(Generic[ParamType]):
-    def __init__(self, zoom_params_file: str):
-        self.zoom_params = self._get_zoom_params(zoom_params_file)
-
-    def _get_zoom_params(self, zoom_params_file: str) -> dict:
-        config_server = ConfigClient(url="https://daq-config.diamond.ac.uk")
-        return config_server.get_file_contents(zoom_params_file, dict)[
+    def __init__(self, zoom_params_file: str, config_client: ConfigClient):
+        self.zoom_params = config_client.get_file_contents(zoom_params_file, dict)[
             "JCameraManSettings"
         ]
 
@@ -165,13 +161,12 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
         self,
         zoom_params_file: str,
         display_config_file: str,
+        config_client: ConfigClient,
     ):
-        self.display_config = self._get_display_config(display_config_file)
-        super().__init__(zoom_params_file)
-
-    def _get_display_config(self, display_config_file: str) -> DisplayConfig:
-        config_server = ConfigClient(url="https://daq-config.diamond.ac.uk")
-        return config_server.get_file_contents(display_config_file, DisplayConfig)
+        self.display_config = config_client.get_file_contents(
+            display_config_file, DisplayConfig
+        )
+        super().__init__(zoom_params_file, config_client)
 
     def _read_display_config(self) -> dict:
         crosshairs = {}

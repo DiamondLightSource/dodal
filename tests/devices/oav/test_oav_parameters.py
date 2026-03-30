@@ -1,6 +1,7 @@
 from typing import cast
 
 import pytest
+from daq_config_server import ConfigClient
 
 from dodal.devices.oav.oav_parameters import (
     OAVConfig,
@@ -26,13 +27,13 @@ def mock_parameters():
 
 @pytest.fixture
 def mock_config() -> dict[str, ZoomParams]:
-    return OAVConfig(TEST_OAV_ZOOM_LEVELS).get_parameters()
+    return OAVConfig(TEST_OAV_ZOOM_LEVELS, ConfigClient("")).get_parameters()
 
 
 @pytest.fixture
 def mock_config_with_beam_centre() -> dict[str, ZoomParamsCrosshair]:
     config = OAVConfigBeamCentre(
-        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
     ).get_parameters()
     config = cast(dict[str, ZoomParamsCrosshair], config)
     return config
