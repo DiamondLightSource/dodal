@@ -1,5 +1,4 @@
 import re
-from abc import ABC
 from collections.abc import Callable
 from typing import Generic, Self, TypeAlias, TypeVar
 
@@ -65,7 +64,6 @@ def energy_mode_validation(data: dict) -> dict:
 
 
 class BaseRegion(
-    ABC,
     JavaToPythonModel,
     Generic[TAcquisitionMode, TLensMode, TPassEnergy],
 ):
@@ -80,7 +78,7 @@ class BaseRegion(
     slices: int = 1
     iterations: int = 1
     excitation_energy_source: SelectedSource = SelectedSource.SOURCE1
-    # These ones we need subclasses to provide default values
+    # These ones we need subclasses to provide sensible default values
     lens_mode: TLensMode
     pass_energy: TPassEnergy
     acquisition_mode: TAcquisitionMode
@@ -173,14 +171,10 @@ TBaseRegion = TypeVar("TBaseRegion", bound=BaseRegion)
 
 
 class BaseSequence(
-    ABC,
     JavaToPythonModel,
     Generic[TBaseRegion],
 ):
-    """Generic sequence model that holds the list of region data. Specialised sequence
-    models should inherit this to extend functionality and define type of region to
-    hold.
-    """
+    """Generic sequence model that holds the list of region data."""
 
     regions: list[TBaseRegion] = Field(default_factory=lambda: [])
 
