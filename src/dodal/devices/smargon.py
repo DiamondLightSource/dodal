@@ -17,7 +17,7 @@ from ophyd_async.epics.motor import Motor
 from dodal.common.maths import AngleWithPhase
 from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
-
+from dodal.log import LOGGER
 
 class StubPosition(Enum):
     CURRENT_AS_CENTER = 0
@@ -123,6 +123,29 @@ class Smargon(XYZWrappedOmegaStage, Movable):
         axes will move at the same time. The put callbacks on the axes themselves will
         only come back after the motion on that axis finished.
         """
+
+        #Sticky Y motor on i03 - try to move chi before the other motors to see if this helps
+        # issues.
+        # Nb smargon motors also appear to be ignoring max velocity during combined moves
+        LOGGER.info("Unwrapping target values...")
+        for motor_name, new_setpoint in value.items():
+            if new_setpoint is not None and isinstance(new_setpoint, int | float):
+                mapped_value = await self._get_target_value(
+                    motor_name, new_setpoint
+                )
+                LOGGER.info(f"Unwrapped {motor_name} {new_setpoint} -> {mapped_value}")
+                value[motor_name] = mapped_value
+
+        LOGGER.info("Doing smargon move...")
+        if "chi" in value.keys() and value["chi"] is not None:
+            LOGGER.info("Doing chi.set")
+            await self.chi.set(value["chi"])
+            LOGGER.info("Chi move done")
+        else:
+            LOGGER.info("Chi not moving in this smargon move")
+        if "omega" in value.keys() and value["omega"] is not None:
+            LOGGER.info("Doing omega set")
+            await self.omega.set(value["omega"])
         await self.defer_move.set(DeferMoves.ON)
         # TODO Hotfix required here until https://github.com/DiamondLightSource/dodal/issues/1998
         # is implemented in separate PR
