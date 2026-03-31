@@ -3,21 +3,21 @@ from ophyd_async.epics.core import epics_signal_rw, epics_signal_rw_rbv
 
 
 class Valve1Positions(StrictEnum):
-    POS_1 = "Pos 1"
-    POS_2 = "Pos 2"
-    POS_3 = "Pos 3"
-    POS_4 = "Pos 4"
-    POS_5 = "Pos 5"
-    POS_6 = "Pos 6"
+    POS_1 = "Sep300"
+    POS_2 = "KW402.5"
+    POS_3 = "S200"
+    POS_4 = "Sup6"
+    POS_5 = "Guest1"
+    POS_6 = "Bypass1"
 
 
 class Valve2Positions(StrictEnum):
-    POS_1 = "Pos 1"
-    POS_2 = "Pos 2"
-    POS_3 = "Pos 3"
-    POS_4 = "Pos 4"
-    POS_5 = "Pos 5"
-    POS_6 = "Pos 6"
+    POS_1 = "KW403"
+    POS_2 = "KW402.5"
+    POS_3 = "S200"
+    POS_4 = "Sep500"
+    POS_5 = "Guest2"
+    POS_6 = "Bypass2"
 
 
 class ViciValves(StandardReadable):
