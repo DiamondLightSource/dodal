@@ -63,9 +63,17 @@ def turbo_slit_pmac(turbo_slit_x: Motor) -> PmacIO:
 
 
 @devices.factory()
-def panda(path_provider: PathProvider) -> HDFPanda:
+def panda1(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
+        path_provider=path_provider,
+    )
+
+
+@devices.factory()
+def panda2(path_provider: PathProvider) -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=path_provider,
     )
 

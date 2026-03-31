@@ -43,6 +43,13 @@ class ShutterState(StrictEnum):
     CLOSING = "Closing"
 
 
+class InterlockState(StrictEnum):
+    FAILED = "Failed"
+    RUN_ILKS_OK = "Run Ilks Ok"
+    OK = "OK"
+    DISARMED = "Disarmed"
+
+
 class BaseHutchInterlock(ABC, StandardReadable):
     status: SignalR[float | EnumTypes]
     bl_prefix: str
@@ -93,6 +100,41 @@ class HutchInterlock(BaseHutchInterlock):
         """
         interlock_state = await self.status.get_value()
         return isclose(float(interlock_state), HUTCH_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
+
+
+class PLCShutterInterlock(BaseHutchInterlock):
+    """Device to check the interlock state of the shutter using PLC pv."""
+
+    def __init__(
+        self,
+        bl_prefix: str,
+        shtr_infix: str = "",
+        interlock_suffix: str = EXP_SHUTTER_1_INFIX,
+        name: str = "",
+    ) -> None:
+        super().__init__(
+            signal_type=InterlockState,
+            bl_prefix=bl_prefix,
+            interlock_infix=shtr_infix,
+            interlock_suffix=interlock_suffix,
+            name=name,
+        )
+
+    # TODO replace with read
+    # See https://github.com/DiamondLightSource/dodal/issues/651
+    async def shutter_safe_to_operate(self) -> bool:
+        """If the status value is OK or Run Ilk OK, shutter is open or safe to operate.
+
+        If the status value is "OK", valve or shutter is open and interlocks are OK to
+        operate. If the status value is "Run Ilks Ok", the opening action can be
+        started. If the status value is not OK ("Failed" or "Disarmed"), interlocks have
+        failed and the shutter cannot be operated. Disarmed status applies only to fast
+        shutters.
+        """
+        interlock_state = await self.status.get_value()
+        return (interlock_state == InterlockState.OK) | (
+            interlock_state == InterlockState.RUN_ILKS_OK
+        )
 
 
 class BaseHutchShutter(ABC, StandardReadable, Movable[ShutterDemand]):
