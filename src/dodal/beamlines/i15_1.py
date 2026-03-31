@@ -65,16 +65,6 @@ def base_y() -> Motor:
 
 
 @devices.factory()
-def blower_y(config_client: ConfigClient) -> Blower:
-    """Same motor as blowerZ."""
-    return Blower(
-        f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
-        config_client,
-        XPDF_PARAMETERS_FILEPATH,
-    )
-
-
-@devices.factory()
 def blower_z(config_client: ConfigClient) -> Blower:
     """Same motor as blowerY."""
     return Blower(
