@@ -6,7 +6,6 @@ from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
-from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
@@ -69,6 +68,9 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
+BEAMLINE_PARAMETERS_PATH = (
+    "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters"
+)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
 I03_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
 
@@ -108,8 +110,9 @@ def daq_configuration_path() -> str:
 
 
 @devices.factory()
-def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters(BL)
+def aperture_scatterguard(config_client: ConfigClient) -> ApertureScatterguard:
+    print(BEAMLINE_PARAMETERS_PATH)
+    params = config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -127,10 +130,12 @@ def attenuator() -> BinaryFilterAttenuator:
 
 
 @devices.factory()
-def beamstop() -> Beamstop:
+def beamstop(config_client: ConfigClient) -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(BL),
+        beamline_parameters=config_client.get_file_contents(
+            BEAMLINE_PARAMETERS_PATH, dict
+        ),
     )
 
 
@@ -370,11 +375,13 @@ def fluorescence_det_motion() -> FluorescenceDetector:
 
 
 @devices.factory()
-def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, config_client: ConfigClient
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(BL),
+        config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict),
     )
 
 
