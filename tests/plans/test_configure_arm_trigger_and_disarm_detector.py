@@ -20,9 +20,9 @@ from dodal.plans.configure_arm_trigger_and_disarm_detector import (
 async def fake_eiger():
     fake_eiger = FastEiger("", MagicMock())
     await fake_eiger.connect(mock=True)
-    fake_eiger.drv.detector.arm.trigger = AsyncMock()
-    fake_eiger.drv.detector.disarm.trigger = AsyncMock()
-    fake_eiger._writer.observe_indices_written = fake_observe_indices_written
+    fake_eiger.detector.arm.trigger = AsyncMock()
+    fake_eiger.detector.disarm.trigger = AsyncMock()
+    fake_eiger.od.fp.observe_indices_written = fake_observe_indices_written
     return fake_eiger
 
 
@@ -31,7 +31,7 @@ async def fake_observe_indices_written(timeout: float) -> AsyncGenerator[int, No
 
 
 async def test_configure_arm_trigger_and_disarm_detector(
-    fake_eiger, eiger_params, run_engine: RunEngine
+    fake_eiger: FastEiger, eiger_params, run_engine: RunEngine
 ):
     trigger_info = TriggerInfo(
         # Manual trigger, so setting number of triggers to 1.
@@ -40,26 +40,32 @@ async def test_configure_arm_trigger_and_disarm_detector(
         deadtime=0.0001,
     )
     filename: str = "filename.h5"
-    fake_eiger._writer._path_provider.return_value.filename = filename
+    fake_eiger._data_logics[0].path_provider.return_value.filename = filename  # type: ignore
 
     def set_meta_active(*args, **kwargs) -> None:
-        set_mock_value(fake_eiger.odin.meta_file_name, filename)
-        set_mock_value(fake_eiger.odin.id, filename)
-        set_mock_value(fake_eiger.odin.meta_active, "Active")
+        set_mock_value(fake_eiger.od.fp.file_path, filename)
+        set_mock_value(fake_eiger.od.mw.acquisition_id, filename)
+        set_mock_value(fake_eiger.od.mw.writing, True)
+        set_mock_value(fake_eiger.detector.bit_depth_image, 16)
+        # set_mock_value(fake_eiger.odin.meta_file_name, filename)
+        # set_mock_value(fake_eiger.odin.id, filename)
+        # set_mock_value(fake_eiger.odin.meta_active, "Active")
 
     def set_capture_rbv_meta_writing_and_detector_state(*args, **kwargs) -> None:
         # Mimics capturing and immediete completion status on Eiger.
-        fake_eiger._writer._path_provider.return_value.filename = "filename.h5"
-        set_mock_value(fake_eiger.odin.capture_rbv, "Capturing")
-        set_mock_value(fake_eiger.odin.meta_writing, "Writing")
-        set_mock_value(fake_eiger.odin.meta_file_name, "filename.h5")
-        set_mock_value(fake_eiger.odin.id, "filename.h5")
-        set_mock_value(fake_eiger.odin.fan_ready, 1)
-        set_mock_value(fake_eiger.drv.detector.state, "idle")
 
-    callback_on_mock_put(fake_eiger.odin.num_to_capture, set_meta_active)
+        # fake_eiger._writer._path_provider.return_value.filename = "filename.h5"
+        # set_mock_value(fake_eiger.odin.capture_rbv, "Capturing")
+        # set_mock_value(fake_eiger.odin.meta_writing, "Writing")
+        # set_mock_value(fake_eiger.odin.meta_file_name, "filename.h5")
+        # set_mock_value(fake_eiger.odin.id, "filename.h5")
+        # set_mock_value(fake_eiger.odin.fan_ready, 1)
+        set_mock_value(fake_eiger.od.fp.start_writing, True)
+        set_mock_value(fake_eiger.detector.state, "idle")
+
+    callback_on_mock_put(fake_eiger.od.fp.start_writing, set_meta_active)
     callback_on_mock_put(
-        fake_eiger.odin.capture, set_capture_rbv_meta_writing_and_detector_state
+        fake_eiger.od.mw.writing, set_capture_rbv_meta_writing_and_detector_state
     )
 
     run_engine(
@@ -67,10 +73,10 @@ async def test_configure_arm_trigger_and_disarm_detector(
             fake_eiger, eiger_params, trigger_info
         )
     )
-    fake_eiger.drv.detector.arm.trigger.assert_called_once()
+    fake_eiger.detector.arm.trigger.assert_called_once()
     # Disarm occurs at the start and end of the plan.
-    assert len(fake_eiger.drv.detector.disarm.trigger.call_args_list) == 2
+    assert len(fake_eiger.detector.disarm.trigger.call_args_list) == 2
     assert (
-        await fake_eiger.drv.detector.photon_energy.get_value()
+        await fake_eiger.detector.photon_energy.get_value()
         == eiger_params.expected_energy_ev
     )
