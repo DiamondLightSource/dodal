@@ -3,7 +3,7 @@ from daq_config_server import ConfigClient
 from daq_config_server.models.i15_1.xpdf_parameters import TemperatureControllerParams
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 
-from dodal.devices.beamlines.i15_1.temperature_controller import (
+from dodal.devices.beamlines.i15_1.safe_or_beam_positioner import (
     SafeOrBeamPosition,
     SafeOrBeamPositioner,
 )

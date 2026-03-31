@@ -2,7 +2,7 @@ from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllerParams,
 )
 
-from dodal.devices.beamlines.i15_1.temperature_controller import SafeOrBeamPositioner
+from dodal.devices.beamlines.i15_1.safe_or_beam_positioner import SafeOrBeamPositioner
 
 
 class Cryostream(SafeOrBeamPositioner):
