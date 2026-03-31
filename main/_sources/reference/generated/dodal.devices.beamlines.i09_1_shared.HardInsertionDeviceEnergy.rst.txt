@@ -19,6 +19,9 @@ dodal.devices.beamlines.i09\_1\_shared.HardInsertionDeviceEnergy
       
       
       
+      ~HardInsertionDeviceEnergy.get_look_up_table
+      
+      
       
       
       ~HardInsertionDeviceEnergy.set

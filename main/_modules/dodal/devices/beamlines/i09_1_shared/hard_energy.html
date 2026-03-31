@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i09_1_shared.hard_energy &#8212; dodal 2.2.1.dev9+gbb55ae603 documentation</title>
+    <title>dodal.devices.beamlines.i09_1_shared.hard_energy &#8212; dodal 2.2.1.dev10+gaf1430fdf documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=c2963550"></script>
+    <script src="../../../../../_static/documentation_options.js?v=d21179f9"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -878,10 +878,11 @@ window.addEventListener("load", load);</script>
                   
   <h1>Source code for dodal.devices.beamlines.i09_1_shared.hard_energy</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">gather</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Locatable</span><span class="p">,</span> <span class="n">Location</span><span class="p">,</span> <span class="n">Movable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndarray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models.lookup_tables</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericLookupTable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Reference</span><span class="p">,</span>
@@ -891,35 +892,58 @@ window.addEventListener("load", load);</script>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i09_1_shared.hard_undulator_functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MAX_ENERGY_COLUMN</span><span class="p">,</span>
-    <span class="n">MIN_ENERGY_COLUMN</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.common_dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DoubleCrystalMonochromatorBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">UndulatorInMm</span><span class="p">,</span> <span class="n">UndulatorOrder</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyGapConvertor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">look_up_table</span><span class="p">:</span> <span class="n">GenericLookupTable</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol for a function to provide value conversion using lookup table.&quot;&quot;&quot;</span>
+        <span class="o">...</span>
 
 
 <div class="viewcode-block" id="HardInsertionDeviceEnergy">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.html#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HardInsertionDeviceEnergy</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compound device to link hard x-ray undulator gap and order to photon energy.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compound device to control insertion device energy.</span>
+
+<span class="sd">    This device link hard x-ray undulator gap and order to the required photon energy.</span>
 <span class="sd">    Setting the energy adjusts the undulator gap accordingly.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        energy_demand (SignalRW[float]): The energy value that the user wants to set.</span>
+<span class="sd">        energy (SignalRW[float]): The actual energy of the insertion device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">undulator_order</span><span class="p">:</span> <span class="n">UndulatorOrder</span><span class="p">,</span>
         <span class="n">undulator</span><span class="p">:</span> <span class="n">UndulatorInMm</span><span class="p">,</span>
-        <span class="n">lut</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">gap_to_energy_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-        <span class="n">energy_to_gap_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">config_server</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
+        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">gap_to_energy_func</span><span class="p">:</span> <span class="n">EnergyGapConvertor</span><span class="p">,</span>
+        <span class="n">energy_to_gap_func</span><span class="p">:</span> <span class="n">EnergyGapConvertor</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lut</span> <span class="o">=</span> <span class="n">lut</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gap_to_energy_func</span> <span class="o">=</span> <span class="n">gap_to_energy_func</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energy_to_gap_func</span> <span class="o">=</span> <span class="n">energy_to_gap_func</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the HardInsertionDeviceEnergy device.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            undulator_order (UndulatorOrder): undulator order device.</span>
+<span class="sd">            undulator (UndulatorInMm): undulator device for gap control.</span>
+<span class="sd">            config_server (ConfigServer): Config server client to retrieve the lookup table.</span>
+<span class="sd">            filepath (str): File path to the lookup table on the config server.</span>
+<span class="sd">            gap_to_energy_func (EnergyGapConvertor): Function to convert gap to energy using the lookup table.</span>
+<span class="sd">            energy_to_gap_func (EnergyGapConvertor): Function to convert energy to gap using the lookup table.</span>
+<span class="sd">            name (str, optional): Name for the device. Defaults to empty string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_undulator_order_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">undulator_order</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_undulator_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">undulator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config_server</span> <span class="o">=</span> <span class="n">config_server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gap_to_energy_func</span> <span class="o">=</span> <span class="n">gap_to_energy_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy_to_gap_func</span> <span class="o">=</span> <span class="n">energy_to_gap_func</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="n">undulator_order</span><span class="p">,</span> <span class="n">undulator</span><span class="o">.</span><span class="n">current_gap</span><span class="p">])</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
@@ -934,40 +958,46 @@ window.addEventListener("load", load);</script>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">current_order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_to_energy_func</span><span class="p">(</span>
-            <span class="n">gap</span><span class="o">=</span><span class="n">current_gap</span><span class="p">,</span>
-            <span class="n">look_up_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lut</span><span class="p">,</span>
-            <span class="n">order</span><span class="o">=</span><span class="n">current_order</span><span class="p">,</span>
+        <span class="n">_lookup_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_look_up_table</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gap_to_energy_func</span><span class="p">(</span>
+            <span class="n">look_up_table</span><span class="o">=</span><span class="n">_lookup_table</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">current_gap</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">current_order</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">current_order</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_undulator_order_ref</span><span class="p">()</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="n">min_energy</span><span class="p">,</span> <span class="n">max_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lut</span><span class="p">[</span><span class="n">current_order</span><span class="p">][</span>
-            <span class="n">MIN_ENERGY_COLUMN</span> <span class="p">:</span> <span class="n">MAX_ENERGY_COLUMN</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">min_energy</span> <span class="o">&lt;=</span> <span class="n">energy</span> <span class="o">&lt;=</span> <span class="n">max_energy</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Requested energy </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2"> keV is out of range for harmonic </span><span class="si">{</span><span class="n">current_order</span><span class="si">}</span><span class="s2">: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">min_energy</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">max_energy</span><span class="si">}</span><span class="s2">] keV&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">target_gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_to_gap_func</span><span class="p">(</span>
-            <span class="n">photon_energy_kev</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">look_up_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lut</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">current_order</span>
-        <span class="p">)</span>
+        <span class="n">_lookup_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_look_up_table</span><span class="p">()</span>
+        <span class="n">target_gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy_to_gap_func</span><span class="p">(</span><span class="n">_lookup_table</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">current_order</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_undulator_ref</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">target_gap</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_look_up_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GenericLookupTable</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lut</span><span class="p">:</span> <span class="n">GenericLookupTable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_server</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filepath</span><span class="p">,</span>
+            <span class="n">desired_return_type</span><span class="o">=</span><span class="n">GenericLookupTable</span><span class="p">,</span>
+            <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lut</span>
+
+<div class="viewcode-block" id="HardInsertionDeviceEnergy.set">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.html#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update energy demand and set energy to a given value in keV.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): Energy in keV.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_demand</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+</div>
 
 
 
 <div class="viewcode-block" id="HardEnergy">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i09_1_shared.HardEnergy.html#dodal.devices.beamlines.i09_1_shared.HardEnergy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HardEnergy</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Locatable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Energy compound device that provides combined change of both DCM energy and</span>
-<span class="sd">    undulator gap accordingly.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compound energy device.</span>
+
+<span class="sd">    This device changes both monochromator and insertion device energy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -976,6 +1006,13 @@ window.addEventListener("load", load);</script>
         <span class="n">undulator_energy</span><span class="p">:</span> <span class="n">HardInsertionDeviceEnergy</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the HardEnergy device.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dcm (DoubleCrystalMonochromatorBase): Double crystal monochromator device.</span>
+<span class="sd">            undulator_energy (HardInsertionDeviceEnergy): Hard insertion device control.</span>
+<span class="sd">            name (str, optional): name for the device. Defaults to empty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dcm_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">dcm</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_undulator_energy_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">undulator_energy</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="n">undulator_energy</span><span class="p">,</span> <span class="n">dcm</span><span class="o">.</span><span class="n">energy_in_keV</span><span class="p">])</span>

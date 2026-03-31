@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy &#8212; dodal 2.2.1.dev9+gbb55ae603 documentation</title>
+    <title>dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy &#8212; dodal 2.2.1.dev10+gaf1430fdf documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=c2963550"></script>
+    <script src="../../_static/documentation_options.js?v=d21179f9"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1019,25 +1019,66 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.i09_1_shared.</span></span><span class="sig-name descname"><span class="pre">HardInsertionDeviceEnergy</span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i09_1_shared/hard_energy.html#HardInsertionDeviceEnergy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy" title="Link to this definition">#</a></dt>
-<dd><p>Compound device to link hard x-ray undulator gap and order to photon energy.
+<dd><p>Compound device to control insertion device energy.</p>
+<p>This device link hard x-ray undulator gap and order to the required photon energy.
 Setting the energy adjusts the undulator gap accordingly.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.energy_demand">
+<span class="sig-name descname"><span class="pre">energy_demand</span></span><a class="headerlink" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.energy_demand" title="Link to this definition">#</a></dt>
+<dd><p>The energy value that the user wants to set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalRW[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.energy">
+<span class="sig-name descname"><span class="pre">energy</span></span><a class="headerlink" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.energy" title="Link to this definition">#</a></dt>
+<dd><p>The actual energy of the insertion device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SignalRW[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>undulator_order</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.undulator.UndulatorOrder.html#dodal.devices.undulator.UndulatorOrder" title="dodal.devices.undulator.UndulatorOrder"><code class="xref py py-class docutils literal notranslate"><span class="pre">UndulatorOrder</span></code></a></span>)</p></li>
 <li><p><strong>undulator</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.undulator.UndulatorInMm.html#dodal.devices.undulator.UndulatorInMm" title="dodal.devices.undulator.UndulatorInMm"><code class="xref py py-class docutils literal notranslate"><span class="pre">UndulatorInMm</span></code></a></span>)</p></li>
-<li><p><strong>lut</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span>)</p></li>
-<li><p><strong>gap_to_energy_func</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
-<li><p><strong>energy_to_gap_func</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+<li><p><strong>config_server</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigClient</span></code></span>)</p></li>
+<li><p><strong>filepath</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>gap_to_energy_func</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyGapConvertor</span></code></span>)</p></li>
+<li><p><strong>energy_to_gap_func</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyGapConvertor</span></code></span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Initialize the HardInsertionDeviceEnergy device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>undulator_order</strong> (<a class="reference internal" href="dodal.devices.undulator.UndulatorOrder.html#dodal.devices.undulator.UndulatorOrder" title="dodal.devices.undulator.UndulatorOrder"><em>UndulatorOrder</em></a>) – undulator order device.</p></li>
+<li><p><strong>undulator</strong> (<a class="reference internal" href="dodal.devices.undulator.UndulatorInMm.html#dodal.devices.undulator.UndulatorInMm" title="dodal.devices.undulator.UndulatorInMm"><em>UndulatorInMm</em></a>) – undulator device for gap control.</p></li>
+<li><p><strong>config_server</strong> (<em>ConfigServer</em>) – Config server client to retrieve the lookup table.</p></li>
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – File path to the lookup table on the config server.</p></li>
+<li><p><strong>gap_to_energy_func</strong> (<em>EnergyGapConvertor</em>) – Function to convert gap to energy using the lookup table.</p></li>
+<li><p><strong>energy_to_gap_func</strong> (<em>EnergyGapConvertor</em>) – Function to convert energy to gap using the lookup table.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Name for the device. Defaults to empty string.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_look_up_table</span></code>()</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.set" title="dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
+<td><p>Update energy demand and set energy to a given value in keV.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1048,6 +1089,20 @@ Setting the energy adjusts the undulator gap accordingly.</p>
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i09_1_shared/hard_energy.html#HardInsertionDeviceEnergy.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.set" title="Link to this definition">#</a></dt>
+<dd><p>Update energy demand and set energy to a given value in keV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Energy in keV.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1099,7 +1154,12 @@ Setting the energy adjusts the undulator gap accordingly.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy"><code class="docutils literal notranslate"><span class="pre">HardInsertionDeviceEnergy</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy"><code class="docutils literal notranslate"><span class="pre">HardInsertionDeviceEnergy</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.energy_demand"><code class="docutils literal notranslate"><span class="pre">HardInsertionDeviceEnergy.energy_demand</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.energy"><code class="docutils literal notranslate"><span class="pre">HardInsertionDeviceEnergy.energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i09_1_shared.HardInsertionDeviceEnergy.set"><code class="docutils literal notranslate"><span class="pre">HardInsertionDeviceEnergy.set()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
