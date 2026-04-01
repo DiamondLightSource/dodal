@@ -58,6 +58,10 @@ def att_y() -> NumberedTripleAxisStage:
         axis3_infix="STICK3",
     )
 
+@devices.factory()
+def attenuator() -> Attenuator:
+    return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
+
 
 @devices.factory()
 def base_y() -> Motor:
@@ -85,6 +89,24 @@ def clean() -> XYStage:
 
 
 @devices.factory()
+def cobra(config_client: ConfigClient) -> Cobra:
+    return Cobra(
+        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
+        config_client,
+        XPDF_PARAMETERS_FILEPATH,
+    )
+
+
+@devices.factory()
+def cryostream(config_client: ConfigClient) -> Cryostream:
+    return Cryostream(
+        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
+        config_client,
+        XPDF_PARAMETERS_FILEPATH,
+    )
+
+
+@devices.factory()
 def det2() -> YZStage:
     return YZStage(f"{PREFIX.beamline_prefix}-EA-DET-02:")
 
@@ -97,6 +119,20 @@ def env_x() -> Motor:
 @devices.factory()
 def f2y() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-OP-ATTN-02:Y")
+
+
+def hutch_interlock() -> HutchInterlock:
+    return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
+
+
+@devices.factory()
+def hutch_shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        bl_prefix=PREFIX.beamline_prefix,
+        interlock=PLCShutterInterlock(
+            bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
+        ),
+    )
 
 
 @devices.factory()
@@ -190,40 +226,3 @@ def robot() -> Robot:
 @devices.factory()
 def puck_detect() -> PuckDetect:
     return PuckDetect("https://i15-1-cam3-processing.diamond.ac.uk/result")
-
-
-@devices.factory()
-def attenuator() -> Attenuator:
-    return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
-
-
-@devices.factory()
-def cobra(config_client: ConfigClient) -> Cobra:
-    return Cobra(
-        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
-        config_client,
-        XPDF_PARAMETERS_FILEPATH,
-    )
-
-
-@devices.factory()
-def cryostream(config_client: ConfigClient) -> Cryostream:
-    return Cryostream(
-        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
-        config_client,
-        XPDF_PARAMETERS_FILEPATH,
-    )
-
-
-def hutch_interlock() -> HutchInterlock:
-    return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
-
-
-@devices.factory()
-def hutch_shutter() -> InterlockedHutchShutter:
-    return InterlockedHutchShutter(
-        bl_prefix=PREFIX.beamline_prefix,
-        interlock=PLCShutterInterlock(
-            bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
-        ),
-    )
