@@ -58,6 +58,7 @@ def att_y() -> NumberedTripleAxisStage:
         axis3_infix="STICK3",
     )
 
+
 @devices.factory()
 def attenuator() -> Attenuator:
     return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
