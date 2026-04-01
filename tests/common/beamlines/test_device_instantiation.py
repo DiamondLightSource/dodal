@@ -1,9 +1,11 @@
 from typing import Any
 
 import pytest
+from daq_config_server import ConfigClient
 from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
+from dodal.common.beamlines.beamline_utils import clear_config_client, set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 from tests.test_data import I04_BEAMLINE_PARAMETERS, TEST_BEAMLINE_PARAMETERS_TXT
@@ -23,6 +25,13 @@ def patch_config_paths(monkeypatch):
         "dodal.beamlines.i04.BEAMLINE_PARAMETERS_PATH",
         I04_BEAMLINE_PARAMETERS,
     )
+
+
+@pytest.fixture(autouse=True)
+def reset_config_client():
+    set_config_client(ConfigClient(""))
+    yield
+    clear_config_client()
 
 
 @pytest.mark.parametrize(
