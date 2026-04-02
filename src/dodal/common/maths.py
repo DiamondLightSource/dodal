@@ -1,4 +1,5 @@
-from typing import NamedTuple, Self
+from collections.abc import Iterable
+from typing import Self, overload
 
 import numpy as np
 from ophyd_async.core import (
@@ -156,29 +157,63 @@ def rotate_counter_clockwise(theta: float, x: float, y: float) -> tuple[float, f
 MotorOffsetAndPhase = Array1D[np.float32]
 
 
-class AngleWithPhase(NamedTuple):
-    """Represents a point in rotational space which has 0<=phase<360 and
-    offset = n * 360.
+class AngleWithPhase:
+    """Represents a point in an absolute rotational space which is defined by a phase where 0<=phase<360
+     and an offset from an origin where the absolute coordinate is the sum of the phase and the offset.
+
+    Attributes:
+        offset: The offset of 0 phase from some other unwrapped rotational coordinate space
+        phase: The phase in degrees relative to this offset.
     """
 
-    offset: float
-    phase: float
+    @overload
+    def __init__(self, offset_and_phase: Iterable[float], /):
+        pass
 
-    @classmethod
-    def from_offset_and_phase(
-        cls, offset_and_phase: MotorOffsetAndPhase
-    ) -> "AngleWithPhase":
-        return cls(offset_and_phase[0], offset_and_phase[1])
+    @overload
+    def __init__(self, offset: float, phase: float, /):
+        pass
+
+    def __init__(self, offset: float | Iterable[float], phase: float = 0):
+        """Construct a normalised representation of the offset and phase, such that
+        0 <= phase < 360.
+
+        Args:
+            offset (float | Iterable[float]): the offset in degrees, or the
+            offset and phase as a list or other iterable
+            phase (float): the phase in degrees
+        """
+        if isinstance(offset, Iterable):
+            offset, phase = offset
+        correction = 360 * (phase // 360)
+        self.offset: float = offset + correction
+        self.phase: float = phase - correction
 
     @classmethod
     def wrap(cls, unwrapped: float) -> "AngleWithPhase":
+        """Construct a representation such that offset = n * 360 and 0 <= phase < 360.
+
+        Args:
+             unwrapped (float): The unwrapped angle in degrees
+        """
         offset = AngleWithPhase.offset_from_unwrapped(unwrapped)
         return cls(offset, unwrapped - offset)
 
+    def rebase_to(self, other: Self) -> Self:
+        """Return this angle with the offset adjusted such that the phases can be compared."""
+        correction = other.offset - self.offset
+        if correction % 360:
+            return AngleWithPhase([self.offset + correction, self.phase - correction])
+        else:
+            return self
+
     def unwrap(self) -> float:
+        """Generate the unwrapped representation of this angle."""
         return self.offset + self.phase
 
     def phase_distance(self, other: Self) -> float:
+        """Determine the shortest distance between this angle and the specified angle."""
+        other = other.rebase_to(self)
         max_theta = max(self.phase, other.phase)
         min_theta = min(self.phase, other.phase)
         return min(max_theta - min_theta, min_theta + 360 - max_theta)
@@ -188,7 +223,7 @@ class AngleWithPhase(NamedTuple):
         """Obtain the offset from the corresponding wrapped angle in degrees."""
         return round(unwrapped_deg // 360) * 360
 
-    def nearest_to_phase(self, phase_deg: float) -> "AngleWithPhase":
+    def nearest_with_phase(self, phase_deg: float) -> "AngleWithPhase":
         """Return the nearest angle to this one with the specified phase."""
         phase_deg = phase_deg % 360
         if phase_deg > self.phase:

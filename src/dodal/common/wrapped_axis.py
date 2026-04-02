@@ -54,9 +54,7 @@ class WrappedAxis(StandardReadable):
         return np.array([angle.offset, angle.phase])
 
     async def _set_motor_offset_and_phase(self, value: MotorOffsetAndPhase):
-        await self._real_motor().set(
-            AngleWithPhase.from_offset_and_phase(value).unwrap()
-        )
+        await self._real_motor().set(AngleWithPhase(value).unwrap())
 
     def _get_phase(self, offset_and_phase: MotorOffsetAndPhase) -> float:
         return offset_and_phase[1].item()
@@ -66,8 +64,8 @@ class WrappedAxis(StandardReadable):
         The motor will travel via the shortest distance path.
         """
         offset_and_phase = await self.offset_and_phase.get_value()
-        current_position = AngleWithPhase.from_offset_and_phase(offset_and_phase)
-        target_value = current_position.nearest_to_phase(value).unwrap()
+        current_position = AngleWithPhase(offset_and_phase)
+        target_value = current_position.nearest_with_phase(value).unwrap()
         await self._real_motor().set(target_value)
 
     def distance(self, theta1_deg: float, theta2_deg: float) -> float:
