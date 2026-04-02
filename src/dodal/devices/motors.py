@@ -14,10 +14,10 @@ from ophyd_async.core import (
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.maths import (
-    WrappedAxis,
     rotate_clockwise,
     rotate_counter_clockwise,
 )
+from dodal.common.wrapped_axis import WrappedAxis
 
 _X = "X"
 _Y = "Y"
@@ -119,7 +119,7 @@ class XYZOmegaStage(XYZStage):
         with self.add_children_as_readables():
             real_motor = Motor(prefix + omega_infix)
             self.omega = real_motor
-            self.omega_axis = WrappedAxis(self.omega)
+            self.wrapped_omega = WrappedAxis(self.omega)
 
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 

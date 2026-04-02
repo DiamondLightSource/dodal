@@ -310,8 +310,8 @@ async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
             "gonio-z": partial_reading(0.0),
             "gonio-y": partial_reading(0.0),
             "gonio-x": partial_reading(0.0),
-            "gonio-omega_axis-phase": partial_reading(0.0),
-            "gonio-omega_axis-offset_and_phase": partial_reading(np.array([0, 0])),
+            "gonio-wrapped_omega-phase": partial_reading(0.0),
+            "gonio-wrapped_omega-offset_and_phase": partial_reading(np.array([0, 0])),
         },
     )
 
@@ -388,7 +388,7 @@ async def test_mod_360_read(real_value: float, expected_phase):
     stage = XYZOmegaStage("BL03I-MO-SGON-01:")
     await stage.connect(mock=True)
     set_mock_value(stage.omega.user_readback, real_value)
-    offset, phase = await stage.omega_axis.offset_and_phase.get_value()
+    offset, phase = await stage.wrapped_omega.offset_and_phase.get_value()
     assert 0 <= expected_phase < 360
     assert math.isclose(phase, expected_phase, abs_tol=1e-6)
 
@@ -474,7 +474,7 @@ async def test_mod_360_unwrap_computes_expected(
     input_value, current_real_value, expected_real_value = values_for_rotation
     stage = stage_in_initial_state
     real_put = get_mock_put(stage.omega.user_setpoint)
-    await stage.omega_axis.phase.set(input_value)
+    await stage.wrapped_omega.phase.set(input_value)
     real_put.assert_called_once()
     actual = real_put.mock_calls[0].args[0]
     assert math.isclose(actual, expected_real_value), (

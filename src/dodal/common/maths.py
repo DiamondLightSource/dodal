@@ -3,12 +3,7 @@ from typing import NamedTuple, Self
 import numpy as np
 from ophyd_async.core import (
     Array1D,
-    Reference,
-    StandardReadable,
-    StandardReadableFormat,
-    derived_signal_rw,
 )
-from ophyd_async.epics.motor import Motor
 
 
 def step_to_num(start: float, stop: float, step: float) -> tuple[float, float, int]:
@@ -210,46 +205,9 @@ class AngleWithPhase(NamedTuple):
             )
 
 
-class WrappedAxis(StandardReadable):
-    def __init__(self, real_motor: Motor, name=""):
-        self._real_motor = Reference(real_motor)
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.offset_and_phase = derived_signal_rw(
-                self._get_motor_offset_and_phase,
-                self._set_motor_offset_and_phase,
-                motor_pos=real_motor,
-            )
-        with self.add_children_as_readables():
-            self.phase = derived_signal_rw(
-                self._get_phase, self._set_phase, offset_and_phase=self.offset_and_phase
-            )
-        super().__init__(name=name)
-
-    def _get_motor_offset_and_phase(self, motor_pos: float) -> MotorOffsetAndPhase:
-        angle = AngleWithPhase.wrap(motor_pos)
-        return np.array([angle.offset, angle.phase])
-
-    async def _set_motor_offset_and_phase(self, value: MotorOffsetAndPhase):
-        await self._real_motor().set(
-            AngleWithPhase.from_offset_and_phase(value).unwrap()
-        )
-
-    def _get_phase(self, offset_and_phase: MotorOffsetAndPhase) -> float:
-        return offset_and_phase[1].item()
-
-    async def _set_phase(self, value: float):
-        """Set the motor phase to the specified phase value in degrees.
-        The motor will travel via the shortest distance path.
-        """
-        offset_and_phase = await self.offset_and_phase.get_value()
-        current_position = AngleWithPhase.from_offset_and_phase(offset_and_phase)
-        target_value = current_position.nearest_to_phase(value).unwrap()
-        await self._real_motor().set(target_value)
-
-    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
-        """Obtain the shortest distance between theta2 and theta1 in degrees.
-        This will be the shortest distance in mod360 space (i.e. always <= 180 degrees).
-        """
-        return AngleWithPhase.wrap(theta1_deg).phase_distance(
-            AngleWithPhase.wrap(theta2_deg)
-        )
+def reflect_phase(phase) -> float:
+    """Convert the phase angle as if the corresponding unwrapped angle were to
+    be reflected about the origin and then re-wrapped, this corresponds to
+    converting a clockwise angle to an anti-clockwise angle and vice-versa.
+    """
+    return (360 - phase) % 360
