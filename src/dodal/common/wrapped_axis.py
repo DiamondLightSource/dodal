@@ -30,6 +30,8 @@ class WrappedAxis(StandardReadable):
              on the wrapped axis.
              * The reverse is also true 0 -> 240 -> 360 ->  is 0 degrees of real motion when executed on the wrapped axis
               but 360 degrees when performed in the unwrapped axis.
+             * The above means that use of phase to set motor position is unsuitable for axes
+             where the underlying motor rotation is constrained.
           offset_and_phase (Array1D[np.float32]): retrieve the offset and phase together, for use when
              mapping to the underlying unwrapped axis. These values can be converted and manipulated using the
              AngleWithPhase helper class.
@@ -67,11 +69,3 @@ class WrappedAxis(StandardReadable):
         current_position = AngleWithPhase(offset_and_phase)
         target_value = current_position.nearest_with_phase(value).unwrap()
         await self._real_motor().set(target_value)
-
-    def distance(self, theta1_deg: float, theta2_deg: float) -> float:
-        """Obtain the shortest distance between theta2 and theta1 in degrees.
-        This will be the shortest distance in mod360 space (i.e. always <= 180 degrees).
-        """
-        return AngleWithPhase.wrap(theta1_deg).phase_distance(
-            AngleWithPhase.wrap(theta2_deg)
-        )

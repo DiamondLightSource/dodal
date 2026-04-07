@@ -168,11 +168,11 @@ class AngleWithPhase:
 
     @overload
     def __init__(self, offset_and_phase: Iterable[float], /):
-        pass
+        pass  # pragma: no cover
 
     @overload
     def __init__(self, offset: float, phase: float, /):
-        pass
+        pass  # pragma: no cover
 
     def __init__(self, offset: float | Iterable[float], phase: float = 0):
         """Construct a normalised representation of the offset and phase, such that
