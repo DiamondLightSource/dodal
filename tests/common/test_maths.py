@@ -8,6 +8,7 @@ from dodal.common.maths import (
     AngleWithPhase,
     Rectangle2D,
     do_rotation,
+    reflect_phase,
     rotate_clockwise,
     rotate_counter_clockwise,
 )
@@ -324,5 +325,5 @@ def test_angle_with_phase_nearest_with_phase(
     "phase, expected_phase",
     [[1, 359], [-1, 1], [180, 180], [179, 181], [181, 179], [360, 0], [0, 0]],
 )
-def reflect_phase(phase: float, expected_phase: float):
+def test_reflect_phase(phase: float, expected_phase: float):
     assert reflect_phase(phase) == expected_phase

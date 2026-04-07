@@ -199,7 +199,7 @@ class AngleWithPhase:
         offset = AngleWithPhase.offset_from_unwrapped(unwrapped)
         return cls(offset, unwrapped - offset)
 
-    def rebase_to(self, other: Self) -> Self:
+    def rebase_to(self, other: Self) -> "AngleWithPhase":
         """Return this angle with the offset adjusted such that the phases can be compared."""
         correction = other.offset - self.offset
         if correction % 360:
