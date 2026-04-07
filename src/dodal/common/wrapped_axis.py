@@ -16,27 +16,27 @@ class WrappedAxis(StandardReadable):
 
     Attributes:
           phase (float): This is a read-write signal that corresponds to the motor's phase angle, relative to the offset.
-          The behaviour of the phase signal differs from that of the underlying motor setpoint/readback signal
-          in the following ways:
-             * Readback values are constrained to 0 <= omega < 360
-             * Write values are normalised to 0 <= omega < 360, and then mapped to the nearest unwrapped angle. The
-             underlying motor will be moved via the shortest path to the required phase angle, thus the direction
-             of an unwrapped axis move is not always the same as the direction of a move in the wrapped axis.
-             * Write values are normalised so for un-normalised writes, the readback will differ.
-             * Bluesky mvr operations greater of 180 degrees or more will not result in the expected moves.
-             * set_and_wait_for_value() is unreliable close to the wrap-around (however in the common case this is
-               where deadband is 0.001 and values are rounded to this level, the default equality comparison is sufficient).
-             * Sequences of moves on the unwrapped axis that would not result in cumulative motion axis will
-             result in a cumulative motion in the wrapped axis. e.g. 0 -> 120 -> 240 -> 0 is 0 degrees of real
-             cumulative motion when performed in the unwrapped case, but is 360 degrees of real motion when performed
-             on the wrapped axis.
-             * The reverse is also true 0 -> 240 -> 360 ->  is 0 degrees of real motion when executed on the wrapped axis
-              but 360 degrees when performed in the unwrapped axis.
-             * The above means that use of phase to set motor position is unsuitable for axes
-             where the underlying motor rotation is constrained.
+              The behaviour of the phase signal differs from that of the underlying motor setpoint/readback signal
+              in the following ways:
+                 * Readback values are constrained to 0 <= omega < 360
+                 * Write values are normalised to 0 <= omega < 360, and then mapped to the nearest unwrapped angle. The
+                   underlying motor will be moved via the shortest path to the required phase angle, thus the direction
+                   of an unwrapped axis move is not always the same as the direction of a move in the wrapped axis.
+                 * Write values are normalised so for un-normalised writes, the readback will differ.
+                 * Bluesky mvr operations greater of 180 degrees or more will not result in the expected moves.
+                 * set_and_wait_for_value() is unreliable close to the wrap-around (however in the common case this is
+                   where deadband is 0.001 and values are rounded to this level, the default equality comparison is sufficient).
+                 * Sequences of moves on the unwrapped axis that would not result in cumulative motion axis will
+                   result in a cumulative motion in the wrapped axis. e.g. 0 -> 120 -> 240 -> 0 is 0 degrees of real
+                   cumulative motion when performed in the unwrapped case, but is 360 degrees of real motion when performed
+                   on the wrapped axis.
+                 * The reverse is also true 0 -> 240 -> 360 ->  is 0 degrees of real motion when executed on the wrapped axis
+                   but 360 degrees when performed in the unwrapped axis.
+                 * The above means that use of phase to set motor position is unsuitable for axes
+                   where the underlying motor rotation is constrained.
           offset_and_phase (Array1D[np.float32]): retrieve the offset and phase together, for use when
-             mapping to the underlying unwrapped axis. These values can be converted and manipulated using the
-             AngleWithPhase helper class.
+              mapping to the underlying unwrapped axis. These values can be converted and manipulated using the
+              AngleWithPhase helper class.
     """
 
     def __init__(self, real_motor: Motor, name=""):
