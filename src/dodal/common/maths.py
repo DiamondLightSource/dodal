@@ -213,9 +213,9 @@ class AngleWithPhase:
 
     def phase_distance(self, other: Self) -> float:
         """Determine the shortest distance between this angle and the specified angle."""
-        other = other.rebase_to(self)
-        max_theta = max(self.phase, other.phase)
-        min_theta = min(self.phase, other.phase)
+        rebased_other = other.rebase_to(self)
+        max_theta = max(self.phase, rebased_other.phase)
+        min_theta = min(self.phase, rebased_other.phase)
         return min(max_theta - min_theta, min_theta + 360 - max_theta)
 
     @classmethod
