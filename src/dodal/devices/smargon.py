@@ -124,7 +124,8 @@ class Smargon(XYZOmegaStage, Movable):
         only come back after the motion on that axis finished.
         """
         await self.defer_move.set(DeferMoves.ON)
-        # TODO something something i03 broken smargon serialise moves workaround
+        # TODO Hotfix required here until https://github.com/DiamondLightSource/dodal/issues/1998
+        # is implemented in separate PR
         try:
             finished_moving = []
             for motor_name, new_setpoint in value.items():

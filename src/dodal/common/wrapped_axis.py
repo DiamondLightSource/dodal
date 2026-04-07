@@ -24,6 +24,8 @@ class WrappedAxis(StandardReadable):
              of an unwrapped axis move is not always the same as the direction of a move in the wrapped axis.
              * Write values are normalised so for un-normalised writes, the readback will differ.
              * Bluesky mvr operations greater of 180 degrees or more will not result in the expected moves.
+             * set_and_wait_for_value() is unreliable close to the wrap-around (however in the common case this is
+               where deadband is 0.001 and values are rounded to this level, the default equality comparison is sufficient).
              * Sequences of moves on the unwrapped axis that would not result in cumulative motion axis will
              result in a cumulative motion in the wrapped axis. e.g. 0 -> 120 -> 240 -> 0 is 0 degrees of real
              cumulative motion when performed in the unwrapped case, but is 360 degrees of real motion when performed
