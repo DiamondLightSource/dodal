@@ -24,6 +24,7 @@ dodal.beamlines.i19\_1
 
    .. autosummary::
    
+      config_client
       oav_config
    
    

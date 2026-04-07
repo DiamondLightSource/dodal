@@ -24,6 +24,7 @@ dodal.beamlines.i24
 
    .. autosummary::
    
+      config_client
       path_provider
    
    

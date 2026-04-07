@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i04 &#8212; dodal 2.2.1.dev10+gaf1430fdf documentation</title>
+    <title>dodal.beamlines.i04 &#8212; dodal 2.2.1.dev11+gfe5c9c0fc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=d21179f9"></script>
+    <script src="../../../_static/documentation_options.js?v=1058cdd3"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,7 +885,6 @@ window.addEventListener("load", load);</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Reference</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_beamline_parameters</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_config_client</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
@@ -942,6 +941,9 @@ window.addEventListener("load", load);</script>
 <span class="c1"># Use BlueAPI scratch until https://github.com/DiamondLightSource/mx-bluesky/issues/1097 is done</span>
 <span class="n">ZOOM_PARAMS_FILE</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i04/software/bluesky/scratch/jCameraManZoomLevels.xml&quot;</span>
 <span class="n">DISPLAY_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i04/software/bluesky/scratch/display.configuration&quot;</span>
+<span class="n">BEAMLINE_PARAMETERS_PATH</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;/dls_sw/i04/software/daq_configuration/domain/beamlineParameters&quot;</span>
+<span class="p">)</span>
 <span class="n">DAQ_CONFIGURATION_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i04/software/daq_configuration&quot;</span>
 <span class="n">I04_CONFIG_SERVER_ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;https://i04-daq-config.diamond.ac.uk&quot;</span>
 
@@ -993,10 +995,12 @@ window.addEventListener("load", load);</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">beamstop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Beamstop</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">beamstop</span><span class="p">(</span><span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Beamstop</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Beamstop</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-BS-01:&quot;</span><span class="p">,</span>
-        <span class="n">beamline_parameters</span><span class="o">=</span><span class="n">get_beamline_parameters</span><span class="p">(</span><span class="n">BL</span><span class="p">),</span>
+        <span class="n">beamline_parameters</span><span class="o">=</span><span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
+            <span class="n">BEAMLINE_PARAMETERS_PATH</span><span class="p">,</span> <span class="nb">dict</span>
+        <span class="p">),</span>
     <span class="p">)</span>
 
 
@@ -1044,8 +1048,8 @@ window.addEventListener("load", load);</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">aperture_scatterguard</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ApertureScatterguard</span><span class="p">:</span>
-    <span class="n">params</span> <span class="o">=</span> <span class="n">get_beamline_parameters</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">aperture_scatterguard</span><span class="p">(</span><span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureScatterguard</span><span class="p">:</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span><span class="n">BEAMLINE_PARAMETERS_PATH</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ApertureScatterguard</span><span class="p">(</span>
         <span class="n">aperture_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-MAPT-01:&quot;</span><span class="p">,</span>
         <span class="n">scatterguard_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-SCAT-01:&quot;</span><span class="p">,</span>
@@ -1104,18 +1108,22 @@ window.addEventListener("load", load);</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">oav</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">OAVConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAVBeamCentrePV</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">oav</span><span class="p">(</span>
+    <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">OAVConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAVBeamCentrePV</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">OAVBeamCentrePV</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-OAV-01:&quot;</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">params</span> <span class="ow">or</span> <span class="n">OAVConfig</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">params</span> <span class="ow">or</span> <span class="n">OAVConfig</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">,</span> <span class="n">config_client</span><span class="p">),</span>
     <span class="p">)</span>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">oav_full_screen</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">OAVConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAVBeamCentrePV</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">oav_full_screen</span><span class="p">(</span>
+    <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">OAVConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAVBeamCentrePV</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">OAVBeamCentrePV</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-OAV-01:&quot;</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">params</span> <span class="ow">or</span> <span class="n">OAVConfig</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">params</span> <span class="ow">or</span> <span class="n">OAVConfig</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">,</span> <span class="n">config_client</span><span class="p">),</span>
         <span class="n">overlay_channel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">mjpeg_prefix</span><span class="o">=</span><span class="s2">&quot;XTAL&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1180,11 +1188,13 @@ window.addEventListener("load", load);</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">scintillator</span><span class="p">(</span><span class="n">aperture_scatterguard</span><span class="p">:</span> <span class="n">ApertureScatterguard</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scintillator</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scintillator</span><span class="p">(</span>
+    <span class="n">aperture_scatterguard</span><span class="p">:</span> <span class="n">ApertureScatterguard</span><span class="p">,</span> <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scintillator</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Scintillator</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-SCIN-01:&quot;</span><span class="p">,</span>
         <span class="n">Reference</span><span class="p">(</span><span class="n">aperture_scatterguard</span><span class="p">),</span>
-        <span class="n">get_beamline_parameters</span><span class="p">(</span><span class="n">BL</span><span class="p">),</span>
+        <span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span><span class="n">BEAMLINE_PARAMETERS_PATH</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span>
     <span class="p">)</span>
 
 

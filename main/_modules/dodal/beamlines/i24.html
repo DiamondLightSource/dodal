@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i24 &#8212; dodal 2.2.1.dev10+gaf1430fdf documentation</title>
+    <title>dodal.beamlines.i24 &#8212; dodal 2.2.1.dev11+gfe5c9c0fc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=d21179f9"></script>
+    <script src="../../../_static/documentation_options.js?v=1058cdd3"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -953,6 +953,15 @@ window.addEventListener("load", load);</script>
 
 
 
+<div class="viewcode-block" id="config_client">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.config_client">[docs]</a>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">fixture</span>
+<span class="nd">@cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">config_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ConfigClient</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ConfigClient</span><span class="p">()</span></div>
+
+
+
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">attenuator</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">EnumFilterAttenuator</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">EnumFilterAttenuator</span><span class="p">(</span>
@@ -995,10 +1004,10 @@ window.addEventListener("load", load);</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">oav</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">OAVBeamCentreFile</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">oav</span><span class="p">(</span><span class="n">config_client</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAVBeamCentreFile</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">OAVBeamCentreFile</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-OAV-01:&quot;</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">OAVConfigBeamCentre</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">,</span> <span class="n">DISPLAY_CONFIG</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">OAVConfigBeamCentre</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">,</span> <span class="n">DISPLAY_CONFIG</span><span class="p">,</span> <span class="n">config_client</span><span class="p">),</span>
     <span class="p">)</span>
 
 
