@@ -273,27 +273,27 @@ def test_angle_with_phase_rebase(
 
 
 @pytest.mark.parametrize(
-    "offset1, phase1, offset2, phase2, expected_distance",
+    "phase1, phase2, expected_distance",
     [
-        [0, 0, 360, 0, 0],
-        [0, 0, 0, 330, 30],
-        [0, 0, 0, 30, 30],
-        [0, 1, 0, 359, 2],
-        [0, 0, 0, 181, 179],
-        [370, 0, 360, 0, 10],
+        [0, 0, 0],
+        [0, 360, 0],
+        [0, 330, 30],
+        [0, 30, 30],
+        [0, 179, 179],
+        [0, 180, 180],
+        [0, 181, 179],
+        [360, 350, 10],
+        [355, -90, 85],
     ],
 )
 def test_angle_with_phase_phase_distance(
-    offset1: float,
     phase1: float,
-    offset2: float,
     phase2: float,
     expected_distance: float,
 ):
-    angle1 = AngleWithPhase(offset1, phase1)
-    angle2 = AngleWithPhase(offset2, phase2)
-    assert angle1.phase_distance(angle2) == expected_distance
-    assert angle2.phase_distance(angle1) == expected_distance
+    angle = AngleWithPhase(0, phase1)
+    assert angle.phase_distance(phase2) == expected_distance
+    assert AngleWithPhase(0, phase2).phase_distance(phase1) == expected_distance
 
 
 @pytest.mark.parametrize(

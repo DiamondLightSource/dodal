@@ -211,11 +211,15 @@ class AngleWithPhase:
         """Generate the unwrapped representation of this angle."""
         return self.offset + self.phase
 
-    def phase_distance(self, other: Self) -> float:
-        """Determine the shortest distance between this angle and the specified angle."""
-        rebased_other = other.rebase_to(self)
-        max_theta = max(self.phase, rebased_other.phase)
-        min_theta = min(self.phase, rebased_other.phase)
+    def phase_distance(self, phase: float) -> float:
+        """Determine the shortest distance between this angle and the specified phase.
+
+        Args:
+            phase (float): The phase angle to compare to
+        """
+        phase = phase % 360
+        max_theta = max(self.phase, phase)
+        min_theta = min(self.phase, phase)
         return min(max_theta - min_theta, min_theta + 360 - max_theta)
 
     @classmethod
