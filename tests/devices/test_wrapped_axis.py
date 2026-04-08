@@ -77,3 +77,29 @@ async def test_wrapped_axis_read_returns_phase_and_offset_phase(
         reading["wrapped_omega-offset_and_phase"]["value"] == np.array([360, 90])
     )
     assert reading["wrapped_omega-phase"]["value"] == 90
+
+
+@pytest.mark.parametrize(
+    "offset, phase, expected_unwrapped",
+    [
+        [0, 0, 0],
+        [360, 0, 360],
+        [-360, 0, -360],
+        [0, 90, 90],
+        [360, 1, 361],
+        [360, -90, 270],
+        [0, 270, 270],
+        [-360, 90, -270],
+        [720, 0, 720],
+        [360, 90, 450],
+    ],
+)
+async def test_wrapped_axis_set_offset_and_phase(
+    omega: Motor,
+    wrapped_omega: WrappedAxis,
+    offset: float,
+    phase: float,
+    expected_unwrapped: float,
+):
+    await wrapped_omega.offset_and_phase.set(np.array([offset, phase]))
+    get_mock_put(omega.user_setpoint).assert_called_once_with(expected_unwrapped)
