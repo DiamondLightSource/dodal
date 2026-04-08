@@ -18,6 +18,7 @@ from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 from dodal.log import LOGGER
 
+
 class StubPosition(Enum):
     CURRENT_AS_CENTER = 0
     RESET_TO_ROBOT_LOAD = 1
