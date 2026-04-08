@@ -17,7 +17,7 @@ from dodal.common.maths import (
     rotate_clockwise,
     rotate_counter_clockwise,
 )
-from dodal.common.wrapped_axis import WrappedAxis
+from dodal.devices.wrapped_axis import WrappedAxis
 
 _X = "X"
 _Y = "Y"

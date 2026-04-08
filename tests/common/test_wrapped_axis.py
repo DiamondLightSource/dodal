@@ -3,7 +3,7 @@ import pytest
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.wrapped_axis import WrappedAxis
+from dodal.devices.wrapped_axis import WrappedAxis
 
 
 @pytest.fixture
