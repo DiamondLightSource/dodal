@@ -19,10 +19,7 @@ from tests.devices.oav.test_data import (
 
 @pytest.fixture
 def mock_parameters():
-    return OAVParameters(
-        "loopCentring",
-        TEST_OAV_CENTRING_JSON,
-    )
+    return OAVParameters(ConfigClient(""), "loopCentring", TEST_OAV_CENTRING_JSON)
 
 
 @pytest.fixture
