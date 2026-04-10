@@ -27,7 +27,7 @@ from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
 )
-from .enum import Pol, UndulatorGateStatus
+from .enum import Pol
 from .lookup_table_models import (
     EnergyCoverage,
     LookupTable,
@@ -60,7 +60,6 @@ __all__ = [
     "Pol",
     "DEFAULT_MOTOR_MIN_TIMEOUT",
     "EnabledDisabledUpper",
-    "UndulatorGateStatus",
     "Apple2LockedPhasesVal",
     "EnergyMotorLookup",
     "ConfigServerEnergyMotorLookup",

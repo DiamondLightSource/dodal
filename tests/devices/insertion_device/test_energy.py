@@ -14,13 +14,13 @@ from ophyd_async.core import (
     wait_for_value,
 )
 
+from dodal.common.enums import OpenClosed
 from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     BeamEnergy,
     InsertionDeviceEnergy,
     Pol,
     UndulatorGap,
-    UndulatorGateStatus,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 
@@ -84,7 +84,7 @@ async def test_insertion_device_energy_prepare_success(
     set_mock_value(mock_id_controller.apple2().gap().min_velocity, 1)
     set_mock_value(mock_id_controller.apple2().gap().low_limit_travel, 0)
     set_mock_value(mock_id_controller.apple2().gap().high_limit_travel, 200)
-    set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id_controller.apple2().gap().gate, OpenClosed.CLOSED)
     set_mock_value(
         mock_id_controller.apple2().gap().acceleration_time, acceleration_time
     )
@@ -173,7 +173,7 @@ async def test_beam_energy_kickoff_set_correct_delay(
     set_mock_value(mock_pgm.energy.low_limit_travel, 0)
     set_mock_value(mock_pgm.energy.high_limit_travel, 1000)
     set_mock_value(mock_pgm.energy.acceleration_time, pgm_acc_time)
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id_gap.gate, OpenClosed.CLOSED)
     mock_id_gap.kickoff = AsyncMock()
     mock_pgm.energy.kickoff = AsyncMock()
     await mock_beam_energy.prepare(fly_info)
