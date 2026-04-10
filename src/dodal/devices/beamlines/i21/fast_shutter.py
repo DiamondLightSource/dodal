@@ -6,8 +6,8 @@ from dodal.devices.fast_shutter import EnumTypesT, FastShutter
 
 
 class FastShutterWithLateralMotor(FastShutter[EnumTypesT], Generic[EnumTypesT]):
-    """Implementation of fast shutter that connects to an epics pv. This pv is an enum
-    that controls the open and close state of the shutter.
+    """Implementation of fast shutter that connects to an epics enum pv. This controls
+    the open and close state of the shutter. This also has the lateral motor x.
 
     Args:
         pv (str): The pv to connect to the shutter device.
