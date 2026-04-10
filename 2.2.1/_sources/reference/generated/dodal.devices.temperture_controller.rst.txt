@@ -1,0 +1,38 @@
+dodal.devices.temperture\_controller
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~temperture_controller.Lakeshore336
+   ~temperture_controller.Lakeshore340
+   ~temperture_controller.Lakeshore
+
+
+
+
+.. automodule:: dodal.devices.temperture_controller
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

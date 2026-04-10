@@ -1,0 +1,35 @@
+dodal.devices.zocalo.ZocaloStartInfo
+====================================
+
+.. currentmodule:: dodal.devices.zocalo
+
+.. autoclass:: ZocaloStartInfo
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ZocaloStartInfo.ispyb_dcid
+      
+      
+      ~ZocaloStartInfo.filename
+      
+      
+      ~ZocaloStartInfo.start_frame_index
+      
+      
+      ~ZocaloStartInfo.number_of_frames
+      
+      
+      ~ZocaloStartInfo.message_index
+      
+   
+   

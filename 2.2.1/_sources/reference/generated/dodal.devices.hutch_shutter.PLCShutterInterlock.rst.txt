@@ -1,0 +1,49 @@
+dodal.devices.hutch\_shutter.PLCShutterInterlock
+================================================
+
+.. currentmodule:: dodal.devices.hutch_shutter
+
+.. autoclass:: PLCShutterInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~PLCShutterInterlock.shutter_safe_to_operate
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~PLCShutterInterlock.status
+      
+      
+      ~PLCShutterInterlock.bl_prefix
+      
+   
+   

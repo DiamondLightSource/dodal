@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i15.jack.JackY
+======================================
+
+.. currentmodule:: dodal.devices.beamlines.i15.jack
+
+.. autoclass:: JackY
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

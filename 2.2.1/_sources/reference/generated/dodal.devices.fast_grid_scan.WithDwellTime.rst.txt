@@ -1,0 +1,61 @@
+dodal.devices.fast\_grid\_scan.WithDwellTime
+============================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: WithDwellTime
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~WithDwellTime.non_integer_dwell_time
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~WithDwellTime.model_config
+      
+      
+      
+      
+      
+      ~WithDwellTime.dwell_time_ms
+      
+   
+   

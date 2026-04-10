@@ -1,0 +1,102 @@
+dodal.devices.electron\_analyser.base.GenericRegion
+===================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: GenericRegion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~GenericRegion.model_config
+      
+      
+      
+      
+      
+      ~GenericRegion.name
+      
+      
+      ~GenericRegion.enabled
+      
+      
+      ~GenericRegion.slices
+      
+      
+      ~GenericRegion.iterations
+      
+      
+      ~GenericRegion.excitation_energy_source
+      
+      
+      ~GenericRegion.lens_mode
+      
+      
+      ~GenericRegion.pass_energy
+      
+      
+      ~GenericRegion.acquisition_mode
+      
+      
+      ~GenericRegion.low_energy
+      
+      
+      ~GenericRegion.centre_energy
+      
+      
+      ~GenericRegion.high_energy
+      
+      
+      ~GenericRegion.acquire_time
+      
+      
+      ~GenericRegion.energy_step
+      
+      
+      ~GenericRegion.energy_mode
+      
+   
+   

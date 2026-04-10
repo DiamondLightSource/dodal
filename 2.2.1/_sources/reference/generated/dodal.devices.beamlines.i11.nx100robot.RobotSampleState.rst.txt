@@ -1,0 +1,44 @@
+dodal.devices.beamlines.i11.nx100robot.RobotSampleState
+=======================================================
+
+.. currentmodule:: dodal.devices.beamlines.i11.nx100robot
+
+.. autoclass:: RobotSampleState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~RobotSampleState.CAROUSEL
+      
+      
+      ~RobotSampleState.ONGRIP
+      
+      
+      ~RobotSampleState.DIFFRACTOMETER
+      
+      
+      ~RobotSampleState.UNKNOWN
+      
+   
+   

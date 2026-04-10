@@ -1,0 +1,36 @@
+dodal.devices.aperture
+======================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~aperture.Aperture
+
+
+
+
+.. automodule:: dodal.devices.aperture
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

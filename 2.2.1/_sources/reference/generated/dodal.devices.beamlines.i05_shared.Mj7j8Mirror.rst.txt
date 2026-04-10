@@ -1,0 +1,84 @@
+dodal.devices.beamlines.i05\_shared.Mj7j8Mirror
+===============================================
+
+.. currentmodule:: dodal.devices.beamlines.i05_shared
+
+.. autoclass:: Mj7j8Mirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Mj7j8Mirror.UNKNOWN
+      
+      
+      ~Mj7j8Mirror.MJ8
+      
+      
+      ~Mj7j8Mirror.MJ7
+      
+      
+      ~Mj7j8Mirror.REFERENCE
+      
+   
+   

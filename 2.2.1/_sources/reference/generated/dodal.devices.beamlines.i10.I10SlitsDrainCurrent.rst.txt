@@ -1,0 +1,31 @@
+dodal.devices.beamlines.i10.I10SlitsDrainCurrent
+================================================
+
+.. currentmodule:: dodal.devices.beamlines.i10
+
+.. autoclass:: I10SlitsDrainCurrent
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
