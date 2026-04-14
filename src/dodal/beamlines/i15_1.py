@@ -86,14 +86,14 @@ def f2y() -> Motor:
 
 
 @devices.factory()
-def h() -> XYZStage:
+def hexapod() -> XYZStage:
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-HEX-01:",
     )
 
 
 @devices.factory()
-def hr() -> XYZStage:
+def hexapod_rot() -> XYZStage:
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-HEX-01:",
         x_infix="RX",
