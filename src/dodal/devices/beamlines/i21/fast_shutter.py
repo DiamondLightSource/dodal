@@ -16,7 +16,7 @@ class FastShutterWithLateralMotor(FastShutter[EnumTypesT], Generic[EnumTypesT]):
         close_state (EnumTypesT): The enum value that corresponds with closing the
             shutter.
         shutter_suffix (str, optional): Shutter suffix state. Defaults to CON.
-        lateral_suffix (str, optional): Lateral mottor suffix. Defaults to LAT.
+        lateral_suffix (str, optional): Lateral motor suffix. Defaults to LAT.
         name (str, optional): The name of the shutter.
     """
 
