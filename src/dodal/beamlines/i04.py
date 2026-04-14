@@ -1,7 +1,10 @@
+from functools import cache
+
+from daq_config_server import ConfigClient
 from ophyd_async.core import Reference
 
-from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
@@ -56,8 +59,11 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 # Use BlueAPI scratch until https://github.com/DiamondLightSource/mx-bluesky/issues/1097 is done
 ZOOM_PARAMS_FILE = "/dls_sw/i04/software/bluesky/scratch/jCameraManZoomLevels.xml"
 DISPLAY_CONFIG = "/dls_sw/i04/software/bluesky/scratch/display.configuration"
+BEAMLINE_PARAMETERS_PATH = (
+    "/dls_sw/i04/software/daq_configuration/domain/beamlineParameters"
+)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
-
+I04_CONFIG_SERVER_ENDPOINT = "https://i04-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i04")
 set_log_beamline(BL)
@@ -72,9 +78,17 @@ PREFIX = BeamlinePrefix(BL)
 devices = DeviceManager()
 
 
-@devices.factory()
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient(I04_CONFIG_SERVER_ENDPOINT)
+    set_config_client(client)
+    return client
+
+
+@devices.factory(use_factory_name=False)
 def smargon() -> Smargon:
-    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", name="gonio")
 
 
 @devices.factory()
@@ -96,10 +110,12 @@ def ipin() -> IPin:
 
 
 @devices.factory()
-def beamstop() -> Beamstop:
+def beamstop(config_client: ConfigClient) -> Beamstop:
     return Beamstop(
         f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(),
+        beamline_parameters=config_client.get_file_contents(
+            BEAMLINE_PARAMETERS_PATH, dict
+        ),
     )
 
 
@@ -147,8 +163,8 @@ def backlight() -> Backlight:
 
 
 @devices.factory()
-def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters()
+def aperture_scatterguard(config_client: ConfigClient) -> ApertureScatterguard:
+    params = config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -179,9 +195,12 @@ def daq_configuration_path() -> str:
 
 
 @devices.factory()
-def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
+def undulator(
+    baton: Baton, daq_configuration_path: str, config_client: ConfigClient
+) -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )
@@ -201,18 +220,22 @@ def zebra() -> Zebra:
 
 
 @devices.factory()
-def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
+def oav(
+    config_client: ConfigClient, params: OAVConfig | None = None
+) -> OAVBeamCentrePV:
     return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfig(ZOOM_PARAMS_FILE),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE, config_client),
     )
 
 
 @devices.factory()
-def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
+def oav_full_screen(
+    config_client: ConfigClient, params: OAVConfig | None = None
+) -> OAVBeamCentrePV:
     return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfig(ZOOM_PARAMS_FILE),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE, config_client),
         overlay_channel=3,
         mjpeg_prefix="XTAL",
     )
@@ -277,11 +300,13 @@ def pin_tip_detection() -> PinTipDetection:
 
 
 @devices.factory()
-def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, config_client: ConfigClient
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(),
+        config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict),
     )
 
 

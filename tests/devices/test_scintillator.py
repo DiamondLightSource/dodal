@@ -1,31 +1,29 @@
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from ophyd_async.core import get_mock_put, init_devices
 from ophyd_async.testing import assert_value
 
-from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
 from dodal.devices.scintillator import InOut, Scintillator
 
 
 @pytest.fixture
-def mock_beamline_parameters() -> GDABeamlineParameters:
-    return GDABeamlineParameters(
-        params={
-            "scin_y_SCIN_IN": 100.855,
-            "scin_y_SCIN_OUT": -0.02,
-            "scin_z_SCIN_IN": 101.5115,
-            "scin_z_SCIN_OUT": 0.1,
-            "scin_y_tolerance": 0.1,
-            "scin_z_tolerance": 0.12,
-        }
-    )
+def mock_beamline_parameters() -> dict[str, Any]:
+    return {
+        "scin_y_SCIN_IN": 100.855,
+        "scin_y_SCIN_OUT": -0.02,
+        "scin_z_SCIN_IN": 101.5115,
+        "scin_z_SCIN_OUT": 0.1,
+        "scin_y_tolerance": 0.1,
+        "scin_z_tolerance": 0.12,
+    }
 
 
 @pytest.fixture
 async def scintillator_and_ap_sg(
-    mock_beamline_parameters: GDABeamlineParameters,
+    mock_beamline_parameters: dict[str, Any],
 ) -> tuple[Scintillator, MagicMock]:
     async with init_devices(mock=True):
         mock_ap_sg = MagicMock()

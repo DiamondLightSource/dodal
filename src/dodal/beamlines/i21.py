@@ -1,10 +1,14 @@
 from pathlib import Path
 
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i21 import Grating
+from dodal.devices.beamlines.i21 import (
+    Grating,
+    I21SampleManipulatorStage,
+    ToolPointMotion,
+)
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
@@ -34,7 +38,7 @@ set_utils_beamline(BL)
 I21_PHASE_POLY_DEG_COLUMNS = ["b"]
 I21_GRATING_COLUMNS = "Grating"
 
-I21_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+I21_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i21/software/gda/workspace_git/gda-diamond.git/configurations/i21-config/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "IDEnergy2GapCalibrations.csv"
 PHASE_LOOKUP_FILE_NAME = "IDEnergy2PhaseCalibrations.csv"
@@ -129,3 +133,13 @@ def energy(
 @devices.factory()
 def sample_temperature_controller() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
+
+
+@devices.factory()
+def smp() -> I21SampleManipulatorStage:
+    return I21SampleManipulatorStage(prefix=f"{PREFIX.beamline_prefix}-EA-SMPL-01:")
+
+
+@devices.factory()
+def uvw(smp: I21SampleManipulatorStage) -> ToolPointMotion:
+    return ToolPointMotion(smp)

@@ -1,14 +1,16 @@
 from dodal.beamlines.b07_shared import devices as b07_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.b07 import PsuMode
 from dodal.devices.beamlines.b07_1 import (
     ChannelCutMonochromator,
     Grating,
     LensMode,
 )
+from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -20,6 +22,11 @@ set_utils_beamline(BL)
 
 devices = DeviceManager()
 devices.include(b07_shared_devices)
+
+
+@devices.factory()
+def pss_shutter1() -> HutchShutter:
+    return HutchShutter(C_PREFIX.beamline_prefix)
 
 
 @devices.factory()
@@ -49,4 +56,17 @@ def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
         energy_source=energy_source,
+    )
+
+
+@devices.factory()
+def sm() -> XYZAzimuthPolarStage:
+    """Sample manipulator."""
+    return XYZAzimuthPolarStage(
+        f"{C_PREFIX.beamline_prefix}-EA-SM-01:",
+        x_infix="XP",
+        y_infix="YP",
+        z_infix="ZP",
+        azimuth_infix="ROTB",
+        polar_infix="ROTA",
     )

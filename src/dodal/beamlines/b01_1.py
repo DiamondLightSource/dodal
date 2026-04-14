@@ -4,6 +4,7 @@ from pathlib import Path
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import NDROIStatIO
+from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -14,8 +15,10 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
-BL = "c01"
-PREFIX = BeamlinePrefix(BL)
+BL = "b01-1"
+# TODO: Remove need for `suffix`
+# https://github.com/DiamondLightSource/dodal/issues/1916
+PREFIX = BeamlinePrefix(BL, suffix="C")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -39,14 +42,28 @@ def path_provider() -> PathProvider:
 
 
 @devices.factory()
-def panda(path_provider: PathProvider) -> HDFPanda:
+def pandabrick(path_provider: PathProvider) -> HDFPanda:
+    """Provides encoder information for triggering.
+
+    Returns:
+        HDFPanda: The HDF5-based device for syncing pmac
+        encoder information with detector triggering.
+    """
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-MO-PPANDA-01:",
+        path_provider=path_provider,
+    )
+
+
+@devices.factory()
+def pandabox(path_provider: PathProvider) -> HDFPanda:
     """Provides triggering of the detectors.
 
     Returns:
         HDFPanda: The HDF5-based detector trigger device.
     """
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-MO-PPANDA-01:",
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=path_provider,
     )
 
@@ -105,4 +122,18 @@ def sample_stage() -> XYZStage:
     """
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+    )
+
+
+@devices.factory()
+def pmac(sample_stage: XYZStage) -> PmacIO:
+    """A Power PMAC.
+
+    Returns:
+        PmacIO: IO interface for the Power PMAC.
+    """
+    return PmacIO(
+        prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+        raw_motors=[sample_stage.y, sample_stage.x],
+        coord_nums=[1],
     )

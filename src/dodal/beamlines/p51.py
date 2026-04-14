@@ -25,14 +25,9 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    # Currently we must hard-code the visit, determining the visit at runtime requires
-    # infrastructure that is still WIP.
-    # Communication with GDA is also WIP so for now we determine an arbitrary scan number
-    # locally and write the commissioning directory. The scan number is not guaranteed to
-    # be unique and the data is at risk - this configuration is for testing only.
     return StaticVisitPathProvider(
         BL,
-        Path("/dls/p51/data/2026/cm44254-1/tmp"),
+        Path("/dls/p51/data/2026/cm44254-1"),
         client=RemoteDirectoryServiceClient("http://i20-1-control:8088/api"),
     )
 
@@ -58,20 +53,28 @@ def turbo_slit_x() -> Motor:
 
 
 @devices.factory()
-def turbo_slit_pmac() -> PmacIO:
+def turbo_slit_pmac(turbo_slit_x: Motor) -> PmacIO:
     """PMac controller using running fly scans with trajectory."""
-    motor = turbo_slit_x()
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-STEP-06:",
-        raw_motors=[motor],
+        raw_motors=[turbo_slit_x],
         coord_nums=[3],
     )
 
 
 @devices.factory()
-def panda(path_provider: PathProvider) -> HDFPanda:
+def panda1(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=path_provider
+        f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
+        path_provider=path_provider,
+    )
+
+
+@devices.factory()
+def panda2(path_provider: PathProvider) -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=path_provider,
     )
 
 

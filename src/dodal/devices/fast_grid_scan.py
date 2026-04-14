@@ -321,9 +321,6 @@ class FastGridScanCommon(
                 )
             )
 
-        # Counter should always start at 0
-        set_statuses.append(set_and_wait_for_value(self.position_counter, 0))
-
         LOGGER.info("Gridscan parameters applied, waiting for sets to complete...")
 
         # wait for parameter sets to complete

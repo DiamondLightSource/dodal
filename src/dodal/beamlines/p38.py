@@ -1,10 +1,15 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
+from dodal.common.beamlines.beamline_utils import (
+    get_config_client,
+    set_config_client,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
@@ -46,6 +51,9 @@ def path_provider() -> PathProvider:
         Path("/dls/p38/data/2025/cm40650-2/bluesky"),
         client=LocalDirectoryServiceClient(),
     )
+
+
+set_config_client(ConfigClient())
 
 
 @devices.factory()
@@ -162,6 +170,7 @@ def dcm() -> DCM:
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        get_config_client(),
         poles=80,
         length=2.0,
     )

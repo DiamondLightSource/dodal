@@ -4,10 +4,12 @@ import threading
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
+from daq_config_server import ConfigClient
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector
@@ -27,6 +29,11 @@ def failed_status(failure: Exception) -> Status:
 
 class StatusError(Exception):
     pass
+
+
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(ConfigClient("test"))
 
 
 @pytest.fixture
@@ -500,7 +507,7 @@ def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_cor
     fake_eiger.odin.wait_for_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
-    fake_eiger.set_num_triggers_and_captures()
+    fake_eiger.set_num_triggers_and_captures().wait()
     assert fake_eiger.cam.num_triggers.get() > fake_eiger.detector_params.num_triggers
     assert fake_eiger.odin.file_writer.num_capture.get() == 0
 

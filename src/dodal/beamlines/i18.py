@@ -1,9 +1,14 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.panda import HDFPanda
 
+from dodal.common.beamlines.beamline_utils import (
+    get_config_client,
+    set_config_client,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
@@ -48,6 +53,9 @@ def path_provider() -> PathProvider:
     )
 
 
+set_config_client(ConfigClient())
+
+
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
@@ -55,7 +63,9 @@ def synchrotron() -> Synchrotron:
 
 @devices.factory()
 def undulator() -> UndulatorInKeV:
-    return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+    return UndulatorInKeV(
+        f"{PREFIX.insertion_prefix}-MO-SERVC-01:", get_config_client()
+    )
 
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180

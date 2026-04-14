@@ -1,4 +1,5 @@
 import pytest
+from daq_config_server import ConfigClient
 from ophyd_async.core import init_devices
 
 from dodal.devices.beamlines.i07.id import InsertionDevice
@@ -19,6 +20,7 @@ async def id(harmonic: UndulatorOrder) -> InsertionDevice:
         id = InsertionDevice(
             "ID-01",
             harmonic,
+            ConfigClient(""),
             TEST_LOOKUP_TABLE_PATH,
         )
     return id

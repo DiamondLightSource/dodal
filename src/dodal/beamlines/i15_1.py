@@ -6,6 +6,14 @@ from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
+from dodal.devices.beamlines.i15_1.attenuator import Attenuator
+from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
+from dodal.devices.beamlines.i15_1.robot import Robot
+from dodal.devices.hutch_shutter import (
+    HutchInterlock,
+    InterlockedHutchShutter,
+    PLCShutterInterlock,
+)
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -155,3 +163,36 @@ def trans() -> XYPhiStage:
 @devices.factory()
 def xtal() -> LaueMonochrometer:
     return LaueMonochrometer(prefix=f"{PREFIX.beamline_prefix}-OP-LAUE-01:")
+
+
+@devices.factory()
+def robot() -> Robot:
+    return Robot(
+        robot_prefix=f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
+        current_sample_prefix=f"{PREFIX.beamline_prefix}-EA-LOC-01:",
+    )
+
+
+@devices.factory()
+def puck_detect() -> PuckDetect:
+    return PuckDetect("https://i15-1-cam3-processing.diamond.ac.uk/result")
+
+
+@devices.factory()
+def attenuator() -> Attenuator:
+    return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
+
+
+@devices.factory()
+def hutch_interlock() -> HutchInterlock:
+    return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
+
+
+@devices.factory()
+def hutch_shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        bl_prefix=PREFIX.beamline_prefix,
+        interlock=PLCShutterInterlock(
+            bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
+        ),
+    )
