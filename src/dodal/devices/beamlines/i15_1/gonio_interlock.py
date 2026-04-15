@@ -2,13 +2,11 @@ from math import isclose
 
 from dodal.devices.hutch_shutter import BaseHutchInterlock
 
-# TODO: Make this the right number
-GONIO_SAFE_FOR_OPERATIONS = 65535
-# GONIO_SAFE_FOR_OPERATIONS = 65439
+GONIO_SAFE_FOR_OPERATIONS = 65535  # All 16 bits are true
 
 
 class GonioInterlock(BaseHutchInterlock):
-    """Device to check if the air is on for the goniometer air bearing."""
+    """Device to check the state of the goniometer interlock."""
 
     def __init__(
         self,
