@@ -93,7 +93,7 @@ def hexapod() -> XYZStage:
 
 
 @devices.factory()
-def hexapod_rot() -> XYZStage:
+def hexapod_rotation() -> XYZStage:
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-HEX-01:",
         x_infix="RX",
