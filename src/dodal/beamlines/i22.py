@@ -8,7 +8,7 @@ from ophyd_async.core import (
     UUIDFilenameProvider,
 )
 from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.epics.adcore import NDPluginBaseIO, NDPluginStatsIO
+from ophyd_async.epics.adcore import NDPluginBaseIO, NDStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -80,9 +80,7 @@ def saxs(path_provider: PathProvider) -> PilatusDetector:
         fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
         plugins={
-            "stats": NDPluginStatsIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:STAT:"
-            )
+            "stats": NDStatsIO(prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:STAT:")
         },
     )
 
@@ -110,9 +108,7 @@ def waxs(path_provider: PathProvider) -> PilatusDetector:
         fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
         plugins={
-            "stats": NDPluginStatsIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:STAT:"
-            )
+            "stats": NDStatsIO(prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:STAT:")
         },
     )
 
