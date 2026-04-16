@@ -20,7 +20,7 @@ async def test_interlock_is_readable(interlock: GonioInterlock):
 @pytest.mark.parametrize(
     "readback, expected_state",
     [
-        (65435, True),
+        (65535, True),
         (65440, False),
     ],
 )
