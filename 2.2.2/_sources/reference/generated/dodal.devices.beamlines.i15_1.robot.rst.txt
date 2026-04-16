@@ -1,0 +1,41 @@
+dodal.devices.beamlines.i15\_1.robot
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i15_1
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~robot.CurrentSample
+   ~robot.MockRobot
+   ~robot.ProgramNames
+   ~robot.ProgramRunning
+   ~robot.Robot
+   ~robot.SampleLocation
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i15_1.robot
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

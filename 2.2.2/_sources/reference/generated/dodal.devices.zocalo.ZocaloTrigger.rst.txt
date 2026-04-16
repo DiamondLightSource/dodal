@@ -1,0 +1,26 @@
+dodal.devices.zocalo.ZocaloTrigger
+==================================
+
+.. currentmodule:: dodal.devices.zocalo
+
+.. autoclass:: ZocaloTrigger
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~ZocaloTrigger.run_end
+      
+      
+      ~ZocaloTrigger.run_start
+      
+   
+   
+
+   
+   
+   

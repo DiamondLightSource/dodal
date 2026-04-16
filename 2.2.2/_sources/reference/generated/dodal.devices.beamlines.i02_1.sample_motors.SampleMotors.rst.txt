@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i02\_1.sample\_motors.SampleMotors
+==========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i02_1.sample_motors
+
+.. autoclass:: SampleMotors
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

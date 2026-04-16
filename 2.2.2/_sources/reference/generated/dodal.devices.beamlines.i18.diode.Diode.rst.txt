@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i18.diode.Diode
+=======================================
+
+.. currentmodule:: dodal.devices.beamlines.i18.diode
+
+.. autoclass:: Diode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

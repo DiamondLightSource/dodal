@@ -1,0 +1,49 @@
+dodal.devices.electron\_analyser.base.BaseElectronAnalyserDetector
+==================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: BaseElectronAnalyserDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~BaseElectronAnalyserDetector.describe
+      
+      
+      ~BaseElectronAnalyserDetector.describe_configuration
+      
+      
+      ~BaseElectronAnalyserDetector.read
+      
+      
+      ~BaseElectronAnalyserDetector.read_configuration
+      
+      
+      ~BaseElectronAnalyserDetector.set
+      
+      
+      
+      ~BaseElectronAnalyserDetector.trigger
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

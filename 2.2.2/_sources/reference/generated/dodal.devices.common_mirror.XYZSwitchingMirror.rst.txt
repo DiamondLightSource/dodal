@@ -1,0 +1,49 @@
+dodal.devices.common\_mirror.XYZSwitchingMirror
+===============================================
+
+.. currentmodule:: dodal.devices.common_mirror
+
+.. autoclass:: XYZSwitchingMirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~XYZSwitchingMirror.locate
+      
+      
+      
+      
+      ~XYZSwitchingMirror.set
+      
+      
+      
+      
+      ~XYZSwitchingMirror.stop
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,34 @@
+dodal.devices.xbpm\_feedback.XBPMFeedback
+=========================================
+
+.. currentmodule:: dodal.devices.xbpm_feedback
+
+.. autoclass:: XBPMFeedback
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~XBPMFeedback.trigger
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
