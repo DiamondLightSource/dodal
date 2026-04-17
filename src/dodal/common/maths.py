@@ -201,7 +201,9 @@ class AngleWithPhase:
         """Return this angle with the offset adjusted such that the phases can be compared."""
         correction = other.offset - self.offset
         if correction % 360:
-            return AngleWithPhase([self.offset + correction, self.phase - correction])
+            return AngleWithPhase.from_iterable(
+                [self.offset + correction, self.phase - correction]
+            )
         else:
             return self
 

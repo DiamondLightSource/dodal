@@ -107,7 +107,7 @@ class Smargon(XYZWrappedOmegaStage, Movable):
 
     async def _get_target_value(self, motor_name: str, value: float) -> float:
         if motor_name == "omega":
-            current_angle = AngleWithPhase(
+            current_angle = AngleWithPhase.from_iterable(
                 await self.wrapped_omega.offset_and_phase.get_value()
             )
             return current_angle.nearest_with_phase(value).unwrap()

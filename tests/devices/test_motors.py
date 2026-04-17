@@ -1,5 +1,5 @@
 import math
-from collections.abc import Generator
+from collections.abc import Generator, Iterable
 
 import numpy as np
 import pytest
@@ -70,7 +70,9 @@ async def xyzpyr_stage() -> XYZPitchYawRollStage:
 
 
 @pytest.fixture()
-async def xyz_wrapped_omega_stage(values_for_rotation: Iterable[float]) -> XYZWrappedOmegaStage:
+async def xyz_wrapped_omega_stage(
+    values_for_rotation: Iterable[float],
+) -> XYZWrappedOmegaStage:
     input_value, current_real_value, expected_real_value = values_for_rotation
 
     async with init_devices(mock=True):
@@ -454,7 +456,9 @@ async def test_mod_360_read(real_value: float, expected_phase: float):
     ],
     ids=lambda values: f"input={values[0]}, current={values[1]}, expected={values[2]}",
 )
-def values_for_rotation(request: pytest.FixtureRequest) -> tuple[float, float, float]:
+def values_for_rotation(
+    request: pytest.FixtureRequest,
+) -> Generator[tuple[float, float, float], None, None]:
     input_value, current_real_value, expected_real_value = request.param
     yield input_value, current_real_value, expected_real_value
 
@@ -484,7 +488,9 @@ async def test_mod_360_expected_actual_movement_never_more_than_180(
 
 
 async def test_mod_360_unwrap_computes_expected(
-    values_for_rotation: tuple[float, float, float], stage_in_initial_state: XYZOmegaStage, run_engine: RunEngine
+    values_for_rotation: tuple[float, float, float],
+    xyz_wrapped_omega_stage: XYZWrappedOmegaStage,
+    run_engine: RunEngine,
 ) -> None:
     input_value, current_real_value, expected_real_value = values_for_rotation
     stage = xyz_wrapped_omega_stage

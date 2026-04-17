@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.epics.motor import Motor
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.wrapped_axis import WrappedAxis
 
@@ -72,12 +73,12 @@ async def test_wrapped_axis_read_returns_phase_and_offset_phase(
     omega: Motor, wrapped_omega: WrappedAxis
 ):
     set_mock_value(omega.user_readback, 450)
-     await assert_reading(
-         wrapped_omega, 
-         {
-              "wrapped_omega-offset_and_phase": partial_reading(np.array([360, 90]))
-              "wrapped_omega-phase": partial_reading(90),
-         }
+    await assert_reading(
+        wrapped_omega,
+        {
+            "wrapped_omega-offset_and_phase": partial_reading(np.array([360, 90])),
+            "wrapped_omega-phase": partial_reading(90),
+        },
     )
 
 
