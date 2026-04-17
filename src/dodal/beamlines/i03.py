@@ -1,13 +1,13 @@
 from functools import cache
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
-from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.beamline_utils import set_path_provider
+from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
@@ -68,7 +68,11 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
+BEAMLINE_PARAMETERS_PATH = (
+    "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters"
+)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
+I03_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i03")
 set_log_beamline(BL)
@@ -93,13 +97,21 @@ def path_provider() -> PathProvider:
 
 
 @devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient(I03_CONFIG_SERVER_ENDPOINT)
+    set_config_client(client)
+    return client
+
+
+@devices.fixture
 def daq_configuration_path() -> str:
     return DAQ_CONFIGURATION_PATH
 
 
 @devices.factory()
-def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters()
+def aperture_scatterguard(config_client: ConfigClient) -> ApertureScatterguard:
+    params = config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -117,10 +129,12 @@ def attenuator() -> BinaryFilterAttenuator:
 
 
 @devices.factory()
-def beamstop() -> Beamstop:
+def beamstop(config_client: ConfigClient) -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(),
+        beamline_parameters=config_client.get_file_contents(
+            BEAMLINE_PARAMETERS_PATH, dict
+        ),
     )
 
 
@@ -141,10 +155,11 @@ def vfm() -> FocusingMirrorWithStripes:
 
 
 @devices.factory()
-def mirror_voltages() -> MirrorVoltages:
+def mirror_voltages(config_client: ConfigClient) -> MirrorVoltages:
     return MirrorVoltages(
         prefix=f"{PREFIX.beamline_prefix}-MO-PSU-01:",
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
+        config_client=config_client,
     )
 
 
@@ -194,11 +209,13 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
 
 @devices.factory()
 def oav(
+    config_client: ConfigClient,
     params: OAVConfigBeamCentre | None = None,
 ) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params
+        or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
 
@@ -223,9 +240,12 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
+def undulator(
+    baton: Baton, daq_configuration_path: str, config_client: ConfigClient
+) -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )
@@ -233,12 +253,16 @@ def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
 
 @devices.factory()
 def undulator_dcm(
-    undulator: UndulatorInKeV, dcm: DCM, daq_configuration_path: str
+    undulator: UndulatorInKeV,
+    dcm: DCM,
+    daq_configuration_path: str,
+    config_client: ConfigClient,
 ) -> UndulatorDCM:
     return UndulatorDCM(
         undulator=undulator,
         dcm=dcm,
         daq_configuration_path=daq_configuration_path,
+        config_client=config_client,
     )
 
 
@@ -350,11 +374,13 @@ def fluorescence_det_motion() -> FluorescenceDetector:
 
 
 @devices.factory()
-def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, config_client: ConfigClient
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(),
+        config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict),
     )
 
 
