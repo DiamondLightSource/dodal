@@ -7,7 +7,7 @@ from dodal.devices.wrapped_axis import WrappedAxis
 
 
 @pytest.fixture
-async def omega():
+async def omega() -> Motor:
     async with init_devices(mock=True, connect=True):
         motor = Motor("BL03I-MO-SGON-01:OMEGA")
     return motor
@@ -34,7 +34,7 @@ def wrapped_omega(omega: Motor):
 async def test_wrapped_axis_set_applies_phase_with_current_set(
     omega: Motor,
     wrapped_omega: WrappedAxis,
-    initial_unwrapped,
+    initial_unwrapped: float,
     phase: float,
     expected_omega: float,
 ):
@@ -72,11 +72,13 @@ async def test_wrapped_axis_read_returns_phase_and_offset_phase(
     omega: Motor, wrapped_omega: WrappedAxis
 ):
     set_mock_value(omega.user_readback, 450)
-    reading = await wrapped_omega.read()
-    assert all(
-        reading["wrapped_omega-offset_and_phase"]["value"] == np.array([360, 90])
+     await assert_reading(
+         wrapped_omega, 
+         {
+              "wrapped_omega-offset_and_phase": partial_reading(np.array([360, 90]))
+              "wrapped_omega-phase": partial_reading(90),
+         }
     )
-    assert reading["wrapped_omega-phase"]["value"] == 90
 
 
 @pytest.mark.parametrize(

@@ -70,7 +70,7 @@ async def xyzpyr_stage() -> XYZPitchYawRollStage:
 
 
 @pytest.fixture()
-async def xyz_wrapped_omega_stage(values_for_rotation):
+async def xyz_wrapped_omega_stage(values_for_rotation: Iterable[float]) -> XYZWrappedOmegaStage:
     input_value, current_real_value, expected_real_value = values_for_rotation
 
     async with init_devices(mock=True):
@@ -326,7 +326,7 @@ async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
 
 @pytest.mark.parametrize("values_for_rotation", [[0, 0, 0]], indirect=True)
 async def test_reading_xyz_wrapped_omega_gonio(
-    xyz_wrapped_omega_stage, values_for_rotation
+    xyz_wrapped_omega_stage: XYZWrappedOmegaStage, values_for_rotation: Iterable[float]
 ):
     await assert_reading(
         xyz_wrapped_omega_stage,
@@ -409,7 +409,7 @@ async def test_lab_vertical_round_trip(six_axis_gonio: SixAxisGonio, set_point: 
         [-10000 * 360 - 0.001, 359.999],
     ],
 )
-async def test_mod_360_read(real_value: float, expected_phase):
+async def test_mod_360_read(real_value: float, expected_phase: float):
     stage = XYZWrappedOmegaStage("BL03I-MO-SGON-01:")
     await stage.connect(mock=True)
     set_mock_value(stage.omega.user_readback, real_value)
@@ -454,13 +454,13 @@ async def test_mod_360_read(real_value: float, expected_phase):
     ],
     ids=lambda values: f"input={values[0]}, current={values[1]}, expected={values[2]}",
 )
-def values_for_rotation(request):
+def values_for_rotation(request: pytest.FixtureRequest) -> tuple[float, float, float]:
     input_value, current_real_value, expected_real_value = request.param
     yield input_value, current_real_value, expected_real_value
 
 
 async def test_mod_360_expected_direction_of_rotation_same_as_apparent_for_moves_apparently_less_than_180(
-    values_for_rotation, xyz_wrapped_omega_stage
+    values_for_rotation: Iterable[float], xyz_wrapped_omega_stage: XYZWrappedOmegaStage
 ):
     input_value, current_real_value, expected_real_value = values_for_rotation
     stage = xyz_wrapped_omega_stage
@@ -477,15 +477,15 @@ async def test_mod_360_expected_direction_of_rotation_same_as_apparent_for_moves
 
 
 async def test_mod_360_expected_actual_movement_never_more_than_180(
-    values_for_rotation, xyz_wrapped_omega_stage
+    values_for_rotation: Iterable[float], xyz_wrapped_omega_stage: XYZWrappedOmegaStage
 ):
     input_value, current_real_value, expected_real_value = values_for_rotation
     assert abs(expected_real_value - current_real_value) <= 180
 
 
 async def test_mod_360_unwrap_computes_expected(
-    values_for_rotation, xyz_wrapped_omega_stage, run_engine: RunEngine
-):
+    values_for_rotation: tuple[float, float, float], stage_in_initial_state: XYZOmegaStage, run_engine: RunEngine
+) -> None:
     input_value, current_real_value, expected_real_value = values_for_rotation
     stage = xyz_wrapped_omega_stage
     real_put = get_mock_put(stage.omega.user_setpoint)

@@ -13,10 +13,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.maths import (
-    rotate_clockwise,
-    rotate_counter_clockwise,
-)
+from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
 from dodal.devices.wrapped_axis import WrappedAxis
 
 _X = "X"
