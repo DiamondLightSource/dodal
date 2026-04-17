@@ -76,9 +76,9 @@ async def xyz_wrapped_omega_stage(
     input_value, current_real_value, expected_real_value = values_for_rotation
 
     async with init_devices(mock=True):
-        gonio = XYZWrappedOmegaStage("BL03I-MO-SGON-01:")
-    set_mock_value(gonio.omega.user_readback, current_real_value)
-    return gonio
+        xyz_wrapped_omega_stage = XYZWrappedOmegaStage("BL03I-MO-SGON-01:")
+    set_mock_value(xyz_wrapped_omega_stage.omega.user_readback, current_real_value)
+    return xyz_wrapped_omega_stage
 
 
 async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
@@ -333,12 +333,14 @@ async def test_reading_xyz_wrapped_omega_gonio(
     await assert_reading(
         xyz_wrapped_omega_stage,
         {
-            "gonio-omega": partial_reading(0.0),
-            "gonio-z": partial_reading(0.0),
-            "gonio-y": partial_reading(0.0),
-            "gonio-x": partial_reading(0.0),
-            "gonio-wrapped_omega-phase": partial_reading(0.0),
-            "gonio-wrapped_omega-offset_and_phase": partial_reading(np.array([0, 0])),
+            "xyz_wrapped_omega_stage-omega": partial_reading(0.0),
+            "xyz_wrapped_omega_stage-z": partial_reading(0.0),
+            "xyz_wrapped_omega_stage-y": partial_reading(0.0),
+            "xyz_wrapped_omega_stage-x": partial_reading(0.0),
+            "xyz_wrapped_omega_stage-wrapped_omega-phase": partial_reading(0.0),
+            "xyz_wrapped_omega_stage-wrapped_omega-offset_and_phase": partial_reading(
+                np.array([0, 0])
+            ),
         },
     )
 
@@ -411,13 +413,19 @@ async def test_lab_vertical_round_trip(six_axis_gonio: SixAxisGonio, set_point: 
         [-10000 * 360 - 0.001, 359.999],
     ],
 )
-async def test_mod_360_read(real_value: float, expected_phase: float):
-    stage = XYZWrappedOmegaStage("BL03I-MO-SGON-01:")
-    await stage.connect(mock=True)
-    set_mock_value(stage.omega.user_readback, real_value)
-    offset, phase = await stage.wrapped_omega.offset_and_phase.get_value()
+async def test_mod_360_read(
+    real_value: float,
+    expected_phase: float,
+    xyz_wrapped_omega_stage: XYZWrappedOmegaStage,
+):
+    set_mock_value(xyz_wrapped_omega_stage.omega.user_readback, real_value)
+    (
+        offset,
+        phase,
+    ) = await xyz_wrapped_omega_stage.wrapped_omega.offset_and_phase.get_value()
     assert 0 <= expected_phase < 360
     assert math.isclose(phase, expected_phase, abs_tol=1e-6)
+    assert math.isclose(phase + offset, real_value, abs_tol=1e-6)
 
 
 @pytest.fixture(
@@ -481,7 +489,8 @@ async def test_mod_360_expected_direction_of_rotation_same_as_apparent_for_moves
 
 
 async def test_mod_360_expected_actual_movement_never_more_than_180(
-    values_for_rotation: Iterable[float], xyz_wrapped_omega_stage: XYZWrappedOmegaStage
+    values_for_rotation: tuple[float, float, float],
+    xyz_wrapped_omega_stage: XYZWrappedOmegaStage,
 ):
     input_value, current_real_value, expected_real_value = values_for_rotation
     assert abs(expected_real_value - current_real_value) <= 180

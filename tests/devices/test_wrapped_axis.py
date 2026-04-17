@@ -16,7 +16,9 @@ async def omega() -> Motor:
 
 @pytest.fixture
 def wrapped_omega(omega: Motor):
-    return WrappedAxis(omega, "wrapped_omega")
+    with init_devices(mock=True):
+        wrapped_omega = WrappedAxis(omega, "wrapped_omega")
+    return wrapped_omega
 
 
 @pytest.mark.parametrize(
