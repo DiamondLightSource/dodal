@@ -1,5 +1,6 @@
 from collections.abc import Iterable
-from typing import Self, overload
+from dataclasses import dataclass
+from typing import Self
 
 import numpy as np
 from ophyd_async.core import (
@@ -157,6 +158,7 @@ def rotate_counter_clockwise(theta: float, x: float, y: float) -> tuple[float, f
 MotorOffsetAndPhase = Array1D[np.float32]
 
 
+@dataclass
 class AngleWithPhase:
     """Represents a point in an absolute rotational space which is defined by a phase where 0<=phase<360
      and an offset from an origin where the absolute coordinate is the sum of the phase and the offset.
@@ -166,28 +168,24 @@ class AngleWithPhase:
         phase: The phase in degrees relative to this offset.
     """
 
-    @overload
-    def __init__(self, offset_and_phase: Iterable[float], /):
-        pass  # pragma: no cover
+    offset: float
+    phase: float = 0.0
 
-    @overload
-    def __init__(self, offset: float, phase: float, /):
-        pass  # pragma: no cover
+    def __post_init__(self) -> None:
+        correction = 360 * (self.phase // 360)
+        self.offset += correction
+        self.phase -= correction
 
-    def __init__(self, offset: float | Iterable[float], phase: float = 0):
+    @classmethod
+    def from_iterable(cls, values: Iterable[float]) -> Self:
         """Construct a normalised representation of the offset and phase, such that
         0 <= phase < 360.
 
         Args:
-            offset (float | Iterable[float]): the offset in degrees, or the
-            offset and phase as a list or other iterable
-            phase (float): the phase in degrees
+            values (Iterable[float]): the offset and phase as a list or other iterable
         """
-        if isinstance(offset, Iterable):
-            offset, phase = offset
-        correction = 360 * (phase // 360)
-        self.offset: float = offset + correction
-        self.phase: float = phase - correction
+        offset, phase = values
+        return cls(offset, phase)
 
     @classmethod
     def wrap(cls, unwrapped: float) -> "AngleWithPhase":
