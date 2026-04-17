@@ -86,7 +86,7 @@ async def test_id_set_pol(
     initial_energy: float,
     target_pol: Pol,
 ):
-    mock_apple_knot_i05_controller._energy_set(initial_energy)
+    mock_apple_knot_i05_controller._energy = initial_energy
     set_mock_value(
         mock_locked_apple2.gap().user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),
@@ -120,7 +120,7 @@ async def test_id_set_pol_fails(
     initial_energy: float,
     target_pol: Pol,
 ):
-    mock_apple_knot_i05_controller._energy_set(initial_energy)
+    mock_apple_knot_i05_controller._energy = initial_energy
     set_mock_value(
         mock_locked_apple2.gap().user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),

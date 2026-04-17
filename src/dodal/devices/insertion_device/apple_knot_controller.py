@@ -168,7 +168,7 @@ class AppleKnotController(
         await self.check_top_bottom_phase_match()
         pol = await self._check_and_get_pol_setpoint()
         await self._combined_move(energy, pol)
-        self._energy_set(energy)
+        self._energy = energy
 
     async def check_top_bottom_phase_match(self) -> None:
         """Check that the top and bottom phase motors are in sync.

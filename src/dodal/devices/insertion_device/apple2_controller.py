@@ -37,6 +37,12 @@ class EnergyMotorConvertor(Protocol):
         ...
 
 
+class MotorEnergyConvertor(Protocol):
+    def __call__(self, gap: float, pol: Pol) -> float:
+        """Protocol to provide motor position to energy conversion."""
+        ...
+
+
 Apple2Type = TypeVar("Apple2Type", bound=Apple2)
 
 
@@ -94,6 +100,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         apple2: Apple2Type,
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
+        energy_gap_coverter: MotorEnergyConvertor | None = None,
         maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
         maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
@@ -102,20 +109,12 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
+        self.energy_gap_converter = energy_gap_coverter
 
         self.maximum_gap_motor_position = maximum_gap_motor_position
         self.maximum_phase_motor_position = maximum_phase_motor_position
         # Store the set energy for readback.
-        self._energy, self._energy_set = soft_signal_r_and_setter(
-            float, initial_value=None, units=units
-        )
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.energy = derived_signal_rw(
-                raw_to_derived=self._read_energy,
-                set_derived=self._set_energy,
-                energy=self._energy,
-                derived_units=units,
-            )
+        self._energy = 0.0
 
         # Store the polarisation for setpoint. And provide readback for LH3.
         # LH3 is a special case as it is indistinguishable from LH in the hardware.
@@ -144,6 +143,15 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 btm_outer=btm_outer,
                 gap=self.apple2().gap().user_readback,
             )
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.energy = derived_signal_rw(
+                raw_to_derived=self._read_energy,
+                set_derived=self._set_energy,
+                pol=self.polarisation,
+                gap=self.apple2().gap().user_readback,
+                derived_units=units,
+            )
+
         super().__init__(name)
 
     @abc.abstractmethod
@@ -166,11 +174,13 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()
         await self._set_motors_from_energy_and_polarisation(energy, pol)
-        self._energy_set(energy)
+        self._energy = energy
 
-    def _read_energy(self, energy: float) -> float:
+    def _read_energy(self, pol: Pol, gap: float) -> float:
         """Readback for energy is just the set value."""
-        return energy
+        if self.energy_gap_converter:
+            return self.energy_gap_converter(gap=gap, pol=pol)
+        return self._energy
 
     async def _check_and_get_pol_setpoint(self) -> Pol:
         """Check the polarisation setpoint and if it is NONE try to read it from
