@@ -21,7 +21,7 @@ from dodal.devices.hutch_shutter import (
     InterlockedHutchShutter,
     PLCShutterInterlock,
 )
-from dodal.devices.motors import XYPhiStage, XYStage, YZStage
+from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -133,6 +133,23 @@ def hutch_shutter() -> InterlockedHutchShutter:
         interlock=PLCShutterInterlock(
             bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
         ),
+    )
+
+
+@devices.factory()
+def hexapod() -> XYZStage:
+    return XYZStage(
+        f"{PREFIX.beamline_prefix}-MO-HEX-01:",
+    )
+
+
+@devices.factory()
+def hexapod_rotation() -> XYZStage:
+    return XYZStage(
+        f"{PREFIX.beamline_prefix}-MO-HEX-01:",
+        x_infix="RX",
+        y_infix="RY",
+        z_infix="RZ",
     )
 
 
