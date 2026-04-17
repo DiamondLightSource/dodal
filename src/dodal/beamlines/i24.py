@@ -68,6 +68,12 @@ def path_provider() -> PathProvider:
     )
 
 
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    return ConfigClient()
+
+
 @devices.factory()
 def attenuator() -> EnumFilterAttenuator:
     return EnumFilterAttenuator(
@@ -93,7 +99,7 @@ def backlight() -> DualBacklight:
 
 @devices.factory()
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:")
+    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:")
 
 
 @devices.factory()
@@ -110,10 +116,10 @@ def pmac() -> PMAC:
 
 
 @devices.factory()
-def oav() -> OAVBeamCentreFile:
+def oav(config_client) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
 
