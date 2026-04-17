@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i19_2 &#8212; dodal 2.2.3.dev1+gb73b770b8 documentation</title>
+    <title>dodal.beamlines.i19_2 &#8212; dodal 2.2.3.dev2+gaf2ac2843 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=83dd2956"></script>
+    <script src="../../../_static/documentation_options.js?v=97c56c22"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -907,6 +907,7 @@ window.addEventListener("load", load);</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i19.beamstop</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamStop</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i19.diffractometer</span><span class="w"> </span><span class="kn">import</span> <span class="n">FourCircleDiffractometer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i19.pin_col_stages</span><span class="w"> </span><span class="kn">import</span> <span class="n">PinholeCollimatorControl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZPhiStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.synchrotron</span><span class="w"> </span><span class="kn">import</span> <span class="n">Synchrotron</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra</span><span class="w"> </span><span class="kn">import</span> <span class="n">Zebra</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra_constants_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -990,6 +991,11 @@ window.addEventListener("load", load);</script>
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">pinhole_and_collimator</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PinholeCollimatorControl</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PinholeCollimatorControl</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="p">)</span>
+
+
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serial_stages</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">XYZPhiStage</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">XYZPhiStage</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-SRL-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
