@@ -89,7 +89,7 @@ async def mock_id_controller(
             gap_energy_motor_lut=mock_j09_gap_energy_motor_lookup,
             phase_energy_motor_lut=mock_j09_phase_energy_motor_lookup,
         )
-    mock_id_controller._energy = 0.5
+    set_mock_value(mock_id_controller._energy, 0.5)
     return mock_id_controller
 
 
