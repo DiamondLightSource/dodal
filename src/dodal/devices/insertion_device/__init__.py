@@ -4,6 +4,7 @@ from .apple2_controller import (
     Apple2EnforceLHMoveController,
     Apple2Type,
     EnergyMotorConvertor,
+    MotorEnergyConvertor,
 )
 from .apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
@@ -67,4 +68,5 @@ __all__ = [
     "EnergyMotorConvertor",
     "UnstoppableMotor",
     "InsertionDeviceEnergyBase",
+    "MotorEnergyConvertor",
 ]

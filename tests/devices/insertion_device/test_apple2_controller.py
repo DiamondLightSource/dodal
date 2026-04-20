@@ -13,6 +13,7 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnabledDisabledUpper,
     EnergyMotorConvertor,
+    MotorEnergyConvertor,
     Pol,
     UndulatorGateStatus,
     UndulatorLockedPhaseAxes,
@@ -70,6 +71,35 @@ class DummyLockedApple2Controller(Apple2Controller[Apple2[UndulatorLockedPhaseAx
         )
 
 
+class DummyEnergyReadbackApple2Controller(
+    Apple2Controller[Apple2[UndulatorLockedPhaseAxes]]
+):
+    """Dummy class to test core logic of Apple2Controller."""
+
+    def __init__(
+        self,
+        apple2: Apple2[UndulatorLockedPhaseAxes],
+        gap_energy_motor_converter: EnergyMotorConvertor,
+        phase_energy_motor_converter: EnergyMotorConvertor,
+        gap_motor_energy_converter: MotorEnergyConvertor,
+        name: str = "",
+    ) -> None:
+        super().__init__(
+            apple2=apple2,
+            gap_energy_motor_converter=gap_energy_motor_converter,
+            phase_energy_motor_converter=phase_energy_motor_converter,
+            gap_motor_energy_converter=gap_motor_energy_converter,
+            maximum_phase_motor_position=TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+            name=name,
+        )
+
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+        return Apple2Val(
+            phase=Apple2LockedPhasesVal(top_outer=phase, btm_inner=phase),
+            gap=gap,
+        )
+
+
 @pytest.fixture
 def configured_gap() -> float:
     return 42.0
@@ -78,6 +108,11 @@ def configured_gap() -> float:
 @pytest.fixture
 def configured_phase() -> float:
     return 7.5
+
+
+@pytest.fixture
+def configured_energy() -> float:
+    return 700.5
 
 
 @pytest.fixture
@@ -90,6 +125,22 @@ async def mock_locked_controller(
         apple2=mock_locked_apple2,
         gap_energy_motor_converter=lambda energy, pol: configured_gap,
         phase_energy_motor_converter=lambda energy, pol: configured_phase,
+    )
+    return mock_locked_controller
+
+
+@pytest.fixture
+async def mock_energy_readback_controller(
+    mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
+    configured_gap: float,
+    configured_phase: float,
+    configured_energy: float,
+) -> DummyEnergyReadbackApple2Controller:
+    mock_locked_controller = DummyEnergyReadbackApple2Controller(
+        apple2=mock_locked_apple2,
+        gap_energy_motor_converter=lambda energy, pol: configured_gap,
+        phase_energy_motor_converter=lambda energy, pol: configured_phase,
+        gap_motor_energy_converter=lambda gap, pol: configured_energy,
     )
     return mock_locked_controller
 
@@ -144,3 +195,10 @@ async def test_id_controller_energy_sets_correct_values(
         gap=configured_gap,
     )
     mock_locked_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
+
+
+async def test_id_controller_energy_read_correct_values_using_readback(
+    mock_energy_readback_controller: DummyEnergyReadbackApple2Controller,
+    configured_energy: float,
+):
+    assert await mock_energy_readback_controller.energy.get_value() == configured_energy

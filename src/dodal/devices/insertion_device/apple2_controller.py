@@ -100,7 +100,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         apple2: Apple2Type,
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
-        energy_gap_coverter: MotorEnergyConvertor | None = None,
+        gap_motor_energy_converter: MotorEnergyConvertor | None = None,
         maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
         maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
@@ -109,7 +109,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
-        self.gap_motor_energy_converter = energy_gap_coverter
+        self.gap_motor_energy_converter = gap_motor_energy_converter
 
         self.maximum_gap_motor_position = maximum_gap_motor_position
         self.maximum_phase_motor_position = maximum_phase_motor_position
