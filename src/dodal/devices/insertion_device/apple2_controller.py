@@ -109,7 +109,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
-        self.energy_gap_converter = energy_gap_coverter
+        self.gap_motor_energy_converter = energy_gap_coverter
 
         self.maximum_gap_motor_position = maximum_gap_motor_position
         self.maximum_phase_motor_position = maximum_phase_motor_position
@@ -179,8 +179,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
     def _read_energy(self, energy: float, pol: Pol, gap: float) -> float:
         """Readback for energy is just the set value."""
-        if self.energy_gap_converter is not None:
-            energy = self.energy_gap_converter(gap=gap, pol=pol)
+        if self.gap_motor_energy_converter is not None:
+            energy = self.gap_motor_energy_converter(gap=gap, pol=pol)
         energy = energy
 
         return energy
