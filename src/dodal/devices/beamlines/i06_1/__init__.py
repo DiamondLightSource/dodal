@@ -1,4 +1,4 @@
-from .led_light import CamLights, LEDLight
+from .led_light import LEDLight
 from .motors import DiffractionDichroism
 
-__all__ = ["CamLights", "LEDLight", "DiffractionDichroism"]
+__all__ = ["LEDLight", "DiffractionDichroism"]
