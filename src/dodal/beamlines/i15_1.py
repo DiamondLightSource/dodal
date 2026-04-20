@@ -91,6 +91,7 @@ def clean() -> XYStage:
 
 @devices.factory()
 def cobra(config_client: ConfigClient) -> Cobra:
+    # Interchangeable with the cryostream, they are mounted onto the same rail
     return Cobra(
         f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
         config_client,
@@ -100,6 +101,7 @@ def cobra(config_client: ConfigClient) -> Cobra:
 
 @devices.factory()
 def cryostream(config_client: ConfigClient) -> Cryostream:
+    # Interchangeable with the cobra, they are mounted onto the same rail
     return Cryostream(
         f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
         config_client,
