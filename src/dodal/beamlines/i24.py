@@ -99,7 +99,7 @@ def backlight() -> DualBacklight:
 
 @devices.factory()
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:")
+    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:")
 
 
 @devices.factory()

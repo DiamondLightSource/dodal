@@ -111,7 +111,6 @@ def daq_configuration_path() -> str:
 
 @devices.factory()
 def aperture_scatterguard(config_client: ConfigClient) -> ApertureScatterguard:
-    print(BEAMLINE_PARAMETERS_PATH)
     params = config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
