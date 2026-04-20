@@ -278,7 +278,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             and zero["bo"]
         ):
             LOGGER.info("Determined polarisation: LV (Linear Vertical).")
-            return Pol.LV, self.maximum_phase_motor_position
+            return Pol.LV, max_p
         if isclose(top_outer, btm_inner, abs_tol=tol) and zero["ti"] and zero["bo"]:
             pol = Pol.PC if top_outer > 0 else Pol.NC
             LOGGER.info(f"Determined polarisation: {pol}.")
