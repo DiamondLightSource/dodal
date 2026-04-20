@@ -285,9 +285,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             return pol, top_outer
 
         if isclose(top_outer, -btm_inner, abs_tol=tol) and zero["ti"] and zero["bo"]:
+            LOGGER.info("Determined polarisation: LA.")
             return Pol.LA, top_outer
 
         if isclose(top_inner, -btm_outer, abs_tol=tol) and zero["to"] and zero["bi"]:
+            LOGGER.info("Determined polarisation: LA.")
             return Pol.LA, top_inner
 
         LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
