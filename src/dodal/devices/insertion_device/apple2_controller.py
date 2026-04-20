@@ -114,7 +114,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.maximum_gap_motor_position = maximum_gap_motor_position
         self.maximum_phase_motor_position = maximum_phase_motor_position
         # Store the set energy for readback.
-        self._energy = 0.0
+        self._energy = soft_signal_rw(float, initial_value=100)
 
         # Store the polarisation for setpoint. And provide readback for LH3.
         # LH3 is a special case as it is indistinguishable from LH in the hardware.
@@ -147,6 +147,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
                 set_derived=self._set_energy,
+                energy=self._energy,
                 pol=self.polarisation,
                 gap=self.apple2().gap().user_readback,
                 derived_units=units,
@@ -174,13 +175,15 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()
         await self._set_motors_from_energy_and_polarisation(energy, pol)
-        self._energy = energy
+        await self._energy.set(energy)
 
-    def _read_energy(self, pol: Pol, gap: float) -> float:
+    def _read_energy(self, energy: float, pol: Pol, gap: float) -> float:
         """Readback for energy is just the set value."""
-        if self.energy_gap_converter:
-            return self.energy_gap_converter(gap=gap, pol=pol)
-        return self._energy
+        if self.energy_gap_converter is not None:
+            energy = self.energy_gap_converter(gap=gap, pol=pol)
+        energy = energy
+
+        return energy
 
     async def _check_and_get_pol_setpoint(self) -> Pol:
         """Check the polarisation setpoint and if it is NONE try to read it from
@@ -207,7 +210,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
         self._polarisation_setpoint_set(value)
-        await self.energy.set(await self.energy.get_value(), timeout=MAXIMUM_MOVE_TIME)
+        await self.energy.set(await self._energy.get_value(), timeout=MAXIMUM_MOVE_TIME)
 
     def _read_pol(
         self,

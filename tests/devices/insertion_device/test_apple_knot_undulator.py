@@ -1,5 +1,6 @@
 import pytest
 from ophyd_async.core import (
+    init_devices,
     set_mock_value,
 )
 
@@ -29,12 +30,13 @@ async def mock_apple_knot_i05_controller(
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     apple_knot_i05_path_finder: AppleKnotPathFinder,
 ) -> AppleKnotController[UndulatorLockedPhaseAxes]:
-    mock_apple_knot_controller = AppleKnotController[UndulatorLockedPhaseAxes](
-        apple=mock_locked_apple2,
-        gap_energy_motor_converter=energy_to_gap_converter,
-        phase_energy_motor_converter=energy_to_phase_converter,
-        path_finder=apple_knot_i05_path_finder,
-    )
+    async with init_devices(mock=True):
+        mock_apple_knot_controller = AppleKnotController[UndulatorLockedPhaseAxes](
+            apple=mock_locked_apple2,
+            gap_energy_motor_converter=energy_to_gap_converter,
+            phase_energy_motor_converter=energy_to_phase_converter,
+            path_finder=apple_knot_i05_path_finder,
+        )
     return mock_apple_knot_controller
 
 
@@ -86,7 +88,7 @@ async def test_id_set_pol(
     initial_energy: float,
     target_pol: Pol,
 ):
-    mock_apple_knot_i05_controller._energy = initial_energy
+    set_mock_value(mock_apple_knot_i05_controller._energy, initial_energy)
     set_mock_value(
         mock_locked_apple2.gap().user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),
@@ -120,7 +122,7 @@ async def test_id_set_pol_fails(
     initial_energy: float,
     target_pol: Pol,
 ):
-    mock_apple_knot_i05_controller._energy = initial_energy
+    set_mock_value(mock_apple_knot_i05_controller._energy, initial_energy)
     set_mock_value(
         mock_locked_apple2.gap().user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),

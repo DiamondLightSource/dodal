@@ -122,7 +122,7 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
 
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:
-        LOGGER.info(f"Moving f{self.name} energy to {energy}.")
+        LOGGER.info(f"Moving {self.name} energy to {energy}.")
         await asyncio.gather(
             self._id_energy().set(
                 energy=energy + await self.id_energy_offset.get_value()
