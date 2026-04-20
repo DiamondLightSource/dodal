@@ -16,7 +16,6 @@ async def test_interlock_is_readable(interlock: GonioInterlock):
     await assert_reading(interlock, {f"{interlock.name}-status": partial_reading(0.0)})
 
 
-# TODO: fix these numbers to be real
 @pytest.mark.parametrize(
     "readback, expected_state",
     [
