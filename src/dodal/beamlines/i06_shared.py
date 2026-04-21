@@ -25,6 +25,11 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
+def i06_epics_polynomial_device() -> I06EpicsPolynomailDevice:
+    return I06EpicsPolynomailDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDD-01:")
+
+
+@devices.factory()
 def idd_gap() -> UndulatorGap:
     return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
@@ -71,8 +76,3 @@ def pgm() -> PlaneGratingMonochromator:
         grating=I06Grating,
         grating_pv="NLINES2",
     )
-
-
-@devices.factory()
-def i06_epics_polynomial_device() -> I06EpicsPolynomailDevice:
-    return I06EpicsPolynomailDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDD-01:")

@@ -19,37 +19,37 @@ class I06EpicsPolynomailDevice(Device, Movable):
         self.lh_polyn_params = DeviceVector(
             {
                 i: epics_signal_rw(float, read_pv=f"{prefix}HZ:C{i}")
-                for i in range(1, 13)
+                for i in range(12, 0, -1)
             }
         )
         self.lv_polyn_params = DeviceVector(
             {
                 i: epics_signal_rw(float, read_pv=f"{prefix}VT:C{i}")
-                for i in range(1, 13)
+                for i in range(12, 0, -1)
             }
         )
         self.pc_polyn_params = DeviceVector(
             {
                 i: epics_signal_rw(float, read_pv=f"{prefix}PC:C{i}")
-                for i in range(1, 13)
+                for i in range(12, 0, -1)
             }
         )
         self.nc_polyn_params = DeviceVector(
             {
                 i: epics_signal_rw(float, read_pv=f"{prefix}NC:C{i}")
-                for i in range(1, 13)
+                for i in range(12, 0, -1)
             }
         )
         self.pc_har3_polyn_params = DeviceVector(
             {
                 i: epics_signal_rw(float, read_pv=f"{prefix}PC:HAR3:C{i}")
-                for i in range(1, 13)
+                for i in range(12, 0, -1)
             }
         )
         self.nc_har3_polyn_params = DeviceVector(
             {
                 i: epics_signal_rw(float, read_pv=f"{prefix}NC:HAR3:C{i}")
-                for i in range(1, 13)
+                for i in range(12, 0, -1)
             }
         )
         self.lut: EnergyMotorLookup = EnergyMotorLookup()
