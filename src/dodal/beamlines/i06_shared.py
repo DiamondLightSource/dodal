@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i06_shared import I06EpicsPolynomailDevice, I06Grating
+from dodal.devices.beamlines.i06_shared import I06EpicsPolynomialDevice, I06Grating
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
@@ -25,8 +25,8 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def i06_epics_polynomial_device() -> I06EpicsPolynomailDevice:
-    return I06EpicsPolynomailDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDD-01:")
+def i06_epics_polynomial_device() -> I06EpicsPolynomialDevice:
+    return I06EpicsPolynomialDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDD-01:")
 
 
 @devices.factory()
