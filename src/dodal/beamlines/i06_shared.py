@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i06_shared import I06Grating
+from dodal.devices.beamlines.i06_shared import I06EpicsPolynomailDevice, I06Grating
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
@@ -71,3 +71,8 @@ def pgm() -> PlaneGratingMonochromator:
         grating=I06Grating,
         grating_pv="NLINES2",
     )
+
+
+@devices.factory()
+def i06_epics_polynomial_device() -> I06EpicsPolynomailDevice:
+    return I06EpicsPolynomailDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDD-01:")

@@ -31,6 +31,7 @@ from .energy_motor_lookup import (
 from .enum import Pol, UndulatorGateStatus
 from .lookup_table_models import (
     EnergyCoverage,
+    EnergyCoverageEntry,
     LookupTable,
     LookupTableColumnConfig,
     convert_csv_to_lookup,
@@ -69,4 +70,5 @@ __all__ = [
     "UnstoppableMotor",
     "InsertionDeviceEnergyBase",
     "MotorEnergyConvertor",
+    "EnergyCoverageEntry",
 ]

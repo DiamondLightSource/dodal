@@ -178,7 +178,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         await self._energy.set(energy)
 
     def _read_energy(self, energy: float, pol: Pol, gap: float) -> float:
-        """Readback for energy is just the set value."""
+        """Readback for energy is just the set value if there is no inverse converter."""
         if self.gap_motor_energy_converter is not None:
             energy = self.gap_motor_energy_converter(gap=gap, pol=pol)
         return energy
