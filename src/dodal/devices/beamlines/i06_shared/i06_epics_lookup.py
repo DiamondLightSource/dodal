@@ -61,12 +61,12 @@ class I06EpicsPolynomailDevice(Device, Movable):
         lv = [await param.get_value() for param in self.lv_polyn_params.values()]
         pc = [await param.get_value() for param in self.pc_polyn_params.values()]
         nc = [await param.get_value() for param in self.nc_polyn_params.values()]
-        # pc_har3 = [
-        #     await param.get_value() for param in self.pc_har3_polyn_params.values()
-        # ]
-        # nc_har3 = [
-        #     await param.get_value() for param in self.nc_har3_polyn_params.values()
-        # ]
+        pc_har3 = [
+            await param.get_value() for param in self.pc_har3_polyn_params.values()
+        ]
+        nc_har3 = [
+            await param.get_value() for param in self.nc_har3_polyn_params.values()
+        ]
         energy_entries = {
             Pol.LH: EnergyCoverage.generate(
                 min_energies=[MINE],
@@ -88,16 +88,16 @@ class I06EpicsPolynomailDevice(Device, Movable):
                 max_energies=[MAXE],
                 poly1d_params=[nc],
             ),
-            # Pol.PC_HAR3: EnergyCoverage.generate(
-            #     min_energies=[MINE],
-            #     max_energies=[MAXE],
-            #     poly1d_params=[pc_har3],
-            # ),
-            # Pol.NC_HAR3: EnergyCoverage.generate(
-            #     min_energies=[MINE],
-            #     max_energies=[MAXE],
-            #     poly1d_params=[nc_har3],
-            # ),
+            Pol.PC3: EnergyCoverage.generate(
+                min_energies=[MINE],
+                max_energies=[MAXE],
+                poly1d_params=[pc_har3],
+            ),
+            Pol.NC3: EnergyCoverage.generate(
+                min_energies=[MINE],
+                max_energies=[MAXE],
+                poly1d_params=[nc_har3],
+            ),
         }
         self.lut = EnergyMotorLookup(LookupTable(energy_entries))
 
