@@ -15,7 +15,7 @@ MAXE = 1700
 MINE = 100
 
 
-class I06EpicsPolynomailDevice(Device, Movable):
+class I06EpicsPolynomialDevice(Device, Movable):
     def __init__(self, prefix: str, name: str = "") -> None:
         # Define mapping of polarization to PV suffix
         self._pol_map = {
@@ -99,4 +99,5 @@ class I06EpicsPolynomailDevice(Device, Movable):
         await super().connect(
             mock=mock, timeout=timeout, force_reconnect=force_reconnect
         )
+        # highjack connect to update lookup tables on connection.
         await self.set(update=True)
