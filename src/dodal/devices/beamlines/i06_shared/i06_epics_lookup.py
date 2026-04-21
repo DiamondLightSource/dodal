@@ -9,6 +9,7 @@ from dodal.devices.insertion_device import (
     LookupTable,
     Pol,
 )
+from dodal.log import LOGGER
 
 MAXE = 1700
 MINE = 100
@@ -75,15 +76,19 @@ class I06EpicsPolynomailDevice(Device, Movable):
         return entries
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def set(self, update: bool = True) -> None:
+        if update:
+            energy_entries = await self._get_table_entries(self.param_dict)
+            self.energy_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
 
-        energy_entries = await self._get_table_entries(self.param_dict)
-        self.energy_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
-
-        inv_energy_entries = await self._get_table_entries(
-            self.inv_param_dict, max_energy=2000, min_energy=-2000
-        )
-        self.motor_energy_lookup = EnergyMotorLookup(LookupTable(inv_energy_entries))
+            inv_energy_entries = await self._get_table_entries(
+                self.inv_param_dict, max_energy=2000, min_energy=-2000
+            )
+            self.motor_energy_lookup = EnergyMotorLookup(
+                LookupTable(inv_energy_entries)
+            )
+        else:
+            LOGGER.info("Not updating lookup tables as update=False")
 
     async def connect(
         self,
