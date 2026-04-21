@@ -16,90 +16,74 @@ MINE = 100
 
 class I06EpicsPolynomailDevice(Device, Movable):
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.lh_polyn_params = DeviceVector(
-            {
-                i: epics_signal_rw(float, read_pv=f"{prefix}HZ:C{i}")
-                for i in range(12, 0, -1)
-            }
-        )
-        self.lv_polyn_params = DeviceVector(
-            {
-                i: epics_signal_rw(float, read_pv=f"{prefix}VT:C{i}")
-                for i in range(12, 0, -1)
-            }
-        )
-        self.pc_polyn_params = DeviceVector(
-            {
-                i: epics_signal_rw(float, read_pv=f"{prefix}PC:C{i}")
-                for i in range(12, 0, -1)
-            }
-        )
-        self.nc_polyn_params = DeviceVector(
-            {
-                i: epics_signal_rw(float, read_pv=f"{prefix}NC:C{i}")
-                for i in range(12, 0, -1)
-            }
-        )
-        self.pc_har3_polyn_params = DeviceVector(
-            {
-                i: epics_signal_rw(float, read_pv=f"{prefix}PC:HAR3:C{i}")
-                for i in range(12, 0, -1)
-            }
-        )
-        self.nc_har3_polyn_params = DeviceVector(
-            {
-                i: epics_signal_rw(float, read_pv=f"{prefix}NC:HAR3:C{i}")
-                for i in range(12, 0, -1)
-            }
-        )
-        self.lut: EnergyMotorLookup = EnergyMotorLookup()
+        # Define mapping of polarization to PV suffix
+        self._pol_map = {
+            Pol.LH: "HZ",
+            Pol.LV: "VT",
+            Pol.PC: "PC",
+            Pol.NC: "NC",
+            Pol.PC3: "PC:HAR3",
+            Pol.NC3: "NC:HAR3",
+        }
+        self._inv_pol_map = {
+            Pol.LH: "BHZ",
+            Pol.LV: "BVT",
+            Pol.PC: "BPC",
+            Pol.NC: "BNC",
+            Pol.PC3: "BPC:HAR3",
+            Pol.NC3: "BNC:HAR3",
+        }
+        self.param_dict = {}
+        self.inv_param_dict = {}
+
+        # Initialize DeviceVectors
+        for pol, suffix in self._inv_pol_map.items():
+            attr_name = f"{pol.name.lower()}_inverse_params"
+            setattr(self, attr_name, self._make_params(f"{prefix}{suffix}"))
+            self.inv_param_dict[pol] = getattr(self, attr_name)
+
+        for pol, suffix in self._pol_map.items():
+            attr_name = f"{pol.name.lower()}_params"
+            setattr(self, attr_name, self._make_params(f"{prefix}{suffix}"))
+            self.param_dict[pol] = getattr(self, attr_name)
+        self.energy_motor_lookup = EnergyMotorLookup()
+        self.motor_energy_lookup = EnergyMotorLookup()
         super().__init__(name=name)
+
+    def _make_params(self, pv_prefix: str) -> DeviceVector:
+        return DeviceVector(
+            {
+                i: epics_signal_rw(float, read_pv=f"{pv_prefix}:C{i}")
+                for i in range(12, 0, -1)
+            }
+        )
+
+    async def _get_table_entries(
+        self,
+        param_dict: dict[Pol, DeviceVector],
+        max_energy: float = MAXE,
+        min_energy: float = MINE,
+    ) -> dict[Pol, EnergyCoverage]:
+        entries = {}
+        for pol, vector in param_dict.items():
+            coeffs = [await p.get_value() for p in vector.values()]
+            entries[pol] = EnergyCoverage.generate(
+                min_energies=[min_energy],
+                max_energies=[max_energy],
+                poly1d_params=[coeffs],
+            )
+        return entries
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
-        lh = [await param.get_value() for param in self.lh_polyn_params.values()]
-        lv = [await param.get_value() for param in self.lv_polyn_params.values()]
-        pc = [await param.get_value() for param in self.pc_polyn_params.values()]
-        nc = [await param.get_value() for param in self.nc_polyn_params.values()]
-        pc_har3 = [
-            await param.get_value() for param in self.pc_har3_polyn_params.values()
-        ]
-        nc_har3 = [
-            await param.get_value() for param in self.nc_har3_polyn_params.values()
-        ]
-        energy_entries = {
-            Pol.LH: EnergyCoverage.generate(
-                min_energies=[MINE],
-                max_energies=[MAXE],
-                poly1d_params=[lh],
-            ),
-            Pol.LV: EnergyCoverage.generate(
-                min_energies=[MINE],
-                max_energies=[MAXE],
-                poly1d_params=[lv],
-            ),
-            Pol.PC: EnergyCoverage.generate(
-                min_energies=[MINE],
-                max_energies=[MAXE],
-                poly1d_params=[pc],
-            ),
-            Pol.NC: EnergyCoverage.generate(
-                min_energies=[MINE],
-                max_energies=[MAXE],
-                poly1d_params=[nc],
-            ),
-            Pol.PC3: EnergyCoverage.generate(
-                min_energies=[MINE],
-                max_energies=[MAXE],
-                poly1d_params=[pc_har3],
-            ),
-            Pol.NC3: EnergyCoverage.generate(
-                min_energies=[MINE],
-                max_energies=[MAXE],
-                poly1d_params=[nc_har3],
-            ),
-        }
-        self.lut = EnergyMotorLookup(LookupTable(energy_entries))
+
+        energy_entries = await self._get_table_entries(self.param_dict)
+        self.energy_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
+
+        inv_energy_entries = await self._get_table_entries(
+            self.inv_param_dict, max_energy=2000, min_energy=-2000
+        )
+        self.motor_energy_lookup = EnergyMotorLookup(LookupTable(inv_energy_entries))
 
     async def connect(
         self,
@@ -110,4 +94,4 @@ class I06EpicsPolynomailDevice(Device, Movable):
         await super().connect(
             mock=mock, timeout=timeout, force_reconnect=force_reconnect
         )
-        await self.set(0)  # set to trigger reading polynomial coefficients from EPICS
+        await self.set(0)
