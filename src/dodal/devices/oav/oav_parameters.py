@@ -30,15 +30,15 @@ class OAVParameters:
 
     def __init__(
         self,
+        config_client: ConfigClient,
         context="loopCentring",
         oav_config_json=OAV_CONFIG_JSON,
     ):
         self.oav_config_json: str = oav_config_json
         self.context = context
-        config_server = ConfigClient(url="https://daq-config.diamond.ac.uk")
 
         self.global_params, self.context_dicts = self.load_json(
-            config_server, self.oav_config_json
+            config_client, self.oav_config_json
         )
         self.active_params: ChainMap = ChainMap(
             self.context_dicts[self.context], self.global_params
@@ -47,12 +47,12 @@ class OAVParameters:
 
     @staticmethod
     def load_json(
-        config_server: ConfigClient, filename: str
+        config_client: ConfigClient, filename: str
     ) -> tuple[dict[str, Any], dict[str, dict]]:
         """Loads the specified file from the config server, and returns a dict with all the
         individual top-level k-v pairs, and one with all the subdicts.
         """
-        raw_params: dict[str, Any] = config_server.get_file_contents(filename, dict)
+        raw_params: dict[str, Any] = config_client.get_file_contents(filename, dict)
         global_params = {
             k: raw_params.pop(k)
             for k, v in list(raw_params.items())

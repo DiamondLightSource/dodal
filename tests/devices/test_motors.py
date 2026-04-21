@@ -12,9 +12,17 @@ from dodal.devices.motors import (
     XYZAzimuthStage,
     XYZAzimuthTiltPolarStage,
     XYZAzimuthTiltStage,
+    XYZPhiStage,
     XYZPitchYawRollStage,
     XYZThetaStage,
 )
+
+
+@pytest.fixture
+async def xyzp_stage() -> XYZPhiStage:
+    async with init_devices(mock=True):
+        xyzp_stage = XYZPhiStage("")
+    return xyzp_stage
 
 
 @pytest.fixture
@@ -118,6 +126,35 @@ async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
             "xyzt_stage-y": partial_reading(4.56),
             "xyzt_stage-z": partial_reading(7.89),
             "xyzt_stage-theta": partial_reading(10.11),
+        },
+    )
+
+
+async def test_setting_xyzphi_position_table(xyzp_stage: XYZPhiStage):
+    """Test setting x,y,z,phi positions on the Table using the ophyd_async mock tools."""
+    await assert_reading(
+        xyzp_stage,
+        {
+            "xyzp_stage-x": partial_reading(0.0),
+            "xyzp_stage-y": partial_reading(0.0),
+            "xyzp_stage-z": partial_reading(0.0),
+            "xyzp_stage-phi": partial_reading(0.0),
+        },
+    )
+
+    # Call set to update the position
+    set_mock_value(xyzp_stage.x.user_readback, 1.23)
+    set_mock_value(xyzp_stage.y.user_readback, 4.56)
+    set_mock_value(xyzp_stage.z.user_readback, 7.89)
+    set_mock_value(xyzp_stage.phi.user_readback, 10.11)
+
+    await assert_reading(
+        xyzp_stage,
+        {
+            "xyzp_stage-x": partial_reading(1.23),
+            "xyzp_stage-y": partial_reading(4.56),
+            "xyzp_stage-z": partial_reading(7.89),
+            "xyzp_stage-phi": partial_reading(10.11),
         },
     )
 
