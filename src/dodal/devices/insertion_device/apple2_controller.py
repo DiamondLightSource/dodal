@@ -38,7 +38,7 @@ class EnergyMotorConvertor(Protocol):
 
 
 class MotorEnergyConvertor(Protocol):
-    def __call__(self, gap: float, pol: Pol) -> float:
+    def __call__(self, energy: float, pol: Pol) -> float:
         """Protocol to provide motor position to energy conversion."""
         ...
 
@@ -180,7 +180,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def _read_energy(self, energy: float, pol: Pol, gap: float) -> float:
         """Readback for energy is just the set value if there is no inverse converter."""
         if self.gap_motor_energy_converter is not None:
-            energy = self.gap_motor_energy_converter(gap=gap, pol=pol)
+            energy = self.gap_motor_energy_converter(energy=gap, pol=pol)
         return energy
 
     async def _check_and_get_pol_setpoint(self) -> Pol:

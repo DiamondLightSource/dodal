@@ -1,11 +1,14 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_shared import I06EpicsPolynomialDevice, I06Grating
+from dodal.devices.beamlines.i06_shared.i06_apple2_controller import I06Apple2Controller
 from dodal.devices.insertion_device import (
     Apple2,
+    InsertionDevicePolarisation,
     UndulatorGap,
     UndulatorLockedPhaseAxes,
 )
+from dodal.devices.insertion_device.energy import InsertionDeviceEnergy
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -76,3 +79,28 @@ def pgm() -> PlaneGratingMonochromator:
         grating=I06Grating,
         grating_pv="NLINES2",
     )
+
+
+@devices.factory()
+def idu_controller(
+    idu: Apple2, i06_epics_polynomial_device: I06EpicsPolynomialDevice
+) -> I06Apple2Controller:
+    """I06 upstream insertion device controller."""
+    return I06Apple2Controller(
+        apple2=idu,
+        gap_energy_motor_lut=i06_epics_polynomial_device.energy_motor_lookup,
+        phase_energy_motor_lut=i06_epics_polynomial_device.energy_motor_lookup,  # need fix this too
+        gap_motor_energy_lut=i06_epics_polynomial_device.motor_energy_lookup,
+    )
+
+
+@devices.factory()
+def idu_energy(idu_controller: I06Apple2Controller) -> InsertionDeviceEnergy:
+    return InsertionDeviceEnergy(id_controller=idu_controller)
+
+
+@devices.factory()
+def idu_polarisation(
+    idu_controller: I06Apple2Controller,
+) -> InsertionDevicePolarisation:
+    return InsertionDevicePolarisation(id_controller=idu_controller)
