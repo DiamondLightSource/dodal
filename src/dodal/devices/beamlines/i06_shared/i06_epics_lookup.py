@@ -99,4 +99,4 @@ class I06EpicsPolynomailDevice(Device, Movable):
         await super().connect(
             mock=mock, timeout=timeout, force_reconnect=force_reconnect
         )
-        await self.set(0)
+        await self.set(update=True)
