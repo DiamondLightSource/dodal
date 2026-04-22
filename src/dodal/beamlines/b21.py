@@ -9,6 +9,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.b21.vici_valves import ViciValves
 from dodal.devices.beamlines.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.focusing_mirror import SimpleMirror
 from dodal.devices.linkam3 import Linkam3
@@ -152,3 +153,10 @@ def wbscam(path_provider: PathProvider) -> AravisDetector:
 @devices.factory(skip=True)
 def linkam() -> Linkam3:
     return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-HPLC-01:")
+
+
+@devices.factory()
+def vici_valves() -> ViciValves:
+    return ViciValves(
+        f"{PREFIX.beamline_prefix}-EA-GIR-01:", f"{PREFIX.beamline_prefix}-EA-VICI-01:"
+    )

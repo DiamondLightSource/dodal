@@ -143,7 +143,7 @@ async def test_abort_program(mock_sleep, fake_pmac: PMAC, run_engine: RunEngine)
     mock_pmac_string = get_mock_put(fake_pmac.pmac_string)
     mock_pmac_string.assert_has_calls(
         [
-            call("A"),
+            call("&2A"),
             call("P2401=0"),
         ]
     )

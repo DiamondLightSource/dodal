@@ -1,10 +1,16 @@
-from ophyd_async.core import InOut
+from ophyd_async.core import InOut, SignalRW
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
+from dodal.devices.beamlines.i09 import (
+    IntensityProtection,
+    LensMode,
+    PassEnergy,
+    PsuMode,
+)
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
@@ -126,3 +132,10 @@ def lakeshore() -> Lakeshore336:
 def smpm() -> XYZAzimuthPolarStage:
     """Sample Manipulator."""
     return XYZAzimuthPolarStage(prefix=f"{I_PREFIX.beamline_prefix}-MO-SMPM-01:")
+
+
+@devices.factory
+def intensity_protection() -> SignalRW[IntensityProtection]:
+    return epics_signal_rw(
+        IntensityProtection, f"{I_PREFIX.beamline_prefix}-DI-EAN-01:PROT:ILK"
+    )
