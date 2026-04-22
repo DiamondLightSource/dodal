@@ -1,19 +1,17 @@
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.beamlines.i06_1.led_light import LEDLight
-from dodal.devices.motors import XYZStage
+from dodal.devices.motors import XYZThetaStage
 
 
-class DiffractionDichroism(XYZStage):
+class DiffractionDichroism(XYZThetaStage):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
-            # Motors
-            self.theta = Motor(prefix + "THETA")
-            self.theta2 = Motor(prefix + "DET:2THETA")
+            # Additional Motors
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
+            self.theta2 = Motor(prefix + "DET:2THETA")
             self.dy = Motor(prefix + "DET:Y")
-
             # Camera lights
             self.cl1 = LEDLight(prefix + "LED1:")
             self.cl2 = LEDLight(prefix + "LED2:")
@@ -22,5 +20,10 @@ class DiffractionDichroism(XYZStage):
             self.cl5 = LEDLight(prefix + "LED5:")
 
         super().__init__(
-            prefix, name, x_infix="SMPL:X", y_infix="SMPL:Y", z_infix="SMPL:Z"
+            prefix=prefix,
+            name=name,
+            x_infix="SMPL:X",
+            y_infix="SMPL:Y",
+            z_infix="SMPL:Z",
+            theta_infix="THETA",
         )
