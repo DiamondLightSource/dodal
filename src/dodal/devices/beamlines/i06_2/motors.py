@@ -4,8 +4,8 @@ from dodal.devices.motors import _PHI, _X, _Y, XYPhiStage
 
 
 class PEEMManipulator(XYPhiStage):
-    """Three-axis stage with a standard xy stage and one axis of rotation: phi. This
-    also has an additional energy slit (es) motor.
+    """Four-axis stage with a standard xy stage and one axis of rotation: phi. This
+    also has an additional energy slit (es) translational motor.
     """
 
     def __init__(
