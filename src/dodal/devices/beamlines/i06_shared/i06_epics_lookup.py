@@ -1,5 +1,4 @@
-from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, Device, DeviceMock, DeviceVector
+from ophyd_async.core import Device, DeviceMock, DeviceVector
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.device_manager import DEFAULT_TIMEOUT
@@ -27,7 +26,7 @@ DEFAULT_POLY1D_PARAMETERS = {
 }
 
 
-class I06EpicsPolynomialDevice(Device, Movable):
+class I06EpicsPolynomialDevice(Device):
     def __init__(self, prefix: str, name: str = "") -> None:
         # Define mapping of polarization to PV suffix
         self._pol_map = {
@@ -74,13 +73,16 @@ class I06EpicsPolynomialDevice(Device, Movable):
 
     async def _get_table_entries(
         self,
-        param_dict: dict[Pol, DeviceVector],
+        param_dict: dict[Pol, DeviceVector | list[float]],
         max_energy: float = MAXE,
         min_energy: float = MINE,
     ) -> dict[Pol, EnergyCoverage]:
         entries = {}
         for pol, vector in param_dict.items():
-            coeffs = [await p.get_value() for p in vector.values()]
+            if isinstance(vector, DeviceVector):
+                coeffs = [await p.get_value() for p in vector.values()]
+            else:
+                coeffs = vector
             entries[pol] = EnergyCoverage.generate(
                 min_energies=[min_energy],
                 max_energies=[max_energy],
@@ -88,36 +90,30 @@ class I06EpicsPolynomialDevice(Device, Movable):
             )
         return entries
 
-    @AsyncStatus.wrap
-    async def set(self, update: bool = True) -> None:
-        if update:
-            # Update gap lookup table
-            energy_entries = await self._get_table_entries(self.param_dict)
-            self.energy_gap_motor_lookup = EnergyMotorLookup(
-                LookupTable(energy_entries)
-            )
-            # find energy range
-            min_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
-                value=MAXE, pol=Pol.LH
-            )
-            max_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
-                value=MINE, pol=Pol.LH
-            )
-            # Update gap inverse lookup table
-            inv_energy_entries = await self._get_table_entries(
-                self.inv_param_dict, max_energy=max_gap, min_energy=min_gap
-            )
-            self.gap_motor_energy_lookup = EnergyMotorLookup(
-                LookupTable(inv_energy_entries)
-            )
-            # Update phase lookup table
-            energy_entries = await self._get_table_entries(
-                DEFAULT_POLY1D_PARAMETERS, max_energy=max_gap, min_energy=min_gap
-            )
-            self.energy_phase_motor_lookup = EnergyMotorLookup(
-                LookupTable(energy_entries)
-            )
-            LOGGER.info("Updating lookup tables with new values from EPICS.")
+    async def update_lookup(self) -> None:
+        # Update gap lookup table
+        energy_entries = await self._get_table_entries(self.param_dict)
+        self.energy_gap_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
+        # find energy range
+        min_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
+            value=MAXE, pol=Pol.LH
+        )
+        max_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
+            value=MINE, pol=Pol.LH
+        )
+        # Update gap inverse lookup table
+        inv_energy_entries = await self._get_table_entries(
+            self.inv_param_dict, max_energy=max_gap, min_energy=min_gap
+        )
+        self.gap_motor_energy_lookup = EnergyMotorLookup(
+            LookupTable(inv_energy_entries)
+        )
+        # Update phase lookup table
+        energy_entries = await self._get_table_entries(
+            DEFAULT_POLY1D_PARAMETERS, max_energy=max_gap, min_energy=min_gap
+        )
+        self.energy_phase_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
+        LOGGER.info("Updating lookup tables with new values from EPICS.")
 
     async def connect(
         self,
@@ -129,4 +125,4 @@ class I06EpicsPolynomialDevice(Device, Movable):
             mock=mock, timeout=timeout, force_reconnect=force_reconnect
         )
         # Highjack connect to update lookup tables on connection.
-        await self.set(update=True)
+        await self.update_lookup()
