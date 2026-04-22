@@ -1,6 +1,7 @@
 import asyncio
 
-from ophyd_async.core import Device, DeviceMock, DeviceVector
+from bluesky.protocols import Triggerable
+from ophyd_async.core import AsyncStatus, Device, DeviceMock, DeviceVector
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.device_manager import DEFAULT_TIMEOUT
@@ -24,7 +25,7 @@ DEFAULT_POLY1D_PARAMETERS = {
 }
 
 
-class I06EpicsPolynomialDevice(Device):
+class I06EpicsPolynomialDevice(Device, Triggerable):
     def __init__(
         self,
         prefix: str,
@@ -75,6 +76,11 @@ class I06EpicsPolynomialDevice(Device):
                 for i in range(12, 0, -1)
             }
         )
+
+    @AsyncStatus.wrap
+    async def trigger(self) -> None:
+        """Triggering this device will update the lookup tables with the current PV values."""
+        await self.update_lookup()
 
     async def _get_table_entries(
         self,
