@@ -53,10 +53,10 @@ async def test_set_motors_from_energy_and_polarisation_sets_correct_values(
     mock_id_controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
     await mock_id_controller.energy.set(100.0)
     mock_id_controller.gap_energy_motor_converter.assert_called_once_with(  # type:ignore
-        value=100.0, pol=Pol.LH
+        energy=100.0, pol=Pol.LH
     )
     mock_id_controller.phase_energy_motor_converter.assert_called_once_with(  # type:ignore
-        value=100.0, pol=Pol.LH
+        energy=100.0, pol=Pol.LH
     )
     expected_val = Apple2Val(
         gap=42.0,
