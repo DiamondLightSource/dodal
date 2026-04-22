@@ -12,8 +12,6 @@ ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
-ALPHA_OFFSET = 180
-MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
 class I06Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):

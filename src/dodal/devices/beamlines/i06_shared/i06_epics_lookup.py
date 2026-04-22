@@ -15,6 +15,18 @@ MAXE = 2200
 MINE = 70
 
 
+ROW_PHASE_CIRCULAR = 15.0
+MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
+DEFAULT_POLY1D_PARAMETERS = {
+    Pol.LH: [0],
+    Pol.LV: [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+    Pol.PC: [ROW_PHASE_CIRCULAR],
+    Pol.PC3: [ROW_PHASE_CIRCULAR],
+    Pol.NC: [-ROW_PHASE_CIRCULAR],
+    Pol.NC3: [-ROW_PHASE_CIRCULAR],
+}
+
+
 class I06EpicsPolynomialDevice(Device, Movable):
     def __init__(self, prefix: str, name: str = "") -> None:
         # Define mapping of polarization to PV suffix
@@ -47,8 +59,9 @@ class I06EpicsPolynomialDevice(Device, Movable):
             attr_name = f"{pol.name.lower()}_params"
             setattr(self, attr_name, self._make_params(f"{prefix}{suffix}"))
             self.param_dict[pol] = getattr(self, attr_name)
-        self.energy_motor_lookup = EnergyMotorLookup()
-        self.motor_energy_lookup = EnergyMotorLookup()
+        self.energy_gap_motor_lookup = EnergyMotorLookup()
+        self.energy_phase_motor_lookup = EnergyMotorLookup()
+        self.gap_motor_energy_lookup = EnergyMotorLookup()
         super().__init__(name=name)
 
     def _make_params(self, pv_prefix: str) -> DeviceVector:
@@ -78,19 +91,31 @@ class I06EpicsPolynomialDevice(Device, Movable):
     @AsyncStatus.wrap
     async def set(self, update: bool = True) -> None:
         if update:
+            # Update gap lookup table
             energy_entries = await self._get_table_entries(self.param_dict)
-            self.energy_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
-            min_gap = self.energy_motor_lookup.find_value_in_lookup_table(
+            self.energy_gap_motor_lookup = EnergyMotorLookup(
+                LookupTable(energy_entries)
+            )
+            # find energy range
+            min_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
                 value=MAXE, pol=Pol.LH
             )
-            max_gap = self.energy_motor_lookup.find_value_in_lookup_table(
+            max_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
                 value=MINE, pol=Pol.LH
             )
+            # Update gap inverse lookup table
             inv_energy_entries = await self._get_table_entries(
                 self.inv_param_dict, max_energy=max_gap, min_energy=min_gap
             )
-            self.motor_energy_lookup = EnergyMotorLookup(
+            self.gap_motor_energy_lookup = EnergyMotorLookup(
                 LookupTable(inv_energy_entries)
+            )
+            # Update phase lookup table
+            energy_entries = await self._get_table_entries(
+                DEFAULT_POLY1D_PARAMETERS, max_energy=max_gap, min_energy=min_gap
+            )
+            self.energy_phase_motor_lookup = EnergyMotorLookup(
+                LookupTable(energy_entries)
             )
             LOGGER.info("Updating lookup tables with new values from EPICS.")
 
