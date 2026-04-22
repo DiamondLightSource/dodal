@@ -35,7 +35,7 @@ def test_lookup_table_get_poly(
     for i in range(len(generate_config_lut.polarisations)):
         min_energy = generate_config_lut.energy_coverage[i].min_energy
         poly = lut.get_poly(
-            energy=min_energy,
+            value=min_energy,
             pol=generate_config_lut.polarisations[i],
         )
         expected_poly = generate_config_lut.energy_coverage[i].get_poly(min_energy)

@@ -13,7 +13,6 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnabledDisabledUpper,
     EnergyMotorConvertor,
-    MotorEnergyConvertor,
     Pol,
     UndulatorGateStatus,
     UndulatorLockedPhaseAxes,
@@ -81,7 +80,7 @@ class DummyEnergyReadbackApple2Controller(
         apple2: Apple2[UndulatorLockedPhaseAxes],
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
-        gap_motor_energy_converter: MotorEnergyConvertor,
+        gap_motor_energy_converter: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
         super().__init__(
@@ -123,8 +122,8 @@ async def mock_locked_controller(
 ) -> DummyLockedApple2Controller:
     mock_locked_controller = DummyLockedApple2Controller(
         apple2=mock_locked_apple2,
-        gap_energy_motor_converter=lambda energy, pol: configured_gap,
-        phase_energy_motor_converter=lambda energy, pol: configured_phase,
+        gap_energy_motor_converter=lambda value, pol: configured_gap,
+        phase_energy_motor_converter=lambda value, pol: configured_phase,
     )
     return mock_locked_controller
 
@@ -138,9 +137,9 @@ async def mock_energy_readback_controller(
 ) -> DummyEnergyReadbackApple2Controller:
     mock_locked_controller = DummyEnergyReadbackApple2Controller(
         apple2=mock_locked_apple2,
-        gap_energy_motor_converter=lambda energy, pol: configured_gap,
-        phase_energy_motor_converter=lambda energy, pol: configured_phase,
-        gap_motor_energy_converter=lambda gap, pol: configured_energy,
+        gap_energy_motor_converter=lambda value, pol: configured_gap,
+        phase_energy_motor_converter=lambda value, pol: configured_phase,
+        gap_motor_energy_converter=lambda value, pol: configured_energy,
     )
     return mock_locked_controller
 

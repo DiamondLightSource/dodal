@@ -32,14 +32,8 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 
 
 class EnergyMotorConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> float:
-        """Protocol to provide energy to motor position conversion."""
-        ...
-
-
-class MotorEnergyConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> float:
-        """Protocol to provide motor position to energy conversion."""
+    def __call__(self, value: float, pol: Pol) -> float:
+        """Protocol to provide energy, motor position conversion."""
         ...
 
 
@@ -100,7 +94,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         apple2: Apple2Type,
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
-        gap_motor_energy_converter: MotorEnergyConvertor | None = None,
+        gap_motor_energy_converter: EnergyMotorConvertor | None = None,
         maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
         maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
@@ -166,8 +160,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self, energy: float, pol: Pol
     ) -> None:
         """Set the undulator motors for a given energy and polarisation."""
-        gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
-        phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        gap = self.gap_energy_motor_converter(value=energy, pol=pol)
+        phase = self.phase_energy_motor_converter(value=energy, pol=pol)
         apple2_val = self._get_apple2_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
         await self.apple2().set(id_motor_values=apple2_val)
@@ -180,7 +174,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def _read_energy(self, energy: float, pol: Pol, gap: float) -> float:
         """Readback for energy is just the set value if there is no inverse converter."""
         if self.gap_motor_energy_converter is not None:
-            energy = self.gap_motor_energy_converter(energy=gap, pol=pol)
+            energy = self.gap_motor_energy_converter(value=gap, pol=pol)
         return energy
 
     async def _check_and_get_pol_setpoint(self) -> Pol:

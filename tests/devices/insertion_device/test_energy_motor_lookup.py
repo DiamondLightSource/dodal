@@ -27,7 +27,7 @@ def test_energy_motor_lookup_find_value_in_lookup_table(
     for i in range(len(generate_config_lut.polarisations)):
         energy = generate_config_lut.energy_coverage[i].min_energy
         value = energy_motor_lookup.find_value_in_lookup_table(
-            energy=energy,
+            value=energy,
             pol=generate_config_lut.polarisations[i],
         )
         expected_poly = generate_config_lut.energy_coverage[i].get_poly(energy)
@@ -65,7 +65,7 @@ def test_energy_motor_lookup_find_value_in_lookup_table_updates_lut_if_lut_empty
 
     energy_motor_lookup.find_value_in_lookup_table(energy, pol)
     mock_update_lut.assert_called_once()
-    mock_lut.get_poly.assert_called_once_with(energy=energy, pol=pol)
+    mock_lut.get_poly.assert_called_once_with(value=energy, pol=pol)
 
 
 @pytest.fixture

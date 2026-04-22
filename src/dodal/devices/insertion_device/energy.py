@@ -62,11 +62,11 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
         await self.set(energy=mid_energy)
         current_pol = await self.id_controller().polarisation_setpoint.get_value()
         start_position = self.id_controller().gap_energy_motor_converter(
-            energy=value.start_position,
+            value=value.start_position,
             pol=current_pol,
         )
         end_position = self.id_controller().gap_energy_motor_converter(
-            energy=value.end_position, pol=current_pol
+            value=value.end_position, pol=current_pol
         )
 
         gap_fly_motor_info = FlyMotorInfo(

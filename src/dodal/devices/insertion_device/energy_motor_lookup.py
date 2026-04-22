@@ -30,11 +30,11 @@ class EnergyMotorLookup:
         """
         pass
 
-    def find_value_in_lookup_table(self, energy: float, pol: Pol) -> float:
+    def find_value_in_lookup_table(self, value: float, pol: Pol) -> float:
         """Convert energy and polarisation to a value from the lookup table.
 
         Args:
-            energy (float): Desired energy.
+            value (float): Desired energy.
             pol (Pol): Polarisation mode.
 
         Returns:
@@ -44,8 +44,8 @@ class EnergyMotorLookup:
         # implemented it.
         if not self.lut.root:
             self.update_lookup_table()
-        poly = self.lut.get_poly(energy=energy, pol=pol)
-        return poly(energy)
+        poly = self.lut.get_poly(value=value, pol=pol)
+        return poly(value)
 
 
 class ConfigServerEnergyMotorLookup(EnergyMotorLookup):

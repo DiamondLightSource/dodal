@@ -81,10 +81,10 @@ class I06EpicsPolynomialDevice(Device, Movable):
             energy_entries = await self._get_table_entries(self.param_dict)
             self.energy_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
             min_gap = self.energy_motor_lookup.find_value_in_lookup_table(
-                energy=MAXE, pol=Pol.LH
+                value=MAXE, pol=Pol.LH
             )
             max_gap = self.energy_motor_lookup.find_value_in_lookup_table(
-                energy=MINE, pol=Pol.LH
+                value=MINE, pol=Pol.LH
             )
             inv_energy_entries = await self._get_table_entries(
                 self.inv_param_dict, max_energy=max_gap, min_energy=min_gap

@@ -424,8 +424,8 @@ async def mock_locked_controller(
 ) -> DummyLockedApple2Controller:
     mock_locked_controller = DummyLockedApple2Controller(
         apple2=mock_locked_apple2,
-        gap_energy_motor_converter=lambda energy, pol: configured_gap,
-        phase_energy_motor_converter=lambda energy, pol: configured_phase,
+        gap_energy_motor_converter=lambda value, pol: configured_gap,
+        phase_energy_motor_converter=lambda value, pol: configured_phase,
     )
     return mock_locked_controller
 

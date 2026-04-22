@@ -195,8 +195,8 @@ class AppleKnotController(
             current_gap, current_phase_top, Pol.NONE
         )
         # get target apple2 value
-        target_gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
-        target_phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        target_gap = self.gap_energy_motor_converter(value=energy, pol=pol)
+        target_phase = self.phase_energy_motor_converter(value=energy, pol=pol)
         target_apple2_val = self._get_apple2_value(target_gap, target_phase, pol)
         # get path avoiding exclusion zone
         manhattan_path = self.path_finder.get_apple_knot_val_path(
