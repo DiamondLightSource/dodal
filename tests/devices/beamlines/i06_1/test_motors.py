@@ -23,7 +23,7 @@ async def test_dd_read(dd: DiffractionDichroism) -> None:
             "dd-theta": partial_reading(0),
             "dd-chi": partial_reading(0),
             "dd-phi": partial_reading(0),
-            "dd-theta2": partial_reading(0),
+            "dd-twotheta": partial_reading(0),
             "dd-dy": partial_reading(0),
             "dd-cl1-intensity": partial_reading(0),
             "dd-cl1-switch": partial_reading(OnOffUpper.ON),

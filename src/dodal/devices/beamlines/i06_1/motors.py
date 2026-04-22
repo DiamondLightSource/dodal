@@ -10,7 +10,7 @@ class DiffractionDichroism(XYZThetaStage):
             # Additional Motors
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
-            self.theta2 = Motor(prefix + "DET:2THETA")
+            self.twotheta = Motor(prefix + "DET:2THETA")
             self.dy = Motor(prefix + "DET:Y")
             # Camera lights
             self.cl1 = LEDLight(prefix + "LED1:")
