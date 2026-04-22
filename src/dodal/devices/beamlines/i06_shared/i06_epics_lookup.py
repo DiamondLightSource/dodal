@@ -1,3 +1,5 @@
+import asyncio
+
 from ophyd_async.core import Device, DeviceMock, DeviceVector
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -80,7 +82,7 @@ class I06EpicsPolynomialDevice(Device):
         entries = {}
         for pol, vector in param_dict.items():
             if isinstance(vector, DeviceVector):
-                coeffs = [await p.get_value() for p in vector.values()]
+                coeffs = await asyncio.gather(*(p.get_value() for p in vector.values()))
             else:
                 coeffs = vector
             entries[pol] = EnergyCoverage.generate(
