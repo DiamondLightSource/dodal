@@ -12,10 +12,6 @@ from dodal.devices.insertion_device import (
 )
 from dodal.log import LOGGER
 
-MAXE = 2200
-MINE = 70
-
-
 ROW_PHASE_CIRCULAR = 15.0
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 DEFAULT_POLY1D_PARAMETERS = {
@@ -29,7 +25,13 @@ DEFAULT_POLY1D_PARAMETERS = {
 
 
 class I06EpicsPolynomialDevice(Device):
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        max_energy: float = 2200,
+        min_energy: float = 70,
+        name: str = "",
+    ) -> None:
         # Define mapping of polarization to PV suffix
         self._pol_map = {
             Pol.LH: "HZ",
@@ -49,7 +51,8 @@ class I06EpicsPolynomialDevice(Device):
         }
         self.param_dict = {}
         self.inv_param_dict = {}
-
+        self.min_energy = min_energy
+        self.max_energy = max_energy
         # Initialize DeviceVectors
         for pol, suffix in self._inv_pol_map.items():
             attr_name = f"{pol.name.lower()}_inverse_params"
@@ -76,8 +79,8 @@ class I06EpicsPolynomialDevice(Device):
     async def _get_table_entries(
         self,
         param_dict: dict[Pol, DeviceVector | list[float]],
-        max_energy: float = MAXE,
-        min_energy: float = MINE,
+        min_energy: float,
+        max_energy: float,
     ) -> dict[Pol, EnergyCoverage]:
         entries = {}
         for pol, vector in param_dict.items():
@@ -94,14 +97,16 @@ class I06EpicsPolynomialDevice(Device):
 
     async def update_lookup(self) -> None:
         # Update gap lookup table
-        energy_entries = await self._get_table_entries(self.param_dict)
+        energy_entries = await self._get_table_entries(
+            self.param_dict, self.min_energy, self.max_energy
+        )
         self.energy_gap_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
-        # find energy range
+        # find gap range from energy range
         min_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
-            value=MAXE, pol=Pol.LH
+            value=self.max_energy, pol=Pol.LH
         )
         max_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
-            value=MINE, pol=Pol.LH
+            value=self.min_energy, pol=Pol.LH
         )
         # Update gap inverse lookup table
         inv_energy_entries = await self._get_table_entries(
