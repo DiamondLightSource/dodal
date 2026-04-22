@@ -28,7 +28,18 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def i06_epics_polynomial_device() -> I06EpicsPolynomialDevice:
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=I06Grating,
+        grating_pv="NLINES2",
+    )
+
+
+# Insertion Device
+# ------------- Downstream Insertion Device --------------------
+@devices.factory()
+def i06_idd_epics_polynomial_device() -> I06EpicsPolynomialDevice:
     return I06EpicsPolynomialDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDD-01:")
 
 
@@ -53,6 +64,25 @@ def idd(idd_gap: UndulatorGap, idd_phase: UndulatorLockedPhaseAxes) -> Apple2:
 
 
 @devices.factory()
+def idd_controller(
+    idd: Apple2, i06_idd_epics_polynomial_device: I06EpicsPolynomialDevice
+) -> I06Apple2Controller:
+    """I06 downstream insertion device controller."""
+    return I06Apple2Controller(
+        apple2=idd,
+        gap_energy_motor_lut=i06_idd_epics_polynomial_device.energy_motor_lookup,
+        phase_energy_motor_lut=i06_idd_epics_polynomial_device.energy_motor_lookup,  # need fix this too
+        gap_motor_energy_lut=i06_idd_epics_polynomial_device.motor_energy_lookup,
+    )
+
+
+# -------------------- Upstream Insertion Device -------------------
+@devices.factory()
+def i06_idu_epics_polynomial_device() -> I06EpicsPolynomialDevice:
+    return I06EpicsPolynomialDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDU-01:")
+
+
+@devices.factory()
 def idu_gap() -> UndulatorGap:
     return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
 
@@ -73,24 +103,15 @@ def idu(idu_gap: UndulatorGap, idu_phase: UndulatorLockedPhaseAxes) -> Apple2:
 
 
 @devices.factory()
-def pgm() -> PlaneGratingMonochromator:
-    return PlaneGratingMonochromator(
-        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
-        grating=I06Grating,
-        grating_pv="NLINES2",
-    )
-
-
-@devices.factory()
 def idu_controller(
-    idu: Apple2, i06_epics_polynomial_device: I06EpicsPolynomialDevice
+    idu: Apple2, i06_idu_epics_polynomial_device: I06EpicsPolynomialDevice
 ) -> I06Apple2Controller:
     """I06 upstream insertion device controller."""
     return I06Apple2Controller(
         apple2=idu,
-        gap_energy_motor_lut=i06_epics_polynomial_device.energy_motor_lookup,
-        phase_energy_motor_lut=i06_epics_polynomial_device.energy_motor_lookup,  # need fix this too
-        gap_motor_energy_lut=i06_epics_polynomial_device.motor_energy_lookup,
+        gap_energy_motor_lut=i06_idu_epics_polynomial_device.energy_motor_lookup,
+        phase_energy_motor_lut=i06_idu_epics_polynomial_device.energy_motor_lookup,  # need fix this too
+        gap_motor_energy_lut=i06_idu_epics_polynomial_device.motor_energy_lookup,
     )
 
 

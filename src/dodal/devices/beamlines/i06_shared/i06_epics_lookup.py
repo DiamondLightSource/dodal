@@ -11,8 +11,8 @@ from dodal.devices.insertion_device import (
 )
 from dodal.log import LOGGER
 
-MAXE = 1700
-MINE = 100
+MAXE = 2200
+MINE = 70
 
 
 class I06EpicsPolynomialDevice(Device, Movable):
@@ -80,15 +80,19 @@ class I06EpicsPolynomialDevice(Device, Movable):
         if update:
             energy_entries = await self._get_table_entries(self.param_dict)
             self.energy_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
-
+            min_gap = self.energy_motor_lookup.find_value_in_lookup_table(
+                energy=MAXE, pol=Pol.LH
+            )
+            max_gap = self.energy_motor_lookup.find_value_in_lookup_table(
+                energy=MINE, pol=Pol.LH
+            )
             inv_energy_entries = await self._get_table_entries(
-                self.inv_param_dict, max_energy=2000, min_energy=-2000
+                self.inv_param_dict, max_energy=max_gap, min_energy=min_gap
             )
             self.motor_energy_lookup = EnergyMotorLookup(
                 LookupTable(inv_energy_entries)
             )
-        else:
-            LOGGER.info("Not updating lookup tables as update=False")
+            LOGGER.info("Updating lookup tables with new values from EPICS.")
 
     async def connect(
         self,
@@ -99,5 +103,5 @@ class I06EpicsPolynomialDevice(Device, Movable):
         await super().connect(
             mock=mock, timeout=timeout, force_reconnect=force_reconnect
         )
-        # highjack connect to update lookup tables on connection.
+        # Highjack connect to update lookup tables on connection.
         await self.set(update=True)
