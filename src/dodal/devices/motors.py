@@ -112,7 +112,7 @@ class XYZThetaStage(XYZStage):
         x_infix: str = _X,
         y_infix: str = _Y,
         z_infix: str = _Z,
-        theta_infix: str = "THETA",
+        theta_infix: str = _THETA,
     ) -> None:
         with self.add_children_as_readables():
             self.theta = Motor(prefix + theta_infix)
@@ -240,7 +240,7 @@ class XYThetaStage(XYStage):
         prefix: str,
         x_infix: str = _X,
         y_infix: str = _Y,
-        theta_infix: str = "THETA",
+        theta_infix: str = _THETA,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
