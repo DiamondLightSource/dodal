@@ -1,4 +1,9 @@
+from functools import cache
+from pathlib import Path
+
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.motor import Motor
+from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -26,6 +31,14 @@ set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
+
+
 """
 Define device factory functions below this point.
 A device factory function is any function that has a return type which conforms
@@ -212,4 +225,12 @@ def hutch_shutter() -> InterlockedHutchShutter:
         interlock=PLCShutterInterlock(
             bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
         ),
+    )
+
+
+@devices.factory()
+def fastcs_eiger(path_provider: PathProvider) -> EigerDetector:
+    return EigerDetector(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=path_provider,
     )
