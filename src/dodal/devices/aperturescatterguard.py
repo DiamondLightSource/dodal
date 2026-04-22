@@ -92,11 +92,7 @@ class AperturePosition(BaseModel):
 
 
 class ApertureValue(StrictEnum):
-    """The possible apertures that can be selected.
-
-    Changing these means changing the external parameter model of Hyperion.
-    See https://github.com/DiamondLightSource/mx-bluesky/issues/760.
-    """
+    """The possible apertures that can be selected."""
 
     SMALL = "SMALL_APERTURE"
     MEDIUM = "MEDIUM_APERTURE"
