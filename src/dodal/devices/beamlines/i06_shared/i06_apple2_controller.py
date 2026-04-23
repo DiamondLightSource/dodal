@@ -18,7 +18,7 @@ class I06Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
 
     Args:
         apple2 (Apple2): An Apple2 device with UndulatorPhaseAxes.
-        gap_energy_motor_lu (EnergyMotorLookup): Handles Energy -> Gap lookup logic.
+        gap_energy_motor_lut (EnergyMotorLookup): Handles Energy -> Gap lookup logic.
         phase_energy_motor_lu (EnergyMotorLookup): Handles Energy -> Phase lookup logic.
         gap_motor_energy_lu (EnergyMotorLookup): Handles Gap -> Energy inverse lookup logic.
         units (str, optional): The units for energy values. Defaults to "eV".
@@ -28,18 +28,18 @@ class I06Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     def __init__(
         self,
         apple2: Apple2[UndulatorPhaseAxes],
-        gap_energy_motor_lu: EnergyMotorLookup,
+        gap_energy_motor_lut: EnergyMotorLookup,
         phase_energy_motor_lu: EnergyMotorLookup,
         gap_motor_energy_lu: EnergyMotorLookup,
         units: str = "eV",
         name: str = "",
     ) -> None:
-        self.gap_energy_motor_lu = gap_energy_motor_lu
+        self.gap_energy_motor_lut = gap_energy_motor_lut
         self.phase_energy_motor_lu = phase_energy_motor_lu
         self.gap_motor_energy_lu = gap_motor_energy_lu
         super().__init__(
             apple2=apple2,
-            gap_energy_motor_converter=gap_energy_motor_lu.find_value_in_lookup_table,
+            gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
             phase_energy_motor_converter=phase_energy_motor_lu.find_value_in_lookup_table,
             gap_motor_energy_converter=gap_motor_energy_lu.find_value_in_lookup_table,
             units=units,

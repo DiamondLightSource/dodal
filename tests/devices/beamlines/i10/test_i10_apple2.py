@@ -136,7 +136,7 @@ async def mock_id_controller(
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            gap_energy_motor_lu=mock_i10_gap_energy_motor_lookup_idu,
+            gap_energy_motor_lut=mock_i10_gap_energy_motor_lookup_idu,
             phase_energy_motor_lu=mock_i10_phase_energy_motor_lookup_idu,
         )
 
@@ -689,10 +689,10 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {}!".format(
-        mock_id_controller.gap_energy_motor_lu.lut.root[
+        mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
         ].min_energy,
-        mock_id_controller.gap_energy_motor_lu.lut.root[
+        mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
         ].max_energy,
     )
@@ -701,9 +701,9 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.gap_energy_motor_lu.update_lookup_table()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     # make gap in energy
-    mock_id_controller.gap_energy_motor_lu.lut.root[Pol.LH] = EnergyCoverage(
+    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH] = EnergyCoverage(
         energy_entries=(
             EnergyCoverageEntry(
                 min_energy=255.3,
