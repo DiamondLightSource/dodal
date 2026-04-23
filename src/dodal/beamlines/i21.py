@@ -97,7 +97,7 @@ def id_controller(
             config_client=I21_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lu=ConfigServerEnergyMotorLookup(
+        hase_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(
                 grating=I21_GRATING_COLUMNS, poly_deg=I21_PHASE_POLY_DEG_COLUMNS
             ),

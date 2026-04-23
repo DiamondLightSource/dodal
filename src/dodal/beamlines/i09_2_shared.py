@@ -84,7 +84,7 @@ def jidcontroller(
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lu=ConfigServerEnergyMotorLookup(
+        hase_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),

@@ -65,16 +65,16 @@ class DummyApple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         self,
         apple2: Apple2[UndulatorPhaseAxes],
         gap_energy_motor_lut: EnergyMotorLookup,
-        phase_energy_motor_lu: EnergyMotorLookup,
+        hase_energy_motor_lut: EnergyMotorLookup,
         units: str = "eV",
         name: str = "",
     ) -> None:
         self.gap_energy_motor_lut = gap_energy_motor_lut
-        self.phase_energy_motor_lu = phase_energy_motor_lu
+        self.hase_energy_motor_lut = hase_energy_motor_lut
         super().__init__(
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
-            phase_energy_motor_converter=phase_energy_motor_lu.find_value_in_lookup_table,
+            phase_energy_motor_converter=hase_energy_motor_lut.find_value_in_lookup_table,
             units=units,
             name=name,
         )
@@ -121,13 +121,13 @@ async def mock_id_controller(
 ) -> DummyApple2Controller:
     mock_gap_energy_motor_lut = EnergyMotorLookup()
     mock_gap_energy_motor_lut.find_value_in_lookup_table = MagicMock(return_value=42.0)
-    mock_phase_energy_motor_lu = EnergyMotorLookup()
-    mock_phase_energy_motor_lu.find_value_in_lookup_table = MagicMock(return_value=7.5)
+    mock_hase_energy_motor_lut = EnergyMotorLookup()
+    mock_hase_energy_motor_lut.find_value_in_lookup_table = MagicMock(return_value=7.5)
     with init_devices(mock=True):
         mock_id_controller = DummyApple2Controller(
             apple2=mock_apple2,
             gap_energy_motor_lut=mock_gap_energy_motor_lut,
-            phase_energy_motor_lu=mock_phase_energy_motor_lu,
+            hase_energy_motor_lut=mock_hase_energy_motor_lut,
         )
     return mock_id_controller
 

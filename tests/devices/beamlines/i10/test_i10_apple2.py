@@ -137,7 +137,7 @@ async def mock_id_controller(
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
             gap_energy_motor_lut=mock_i10_gap_energy_motor_lookup_idu,
-            phase_energy_motor_lu=mock_i10_phase_energy_motor_lookup_idu,
+            hase_energy_motor_lut=mock_i10_phase_energy_motor_lookup_idu,
         )
 
     return mock_id_controller

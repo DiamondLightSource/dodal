@@ -87,7 +87,7 @@ async def mock_id_controller(
         mock_id_controller = Apple2EnforceLHMoveController[UndulatorPhaseAxes](
             apple2=mock_apple2,
             gap_energy_motor_lut=mock_j09_gap_energy_motor_lookup,
-            phase_energy_motor_lu=mock_j09_phase_energy_motor_lookup,
+            hase_energy_motor_lut=mock_j09_phase_energy_motor_lookup,
         )
     set_mock_value(mock_id_controller._energy, 0.5)
     return mock_id_controller
@@ -285,7 +285,7 @@ async def test_j09_apple2_controller_set_pol(
     set_mock_value(mock_id_controller.apple2().phase().top_inner.user_readback, 3)
     set_mock_value(mock_id_controller.apple2().phase().btm_outer.user_readback, 4)
     mock_id_controller.gap_energy_motor_lut.update_lookup_table()
-    mock_id_controller.phase_energy_motor_lu.update_lookup_table()
+    mock_id_controller.hase_energy_motor_lut.update_lookup_table()
     await mock_id_controller.polarisation.set(pol)
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
