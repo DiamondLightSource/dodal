@@ -101,7 +101,7 @@ def id_controller(
             config_client=K07_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        hase_energy_motor_lut=ConfigServerEnergyMotorLookup(
+        phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(
                 grating=K07_GRATING_COLUMNS, poly_deg=K07_PHASE_POLY_DEG_COLUMNS
             ),

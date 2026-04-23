@@ -84,7 +84,7 @@ def id_controller(
     return I17Apple2Controller(
         apple2=id,
         gap_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
-        hase_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
+        phase_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
     )
 
 
