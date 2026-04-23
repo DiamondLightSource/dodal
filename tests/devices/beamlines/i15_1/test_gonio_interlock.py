@@ -13,7 +13,14 @@ async def interlock() -> GonioInterlock:
 
 
 async def test_interlock_is_readable(interlock: GonioInterlock):
-    await assert_reading(interlock, {f"{interlock.name}-status": partial_reading(0.0)})
+    set_mock_value(interlock.status, 65535)
+    await assert_reading(
+        interlock,
+        {
+            f"{interlock.name}-is_safe": partial_reading(True),
+            f"{interlock.name}-status": partial_reading(65535),
+        },
+    )
 
 
 @pytest.mark.parametrize(
@@ -29,4 +36,4 @@ async def test_interlock_safe_to_operate_logic(
     expected_state: bool,
 ):
     set_mock_value(interlock.status, readback)
-    assert await interlock.shutter_safe_to_operate() is expected_state
+    assert await interlock.is_safe.get_value() is expected_state

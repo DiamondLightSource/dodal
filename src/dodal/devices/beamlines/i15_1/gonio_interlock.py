@@ -1,5 +1,7 @@
 from math import isclose
 
+from ophyd_async.core import EnumTypes
+
 from dodal.devices.hutch_shutter import BaseHutchInterlock
 
 GONIO_SAFE_FOR_OPERATIONS = 65535  # All 16 bits are true
@@ -23,11 +25,10 @@ class GonioInterlock(BaseHutchInterlock):
             name=name,
         )
 
-    async def shutter_safe_to_operate(self) -> bool:
+    def _safe_to_operate(self, status: float | EnumTypes) -> bool:
         """Check device is safe to operate.
 
         If the status value is not 65535 (healhty), the interlock has been tripped and
         the device cannot be operated.
         """
-        interlock_state = await self.status.get_value()
-        return isclose(float(interlock_state), GONIO_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
+        return isclose(float(status), GONIO_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
