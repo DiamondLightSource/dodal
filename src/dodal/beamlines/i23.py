@@ -58,14 +58,20 @@ def _is_i23_machine():
     hostname = get_hostname()
     return hostname.startswith("i23-ws") or hostname.startswith("i23-control")
 
-
-@devices.factory(skip=lambda: not _is_i23_machine())
-def oav_pin_tip_detection() -> PinTipDetection:
-    return PinTipDetection(
-        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        "pin_tip_detection",
+@devices.factory()
+def oav(
+    config_client: ConfigClient,
+    params: OAVConfigBeamCentre | None = None,
+) -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
+        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        config=params
+        or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
+@devices.factory()
+def pin_tip_detection() -> PinTipDetection:
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 @devices.factory()
 def shutter() -> ZebraShutter:
