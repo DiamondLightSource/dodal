@@ -137,7 +137,7 @@ async def mock_id_controller(
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
             gap_energy_motor_lut=mock_i10_gap_energy_motor_lookup_idu,
-            hase_energy_motor_lut=mock_i10_phase_energy_motor_lookup_idu,
+            phase_energy_motor_lut=mock_i10_phase_energy_motor_lookup_idu,
         )
 
     return mock_id_controller
@@ -347,8 +347,8 @@ async def test_id_polarisation_set(
     expect_btm_outer: float,
     expect_gap: float,
 ):
-
     set_mock_value(mock_id_controller._energy, energy)
+
     if pol == "dsf":
         with pytest.raises(ValueError):
             await mock_id_pol.set(Pol(pol))
@@ -358,29 +358,29 @@ async def test_id_polarisation_set(
         top_inner = get_mock_put(
             mock_id_controller.apple2().phase().top_inner.user_setpoint
         )
-        top_inner.assert_called()
+        top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
         top_outer = get_mock_put(
             mock_id_controller.apple2().phase().top_outer.user_setpoint
         )
-        top_outer.assert_called()
+        top_outer.assert_called_once()
         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
         btm_inner = get_mock_put(
             mock_id_controller.apple2().phase().btm_inner.user_setpoint
         )
-        btm_inner.assert_called()
+        btm_inner.assert_called_once()
         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
         btm_outer = get_mock_put(
             mock_id_controller.apple2().phase().btm_outer.user_setpoint
         )
-        btm_outer.assert_called()
+        btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
         gap = get_mock_put(mock_id_controller.apple2().gap().user_setpoint)
-        # gap.assert_called_once()
+        gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
 
