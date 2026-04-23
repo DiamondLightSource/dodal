@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i03 &#8212; dodal 2.2.3.dev4+gcb0a654a8 documentation</title>
+    <title>dodal.beamlines.i03 &#8212; dodal 2.2.3.dev5+g257b180e8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=39805889"></script>
+    <script src="../../../_static/documentation_options.js?v=cf6ecdf2"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -881,6 +881,7 @@ window.addEventListener("load", load);</script>
                   
   <h1>Source code for dodal.beamlines.i03</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">getenv</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathProvider</span><span class="p">,</span> <span class="n">Reference</span>
@@ -954,7 +955,7 @@ window.addEventListener("load", load);</script>
     <span class="s2">&quot;/dls_sw/i03/software/daq_configuration/domain/beamlineParameters&quot;</span>
 <span class="p">)</span>
 <span class="n">DAQ_CONFIGURATION_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i03/software/daq_configuration&quot;</span>
-<span class="n">I03_CONFIG_SERVER_ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;https://i03-daq-config.diamond.ac.uk&quot;</span>
+<span class="n">DEFAULT_CONFIG_SERVER_ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;https://i03-daq-config.diamond.ac.uk&quot;</span>
 
 <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;i03&quot;</span><span class="p">)</span>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
@@ -986,7 +987,8 @@ window.addEventListener("load", load);</script>
 <span class="nd">@devices</span><span class="o">.</span><span class="n">fixture</span>
 <span class="nd">@cache</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">config_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ConfigClient</span><span class="p">:</span>
-    <span class="n">client</span> <span class="o">=</span> <span class="n">ConfigClient</span><span class="p">(</span><span class="n">I03_CONFIG_SERVER_ENDPOINT</span><span class="p">)</span>
+    <span class="n">config_server_url</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CONFIG_SERVER_URL&quot;</span><span class="p">,</span> <span class="n">DEFAULT_CONFIG_SERVER_ENDPOINT</span><span class="p">)</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">ConfigClient</span><span class="p">(</span><span class="n">config_server_url</span><span class="p">)</span>
     <span class="n">set_config_client</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">client</span></div>
 
