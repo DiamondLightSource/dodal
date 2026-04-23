@@ -171,6 +171,7 @@ async def test_interlocked_shutter_readable(
 ):
     result = {
         f"{fake_interlocked_shutter.name}-status": partial_reading(ShutterState.FAULT),
+        f"{fake_interlocked_shutter.interlock.name}-is_safe": partial_reading(True),
     }
     result[f"{fake_interlocked_shutter.interlock.name}-status"] = partial_reading(0.0)
     await assert_reading(
