@@ -33,15 +33,13 @@ async def mock_id_controller(
 ) -> I17Apple2Controller:
     mock_gap_energy_motor_lutt = EnergyMotorLookup()
     mock_gap_energy_motor_lutt.find_value_in_lookup_table = MagicMock(return_value=42.0)
-    mock_phase_energy_motor_lutt = EnergyMotorLookup()
-    mock_phase_energy_motor_lutt.find_value_in_lookup_table = MagicMock(
-        return_value=7.5
-    )
+    mock_phase_energy_motor_lut = EnergyMotorLookup()
+    mock_phase_energy_motor_lut.find_value_in_lookup_table = MagicMock(return_value=7.5)
     with init_devices(mock=True):
         mock_id_controller = I17Apple2Controller(
             apple2=mock_apple2,
             gap_energy_motor_lut=mock_gap_energy_motor_lutt,
-            phase_energy_motor_lu=mock_phase_energy_motor_lutt,
+            phase_energy_motor_lu=mock_phase_energy_motor_lut,
         )
     return mock_id_controller
 
