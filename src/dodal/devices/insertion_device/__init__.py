@@ -1,5 +1,7 @@
 from .apple2_controller import (
+    MAXIMUM_GAP_MOTOR_POSITION,
     MAXIMUM_MOVE_TIME,
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     Apple2Controller,
     Apple2EnforceLHMoveController,
     Apple2Type,
@@ -69,4 +71,6 @@ __all__ = [
     "UnstoppableMotor",
     "InsertionDeviceEnergyBase",
     "EnergyCoverageEntry",
+    "MAXIMUM_ROW_PHASE_MOTOR_POSITION",
+    "MAXIMUM_GAP_MOTOR_POSITION",
 ]

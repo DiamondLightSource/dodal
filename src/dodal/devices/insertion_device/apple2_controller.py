@@ -303,17 +303,17 @@ class Apple2EnforceLHMoveController(
     def __init__(
         self,
         apple2: Apple2[PhaseAxesType],
-        gap_energy_motor_lut: EnergyMotorLookup,
-        phase_energy_motor_lut: EnergyMotorLookup,
+        gap_energy_motor_lu: EnergyMotorLookup,
+        phase_energy_motor_lu: EnergyMotorLookup,
         units: str = "eV",
         name: str = "",
     ) -> None:
-        self.gap_energy_motor_lut = gap_energy_motor_lut
-        self.phase_energy_motor_lut = phase_energy_motor_lut
+        self.gap_energy_motor_lu = gap_energy_motor_lu
+        self.phase_energy_motor_lu = phase_energy_motor_lu
         super().__init__(
             apple2=apple2,
-            gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
-            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
+            gap_energy_motor_converter=gap_energy_motor_lu.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lu.find_value_in_lookup_table,
             units=units,
             name=name,
         )
@@ -346,7 +346,7 @@ class Apple2EnforceLHMoveController(
             if (value is not Pol.LH) and (current_pol is not Pol.LH):
                 self._polarisation_setpoint_set(Pol.LH)
                 max_lh_energy = float(
-                    self.gap_energy_motor_lut.lut.root[Pol.LH].max_energy
+                    self.gap_energy_motor_lu.lut.root[Pol.LH].max_energy
                 )
                 lh_setpoint = (
                     max_lh_energy if target_energy > max_lh_energy else target_energy

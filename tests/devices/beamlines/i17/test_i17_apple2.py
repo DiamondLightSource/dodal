@@ -38,8 +38,8 @@ async def mock_id_controller(
     with init_devices(mock=True):
         mock_id_controller = I17Apple2Controller(
             apple2=mock_apple2,
-            gap_energy_motor_lut=mock_gap_energy_motor_lut,
-            phase_energy_motor_lut=mock_phase_energy_motor_lut,
+            gap_energy_motor_lu=mock_gap_energy_motor_lut,
+            phase_energy_motor_lu=mock_phase_energy_motor_lut,
         )
     return mock_id_controller
 

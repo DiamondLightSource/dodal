@@ -96,12 +96,12 @@ def id_controller(
     """I21 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=id,
-        gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
+        gap_energy_motor_lu=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(grating=K07_GRATING_COLUMNS),
             config_client=K07_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
+        phase_energy_motor_lu=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(
                 grating=K07_GRATING_COLUMNS, poly_deg=K07_PHASE_POLY_DEG_COLUMNS
             ),

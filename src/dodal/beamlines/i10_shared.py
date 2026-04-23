@@ -129,20 +129,20 @@ def idd(
 def idd_controller(idd: I10Apple2) -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
     source = Source(column="Source", value="idd")
-    idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
+    idd_gap_energy_motor_lu = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
-    idd_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
+    idd_phase_energy_motor_lu = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(
         apple2=idd,
-        gap_energy_motor_lut=idd_gap_energy_motor_lut,
-        phase_energy_motor_lut=idd_phase_energy_motor_lut,
+        gap_energy_motor_lu=idd_gap_energy_motor_lu,
+        phase_energy_motor_lu=idd_phase_energy_motor_lu,
     )
 
 
@@ -209,20 +209,20 @@ def idu(
 def idu_controller(idu: I10Apple2) -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     source = Source(column="Source", value="idu")
-    idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
+    idu_gap_energy_motor_lu = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
-    idu_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
+    idu_phase_energy_motor_lu = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(
         apple2=idu,
-        gap_energy_motor_lut=idu_gap_energy_motor_lut,
-        phase_energy_motor_lut=idu_phase_energy_motor_lut,
+        gap_energy_motor_lu=idu_gap_energy_motor_lu,
+        phase_energy_motor_lu=idu_phase_energy_motor_lu,
     )
 
 

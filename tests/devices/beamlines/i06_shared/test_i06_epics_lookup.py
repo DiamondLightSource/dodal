@@ -51,8 +51,8 @@ async def test_i06_epics_polynomial_device_get_table_entries_list(
 
     entries = await i06_epics_polynomial_device._get_table_entries(
         param_dict=param_dict,
-        min_energy=70,
-        max_energy=2200,
+        min_value=70,
+        max_value=2200,
     )
     energy = 100
     assert Pol.LH in entries
@@ -81,15 +81,14 @@ async def test_i06_epics_polynomial_device_get_table_entries_deviceector(
 ) -> None:
     for pol, coeffs in param_dict.items():
         for i, coeff in enumerate(coeffs):
-            print(i, coeff)
             set_mock_value(
                 i06_epics_polynomial_device.param_dict[pol][i + 1],
                 coeff,
             )
     entries = await i06_epics_polynomial_device._get_table_entries(
         param_dict=i06_epics_polynomial_device.param_dict,
-        min_energy=70,
-        max_energy=2200,
+        min_value=70,
+        max_value=2200,
     )
     energy = 100
     assert Pol.LH in entries

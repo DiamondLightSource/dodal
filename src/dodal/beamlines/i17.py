@@ -83,8 +83,8 @@ def id_controller(
     """I17 insertion device controller with dummy energy to motor_converter."""
     return I17Apple2Controller(
         apple2=id,
-        gap_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
-        phase_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
+        gap_energy_motor_lu=EnergyMotorLookup(lut=LookupTable()),
+        phase_energy_motor_lu=EnergyMotorLookup(lut=LookupTable()),
     )
 
 

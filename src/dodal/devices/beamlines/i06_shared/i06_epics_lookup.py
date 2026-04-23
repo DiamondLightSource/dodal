@@ -6,6 +6,8 @@ from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.device_manager import DEFAULT_TIMEOUT
 from dodal.devices.insertion_device import (
+    MAXIMUM_GAP_MOTOR_POSITION,
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     EnergyCoverage,
     EnergyMotorLookup,
     LookupTable,
@@ -13,8 +15,8 @@ from dodal.devices.insertion_device import (
 )
 from dodal.log import LOGGER
 
+MINIMUM_GAP_MOTOR_POSITION = 15
 ROW_PHASE_CIRCULAR = 15.0
-MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 DEFAULT_POLY1D_PARAMETERS = {
     Pol.LH: [0],
     Pol.LV: [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
@@ -26,6 +28,32 @@ DEFAULT_POLY1D_PARAMETERS = {
 
 
 class I06EpicsPolynomialDevice(Device, Triggerable):
+    """A specialized Insertion Device for the I06 beamline that dynamically synchronizes
+    lookup tables with polynomial coefficients stored in EPICS PVs.
+
+    This device reads coefficients (C0 through C12) for multiple polarizations to
+    construct mappings between Energy, Gap, and Phase. It supports both forward
+    (Energy -> Gap) and inverse (Gap -> Energy) lookups, as well as phase calculations.
+
+    The device implements the `Triggerable` protocol, allowing the physics tables
+    to be refreshed during a Bluesky plan via `yield from bps.trigger(device)`.
+
+    Args:
+        prefix (str): The EPICS prefix for the polynomial coefficient PVs.
+        max_energy (float, optional): The maximum operating energy in eV. Defaults to 2200.
+        min_energy (float, optional): The minimum operating energy in eV. Defaults to 70.
+        phase_poly_params (dict[Pol, list[float]], optional): Static polynomial
+            parameters for phase calculation. Defaults to DEFAULT_POLY1D_PARAMETERS.
+        name (str, optional): The name of the device for Bluesky/Ophyd.
+
+    Attributes:
+        energy_gap_motor_lookup (EnergyMotorLookup): Mapping for Energy -> Gap.
+        energy_phase_motor_lookup (EnergyMotorLookup): Mapping for Energy -> Phase.
+        gap_motor_energy_lookup (EnergyMotorLookup): Mapping for Gap -> Energy.
+        param_dict (dict[Pol, DeviceVector]): Dictionary of forward polynomial signals.
+        inv_param_dict (dict[Pol, DeviceVector]): Dictionary of inverse polynomial signals.
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -87,8 +115,8 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
     async def _get_table_entries(
         self,
         param_dict: dict[Pol, DeviceVector] | dict[Pol, list[float]],
-        min_energy: float,
-        max_energy: float,
+        min_value: float,
+        max_value: float,
     ) -> dict[Pol, EnergyCoverage]:
         entries = {}
         for pol, vector in param_dict.items():
@@ -97,8 +125,8 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
             else:
                 coeffs = vector
             entries[pol] = EnergyCoverage.generate(
-                min_energies=[min_energy],
-                max_energies=[max_energy],
+                min_energies=[min_value],
+                max_energies=[max_value],
                 poly1d_params=[coeffs],
             )
         return entries
@@ -109,25 +137,24 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
             self.param_dict, self.min_energy, self.max_energy
         )
         self.energy_gap_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
-        # find gap range from energy range
-        min_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
-            value=self.max_energy, pol=Pol.LH
-        )
-        max_gap = self.energy_gap_motor_lookup.find_value_in_lookup_table(
-            value=self.min_energy, pol=Pol.LH
-        )
+
         # Update gap inverse lookup table
         inv_energy_entries = await self._get_table_entries(
-            self.inv_param_dict, max_energy=max_gap, min_energy=min_gap
+            self.inv_param_dict,
+            max_value=MAXIMUM_GAP_MOTOR_POSITION,
+            min_value=MINIMUM_GAP_MOTOR_POSITION,
         )
         self.gap_motor_energy_lookup = EnergyMotorLookup(
             LookupTable(inv_energy_entries)
         )
         # Update phase lookup table
-        energy_entries = await self._get_table_entries(
-            self.phase_poly_params, max_energy=max_gap, min_energy=min_gap
+        phase_entries = await self._get_table_entries(
+            self.phase_poly_params,
+            max_value=self.max_energy,
+            min_value=self.min_energy,
         )
-        self.energy_phase_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
+        self.energy_phase_motor_lookup = EnergyMotorLookup(LookupTable(phase_entries))
+
         LOGGER.info("Updating lookup tables with new values from EPICS.")
 
     async def connect(

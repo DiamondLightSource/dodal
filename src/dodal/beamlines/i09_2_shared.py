@@ -79,12 +79,12 @@ def jidcontroller(
     """J09 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=jid,
-        gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
+        gap_energy_motor_lu=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
+        phase_energy_motor_lu=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
