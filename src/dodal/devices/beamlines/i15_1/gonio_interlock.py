@@ -24,6 +24,10 @@ class GonioInterlock(BaseHutchInterlock):
         )
 
     async def shutter_safe_to_operate(self) -> bool:
-        """Description."""
+        """Check device is safe to operate.
+
+        If the status value is not 65535 (healhty), the interlock has been tripped and
+        the device cannot be operated.
+        """
         interlock_state = await self.status.get_value()
         return isclose(float(interlock_state), GONIO_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
