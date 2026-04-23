@@ -304,16 +304,16 @@ class Apple2EnforceLHMoveController(
         self,
         apple2: Apple2[PhaseAxesType],
         gap_energy_motor_lut: EnergyMotorLookup,
-        hase_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
         units: str = "eV",
         name: str = "",
     ) -> None:
         self.gap_energy_motor_lut = gap_energy_motor_lut
-        self.hase_energy_motor_lut = hase_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
-            phase_energy_motor_converter=hase_energy_motor_lut.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
             units=units,
             name=name,
         )

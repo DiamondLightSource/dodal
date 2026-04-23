@@ -61,7 +61,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         apple2 (I10Apple2): An I10Apple2 device.
         gap_energy_motor_lut (EnergyMotorLookup): The class that handles the gap
             look up table logic for the insertion device.
-        hase_energy_motor_lut (EnergyMotorLookup): The class that handles the phase
+        phase_energy_motor_lut (EnergyMotorLookup): The class that handles the phase
             look up table logic for the insertion device.
         jaw_phase_limit (float, optional): The maximum allowed jaw_phase movement.
             The default is 12.0
@@ -77,7 +77,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         self,
         apple2: I10Apple2,
         gap_energy_motor_lut: EnergyMotorLookup,
-        hase_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
@@ -85,11 +85,11 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         name: str = "",
     ) -> None:
         self.gap_energy_motor_lut = gap_energy_motor_lut
-        self.hase_energy_motor_lut = hase_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
-            phase_energy_motor_converter=hase_energy_motor_lut.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
             units=units,
             name=name,
         )
