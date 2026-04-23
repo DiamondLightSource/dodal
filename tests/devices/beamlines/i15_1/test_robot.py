@@ -190,7 +190,9 @@ async def test_given_wrong_spinner_program_gets_loaded_robot_times_out(robot: Ro
 
 
 # Can unskip this test once https://github.com/DiamondLightSource/crystallography-bluesky/issues/16 done
-@pytest.mark.skip(reason="Temporarily handling this timeout error, see https://github.com/DiamondLightSource/crystallography-bluesky/issues/34")
+@pytest.mark.skip(
+    reason="Temporarily handling this timeout error, see https://github.com/DiamondLightSource/crystallography-bluesky/issues/34"
+)
 async def test_given_spinner_stop_program_doesnt_start_then_robot_times_out(
     robot: Robot,
 ):
@@ -204,7 +206,9 @@ async def test_given_spinner_stop_program_doesnt_start_then_robot_times_out(
 
 
 # Can unskip this test once https://github.com/DiamondLightSource/crystallography-bluesky/issues/16 done
-@pytest.mark.skip(reason="Temporarily handling this timeout error, see https://github.com/DiamondLightSource/crystallography-bluesky/issues/34")
+@pytest.mark.skip(
+    reason="Temporarily handling this timeout error, see https://github.com/DiamondLightSource/crystallography-bluesky/issues/34"
+)
 async def test_given_spinner_stop_program_doesnt_stop_then_robot_times_out(
     robot: Robot,
 ):
@@ -241,7 +245,6 @@ async def test_after_robot_unload_new_0_0_is_put_in_index_pvs(robot: Robot):
 
     assert await robot.current_sample.puck.get_value() == 0
     assert await robot.current_sample.position.get_value() == 0
-
 
 
 async def test_given_spinner_not_running_then_unload_does_not_raise_an_error(
