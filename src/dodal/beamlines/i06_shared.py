@@ -72,7 +72,7 @@ def idd_controller(
         apple2=idd,
         gap_energy_motor_lut=i06_idd_epics_polynomial_device.energy_gap_motor_lookup,
         phase_energy_motor_lut=i06_idd_epics_polynomial_device.energy_phase_motor_lookup,
-        gap_motor_energy_lut=i06_idd_epics_polynomial_device.gap_motor_energy_lookup,
+        inverse_gap_energy_motor_lut=i06_idd_epics_polynomial_device.gap_motor_energy_lookup,
     )
 
 
@@ -111,7 +111,7 @@ def idu_controller(
         apple2=idu,
         gap_energy_motor_lut=i06_idu_epics_polynomial_device.energy_gap_motor_lookup,
         phase_energy_motor_lut=i06_idu_epics_polynomial_device.energy_phase_motor_lookup,
-        gap_motor_energy_lut=i06_idu_epics_polynomial_device.gap_motor_energy_lookup,
+        inverse_gap_energy_motor_lut=i06_idu_epics_polynomial_device.gap_motor_energy_lookup,
     )
 
 

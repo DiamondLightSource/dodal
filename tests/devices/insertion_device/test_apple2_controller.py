@@ -80,14 +80,14 @@ class DummyEnergyReadbackApple2Controller(
         apple2: Apple2[UndulatorLockedPhaseAxes],
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
-        gap_motor_energy_converter: EnergyMotorConvertor,
+        inverse_gap_energy_motor_converter: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
         super().__init__(
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_converter,
             phase_energy_motor_converter=phase_energy_motor_converter,
-            gap_motor_energy_converter=gap_motor_energy_converter,
+            inverse_gap_energy_motor_converter=inverse_gap_energy_motor_converter,
             maximum_phase_motor_position=TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION,
             name=name,
         )
@@ -139,7 +139,7 @@ async def mock_energy_readback_controller(
         apple2=mock_locked_apple2,
         gap_energy_motor_converter=lambda value, pol: configured_gap,
         phase_energy_motor_converter=lambda value, pol: configured_phase,
-        gap_motor_energy_converter=lambda value, pol: configured_energy,
+        inverse_gap_energy_motor_converter=lambda value, pol: configured_energy,
     )
     return mock_locked_controller
 

@@ -94,7 +94,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         apple2: Apple2Type,
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
-        gap_motor_energy_converter: EnergyMotorConvertor | None = None,
+        inverse_gap_energy_motor_converter: EnergyMotorConvertor | None = None,
         maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
         maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
@@ -103,7 +103,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
-        self.gap_motor_energy_converter = gap_motor_energy_converter
+        self.inverse_gap_energy_motor_converter = inverse_gap_energy_motor_converter
 
         self.maximum_gap_motor_position = maximum_gap_motor_position
         self.maximum_phase_motor_position = maximum_phase_motor_position
@@ -173,8 +173,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
     def _read_energy(self, energy: float, pol: Pol, gap: float) -> float:
         """Readback for energy is just the set value if there is no inverse converter."""
-        if self.gap_motor_energy_converter is not None:
-            energy = self.gap_motor_energy_converter(value=gap, pol=pol)
+        if self.inverse_gap_energy_motor_converter is not None:
+            energy = self.inverse_gap_energy_motor_converter(value=gap, pol=pol)
         return energy
 
     async def _check_and_get_pol_setpoint(self) -> Pol:
