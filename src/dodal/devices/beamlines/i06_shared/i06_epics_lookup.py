@@ -31,6 +31,7 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
         prefix: str,
         max_energy: float = 2200,
         min_energy: float = 70,
+        phase_poly_params: dict[Pol, list[float]] = DEFAULT_POLY1D_PARAMETERS,
         name: str = "",
     ) -> None:
         # Define mapping of polarization to PV suffix
@@ -54,6 +55,7 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
         self.inv_param_dict = {}
         self.min_energy = min_energy
         self.max_energy = max_energy
+        self.phase_poly_params = phase_poly_params
         # Initialize DeviceVectors
         for pol, suffix in self._inv_pol_map.items():
             attr_name = f"{pol.name.lower()}_inverse_params"
@@ -84,7 +86,7 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
 
     async def _get_table_entries(
         self,
-        param_dict: dict[Pol, DeviceVector | list[float]],
+        param_dict: dict[Pol, DeviceVector] | dict[Pol, list[float]],
         min_energy: float,
         max_energy: float,
     ) -> dict[Pol, EnergyCoverage]:
@@ -123,7 +125,7 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
         )
         # Update phase lookup table
         energy_entries = await self._get_table_entries(
-            DEFAULT_POLY1D_PARAMETERS, max_energy=max_gap, min_energy=min_gap
+            self.phase_poly_params, max_energy=max_gap, min_energy=min_gap
         )
         self.energy_phase_motor_lookup = EnergyMotorLookup(LookupTable(energy_entries))
         LOGGER.info("Updating lookup tables with new values from EPICS.")
