@@ -20,6 +20,7 @@ _X = "X"
 _Y = "Y"
 _Z = "Z"
 
+_THETA = "THETA"
 _OMEGA = "OMEGA"
 _PHI = "PHI"
 _POLAR = "POLAR"
@@ -112,7 +113,7 @@ class XYZThetaStage(XYZStage):
         x_infix: str = _X,
         y_infix: str = _Y,
         z_infix: str = _Z,
-        theta_infix: str = "THETA",
+        theta_infix: str = _THETA,
     ) -> None:
         with self.add_children_as_readables():
             self.theta = Motor(prefix + theta_infix)
@@ -247,6 +248,22 @@ class XYPhiStage(XYStage):
     ) -> None:
         with self.add_children_as_readables():
             self.phi = Motor(prefix + phi_infix)
+        super().__init__(prefix, name, x_infix, y_infix)
+
+
+class XYThetaStage(XYStage):
+    """Three-axis stage with a standard xy stage and one axis of rotation: theta."""
+
+    def __init__(
+        self,
+        prefix: str,
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        theta_infix: str = _THETA,
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.theta = Motor(prefix + theta_infix)
         super().__init__(prefix, name, x_infix, y_infix)
 
 
