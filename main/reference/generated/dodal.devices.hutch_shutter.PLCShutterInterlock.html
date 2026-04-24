@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.hutch_shutter.PLCShutterInterlock &#8212; dodal 2.2.3.dev6+g162b497a3 documentation</title>
+    <title>dodal.devices.hutch_shutter.PLCShutterInterlock &#8212; dodal 2.2.3.dev7+g9fda1f29e documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=03778e16"></script>
+    <script src="../../_static/documentation_options.js?v=39f102da"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1036,9 +1036,6 @@
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.hutch_shutter.PLCShutterInterlock.shutter_safe_to_operate" title="dodal.devices.hutch_shutter.PLCShutterInterlock.shutter_safe_to_operate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutter_safe_to_operate</span></code></a>()</p></td>
-<td><p>If the status value is OK or Run Ilk OK, shutter is open or safe to operate.</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1054,22 +1051,6 @@
 </tbody>
 </table>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.hutch_shutter.PLCShutterInterlock.shutter_safe_to_operate">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shutter_safe_to_operate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/hutch_shutter.html#PLCShutterInterlock.shutter_safe_to_operate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.hutch_shutter.PLCShutterInterlock.shutter_safe_to_operate" title="Link to this definition">#</a></dt>
-<dd><p>If the status value is OK or Run Ilk OK, shutter is open or safe to operate.</p>
-<p>If the status value is “OK”, valve or shutter is open and interlocks are OK to
-operate. If the status value is “Run Ilks Ok”, the opening action can be
-started. If the status value is not OK (“Failed” or “Disarmed”), interlocks have
-failed and the shutter cannot be operated. Disarmed status applies only to fast
-shutters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -1121,10 +1102,7 @@ shutters.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.hutch_shutter.PLCShutterInterlock"><code class="docutils literal notranslate"><span class="pre">PLCShutterInterlock</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.hutch_shutter.PLCShutterInterlock.shutter_safe_to_operate"><code class="docutils literal notranslate"><span class="pre">PLCShutterInterlock.shutter_safe_to_operate()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.hutch_shutter.PLCShutterInterlock"><code class="docutils literal notranslate"><span class="pre">PLCShutterInterlock</span></code></a></li>
 </ul>
   </nav></div>
 

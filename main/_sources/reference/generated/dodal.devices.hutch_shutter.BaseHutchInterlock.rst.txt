@@ -22,9 +22,6 @@ dodal.devices.hutch\_shutter.BaseHutchInterlock
       
       
       
-      ~BaseHutchInterlock.shutter_safe_to_operate
-      
-      
       
    
    
