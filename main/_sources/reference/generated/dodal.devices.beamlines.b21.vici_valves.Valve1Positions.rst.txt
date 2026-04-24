@@ -69,22 +69,22 @@ dodal.devices.beamlines.b21.vici\_valves.Valve1Positions
    .. autosummary::
    
       
-      ~Valve1Positions.POS_1
+      ~Valve1Positions.SEP_300
       
       
-      ~Valve1Positions.POS_2
+      ~Valve1Positions.KW_402_5
       
       
-      ~Valve1Positions.POS_3
+      ~Valve1Positions.S_200
       
       
-      ~Valve1Positions.POS_4
+      ~Valve1Positions.SUP_6
       
       
-      ~Valve1Positions.POS_5
+      ~Valve1Positions.GUEST_1
       
       
-      ~Valve1Positions.POS_6
+      ~Valve1Positions.BYPASS_1
       
    
    
