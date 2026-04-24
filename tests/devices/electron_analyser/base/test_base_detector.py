@@ -1,16 +1,15 @@
+from collections.abc import Mapping
 from unittest.mock import AsyncMock
 
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import TriggerInfo
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
 )
 
 from dodal.devices.electron_analyser.base import (
-    GenericBaseElectronAnalyserDetector,
     GenericElectronAnalyserDetector,
     GenericSequence,
 )
@@ -23,7 +22,7 @@ def sequence(sim_detector: GenericElectronAnalyserDetector) -> GenericSequence:
 
 
 def test_base_analyser_detector_trigger(
-    sim_detector: GenericBaseElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
     run_engine: RunEngine,
 ) -> None:
     sim_detector._controller.arm = AsyncMock()
@@ -36,14 +35,14 @@ def test_base_analyser_detector_trigger(
 
 
 async def test_base_analyser_detector_read(
-    sim_detector: GenericBaseElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
     driver_read = await sim_detector._controller.driver.read()
     await assert_reading(sim_detector, driver_read)
 
 
 async def test_base_analyser_describe(
-    sim_detector: GenericBaseElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
     energy_array = await sim_detector._controller.driver.energy_axis.get_value()
     angle_array = await sim_detector._controller.driver.angle_axis.get_value()
@@ -55,28 +54,20 @@ async def test_base_analyser_describe(
 
 
 async def test_base_analyser_detector_configuration(
-    sim_detector: GenericBaseElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
     driver_config = await sim_detector._controller.driver.read_configuration()
     await assert_configuration(sim_detector, driver_config)
 
 
 async def test_base_analyser_detector_describe_configuration(
-    sim_detector: GenericBaseElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
     driver_describe_config = (
         await sim_detector._controller.driver.describe_configuration()
     )
 
     assert await sim_detector.describe_configuration() == driver_describe_config
-
-
-def test_analyser_detector_loads_sequence_correctly(
-    sim_detector: GenericElectronAnalyserDetector,
-    sequence: GenericSequence,
-) -> None:
-    seq = sim_detector.create_region_detector_list(sequence.get_enabled_regions())
-    assert seq is not None
 
 
 async def test_analyser_detector_stage(
@@ -97,40 +88,6 @@ async def test_analyser_detector_unstage(
     await sim_detector.unstage()
 
     sim_detector._controller.disarm.assert_awaited_once()
-
-
-def test_analyser_detector_creates_region_detectors(
-    sim_detector: GenericElectronAnalyserDetector,
-    sequence: GenericSequence,
-) -> None:
-    region_detectors = sim_detector.create_region_detector_list(
-        sequence.get_enabled_regions()
-    )
-    assert len(region_detectors) == len(sequence.get_enabled_regions())
-    for det in region_detectors:
-        assert det.region.enabled is True
-        assert det.name == sim_detector.name + "_" + det.region.name
-
-
-def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
-    sim_detector: GenericElectronAnalyserDetector,
-    sequence: GenericSequence,
-) -> None:
-    # Remove parent name from driver name so it can be checked it exists in
-    # _child_devices dict
-    driver_name = sim_detector._controller.driver.name.replace(
-        sim_detector.name + "-", ""
-    )
-
-    assert sim_detector._controller.driver.parent == sim_detector
-    assert sim_detector._child_devices.get(driver_name) is not None
-
-    region_detectors = sim_detector.create_region_detector_list(
-        sequence.get_enabled_regions()
-    )
-    for det in region_detectors:
-        assert det._child_devices.get(driver_name) is None
-        assert det._controller.driver.parent == sim_detector
 
 
 def test_analyser_detector_trigger_called_controller_prepare(
@@ -159,25 +116,33 @@ def test_analyser_detector_set_called_controller_setup_with_region(
     sim_detector._controller.setup_with_region.assert_awaited_once_with(region)
 
 
-async def test_analyser_region_detector_trigger_sets_driver_with_region(
+def test_analyser_read_configuration_is_unique_per_region(
     sim_detector: GenericElectronAnalyserDetector,
     sequence: GenericSequence,
     run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
 ) -> None:
-    region_detectors = sim_detector.create_region_detector_list(
-        sequence.get_enabled_regions()
-    )
-    trigger_info = TriggerInfo()
 
-    for reg_det in region_detectors:
-        reg_det.set = AsyncMock()
-        reg_det._controller.prepare = AsyncMock()
-        reg_det._controller.arm = AsyncMock()
-        reg_det._controller.wait_for_idle = AsyncMock()
+    def multi_region_analyser_plan(
+        analyser: GenericElectronAnalyserDetector, sequence: GenericSequence
+    ):
+        yield from bps.open_run()
+        yield from bps.stage(analyser)
+        for region in sequence.get_enabled_regions():
+            yield from bps.mv(analyser, region)
+            yield from bps.trigger_and_read([analyser], name=region.name)
+        yield from bps.unstage(analyser)
+        yield from bps.close_run()
 
-        run_engine(bps.trigger(reg_det, wait=True), wait=True)
+    run_engine(multi_region_analyser_plan(sim_detector, sequence))
 
-        reg_det.set.assert_awaited_once_with(reg_det.region)
-        reg_det._controller.prepare.assert_awaited_once_with(trigger_info)
-        reg_det._controller.arm.assert_awaited_once()
-        reg_det._controller.wait_for_idle.assert_awaited_once()
+    descriptor = run_engine_documents["descriptor"]
+    drv = sim_detector._controller.driver
+
+    # Test subset of data to check configuration of detector per region correctly renews
+    # configutation cache and matches the region data it was given.
+    for desc, region in zip(descriptor, sequence.get_enabled_regions(), strict=True):
+        config_analyser_data = desc["configuration"][sim_detector.name]["data"]
+        assert config_analyser_data[drv.region_name.name] == region.name
+        assert config_analyser_data[drv.lens_mode.name] == region.lens_mode
+        assert config_analyser_data[drv.pass_energy.name] == region.pass_energy
