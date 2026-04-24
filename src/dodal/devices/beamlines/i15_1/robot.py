@@ -24,6 +24,8 @@ from ophyd_async.epics.core import (
     epics_signal_x,
 )
 
+from dodal.log import LOGGER
+
 
 @dataclass
 class SampleLocation:
@@ -202,8 +204,9 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         # https://jira.diamond.ac.uk/browse/I15_1-1540
         try:
             await self._trigger_program_and_wait_for_complete(self.spinner_off)
-        except TimeoutError:
-            # Spinner is already off.
+        except TimeoutError as e:
+            # Assume spinner is already off.
+            LOGGER.warning(f"Assuming spinner is off, ignoring TimeoutError: {e}")
             pass
 
         await self._load_program_and_wait_for_loaded(

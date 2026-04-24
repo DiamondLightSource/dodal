@@ -247,6 +247,7 @@ async def test_after_robot_unload_new_0_0_is_put_in_index_pvs(robot: Robot):
     assert await robot.current_sample.position.get_value() == 0
 
 
+# Can remove this test once https://github.com/DiamondLightSource/crystallography-bluesky/issues/16 done
 async def test_given_spinner_not_running_then_unload_does_not_raise_an_error(
     robot: Robot,
 ):
