@@ -65,7 +65,7 @@ def bs2() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-SMAR-02:")
 
 
-@devices.factory()
+@devices.factory(skip=True)  # Currently turned off due to work on the beamline
 def clean() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-ABSB-01:CLEAN:")
 
@@ -117,7 +117,7 @@ def sam() -> XYPhiStage:
     return XYPhiStage(f"{PREFIX.beamline_prefix}-MO-TABLE-01:SAMPLE:", phi_infix="PHI2")
 
 
-@devices.factory()
+@devices.factory(skip=True)  # Currently turned off due to work on the beamline
 def slits_1() -> Slits:
     return Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
@@ -177,7 +177,7 @@ def trans() -> XYPhiStage:
     return XYPhiStage(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01:TRANS:")
 
 
-@devices.factory()
+@devices.factory(skip=True)  # Currently turned off due to work on the beamline
 def xtal() -> LaueMonochrometer:
     return LaueMonochrometer(prefix=f"{PREFIX.beamline_prefix}-OP-LAUE-01:")
 
