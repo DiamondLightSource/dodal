@@ -1,4 +1,5 @@
 from functools import cache
+from os import getenv
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, Reference
@@ -6,7 +7,6 @@ from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
-from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
@@ -69,8 +69,11 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
+BEAMLINE_PARAMETERS_PATH = (
+    "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters"
+)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
-I03_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
+DEFAULT_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i03")
 set_log_beamline(BL)
@@ -97,7 +100,8 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient(I03_CONFIG_SERVER_ENDPOINT)
+    config_server_url = getenv("CONFIG_SERVER_URL", DEFAULT_CONFIG_SERVER_ENDPOINT)
+    client = ConfigClient(config_server_url)
     set_config_client(client)
     return client
 
@@ -108,8 +112,8 @@ def daq_configuration_path() -> str:
 
 
 @devices.factory()
-def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters(BL)
+def aperture_scatterguard(config_client: ConfigClient) -> ApertureScatterguard:
+    params = config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -127,10 +131,12 @@ def attenuator() -> BinaryFilterAttenuator:
 
 
 @devices.factory()
-def beamstop() -> Beamstop:
+def beamstop(config_client: ConfigClient) -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(BL),
+        beamline_parameters=config_client.get_file_contents(
+            BEAMLINE_PARAMETERS_PATH, dict
+        ),
     )
 
 
@@ -205,11 +211,13 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
 
 @devices.factory()
 def oav(
+    config_client: ConfigClient,
     params: OAVConfigBeamCentre | None = None,
 ) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params
+        or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
 
@@ -368,11 +376,13 @@ def fluorescence_det_motion() -> FluorescenceDetector:
 
 
 @devices.factory()
-def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, config_client: ConfigClient
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(BL),
+        config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict),
     )
 
 
