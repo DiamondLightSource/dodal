@@ -134,7 +134,7 @@ def wait(
 
 
 def rd(readable: Readable) -> MsgGenerator[Any]:
-    """Reads a single-value non-triggered object, wrapper for `bp.rd`.
+    """Reads a single-value non-triggered object, wrapper for `bps.rd`.
 
     Args:
         readable (Readable): The device to be read
@@ -149,7 +149,7 @@ def rd(readable: Readable) -> MsgGenerator[Any]:
 
 
 def stop(stoppable: Stoppable) -> MsgGenerator:
-    """Stop a device, wrapper for `bp.stop`.
+    """Stop a device, wrapper for `bps.stop`.
 
     Args:
         stoppable (Stoppable): Device to be stopped
