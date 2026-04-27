@@ -1,6 +1,7 @@
+import asyncio
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Reading, Stageable, Triggerable
+from bluesky.protocols import Preparable, Reading, Stageable, Triggerable
 from event_model import DataKey
 from ophyd_async.core import (
     AsyncConfigurable,
@@ -18,9 +19,34 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
+    AbstractBaseRegion,
+    AbstractBaseSequence,
     GenericRegion,
     TAbstractBaseRegion,
 )
+
+
+class SequenceHolder(Stageable, Preparable):
+    """Wrapper to hold the sequence data for an electron analyser.
+
+    Used in scans when we need to hold the state of the configured sequence of regions
+    to give to the electron analyser for each step of a scan.
+    """
+
+    def __init__(self):
+        self.data: AbstractBaseSequence[AbstractBaseRegion] | None = None
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: AbstractBaseSequence[AbstractBaseRegion] | None):
+        self.data = value
+
+    @AsyncStatus.wrap
+    async def stage(self):
+        pass
+
+    @AsyncStatus.wrap
+    async def unstage(self):
+        self.data = None
 
 
 class ElectronAnalyserDetector(
@@ -46,6 +72,7 @@ class ElectronAnalyserDetector(
         ],
         name: str = "",
     ):
+        self.sequence = SequenceHolder()
         self._controller = controller
         super().__init__(name)
 
@@ -53,20 +80,18 @@ class ElectronAnalyserDetector(
     async def stage(self) -> None:
         """Prepare the detector for use by ensuring it is idle and ready.
 
-        This method asynchronously stages the detector by first disarming the controller
-        to ensure the detector is not actively acquiring data, then invokes the driver's
-        stage procedure. This ensures the detector is in a known, ready state
-        before use.
+        This method asynchronously stages the detector by disarming the controller to
+        ensure the detector is not actively acquiring data.
 
         Raises:
             Any exceptions raised by the driver's stage or controller's disarm methods.
         """
-        await self._controller.disarm()
+        await asyncio.gather(self._controller.disarm(), self.sequence.stage())
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
-        await self._controller.disarm()
+        await asyncio.gather(self._controller.disarm(), self.sequence.unstage())
 
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion) -> None:

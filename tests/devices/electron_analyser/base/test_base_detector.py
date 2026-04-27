@@ -124,11 +124,13 @@ def test_analyser_read_configuration_is_unique_per_region(
 ) -> None:
 
     def multi_region_analyser_plan(
-        analyser: GenericElectronAnalyserDetector, sequence: GenericSequence
+        analyser: GenericElectronAnalyserDetector, seq: GenericSequence
     ):
         yield from bps.open_run()
         yield from bps.stage(analyser)
-        for region in sequence.get_enabled_regions():
+        yield from bps.prepare(analyser.sequence, seq)
+        assert analyser.sequence.data is not None
+        for region in analyser.sequence.data.get_enabled_regions():
             yield from bps.mv(analyser, region)
             yield from bps.trigger_and_read([analyser], name=region.name)
         yield from bps.unstage(analyser)
