@@ -827,6 +827,14 @@ def test_make_stepped_list_step(start: float, stop: float, step: float):
     assert stepped_list[10] == 0
 
 
+def test_make_stepped_list_step_with_large_step():
+    stepped_list = _make_stepped_list_step(0, 1, 5)
+    stepped_list_length = len(stepped_list)
+    assert stepped_list_length == 2
+    assert stepped_list[0] == 0
+    assert stepped_list[-1] == 1
+
+
 @pytest.mark.parametrize("start, step", ([-1, 0.1], [-2, 0.2], [1, -0.1], [2, -0.2]))
 def test_make_stepped_list_num(start: float, step: float):
     stepped_list = _make_stepped_list_num(start, step, num=21)

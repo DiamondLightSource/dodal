@@ -378,7 +378,7 @@ def list_grid_rscan(
     )
 
 
-def _round_list_elements(stepped_list, params):
+def _round_list_elements(stepped_list, params) -> list[float]:
     decimals = [Decimal(str(param)) for param in params]
     exponents = [d.as_tuple().exponent for d in decimals]
     decimal_places = [-exponent for exponent in exponents]  # type: ignore
@@ -413,13 +413,11 @@ def _make_stepped_list_num(start, step, num) -> list:
 
 def _make_step_scan_args(
     params: list[tuple[Movable | Motor, list[float | int]]], grid: bool
-):
+) -> tuple[list[Any], list[float]]:
     args = []
     shape = []
     stepped_list_length = None
 
-    if not params:
-        return [], []
     first_movable_param, *additional_movable_params = params
     if len(first_movable_param[1]) == 3:
         start, stop, step = first_movable_param[1]
