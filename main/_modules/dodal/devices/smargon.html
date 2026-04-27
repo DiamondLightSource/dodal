@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.smargon &#8212; dodal 2.2.3.dev13+g436a80c69 documentation</title>
+    <title>dodal.devices.smargon &#8212; dodal 2.2.3.dev14+g729a8b2d8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=df1c0f66"></script>
+    <script src="../../../_static/documentation_options.js?v=f92fca38"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -901,7 +901,8 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZOmegaStage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.maths</span><span class="w"> </span><span class="kn">import</span> <span class="n">AngleWithPhase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZWrappedOmegaStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.util.epics_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">SetWhenEnabled</span>
 
 
@@ -982,7 +983,7 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="Smargon">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Smargon</span><span class="p">(</span><span class="n">XYZOmegaStage</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Smargon</span><span class="p">(</span><span class="n">XYZWrappedOmegaStage</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Real motors added to allow stops following pin load (e.g. real_x1.stop() )</span>
 <span class="sd">    X1 and X2 real motors provide compound chi motion as well as the compound X travel,</span>
 <span class="sd">    increasing the gap between x1 and x2 changes chi, moving together changes virtual x.</span>
@@ -1008,6 +1009,15 @@ window.runMermaid = runMermaid;</script>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_target_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">motor_name</span> <span class="o">==</span> <span class="s2">&quot;omega&quot;</span><span class="p">:</span>
+            <span class="n">current_angle</span> <span class="o">=</span> <span class="n">AngleWithPhase</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_omega</span><span class="o">.</span><span class="n">offset_and_phase</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">current_angle</span><span class="o">.</span><span class="n">nearest_with_phase</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">unwrap</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+
 <div class="viewcode-block" id="Smargon.set">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
@@ -1020,11 +1030,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        only come back after the motion on that axis finished.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">defer_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">DeferMoves</span><span class="o">.</span><span class="n">ON</span><span class="p">)</span>
+        <span class="c1"># TODO Hotfix required here until https://github.com/DiamondLightSource/dodal/issues/1998</span>
+        <span class="c1"># is implemented in separate PR</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">finished_moving</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">motor_name</span><span class="p">,</span> <span class="n">new_setpoint</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">new_setpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_setpoint</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
-                    <span class="n">axis</span><span class="p">:</span> <span class="n">Motor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_name</span><span class="p">)</span>
+                    <span class="n">new_setpoint</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_target_value</span><span class="p">(</span>
+                        <span class="n">motor_name</span><span class="p">,</span> <span class="n">new_setpoint</span>
+                    <span class="p">)</span>
+                    <span class="n">axis</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_name</span><span class="p">)</span>
                     <span class="k">await</span> <span class="n">axis</span><span class="o">.</span><span class="n">check_motor_limit</span><span class="p">(</span>
                         <span class="k">await</span> <span class="n">axis</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">new_setpoint</span>
                     <span class="p">)</span>

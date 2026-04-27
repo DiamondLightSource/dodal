@@ -33,6 +33,7 @@ dodal.devices.motors
    ~motors.XYZPitchYawStage
    ~motors.XYZStage
    ~motors.XYZThetaStage
+   ~motors.XYZWrappedOmegaStage
    ~motors.YZStage
 
 
