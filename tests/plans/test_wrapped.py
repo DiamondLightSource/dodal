@@ -25,7 +25,9 @@ from dodal.plans.wrapped import (
     _make_list_scan_args,
     _make_num_scan_args,
     _make_step_scan_args,
-    _make_stepped_list,
+    _make_stepped_list_num,
+    _make_stepped_list_step,
+    _round_list_elements,
     count,
     list_grid_rscan,
     list_grid_scan,
@@ -791,7 +793,23 @@ def test_list_grid_rscan(
 
 
 @pytest.mark.parametrize(
-    "params",
+    "stepped_list, params, rounded_element",
+    (
+        [[0.1234, 1.1234, 2.1234], [0.123, 2.123, 1], 0.123],
+        [[0.1234, 1.1234, 2.1234], [0.12, 2.12, 1], 0.12],
+        [[0.1234, 1.1234, 2.1234], [0.1, 2.1, 1], 0.1],
+        [[0.1234, 1.1234, 2.1234], [0, 2, 1], 0],
+    ),
+)
+def test_round_list_elements(
+    stepped_list: list[float], params: list[float], rounded_element: float
+):
+    rounded_list = _round_list_elements(stepped_list, params)
+    assert rounded_list[0] == rounded_element
+
+
+@pytest.mark.parametrize(
+    "start, stop, step",
     (
         [-1, 1, 0.1],
         [-2, 2, 0.2],
@@ -801,52 +819,43 @@ def test_list_grid_rscan(
         [2, -2, 0.2],
     ),
 )
-def test_make_stepped_list_when_given_three_params(params: list):
-    stepped_list, stepped_list_length = _make_stepped_list(params=params)
+def test_make_stepped_list_step(start: float, stop: float, step: float):
+    stepped_list = _make_stepped_list_step(start, stop, step)
+    stepped_list_length = len(stepped_list)
     assert stepped_list_length == 21
     assert stepped_list[0] / stepped_list[-1] == -1
     assert stepped_list[10] == 0
 
 
-@pytest.mark.parametrize("params", ([-1, 0.1], [-2, 0.2], [1, -0.1], [2, -0.2]))
-def test_make_stepped_list_when_given_two_params(params: list):
-    stepped_list, stepped_list_length = _make_stepped_list(params=params, num=21)
+@pytest.mark.parametrize("start, step", ([-1, 0.1], [-2, 0.2], [1, -0.1], [2, -0.2]))
+def test_make_stepped_list_num(start: float, step: float):
+    stepped_list = _make_stepped_list_num(start, step, num=21)
+    stepped_list_length = len(stepped_list)
     assert stepped_list_length == 21
     assert stepped_list[0] / stepped_list[-1] == -1
     assert stepped_list[10] == 0
-
-
-def test_make_stepped_list_when_given_wrong_number_of_params():
-    with pytest.raises(ValueError):
-        _make_stepped_list(params=[1])
-
-
-def test_make_stepped_list_when_given_step_larger_than_range():
-    stepped_list, stepped_list_length = _make_stepped_list(params=[1, 2, 3])
-    assert stepped_list_length == 2
-    assert stepped_list == [1, 2]
 
 
 def test_make_stepped_list_fails_when_given_equal_start_and_stop_values():
     with pytest.raises(ValueError):
-        _make_stepped_list(params=[1.1, 1.1, 0.25])
+        _make_stepped_list_step(start=1.1, stop=1.1, step=0.25)
 
 
 @pytest.mark.parametrize(
     "x_list, y_list, grid, final_shape, final_length",
     (
-        [[0, 1, 0.25], [0, 0.1], None, [5], 4],
+        [[0, 1, 0.25], [0, 0.1], False, [5], 4],
         [[0, 1, 0.25], [0, 1, 0.2], True, [5, 6], 4],
-        [[0, -1, -0.25], [0, -0.1], None, [5], 4],
+        [[0, -1, -0.25], [0, -0.1], False, [5], 4],
         [[0, -1, -0.25], [0, -1, -0.2], True, [5, 6], 4],
     ),
 )
 def test_make_step_scan_args(
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float],
     y_axis: Motor,
-    y_list: list,
-    grid: bool | None,
+    y_list: list[float],
+    grid: bool,
     final_shape: list,
     final_length: int,
 ):
@@ -862,8 +871,8 @@ def test_make_step_scan_args(
 @pytest.mark.parametrize(
     "x_list, y_list, z_list, grid",
     (
-        [[0, 1], [0, 0.2], [0, 0.5], None],
-        [[0, 1, 0.25], [0, 0.2], [0, 1, 0.2, 0.5], None],
+        [[0, 1], [0, 0.2], [0, 0.5], False],
+        [[0, 1, 0.25], [0, 0.2], [0, 1, 0.2, 0.5], False],
         [[0, 1, 0.25], [0, 0.2], [0, 1, 0.5], True],
         [[0, 1, 0.25], [0, 1, 0.2], [0, 0.5], True],
     ),
@@ -875,7 +884,7 @@ def test_make_step_scan_args_fails_when_given_incorrect_number_of_parameters(
     y_list: list,
     z_axis: Motor,
     z_list: list,
-    grid: bool | None,
+    grid: bool,
 ):
     with pytest.raises(ValueError):
         _make_step_scan_args(
