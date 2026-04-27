@@ -271,7 +271,8 @@ def test_num_scan_fails_when_given_wrong_number_of_params(
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list, num", ([[-1, 1], [2, 0], 0], [[-1, 1], [-1, 1], 3.5])
+    "x_list, y_list, num",
+    ([[-1, 1], [2, 0], 0], [[-1, 1], [-1, 1], 3.5], [[-1, 1], [-1, 1], -2]),
 )
 def test_num_scan_fails_when_given_bad_info(
     run_engine: RunEngine,
