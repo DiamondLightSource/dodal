@@ -9,7 +9,6 @@ from ophyd_async.core import AsyncReadable
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
-from dodal.devices.motors import Motor
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
 """This module wraps plan(s) from bluesky.plans until required handling for them is
@@ -64,7 +63,7 @@ def count(
 
 
 def _make_num_scan_args(
-    params: list[tuple[Movable | Motor, list[float | int]]], num: int | None = None
+    params: list[tuple[Movable, list[float | int]]], num: int | None = None
 ):
     shape = []
     if num:
@@ -100,7 +99,7 @@ def num_scan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For concurrent "
             "trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, "
@@ -133,7 +132,7 @@ def num_grid_scan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For independent \
             trajectories, provide '[(movable1, [start1, stop1, num1]), (movable2, \
@@ -167,7 +166,7 @@ def num_rscan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For concurrent \
             trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, \
@@ -200,7 +199,7 @@ def num_grid_rscan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For independent \
             trajectories, provide '[(movable1, [start1, stop1, num1]), (movable2, \
@@ -226,9 +225,7 @@ def num_grid_rscan(
     )
 
 
-def _make_list_scan_args(
-    params: list[tuple[Movable | Motor, list[float | int]]], grid: bool
-):
+def _make_list_scan_args(params: list[tuple[Movable, list[float | int]]], grid: bool):
     shape = []
     args = []
     for param in params:
@@ -254,7 +251,7 @@ def list_scan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, positions). For concurrent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
@@ -286,7 +283,7 @@ def list_grid_scan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, positions). For independent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
@@ -321,7 +318,7 @@ def list_rscan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, positions). For concurrent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
@@ -353,7 +350,7 @@ def list_grid_rscan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, positions). For independent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
@@ -412,7 +409,7 @@ def _make_stepped_list_num(start, step, num) -> list:
 
 
 def _make_step_scan_args(
-    params: list[tuple[Movable | Motor, list[float | int]]], grid: bool
+    params: list[tuple[Movable, list[float | int]]], grid: bool
 ) -> tuple[list[Any], list[float]]:
     args = []
     shape = []
@@ -466,7 +463,7 @@ def step_scan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For concurrent \
             trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
@@ -498,7 +495,7 @@ def step_grid_scan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For independent \
             trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
@@ -534,7 +531,7 @@ def step_rscan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For concurrent \
             trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
@@ -566,7 +563,7 @@ def step_grid_rscan(
         ),
     ],
     params: Annotated[
-        list[tuple[Movable | Motor, list[float | int]]],
+        list[tuple[Movable, list[float | int]]],
         Field(
             description="List of tuples (device, parameter). For independent \
             trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
