@@ -379,7 +379,7 @@ def list_grid_rscan(
 
 
 def _make_stepped_list(
-    params: list[Any] | Sequence[Any],
+    params: list[Any],
     num: int | None = None,
 ):
     def round_list_elements(stepped_list, step):
