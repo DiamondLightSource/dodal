@@ -269,7 +269,7 @@ def test_num_scan_fails_when_given_wrong_number_of_params(
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list,", ([[-1, 1, 0], [2, 0]], [[-1, 1, 3.5], [-1, 1]])
+    "x_list, y_list, num", ([[-1, 1], [2, 0], 0], [[-1, 1], [-1, 1], 3.5])
 )
 def test_num_scan_fails_when_given_bad_info(
     run_engine: RunEngine,
@@ -278,12 +278,14 @@ def test_num_scan_fails_when_given_bad_info(
     x_list: list[float | int],
     y_axis: Motor,
     y_list: list[float | int],
+    num: int,
 ):
     with pytest.raises(ValueError):
         run_engine(
             num_scan(
                 detectors=[det],
                 params=[(x_axis, x_list), (y_axis, y_list)],
+                num=num,
             )
         )
 
