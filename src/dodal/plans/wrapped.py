@@ -102,12 +102,12 @@ def num_scan(
     params: Annotated[
         list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="List of tuples (device, parameter). For concurrent \
-            trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, \
-            stop2]), ... , (movableN, [startN, stopN])]'."
+            description="List of tuples (device, parameter). For concurrent "
+            "trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, "
+            "stop2]), ... , (movableN, [startN, stopN])]'."
         ),
     ],
-    num: int | None = None,
+    num: int,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent single or multi-motor trajector(y/ies).
