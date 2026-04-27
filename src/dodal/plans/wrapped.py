@@ -255,7 +255,7 @@ def list_scan(
     params: Annotated[
         list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="List of tuples (device, parameter). For concurrent \
+            description="List of tuples (device, positions). For concurrent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
             [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
             of points for each movable must be equal."
@@ -287,7 +287,7 @@ def list_grid_scan(
     params: Annotated[
         list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="List of tuples (device, parameter). For independent \
+            description="List of tuples (device, positions). For independent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
             [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
         ),
@@ -321,7 +321,7 @@ def list_rscan(
     params: Annotated[
         list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="List of tuples (device, parameter). For concurrent \
+            description="List of tuples (device, positions). For concurrent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
             [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
             of points for each movable must be equal."
@@ -353,7 +353,7 @@ def list_grid_rscan(
     params: Annotated[
         list[tuple[Movable | Motor, list[float | int]]],
         Field(
-            description="List of tuples (device, parameter). For independent \
+            description="List of tuples (device, positions). For independent \
             trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
             [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
         ),
