@@ -90,7 +90,6 @@ def _make_num_scan_args(
     return args, shape
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_scan(
     detectors: Annotated[
@@ -124,7 +123,6 @@ def num_scan(
     yield from bp.scan(tuple(detectors), *args, num=num, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_grid_scan(
     detectors: Annotated[
@@ -158,7 +156,6 @@ def num_grid_scan(
     yield from bp.grid_scan(tuple(detectors), *args, snake_axes=snake_axes, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_rscan(
     detectors: Annotated[
@@ -192,7 +189,6 @@ def num_rscan(
     yield from bp.rel_scan(tuple(detectors), *args, num=num, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_grid_rscan(
     detectors: Annotated[
@@ -246,7 +242,6 @@ def _make_list_scan_args(
     return args, shape
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_scan(
     detectors: Annotated[
@@ -279,7 +274,6 @@ def list_scan(
     yield from bp.list_scan(tuple(detectors), *args, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_grid_scan(
     detectors: Annotated[
@@ -314,7 +308,6 @@ def list_grid_scan(
     )
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_rscan(
     detectors: Annotated[
@@ -347,7 +340,6 @@ def list_rscan(
     yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_grid_rscan(
     detectors: Annotated[
@@ -465,7 +457,6 @@ def _make_step_scan_args(
     return args, shape
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_scan(
     detectors: Annotated[
@@ -498,7 +489,6 @@ def step_scan(
     yield from bp.list_scan(tuple(detectors), *args, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_grid_scan(
     detectors: Annotated[
@@ -535,7 +525,6 @@ def step_grid_scan(
     )
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_rscan(
     detectors: Annotated[
@@ -568,7 +557,6 @@ def step_rscan(
     yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_grid_rscan(
     detectors: Annotated[
