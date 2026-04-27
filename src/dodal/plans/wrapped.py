@@ -421,8 +421,23 @@ def _make_step_scan_args(
     args = []
     shape = []
     stepped_list_length = None
-    for param, movable_num in zip(params, range(len(params)), strict=True):
-        if movable_num == 0:
+
+    if not params:
+        return [], []
+    first_movable_param, *additional_movable_params = params
+    if len(first_movable_param[1]) == 3:
+        stepped_list, stepped_list_length = _make_stepped_list(
+            params=first_movable_param[1]
+        )
+        args.append(first_movable_param[0])
+        args.append(stepped_list)
+        shape.append(stepped_list_length)
+    else:
+        raise ValueError(
+            f"You provided {len(first_movable_param[1])} parameters, rather than 3."
+        )
+    for param in additional_movable_params:
+        if grid:
             if len(param[1]) == 3:
                 stepped_list, stepped_list_length = _make_stepped_list(params=param[1])
                 args.append(param[0])
@@ -432,30 +447,17 @@ def _make_step_scan_args(
                 raise ValueError(
                     f"You provided {len(param[1])} parameters, rather than 3."
                 )
-        elif movable_num >= 1:
-            if grid:
-                if len(param[1]) == 3:
-                    stepped_list, stepped_list_length = _make_stepped_list(
-                        params=param[1]
-                    )
-                    args.append(param[0])
-                    args.append(stepped_list)
-                    shape.append(stepped_list_length)
-                else:
-                    raise ValueError(
-                        f"You provided {len(param[1])} parameters, rather than 3."
-                    )
+        else:
+            if len(param[1]) == 2:
+                stepped_list, stepped_list_length = _make_stepped_list(
+                    params=param[1], num=stepped_list_length
+                )
+                args.append(param[0])
+                args.append(stepped_list)
             else:
-                if len(param[1]) == 2:
-                    stepped_list, stepped_list_length = _make_stepped_list(
-                        params=param[1], num=stepped_list_length
-                    )
-                    args.append(param[0])
-                    args.append(stepped_list)
-                else:
-                    raise ValueError(
-                        f"You provided {len(param[1])} parameters, rather than 2."
-                    )
+                raise ValueError(
+                    f"You provided {len(param[1])} parameters, rather than 2."
+                )
 
     return args, shape
 
