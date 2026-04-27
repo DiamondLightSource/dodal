@@ -212,7 +212,8 @@ def num_grid_rscan(
     """Scan independent trajectories, relative to current positions.
 
     The scan is defined by number of points along scan trajectories. Snakes all fast
-    axes by default. Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata).
+    axes by default. Wraps bluesky.plans.rel_grid_scan(det, *args, snake_axes,
+    md=metadata).
     """
     # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
