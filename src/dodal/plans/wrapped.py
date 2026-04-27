@@ -434,7 +434,7 @@ def _make_step_scan_args(
         shape.append(stepped_list_length)
     else:
         raise ValueError(
-            f"You provided {len(first_movable_param[1])} parameters, rather than 3."
+            f"You provided {len(first_movable_param[1])} parameters for {first_movable_param[0]}, rather than 3."
         )
     for param in additional_movable_params:
         if grid:
@@ -445,7 +445,7 @@ def _make_step_scan_args(
                 shape.append(stepped_list_length)
             else:
                 raise ValueError(
-                    f"You provided {len(param[1])} parameters, rather than 3."
+                    f"You provided {len(param[1])} parameters for {param[0]}, rather than 3."
                 )
         else:
             if len(param[1]) == 2:
@@ -456,7 +456,7 @@ def _make_step_scan_args(
                 args.append(stepped_list)
             else:
                 raise ValueError(
-                    f"You provided {len(param[1])} parameters, rather than 2."
+                    f"You provided {len(param[1])} parameters {param[0]}, rather than 2."
                 )
 
     return args, shape
