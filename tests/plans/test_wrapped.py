@@ -555,7 +555,7 @@ def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
 
 @pytest.mark.parametrize(
     "x_list, y_list, grid, final_shape, final_length",
-    ([[0, 1, 2], [3, 4, 5], None, [3], 4], [[0, 1, 2], [3, 4, 5, 6], True, [3, 4], 4]),
+    ([[0, 1, 2], [3, 4, 5], False, [3], 4], [[0, 1, 2], [3, 4, 5, 6], True, [3, 4], 4]),
 )
 def test_make_list_scan_args(
     x_axis: Motor,
@@ -578,7 +578,9 @@ def test_make_list_scan_args_fails_when_lists_are_different_lengths(
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
-        _make_list_scan_args(params=[(x_axis, [0, 1, 2]), (y_axis, [0, 1, 2, 3])])
+        _make_list_scan_args(
+            params=[(x_axis, [0, 1, 2]), (y_axis, [0, 1, 2, 3])], grid=False
+        )
 
 
 @pytest.mark.parametrize("x_list", ([0, 1, 2, 3], [1.1, 2.2, 3.3]))

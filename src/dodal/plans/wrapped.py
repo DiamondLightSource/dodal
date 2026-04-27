@@ -226,7 +226,7 @@ def num_grid_rscan(
 
 
 def _make_list_scan_args(
-    params: list[tuple[Movable | Motor, list[float | int]]], grid: bool | None = None
+    params: list[tuple[Movable | Motor, list[float | int]]], grid: bool
 ):
     shape = []
     args = []
@@ -268,7 +268,7 @@ def list_scan(
     The scan is defined by providing a list of points for each scan trajectory.
     Wraps bluesky.plans.list_scan(det, *args, md=metadata).
     """
-    args, shape = _make_list_scan_args(params=params)
+    args, shape = _make_list_scan_args(params=params, grid=False)
     metadata = metadata or {}
     metadata["shape"] = shape
 
@@ -334,7 +334,7 @@ def list_rscan(
     The scan is defined by providing a list of points for each scan trajectory.
     Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata).
     """
-    args, shape = _make_list_scan_args(params=params)
+    args, shape = _make_list_scan_args(params=params, grid=False)
     metadata = metadata or {}
     metadata["shape"] = shape
 
