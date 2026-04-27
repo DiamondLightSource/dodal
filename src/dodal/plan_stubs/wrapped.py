@@ -140,7 +140,10 @@ def rd(readable: Readable) -> MsgGenerator[Any]:
         readable (Readable): The device to be read
 
     Returns:
-        Iterator[MsgGenerator]: Bluesky messages
+        MsgGenerator: Plan.
+
+    Yields:
+        Iterator[MsgGenerator]: Bluesky messages.
     """
     return (yield from bps.rd(readable))
 
@@ -152,6 +155,9 @@ def stop(stoppable: Stoppable) -> MsgGenerator:
         stoppable (Stoppable): Device to be stopped
 
     Returns:
-        Iterator[MsgGenerator]: Bluesky messages
+        MsgGenerator: Plan.
+
+    Yields:
+        Iterator[MsgGenerator]: Bluesky messages.
     """
     return (yield from bps.stop(stoppable))
