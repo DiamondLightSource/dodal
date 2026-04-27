@@ -80,7 +80,7 @@ def _make_num_scan_args(
                 shape.append(param[1][-1])
             else:
                 raise ValueError(
-                    "You must provide 'start stop step' for each motor in a grid scan."
+                    "You must provide 'start stop num' for each motor in a grid scan."
                 )
 
     args = []
