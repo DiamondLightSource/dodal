@@ -1,4 +1,5 @@
 from functools import cache
+from os import getenv
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, Reference
@@ -72,7 +73,7 @@ BEAMLINE_PARAMETERS_PATH = (
     "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters"
 )
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
-I03_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
+DEFAULT_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i03")
 set_log_beamline(BL)
@@ -99,7 +100,8 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient(I03_CONFIG_SERVER_ENDPOINT)
+    config_server_url = getenv("CONFIG_SERVER_URL", DEFAULT_CONFIG_SERVER_ENDPOINT)
+    client = ConfigClient(config_server_url)
     set_config_client(client)
     return client
 
