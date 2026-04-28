@@ -5,8 +5,10 @@ import pytest
 
 from dodal.common import in_micros, step_to_num
 from dodal.common.maths import (
+    AngleWithPhase,
     Rectangle2D,
     do_rotation,
+    reflect_phase,
     rotate_clockwise,
     rotate_counter_clockwise,
 )
@@ -189,3 +191,139 @@ def test_do_rotation_matches_manual_matrix_multiply() -> None:
 
     assert x_new == pytest.approx(expected[0])
     assert y_new == pytest.approx(expected[1])
+
+
+@pytest.mark.parametrize(
+    "offset, phase, expected_offset, expected_phase",
+    [
+        [0, 0, 0, 0],
+        [360, 0, 360, 0],
+        [370, 0, 370, 0],
+        [390, 30, 390, 30],
+        [360, -30, 0, 330],
+        [-270, -90, -630, 270],
+    ],
+)
+def test_angle_with_phase_construct_from_offset_and_phase(
+    offset: float, phase: float, expected_offset: float, expected_phase: float
+):
+    angle_with_phase = AngleWithPhase(offset, phase)
+    assert angle_with_phase.offset == expected_offset
+    assert angle_with_phase.phase == expected_phase
+
+
+@pytest.mark.parametrize(
+    "unwrapped, expected_offset, expected_phase",
+    [
+        [0, 0, 0],
+        [270, 0, 270],
+        [540, 360, 180],
+        [-90, -360, 270],
+        [180, 0, 180],
+        [360, 360, 0],
+    ],
+)
+def test_angle_with_phase_wrap(
+    unwrapped: float, expected_offset: float, expected_phase: float
+):
+    angle_with_phase = AngleWithPhase.wrap(unwrapped)
+    assert angle_with_phase.offset == expected_offset
+    assert angle_with_phase.phase == expected_phase
+
+
+@pytest.mark.parametrize(
+    "offset, phase, expected_unwrapped",
+    [
+        [0, 0, 0],
+        [360, 0, 360],
+        [370, 0, 370],
+        [390, 30, 420],
+        [360, -30, 330],
+        [-270, -90, -360],
+    ],
+)
+def test_angle_with_phase_unwrap(
+    offset: float, phase: float, expected_unwrapped: float
+):
+    angle_with_phase = AngleWithPhase(offset, phase)
+    assert angle_with_phase.unwrap() == expected_unwrapped
+
+
+@pytest.mark.parametrize(
+    "offset1, phase1, offset2, phase2, expected_offset, expected_phase",
+    [
+        [0, 0, 360, 0, 0, 0],
+        [0, 0, 10, 0, -350, 350],
+        [0, 90, 370, 0, 10, 80],
+    ],
+)
+def test_angle_with_phase_rebase(
+    offset1: float,
+    phase1: float,
+    offset2: float,
+    phase2: float,
+    expected_offset: float,
+    expected_phase: float,
+):
+    angle1 = AngleWithPhase(offset1, phase1)
+    angle2 = AngleWithPhase(offset2, phase2)
+    rebased = angle1.rebase_to(angle2)
+    assert rebased.offset == expected_offset
+    assert rebased.phase == expected_phase
+
+
+@pytest.mark.parametrize(
+    "phase1, phase2, expected_distance",
+    [
+        [0, 0, 0],
+        [0, 360, 0],
+        [0, 330, 30],
+        [0, 30, 30],
+        [0, 179, 179],
+        [0, 180, 180],
+        [0, 181, 179],
+        [360, 350, 10],
+        [355, -90, 85],
+    ],
+)
+def test_angle_with_phase_phase_distance(
+    phase1: float,
+    phase2: float,
+    expected_distance: float,
+):
+    angle = AngleWithPhase(0, phase1)
+    assert angle.phase_distance(phase2) == expected_distance
+    assert AngleWithPhase(0, phase2).phase_distance(phase1) == expected_distance
+
+
+@pytest.mark.parametrize(
+    "offset, phase, target_phase, expected_offset, expected_phase",
+    [
+        [0, 0, 0, 0, 0],
+        [0, 0, 270, -360, 270],
+        [0, 0, 90, 0, 90],
+        [360, 179, 181, 360, 181],
+        [360, 181, 179, 360, 179],
+        [360, 1, -1, 0, 359],
+        [360, 1, 359, 0, 359],
+    ],
+)
+def test_angle_with_phase_nearest_with_phase(
+    offset: float,
+    phase: float,
+    target_phase: float,
+    expected_offset: float,
+    expected_phase: float,
+):
+    angle = AngleWithPhase(offset, phase)
+    nearest = angle.nearest_with_phase(target_phase)
+    assert nearest.offset == expected_offset
+    assert nearest.phase == expected_phase
+
+
+@pytest.mark.parametrize(
+    "phase, expected_phase",
+    [[1, 359], [-1, 1], [180, 180], [179, 181], [181, 179], [360, 0], [0, 0]],
+)
+def test_reflect_phase(phase: float, expected_phase: float):
+    assert reflect_phase(phase) == expected_phase
