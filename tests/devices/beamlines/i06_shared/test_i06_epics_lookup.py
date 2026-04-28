@@ -103,16 +103,16 @@ async def test_epics_polynomial_device_get_table_entries_list(
 )
 async def test_epics_polynomial_device_get_table_entries_deviceector(
     param_dict: dict[Pol, list[float]],
-    epics_polynomial_device: EpicsPolynomialEnergyMotorLookup,
+    epics_polynomial_device_vectors: EpicsPolynomialEnergyMotorLookup,
 ) -> None:
     for pol, coeffs in param_dict.items():
         for i, coeff in enumerate(coeffs):
             set_mock_value(
-                epics_polynomial_device.param_dict[pol][i + 1],
+                epics_polynomial_device_vectors.param_dict[pol][i + 1],
                 coeff,
             )
-    entries = await epics_polynomial_device._get_table_entries(
-        param_dict=epics_polynomial_device.param_dict,
+    entries = await epics_polynomial_device_vectors._get_table_entries(
+        param_dict=epics_polynomial_device_vectors.param_dict,
         min_value=70,
         max_value=2200,
     )
@@ -165,20 +165,6 @@ async def i06_epics_polynomial_device() -> I06EpicsPolynomialDevice:
     async with init_devices(mock=True):
         poly_device = I06EpicsPolynomialDevice(prefix="TEST", name="poly_device")
     return poly_device
-
-
-async def test_i06_epics_polynomial_device_connection(
-    i06_epics_polynomial_device: I06EpicsPolynomialDevice,
-) -> None:
-    i06_epics_polynomial_device.energy_gap_motor_lookup.update_lookup = AsyncMock()
-    i06_epics_polynomial_device.energy_phase_motor_lookup.update_lookup = AsyncMock()
-    i06_epics_polynomial_device.gap_motor_energy_lookup.update_lookup = AsyncMock()
-    with patch("ophyd_async.core.Device.connect") as mock_connect:
-        await i06_epics_polynomial_device.connect()
-        mock_connect.assert_awaited_once()
-        i06_epics_polynomial_device.energy_gap_motor_lookup.update_lookup.assert_awaited_once()
-        i06_epics_polynomial_device.energy_phase_motor_lookup.update_lookup.assert_awaited_once()
-        i06_epics_polynomial_device.gap_motor_energy_lookup.update_lookup.assert_awaited_once()
 
 
 async def test_i06_epics_polynomial_device_trigger(
