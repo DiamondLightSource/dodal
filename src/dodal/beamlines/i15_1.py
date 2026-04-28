@@ -11,10 +11,9 @@ from dodal.devices.beamlines.i15_1.gonio_interlock import GonioInterlock
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
 from dodal.devices.hutch_shutter import (
-    HutchInterlock,
     InterlockedHutchShutter,
-    PLCShutterInterlock,
 )
+from dodal.devices.interlocks import EnumPLCInterlock, PSSInterlock
 from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -202,15 +201,15 @@ def attenuator() -> Attenuator:
 
 
 @devices.factory()
-def hutch_interlock() -> HutchInterlock:
-    return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
+def hutch_interlock() -> PSSInterlock:
+    return PSSInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
 
 
 @devices.factory()
 def hutch_shutter() -> InterlockedHutchShutter:
     return InterlockedHutchShutter(
         bl_prefix=PREFIX.beamline_prefix,
-        interlock=PLCShutterInterlock(
+        interlock=EnumPLCInterlock(
             bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
         ),
     )
