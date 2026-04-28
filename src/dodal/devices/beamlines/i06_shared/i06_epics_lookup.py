@@ -8,6 +8,7 @@ from dodal.devices.insertion_device import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     EpicsPolynomialEnergyMotorLookup,
     Pol,
+    StaticPolynomialEnergyMotorLookup,
 )
 
 MINIMUM_GAP_MOTOR_POSITION = 15
@@ -26,27 +27,26 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
     """A specialized Insertion Device for the I06 beamline that dynamically synchronizes
     lookup tables with polynomial coefficients stored in EPICS PVs.
 
-    This device reads coefficients (C0 through C12) for multiple polarizations to
-    construct mappings between Energy, Gap, and Phase. It supports both forward
-    (Energy -> Gap) and inverse (Gap -> Energy) lookups, as well as phase calculations.
+    This device composes multiple lookup objects to manage the relationships between
+    Energy, Gap, and Phase. It utilizes EpicsPolynomialEnergyMotorLookup for dynamic
+    forward/inverse energy mappings and StaticPolynomialEnergyMotorLookup for
+    fixed phase positions.
 
-    The device implements the `Triggerable` protocol, allowing the physics tables
-    to be refreshed during a Bluesky plan via `yield from bps.trigger(device)`.
+    The device implements the `Triggerable` protocol, allowing all dynamic physics
+    tables to be refreshed simultaneously during a Bluesky plan via
+    `yield from bps.trigger(device)`.
 
     Args:
         prefix (str): The EPICS prefix for the polynomial coefficient PVs.
-        max_energy (float, optional): The maximum operating energy in eV. Defaults to 2200.
-        min_energy (float, optional): The minimum operating energy in eV. Defaults to 70.
-        phase_poly_params (dict[Pol, list[float]], optional): Static polynomial
-            parameters for phase calculation. Defaults to DEFAULT_POLY1D_PARAMETERS.
-        name (str, optional): The name of the device for Bluesky/Ophyd.
+        name (str): The name of the device for Bluesky/Ophyd.
 
     Attributes:
-        energy_gap_motor_lookup (EnergyMotorLookup): Mapping for Energy -> Gap.
-        energy_phase_motor_lookup (EnergyMotorLookup): Mapping for Energy -> Phase.
-        gap_motor_energy_lookup (EnergyMotorLookup): Mapping for Gap -> Energy.
-        param_dict (dict[Pol, DeviceVector]): Dictionary of forward polynomial signals.
-        inv_param_dict (dict[Pol, DeviceVector]): Dictionary of inverse polynomial signals.
+        energy_gap_motor_lookup (EpicsPolynomialEnergyMotorLookup):
+            Handles dynamic Energy -> Gap mapping via EPICS.
+        gap_motor_energy_lookup (EpicsPolynomialEnergyMotorLookup):
+            Handles dynamic Gap -> Energy mapping via EPICS.
+        energy_phase_motor_lookup (StaticPolynomialEnergyMotorLookup):
+            Handles static Energy -> Phase mapping.
     """
 
     def __init__(
@@ -77,13 +77,12 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
         )
         self.gap_motor_energy_lookup = EpicsPolynomialEnergyMotorLookup(
             prefix=prefix,
-            max_value=20,
-            min_value=MAXIMUM_GAP_MOTOR_POSITION,
+            max_value=MINIMUM_GAP_MOTOR_POSITION,  # min gap max energy
+            min_value=MAXIMUM_GAP_MOTOR_POSITION,  # max gap min energy
             poly_params=self._inv_pol_map,
         )
 
-        self.energy_phase_motor_lookup = EpicsPolynomialEnergyMotorLookup(
-            prefix=prefix,
+        self.energy_phase_motor_lookup = StaticPolynomialEnergyMotorLookup(
             max_value=2200,
             min_value=70,
             poly_params=DEFAULT_POLY1D_PARAMETERS,
@@ -95,6 +94,5 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
         """Triggering this device will update the lookup tables with the current PV values."""
         await asyncio.gather(
             self.energy_gap_motor_lookup.update_lookup(),
-            self.energy_phase_motor_lookup.update_lookup(),
             self.gap_motor_energy_lookup.update_lookup(),
         )

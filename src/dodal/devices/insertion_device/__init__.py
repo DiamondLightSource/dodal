@@ -29,6 +29,7 @@ from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
     EpicsPolynomialEnergyMotorLookup,
+    StaticPolynomialEnergyMotorLookup,
 )
 from .enum import Pol, UndulatorGateStatus
 from .lookup_table_models import (
@@ -75,4 +76,5 @@ __all__ = [
     "EnergyCoverageEntry",
     "MAXIMUM_ROW_PHASE_MOTOR_POSITION",
     "MAXIMUM_GAP_MOTOR_POSITION",
+    "StaticPolynomialEnergyMotorLookup",
 ]

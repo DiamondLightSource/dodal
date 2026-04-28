@@ -11,6 +11,7 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
     EnergyCoverage,
     EnergyMotorLookup,
     EpicsPolynomialEnergyMotorLookup,
+    StaticPolynomialEnergyMotorLookup,
 )
 from dodal.devices.insertion_device.lookup_table_models import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
@@ -105,10 +106,9 @@ DEFAULT_POLY1D_PARAMETERS = {
 
 
 @pytest.fixture
-async def epics_polynomial_device() -> EpicsPolynomialEnergyMotorLookup:
+async def polynomial_device() -> StaticPolynomialEnergyMotorLookup:
     async with init_devices(mock=True):
-        poly_device = EpicsPolynomialEnergyMotorLookup(
-            prefix="TEST",
+        poly_device = StaticPolynomialEnergyMotorLookup(
             max_value=2200,
             min_value=70,
             poly_params=DEFAULT_POLY1D_PARAMETERS,
@@ -117,7 +117,7 @@ async def epics_polynomial_device() -> EpicsPolynomialEnergyMotorLookup:
 
 
 @pytest.fixture
-async def epics_polynomial_device_vectors() -> EpicsPolynomialEnergyMotorLookup:
+async def epics_polynomial_device() -> EpicsPolynomialEnergyMotorLookup:
     async with init_devices(mock=True):
         poly_device = EpicsPolynomialEnergyMotorLookup(
             prefix="TEST",
@@ -165,14 +165,10 @@ async def test_epics_polynomial_device_trigger(
 )
 async def test_epics_polynomial_device_get_table_entries_list(
     param_dict: dict[Pol, list[float]],
-    epics_polynomial_device: EpicsPolynomialEnergyMotorLookup,
+    polynomial_device: StaticPolynomialEnergyMotorLookup,
 ) -> None:
 
-    entries = await epics_polynomial_device._get_table_entries(
-        param_dict=param_dict,
-        min_value=70,
-        max_value=2200,
-    )
+    entries = polynomial_device._generate_entries(param_dict=param_dict)
     energy = 100
     assert Pol.LH in entries
     assert Pol.PC in entries
@@ -196,22 +192,20 @@ async def test_epics_polynomial_device_get_table_entries_list(
 )
 async def test_epics_polynomial_device_get_table_entries_deviceector(
     param_dict: dict[Pol, list[float]],
-    epics_polynomial_device_vectors: EpicsPolynomialEnergyMotorLookup,
+    epics_polynomial_device: EpicsPolynomialEnergyMotorLookup,
 ) -> None:
     for pol, coeffs in param_dict.items():
         for i, coeff in enumerate(coeffs):
             set_mock_value(
-                epics_polynomial_device_vectors.param_dict[pol][i + 1],
+                epics_polynomial_device.param_dict[pol][i + 1],
                 coeff,
             )
-    entries = await epics_polynomial_device_vectors._get_table_entries(
-        param_dict=epics_polynomial_device_vectors.param_dict,
-        min_value=70,
-        max_value=2200,
-    )
+    await epics_polynomial_device.update_lookup()
+    entries = epics_polynomial_device.lut.root
     energy = 100
     assert Pol.LH in entries
     assert Pol.PC in entries
+
     assert isinstance(entries[Pol.LH], EnergyCoverage)
     assert isinstance(entries[Pol.PC], EnergyCoverage)
     assert entries[Pol.LH].get_poly(energy)(energy) == pytest.approx(
@@ -225,7 +219,7 @@ async def test_epics_polynomial_device_get_table_entries_deviceector(
 
 
 async def test_epics_polynomial_device_update_lookup(
-    epics_polynomial_device_vectors: EpicsPolynomialEnergyMotorLookup,
+    epics_polynomial_device: EpicsPolynomialEnergyMotorLookup,
 ) -> None:
     param_dict = {
         Pol.LH: [1.0, 5.0, 2.0],
@@ -234,20 +228,16 @@ async def test_epics_polynomial_device_update_lookup(
     for pol, coeffs in param_dict.items():
         for i, coeff in enumerate(coeffs):
             set_mock_value(
-                epics_polynomial_device_vectors.param_dict[pol][i + 1],
+                epics_polynomial_device.param_dict[pol][i + 1],
                 coeff,
             )
 
-    await epics_polynomial_device_vectors.update_lookup()
+    await epics_polynomial_device.update_lookup()
     np.testing.assert_allclose(
-        epics_polynomial_device_vectors.lut.root[Pol.LH]
-        .energy_entries[0]
-        .poly.coefficients,
+        epics_polynomial_device.lut.root[Pol.LH].energy_entries[0].poly.coefficients,
         np.array([2.0, 5.0, 1.0]),
     )
     np.testing.assert_allclose(
-        epics_polynomial_device_vectors.lut.root[Pol.PC]
-        .energy_entries[0]
-        .poly.coefficients,
+        epics_polynomial_device.lut.root[Pol.PC].energy_entries[0].poly.coefficients,
         np.array([3.0, 2.0, 1.0]),
     )

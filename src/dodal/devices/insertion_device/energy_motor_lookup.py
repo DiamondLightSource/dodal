@@ -88,31 +88,76 @@ class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
         self.lut = self.read_lut()
 
 
-class EpicsPolynomialEnergyMotorLookup(Device, Triggerable, EnergyMotorLookup):
-    """A specialized Insertion Device for the I06 beamline that dynamically synchronizes
-    lookup tables with polynomial coefficients stored in EPICS PVs.
+class StaticPolynomialEnergyMotorLookup(EnergyMotorLookup):
+    """A lookup table where polynomial coefficients are fixed at initialization.
 
-    This device reads coefficients (C0 through C12) for multiple polarizations to
-    construct mappings between Energy, Gap, and Phase. It supports both forward
-    (Energy -> Gap) and inverse (Gap -> Energy) lookups, as well as phase calculations.
+    This class serves as the base for polynomial-based energy/motor conversions.
+    It generates an internal LookupTable by evaluating a dictionary of
+    polarization-specific coefficient lists across a defined value range.
 
-    The device implements the `Triggerable` protocol, allowing the physics tables
-    to be refreshed during a Bluesky plan via `yield from bps.trigger(device)`.
+    Args:
+        max_value (float): The maximum valid input value (e.g., Energy in eV).
+        min_value (float): The minimum valid input value.
+        poly_params (dict[Pol, list[float]]): Mapping of Polarization to a
+            list of polynomial coefficients (ordered by power).
+    """
+
+    def __init__(
+        self,
+        max_value: float,
+        min_value: float,
+        poly_params: dict[Pol, list[float]],
+    ) -> None:
+        self.min_value = min_value
+        self.max_value = max_value
+        self.poly_params = poly_params
+
+        # Initialize with the static data immediately
+        entries = self._generate_entries(self.poly_params)
+        super().__init__(LookupTable(entries))
+
+    def _generate_entries(
+        self, param_dict: dict[Pol, list[float]]
+    ) -> dict[Pol, EnergyCoverage]:
+        return {
+            pol: EnergyCoverage.generate(
+                min_energies=[self.min_value],
+                max_energies=[self.max_value],
+                poly1d_params=[coeffs],
+            )
+            for pol, coeffs in param_dict.items()
+        }
+
+
+class EpicsPolynomialEnergyMotorLookup(
+    Device, Triggerable, StaticPolynomialEnergyMotorLookup
+):
+    """A specialized lookup device that synchronizes polynomial coefficients
+    directly from EPICS PVs.
+
+    This device extends the static lookup by introducing Ophyd-async signals
+    (DeviceVectors) to fetch live calibration data from an IOC. It allows
+    physics tables to be updated dynamically without restarting the control
+    system or manually reloading CSV files.
+
+    It implements the `Triggerable` protocol to allow on-demand table
+    regeneration within a Bluesky plan.
 
     Args:
         prefix (str): The EPICS prefix for the polynomial coefficient PVs.
-        max_energy (float, optional): The maximum operating energy in eV. Defaults to 2200.
-        min_energy (float, optional): The minimum operating energy in eV. Defaults to 70.
-        phase_poly_params (dict[Pol, list[float]], optional): Static polynomial
-            parameters for phase calculation. Defaults to DEFAULT_POLY1D_PARAMETERS.
-        name (str, optional): The name of the device for Bluesky/Ophyd.
+        max_value (float): The maximum valid input value for the lookup.
+        min_value (float): The minimum valid input value for the lookup.
+        poly_params (dict[Pol, str]): Mapping of Polarization to the PV
+            suffix (e.g., {Pol.LH: "HZ"}).
+        pv_start (int, optional): The starting index of the PV coefficient
+            (e.g., 12 for C12). Defaults to 12.
+        pv_end (int, optional): The ending index of the PV coefficient
+            (e.g., 1 for C1). Defaults to 1.
+        name (str, optional): Name of the device for logging and Bluesky.
 
     Attributes:
-        energy_gap_motor_lookup (EnergyMotorLookup): Mapping for Energy -> Gap.
-        energy_phase_motor_lookup (EnergyMotorLookup): Mapping for Energy -> Phase.
-        gap_motor_energy_lookup (EnergyMotorLookup): Mapping for Gap -> Energy.
-        param_dict (dict[Pol, DeviceVector]): Dictionary of forward polynomial signals.
-        inv_param_dict (dict[Pol, DeviceVector]): Dictionary of inverse polynomial signals.
+        param_dict (dict[Pol, DeviceVector]): Dictionary of signals used to
+            fetch coefficients for each polarization.
     """
 
     def __init__(
@@ -120,38 +165,34 @@ class EpicsPolynomialEnergyMotorLookup(Device, Triggerable, EnergyMotorLookup):
         prefix: str,
         max_value: float,
         min_value: float,
-        poly_params: dict[Pol, list[float]] | dict[Pol, str],
+        poly_params: dict[Pol, str],
         pv_start: int = 12,
-        pv_end: int = 0,
+        pv_end: int = 1,
         name: str = "",
     ) -> None:
         self.param_dict = {}
         self.min_value = min_value
         self.max_value = max_value
         for pol, suffix in poly_params.items():
-            if isinstance(suffix, str):
-                attr_name = f"{pol.name.lower()}_params"
-                setattr(
-                    self,
-                    attr_name,
-                    self._make_params(
-                        pv_prefix=f"{prefix}{suffix}",
-                        start=pv_start,
-                        end=pv_end,
-                    ),
-                )
-                self.param_dict[pol] = getattr(self, attr_name)
-            else:
-                self.param_dict[pol] = poly_params[pol]
+            attr_name = f"{pol.name.lower()}_params"
+            setattr(
+                self,
+                attr_name,
+                self._make_params(
+                    pv_prefix=f"{prefix}{suffix}",
+                    start=pv_start,
+                    end=pv_end,
+                ),
+            )
+            self.param_dict[pol] = getattr(self, attr_name)
         super().__init__(name=name)
 
-    def _make_params(
-        self, pv_prefix: str, start: int = 12, end: int = 0
-    ) -> DeviceVector:
+    def _make_params(self, pv_prefix: str, start: int, end: int) -> DeviceVector:
+        sign = 1 if start < end else -1
         return DeviceVector(
             {
                 i: epics_signal_rw(float, read_pv=f"{pv_prefix}:C{i}")
-                for i in range(start, end, -1)
+                for i in range(start, end + sign, sign)
             }
         )
 
@@ -160,33 +201,35 @@ class EpicsPolynomialEnergyMotorLookup(Device, Triggerable, EnergyMotorLookup):
         """Triggering this device will update the lookup tables with the current PV values."""
         await self.update_lookup()
 
-    async def _get_table_entries(
-        self,
-        param_dict: dict[Pol, DeviceVector] | dict[Pol, list[float]],
-        min_value: float,
-        max_value: float,
-    ) -> dict[Pol, EnergyCoverage]:
-        entries = {}
-        for pol, vector in param_dict.items():
-            if isinstance(vector, DeviceVector):
-                coeffs = await asyncio.gather(*(p.get_value() for p in vector.values()))
-            else:
-                coeffs = vector
-            entries[pol] = EnergyCoverage.generate(
-                min_energies=[min_value],
-                max_energies=[max_value],
-                poly1d_params=[coeffs],
-            )
-        return entries
-
     async def update_lookup(self) -> None:
-        # Update gap lookup table
-        energy_entries = await self._get_table_entries(
-            self.param_dict, self.min_value, self.max_value
-        )
-        self.lut = LookupTable(energy_entries)
+        """Fetch the latest polynomial coefficients from EPICS, update the lookup table,
+        and handle any errors that occur during the process.
+        """
+        try:
+            pols = list(self.param_dict.keys())
+            vectors = list(self.param_dict.values())
+            poly_values = await asyncio.gather(
+                *(asyncio.gather(*(p.get_value() for p in v.values())) for v in vectors)
+            )
+            current_coeffs = {
+                pol: list(val) for pol, val in zip(pols, poly_values, strict=True)
+            }
 
-        LOGGER.info("Updating lookup tables with new values from EPICS.")
+            self.lut = LookupTable(self._generate_entries(current_coeffs))
+            LOGGER.info(f"Successfully synced {self.name} from EPICS.")
+        except Exception as e:
+            LOGGER.error(f"Failed to update {self.name}: {e}")
+            raise
+
+    def update_lookup_table(self) -> None:
+        """Overrides the base synchronous method to provide a warning.
+        Since EPICS communication is asynchronous, use 'await update_lookup()' instead.
+        """
+        LOGGER.warning(
+            f"Synchronous update_lookup_table called on {self.name}. "
+            "This does nothing for EPICS-based lookups. "
+            "Please use 'await device.update_lookup()' or 'yield from bps.trigger(device)'."
+        )
 
     async def connect(
         self,
