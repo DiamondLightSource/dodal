@@ -53,7 +53,14 @@ async def test_enum_plc_interlock_is_readable(enum_plc_interlock: EnumPLCInterlo
     )
 
 
-async def test_int_plc_interlock_is_readable(): ...
+async def test_int_plc_interlock_is_readable(int_plc_interlock: IntPLCInterlock):
+    await assert_reading(
+        int_plc_interlock,
+        {
+            f"{int_plc_interlock.name}-is_safe": partial_reading(False),
+            f"{int_plc_interlock.name}-status": partial_reading(0),
+        },
+    )
 
 
 @pytest.mark.parametrize(
@@ -65,12 +72,12 @@ async def test_int_plc_interlock_is_readable(): ...
     ],
 )
 async def test_pss_interlock_safe_to_operate_logic(
-    interlock: PSSInterlock,
+    pss_interlock: PSSInterlock,
     readback: float,
     expected_state: bool,
 ):
-    set_mock_value(interlock.status, readback)
-    assert await interlock.is_safe.get_value() is expected_state
+    set_mock_value(pss_interlock.status, readback)
+    assert await pss_interlock.is_safe.get_value() is expected_state
 
 
 @pytest.mark.parametrize(
@@ -83,12 +90,25 @@ async def test_pss_interlock_safe_to_operate_logic(
     ],
 )
 async def test_enum_plc_interlock_safe_to_operate_logic(
-    plc_interlock: EnumPLCInterlock,
+    enum_plc_interlock: EnumPLCInterlock,
     readback: float,
     expected_state: bool,
 ):
-    set_mock_value(plc_interlock.status, readback)
-    assert await plc_interlock.is_safe.get_value() is expected_state
+    set_mock_value(enum_plc_interlock.status, readback)
+    assert await enum_plc_interlock.is_safe.get_value() is expected_state
 
 
-async def test_int_plc_interlock_safe_to_opperate_logic(): ...
+@pytest.mark.parametrize(
+    "readback, expected_state",
+    [
+        (65535, True),
+        (0, False),
+    ],
+)
+async def test_int_plc_interlock_safe_to_opperate_logic(
+    int_plc_interlock: IntPLCInterlock,
+    readback: float,
+    expected_state: bool,
+):
+    set_mock_value(int_plc_interlock.status, readback)
+    assert await int_plc_interlock.is_safe.get_value() is expected_state
