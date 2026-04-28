@@ -1,0 +1,46 @@
+dodal.devices.beamlines.i15\_1.gonio\_interlock.GonioInterlock
+==============================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.gonio_interlock
+
+.. autoclass:: GonioInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~GonioInterlock.status
+      
+      
+      ~GonioInterlock.bl_prefix
+      
+   
+   
