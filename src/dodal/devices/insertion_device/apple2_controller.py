@@ -106,7 +106,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.maximum_gap_motor_position = maximum_gap_motor_position
         self.maximum_phase_motor_position = maximum_phase_motor_position
         # Store the set energy for readback.
-        self._energy = soft_signal_rw(float, initial_value=100)
+        self._energy = soft_signal_rw(float, initial_value=None, units=units)
 
         # Store the polarisation for setpoint. And provide readback for LH3.
         # LH3 is a special case as it is indistinguishable from LH in the hardware.
