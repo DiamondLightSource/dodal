@@ -159,6 +159,14 @@ async def test_given_loaded_from_a_position_then_unload_moves_to_position(
     assert await robot.pos_sel.get_value() == 2
 
 
+async def test_given_spinner_started_then_can_read_spinner_state(
+    robot: Robot,
+):
+    await robot.spinner.set(SpinnerState.ON)
+
+    assert await robot.spinner.get_value() == SpinnerState.ON
+
+
 async def test_when_unloaded_then_spinner_stops_before_beam_program_loaded(
     robot: Robot,
 ) -> None:
