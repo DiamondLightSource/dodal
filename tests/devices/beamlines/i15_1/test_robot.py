@@ -14,6 +14,7 @@ from dodal.devices.beamlines.i15_1.robot import (
     ProgramRunning,
     Robot,
     SampleLocation,
+    SpinnerState,
 )
 
 
@@ -158,6 +159,14 @@ async def test_given_loaded_from_a_position_then_unload_moves_to_position(
     assert await robot.pos_sel.get_value() == 2
 
 
+async def test_given_spinner_started_then_can_read_spinner_state(
+    robot: Robot,
+):
+    await robot.spinner.set(SpinnerState.ON)
+
+    assert await robot.spinner.get_value() == SpinnerState.ON
+
+
 async def test_when_unloaded_then_spinner_stops_before_beam_program_loaded(
     robot: Robot,
 ) -> None:
@@ -169,56 +178,63 @@ async def test_when_unloaded_then_spinner_stops_before_beam_program_loaded(
     parent_mock = get_mock(robot)
 
     expected_calls = [
-        call.spinner_load_program.put(ANY),
-        call.spinner_off.put(ANY),
+        call._spinner_load_program.put(ANY),
+        call._spinner_off.put(ANY),
         call.beam_load_program.put(ANY),
     ]
 
     parent_mock.assert_has_calls(expected_calls, any_order=False)
 
 
-async def test_given_wrong_spinner_program_gets_loaded_robot_times_out(robot: Robot):
+async def test_given_wrong_spinner_program_gets_loaded_then_times_out(robot: Robot):
     def change_to_wrong_program(*_, **__):
         set_mock_value(robot.program_name, "BAD PROGRAM")
 
-    callback_on_mock_put(robot.spinner_load_program, change_to_wrong_program)
+    callback_on_mock_put(robot._spinner_load_program, change_to_wrong_program)
 
     with pytest.raises(TimeoutError):
-        await robot.set(SAMPLE_LOCATION_EMPTY)
+        await robot.spinner.set(SpinnerState.OFF)
 
-    get_mock_put(robot.spinner_off).assert_not_called()
+    get_mock_put(robot._spinner_off).assert_not_called()
 
 
-# Can unskip this test once https://github.com/DiamondLightSource/crystallography-bluesky/issues/16 done
-@pytest.mark.skip(
-    reason="Temporarily handling this timeout error, see https://github.com/DiamondLightSource/crystallography-bluesky/issues/34"
-)
-async def test_given_spinner_stop_program_doesnt_start_then_robot_times_out(
+async def test_given_spinner_stop_program_doesnt_start_then_times_out(
     robot: Robot,
 ):
     def do_nothing(*_, **__):
         pass
 
-    callback_on_mock_put(robot.spinner_off, do_nothing)
+    callback_on_mock_put(robot._spinner_off, do_nothing)
 
     with pytest.raises(TimeoutError):
-        await robot.set(SAMPLE_LOCATION_EMPTY)
+        await robot.spinner.set(SpinnerState.OFF)
 
 
-# Can unskip this test once https://github.com/DiamondLightSource/crystallography-bluesky/issues/16 done
-@pytest.mark.skip(
-    reason="Temporarily handling this timeout error, see https://github.com/DiamondLightSource/crystallography-bluesky/issues/34"
-)
-async def test_given_spinner_stop_program_doesnt_stop_then_robot_times_out(
+async def test_given_spinner_stop_program_doesnt_stop_then_times_out(
     robot: Robot,
 ):
     def infinite_program(*_, **__):
         set_mock_value(robot.program_running, ProgramRunning.PROGRAM_RUNNING)
 
-    callback_on_mock_put(robot.spinner_off, infinite_program)
+    callback_on_mock_put(robot._spinner_off, infinite_program)
 
     with pytest.raises(TimeoutError):
-        await robot.set(SAMPLE_LOCATION_EMPTY)
+        await robot.spinner.set(SpinnerState.OFF)
+
+
+@pytest.mark.parametrize(
+    "initial_state",
+    (SpinnerState.ON, SpinnerState.OFF),
+)
+async def test_given_spinner_is_already_in_state_then_dont_change_it(
+    robot: Robot,
+    initial_state: SpinnerState,
+):
+    set_mock_value(robot._spinner_rbv, initial_state)
+
+    await robot.spinner.set(initial_state)
+
+    get_mock_put(robot._spinner_load_program).assert_not_called()
 
 
 async def test_when_robot_unloaded_beam_picked_then_puck_placed(robot: Robot) -> None:
@@ -245,15 +261,3 @@ async def test_after_robot_unload_new_0_0_is_put_in_index_pvs(robot: Robot):
 
     assert await robot.current_sample.puck.get_value() == 0
     assert await robot.current_sample.position.get_value() == 0
-
-
-# Can remove this test once https://github.com/DiamondLightSource/crystallography-bluesky/issues/16 done
-async def test_given_spinner_not_running_then_unload_does_not_raise_an_error(
-    robot: Robot,
-):
-    def do_nothing(*_, **__):
-        pass
-
-    callback_on_mock_put(robot.spinner_off, do_nothing)
-
-    await robot._unload()
