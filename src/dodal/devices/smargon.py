@@ -14,7 +14,8 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import XYZOmegaStage
+from dodal.common.maths import AngleWithPhase
+from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 
 
@@ -78,7 +79,7 @@ class CombinedMove(TypedDict, total=False):
     chi: float | None
 
 
-class Smargon(XYZOmegaStage, Movable):
+class Smargon(XYZWrappedOmegaStage, Movable):
     """Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
     increasing the gap between x1 and x2 changes chi, moving together changes virtual x.
@@ -104,6 +105,15 @@ class Smargon(XYZOmegaStage, Movable):
 
         super().__init__(prefix, name)
 
+    async def _get_target_value(self, motor_name: str, value: float) -> float:
+        if motor_name == "omega":
+            current_angle = AngleWithPhase.from_iterable(
+                await self.wrapped_omega.offset_and_phase.get_value()
+            )
+            return current_angle.nearest_with_phase(value).unwrap()
+        else:
+            return value
+
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
         """This will move all motion together in a deferred move.
@@ -114,11 +124,16 @@ class Smargon(XYZOmegaStage, Movable):
         only come back after the motion on that axis finished.
         """
         await self.defer_move.set(DeferMoves.ON)
+        # TODO Hotfix required here until https://github.com/DiamondLightSource/dodal/issues/1998
+        # is implemented in separate PR
         try:
             finished_moving = []
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None and isinstance(new_setpoint, int | float):
-                    axis: Motor = getattr(self, motor_name)
+                    new_setpoint = await self._get_target_value(
+                        motor_name, new_setpoint
+                    )
+                    axis = getattr(self, motor_name)
                     await axis.check_motor_limit(
                         await axis.user_setpoint.get_value(), new_setpoint
                     )
