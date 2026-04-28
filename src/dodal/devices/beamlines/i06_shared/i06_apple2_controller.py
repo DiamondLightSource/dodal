@@ -34,9 +34,6 @@ class I06Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         units: str = "eV",
         name: str = "",
     ) -> None:
-        self.gap_energy_motor_lut = gap_energy_motor_lut
-        self.phase_energy_motor_lut = phase_energy_motor_lut
-        self.inverse_gap_energy_motor_lut = inverse_gap_energy_motor_lut
         super().__init__(
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
