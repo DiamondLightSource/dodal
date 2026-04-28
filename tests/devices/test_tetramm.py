@@ -189,6 +189,14 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
         )
 
 
+async def test_validate_deadtime_raises_error_if_no_trigger_logic(
+    tetramm: TetrammDetector,
+):
+    tetramm._trigger_logic = None
+    with pytest.raises(RuntimeError):
+        tetramm._validate_deadtime(MagicMock())
+
+
 async def test_prepare_arms_tetramm(tetramm: TetrammDetector):
     trigger_info = TriggerInfo(
         number_of_events=5,
