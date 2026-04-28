@@ -3,10 +3,10 @@ from dodal.devices.insertion_device import (
     Apple2Controller,
     Apple2PhasesVal,
     Apple2Val,
+    EnergyMotorLookup,
     Pol,
     UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
 
 class I06Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):

@@ -28,6 +28,7 @@ from .energy import BeamEnergy, InsertionDeviceEnergy, InsertionDeviceEnergyBase
 from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
+    EpicsPolynomialEnergyMotorLookup,
 )
 from .enum import Pol, UndulatorGateStatus
 from .lookup_table_models import (
@@ -67,6 +68,7 @@ __all__ = [
     "Apple2LockedPhasesVal",
     "EnergyMotorLookup",
     "ConfigServerEnergyMotorLookup",
+    "EpicsPolynomialEnergyMotorLookup",
     "EnergyMotorConvertor",
     "UnstoppableMotor",
     "InsertionDeviceEnergyBase",
