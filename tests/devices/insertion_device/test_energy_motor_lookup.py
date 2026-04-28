@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -116,6 +117,33 @@ async def polynomial_device() -> StaticPolynomialEnergyMotorLookup:
     return poly_device
 
 
+@pytest.mark.parametrize(
+    "param_dict",
+    [
+        {Pol.LH: [1.0, 2.0, 3.0], Pol.PC: [1.0, 2.0, 3.0]},
+    ],
+)
+async def test_static_polynomial_device_get_table_entries_list(
+    param_dict: dict[Pol, list[float]],
+    polynomial_device: StaticPolynomialEnergyMotorLookup,
+) -> None:
+
+    entries = polynomial_device._generate_entries(param_dict=param_dict)
+    energy = 100
+    assert Pol.LH in entries
+    assert Pol.PC in entries
+    assert isinstance(entries[Pol.LH], EnergyCoverage)
+    assert isinstance(entries[Pol.PC], EnergyCoverage)
+    assert entries[Pol.LH].get_poly(energy)(energy) == pytest.approx(
+        np.poly1d(param_dict[Pol.LH])(energy),
+        rel=0.01,
+    )
+    assert entries[Pol.PC].get_poly(energy)(energy) == pytest.approx(
+        np.poly1d(param_dict[Pol.PC])(energy),
+        rel=0.01,
+    )
+
+
 @pytest.fixture
 async def epics_polynomial_device() -> EpicsPolynomialEnergyMotorLookup:
     async with init_devices(mock=True):
@@ -155,33 +183,6 @@ async def test_epics_polynomial_device_trigger(
     await status
     assert status.done
     epics_polynomial_device.update_lookup.assert_awaited_once()
-
-
-@pytest.mark.parametrize(
-    "param_dict",
-    [
-        {Pol.LH: [1.0, 2.0, 3.0], Pol.PC: [1.0, 2.0, 3.0]},
-    ],
-)
-async def test_epics_polynomial_device_get_table_entries_list(
-    param_dict: dict[Pol, list[float]],
-    polynomial_device: StaticPolynomialEnergyMotorLookup,
-) -> None:
-
-    entries = polynomial_device._generate_entries(param_dict=param_dict)
-    energy = 100
-    assert Pol.LH in entries
-    assert Pol.PC in entries
-    assert isinstance(entries[Pol.LH], EnergyCoverage)
-    assert isinstance(entries[Pol.PC], EnergyCoverage)
-    assert entries[Pol.LH].get_poly(energy)(energy) == pytest.approx(
-        np.poly1d(param_dict[Pol.LH])(energy),
-        rel=0.01,
-    )
-    assert entries[Pol.PC].get_poly(energy)(energy) == pytest.approx(
-        np.poly1d(param_dict[Pol.PC])(energy),
-        rel=0.01,
-    )
 
 
 @pytest.mark.parametrize(
@@ -241,3 +242,33 @@ async def test_epics_polynomial_device_update_lookup(
         epics_polynomial_device.lut.root[Pol.PC].energy_entries[0].poly.coefficients,
         np.array([3.0, 2.0, 1.0]),
     )
+
+
+async def test_update_lookup_logs_and_raises_on_error(
+    epics_polynomial_device: EpicsPolynomialEnergyMotorLookup,
+    caplog: pytest.LogCaptureFixture,
+):
+
+    for vector in epics_polynomial_device.param_dict.values():
+        for signal in vector.values():
+            signal.get_value = AsyncMock(side_effect=RuntimeError("EPICS Disconnected"))
+
+    with pytest.raises(RuntimeError, match="EPICS Disconnected"):
+        await epics_polynomial_device.update_lookup()
+
+    assert (
+        f"Failed to update {epics_polynomial_device.name}: EPICS Disconnected"
+        in caplog.text
+    )
+
+
+def test_update_lookup_table(
+    epics_polynomial_device: EpicsPolynomialEnergyMotorLookup,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    with caplog.at_level(logging.WARNING):
+        epics_polynomial_device.update_lookup_table()
+        assert (
+            f"Synchronous update_lookup_table called on {epics_polynomial_device.name}"
+            in caplog.text
+        )
