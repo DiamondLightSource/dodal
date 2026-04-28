@@ -240,7 +240,7 @@ def gonio_interlock() -> GonioInterlock:
 
 
 @devices.factory()
-def webcam(path_provider: PathProvider) -> ContAcqAreaDetector:
+def webcam_1(path_provider: PathProvider) -> ContAcqAreaDetector:
     return ContAcqAreaDetector(
         f"{PREFIX.beamline_prefix}-DI-WEB-01:",
         path_provider=path_provider,
@@ -264,7 +264,7 @@ def webcam_2(path_provider: PathProvider) -> ContAcqAreaDetector:
 
 
 @devices.factory()
-def cam(path_provider: PathProvider) -> ContAcqAreaDetector:
+def cam_1(path_provider: PathProvider) -> ContAcqAreaDetector:
     return ContAcqAreaDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
         path_provider=path_provider,
