@@ -20,6 +20,7 @@ dodal.devices.beamlines.i15\_1.robot
    ~robot.ProgramRunning
    ~robot.Robot
    ~robot.SampleLocation
+   ~robot.SpinnerState
 
 
 
