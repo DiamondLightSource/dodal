@@ -14,6 +14,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
+from dodal.devices.wrapped_axis import WrappedAxis
 
 _X = "X"
 _Y = "Y"
@@ -133,7 +134,25 @@ class XYZOmegaStage(XYZStage):
     ) -> None:
         with self.add_children_as_readables():
             self.omega = Motor(prefix + omega_infix)
+
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
+class XYZWrappedOmegaStage(XYZOmegaStage):
+    """Four-axis stage with x, y, z linear axes and an omega axis with unrestricted rotation."""
+
+    def __init__(
+        self,
+        prefix: str = "",
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        omega_infix: str = _OMEGA,
+    ):
+        super().__init__(prefix, name, x_infix, y_infix, z_infix, omega_infix)
+        with self.add_children_as_readables():
+            self.wrapped_omega = WrappedAxis(self.omega)
 
 
 class XYZAzimuthStage(XYZStage):
