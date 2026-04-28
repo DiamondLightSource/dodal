@@ -187,7 +187,7 @@ class TetrammDetector(StandardDetector):
             and self._arm_logic is not None
         ):  # if freerun turn off first
             LOGGER.info("Disarming TetrAMM from free run")
-            await self._arm_logic.disarm()
+            await self._arm_logic.disarm(on_unstage=False)
         await super().prepare(value)
         self._validate_deadtime(value)
 
