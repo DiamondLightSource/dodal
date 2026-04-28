@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plans.wrapped &#8212; dodal 2.2.3.dev14+g729a8b2d8 documentation</title>
+    <title>dodal.plans.wrapped &#8212; dodal 2.2.4.dev1+g6855e4d9f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=f92fca38"></script>
+    <script src="../../../_static/documentation_options.js?v=5aa4c324"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,10 +886,13 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.plans.wrapped</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">decimal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decimal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plans</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bp</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Readable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Readable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncReadable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">NonNegativeFloat</span><span class="p">,</span> <span class="n">validate_call</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span>
@@ -916,7 +919,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="nb">set</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
             <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -935,6 +938,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads from a number of devices.</span>
+
 <span class="sd">    Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable</span>
 <span class="sd">    parameters and metadata.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -945,6 +949,569 @@ window.runMermaid = runMermaid;</script>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
     <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">num</span><span class="p">,)</span>
     <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="n">num</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_num_scan_args</span><span class="p">(</span>
+    <span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">num</span><span class="p">:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">num</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide &#39;start stop&#39; for each motor.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;You must provide &#39;start stop num&#39; for each motor in a grid scan.&quot;</span>
+                <span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">shape</span>
+
+
+<div class="viewcode-block" id="num_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.num_scan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">num_scan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For concurrent &quot;</span>
+            <span class="s2">&quot;trajectories, provide &#39;[(movable1, [start1, stop1]), (movable2, [start2, &quot;</span>
+            <span class="s2">&quot;stop2]), ... , (movableN, [startN, stopN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan concurrent single or multi-motor trajector(y/ies).</span>
+
+<span class="sd">    The scan is defined by number of points along scan trajector(y/ies). Wraps</span>
+<span class="sd">    bluesky.plans.scan(det, *args, num, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Range spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_num_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="num_grid_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.num_grid_scan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">num_grid_scan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For independent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [start1, stop1, num1]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [start2, stop2, num2]), ... , (movableN, [startN, stopN, numN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">snake_axes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan independent multi-motor trajectories.</span>
+
+<span class="sd">    The scan is defined by number of points along scan trajectories. Snakes all fast</span>
+<span class="sd">    axes by default (all axes but the first axis provided). Wraps</span>
+<span class="sd">    bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Range spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_num_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">grid_scan</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">snake_axes</span><span class="o">=</span><span class="n">snake_axes</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="num_rscan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.num_rscan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">num_rscan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For concurrent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [start1, stop1]), (movable2, [start2, </span><span class="se">\</span>
+<span class="s2">            stop2]), ... , (movableN, [startN, stopN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan concurrent trajector(y/ies), relative to current position(s).</span>
+
+<span class="sd">    The scan is defined by number of points along scan trajector(y/ies). Wraps</span>
+<span class="sd">    bluesky.plans.rel_scan(det, *args, num, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Range spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_num_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">rel_scan</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="num_grid_rscan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.num_grid_rscan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">num_grid_rscan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For independent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [start1, stop1, num1]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [start2, stop2, num2]), ... , (movableN, [startN, stopN, numN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">snake_axes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan independent trajectories, relative to current positions.</span>
+
+<span class="sd">    The scan is defined by number of points along scan trajectories. Snakes all fast</span>
+<span class="sd">    axes by default (all axes but the first axis provided). Wraps</span>
+<span class="sd">    bluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Range spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_num_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">rel_grid_scan</span><span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">snake_axes</span><span class="o">=</span><span class="n">snake_axes</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_list_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span> <span class="n">grid</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+        <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">grid</span><span class="p">:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">shape</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Lists of motor positions are not equal in length.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">shape</span>
+
+
+<div class="viewcode-block" id="list_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.list_scan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_scan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, positions). For concurrent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [point1, point2, ...]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]&#39;. Number </span><span class="se">\</span>
+<span class="s2">            of points for each movable must be equal.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan concurrent single or multi-motor trajector(y/ies).</span>
+
+<span class="sd">    The scan is defined by providing a list of points for each scan trajectory.</span>
+<span class="sd">    Wraps bluesky.plans.list_scan(det, *args, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_list_scan_args</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">list_scan</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="list_grid_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.list_grid_scan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_grid_scan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, positions). For independent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [point1, point2, ...]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">snake_axes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Currently specifying axes to snake is not supported</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan independent trajectories.</span>
+
+<span class="sd">    The scan is defined by providing a list of points for each scan trajectory. Snakes</span>
+<span class="sd">    all fast axes by default (all axes but the first axis provided). Wraps</span>
+<span class="sd">    bluesky.plans.list_grid_scan(det, *args, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_list_scan_args</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">list_grid_scan</span><span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">snake_axes</span><span class="o">=</span><span class="n">snake_axes</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="list_rscan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.list_rscan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_rscan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, positions). For concurrent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [point1, point2, ...]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]&#39;. Number </span><span class="se">\</span>
+<span class="s2">            of points for each movable must be equal.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan concurrent trajector(y/ies), relative to current position.</span>
+
+<span class="sd">    The scan is defined by providing a list of points for each scan trajectory.</span>
+<span class="sd">    Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_list_scan_args</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">rel_list_scan</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="list_grid_rscan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.list_grid_rscan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_grid_rscan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, positions). For independent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [point1, point2, ...]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">snake_axes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Currently specifying axes to snake is not supported</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan independent trajectories, relative to current positions.</span>
+
+<span class="sd">    The scan is defined by providing a list of points for each scan trajectory. Snakes</span>
+<span class="sd">    all fast axes by default (all axes but the first axis provided). Wraps</span>
+<span class="sd">    bluesky.plans.rel_list_grid_scan(det, *args, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_list_scan_args</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">rel_list_grid_scan</span><span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">snake_axes</span><span class="o">=</span><span class="n">snake_axes</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_round_list_elements</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="n">decimals</span> <span class="o">=</span> <span class="p">[</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">param</span><span class="p">))</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">]</span>
+    <span class="n">exponents</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">as_tuple</span><span class="p">()</span><span class="o">.</span><span class="n">exponent</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">decimals</span><span class="p">]</span>
+    <span class="n">decimal_places</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">exponent</span> <span class="k">for</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">exponents</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">max_decimal_places</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">decimal_places</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="n">max_decimal_places</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_stepped_list_step</span><span class="p">(</span><span class="n">start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="n">stop</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Start (</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">) and stop (</span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s2">) values cannot be the same.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">step</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">):</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">step</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+    <span class="n">stepped_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">((</span><span class="n">stepped_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">step</span><span class="p">)</span> <span class="o">-</span> <span class="n">stop</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">step</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">):</span>
+        <span class="n">stepped_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">step</span><span class="p">)</span>
+    <span class="n">rounded_stepped_list</span> <span class="o">=</span> <span class="n">_round_list_elements</span><span class="p">(</span>
+        <span class="n">stepped_list</span><span class="o">=</span><span class="n">stepped_list</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">rounded_stepped_list</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_stepped_list_num</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="n">stepped_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">)]</span>
+    <span class="n">rounded_stepped_list</span> <span class="o">=</span> <span class="n">_round_list_elements</span><span class="p">(</span>
+        <span class="n">stepped_list</span><span class="o">=</span><span class="n">stepped_list</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">start</span><span class="p">,</span> <span class="n">step</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">rounded_stepped_list</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_step_scan_args</span><span class="p">(</span>
+    <span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span> <span class="n">grid</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">stepped_list_length</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">first_movable_param</span><span class="p">,</span> <span class="o">*</span><span class="n">additional_movable_params</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_movable_param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">first_movable_param</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">stepped_list</span> <span class="o">=</span> <span class="n">_make_stepped_list_step</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+        <span class="n">stepped_list_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">first_movable_param</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">)</span>
+        <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepped_list_length</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;You provided </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">first_movable_param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2"> parameters for </span><span class="si">{</span><span class="n">first_movable_param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, rather than 3.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">additional_movable_params</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">grid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">stepped_list</span> <span class="o">=</span> <span class="n">_make_stepped_list_step</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">)</span>
+                <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;You provided </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2"> parameters for </span><span class="si">{</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, rather than 3.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">stepped_list</span> <span class="o">=</span> <span class="n">_make_stepped_list_num</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">stepped_list_length</span><span class="p">)</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepped_list</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;You provided </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2"> parameters </span><span class="si">{</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, rather than 2.&quot;</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">shape</span>
+
+
+<div class="viewcode-block" id="step_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.step_scan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">step_scan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For concurrent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [start1, stop1, step1]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [start2, step2]), ... , (movableN, [startN, stepN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan concurrent trajectories with specified step size.</span>
+
+<span class="sd">    Generates list(s) of points for each trajectory, used with</span>
+<span class="sd">    bluesky.plans.list_scan(det, *args, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_step_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">list_scan</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="step_grid_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.step_grid_scan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">step_grid_scan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For independent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [start1, stop1, step1]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">snake_axes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Currently specifying axes to snake is not supported</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan independent trajectories with specified step size.</span>
+
+<span class="sd">    Generates list(s) of points for each trajectory, used with</span>
+<span class="sd">    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by</span>
+<span class="sd">    default (all axes but the first axis provided).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_step_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">list_grid_scan</span><span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">snake_axes</span><span class="o">=</span><span class="n">snake_axes</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="step_rscan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.step_rscan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">step_rscan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For concurrent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [start1, stop1, step1]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [start2, step2]), ... , (movableN, [startN, stepN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan concurrent trajectories with specified step size, relative to position.</span>
+
+<span class="sd">    Generates list(s) of points for each trajectory, used with</span>
+<span class="sd">    bluesky.plans.rel_list_scan(det, *args, md=metadata).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_step_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">rel_list_scan</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="step_grid_rscan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.html#dodal.plans.step_grid_rscan">[docs]</a>
+<span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">step_grid_rscan</span><span class="p">(</span>
+    <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of tuples (device, parameter). For independent </span><span class="se">\</span>
+<span class="s2">            trajectories, provide &#39;[(movable1, [start1, stop1, step1]), (movable2, </span><span class="se">\</span>
+<span class="s2">            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]&#39;.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">snake_axes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Currently specifying axes to snake is not supported</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scan independent trajectories with specified step size, relative to position.</span>
+
+<span class="sd">    Generates list(s) of points for each trajectory, used with</span>
+<span class="sd">    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by</span>
+<span class="sd">    default (all axes but the first axis provided).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">_make_step_scan_args</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">rel_list_grid_scan</span><span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">snake_axes</span><span class="o">=</span><span class="n">snake_axes</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">metadata</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 
