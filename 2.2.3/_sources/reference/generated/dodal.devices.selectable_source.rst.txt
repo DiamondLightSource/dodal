@@ -1,0 +1,43 @@
+dodal.devices.selectable\_source
+================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~selectable_source.SelectedSource
+   ~selectable_source.SourceSelector
+
+
+
+
+.. automodule:: dodal.devices.selectable_source
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_obj_from_selected_source
+   
+   
+
+   
+   
+   

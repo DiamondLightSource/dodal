@@ -1,0 +1,97 @@
+dodal.devices.tetramm.TetrammDriver
+===================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammDriver
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~TetrammDriver.range
+      
+      
+      ~TetrammDriver.sample_time
+      
+      
+      ~TetrammDriver.values_per_reading
+      
+      
+      ~TetrammDriver.averaging_time
+      
+      
+      ~TetrammDriver.to_average
+      
+      
+      ~TetrammDriver.averaged
+      
+      
+      ~TetrammDriver.overflows
+      
+      
+      ~TetrammDriver.num_channels
+      
+      
+      ~TetrammDriver.resolution
+      
+      
+      ~TetrammDriver.trigger_mode
+      
+      
+      ~TetrammDriver.bias
+      
+      
+      ~TetrammDriver.bias_volts
+      
+      
+      ~TetrammDriver.geometry
+      
+      
+      ~TetrammDriver.read_format
+      
+      
+      ~TetrammDriver.unique_id
+      
+      
+      ~TetrammDriver.nd_attributes_file
+      
+      
+      ~TetrammDriver.acquire
+      
+      
+      ~TetrammDriver.array_size_x
+      
+      
+      ~TetrammDriver.array_size_y
+      
+      
+      ~TetrammDriver.data_type
+      
+      
+      ~TetrammDriver.array_counter
+      
+      
+      ~TetrammDriver.wait_for_plugins
+      
+   
+   

@@ -1,0 +1,124 @@
+dodal.devices.detector.DetectorParams
+=====================================
+
+.. currentmodule:: dodal.devices.detector
+
+.. autoclass:: DetectorParams
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~DetectorParams.get_beam_position_mm
+      
+      
+      ~DetectorParams.get_beam_position_pixels
+      
+      
+      ~DetectorParams.get_detector_size_pizels
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~DetectorParams.serialize_detector_size_constants
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DetectorParams.beam_xy_converter
+      
+      
+      ~DetectorParams.full_filename
+      
+      
+      ~DetectorParams.full_number_of_images
+      
+      
+      
+      ~DetectorParams.model_config
+      
+      
+      
+      
+      
+      ~DetectorParams.run_number
+      
+      
+      ~DetectorParams.expected_energy_ev
+      
+      
+      ~DetectorParams.exposure_time_s
+      
+      
+      ~DetectorParams.directory
+      
+      
+      ~DetectorParams.prefix
+      
+      
+      ~DetectorParams.detector_distance
+      
+      
+      ~DetectorParams.omega_start
+      
+      
+      ~DetectorParams.omega_increment
+      
+      
+      ~DetectorParams.num_images_per_trigger
+      
+      
+      ~DetectorParams.num_triggers
+      
+      
+      ~DetectorParams.use_roi_mode
+      
+      
+      ~DetectorParams.det_dist_to_beam_converter_path
+      
+      
+      ~DetectorParams.override_run_number
+      
+      
+      ~DetectorParams.trigger_mode
+      
+      
+      ~DetectorParams.detector_size_constants
+      
+      
+      ~DetectorParams.enable_dev_shm
+      
+   
+   

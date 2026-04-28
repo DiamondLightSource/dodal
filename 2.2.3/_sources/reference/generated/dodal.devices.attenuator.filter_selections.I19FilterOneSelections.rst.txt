@@ -1,0 +1,90 @@
+dodal.devices.attenuator.filter\_selections.I19FilterOneSelections
+==================================================================
+
+.. currentmodule:: dodal.devices.attenuator.filter_selections
+
+.. autoclass:: I19FilterOneSelections
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I19FilterOneSelections.AIR1
+      
+      
+      ~I19FilterOneSelections.AL
+      
+      
+      ~I19FilterOneSelections.AIR3
+      
+      
+      ~I19FilterOneSelections.AU
+      
+      
+      ~I19FilterOneSelections.AIR5
+      
+      
+      ~I19FilterOneSelections.FE
+      
+   
+   

@@ -1,0 +1,114 @@
+dodal.devices.v2f.V2FGain
+=========================
+
+.. currentmodule:: dodal.devices.v2f
+
+.. autoclass:: V2FGain
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~V2FGain.LOW_NOISE3
+      
+      
+      ~V2FGain.LOW_NOISE4
+      
+      
+      ~V2FGain.LOW_NOISE5
+      
+      
+      ~V2FGain.LOW_NOISE6
+      
+      
+      ~V2FGain.LOW_NOISE7
+      
+      
+      ~V2FGain.LOW_NOISE8
+      
+      
+      ~V2FGain.LOW_NOISE9
+      
+      
+      ~V2FGain.HIGH_SPEED5
+      
+      
+      ~V2FGain.HIGH_SPEED6
+      
+      
+      ~V2FGain.HIGH_SPEED7
+      
+      
+      ~V2FGain.HIGH_SPEED8
+      
+      
+      ~V2FGain.HIGH_SPEED9
+      
+      
+      ~V2FGain.HIGH_SPEED10
+      
+      
+      ~V2FGain.HIGH_SPEED11
+      
+   
+   

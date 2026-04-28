@@ -1,0 +1,84 @@
+dodal.devices.hutch\_shutter.InterlockState
+===========================================
+
+.. currentmodule:: dodal.devices.hutch_shutter
+
+.. autoclass:: InterlockState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~InterlockState.FAILED
+      
+      
+      ~InterlockState.RUN_ILKS_OK
+      
+      
+      ~InterlockState.OK
+      
+      
+      ~InterlockState.DISARMED
+      
+   
+   

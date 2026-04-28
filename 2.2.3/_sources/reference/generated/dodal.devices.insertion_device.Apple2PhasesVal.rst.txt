@@ -1,0 +1,32 @@
+dodal.devices.insertion\_device.Apple2PhasesVal
+===============================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: Apple2PhasesVal
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Apple2PhasesVal.top_inner
+      
+      
+      ~Apple2PhasesVal.btm_outer
+      
+      
+      ~Apple2PhasesVal.top_outer
+      
+      
+      ~Apple2PhasesVal.btm_inner
+      
+   
+   

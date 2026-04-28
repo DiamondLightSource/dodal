@@ -1,0 +1,67 @@
+dodal.devices.insertion\_device
+===============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~insertion_device.Apple2
+   ~insertion_device.Apple2Controller
+   ~insertion_device.Apple2EnforceLHMoveController
+   ~insertion_device.AppleKnotController
+   ~insertion_device.AppleKnotPathFinder
+   ~insertion_device.UndulatorGap
+   ~insertion_device.UndulatorPhaseAxes
+   ~insertion_device.UndulatorJawPhase
+   ~insertion_device.Apple2Val
+   ~insertion_device.Apple2PhasesVal
+   ~insertion_device.LookupTable
+   ~insertion_device.LookupTableColumnConfig
+   ~insertion_device.InsertionDeviceEnergy
+   ~insertion_device.InsertionDevicePolarisation
+   ~insertion_device.BeamEnergy
+   ~insertion_device.UndulatorLockedPhaseAxes
+   ~insertion_device.EnergyCoverage
+   ~insertion_device.Pol
+   ~insertion_device.EnabledDisabledUpper
+   ~insertion_device.UndulatorGateStatus
+   ~insertion_device.Apple2LockedPhasesVal
+   ~insertion_device.EnergyMotorLookup
+   ~insertion_device.ConfigServerEnergyMotorLookup
+   ~insertion_device.EnergyMotorConvertor
+   ~insertion_device.UnstoppableMotor
+   ~insertion_device.InsertionDeviceEnergyBase
+
+
+
+
+.. automodule:: dodal.devices.insertion_device
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      convert_csv_to_lookup
+   
+   
+
+   
+   
+   

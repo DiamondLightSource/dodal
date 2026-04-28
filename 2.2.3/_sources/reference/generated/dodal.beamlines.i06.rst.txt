@@ -1,0 +1,27 @@
+dodal.beamlines.i06
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i06
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

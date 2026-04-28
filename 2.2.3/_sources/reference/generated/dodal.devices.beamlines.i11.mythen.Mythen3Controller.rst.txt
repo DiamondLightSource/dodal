@@ -1,0 +1,31 @@
+dodal.devices.beamlines.i11.mythen.Mythen3Controller
+====================================================
+
+.. currentmodule:: dodal.devices.beamlines.i11.mythen
+
+.. autoclass:: Mythen3Controller
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Mythen3Controller.get_deadtime
+      
+      
+      ~Mythen3Controller.prepare
+      
+      
+      
+      
+   
+   
+
+   
+   
+   

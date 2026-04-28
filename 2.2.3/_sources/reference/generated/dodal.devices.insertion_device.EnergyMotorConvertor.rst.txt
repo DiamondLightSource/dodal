@@ -1,0 +1,15 @@
+dodal.devices.insertion\_device.EnergyMotorConvertor
+====================================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: EnergyMotorConvertor
+   :members:
+
+   
+   
+   
+
+   
+   
+   
