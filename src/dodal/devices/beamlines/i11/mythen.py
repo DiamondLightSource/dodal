@@ -100,30 +100,6 @@ class Mythen3TriggerLogic(DetectorTriggerLogic):
     def get_deadtime(self, config_values) -> float:
         return _DEADTIMES[_BIT_DEPTH]
 
-    # async def prepare(self, trigger_info: TriggerInfo) -> None:
-    #     if (exposure := trigger_info.livetime) is not None:
-    #         await self._driver.acquire_time.set(exposure)
-
-    #     if trigger_info.trigger is DetectorTrigger.INTERNAL:
-    #         await self._driver.trigger_mode.set(Mythen3TriggerMode.INTERNAL)
-    #     elif trigger_info.trigger in {
-    #         DetectorTrigger.EXTERNAL_LEVEL,
-    #         DetectorTrigger.EXTERNAL_EDGE,
-    #         DetectorTrigger.EXTERNAL_LEVEL,
-    #     }:
-    #         await self._driver.trigger_mode.set(Mythen3TriggerMode.EXTERNAL)
-    #     else:
-    #         raise ValueError(f"Mythen3 does not support {trigger_info.trigger}")
-
-    #     if trigger_info.number_of_exposures == 0:
-    #         image_mode = ADImageMode.CONTINUOUS
-    #     else:
-    #         image_mode = ADImageMode.MULTIPLE
-    #     await asyncio.gather(
-    #         self._driver.num_images.set(trigger_info.number_of_exposures),
-    #         self._driver.image_mode.set(image_mode),
-    #     )
-
     async def prepare_internal(self, num: int, livetime: float, deadtime: float):
         if livetime:
             await self._driver.acquire_time.set(livetime)

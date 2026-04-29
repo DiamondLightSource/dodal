@@ -40,9 +40,6 @@ def saxs(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=path_provider,
-        # driver_suffix="-EA-EIGER-01:",
-        # hdf_suffix="-EA-EIGER-01:OD:",
-        # odin_nodes=1,
     )
 
 
@@ -51,9 +48,6 @@ def waxs(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=path_provider,
-        # drv_suffix="-EA-EIGER-02:",
-        # hdf_suffix="-EA-EIGER-02:OD:",
-        # odin_nodes=1,
     )
 
 

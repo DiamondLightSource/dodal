@@ -133,8 +133,8 @@ class TetrammDetector(StandardDetector):
         self,
         prefix: str,
         path_provider: PathProvider,
-        drv_suffix="DRV:",
-        fileio_suffix="HDF5:",
+        drv_suffix: str = "DRV:",
+        fileio_suffix: str = "HDF5:",
         plugins: Sequence[NDPluginBaseIO] = [],
         name: str = "",
     ):
