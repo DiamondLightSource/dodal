@@ -45,8 +45,8 @@ def det() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-MAP-01:",
         path_provider=get_path_provider(),
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=DET_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
     )
 
 
@@ -56,8 +56,8 @@ def diff() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-DIFF-01:",
         path_provider=get_path_provider(),
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=DET_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
     )
 
 

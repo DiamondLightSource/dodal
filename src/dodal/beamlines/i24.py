@@ -3,6 +3,7 @@ from pathlib import Path
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
+from ophyd_async.fastcs.jungfrau import JungfrauDetector
 
 from dodal.common.beamlines.beamline_utils import BL, set_config_client
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -16,7 +17,6 @@ from dodal.devices.attenuator.filter_selections import (
 from dodal.devices.beamlines.i24.aperture import Aperture
 from dodal.devices.beamlines.i24.beam_center import DetectorBeamCenter
 from dodal.devices.beamlines.i24.beamstop import Beamstop
-from dodal.devices.beamlines.i24.commissioning_jungfrau import CommissioningJungfrau
 from dodal.devices.beamlines.i24.dcm import DCM
 from dodal.devices.beamlines.i24.dual_backlight import DualBacklight
 from dodal.devices.beamlines.i24.focus_mirrors import FocusMirrorsMode
@@ -154,16 +154,14 @@ def eiger_beam_center() -> DetectorBeamCenter:
 
 
 @devices.factory()
-def commissioning_jungfrau(
+def jungfrau(
     path_provider: PathProvider,
-) -> CommissioningJungfrau:
-    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
-    device in place of Odin while the detector is in commissioning.
-    """
-    return CommissioningJungfrau(
+) -> JungfrauDetector:
+    return JungfrauDetector(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
-        f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
         AutoMaxIncrementingPathProvider(path_provider),
+        "CAM:",
+        "OD:",
     )
 
 

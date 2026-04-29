@@ -90,8 +90,8 @@ def pilatus(path_provider: PathProvider) -> PilatusDetector:
     return PilatusDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=path_provider,
-        drv_suffix="cam1:",
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix="cam1:",
+        writer_suffix=HDF5_SUFFIX,
     )
 
 

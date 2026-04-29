@@ -8,7 +8,7 @@ from ophyd_async.core import (
     UUIDFilenameProvider,
 )
 from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.epics.adcore import NDPluginBaseIO, NDPluginStatsIO
+from ophyd_async.epics.adcore import NDPluginBaseIO, NDStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -76,13 +76,11 @@ def saxs(path_provider: PathProvider) -> PilatusDetector:
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
         plugins={
-            "stats": NDPluginStatsIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:STAT:"
-            )
+            "stats": NDStatsIO(prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:STAT:")
         },
     )
 
@@ -106,13 +104,11 @@ def waxs(path_provider: PathProvider) -> PilatusDetector:
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
         plugins={
-            "stats": NDPluginStatsIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:STAT:"
-            )
+            "stats": NDStatsIO(prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:STAT:")
         },
     )
 
@@ -122,12 +118,7 @@ def i0(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:",
         path_provider=path_provider,
-        type="Cividec Diamond XBPM",
-        plugins={
-            "stats": NDPluginBaseIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:SumAll:"
-            )
-        },
+        plugins=[NDPluginBaseIO(prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:SumAll:")],
     )
 
 
@@ -136,12 +127,7 @@ def it(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:",
         path_provider=path_provider,
-        type="PIN Diode",
-        plugins={
-            "stats": NDPluginBaseIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:SumAll:"
-            )
-        },
+        plugins=[NDPluginBaseIO(prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:SumAll:")],
     )
 
 
@@ -282,8 +268,8 @@ def oav(path_provider: PathProvider) -> AravisDetector:
     )
     return NXSasOAV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=DET_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
         path_provider=path_provider,
         metadata_holder=metadata_holder,
     )

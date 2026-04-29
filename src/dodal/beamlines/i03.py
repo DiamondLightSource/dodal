@@ -191,8 +191,6 @@ def fastcs_eiger(path_provider: PathProvider) -> FastEiger:
     return FastEiger(
         prefix=PREFIX.beamline_prefix,
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-02:",
-        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 

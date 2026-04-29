@@ -2,19 +2,17 @@ import asyncio
 from typing import Annotated as A
 
 from ophyd_async.core import (
-    DetectorTrigger,
+    DetectorTriggerLogic,
     PathProvider,
     SignalRW,
     StrictEnum,
-    TriggerInfo,
 )
 from ophyd_async.epics.adcore import (
-    ADBaseController,
-    ADHDFWriter,
+    ADArmLogic,
+    ADBaseIO,
     ADImageMode,
-    ADWriter,
+    ADWriterType,
     AreaDetector,
-    NDArrayBaseIO,
 )
 from ophyd_async.epics.core import PvSuffix
 
@@ -47,14 +45,8 @@ class Mythen3DetectorState(StrictEnum):
     ABORTED = "Aborted"
 
 
-class Mythen3Driver(NDArrayBaseIO):
-    acquire_time: A[SignalRW[float], PvSuffix.rbv("AcquireTime")]
-    acquire_period: A[SignalRW[float], PvSuffix.rbv("AcquirePeriod")]
-    num_images: A[SignalRW[int], PvSuffix.rbv("NumImages")]
-    image_mode: A[SignalRW[ADImageMode], PvSuffix.rbv("ImageMode")]
-
+class Mythen3Driver(ADBaseIO):
     # Non-specific PV's but with mythen3 specific values
-    detector_state: A[SignalRW[Mythen3DetectorState], PvSuffix("DetectorState_RBV")]
     trigger_mode: A[SignalRW[Mythen3TriggerMode], PvSuffix.rbv("TriggerMode")]
 
     # mythen3 specific PV's
@@ -98,42 +90,41 @@ _DEADTIMES = {
 _BIT_DEPTH = 24
 
 
-class Mythen3Controller(ADBaseController):
-    """ADBaseController` for a Mythen3."""
+class Mythen3TriggerLogic(DetectorTriggerLogic):
+    """Trigger logic for a Mythen3."""
 
     def __init__(self, driver: Mythen3Driver):
         self._driver = driver
-        super().__init__(driver=self._driver)
+        # super().__init__(driver=self._driver)
 
-    def get_deadtime(self, exposure: float | None) -> float:
+    def get_deadtime(self, config_values) -> float:
         return _DEADTIMES[_BIT_DEPTH]
 
-    async def prepare(self, trigger_info: TriggerInfo) -> None:
-        if (exposure := trigger_info.livetime) is not None:
-            await self._driver.acquire_time.set(exposure)
-
-        if trigger_info.trigger is DetectorTrigger.INTERNAL:
-            await self._driver.trigger_mode.set(Mythen3TriggerMode.INTERNAL)
-        elif trigger_info.trigger in {
-            DetectorTrigger.CONSTANT_GATE,
-            DetectorTrigger.EDGE_TRIGGER,
-            DetectorTrigger.VARIABLE_GATE,
-        }:
-            await self._driver.trigger_mode.set(Mythen3TriggerMode.EXTERNAL)
-        else:
-            raise ValueError(f"Mythen3 does not support {trigger_info.trigger}")
-
-        if trigger_info.total_number_of_exposures == 0:
-            image_mode = ADImageMode.CONTINUOUS
-        else:
-            image_mode = ADImageMode.MULTIPLE
+    async def prepare_internal(self, num: int, livetime: float, deadtime: float):
+        if livetime:
+            await self._driver.acquire_time.set(livetime)
+        await self._driver.trigger_mode.set(Mythen3TriggerMode.INTERNAL)
+        image_mode = ADImageMode.CONTINUOUS if num == 0 else ADImageMode.MULTIPLE
         await asyncio.gather(
-            self._driver.num_images.set(trigger_info.total_number_of_exposures),
+            self._driver.num_images.set(num),
             self._driver.image_mode.set(image_mode),
         )
 
+    async def prepare_edge(self, num: int, livetime: float):
+        if livetime:
+            await self._driver.acquire_time.set(livetime)
+        await self._driver.trigger_mode.set(Mythen3TriggerMode.EXTERNAL)
+        image_mode = ADImageMode.CONTINUOUS if num == 0 else ADImageMode.MULTIPLE
+        await asyncio.gather(
+            self._driver.num_images.set(num),
+            self._driver.image_mode.set(image_mode),
+        )
 
-class Mythen3(AreaDetector[Mythen3Controller]):
+    async def prepare_level(self, num: int):
+        await self.prepare_edge(num, 0.0)
+
+
+class Mythen3(AreaDetector[Mythen3Driver]):
     """The detector may be configured for an external trigger on a GPIO port,
     which must be done prior to preparing the detector.
     """
@@ -143,22 +134,19 @@ class Mythen3(AreaDetector[Mythen3Controller]):
         prefix: str,
         path_provider: PathProvider,
         drv_suffix: str = DET_SUFFIX,
-        writer_cls: type[ADWriter] = ADHDFWriter,
-        fileio_suffix: str | None = "HDF:",
+        writer_type: ADWriterType = ADWriterType.HDF,
+        writer_suffix: str | None = "HDF:",
         name: str = "",
     ):
         self.driver = Mythen3Driver(prefix + drv_suffix)
-        self.controller = Mythen3Controller(driver=self.driver)
-
-        self.writer = writer_cls.with_io(
-            prefix,
-            path_provider,
-            dataset_source=self.driver,
-            fileio_suffix=fileio_suffix,
-        )
 
         super().__init__(
-            controller=self.controller,
-            writer=self.writer,
+            prefix=prefix,
+            driver=self.driver,
+            arm_logic=ADArmLogic(self.driver),
+            trigger_logic=Mythen3TriggerLogic(self.driver),
+            path_provider=path_provider,
+            writer_type=writer_type,
+            writer_suffix=writer_suffix,
             name=name,
-        )  # plugins=plugins # config_sigs=config_sigs
+        )

@@ -3,28 +3,27 @@ from collections.abc import Sequence
 from typing import Annotated as A
 
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
-    DatasetDescriber,
-    DetectorController,
-    DetectorTrigger,
+    # DetectorController,
+    DetectorTriggerLogic,
     PathProvider,
+    SignalDict,
     SignalR,
     SignalRW,
     StandardDetector,
     StrictEnum,
     TriggerInfo,
-    set_and_wait_for_value,
-    soft_signal_r_and_setter,
-    wait_for_value,
+    derived_signal_r,
 )
 from ophyd_async.epics.adcore import (
-    ADHDFWriter,
-    NDArrayBaseIO,
-    NDFileHDFIO,
+    ADArmLogic,
+    ADBaseIO,
+    ADHDFDataLogic,
+    NDArrayDescription,
+    NDFileHDF5IO,
     NDPluginBaseIO,
 )
-from ophyd_async.epics.core import PvSuffix, epics_signal_r, stop_busy_record
+from ophyd_async.epics.core import PvSuffix, epics_signal_r
 
 from dodal.log import LOGGER
 
@@ -57,7 +56,7 @@ class TetrammGeometry(StrictEnum):
     SQUARE = "Square"
 
 
-class TetrammDriver(NDArrayBaseIO):
+class TetrammDriver(ADBaseIO):
     range = A[SignalRW[TetrammRange], PvSuffix.rbv("Range")]
     sample_time: A[SignalR[float], PvSuffix("SampleTime_RBV")]
     values_per_reading: A[SignalRW[int], PvSuffix.rbv("ValuesPerRead")]
@@ -74,141 +73,48 @@ class TetrammDriver(NDArrayBaseIO):
     read_format: A[SignalRW[bool], PvSuffix.rbv("ReadFormat")]
 
 
-class TetrammController(DetectorController):
-    """Controller for a TetrAMM current monitor."""
-
-    _supported_trigger_types = {
-        DetectorTrigger.EDGE_TRIGGER: TetrammTrigger.EXT_TRIGGER,
-        DetectorTrigger.CONSTANT_GATE: TetrammTrigger.EXT_TRIGGER,
-        DetectorTrigger.VARIABLE_GATE: TetrammTrigger.EXT_TRIGGER,
-    }
-    """"On the TetrAMM ASCII mode requires a minimum value of ValuesPerRead of 500,
-    [...] binary mode the minimum value of ValuesPerRead is 5."
-    https://millenia.cars.aps.anl.gov/software/epics/quadEMDoc.html
-    """
+class TetrammTriggerLogic(DetectorTriggerLogic):
+    _base_sample_rate = 100_000
     _minimal_values_per_reading = {0: 5, 1: 500}
-    """The TetrAMM always digitizes at 100 kHz"""
-    _base_sample_rate: int = 100_000
 
-    def __init__(self, driver: TetrammDriver, file_io: NDFileHDFIO) -> None:
+    def __init__(self, driver: TetrammDriver, file_io: NDFileHDF5IO):
         self.driver = driver
-        self._file_io = file_io
-        self._arm_status: AsyncStatus | None = None
+        self.file_io = file_io
 
-    def get_deadtime(self, exposure: float | None) -> float:
-        # 2 internal clock cycles. Best effort approximation
+    def get_deadtime(self, config_values) -> float:
         return 2 / self._base_sample_rate
 
-    async def prepare(self, trigger_info: TriggerInfo) -> None:
-        if trigger_info.trigger not in self._supported_trigger_types:
-            raise TypeError(
-                f"{self.__class__.__name__} only supports the following trigger "
-                f"types: {[k.name for k in self._supported_trigger_types]} but was asked to "
-                f"use {trigger_info.trigger}"
-            )
-        if trigger_info.livetime is None:
-            raise ValueError(f"{self.__class__.__name__} requires that livetime is set")
-
-        current_trig_status = await self.driver.trigger_mode.get_value()
-
-        if current_trig_status == TetrammTrigger.FREE_RUN:  # if freerun turn off first
-            LOGGER.info("Disarming TetrAMM from free run")
-            await self.disarm()
-
-        # trigger mode must be set first and on its own!
-        await self.driver.trigger_mode.set(
-            self._supported_trigger_types[trigger_info.trigger]
-        )
+    async def prepare_edge(self, num: int, livetime: float):
+        await self.driver.trigger_mode.set(TetrammTrigger.EXT_TRIGGER)
 
         await asyncio.gather(
-            self.set_exposure(trigger_info.livetime),
-            self._file_io.num_capture.set(trigger_info.total_number_of_exposures),
+            self.set_exposure(livetime),
+            self.file_io.num_capture.set(num),
         )
 
-        # raise an error if asked to trigger faster than the max.
-        # possible speed for a tetramm
-        self._validate_deadtime(trigger_info)
+    async def prepare_level(self, num: int):
+        await self.driver.trigger_mode.set(TetrammTrigger.EXT_TRIGGER)
+        await self.file_io.num_capture.set(num)
 
-    def _validate_deadtime(self, value: TriggerInfo) -> None:
-        minimum_deadtime = self.get_deadtime(value.livetime)
-        if minimum_deadtime > value.deadtime:
-            msg = (
-                f"Tetramm {self} needs at least {minimum_deadtime}s "
-                f"deadtime, but trigger logic provides only {value.deadtime}s"
-            )
-            raise ValueError(msg)
-
-    async def arm(self):
-        self._arm_status = await self.start_acquiring_driver_and_ensure_status()
-
-    async def wait_for_idle(self):
-        # tetramm never goes idle really, actually it is always acquiring
-        # so need to wait for the capture to finish instead
-        await wait_for_value(self._file_io.acquire, False, timeout=None)
-
-    async def unstage(self):
-        LOGGER.info("Unstaging TetrAMM")
-        await self._file_io.acquire.set(False)
-
-    async def disarm(self):
-        # We can't use caput callback as we already used it in arm() and we can't have
-        # 2 or they will deadlock. Therefore must use stop_busy_record
-        LOGGER.info("Disarming TetrAMM")
-        await stop_busy_record(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
-
-    async def set_exposure(self, exposure: float) -> None:
-        """Set the exposure time and acquire period.
-
-        As during the  exposure time, the device must collect an integer number
-        of readings, in the case where the exposure is not a multiple of the base
-        sample rate, it will be lowered to the prior multiple ot ensure triggers
-        are not missed.
-
-        Args:
-            exposure (float): Desired exposure time.
-        """
+    async def set_exposure(self, exposure: float):
         sample_time = await self.driver.sample_time.get_value()
+
         minimum_samples = self._minimal_values_per_reading[
             await self.driver.read_format.get_value()
         ]
-        samples_per_reading = int(exposure / sample_time)
-        if samples_per_reading < minimum_samples:
+
+        samples = int(exposure / sample_time)
+
+        if samples < minimum_samples:
             raise ValueError(
                 "Tetramm exposure time must be at least "
                 f"{minimum_samples * sample_time}s, asked to set it to {exposure}s"
             )
-        await self.driver.averaging_time.set(
-            samples_per_reading * sample_time
-        )  # correct
 
-    async def start_acquiring_driver_and_ensure_status(self) -> AsyncStatus:
-        """Start acquiring driver, raising ValueError if the detector is in a bad state.
-
-        This sets driver.acquire to True, and waits for it to be True up to a timeout.
-        Then, it checks that the DetectorState PV is in DEFAULT_GOOD_STATES,
-        and otherwise raises a ValueError.
-
-        Returns:
-            AsyncStatus: An AsyncStatus that can be awaited to set driver.acquire to
-                True and perform subsequent raising (if applicable) due to detector
-                state.
-        """
-        status = await set_and_wait_for_value(
-            self.driver.acquire,
-            True,
-            timeout=DEFAULT_TIMEOUT,
-            wait_for_set_completion=False,
-        )
-
-        async def complete_acquisition() -> None:
-            # NOTE: possible race condition here between the callback from
-            # set_and_wait_for_value and the detector state updating.
-            await status
-
-        return AsyncStatus(complete_acquisition())
+        await self.driver.averaging_time.set(samples * sample_time)
 
 
-class TetrammDatasetDescriber(DatasetDescriber):
+class TetrammDatasetDescriber(NDArrayDescription):
     def __init__(self, driver: TetrammDriver) -> None:
         self._driver = driver
 
@@ -229,55 +135,69 @@ class TetrammDetector(StandardDetector):
         path_provider: PathProvider,
         drv_suffix: str = "DRV:",
         fileio_suffix: str = "HDF5:",
+        plugins: Sequence[NDPluginBaseIO] = [],
         name: str = "",
-        plugins: dict[str, NDPluginBaseIO] | None = None,
-        config_sigs: Sequence[SignalR] = (),
-        type: str | None = None,
     ):
         self.driver = TetrammDriver(prefix + drv_suffix)
-        self.file_io = NDFileHDFIO(prefix + fileio_suffix)
-        controller = TetrammController(self.driver, self.file_io)
+        self.file_io = NDFileHDF5IO(prefix + fileio_suffix)
 
+        def _get_num_channels(num_channels: TetrammChannels) -> int:
+            return int(num_channels)
+
+        self.num_channels = derived_signal_r(
+            _get_num_channels, num_channels=self.driver.num_channels
+        )
+
+        super().__init__(name=name)
+
+        self.add_detector_logics(
+            ADHDFDataLogic(
+                writer=self.file_io,
+                driver=self.driver,
+                path_provider=path_provider,
+                description=NDArrayDescription(
+                    shape_signals=[self.num_channels, self.driver.to_average],
+                    data_type_signal=self.driver.data_type,
+                    color_mode_signal=self.driver.color_mode,
+                ),
+                plugins=plugins,
+            ),
+            TetrammTriggerLogic(self.driver, self.file_io),
+            ADArmLogic(self.driver),
+        )
+
+        # currents
         self.current1 = epics_signal_r(float, prefix + "Cur1:MeanValue_RBV")
         self.current2 = epics_signal_r(float, prefix + "Cur2:MeanValue_RBV")
         self.current3 = epics_signal_r(float, prefix + "Cur3:MeanValue_RBV")
         self.current4 = epics_signal_r(float, prefix + "Cur4:MeanValue_RBV")
 
-        self.sum_x = epics_signal_r(float, prefix + "SumX:MeanValue_RBV")
-        self.sum_y = epics_signal_r(float, prefix + "SumY:MeanValue_RBV")
-        self.sum_all = epics_signal_r(float, prefix + "SumAll:MeanValue_RBV")
-        self.diff_x = epics_signal_r(float, prefix + "DiffX:MeanValue_RBV")
-        self.diff_y = epics_signal_r(float, prefix + "DiffY:MeanValue_RBV")
-        self.pos_x = epics_signal_r(float, prefix + "PosX:MeanValue_RBV")
-        self.pos_y = epics_signal_r(float, prefix + "PosY:MeanValue_RBV")
-
-        writer = ADHDFWriter(
-            fileio=self.file_io,
-            path_provider=path_provider,
-            dataset_describer=TetrammDatasetDescriber(self.driver),
-            plugins=plugins,
-        )
-
-        config_sigs = [
+        # configuration signals
+        self.add_config_signals(
             self.driver.values_per_reading,
             self.driver.averaging_time,
             self.driver.sample_time,
-            *config_sigs,
-        ]
-
-        if type:
-            self.type, _ = soft_signal_r_and_setter(str, type)
-            config_sigs.append(self.type)
-        else:
-            self.type = None
-
-        if plugins is not None:
-            for plugin_name, plugin in plugins.items():
-                setattr(self, plugin_name, plugin)
-
-        super().__init__(
-            controller=controller,
-            writer=writer,
-            name=name,
-            config_sigs=config_sigs,
         )
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: TriggerInfo):
+        current_trig_status = await self.driver.trigger_mode.get_value()
+        if (
+            current_trig_status == TetrammTrigger.FREE_RUN
+            and self._arm_logic is not None
+        ):  # if freerun turn off first
+            LOGGER.info("Disarming TetrAMM from free run")
+            await self._arm_logic.disarm(on_unstage=False)
+        await super().prepare(value)
+        self._validate_deadtime(value)
+
+    def _validate_deadtime(self, value: TriggerInfo) -> None:
+        if self._trigger_logic is None:
+            raise RuntimeError("")
+        minimum_deadtime = self._trigger_logic.get_deadtime(SignalDict())
+        if minimum_deadtime > value.deadtime:
+            msg = (
+                f"Tetramm {self} needs at least {minimum_deadtime}s "
+                f"deadtime, but trigger logic provides only {value.deadtime}s"
+            )
+            raise ValueError(msg)

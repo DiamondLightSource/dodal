@@ -9,12 +9,10 @@ from ophyd_async.core import StrictEnum, get_mock_put, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
-    assert_value,
     partial_reading,
 )
 
 from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
-from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaDetector,
@@ -95,7 +93,6 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}acquire_time": partial_reading(region.acquire_time),
             f"{prefix}total_time": partial_reading(ANY),
             f"{prefix}energy_axis": partial_reading(ANY),
-            f"{prefix}binding_energy_axis": partial_reading(ANY),
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}detector_mode": partial_reading(region.detector_mode),
             f"{prefix}region_min_x": partial_reading(region.min_x),
@@ -105,7 +102,6 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}region_size_y": partial_reading(region.size_y),
             f"{prefix}sensor_max_size_y": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
-            f"{prefix}cached_excitation_energy": partial_reading(0),
         },
     )
 
@@ -132,30 +128,6 @@ async def test_analyser_sets_region_and_read_is_correct(
             f"{prefix}total_intensity": partial_reading(expected_total_intensity),
         },
     )
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_analayser_binding_energy_is_correct(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    region: VGScientaRegion[LensMode, PassEnergy],
-    run_engine: RunEngine,
-) -> None:
-    run_engine(bps.mv(sim_driver, region), wait=True)
-    excitation_energy = 500
-    await sim_driver.cached_excitation_energy.set(excitation_energy)
-    # Check binding energy is correct
-    energy_axis = [1, 2, 3, 4, 5]
-    set_mock_value(sim_driver.energy_axis, np.array(energy_axis, dtype=float))
-
-    # Check binding energy is correct
-    is_region_binding = region.is_binding_energy()
-    is_driver_binding = await sim_driver.energy_mode.get_value() == EnergyMode.BINDING
-    # Catch that driver correctly reflects what region energy mode is.
-    assert is_region_binding == is_driver_binding
-    expected_binding_energy_axis = np.array(
-        [excitation_energy - e if is_driver_binding else e for e in energy_axis]
-    )
-    await assert_value(sim_driver.binding_energy_axis, expected_binding_energy_axis)
 
 
 def test_driver_throws_error_with_wrong_pass_energy(
