@@ -206,7 +206,7 @@ def test_missing_device_manager(connect, make, imp, runner: CliRunner):
 
 @patch.dict(os.environ, clear=True)
 @pytest.mark.parametrize(
-    "sim, timeout",
+    "mock, timeout",
     [
         (True, 5.0),  # default
         (False, 5.0),  # default
