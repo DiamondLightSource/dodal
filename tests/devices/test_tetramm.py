@@ -163,7 +163,7 @@ async def test_disarm_disarms_driver(
         )
     )
     assert (await tetramm.driver.acquire.get_value()) == 1
-    await tetramm._arm_logic.disarm()  # type: ignore
+    await tetramm._arm_logic.disarm(on_unstage=False)  # type: ignore
     assert (await tetramm.driver.acquire.get_value()) == 0
 
 
@@ -187,6 +187,14 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
                 livetime=VALID_TEST_EXPOSURE_TIME,
             )
         )
+
+
+async def test_validate_deadtime_raises_error_if_no_trigger_logic(
+    tetramm: TetrammDetector,
+):
+    tetramm._trigger_logic = None
+    with pytest.raises(RuntimeError):
+        tetramm._validate_deadtime(MagicMock())
 
 
 async def test_prepare_arms_tetramm(tetramm: TetrammDetector):
@@ -280,7 +288,7 @@ async def test_tetramm_controller(
 
     assert await tetramm.driver.acquire.get_value() is True
 
-    await tetramm._arm_logic.disarm()  # type: ignore
+    await tetramm._arm_logic.disarm(on_unstage=False)  # type: ignore
 
     assert await tetramm.driver.acquire.get_value() is False
 
@@ -330,5 +338,5 @@ async def test_tetramm_disarm_calls_stop_busy_recording(
     stop_busy_record_mock: MagicMock,
     tetramm: TetrammDetector,
 ):
-    await tetramm._arm_logic.disarm()  # type: ignore
+    await tetramm._arm_logic.disarm(on_unstage=False)  # type: ignore
     stop_busy_record_mock.assert_called_once()

@@ -25,6 +25,7 @@ from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.motors import XYZPhiStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -103,6 +104,11 @@ def panda(path_provider: PathProvider) -> HDFPanda:
 @devices.factory()
 def pinhole_and_collimator() -> PinholeCollimatorControl:
     return PinholeCollimatorControl(prefix=PREFIX.beamline_prefix)
+
+
+@devices.factory()
+def serial_stages() -> XYZPhiStage:
+    return XYZPhiStage(prefix=f"{PREFIX.beamline_prefix}-MO-SRL-01:")
 
 
 @devices.factory()

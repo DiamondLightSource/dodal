@@ -14,12 +14,15 @@ from ophyd_async.core import (
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.maths import rotate_clockwise, rotate_counter_clockwise
+from dodal.devices.wrapped_axis import WrappedAxis
 
 _X = "X"
 _Y = "Y"
 _Z = "Z"
 
+_THETA = "THETA"
 _OMEGA = "OMEGA"
+_PHI = "PHI"
 _POLAR = "POLAR"
 _AZIMUTH = "AZIMUTH"
 _TILT = "TILT"
@@ -83,6 +86,23 @@ class XYZStage(XYStage):
         super().__init__(prefix, name, x_infix, y_infix)
 
 
+class XYZPhiStage(XYZStage):
+    """Four-axis stage with a standard xyz stage and one axis of rotation: phi."""
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        phi_infix: str = _PHI,
+    ) -> None:
+        with self.add_children_as_readables():
+            self.phi = Motor(prefix + phi_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
 class XYZThetaStage(XYZStage):
     """Four-axis stage with a standard xyz stage and one axis of rotation: theta."""
 
@@ -93,7 +113,7 @@ class XYZThetaStage(XYZStage):
         x_infix: str = _X,
         y_infix: str = _Y,
         z_infix: str = _Z,
-        theta_infix: str = "THETA",
+        theta_infix: str = _THETA,
     ) -> None:
         with self.add_children_as_readables():
             self.theta = Motor(prefix + theta_infix)
@@ -114,7 +134,25 @@ class XYZOmegaStage(XYZStage):
     ) -> None:
         with self.add_children_as_readables():
             self.omega = Motor(prefix + omega_infix)
+
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
+class XYZWrappedOmegaStage(XYZOmegaStage):
+    """Four-axis stage with x, y, z linear axes and an omega axis with unrestricted rotation."""
+
+    def __init__(
+        self,
+        prefix: str = "",
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        omega_infix: str = _OMEGA,
+    ):
+        super().__init__(prefix, name, x_infix, y_infix, z_infix, omega_infix)
+        with self.add_children_as_readables():
+            self.wrapped_omega = WrappedAxis(self.omega)
 
 
 class XYZAzimuthStage(XYZStage):
@@ -205,11 +243,27 @@ class XYPhiStage(XYStage):
         prefix: str,
         x_infix: str = _X,
         y_infix: str = _Y,
-        phi_infix: str = "PHI",
+        phi_infix: str = _PHI,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
             self.phi = Motor(prefix + phi_infix)
+        super().__init__(prefix, name, x_infix, y_infix)
+
+
+class XYThetaStage(XYStage):
+    """Three-axis stage with a standard xy stage and one axis of rotation: theta."""
+
+    def __init__(
+        self,
+        prefix: str,
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        theta_infix: str = _THETA,
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.theta = Motor(prefix + theta_infix)
         super().__init__(prefix, name, x_infix, y_infix)
 
 
@@ -302,7 +356,7 @@ class SixAxisGonio(XYZOmegaStage):
         y_infix: str = _Y,
         z_infix: str = _Z,
         kappa_infix: str = "KAPPA",
-        phi_infix: str = "PHI",
+        phi_infix: str = _PHI,
         omega_infix: str = _OMEGA,
     ):
         with self.add_children_as_readables():
@@ -328,7 +382,7 @@ class SixAxisGonioKappaPhi(XYZStage):
         y_infix: str = _Y,
         z_infix: str = _Z,
         kappa_infix: str = "KAPPA",
-        phi_infix: str = "PHI",
+        phi_infix: str = _PHI,
     ):
         with self.add_children_as_readables():
             self.kappa = Motor(prefix + kappa_infix)

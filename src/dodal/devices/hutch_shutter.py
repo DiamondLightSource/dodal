@@ -8,7 +8,9 @@ from ophyd_async.core import (
     EnumTypes,
     SignalR,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_w
@@ -43,6 +45,13 @@ class ShutterState(StrictEnum):
     CLOSING = "Closing"
 
 
+class InterlockState(StrictEnum):
+    FAILED = "Failed"
+    RUN_ILKS_OK = "Run Ilks Ok"
+    OK = "OK"
+    DISARMED = "Disarmed"
+
+
 class BaseHutchInterlock(ABC, StandardReadable):
     status: SignalR[float | EnumTypes]
     bl_prefix: str
@@ -56,12 +65,19 @@ class BaseHutchInterlock(ABC, StandardReadable):
         name: str = "",
     ) -> None:
         pv_address = f"{bl_prefix}{interlock_infix}{interlock_suffix}"
+
         with self.add_children_as_readables():
             self.status = epics_signal_r(signal_type, pv_address)
+
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.is_safe = derived_signal_r(
+                self._safe_to_operate,
+                status=self.status,
+            )
         super().__init__(name)
 
     @abstractmethod
-    async def shutter_safe_to_operate(self) -> bool:
+    def _safe_to_operate(self, status: float | EnumTypes) -> bool:
         """Abstract method to define if interlock allows shutter to operate."""
 
 
@@ -83,16 +99,43 @@ class HutchInterlock(BaseHutchInterlock):
             name=name,
         )
 
-    # TODO replace with read
-    # See https://github.com/DiamondLightSource/dodal/issues/651
-    async def shutter_safe_to_operate(self) -> bool:
+    def _safe_to_operate(self, status: float | EnumTypes) -> bool:
         """If the status value is 0, hutch has been searched and locked and it is safe \
         to operate the shutter.
         If the status value is not 0 (usually set to 7), the hutch is open and the \
         shutter should not be in use.
         """
-        interlock_state = await self.status.get_value()
-        return isclose(float(interlock_state), HUTCH_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
+        return isclose(float(status), HUTCH_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
+
+
+class PLCShutterInterlock(BaseHutchInterlock):
+    """Device to check the interlock state of the shutter using PLC pv."""
+
+    def __init__(
+        self,
+        bl_prefix: str,
+        shtr_infix: str = "",
+        interlock_suffix: str = EXP_SHUTTER_1_INFIX,
+        name: str = "",
+    ) -> None:
+        super().__init__(
+            signal_type=InterlockState,
+            bl_prefix=bl_prefix,
+            interlock_infix=shtr_infix,
+            interlock_suffix=interlock_suffix,
+            name=name,
+        )
+
+    def _safe_to_operate(self, status: float | EnumTypes) -> bool:
+        """If the status value is OK or Run Ilk OK, shutter is open or safe to operate.
+
+        If the status value is "OK", valve or shutter is open and interlocks are OK to
+        operate. If the status value is "Run Ilks Ok", the opening action can be
+        started. If the status value is not OK ("Failed" or "Disarmed"), interlocks have
+        failed and the shutter cannot be operated. Disarmed status applies only to fast
+        shutters.
+        """
+        return (status == InterlockState.OK) | (status == InterlockState.RUN_ILKS_OK)
 
 
 class BaseHutchShutter(ABC, StandardReadable, Movable[ShutterDemand]):
@@ -207,7 +250,7 @@ class InterlockedHutchShutter(BaseHutchShutter):
         Raises:
              ShutterNotSafeToOperateError - whereby an unhappy interlock will veto any attempt to open the shutter.
         """
-        interlock_state = await self.interlock.shutter_safe_to_operate()
+        interlock_state = await self.interlock.is_safe.get_value()
         if not interlock_state:
             raise ShutterNotSafeToOperateError(
                 "The hutch has not been locked, not operating shutter."

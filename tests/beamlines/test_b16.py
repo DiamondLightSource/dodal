@@ -1,9 +1,14 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+from ophyd_async.core import SignalDict
 from ophyd_async.epics.adcore import ADWriterType
 
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
-from dodal.devices.beamlines.b16.detector import software_triggered_tiff_area_detector
+from dodal.devices.beamlines.b16.detector import (
+    TiffTriggerLogic,
+    software_triggered_tiff_area_detector,
+)
 
 
 def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
@@ -66,3 +71,29 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
 
         # The function should return the AreaDetector instance
         assert result is mock_area_detector_instance
+
+
+def test_tiff_trigger_logic_get_deadtime():
+    driver = MagicMock()
+    logic = TiffTriggerLogic(driver, deadtime=0.123)
+    result = logic.get_deadtime(SignalDict())
+    assert result == 0.123
+
+
+@pytest.mark.asyncio
+async def test_tiff_trigger_logic_prepare_internal_calls_prepare_exposures():
+    driver = MagicMock()
+    logic = TiffTriggerLogic(driver, deadtime=0.5)
+
+    with patch(
+        "dodal.devices.beamlines.b16.detector.prepare_exposures",
+        new_callable=AsyncMock,
+    ) as mock_prepare:
+        await logic.prepare_internal(num=5, livetime=1.0, deadtime=0.2)
+
+        mock_prepare.assert_awaited_once_with(
+            driver,
+            5,
+            1.0,
+            0.2,
+        )

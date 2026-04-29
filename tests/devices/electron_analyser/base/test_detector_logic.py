@@ -27,7 +27,7 @@ from dodal.devices.electron_analyser.base.detector_logic import (
 )
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
-from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
@@ -57,7 +57,7 @@ def driver(request: pytest.FixtureRequest) -> AbstractAnalyserDriverIO:
 
 
 @pytest.fixture(params=["shutter1", "dual_fast_shutter"])
-def shutter(request: pytest.FixtureRequest) -> FastShutter:
+def shutter(request: pytest.FixtureRequest) -> GenericFastShutter:
     return request.getfixturevalue(request.param)
 
 
@@ -70,9 +70,9 @@ def shutter(request: pytest.FixtureRequest) -> FastShutter:
 )
 async def test_shutter_arm_logic_opens_shutters(
     driver: AbstractAnalyserDriverIO,
-    shutter: FastShutter,
+    shutter: GenericFastShutter,
     close_shutter_idle: bool,
-    expected_shutter_calls: Callable[[FastShutter], list[Any]],
+    expected_shutter_calls: Callable[[GenericFastShutter], list[Any]],
 ):
     with init_devices(mock=True):
         close_shutter_idle_signal = soft_signal_rw(bool, close_shutter_idle)

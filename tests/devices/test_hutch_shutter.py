@@ -16,6 +16,8 @@ from dodal.devices.hutch_shutter import (
     HutchInterlock,
     HutchShutter,
     InterlockedHutchShutter,
+    InterlockState,
+    PLCShutterInterlock,
     ShutterDemand,
     ShutterNotSafeToOperateError,
     ShutterState,
@@ -26,6 +28,13 @@ from dodal.devices.hutch_shutter import (
 async def interlock() -> HutchInterlock:
     async with init_devices(mock=True):
         interlock = HutchInterlock(bl_prefix="TEST")
+    return interlock
+
+
+@pytest.fixture
+async def plc_interlock() -> PLCShutterInterlock:
+    async with init_devices(mock=True):
+        interlock = PLCShutterInterlock(bl_prefix="TEST")
     return interlock
 
 
@@ -52,6 +61,20 @@ async def fake_interlocked_shutter(
 
 
 @pytest.fixture
+async def fake_plc_interlocked_shutter(
+    plc_interlock: PLCShutterInterlock,
+) -> InterlockedHutchShutter:
+    async with init_devices(mock=True):
+        interlocked_shutter = InterlockedHutchShutter(
+            bl_prefix="TEST", interlock=plc_interlock
+        )
+
+    _apply_status_setter(interlocked_shutter)
+
+    return interlocked_shutter
+
+
+@pytest.fixture
 async def fake_shutter_without_interlock() -> HutchShutter:
     async with init_devices(mock=True):
         shutter = HutchShutter(bl_prefix="TEST")
@@ -70,11 +93,28 @@ def test_interlocked_shutter_can_be_created(
     assert isinstance(fake_interlocked_shutter, BaseHutchShutter)
 
 
+def test_plc_interlocked_shutter_can_be_created(
+    fake_plc_interlocked_shutter: InterlockedHutchShutter,
+):
+    assert isinstance(fake_plc_interlocked_shutter, BaseHutchShutter)
+
+
 async def test_interlock_is_readable(interlock: HutchInterlock):
     await assert_reading(
         interlock,
         {
+            f"{interlock.name}-is_safe": partial_reading(True),
             f"{interlock.name}-status": partial_reading(0.0),
+        },
+    )
+
+
+async def test_plc_interlock_is_readable(plc_interlock: PLCShutterInterlock):
+    await assert_reading(
+        plc_interlock,
+        {
+            f"{interlock.name}-is_safe": partial_reading(False),
+            f"{plc_interlock.name}-status": partial_reading(InterlockState.FAILED),
         },
     )
 
@@ -93,7 +133,25 @@ async def test_hutch_interlock_safe_to_operate_logic(
     expected_state: bool,
 ):
     set_mock_value(interlock.status, readback)
-    assert await interlock.shutter_safe_to_operate() is expected_state
+    assert await interlock.is_safe.get_value() is expected_state
+
+
+@pytest.mark.parametrize(
+    "readback, expected_state",
+    [
+        (InterlockState.OK, True),
+        (InterlockState.RUN_ILKS_OK, True),
+        (InterlockState.DISARMED, False),
+        (InterlockState.FAILED, False),
+    ],
+)
+async def test_plc_shutter_interlock_safe_to_operate_logic(
+    plc_interlock: PLCShutterInterlock,
+    readback: float,
+    expected_state: bool,
+):
+    set_mock_value(plc_interlock.status, readback)
+    assert await plc_interlock.is_safe.get_value() is expected_state
 
 
 async def test_shutter_readable(fake_shutter_without_interlock: HutchShutter):
@@ -113,6 +171,7 @@ async def test_interlocked_shutter_readable(
 ):
     result = {
         f"{fake_interlocked_shutter.name}-status": partial_reading(ShutterState.FAULT),
+        f"{fake_interlocked_shutter.interlock.name}-is_safe": partial_reading(True),
     }
     result[f"{fake_interlocked_shutter.interlock.name}-status"] = partial_reading(0.0)
     await assert_reading(
@@ -126,7 +185,7 @@ async def test_interlocked_shutter_raises_error_on_open_if_hutch_not_locked(
     interlock: HutchInterlock,
 ):
     set_mock_value(interlock.status, 1)  # hutch is unlocked
-    assert await interlock.shutter_safe_to_operate() is False
+    assert await interlock.is_safe.get_value() is False
 
     with pytest.raises(ShutterNotSafeToOperateError):
         await fake_interlocked_shutter.set(ShutterDemand.OPEN)
@@ -137,7 +196,7 @@ async def test_interlocked_shutter_does_not_error_on_close_even_if_hutch_not_loc
     interlock: HutchInterlock,
 ):
     set_mock_value(interlock.status, 1)  # hutch is unlocked
-    assert await interlock.shutter_safe_to_operate() is False
+    assert await interlock.is_safe.get_value() is False
 
     await fake_interlocked_shutter.set(ShutterDemand.CLOSE)
 
