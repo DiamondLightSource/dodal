@@ -213,7 +213,9 @@ def test_missing_device_manager(connect, make, imp, runner: CliRunner):
         (True, 3.0),
         (False, 3.0),
     ],
-    ids=lambda x: f"{x}" if isinstance(x, float) else ("sim" if x else "live"),
+    ids=lambda x: (
+        f"{x} second timeout" if isinstance(x, float) else ("sim" if x else "live")
+    ),
 )
 def test_device_manager_init(runner: CliRunner, mock: bool, timeout: float):
     with patch("dodal.cli.importlib") as mock_import:
