@@ -12,7 +12,6 @@ dodal.devices.beamlines
    dodal.devices.beamlines.b07
    dodal.devices.beamlines.b07_1
    dodal.devices.beamlines.b07_shared
-   dodal.devices.beamlines.b16
    dodal.devices.beamlines.b21
    dodal.devices.beamlines.i02_1
    dodal.devices.beamlines.i02_2

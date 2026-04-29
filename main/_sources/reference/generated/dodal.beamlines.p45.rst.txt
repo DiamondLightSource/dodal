@@ -20,6 +20,12 @@ dodal.beamlines.p45
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      path_provider
+   
    
 
    
