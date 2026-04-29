@@ -84,7 +84,7 @@ def describe(beamline: str, device_manager: str) -> None:
     "-t",
     "--timeout",
     is_flag=False,
-    help="Specify the timeout when connect devices. Default is 5 seconds.",
+    help="Specify the timeout when connecting devices. Default is 5 seconds.",
     default=5.0,
 )
 def connect(
