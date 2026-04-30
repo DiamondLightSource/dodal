@@ -104,7 +104,7 @@ def test_count_num_validation(det: StandardDetector, run_engine: RunEngine):
 @pytest.mark.parametrize(
     "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"]
 )
-def test_plan_produces_expected_start_document(
+def test_count_plan_produces_expected_start_document(
     documents_from_num: dict[str, list[Document]], shape: tuple[int, ...]
 ):
     docs = documents_from_num.get("start")
@@ -119,7 +119,7 @@ def test_plan_produces_expected_start_document(
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
-def test_plan_produces_expected_stop_document(
+def test_count_plan_produces_expected_stop_document(
     documents_from_num: dict[str, list[Document]], length: int
 ):
     docs = documents_from_num.get("stop")
@@ -130,7 +130,7 @@ def test_plan_produces_expected_stop_document(
 
 
 @pytest.mark.parametrize("documents_from_num", [1], indirect=True)
-def test_plan_produces_expected_descriptor(
+def test_count_plan_produces_expected_descriptor(
     documents_from_num: dict[str, list[Document]], det: StandardDetector
 ):
     docs = documents_from_num.get("descriptor")
@@ -144,7 +144,7 @@ def test_plan_produces_expected_descriptor(
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
-def test_plan_produces_expected_events(
+def test_count_plan_produces_expected_events(
     documents_from_num: dict[str, list[Document]],
     length: int,
     det: StandardDetector,
@@ -158,7 +158,7 @@ def test_plan_produces_expected_events(
 
 
 @pytest.mark.parametrize("documents_from_num", [1, 3], indirect=True)
-def test_plan_produces_expected_resources(
+def test_count_plan_produces_expected_resources(
     documents_from_num: dict[str, list[Document]],
     det: StandardDetector,
 ):
@@ -173,7 +173,7 @@ def test_plan_produces_expected_resources(
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
-def test_plan_produces_expected_datums(
+def test_count_plan_produces_expected_datums(
     documents_from_num: dict[str, list[Document]],
     length: int,
     det: StandardDetector,
