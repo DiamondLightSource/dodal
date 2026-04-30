@@ -182,6 +182,11 @@ def test_count_plan_produces_expected_datums(
     assert stream_datum and len(stream_datum) == len(data_keys) * length
 
 
+def test_count_with_no_detector(run_engine: RunEngine):
+    with pytest.raises(ValidationError):
+        run_engine(count([]))
+
+
 @pytest.mark.parametrize(
     "x_list, y_list, num, final_shape, final_length",
     (
