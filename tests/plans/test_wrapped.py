@@ -259,9 +259,7 @@ def test_num_scan_with_two_axes(
 
 
 def test_num_scan_fails_when_given_wrong_number_of_params(
-    run_engine: RunEngine,
-    det: StandardDetector,
-    x_axis: Motor,
+    run_engine: RunEngine, det: StandardDetector, x_axis: Motor
 ):
     with pytest.raises(ValueError):
         run_engine(num_scan(detectors=[det], params=[(x_axis, [-1, 1, 5])], num=5))
