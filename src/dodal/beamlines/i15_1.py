@@ -1,6 +1,13 @@
+from functools import cache
+from pathlib import Path
+
+from ophyd_async.core import PathProvider
+from ophyd_async.epics.adcore import ADWriterType, ContAcqDetector
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX
+from dodal.common.visit import StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
@@ -32,6 +39,15 @@ Define device factory functions below this point.
 A device factory function is any function that has a return type which conforms
 to one or more Bluesky Protocols.
 """
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticVisitPathProvider(
+        BL,
+        Path("/dls/i15-1/data/2026/cm44163-2/"),
+    )
 
 
 @devices.factory()
@@ -220,4 +236,64 @@ def hutch_shutter() -> InterlockedHutchShutter:
 def gonio_interlock() -> GonioInterlock:
     return GonioInterlock(
         bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-VA-OMRON-01:INT3:ILK"
+    )
+
+
+@devices.factory()
+def webcam_1(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-WEB-01:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def webcam_2(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-WEB-02:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def cam_1(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-CAM-01:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def cam_2(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-CAM-02:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def cam_3(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-CAM-03:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
     )
