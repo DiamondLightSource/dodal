@@ -2,7 +2,7 @@ from functools import cache
 from pathlib import Path
 
 from ophyd_async.core import PathProvider
-from ophyd_async.epics.adcore import ADJPEGWriter, ContAcqAreaDetector
+from ophyd_async.epics.adcore import ADWriterType, ContAcqDetector
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -212,7 +212,7 @@ def puck_detect() -> PuckDetect:
     return PuckDetect("https://i15-1-cam3-processing.diamond.ac.uk/result")
 
 
-@devices.factory()
+@devices.factory(skip=True)
 def attenuator() -> Attenuator:
     return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
 
@@ -240,60 +240,60 @@ def gonio_interlock() -> GonioInterlock:
 
 
 @devices.factory()
-def webcam_1(path_provider: PathProvider) -> ContAcqAreaDetector:
-    return ContAcqAreaDetector(
+def webcam_1(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-WEB-01:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_cls=ADJPEGWriter,
-        fileio_suffix="JPEG:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
     )
 
 
 @devices.factory()
-def webcam_2(path_provider: PathProvider) -> ContAcqAreaDetector:
-    return ContAcqAreaDetector(
+def webcam_2(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-WEB-02:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_cls=ADJPEGWriter,
-        fileio_suffix="JPEG:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
     )
 
 
 @devices.factory()
-def cam_1(path_provider: PathProvider) -> ContAcqAreaDetector:
-    return ContAcqAreaDetector(
+def cam_1(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_cls=ADJPEGWriter,
-        fileio_suffix="JPEG:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
     )
 
 
 @devices.factory()
-def cam_2(path_provider: PathProvider) -> ContAcqAreaDetector:
-    return ContAcqAreaDetector(
+def cam_2(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-02:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_cls=ADJPEGWriter,
-        fileio_suffix="JPEG:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
     )
 
 
 @devices.factory()
-def cam_3(path_provider: PathProvider) -> ContAcqAreaDetector:
-    return ContAcqAreaDetector(
+def cam_3(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-03:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_cls=ADJPEGWriter,
-        fileio_suffix="JPEG:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
     )
