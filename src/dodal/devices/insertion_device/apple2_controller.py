@@ -18,9 +18,7 @@ from dodal.devices.insertion_device.apple2_undulator import (
     PhaseAxesType,
     UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.energy_motor_lookup import (
-    EnergyMotorLookup,
-)
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
@@ -32,8 +30,8 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 
 
 class EnergyMotorConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> float:
-        """Protocol to provide energy to motor position conversion."""
+    def __call__(self, value: float, pol: Pol) -> float:
+        """Protocol to provide energy, motor position conversion."""
         ...
 
 
@@ -94,6 +92,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         apple2: Apple2Type,
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
+        inverse_gap_energy_motor_converter: EnergyMotorConvertor | None = None,
         maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
         maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
@@ -102,20 +101,12 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
+        self.inverse_gap_energy_motor_converter = inverse_gap_energy_motor_converter
 
         self.maximum_gap_motor_position = maximum_gap_motor_position
         self.maximum_phase_motor_position = maximum_phase_motor_position
         # Store the set energy for readback.
-        self._energy, self._energy_set = soft_signal_r_and_setter(
-            float, initial_value=None, units=units
-        )
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.energy = derived_signal_rw(
-                raw_to_derived=self._read_energy,
-                set_derived=self._set_energy,
-                energy=self._energy,
-                derived_units=units,
-            )
+        self._energy = soft_signal_rw(float, initial_value=None, units=units)
 
         # Store the polarisation for setpoint. And provide readback for LH3.
         # LH3 is a special case as it is indistinguishable from LH in the hardware.
@@ -144,6 +135,16 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 btm_outer=btm_outer,
                 gap=self.apple2().gap().user_readback,
             )
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.energy = derived_signal_rw(
+                raw_to_derived=self._read_energy,
+                set_derived=self._set_energy,
+                energy=self._energy,
+                pol=self.polarisation,
+                gap=self.apple2().gap().user_readback,
+                derived_units=units,
+            )
+
         super().__init__(name)
 
     @abc.abstractmethod
@@ -157,8 +158,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self, energy: float, pol: Pol
     ) -> None:
         """Set the undulator motors for a given energy and polarisation."""
-        gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
-        phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        gap = self.gap_energy_motor_converter(value=energy, pol=pol)
+        phase = self.phase_energy_motor_converter(value=energy, pol=pol)
         apple2_val = self._get_apple2_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
         await self.apple2().set(id_motor_values=apple2_val)
@@ -166,10 +167,12 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()
         await self._set_motors_from_energy_and_polarisation(energy, pol)
-        self._energy_set(energy)
+        await self._energy.set(energy)
 
-    def _read_energy(self, energy: float) -> float:
-        """Readback for energy is just the set value."""
+    def _read_energy(self, energy: float, pol: Pol, gap: float) -> float:
+        """Readback for energy is just the set value if there is no inverse converter."""
+        if self.inverse_gap_energy_motor_converter is not None:
+            energy = self.inverse_gap_energy_motor_converter(value=gap, pol=pol)
         return energy
 
     async def _check_and_get_pol_setpoint(self) -> Pol:
@@ -197,7 +200,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
         self._polarisation_setpoint_set(value)
-        await self.energy.set(await self.energy.get_value(), timeout=MAXIMUM_MOVE_TIME)
+        await self.energy.set(await self._energy.get_value(), timeout=MAXIMUM_MOVE_TIME)
 
     def _read_pol(
         self,
@@ -247,57 +250,38 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
             )
 
-        if all(
-            isclose(x, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            for x in [top_outer, top_inner, btm_inner, btm_outer]
-        ):
+        tol = ROW_PHASE_MOTOR_TOLERANCE
+        max_p = self.maximum_phase_motor_position
+
+        zero = {
+            "to": isclose(top_outer, 0.0, abs_tol=tol),
+            "ti": isclose(top_inner, 0.0, abs_tol=tol),
+            "bi": isclose(btm_inner, 0.0, abs_tol=tol),
+            "bo": isclose(btm_outer, 0.0, abs_tol=tol),
+        }
+
+        if all(zero.values()):
             LOGGER.info("Determined polarisation: LH (Linear Horizontal).")
             return Pol.LH, 0.0
         if (
-            isclose(
-                top_outer,
-                btm_inner,
-                abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
-            )
-            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(
-                abs(btm_inner),
-                self.maximum_phase_motor_position,
-                abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
-            )
+            isclose(top_outer, btm_inner, abs_tol=tol)
+            and isclose(abs(top_outer), max_p, abs_tol=tol)
+            and zero["ti"]
+            and zero["bo"]
         ):
             LOGGER.info("Determined polarisation: LV (Linear Vertical).")
-            return Pol.LV, self.maximum_phase_motor_position
-        if (
-            isclose(top_outer, btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and top_outer > 0.0
-            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-        ):
-            LOGGER.info("Determined polarisation: PC (Positive Circular).")
-            return Pol.PC, top_outer
-        if (
-            isclose(top_outer, btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and top_outer < 0.0
-            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-        ):
-            LOGGER.info("Determined polarisation: NC (Negative Circular).")
-            return Pol.NC, top_outer
-        if (
-            isclose(top_outer, -btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-        ):
-            LOGGER.info("Determined polarisation: LA (Positive Linear Arbitrary).")
+            return Pol.LV, max_p
+        if isclose(top_outer, btm_inner, abs_tol=tol) and zero["ti"] and zero["bo"]:
+            pol = Pol.PC if top_outer > 0 else Pol.NC
+            LOGGER.info(f"Determined polarisation: {pol}.")
+            return pol, top_outer
+
+        if isclose(top_outer, -btm_inner, abs_tol=tol) and zero["ti"] and zero["bo"]:
+            LOGGER.info("Determined polarisation: LA.")
             return Pol.LA, top_outer
-        if (
-            isclose(top_inner, -btm_outer, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(top_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(btm_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-        ):
-            LOGGER.info("Determined polarisation: LA (Negative Linear Arbitrary).")
+
+        if isclose(top_inner, -btm_outer, abs_tol=tol) and zero["to"] and zero["bi"]:
+            LOGGER.info("Determined polarisation: LA.")
             return Pol.LA, top_inner
 
         LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
@@ -322,8 +306,8 @@ class Apple2EnforceLHMoveController(
         units: str = "eV",
         name: str = "",
     ) -> None:
-        self.gap_energy_motor_lu = gap_energy_motor_lut
-        self.phase_energy_motor_lu = phase_energy_motor_lut
+        self.gap_energy_motor_lut = gap_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
@@ -360,7 +344,7 @@ class Apple2EnforceLHMoveController(
             if (value is not Pol.LH) and (current_pol is not Pol.LH):
                 self._polarisation_setpoint_set(Pol.LH)
                 max_lh_energy = float(
-                    self.gap_energy_motor_lu.lut.root[Pol("lh")].max_energy
+                    self.gap_energy_motor_lut.lut.root[Pol.LH].max_energy
                 )
                 lh_setpoint = (
                     max_lh_energy if target_energy > max_lh_energy else target_energy

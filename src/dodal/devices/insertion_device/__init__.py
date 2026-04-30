@@ -1,5 +1,7 @@
 from .apple2_controller import (
+    MAXIMUM_GAP_MOTOR_POSITION,
     MAXIMUM_MOVE_TIME,
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     Apple2Controller,
     Apple2EnforceLHMoveController,
     Apple2Type,
@@ -26,10 +28,13 @@ from .energy import BeamEnergy, InsertionDeviceEnergy, InsertionDeviceEnergyBase
 from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
+    EpicsPolynomialEnergyMotorLookup,
+    StaticPolynomialEnergyMotorLookup,
 )
 from .enum import Pol, UndulatorGateStatus
 from .lookup_table_models import (
     EnergyCoverage,
+    EnergyCoverageEntry,
     LookupTable,
     LookupTableColumnConfig,
     convert_csv_to_lookup,
@@ -64,7 +69,12 @@ __all__ = [
     "Apple2LockedPhasesVal",
     "EnergyMotorLookup",
     "ConfigServerEnergyMotorLookup",
+    "EpicsPolynomialEnergyMotorLookup",
     "EnergyMotorConvertor",
     "UnstoppableMotor",
     "InsertionDeviceEnergyBase",
+    "EnergyCoverageEntry",
+    "MAXIMUM_ROW_PHASE_MOTOR_POSITION",
+    "MAXIMUM_GAP_MOTOR_POSITION",
+    "StaticPolynomialEnergyMotorLookup",
 ]
