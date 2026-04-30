@@ -10,16 +10,11 @@ from .base_detector import (
     GenericElectronAnalyserDetector,
     GenericElectronAnalyserRegionDetector,
 )
-from .base_driver_io import (
-    AbstractAnalyserDriverIO,
-    GenericAnalyserDriverIO,
-    TAbstractAnalyserDriverIO,
-)
+from .base_driver_io import AbstractAnalyserDriverIO, TAbstractAnalyserDriverIO
 from .base_enums import EnergyMode
 from .base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
-    GenericRegion,
     GenericSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
@@ -39,12 +34,10 @@ __all__ = [
     "GenericElectronAnalyserDetector",
     "GenericElectronAnalyserRegionDetector",
     "AbstractAnalyserDriverIO",
-    "GenericAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
     "EnergyMode",
     "AbstractBaseRegion",
     "AbstractBaseSequence",
-    "GenericRegion",
     "GenericSequence",
     "TAbstractBaseRegion",
     "TAbstractBaseSequence",
