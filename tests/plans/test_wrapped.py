@@ -219,7 +219,6 @@ def test_num_scan_with_one_axis(
     num: int,
 ):
     run_engine(num_scan(detectors=[det], params=[(x_axis, x_list)], num=num))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -251,7 +250,6 @@ def test_num_scan_with_two_axes(
             num=num,
         )
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -313,7 +311,6 @@ def test_num_grid_scan(
             params=[(x_axis, x_list), (y_axis, y_list)],
         )
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -346,7 +343,6 @@ def test_num_grid_scan_when_not_snaking(
             snake_axes=False,
         )
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -403,7 +399,6 @@ def test_num_rscan(
     num: int,
 ):
     run_engine(num_rscan(detectors=[det], params=[(x_axis, x_list)], num=num))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -431,7 +426,6 @@ def test_num_rscan_with_two_axes(
     run_engine(
         num_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)], num=num)
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -485,7 +479,6 @@ def test_num_grid_rscan(
             params=[(x_axis, x_list), (y_axis, y_list)],
         )
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -518,7 +511,6 @@ def test_num_grid_rscan_when_not_snaking(
             snake_axes=False,
         )
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -592,7 +584,6 @@ def test_list_scan(
     num = int(len(x_list))
 
     run_engine(list_scan(detectors=[det], params=[(x_axis, x_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -623,7 +614,6 @@ def test_list_scan_with_two_axes(
     num = int(len(x_list))
 
     run_engine(list_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -671,7 +661,6 @@ def test_list_grid_scan(
     run_engine(
         list_grid_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -694,7 +683,6 @@ def test_list_rscan(
     num = int(len(x_list))
 
     run_engine(list_rscan(detectors=[det], params=[(x_axis, x_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -725,7 +713,6 @@ def test_list_rscan_with_two_axes(
     num = int(len(x_list))
 
     run_engine(list_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -773,7 +760,6 @@ def test_list_grid_rscan(
     run_engine(
         list_grid_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -905,7 +891,6 @@ def test_step_scan(
     num,
 ):
     run_engine(step_scan(detectors=[det], params=[(x_axis, x_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -936,7 +921,6 @@ def test_step_scan_with_multiple_axes(
     num,
 ):
     run_engine(step_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -969,7 +953,6 @@ def test_step_grid_scan(
     run_engine(
         step_grid_scan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -1005,7 +988,6 @@ def test_step_grid_scan_when_not_snaking(
             snake_axes=False,
         )
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -1046,7 +1028,6 @@ def test_step_rscan(
     num,
 ):
     run_engine(step_rscan(detectors=[det], params=[(x_axis, x_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -1077,7 +1058,6 @@ def test_step_rscan_with_multiple_axes(
     num,
 ):
     run_engine(step_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)]))
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -1110,7 +1090,6 @@ def test_step_grid_rscan(
     run_engine(
         step_grid_rscan(detectors=[det], params=[(x_axis, x_list), (y_axis, y_list)])
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -1146,7 +1125,6 @@ def test_step_grid_rscan_when_not_snaking(
             snake_axes=False,
         )
     )
-
     assert_emitted(
         run_engine_documents,
         start=1,
