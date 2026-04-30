@@ -23,8 +23,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.enums import EnabledDisabledUpper
-from dodal.devices.insertion_device.enum import UndulatorGateStatus
+from dodal.common.enums import EnabledDisabledUpper, OpenClosed
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -71,7 +70,7 @@ class UndulatorBase(abc.ABC, Device, Generic[T]):
 
     def __init__(self, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
-        self.gate: SignalR[UndulatorGateStatus]
+        self.gate: SignalR[OpenClosed]
         self.status: SignalR[EnabledDisabledUpper]
         super().__init__(name=name)
 
@@ -86,7 +85,7 @@ class UndulatorBase(abc.ABC, Device, Generic[T]):
     async def raise_if_cannot_move(self) -> None:
         if await self.status.get_value() is EnabledDisabledUpper.DISABLED:
             raise RuntimeError(f"{self.name} is DISABLED and cannot move.")
-        if await self.gate.get_value() is UndulatorGateStatus.OPEN:
+        if await self.gate.get_value() is OpenClosed.OPEN:
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
@@ -97,7 +96,7 @@ class SafeUndulatorMover(StandardReadable, UndulatorBase, Generic[T]):
 
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
-        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+        self.gate = epics_signal_r(OpenClosed, prefix + "BLGATE")
         self.status = epics_signal_r(EnabledDisabledUpper, prefix + "IDBLENA")
         self.set_move = set_move
         super().__init__(name)
@@ -110,7 +109,7 @@ class SafeUndulatorMover(StandardReadable, UndulatorBase, Generic[T]):
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+        await wait_for_value(self.gate, OpenClosed.CLOSED, timeout=timeout)
 
 
 class UnstoppableMotor(Motor):
@@ -129,7 +128,7 @@ class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):
 
     def __init__(self, set_move: SignalW[int], prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
-        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+        self.gate = epics_signal_r(OpenClosed, prefix + "BLGATE")
         self.status = epics_signal_r(EnabledDisabledUpper, prefix + "IDBLENA")
         self.set_move = set_move
         super().__init__(prefix=prefix + "BLGAPMTR", name=name)
@@ -153,7 +152,7 @@ class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):
 
         await self.set_move.set(value=1, timeout=timeout)
         move_status = AsyncStatus(
-            wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+            wait_for_value(self.gate, OpenClosed.CLOSED, timeout=timeout)
         )
 
         async for current_position in observe_value(
@@ -402,6 +401,4 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             self.phase().set_move.set(value=1, timeout=timeout),
         )
 
-        await wait_for_value(
-            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
-        )
+        await wait_for_value(self.gap().gate, OpenClosed.CLOSED, timeout=timeout)

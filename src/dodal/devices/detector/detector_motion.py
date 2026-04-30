@@ -1,13 +1,8 @@
-from ophyd_async.core import StrictEnum
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.enums import OpenClosed
 from dodal.devices.motors import XYZStage
-
-
-class ShutterState(StrictEnum):
-    CLOSED = "Closed"
-    OPEN = "Open"
 
 
 class DetectorMotion(XYZStage):
@@ -16,9 +11,7 @@ class DetectorMotion(XYZStage):
         self.downstream_x = Motor(f"{device_prefix}DOWNSTREAMX")
         self.yaw = Motor(f"{device_prefix}YAW")
 
-        self.shutter = epics_signal_rw(
-            ShutterState, f"{device_prefix}SET_SHUTTER_STATE"
-        )
+        self.shutter = epics_signal_rw(OpenClosed, f"{device_prefix}SET_SHUTTER_STATE")
         self.shutter_closed_lim = epics_signal_r(
             float, f"{device_prefix}CLOSE_LIMIT"
         )  # on limit = 1, off = 0

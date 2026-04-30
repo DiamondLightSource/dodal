@@ -1,5 +1,11 @@
 from ophyd_async.core import StrictEnum
 
+
+class OpenClosed(StrictEnum):
+    OPEN = "Open"
+    CLOSED = "Closed"
+
+
 # Any capitalised enums needs to be removed and replaced with ones from ophyd-async.core
 # https://github.com/DiamondLightSource/dodal/issues/1416
 

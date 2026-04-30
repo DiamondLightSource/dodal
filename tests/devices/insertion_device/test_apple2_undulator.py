@@ -19,6 +19,7 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
+from dodal.common.enums import OpenClosed
 from dodal.devices.insertion_device import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2,
@@ -30,7 +31,6 @@ from dodal.devices.insertion_device import (
     EnergyMotorConvertor,
     Pol,
     UndulatorGap,
-    UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,
@@ -60,14 +60,14 @@ async def test_in_motion_error(
     mock_phase_axes: UndulatorPhaseAxes,
     mock_jaw_phase: UndulatorJawPhase,
 ):
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN)
+    set_mock_value(mock_id_gap.gate, OpenClosed.OPEN)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN)
+    set_mock_value(mock_phase_axes.gate, OpenClosed.OPEN)
     set_value = Apple2PhasesVal(3, 2, 5, 7)
     with pytest.raises(RuntimeError):
         await mock_phase_axes.set(set_value)
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
+    set_mock_value(mock_jaw_phase.gate, OpenClosed.OPEN)
     with pytest.raises(RuntimeError):
         await mock_jaw_phase.set(2)
 
@@ -99,7 +99,7 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
 ):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, OpenClosed.OPEN),
     )
     mock_id_gap.get_timeout = AsyncMock(return_value=0.002)
 
@@ -120,7 +120,7 @@ async def test_gap_success_scan(
 ):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, OpenClosed.OPEN),
     )
     output = range(0, 11, 1)
 
@@ -131,7 +131,7 @@ async def test_gap_success_scan(
 
     def set_complete_move():
         set_mock_value(mock_id_gap.user_readback, next(pos))
-        set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
+        set_mock_value(mock_id_gap.gate, OpenClosed.CLOSED)
 
     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
 
@@ -148,7 +148,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
 
     callback_on_mock_put(
         mock_phase_axes.top_outer.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN),
+        lambda *_, **__: set_mock_value(mock_phase_axes.gate, OpenClosed.OPEN),
     )
     mock_phase_axes.get_timeout = AsyncMock(return_value=0.002)
     with pytest.raises(TimeoutError):
@@ -259,7 +259,7 @@ async def test_phase_success_set(
     set_value = Apple2PhasesVal(top_inner=3, top_outer=2, btm_inner=5, btm_outer=7)
     callback_on_mock_put(
         mock_phase_axes.top_inner.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN),
+        lambda *_, **__: set_mock_value(mock_phase_axes.gate, OpenClosed.OPEN),
     )
 
     def set_complete_move():
@@ -279,7 +279,7 @@ async def test_phase_success_set(
             mock_phase_axes.btm_outer.user_readback,
             7,
         )
-        set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+        set_mock_value(mock_phase_axes.gate, OpenClosed.CLOSED)
 
     callback_on_mock_put(mock_phase_axes.set_move, lambda *_, **__: set_complete_move())
     run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
@@ -313,7 +313,7 @@ async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
 ):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
+        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, OpenClosed.OPEN),
     )
     mock_jaw_phase.get_timeout = AsyncMock(return_value=0.002)
     with pytest.raises(TimeoutError):
@@ -358,7 +358,7 @@ async def test_jaw_phase_success_scan(
 ):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
+        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, OpenClosed.OPEN),
     )
     output = range(0, 11, 1)
 
@@ -369,7 +369,7 @@ async def test_jaw_phase_success_scan(
 
     def set_complete_move():
         set_mock_value(mock_jaw_phase.jaw_phase.user_readback, next(pos))
-        set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
+        set_mock_value(mock_jaw_phase.gate, OpenClosed.CLOSED)
 
     callback_on_mock_put(mock_jaw_phase.set_move, lambda *_, **__: set_complete_move())
 
