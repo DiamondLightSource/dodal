@@ -212,7 +212,7 @@ def puck_detect() -> PuckDetect:
     return PuckDetect("https://i15-1-cam3-processing.diamond.ac.uk/result")
 
 
-@devices.factory(skip=True)
+@devices.factory()
 def attenuator() -> Attenuator:
     return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
 
