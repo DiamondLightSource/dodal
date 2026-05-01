@@ -33,6 +33,7 @@ dodal.beamlines.i23
 
    .. autosummary::
    
+      config_client
       path_provider
    
    
