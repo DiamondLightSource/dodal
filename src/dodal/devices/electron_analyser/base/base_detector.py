@@ -19,7 +19,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 )
 from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
-    TAbstractBaseRegion,
+    TBaseRegion,
 )
 
 
@@ -28,7 +28,7 @@ class BaseElectronAnalyserDetector(
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Detector for data acquisition of electron analyser. Can only acquire using
     settings already configured for the device.
@@ -40,16 +40,14 @@ class BaseElectronAnalyserDetector(
 
     def __init__(
         self,
-        controller: ElectronAnalyserController[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ],
+        controller: ElectronAnalyserController[TAbstractAnalyserDriverIO, TBaseRegion],
         name: str = "",
     ):
         self._controller = controller
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, region: TAbstractBaseRegion) -> None:
+    async def set(self, region: TBaseRegion) -> None:
         await self._controller.setup_with_region(region)
 
     @AsyncStatus.wrap
@@ -83,8 +81,8 @@ GenericBaseElectronAnalyserDetector = BaseElectronAnalyserDetector[
 
 
 class ElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Extends electron analyser detector to configure specific region settings before
     data acquisition. It is designed to only exist inside a plan.
@@ -92,10 +90,8 @@ class ElectronAnalyserRegionDetector(
 
     def __init__(
         self,
-        controller: ElectronAnalyserController[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ],
-        region: TAbstractBaseRegion,
+        controller: ElectronAnalyserController[TAbstractAnalyserDriverIO, TBaseRegion],
+        region: TBaseRegion,
         name: str = "",
     ):
         self.region = region
@@ -121,9 +117,9 @@ TElectronAnalyserRegionDetector = TypeVar(
 
 
 class ElectronAnalyserDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TBaseRegion],
     Stageable,
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Electron analyser detector with the additional functionality to load a sequence
     file and create a list of temporary ElectronAnalyserRegionDetector objects. These
@@ -150,10 +146,8 @@ class ElectronAnalyserDetector(
         await self._controller.disarm()
 
     def create_region_detector_list(
-        self, regions: list[TAbstractBaseRegion]
-    ) -> list[
-        ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
-    ]:
+        self, regions: list[TBaseRegion]
+    ) -> list[ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TBaseRegion]]:
         """This method can hopefully be dropped when this is merged and released.
         https://github.com/bluesky/bluesky/pull/1978.
 
@@ -168,9 +162,9 @@ class ElectronAnalyserDetector(
             the sequence file.
         """
         return [
-            ElectronAnalyserRegionDetector[
-                TAbstractAnalyserDriverIO, TAbstractBaseRegion
-            ](self._controller, r, self.name + "_" + r.name)
+            ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TBaseRegion](
+                self._controller, r, self.name + "_" + r.name
+            )
             for r in regions
         ]
 

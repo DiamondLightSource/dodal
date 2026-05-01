@@ -33,7 +33,6 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region",
             "enabled": True,
-            "id": "_aQOmgPsmEe6w2YUF3bV-LA",
             "lens_mode": LensMode.ANGULAR56,
             "pass_energy": PassEnergy.E5,
             "slices": 1,
@@ -57,7 +56,6 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region1",
             "enabled": False,
-            "id": "_aQOmgPsmEe6w2YUF3GV-LL",
             "lens_mode": LensMode.ANGULAR45,
             "pass_energy": PassEnergy.E10,
             "slices": 10,
@@ -81,7 +79,6 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region2",
             "enabled": True,
-            "id": "_NAVc8ExAEfCC6ZXV-LTq8A",
             "lens_mode": LensMode.ANGULAR45VUV,
             "pass_energy": PassEnergy.E20,
             "slices": 5,
@@ -105,7 +102,7 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_sequence_get_expected_enabled_region_names(
+def test_load_sequence_using_alias_field_names_has_expected_enabled_region_names(
     sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     expected_enabled_region_names: list[str],
 ) -> None:
@@ -114,10 +111,17 @@ def test_sequence_get_expected_enabled_region_names(
         assert region.name == expected_enabled_region_names[i]
 
 
-def test_file_loads_into_class_with_expected_values(
+def test_load_sequence_using_alias_field_names_has_expected_values(
     sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
-    assert len(sequence.regions) == len(expected_region_values)
-    for i, r in enumerate(sequence.regions):
-        assert_region_has_expected_values(r, expected_region_values[i])
+    for i, r in zip(sequence.regions, expected_region_values, strict=True):
+        assert_region_has_expected_values(i, r)
+
+
+def test_region_loads_using_field_names_has_expected_values(
+    expected_region_values: list[dict[str, Any]],
+) -> None:
+    for expected_region in expected_region_values:
+        r = VGScientaRegion[LensMode, PassEnergy].model_validate(expected_region)
+        assert_region_has_expected_values(r, expected_region)

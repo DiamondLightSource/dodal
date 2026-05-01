@@ -5,7 +5,7 @@ from ophyd_async.core import TriggerInfo, get_mock_put
 
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
-    AbstractBaseRegion,
+    BaseRegion,
     ElectronAnalyserController,
     GenericElectronAnalyserController,
     GenericElectronAnalyserDetector,
@@ -31,7 +31,7 @@ def analyser_controller(
 
 async def test_controller_prepare_sets_excitation_energy(
     analyser_controller: ElectronAnalyserController[
-        AbstractAnalyserDriverIO, AbstractBaseRegion
+        AbstractAnalyserDriverIO, BaseRegion
     ],
 ) -> None:
     excitation_energy = await analyser_controller.energy_source.energy.get_value()
@@ -44,18 +44,18 @@ async def test_controller_prepare_sets_excitation_energy(
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_controller_setup_with_region_sets_region_for_epics_and_sets_driver(
     analyser_controller: ElectronAnalyserController[
-        AbstractAnalyserDriverIO, AbstractBaseRegion
+        AbstractAnalyserDriverIO, BaseRegion
     ],
-    region: AbstractBaseRegion,
+    region: BaseRegion,
 ) -> None:
     sim_driver = analyser_controller.driver
     sim_driver.set = AsyncMock()
 
     # Patch switch_energy_mode so we can check on calls, but still run the real function
     with patch.object(
-        AbstractBaseRegion,
+        BaseRegion,
         "prepare_for_epics",
-        side_effect=AbstractBaseRegion.prepare_for_epics,  # run the real method
+        side_effect=BaseRegion.prepare_for_epics,  # run the real method
         autospec=True,
     ) as mock_prepare_for_epics:
         await analyser_controller.setup_with_region(region)
@@ -80,9 +80,9 @@ async def test_controller_setup_with_region_sets_region_for_epics_and_sets_drive
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_controller_setup_with_region_moves_selected_source_if_not_none(
     analyser_controller: ElectronAnalyserController[
-        AbstractAnalyserDriverIO, AbstractBaseRegion
+        AbstractAnalyserDriverIO, BaseRegion
     ],
-    region: AbstractBaseRegion,
+    region: BaseRegion,
 ) -> None:
     source_selector = analyser_controller.source_selector
 
@@ -96,9 +96,9 @@ async def test_controller_setup_with_region_moves_selected_source_if_not_none(
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_controller_setup_with_region_moves_shutter_if_not_none(
     analyser_controller: ElectronAnalyserController[
-        AbstractAnalyserDriverIO, AbstractBaseRegion
+        AbstractAnalyserDriverIO, BaseRegion
     ],
-    region: AbstractBaseRegion,
+    region: BaseRegion,
 ) -> None:
     shutter = analyser_controller.shutter
     if shutter is not None:
@@ -110,7 +110,7 @@ async def test_controller_setup_with_region_moves_shutter_if_not_none(
 
 async def test_controller_prepare_moves_shutters_if_not_none(
     analyser_controller: ElectronAnalyserController[
-        AbstractAnalyserDriverIO, AbstractBaseRegion
+        AbstractAnalyserDriverIO, BaseRegion
     ],
 ) -> None:
     shutter = analyser_controller.shutter
