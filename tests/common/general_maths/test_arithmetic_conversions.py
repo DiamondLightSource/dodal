@@ -1,5 +1,6 @@
 import pytest
-from dodal.common.arithmetic_conversions import (
+
+from dodal.common.general_maths.arithmetic_conversions import (
     convert_cm_to_mm,
     convert_ev_to_kev,
     convert_factor_to_percentage,
