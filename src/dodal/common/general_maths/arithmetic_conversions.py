@@ -20,14 +20,14 @@ def convert_microns_to_cm(t_um):
 
 
 def convert_microns_to_mm(v_um):
-    v_um = v_um * 1000
+    v_um = v_um / 1000
     return v_um
 
     # Takes the numerical part of a distance in microns and converts this to mm
 
 
 def convert_mm_to_microns(w_mm):
-    w_mm = w_mm / 1000
+    w_mm = w_mm * 1000
     return w_mm
 
     # Takes the numerical part of a distance in mm and converts this to microns
