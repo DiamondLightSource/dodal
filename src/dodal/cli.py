@@ -1,17 +1,15 @@
 import importlib
 import os
 from collections.abc import Mapping
-from pathlib import Path
 
 import click
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import NotConnectedError, StaticPathProvider, UUIDFilenameProvider
-from ophyd_async.plan_stubs import ensure_connected
+from click.exceptions import ClickException
+from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
-from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.device_manager import DeviceManager
-from dodal.utils import AnyDevice, filter_ophyd_devices, make_all_devices
+from dodal.utils import AnyDevice
 
 from . import __version__
 
@@ -103,7 +101,7 @@ def connect(
 
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
-    run_engine = RunEngine(call_returns_result=True)
+    _run_engine = RunEngine(call_returns_result=True)
 
     print(f"Attempting connection to {beamline} (using {full_module_path})")
 
@@ -121,15 +119,9 @@ def connect(
             timeout=timeout,
         )
     else:
-        print(f"No device manager named '{device_manager}' found in {mod}")
-        _spoof_path_provider()
-        devices, instance_exceptions = make_all_devices(
-            full_module_path,
-            include_skipped=all,
-            fake_with_ophyd_sim=sim_backend,
-            wait_for_connection=False,
+        raise ClickException(
+            f"No device manager named '{device_manager}' found in {mod}"
         )
-        devices, connect_exceptions = _connect_devices(run_engine, devices, sim_backend)
 
     # Inform user of successful connections
     _report_successful_devices(devices, sim_backend)
@@ -151,35 +143,3 @@ def _report_successful_devices(
 
     print(f"{len(devices)} devices connected{sim_statement}:")
     print(connected_devices)
-
-
-def _connect_devices(
-    run_engine: RunEngine,
-    devices: Mapping[str, AnyDevice],
-    sim_backend: bool,
-) -> tuple[Mapping[str, AnyDevice], Mapping[str, Exception]]:
-    ophyd_devices, ophyd_async_devices = filter_ophyd_devices(devices)
-    exceptions = {}
-
-    # Connect ophyd devices
-    for name, device in ophyd_devices.items():
-        try:
-            device.wait_for_connection()
-        except Exception as ex:
-            exceptions[name] = ex
-
-    # Connect ophyd-async devices
-    try:
-        run_engine(ensure_connected(*ophyd_async_devices.values(), mock=sim_backend))
-    except NotConnectedError as ex:
-        exceptions = {**exceptions, **ex.sub_errors}
-
-    # Only return the subset of devices that haven't raised an exception
-    successful_devices = {
-        name: device for name, device in devices.items() if name not in exceptions
-    }
-    return successful_devices, exceptions
-
-
-def _spoof_path_provider() -> None:
-    set_path_provider(StaticPathProvider(UUIDFilenameProvider(), Path("/tmp")))
