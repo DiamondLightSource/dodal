@@ -5,6 +5,7 @@ import pytest
 from dodal.common.general_maths.check_bounds import is_within_range
 
 
+# Happy Path
 @pytest.mark.parametrize(
     "lower_bound,upper_bound,tested_value,result",
     [
@@ -37,6 +38,7 @@ def test_is_outside_range(
     assert is_within_range(lower_bound, upper_bound, tested_value) == result
 
 
+# Inauspicious Path
 def test_has_misordered_inputs():
     with pytest.raises(ValueError):
         is_within_range(4, -4, 1)

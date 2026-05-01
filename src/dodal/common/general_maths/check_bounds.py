@@ -20,7 +20,3 @@ def is_within_range(lower_bound: float, upper_bound: float, tested_value: float)
             upper_bound,
             tested_value,
         )
-
-
-# Ensures each argument is a real number and checks last argument is within the range
-# #(inclusive of bound values)
