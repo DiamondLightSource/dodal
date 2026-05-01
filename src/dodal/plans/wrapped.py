@@ -1,8 +1,11 @@
 from collections.abc import Sequence
+from decimal import Decimal
 from typing import Annotated, Any
 
 import bluesky.plans as bp
-from bluesky.protocols import Readable
+import numpy as np
+from bluesky.protocols import Movable, Readable
+from ophyd_async.core import AsyncReadable
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
@@ -27,7 +30,7 @@ We may also need other adjustments for UI purposes, e.g.
 @validate_call(config={"arbitrary_types_allowed": True})
 def count(
     detectors: Annotated[
-        set[Readable],
+        Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -46,6 +49,7 @@ def count(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Reads from a number of devices.
+
     Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable
     parameters and metadata.
     """
@@ -56,3 +60,518 @@ def count(
     metadata = metadata or {}
     metadata["shape"] = (num,)
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)
+
+
+def _make_num_scan_args(
+    params: list[tuple[Movable, list[float | int]]], num: int | None = None
+):
+    shape = []
+    if num:
+        shape = [num]
+        for param in params:
+            if len(param[1]) == 2:
+                pass
+            else:
+                raise ValueError("You must provide 'start stop' for each motor.")
+    else:
+        for param in params:
+            if len(param[1]) == 3:
+                shape.append(param[1][-1])
+            else:
+                raise ValueError(
+                    "You must provide 'start stop num' for each motor in a grid scan."
+                )
+
+    args = []
+    for param in params:
+        args.append(param[0])
+        args.extend(param[1])
+    return args, shape
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def num_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For concurrent "
+            "trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, "
+            "stop2]), ... , (movableN, [startN, stopN])]'."
+        ),
+    ],
+    num: int,
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan concurrent single or multi-motor trajector(y/ies).
+
+    The scan is defined by number of points along scan trajector(y/ies). Wraps
+    bluesky.plans.scan(det, *args, num, md=metadata).
+    """
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_num_scan_args(params, num)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.scan(tuple(detectors), *args, num=num, md=metadata)
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def num_grid_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, num1]), (movable2, \
+            [start2, stop2, num2]), ... , (movableN, [startN, stopN, numN])]'."
+        ),
+    ],
+    snake_axes: list | bool = True,
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan independent multi-motor trajectories.
+
+    The scan is defined by number of points along scan trajectories. Snakes all fast
+    axes by default (all axes but the first axis provided). Wraps
+    bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).
+    """
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_num_scan_args(params)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.grid_scan(tuple(detectors), *args, snake_axes=snake_axes, md=metadata)
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def num_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [start1, stop1]), (movable2, [start2, \
+            stop2]), ... , (movableN, [startN, stopN])]'."
+        ),
+    ],
+    num: int | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan concurrent trajector(y/ies), relative to current position(s).
+
+    The scan is defined by number of points along scan trajector(y/ies). Wraps
+    bluesky.plans.rel_scan(det, *args, num, md=metadata).
+    """
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_num_scan_args(params, num)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.rel_scan(tuple(detectors), *args, num=num, md=metadata)
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def num_grid_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, num1]), (movable2, \
+            [start2, stop2, num2]), ... , (movableN, [startN, stopN, numN])]'."
+        ),
+    ],
+    snake_axes: list | bool = True,
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan independent trajectories, relative to current positions.
+
+    The scan is defined by number of points along scan trajectories. Snakes all fast
+    axes by default (all axes but the first axis provided). Wraps
+    bluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata).
+    """
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_num_scan_args(params)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.rel_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+def _make_list_scan_args(params: list[tuple[Movable, list[float | int]]], grid: bool):
+    shape = []
+    args = []
+    for param in params:
+        shape.append(len(param[1]))
+        args.append(param[0])
+        args.append(param[1])
+
+    if not grid:
+        shape = list(set(shape))
+        if len(shape) > 1:
+            raise ValueError("Lists of motor positions are not equal in length.")
+
+    return args, shape
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def list_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, positions). For concurrent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
+            of points for each movable must be equal."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan concurrent single or multi-motor trajector(y/ies).
+
+    The scan is defined by providing a list of points for each scan trajectory.
+    Wraps bluesky.plans.list_scan(det, *args, md=metadata).
+    """
+    args, shape = _make_list_scan_args(params=params, grid=False)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.list_scan(tuple(detectors), *args, md=metadata)
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def list_grid_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, positions). For independent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
+        ),
+    ],
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan independent trajectories.
+
+    The scan is defined by providing a list of points for each scan trajectory. Snakes
+    all fast axes by default (all axes but the first axis provided). Wraps
+    bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    """
+    args, shape = _make_list_scan_args(params=params, grid=True)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.list_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def list_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, positions). For concurrent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
+            of points for each movable must be equal."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan concurrent trajector(y/ies), relative to current position.
+
+    The scan is defined by providing a list of points for each scan trajectory.
+    Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata).
+    """
+    args, shape = _make_list_scan_args(params=params, grid=False)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def list_grid_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, positions). For independent \
+            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
+            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
+        ),
+    ],
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan independent trajectories, relative to current positions.
+
+    The scan is defined by providing a list of points for each scan trajectory. Snakes
+    all fast axes by default (all axes but the first axis provided). Wraps
+    bluesky.plans.rel_list_grid_scan(det, *args, md=metadata).
+    """
+    args, shape = _make_list_scan_args(params=params, grid=True)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.rel_list_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+def _round_list_elements(stepped_list, params) -> list[float]:
+    decimals = [Decimal(str(param)) for param in params]
+    exponents = [d.as_tuple().exponent for d in decimals]
+    decimal_places = [-exponent for exponent in exponents]  # type: ignore
+    max_decimal_places = max(decimal_places)
+    return np.round(stepped_list, decimals=max_decimal_places).tolist()
+
+
+def _make_stepped_list_step(start: float, stop: float, step: float) -> list:
+    if start == stop:
+        raise ValueError(
+            f"Start ({start}) and stop ({stop}) values cannot be the same."
+        )
+    if abs(step) > abs(stop - start):
+        step = stop - start
+    step = abs(step) * np.sign(stop - start)
+    stepped_list = np.arange(start, stop, step).tolist()
+    if abs((stepped_list[-1] + step) - stop) <= abs(step * 0.05):
+        stepped_list.append(stepped_list[-1] + step)
+    rounded_stepped_list = _round_list_elements(
+        stepped_list=stepped_list, params=[start, stop, step]
+    )
+    return rounded_stepped_list
+
+
+def _make_stepped_list_num(start, step, num) -> list:
+    stepped_list = [start + (n * step) for n in range(num)]
+    rounded_stepped_list = _round_list_elements(
+        stepped_list=stepped_list, params=[start, step]
+    )
+    return rounded_stepped_list
+
+
+def _make_step_scan_args(
+    params: list[tuple[Movable, list[float | int]]], grid: bool
+) -> tuple[list[Any], list[float]]:
+    args = []
+    shape = []
+    stepped_list_length = None
+
+    first_movable_param, *additional_movable_params = params
+    if len(first_movable_param[1]) == 3:
+        start, stop, step = first_movable_param[1]
+        stepped_list = _make_stepped_list_step(start, stop, step)
+        stepped_list_length = len(stepped_list)
+        args.append(first_movable_param[0])
+        args.append(stepped_list)
+        shape.append(stepped_list_length)
+    else:
+        raise ValueError(
+            f"You provided {len(first_movable_param[1])} parameters for {first_movable_param[0]}, rather than 3."
+        )
+    for param in additional_movable_params:
+        if grid:
+            if len(param[1]) == 3:
+                start, stop, step = param[1]
+                stepped_list = _make_stepped_list_step(start, stop, step)
+                args.append(param[0])
+                args.append(stepped_list)
+                shape.append(len(stepped_list))
+            else:
+                raise ValueError(
+                    f"You provided {len(param[1])} parameters for {param[0]}, rather than 3."
+                )
+        else:
+            if len(param[1]) == 2:
+                start, step = param[1]
+                stepped_list = _make_stepped_list_num(start, step, stepped_list_length)
+                args.append(param[0])
+                args.append(stepped_list)
+            else:
+                raise ValueError(
+                    f"You provided {len(param[1])} parameters {param[0]}, rather than 2."
+                )
+
+    return args, shape
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, step2]), ... , (movableN, [startN, stepN])]'."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan concurrent trajectories with specified step size.
+
+    Generates list(s) of points for each trajectory, used with
+    bluesky.plans.list_scan(det, *args, md=metadata).
+    """
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_step_scan_args(params, grid=False)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.list_scan(tuple(detectors), *args, md=metadata)
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_grid_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]'."
+        ),
+    ],
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan independent trajectories with specified step size.
+
+    Generates list(s) of points for each trajectory, used with
+    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by
+    default (all axes but the first axis provided).
+    """
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_step_scan_args(params, grid=True)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.list_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For concurrent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, step2]), ... , (movableN, [startN, stepN])]'."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan concurrent trajectories with specified step size, relative to position.
+
+    Generates list(s) of points for each trajectory, used with
+    bluesky.plans.rel_list_scan(det, *args, md=metadata).
+    """
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_step_scan_args(params, grid=False)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
+
+
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_grid_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+        ),
+    ],
+    params: Annotated[
+        list[tuple[Movable, list[float | int]]],
+        Field(
+            description="List of tuples (device, parameter). For independent \
+            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
+            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]'."
+        ),
+    ],
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan independent trajectories with specified step size, relative to position.
+
+    Generates list(s) of points for each trajectory, used with
+    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by
+    default (all axes but the first axis provided).
+    """
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
+    args, shape = _make_step_scan_args(params, grid=True)
+    metadata = metadata or {}
+    metadata["shape"] = shape
+
+    yield from bp.rel_list_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
