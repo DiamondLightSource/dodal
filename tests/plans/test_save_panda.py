@@ -4,7 +4,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from bluesky import RunEngine
 
-from dodal.plans.save_panda import _save_panda, main
+from dodal.device_manager import DeviceManager
+from dodal.plans.save_panda import _build_panda, _save_panda, main
 
 
 @pytest.fixture(autouse=True)
@@ -13,14 +14,31 @@ def patch_run_engine_in_save_panda_to_avoid_leaks(run_engine: RunEngine):
         yield
 
 
+def test_build_panda(sim_run_engine):
+    panda = MagicMock()
+    panda_factory = MagicMock()
+    panda_factory.build.return_value = panda
+
+    dev_man = MagicMock(spec=DeviceManager)
+    dev_man.__getitem__.side_effect = {"panda": panda_factory}.get
+
+    with patch(
+        "dodal.plans.save_panda.importlib.import_module",
+        return_value=MagicMock(devices=dev_man),
+    ) as imp:
+        built_panda = _build_panda("i03", "panda")
+        imp.assert_called_once_with("dodal.beamlines.i03")
+        panda_factory.build.assert_called_once_with(connect_immediately=True)
+        assert built_panda is panda
+
+
 def test_save_panda(sim_run_engine):
     panda = MagicMock()
+
     directory = "test"
     filename = "file.yml"
     with (
-        patch(
-            "dodal.plans.save_panda.make_device", return_value={"panda": panda}
-        ) as mock_make_device,
+        patch("dodal.plans.save_panda._build_panda", return_value=panda) as build,
         patch(
             "dodal.plans.save_panda.RunEngine",
             return_value=MagicMock(side_effect=sim_run_engine.simulate_plan),
@@ -30,9 +48,7 @@ def test_save_panda(sim_run_engine):
     ):
         _save_panda("i03", "panda", directory, filename)
 
-        mock_make_device.assert_called_with(
-            "dodal.beamlines.i03", "panda", connect_immediately=True
-        )
+        build.assert_called_once_with("i03", "panda")
         mock_store_settings.assert_called_with(
             mock_settings_provider(),
             "file.yml",
@@ -46,7 +62,7 @@ def test_save_panda(sim_run_engine):
 )
 def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit, tmpdir):
     with patch(
-        "dodal.plans.save_panda.make_device",
+        "dodal.plans.save_panda._build_panda",
         side_effect=ValueError("device does not exist"),
     ):
         with pytest.raises(AssertionError):
