@@ -32,10 +32,12 @@ set_utils_beamline(BL)
 
 devices = DeviceManager()
 
+
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
     return ConfigClient()
+
 
 @devices.fixture
 @cache
@@ -66,6 +68,7 @@ def _is_i23_machine():
     hostname = get_hostname()
     return hostname.startswith("i23-ws") or hostname.startswith("i23-control")
 
+
 @devices.factory()
 def oav(config_client) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
@@ -73,9 +76,11 @@ def oav(config_client) -> OAVBeamCentreFile:
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
+
 @devices.factory()
 def pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
+
 
 @devices.factory()
 def shutter() -> ZebraShutter:
