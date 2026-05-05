@@ -1,4 +1,4 @@
-from pydantic import NonNegativeFloat, PositiveFloat, validate_call
+from pydantic import NonNegativeFloat, validate_call
 
 from dodal.common.general_maths import transmission_interconversion
 
