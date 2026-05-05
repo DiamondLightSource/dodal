@@ -1,4 +1,4 @@
-from pydantic import PositiveFloat
+from pydantic import PositiveFloat, validate_call
 
 from dodal.common.general_maths import transmission_interconversion
 
@@ -24,6 +24,7 @@ def photon_mass_attenuation_per_unit_length(
     )
 
 
+@validate_call()
 def attenuation_at_depth_cm(
     depth_cm: PositiveFloat, absorption_coefficient_per_cm: PositiveFloat
 ):
@@ -41,19 +42,13 @@ def attenuation_at_depth_cm(
     Returns:
         (float): attenuation in Barnett units
     """
-    if depth_cm < 0.0:
-        raise ValueError(f"Negative depth is an invalid input: {depth_cm}")
-    if absorption_coefficient_per_cm < 0.0:
-        raise ValueError(
-            "Invalid absorption, this calculator is no for systems with\
-                         optical gain."
-        )
     ln_t = -(depth_cm * absorption_coefficient_per_cm)
     return transmission_interconversion.attenuation_from_natural_log_of_transmission(
         ln_t
     )
 
 
+@validate_call()
 def thickness_cm_required_to_attenuate(
     target_attenuation_bn: PositiveFloat,
     absorption_coefficient_per_cm: float,
@@ -74,10 +69,7 @@ def thickness_cm_required_to_attenuate(
         (float): material depth in cm.
     """
     minimum_meaningful_absorption_coefficient = 1.0e-14
-    if (
-        target_attenuation_bn < 0.0
-        or absorption_coefficient_per_cm < minimum_meaningful_absorption_coefficient
-    ):
+    if absorption_coefficient_per_cm < minimum_meaningful_absorption_coefficient:
         raise ValueError(
             "Invalid absorption - this calculator is not for transparent media nor thos\
                 e with optical gain."
