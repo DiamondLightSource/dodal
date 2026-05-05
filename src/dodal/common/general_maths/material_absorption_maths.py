@@ -1,4 +1,4 @@
-from pydantic import PositiveFloat, validate_call
+from pydantic import NonNegativeFloat, PositiveFloat, validate_call
 
 from dodal.common.general_maths import transmission_interconversion
 
@@ -26,7 +26,7 @@ def photon_mass_attenuation_per_unit_length(
 
 @validate_call()
 def attenuation_at_depth_cm(
-    depth_cm: PositiveFloat, absorption_coefficient_per_cm: PositiveFloat
+    depth_cm: NonNegativeFloat, absorption_coefficient_per_cm: PositiveFloat
 ):
     # TODO: check this - not sure if it really is the depth of the wedge?
     """Calculates attenuation in Barnett units.
@@ -50,7 +50,7 @@ def attenuation_at_depth_cm(
 
 @validate_call()
 def thickness_cm_required_to_attenuate(
-    target_attenuation_bn: PositiveFloat,
+    target_attenuation_bn: NonNegativeFloat,
     absorption_coefficient_per_cm: float,
 ):
     """Calculates material depth in cm.

@@ -24,7 +24,7 @@ def test_photon_mass_attenuation_per_unit_length(
 ):
     assert material_absorption_maths.photon_mass_attenuation_per_unit_length(
         energy_kev, photon_absorption_factor_per_unit_length, energy_dependence_exponent
-    ) == pytest.approx(result)
+    ) == pytest.approx(result, rel=1e-6)
 
 
 @pytest.mark.parametrize(
@@ -34,7 +34,7 @@ def test_photon_mass_attenuation_per_unit_length(
 def test_attenuation_at_depth_cm(depth_cm, absorption_coefficient_per_cm, result):
     assert material_absorption_maths.attenuation_at_depth_cm(
         depth_cm, absorption_coefficient_per_cm
-    ) == pytest.approx(result)
+    ) == pytest.approx(result, rel=1e-6)
 
 
 @pytest.mark.parametrize(
@@ -49,7 +49,7 @@ def test_thickness_cm_required_to_attenuate(
 ):
     assert material_absorption_maths.thickness_cm_required_to_attenuate(
         target_attenuation_bn, absorption_coefficient_per_cm
-    ) == pytest.approx(result)
+    ) == pytest.approx(result, rel=1e-6)
 
 
 # inauspicious path
@@ -65,13 +65,13 @@ def test_attenuation_at_depth_cm_too_negative_target():
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
 def test_thickness_cm_required_to_attenuate_target_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         material_absorption_maths.thickness_cm_required_to_attenuate(bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
 def test_thickness_cm_required_to_attenuate_absorption_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         material_absorption_maths.thickness_cm_required_to_attenuate(1.0, bad_input)
 
 
@@ -89,13 +89,13 @@ def test_attenuation_at_depth_cm_depth_negative_error(bad_input):
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
 def test_attenuation_at_depth_cm_depth_depth_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         material_absorption_maths.attenuation_at_depth_cm(bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
 def test_attenuation_at_depth_cm_depth_absorption_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         material_absorption_maths.attenuation_at_depth_cm(1.0, bad_input)
 
 

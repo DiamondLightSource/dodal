@@ -12,7 +12,7 @@ from dodal.common.general_maths import transmission_interconversion
 def test_attenuation_from_natural_log_of_transmission(ln_t, result):
     assert transmission_interconversion.attenuation_from_natural_log_of_transmission(
         ln_t
-    ) == pytest.approx(result)
+    ) == pytest.approx(result, rel=1e-6)
 
 
 @pytest.mark.parametrize(
@@ -22,7 +22,7 @@ def test_attenuation_from_natural_log_of_transmission(ln_t, result):
 def test_attenuation_from_transmission(transmission_as_fraction, result):
     assert transmission_interconversion.attenuation_from_transmission(
         transmission_as_fraction
-    ) == pytest.approx(result)
+    ) == pytest.approx(result, rel=1e-6)
 
 
 @pytest.mark.parametrize(
@@ -32,7 +32,7 @@ def test_attenuation_from_transmission(transmission_as_fraction, result):
 def test_natural_log_of_transmission_from_attenuation(attenuation_bn, result):
     assert transmission_interconversion.natural_log_of_transmission_from_attenuation(
         attenuation_bn
-    ) == pytest.approx(result)
+    ) == pytest.approx(result, rel=1e-6)
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,7 @@ def test_natural_log_of_transmission_from_attenuation(attenuation_bn, result):
 def test_transmission_from_attenutation(attenuation_bn, result):
     assert transmission_interconversion.transmission_from_attenutation(
         attenuation_bn
-    ) == pytest.approx(result)
+    ) == pytest.approx(result, rel=1e-6)
 
 
 # inauspicious:
