@@ -1,16 +1,9 @@
-import inspect
-from collections.abc import Callable
-from typing import TypeVar
-
 from daq_config_server import ConfigClient
 from ophyd_async.core import (
     PathProvider,
 )
 
 from dodal.log import LOGGER
-from dodal.utils import (
-    AnyDevice,
-)
 
 BL = ""
 
@@ -18,15 +11,6 @@ BL = ""
 def set_beamline(beamline: str):
     global BL
     BL = beamline
-
-
-def active_device_is_same_type(
-    active_device: AnyDevice, device: Callable[..., AnyDevice]
-) -> bool:
-    return inspect.isclass(device) and isinstance(active_device, device)
-
-
-T = TypeVar("T", bound=AnyDevice)
 
 
 def set_path_provider(provider: PathProvider):

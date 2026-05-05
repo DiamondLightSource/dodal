@@ -3,14 +3,10 @@ import os
 import re
 import socket
 import string
-from collections.abc import Callable
 from dataclasses import dataclass
 from os import environ
 from types import ModuleType
-from typing import (
-    TypeAlias,
-    TypeVar,
-)
+from typing import TypeAlias
 
 from bluesky.protocols import (
     Checkable,
@@ -52,9 +48,6 @@ BLUESKY_PROTOCOLS = [
 ]
 
 AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
-V1DeviceFactory: TypeAlias = Callable[..., OphydV1Device]
-V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
-AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
 
 
 def get_beamline_name(default: str | None = None) -> str:
@@ -82,9 +75,6 @@ class BeamlinePrefix:
         self.beamline_prefix = f"BL{self.ixx[1:3]}{self.suffix}"
         self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
         self.frontend_prefix = f"FE{self.ixx[1:3]}{self.suffix}"
-
-
-T = TypeVar("T", bound=AnyDevice)
 
 
 def get_beamline_based_on_environment_variable() -> ModuleType:
