@@ -2,7 +2,7 @@ from pathlib import Path
 from unittest.mock import call
 
 import pytest
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     get_mock_put,
     init_devices,
@@ -48,7 +48,7 @@ pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 @pytest.fixture
 def mock_j09_gap_energy_motor_lookup(
-    mock_config_client: ConfigServer,
+    mock_config_client: ConfigClient,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
@@ -59,7 +59,7 @@ def mock_j09_gap_energy_motor_lookup(
 
 @pytest.fixture
 def mock_j09_phase_energy_motor_lookup(
-    mock_config_client: ConfigServer,
+    mock_config_client: ConfigClient,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),

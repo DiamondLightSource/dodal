@@ -29,3 +29,8 @@ class PassEnergy(StrictEnum):
     E100 = "100"
     E200 = "200"
     E500 = "500"
+
+
+class IntensityProtection(StrictEnum):
+    CLEAR = "Clear"
+    TRIPPED = "Tripped"

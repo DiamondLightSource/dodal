@@ -3,8 +3,10 @@ from unittest.mock import MagicMock, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
+from daq_config_server import ConfigClient
 from ophyd_async.core import init_devices, set_mock_value
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
 from dodal.plan_stubs.check_topup import (
     check_topup_and_wait_if_necessary,
@@ -17,6 +19,11 @@ from tests.plan_stubs.test_data import (
 from tests.test_data import TEST_BEAMLINE_PARAMETERS_TXT
 
 
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(ConfigClient("test"))
+
+
 @pytest.fixture
 async def synchrotron() -> Synchrotron:
     async with init_devices(mock=True):
@@ -26,6 +33,10 @@ async def synchrotron() -> Synchrotron:
 
 @patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
+@patch(
+    "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
+    {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
+)
 def test_when_topup_before_end_of_collection_wait(
     fake_sleep: MagicMock,
     fake_wait: MagicMock,

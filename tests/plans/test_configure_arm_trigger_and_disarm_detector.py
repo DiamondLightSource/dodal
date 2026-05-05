@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     DetectorTrigger,
     TriggerInfo,
@@ -11,6 +12,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.plans.configure_arm_trigger_and_disarm_detector import (
     configure_arm_trigger_and_disarm_detector,
 )
@@ -33,6 +35,7 @@ async def fake_observe_indices_written(timeout: float) -> AsyncGenerator[int, No
 async def test_configure_arm_trigger_and_disarm_detector(
     fake_eiger, eiger_params, run_engine: RunEngine
 ):
+    set_config_client(ConfigClient("test"))
     trigger_info = TriggerInfo(
         # Manual trigger, so setting number of triggers to 1.
         number_of_events=1,

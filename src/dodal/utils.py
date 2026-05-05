@@ -66,8 +66,11 @@ V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
 AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
 
 
-def get_beamline_name(default: str) -> str:
-    return environ.get("BEAMLINE") or default
+def get_beamline_name(default: str | None = None) -> str:
+    beamline_name = environ.get("BEAMLINE") or default
+    if beamline_name is None:
+        raise ValueError("Set BEAMLINE environment variable or provide default.")
+    return beamline_name
 
 
 def is_test_mode() -> bool:

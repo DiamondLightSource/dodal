@@ -1,5 +1,5 @@
 import asyncio
-from asyncio import FIRST_COMPLETED, CancelledError, Task, wait_for
+from asyncio import ALL_COMPLETED, FIRST_COMPLETED, CancelledError, Task, wait_for
 from dataclasses import dataclass
 from enum import IntEnum
 
@@ -70,6 +70,32 @@ class ErrorStatus(Device):
             raise RobotLoadError(int(error_code), error_string) from raise_from
 
 
+# Error codes that we do special things on
+class ProgErrorCode(IntEnum):
+    NO_ERROR = 0
+    SAMPLE_POSITION_NOT_READY = 9
+    NO_PIN_ERROR_CODE = 25
+
+    @classmethod
+    def is_retryable(cls, error_code: int) -> bool:
+        return error_code in {
+            ProgErrorCode.NO_ERROR,
+            ProgErrorCode.SAMPLE_POSITION_NOT_READY,
+        }
+
+
+class ControllerErrorCode(IntEnum):
+    NO_ERROR = 0
+    LIGHT_CURTAIN_TRIPPED = 40
+
+    @classmethod
+    def is_retryable(cls, error_code: int) -> bool:
+        return error_code in {
+            ControllerErrorCode.NO_ERROR,
+            ControllerErrorCode.LIGHT_CURTAIN_TRIPPED,
+        }
+
+
 class BartRobot(StandardReadable, Movable[SampleLocation]):
     """The sample changing robot."""
 
@@ -79,11 +105,6 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
 
-    # Error codes that we do special things on
-    NO_ERROR = 0
-    NO_PIN_ERROR_CODE = 25
-    LIGHT_CURTAIN_TRIPPED = 40
-
     # How far the gonio position can be out before loading will fail
     LOAD_TOLERANCE_MM = 0.02
 
@@ -91,6 +112,8 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     # is completed these should be made into a proper enum
     CRYO_MODE_WARM = 0.0
     CRYO_MODE_CRYO = 1.0
+
+    NO_PIN_LOCATION = SampleLocation(0, 0)
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -132,30 +155,70 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         )
         super().__init__(name=name)
 
-    async def beamline_status_or_error(self, expected_state: BeamlineStatus):
+    async def beamline_status_or_error(
+        self,
+        expected_state: BeamlineStatus,
+        sample_location: SampleLocation | None = None,
+    ):
         """This co-routine will finish when either the beamline reaches the specified
         state or the robot gives an error (whichever happens first). In the case where
         there is an error a RobotLoadError error is raised.
+
+        Args:
+            expected_state (BeamlineStatus): The beamline state to wait for
+            sample_location (SampleLocation): The loaded puck and pin to wait for, or None to not
+            wait.
         """
 
-        async def raise_if_error():
+        async def raise_if_prog_error():
             await wait_for_value(
-                self.prog_error.code, lambda value: value != self.NO_ERROR, None
+                self.prog_error.code,
+                lambda value: value != ProgErrorCode.NO_ERROR,
+                None,
             )
             error_code = await self.prog_error.code.get_value()
             error_msg = await self.prog_error.str.get_value()
             raise RobotLoadError(error_code, error_msg)
 
+        async def raise_if_ctl_error():
+            await wait_for_value(
+                self.controller_error.code,
+                lambda value: value != ControllerErrorCode.NO_ERROR,
+                None,
+            )
+            error_code = await self.controller_error.code.get_value()
+            error_msg = await self.controller_error.str.get_value()
+            raise RobotLoadError(error_code, error_msg)
+
         async def wait_for_expected_state():
             await wait_for_value(self.beamline_disabled, expected_state.value, None)
 
+        async def wait_for_puck(_sample_location: SampleLocation):
+            await wait_for_value(self.current_puck, _sample_location.puck, None)
+
+        async def wait_for_pin(_sample_location: SampleLocation):
+            await wait_for_value(self.current_pin, _sample_location.pin, None)
+
+        check_for_prog_error_task = Task(raise_if_prog_error())
+        check_for_ctl_error_task = Task(raise_if_ctl_error())
         tasks = [
-            (Task(raise_if_error())),
             (Task(wait_for_expected_state())),
         ]
+        if sample_location:
+            tasks += [
+                Task(wait_for_puck(sample_location)),
+                Task(wait_for_pin(sample_location)),
+            ]
+        check_for_completion_conditions = asyncio.create_task(
+            asyncio.wait(tasks, return_when=ALL_COMPLETED)
+        )
         try:
             finished, unfinished = await asyncio.wait(
-                tasks,
+                [
+                    check_for_prog_error_task,
+                    check_for_ctl_error_task,
+                    check_for_completion_conditions,
+                ],
                 return_when=FIRST_COMPLETED,
             )
             for task in unfinished:
@@ -167,13 +230,36 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             # in the current task, when it propagates to here we should cancel all pending tasks before bubbling up
             for task in tasks:
                 task.cancel()
-
+            check_for_prog_error_task.cancel()
+            check_for_ctl_error_task.cancel()
             raise
 
-    async def _load_pin_and_puck(self, sample_location: SampleLocation):
-        if await self.controller_error.code.get_value() == self.LIGHT_CURTAIN_TRIPPED:
-            LOGGER.info("Light curtain tripped, trying again")
+    async def _check_errors_and_clear_if_retryable(self):
+        ctl_err_code = await self.controller_error.code.get_value()
+        prog_err_code = await self.prog_error.code.get_value()
+        if (
+            ctl_err_code != ControllerErrorCode.NO_ERROR
+            or prog_err_code != ProgErrorCode.NO_ERROR
+        ):
+            ctl_err_msg = await self.controller_error.str.get_value()
+            prog_err_msg = await self.prog_error.str.get_value()
+            if ctl_err_code != ControllerErrorCode.NO_ERROR:
+                LOGGER.info(
+                    f"Detected error from previous load/unload attempt controller_error {ctl_err_code}:{ctl_err_msg}"
+                )
+            if prog_err_code != ProgErrorCode.NO_ERROR:
+                LOGGER.info(
+                    f"Detected error from previous load/unload attempt prog_error {prog_err_code}:{prog_err_msg}"
+                )
+            if not ProgErrorCode.is_retryable(prog_err_code):
+                raise RobotLoadError(prog_err_code, prog_err_msg)
+            if not ControllerErrorCode.is_retryable(ctl_err_code):
+                raise RobotLoadError(ctl_err_code, ctl_err_msg)
+
+            LOGGER.info("Errors are retryable, resetting errors and trying again")
             await self.reset.trigger()
+
+    async def _load_pin_and_puck(self, sample_location: SampleLocation):
         LOGGER.info(f"Loading pin {sample_location}")
         if await self.program_running.get_value():
             LOGGER.info(
@@ -187,15 +273,17 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             set_and_wait_for_value(self.next_pin, sample_location.pin),
         )
         await self.load.trigger()
-        await self._wait_for_beamline_enabled_after_load_or_unload()
+        await self._wait_for_beamline_enabled_after_load_or_unload(sample_location)
 
-    async def _wait_for_beamline_enabled_after_load_or_unload(self):
+    async def _wait_for_beamline_enabled_after_load_or_unload(
+        self, sample_location: SampleLocation
+    ):
         if await self.beamline_disabled.get_value() == BeamlineStatus.ENABLED.value:
             LOGGER.info(WAIT_FOR_BEAMLINE_DISABLE_MSG)
             await self.beamline_status_or_error(BeamlineStatus.DISABLED)
 
         LOGGER.info(WAIT_FOR_BEAMLINE_ENABLE_MSG)
-        await self.beamline_status_or_error(BeamlineStatus.ENABLED)
+        await self.beamline_status_or_error(BeamlineStatus.ENABLED, sample_location)
 
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
@@ -210,6 +298,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 sample.
         """
         try:
+            await self._check_errors_and_clear_if_retryable()
             if value != SAMPLE_LOCATION_EMPTY:
                 await wait_for(
                     self._load_pin_and_puck(value),
@@ -218,7 +307,9 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             else:
                 await self.unload.trigger(timeout=self.LOAD_TIMEOUT)
                 await wait_for(
-                    self._wait_for_beamline_enabled_after_load_or_unload(),
+                    self._wait_for_beamline_enabled_after_load_or_unload(
+                        self.NO_PIN_LOCATION
+                    ),
                     timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
                 )
         except TimeoutError as e:
