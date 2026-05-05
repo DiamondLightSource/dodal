@@ -14,6 +14,5 @@ def photon_mass_attenuation_per_unit_length(
     Returns:
         (float): mass attenuation per unit length.
     """
-    return photon_absorption_factor_per_unit_length * (
-        energy_kev**energy_dependence_exponent
-    )
+    roll_off = energy_kev**energy_dependence_exponent
+    return photon_absorption_factor_per_unit_length * roll_off
