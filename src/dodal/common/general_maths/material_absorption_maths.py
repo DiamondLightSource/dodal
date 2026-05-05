@@ -1,3 +1,5 @@
+from pydantic import PositiveFloat
+
 from dodal.common.general_maths import transmission_interconversion
 
 
@@ -22,7 +24,9 @@ def photon_mass_attenuation_per_unit_length(
     )
 
 
-def attenuation_at_depth_cm(depth_cm: float, absorption_coefficient_per_cm: float):
+def attenuation_at_depth_cm(
+    depth_cm: PositiveFloat, absorption_coefficient_per_cm: PositiveFloat
+):
     # TODO: check this - not sure if it really is the depth of the wedge?
     """Calculates attenuation in Barnett units.
 
@@ -31,8 +35,8 @@ def attenuation_at_depth_cm(depth_cm: float, absorption_coefficient_per_cm: floa
         absorption_coefficient_per_cm (float): absorption coefficient per cm
 
     Raises:
-        ValueError: If either input value for either depth_cm or absorption_coefficient_
-        per_cm <0.0, raises a value error.
+        ValueError: If either depth_cm or absorption_coefficient are negative, an error
+        is raised
 
     Returns:
         (float): attenuation in Barnett units
@@ -44,13 +48,14 @@ def attenuation_at_depth_cm(depth_cm: float, absorption_coefficient_per_cm: floa
             "Invalid absorption, this calculator is no for systems with\
                          optical gain."
         )
+    ln_t = -(depth_cm * absorption_coefficient_per_cm)
     return transmission_interconversion.attenuation_from_natural_log_of_transmission(
-        -(depth_cm * absorption_coefficient_per_cm)
+        ln_t
     )
 
 
 def thickness_cm_required_to_attenuate(
-    target_attenuation_bn: float,
+    target_attenuation_bn: PositiveFloat,
     absorption_coefficient_per_cm: float,
 ):
     """Calculates material depth in cm.
