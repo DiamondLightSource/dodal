@@ -1,8 +1,12 @@
 """Beamline i02-1 is also known as VMXm, or I02J."""
 
-from dodal.devices.beamlines.i02_1.sample_motors import SampleMotors
+from functools import cache
+from os import getenv
+
+from daq_config_server import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
@@ -39,7 +43,18 @@ I02_1_ZEBRA_MAPPING = ZebraMapping(
     sources=ZebraSources(),
 )
 
+DEFAULT_CONFIG_SERVER_ENDPOINT = "https://daq-config.diamond.ac.uk"
+
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    config_server_url = getenv("CONFIG_SERVER_URL", DEFAULT_CONFIG_SERVER_ENDPOINT)
+    client = ConfigClient(config_server_url)
+    set_config_client(client)
+    return client
 
 
 @devices.v1_init(
@@ -51,9 +66,12 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
 
 
 @devices.factory()
-def undulator(daq_configuration_path: str) -> UndulatorInKeV:
+def undulator(
+    daq_configuration_path: str, config_client: ConfigClient
+) -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
     )
 
