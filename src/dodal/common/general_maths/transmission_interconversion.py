@@ -1,8 +1,5 @@
 import math
 
-canonical_barnett_conversion = -1.0e3
-reverse_barnett_conversion = -1.0e-3
-
 
 def attenuation_from_natural_log_of_transmission(ln_t: float):
     """Converts from natural log of transmission fraction into Barnett attenuation units
@@ -14,7 +11,8 @@ def attenuation_from_natural_log_of_transmission(ln_t: float):
     Returns:
         (float): Barnett attenuation units
     """
-    return canonical_barnett_conversion * ln_t
+    _canonical_barnett_conversion = -1.0e3
+    return _canonical_barnett_conversion * ln_t
 
 
 def attenuation_from_transmission(transmission_as_fraction: float):
@@ -40,7 +38,8 @@ def natural_log_of_transmission_from_attenuation(attenuation_bn: float):
     Returns:
         (float): natural log of transmission fraction
     """
-    return reverse_barnett_conversion * attenuation_bn
+    _reverse_barnett_conversion = -1.0e-3
+    return _reverse_barnett_conversion * attenuation_bn
 
 
 def transmission_from_attenutation(attenuation_bn: float):
