@@ -1,9 +1,24 @@
-def subordinate_range_test(lower_bound: float, upper_bound: float, x: float):
+"""Provides a checker to determine if a value is within a certain range."""
+
+from pydantic import BaseModel, validate_call
+
+
+def subordinate_range_test(lower_bound: float, upper_bound: float, x: float) -> bool:
     outside_range = x < lower_bound or x > upper_bound
     return not outside_range
 
 
-def is_within_range(lower_bound: float, upper_bound: float, tested_value: float):
+class Range(BaseModel):
+    lower_bound: float  # Annotated[float, Field(lt=upper_bound)]
+    upper_bound: float  # Annotated[float, Field(gt=lower_bound)]
+
+
+@validate_call
+def is_within_range(
+    lower_bound: float,
+    upper_bound: float,
+    tested_value: float,
+) -> bool:
     """Checks if a single value falls between two bounds, a lower (first) and an upper
     (second).
 
@@ -15,7 +30,8 @@ def is_within_range(lower_bound: float, upper_bound: float, tested_value: float)
     Returns:
         outside_range (bool): True if the tested value falls between, or False if not
     """
-    # TODO check if we need to use pydantic for this.
+    # still in progress. Pydantic strangeness. Will fix.
+    Range(lower_bound=lower_bound, upper_bound=upper_bound)
     if upper_bound < lower_bound:
         value_error_message_template = (
             "Range upper bound %.4f < lower bound %.4f is an invalid condition"

@@ -1,4 +1,7 @@
-def convert_percentage_to_factor(pc: float):
+"""Provides functions to convert between common units for attenuation."""
+
+
+def convert_percentage_to_factor(pc: float) -> float:
     """Takes a percentage value and converts it the corresponding multiplication factor.
 
     Args:
@@ -9,7 +12,7 @@ def convert_percentage_to_factor(pc: float):
     return pc * 1e-2
 
 
-def convert_factor_to_percentage(f: float):
+def convert_factor_to_percentage(f: float) -> float:
     """Takes a multiplication factor and converts it to the corresponding percentage.
 
     Args:
@@ -21,7 +24,7 @@ def convert_factor_to_percentage(f: float):
     return f * 1e2
 
 
-def convert_microns_to_cm(t_um: float):
+def convert_microns_to_cm(t_um: float) -> float:
     """Takes the numerical part of a distance in microns and converts this to cm.
 
     Args:
@@ -33,7 +36,7 @@ def convert_microns_to_cm(t_um: float):
     return t_um * 1e-4
 
 
-def convert_microns_to_mm(v_um: float):
+def convert_microns_to_mm(v_um: float) -> float:
     """Takes the numerical part of a distance in microns and converts this to mm.
 
     Args:
@@ -45,7 +48,7 @@ def convert_microns_to_mm(v_um: float):
     return v_um * 1e-3
 
 
-def convert_mm_to_microns(w_mm: float):
+def convert_mm_to_microns(w_mm: float) -> float:
     """Takes the numerical part of a distance in mm and converts this to microns.
 
     Args:
@@ -57,7 +60,7 @@ def convert_mm_to_microns(w_mm: float):
     return w_mm * 1e3
 
 
-def convert_mm_to_cm(x_mm: float):
+def convert_mm_to_cm(x_mm: float) -> float:
     """Takes the numerical part of a distance in mm and converts this to cm.
 
     Args:
@@ -69,7 +72,7 @@ def convert_mm_to_cm(x_mm: float):
     return x_mm * 1e-1
 
 
-def convert_cm_to_mm(y_cm: float):
+def convert_cm_to_mm(y_cm: float) -> float:
     """Takes the numerical part of a distance in cm and converts this to mm.
 
     Args:
@@ -81,7 +84,7 @@ def convert_cm_to_mm(y_cm: float):
     return y_cm * 1e1
 
 
-def convert_ev_to_kev(energy_ev: float):
+def convert_ev_to_kev(energy_ev: float) -> float:
     """Takes the numerical part of an x-ray energy in electron volts and converts this
     to keV.
 

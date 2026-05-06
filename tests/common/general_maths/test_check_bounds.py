@@ -1,5 +1,6 @@
 import math
 
+import pydantic_core
 import pytest
 
 from dodal.common.general_maths.check_bounds import is_within_range
@@ -58,7 +59,7 @@ def test_has_misordered_inputs():
 def test_is_within_range_raises_error_with_bad_tested_value(
     bad_input,
 ):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic_core.ValidationError):
         is_within_range(-4, 4, bad_input)
 
 
@@ -76,7 +77,7 @@ def test_is_within_range_raises_error_with_bad_tested_value(
 def test_is_within_range_raises_error_with_bad_upper_bound(
     bad_input,
 ):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic_core.ValidationError):
         is_within_range(-4, bad_input, 4)
 
 
@@ -94,5 +95,5 @@ def test_is_within_range_raises_error_with_bad_upper_bound(
 def test_is_within_range_raises_error_with_bad_lower_bound(
     bad_input,
 ):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic_core.ValidationError):
         is_within_range(bad_input, 4, 0)
