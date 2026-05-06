@@ -10,10 +10,10 @@ from dodal.common.general_maths import material_absorption_maths
     "energy_kev,photon_absorption_factor_per_unit_length,energy_dependence_exponent,"
     "result",
     [
-        (5.042, 1.98e2, -2.717, 2.44170544),  # Arbitrary
-        (8.3328, 2.5706e3, -2.83, 6.3708311),  # Nickel
-        (11.9187, 1.48e3, -2.93, 1.03970725),  # Gold-Three
-        (25.514, 6.48e3, -2.41, 2.63778077),  # Silver
+        (5.042, 1.98e2, -2.717, 2.44170544),  # Arbitrary energy
+        (8.3328, 2.5706e3, -2.83, 6.3708311),  # Nickel energy
+        (11.9187, 1.48e3, -2.93, 1.03970725),  # Gold-Three energy
+        (25.514, 6.48e3, -2.41, 2.63778077),  # Silver energy
     ],
 )
 def test_photon_mass_attenuation_per_unit_length(
@@ -29,7 +29,19 @@ def test_photon_mass_attenuation_per_unit_length(
 
 @pytest.mark.parametrize(
     "depth_cm,absorption_coefficient_per_cm,result",
-    [(0.5, 2, 1000), (1.89, 0.316, 597.24), (0.0, 2.5, 0)],
+    [
+        (
+            0.5,
+            2,
+            1000,
+        ),  # tests attenuation is 1 kilobarnett at single attenuation length
+        (
+            1.89,
+            0.316,
+            597.24,
+        ),  # tests attenuation matches expectations at arbitrary attenuation depth
+        (0.0, 2.5, 0),  # tests attenuation is zero after zero depth
+    ],
 )
 def test_attenuation_at_depth_cm(depth_cm, absorption_coefficient_per_cm, result):
     assert material_absorption_maths.attenuation_at_depth_cm(
@@ -40,8 +52,12 @@ def test_attenuation_at_depth_cm(depth_cm, absorption_coefficient_per_cm, result
 @pytest.mark.parametrize(
     "target_attenuation_bn,absorption_coefficient_per_cm,result",
     [
-        (0, 2.4, 0),
-        (248.461, 2.13, 0.1166483568),
+        (0, 2.4, 0),  # tests attenuator thickness required for transparency is zero
+        (
+            248.461,
+            2.13,
+            0.1166483568,
+        ),  # tests attenuator thickness frequired for arbitrary attenuation
     ],
 )
 def test_thickness_cm_required_to_attenuate(
