@@ -10,10 +10,10 @@ from dodal.common.general_maths.check_bounds import is_within_range
 @pytest.mark.parametrize(
     "lower_bound,upper_bound,tested_value,result",
     [
-        (1, 3, 2, True),
-        (-3, -1, -2, True),
-        (-1, 1, 0, True),
-        (-1, -0.1, -0.5, True),
+        (1.0, 3.0, 2.0, True),
+        (-3.0, -1.0, -2, True),
+        (-1.0, 1.0, 0.0, True),
+        (-1.0, -0.1, -0.5, True),
         (0.1, 1, 0.5, True),
     ],
 )
