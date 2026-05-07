@@ -1,4 +1,11 @@
+from collections.abc import Iterable
+from dataclasses import dataclass
+from typing import Self
+
 import numpy as np
+from ophyd_async.core import (
+    Array1D,
+)
 
 
 def step_to_num(start: float, stop: float, step: float) -> tuple[float, float, int]:
@@ -146,3 +153,100 @@ def rotate_clockwise(theta: float, x: float, y: float) -> tuple[float, float]:
 
 def rotate_counter_clockwise(theta: float, x: float, y: float) -> tuple[float, float]:
     return rotate_clockwise(-theta, x, y)
+
+
+MotorOffsetAndPhase = Array1D[np.float32]
+
+
+@dataclass
+class AngleWithPhase:
+    """Represents a point in an absolute rotational space which is defined by a phase where 0<=phase<360
+     and an offset from an origin where the absolute coordinate is the sum of the phase and the offset.
+
+    Attributes:
+        offset: The offset of 0 phase from some other unwrapped rotational coordinate space
+        phase: The phase in degrees relative to this offset.
+    """
+
+    offset: float
+    phase: float = 0.0
+
+    def __post_init__(self) -> None:
+        correction = 360 * (self.phase // 360)
+        self.offset += correction
+        self.phase -= correction
+
+    @classmethod
+    def from_iterable(cls, values: Iterable[float]) -> Self:
+        """Construct a normalised representation of the offset and phase, such that
+        0 <= phase < 360.
+
+        Args:
+            values (Iterable[float]): the offset and phase as a list or other iterable
+        """
+        offset, phase = values
+        return cls(offset, phase)
+
+    @classmethod
+    def wrap(cls, unwrapped: float) -> "AngleWithPhase":
+        """Construct a representation such that offset = n * 360 and 0 <= phase < 360.
+
+        Args:
+             unwrapped (float): The unwrapped angle in degrees
+        """
+        offset = AngleWithPhase.offset_from_unwrapped(unwrapped)
+        return cls(offset, unwrapped - offset)
+
+    def rebase_to(self, other: Self) -> "AngleWithPhase":
+        """Return this angle with the offset adjusted such that the phases can be compared."""
+        correction = other.offset - self.offset
+        if correction % 360:
+            return AngleWithPhase.from_iterable(
+                [self.offset + correction, self.phase - correction]
+            )
+        else:
+            return self
+
+    def unwrap(self) -> float:
+        """Generate the unwrapped representation of this angle."""
+        return self.offset + self.phase
+
+    def phase_distance(self, phase: float) -> float:
+        """Determine the shortest distance between this angle and the specified phase.
+
+        Args:
+            phase (float): The phase angle to compare to
+        """
+        phase = phase % 360
+        max_theta = max(self.phase, phase)
+        min_theta = min(self.phase, phase)
+        return min(max_theta - min_theta, min_theta + 360 - max_theta)
+
+    @classmethod
+    def offset_from_unwrapped(cls, unwrapped_deg: float) -> float:
+        """Obtain the offset from the corresponding wrapped angle in degrees."""
+        return round(unwrapped_deg // 360) * 360
+
+    def nearest_with_phase(self, phase_deg: float) -> "AngleWithPhase":
+        """Return the nearest angle to this one with the specified phase."""
+        phase_deg = phase_deg % 360
+        if phase_deg > self.phase:
+            return (
+                AngleWithPhase(self.offset, phase_deg)
+                if phase_deg - self.phase <= 180
+                else AngleWithPhase(self.offset - 360, phase_deg)
+            )
+        else:
+            return (
+                AngleWithPhase(self.offset, phase_deg)
+                if self.phase - phase_deg <= 180
+                else AngleWithPhase(self.offset + 360, phase_deg)
+            )
+
+
+def reflect_phase(phase) -> float:
+    """Convert the phase angle as if the corresponding unwrapped angle were to
+    be reflected about the origin and then re-wrapped, this corresponds to
+    converting a clockwise angle to an anti-clockwise angle and vice-versa.
+    """
+    return (360 - phase) % 360

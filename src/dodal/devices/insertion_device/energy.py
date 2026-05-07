@@ -42,7 +42,7 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
         self, id_controller: Apple2Controller[Apple2Type], name: str = ""
     ) -> None:
         self.energy = Reference(id_controller.energy)
-        self._id_controller = Reference(id_controller)
+        self.id_controller = Reference(id_controller)
         super().__init__(name=name)
 
         self.add_readables([self.energy()], StandardReadableFormat.HINTED_SIGNAL)
@@ -57,15 +57,15 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
         """Convert FlyMotorInfo from energy to gap motion and move phase motor to mid point."""
         mid_energy = (value.start_position + value.end_position) / 2.0
         LOGGER.info(
-            f"Preparing for fly energy scan, move {self._id_controller().apple2().phase} to {mid_energy}"
+            f"Preparing for fly energy scan, move {self.id_controller().apple2().phase} to {mid_energy}"
         )
         await self.set(energy=mid_energy)
-        current_pol = await self._id_controller().polarisation_setpoint.get_value()
-        start_position = self._id_controller().gap_energy_motor_converter(
+        current_pol = await self.id_controller().polarisation_setpoint.get_value()
+        start_position = self.id_controller().gap_energy_motor_converter(
             energy=value.start_position,
             pol=current_pol,
         )
-        end_position = self._id_controller().gap_energy_motor_converter(
+        end_position = self.id_controller().gap_energy_motor_converter(
             energy=value.end_position, pol=current_pol
         )
 
@@ -80,17 +80,17 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
             + f"Flyscan info in gap: {gap_fly_motor_info}. "
             + f"Speed: {gap_fly_motor_info.velocity}."
         )
-        await self._id_controller().apple2().gap().prepare(value=gap_fly_motor_info)
+        await self.id_controller().apple2().gap().prepare(value=gap_fly_motor_info)
 
     @AsyncStatus.wrap
     async def kickoff(self):
-        await self._id_controller().apple2().gap().kickoff()
+        await self.id_controller().apple2().gap().kickoff()
 
     def complete(self) -> WatchableAsyncStatus:
-        return self._id_controller().apple2().gap().complete()
+        return self.id_controller().apple2().gap().complete()
 
     async def get_id_acceleration_time(self) -> float:
-        return await self._id_controller().apple2().gap().acceleration_time.get_value()
+        return await self.id_controller().apple2().gap().acceleration_time.get_value()
 
 
 class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
@@ -105,13 +105,13 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
     def __init__(
         self, id_energy: InsertionDeviceEnergy, mono: Motor, name: str = ""
     ) -> None:
-        self._id_energy = Reference(id_energy)
-        self._mono_energy = Reference(mono)
+        self.id_energy = Reference(id_energy)
+        self.mono_energy = Reference(mono)
 
         self.add_readables(
             [
-                self._id_energy().energy(),
-                self._mono_energy().user_readback,
+                self.id_energy().energy(),
+                self.mono_energy().user_readback,
             ],
             StandardReadableFormat.HINTED_SIGNAL,
         )
@@ -124,29 +124,29 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
     async def set(self, energy: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {energy}.")
         await asyncio.gather(
-            self._id_energy().set(
+            self.id_energy().set(
                 energy=energy + await self.id_energy_offset.get_value()
             ),
-            self._mono_energy().set(energy),
+            self.mono_energy().set(energy),
         )
 
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMotorInfo) -> None:
         await asyncio.gather(
-            self._id_energy().prepare(value), self._mono_energy().prepare(value)
+            self.id_energy().prepare(value), self.mono_energy().prepare(value)
         )
 
     @AsyncStatus.wrap
     async def kickoff(self):
         pgm_acceleration_time, gap_acceleration_time = await asyncio.gather(
-            self._mono_energy().acceleration_time.get_value(),
-            self._id_energy().get_id_acceleration_time(),
+            self.mono_energy().acceleration_time.get_value(),
+            self.id_energy().get_id_acceleration_time(),
         )
         start_offset_time = pgm_acceleration_time - gap_acceleration_time
 
-        await self._mono_energy().kickoff()
+        await self.mono_energy().kickoff()
         await asyncio.sleep(start_offset_time)
-        await self._id_energy().kickoff()
+        await self.id_energy().kickoff()
         self._fly_status = self._combined_fly_status()
 
     def complete(self) -> AsyncStatus:
@@ -156,6 +156,6 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
 
     @AsyncStatus.wrap
     async def _combined_fly_status(self):
-        status_pgm = self._mono_energy().complete()
-        status_id = self._id_energy().complete()
+        status_pgm = self.mono_energy().complete()
+        status_id = self.id_energy().complete()
         await asyncio.gather(status_pgm, status_id)

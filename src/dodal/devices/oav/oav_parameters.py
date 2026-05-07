@@ -1,10 +1,11 @@
-import json
 from abc import abstractmethod
 from collections import ChainMap
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
-from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
+
+from daq_config_server import ConfigClient
+from daq_config_server.models import DisplayConfig
 
 # GDA currently assumes this aspect ratio for the OAV window size.
 # For some beamline this doesn't affect anything as the actual OAV aspect ratio
@@ -29,25 +30,29 @@ class OAVParameters:
 
     def __init__(
         self,
+        config_client: ConfigClient,
         context="loopCentring",
         oav_config_json=OAV_CONFIG_JSON,
     ):
         self.oav_config_json: str = oav_config_json
         self.context = context
 
-        self.global_params, self.context_dicts = self.load_json(self.oav_config_json)
+        self.global_params, self.context_dicts = self.load_json(
+            config_client, self.oav_config_json
+        )
         self.active_params: ChainMap = ChainMap(
             self.context_dicts[self.context], self.global_params
         )
         self.update_self_from_current_context()
 
     @staticmethod
-    def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
-        """Loads the json from the specified file, and returns a dict with all the
+    def load_json(
+        config_client: ConfigClient, filename: str
+    ) -> tuple[dict[str, Any], dict[str, dict]]:
+        """Loads the specified file from the config server, and returns a dict with all the
         individual top-level k-v pairs, and one with all the subdicts.
         """
-        with open(filename) as f:
-            raw_params: dict[str, Any] = json.load(f)
+        raw_params: dict[str, Any] = config_client.get_file_contents(filename, dict)
         global_params = {
             k: raw_params.pop(k)
             for k, v in list(raw_params.items())
@@ -116,21 +121,20 @@ ParamType = TypeVar("ParamType", bound="ZoomParams")
 
 
 class OAVConfigBase(Generic[ParamType]):
-    def __init__(self, zoom_params_file: str):
-        self.zoom_params = self._get_zoom_params(zoom_params_file)
-
-    def _get_zoom_params(self, zoom_params_file: str):
-        tree = ElementTree.parse(zoom_params_file)
-        root = tree.getroot()
-        return root.findall(".//zoomLevel")
+    def __init__(self, zoom_params_file: str, config_client: ConfigClient):
+        self.zoom_params = config_client.get_file_contents(zoom_params_file, dict)[
+            "JCameraManSettings"
+        ]
 
     def _read_zoom_params(self) -> dict:
         um_per_pix = {}
-        for node in self.zoom_params:
-            zoom = str(_get_element_as_float(node, "level"))
-            um_pix_x = _get_element_as_float(node, "micronsPerXPixel")
-            um_pix_y = _get_element_as_float(node, "micronsPerYPixel")
-            um_per_pix[zoom] = (um_pix_x, um_pix_y)
+        zoom_levels: list[dict] = self.zoom_params["levels"]["zoomLevel"]
+        for level in zoom_levels:
+            zoom = level["level"]
+            um_per_pix[zoom] = (
+                float(level["micronsPerXPixel"]),
+                float(level["micronsPerYPixel"]),
+            )
         return um_per_pix
 
     @abstractmethod
@@ -157,23 +161,17 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
         self,
         zoom_params_file: str,
         display_config_file: str,
+        config_client: ConfigClient,
     ):
-        self.display_config = self._get_display_config(display_config_file)
-        super().__init__(zoom_params_file)
-
-    def _get_display_config(self, display_config_file: str):
-        with open(display_config_file) as f:
-            file_lines = f.readlines()
-        return file_lines
+        self.display_config = config_client.get_file_contents(
+            display_config_file, DisplayConfig
+        )
+        super().__init__(zoom_params_file, config_client)
 
     def _read_display_config(self) -> dict:
         crosshairs = {}
-        for i in range(len(self.display_config)):
-            if self.display_config[i].startswith("zoomLevel"):
-                zoom = self.display_config[i].split(" = ")[1].strip()
-                x = int(self.display_config[i + 1].split(" = ")[1])
-                y = int(self.display_config[i + 2].split(" = ")[1])
-                crosshairs[zoom] = (x, y)
+        for zoom, values in self.display_config.zoom_levels.items():
+            crosshairs[str(zoom)] = (values.crosshair_x, values.crosshair_y)
         return crosshairs
 
     def get_parameters(self) -> dict[str, ZoomParamsCrosshair]:

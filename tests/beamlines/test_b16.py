@@ -1,33 +1,21 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
+from dodal.beamlines import b16
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
-from dodal.devices.beamlines.b16.detector import software_triggered_tiff_area_detector
 
 
-def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
-    prefix = "PV-PREFIX:"
+def test_detector_calls_with_io_correctly():
+    prefix = "BL16B-EA-FDS-02:"
     default_deadtime = 0.0
 
     with (
-        patch(
-            "dodal.devices.beamlines.b16.detector.ADTIFFWriter.with_io"
-        ) as mock_writer_with_io,
-        patch(
-            "dodal.devices.beamlines.b16.detector.AreaDetector"
-        ) as mock_area_detector,
-        patch(
-            "dodal.devices.beamlines.b16.detector.ConstantDeadTimeController"
-        ) as mock_controller,
-        patch(
-            "dodal.devices.beamlines.b16.detector.get_path_provider"
-        ) as mock_get_path_provider,
-        patch("dodal.devices.beamlines.b16.detector.ADBaseIO") as mock_adbase_io,
+        patch("dodal.beamlines.b16.ADTIFFWriter.with_io") as mock_writer_with_io,
+        patch("dodal.beamlines.b16.AreaDetector") as mock_area_detector,
+        patch("dodal.beamlines.b16.ConstantDeadTimeController") as mock_controller,
+        patch("dodal.beamlines.b16.ADBaseIO") as mock_adbase_io,
     ):
         mock_writer = MagicMock(name="Writer")
         mock_writer_with_io.return_value = mock_writer
-
-        mock_path_provider = MagicMock(name="PathProvider")
-        mock_get_path_provider.return_value = mock_path_provider
 
         mock_controller_instance = MagicMock(name="Controller")
         mock_controller.return_value = mock_controller_instance
@@ -38,13 +26,11 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
         mock_area_detector_instance = MagicMock(name="AreaDetectorInstance")
         mock_area_detector.return_value = mock_area_detector_instance
 
-        result = software_triggered_tiff_area_detector(prefix)  # default deadtime
+        result = b16.fds2.build(mock=True)
 
         # Assert with_io called with correct arguments
         mock_writer_with_io.assert_called_once_with(
-            prefix=prefix,
-            path_provider=mock_path_provider,
-            fileio_suffix=TIFF_SUFFIX,
+            prefix, ANY, fileio_suffix=TIFF_SUFFIX
         )
 
         # Assert ADBaseIO called with correct prefix + suffix
