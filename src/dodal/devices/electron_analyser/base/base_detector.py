@@ -19,10 +19,10 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
+    BaseRegion,
+    BaseSequence,
     GenericRegion,
-    TAbstractBaseRegion,
+    TBaseRegion,
 )
 
 
@@ -34,10 +34,10 @@ class SequenceHolder(Stageable, Preparable):
     """
 
     def __init__(self):
-        self.data: AbstractBaseSequence[AbstractBaseRegion] | None = None
+        self.data: BaseSequence[BaseRegion] | None = None
 
     @AsyncStatus.wrap
-    async def prepare(self, value: AbstractBaseSequence[AbstractBaseRegion] | None):
+    async def prepare(self, value: BaseSequence[BaseRegion] | None):
         self.data = value
 
     @AsyncStatus.wrap
@@ -55,7 +55,7 @@ class ElectronAnalyserDetector(
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Detector for data acquisition of electron analyser. Can only acquire using
     settings already configured for the device.
@@ -67,9 +67,7 @@ class ElectronAnalyserDetector(
 
     def __init__(
         self,
-        controller: ElectronAnalyserController[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ],
+        controller: ElectronAnalyserController[TAbstractAnalyserDriverIO, TBaseRegion],
         name: str = "",
     ):
         self.sequence = SequenceHolder()
@@ -94,7 +92,7 @@ class ElectronAnalyserDetector(
         await asyncio.gather(self._controller.disarm(), self.sequence.unstage())
 
     @AsyncStatus.wrap
-    async def set(self, region: TAbstractBaseRegion) -> None:
+    async def set(self, region: TBaseRegion) -> None:
         await self._controller.setup_with_region(region)
 
     @AsyncStatus.wrap
