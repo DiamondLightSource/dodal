@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.2.4.dev8+g553594d52 documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.2.4.dev9+g4ba9de171 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=2cb2014a"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9c969d13"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -910,8 +910,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">AnyLensMode</span><span class="p">,</span>
     <span class="n">AnyPassEnergy</span><span class="p">,</span>
     <span class="n">GenericRegion</span><span class="p">,</span>
-    <span class="n">TAbstractBaseRegion</span><span class="p">,</span>
     <span class="n">TAcquisitionMode</span><span class="p">,</span>
+    <span class="n">TBaseRegion</span><span class="p">,</span>
     <span class="n">TLensMode</span><span class="p">,</span>
     <span class="n">TPassEnergy</span><span class="p">,</span>
 <span class="p">)</span>
@@ -929,8 +929,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">ABC</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">ADBaseIO</span><span class="p">,</span>
-    <span class="n">Movable</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">],</span>
-    <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">,</span> <span class="n">TAcquisitionMode</span><span class="p">,</span> <span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">,</span> <span class="n">TPassEnergy</span><span class="p">],</span>
+    <span class="n">Movable</span><span class="p">[</span><span class="n">TBaseRegion</span><span class="p">],</span>
+    <span class="n">Generic</span><span class="p">[</span><span class="n">TBaseRegion</span><span class="p">,</span> <span class="n">TAcquisitionMode</span><span class="p">,</span> <span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">,</span> <span class="n">TPassEnergy</span><span class="p">],</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Driver device that defines signals and readables that should be common to all</span>
 <span class="sd">    electron analysers. Implementations of electron analyser devices should inherit</span>
@@ -1028,12 +1028,12 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html#dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.set">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epics_region</span><span class="p">:</span> <span class="n">TAbstractBaseRegion</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epics_region</span><span class="p">:</span> <span class="n">TBaseRegion</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Move a group of signals defined in a region. Each implementation of this</span>
 <span class="sd">        class is responsible for implementing this method correctly.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            epics_region (TAbstractBaseRegion): Contains the parameters to setup the</span>
+<span class="sd">            epics_region (TBaseRegion): Contains the parameters to setup the</span>
 <span class="sd">                driver for a scan.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 

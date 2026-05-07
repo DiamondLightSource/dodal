@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_region &#8212; dodal 2.2.4.dev8+g553594d52 documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_region &#8212; dodal 2.2.4.dev9+g4ba9de171 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=2cb2014a"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9c969d13"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,7 +886,6 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.devices.electron_analyser.base.base_region</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">TypeVar</span>
 
@@ -951,12 +950,12 @@ window.runMermaid = runMermaid;</script>
     <span class="k">return</span> <span class="n">data</span>
 
 
-<div class="viewcode-block" id="AbstractBaseRegion">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AbstractBaseRegion</span><span class="p">(</span>
-    <span class="n">ABC</span><span class="p">,</span>
+<div class="viewcode-block" id="BaseRegion">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.BaseRegion.html#dodal.devices.electron_analyser.base.BaseRegion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseRegion</span><span class="p">(</span>
     <span class="n">JavaToPythonModel</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAcquisitionMode</span><span class="p">,</span> <span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPassEnergy</span><span class="p">],</span>
+    <span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Needed so model accepts field name and alias name.</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic region model that holds the data. Specialised region models should</span>
 <span class="sd">    inherit this to extend functionality. All energy units are assumed to be in eV.</span>
@@ -967,7 +966,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">slices</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">excitation_energy_source</span><span class="p">:</span> <span class="n">SelectedSource</span> <span class="o">=</span> <span class="n">SelectedSource</span><span class="o">.</span><span class="n">SOURCE1</span>
-    <span class="c1"># These ones we need subclasses to provide default values</span>
+    <span class="c1"># These ones we need subclasses to provide sensible default values</span>
     <span class="n">lens_mode</span><span class="p">:</span> <span class="n">TLensMode</span>
     <span class="n">pass_energy</span><span class="p">:</span> <span class="n">TPassEnergy</span>
     <span class="n">acquisition_mode</span><span class="p">:</span> <span class="n">TAcquisitionMode</span>
@@ -978,22 +977,22 @@ window.runMermaid = runMermaid;</script>
     <span class="n">energy_step</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># in eV</span>
     <span class="n">energy_mode</span><span class="p">:</span> <span class="n">EnergyMode</span> <span class="o">=</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span>
 
-<div class="viewcode-block" id="AbstractBaseRegion.is_binding_energy">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.is_binding_energy">[docs]</a>
+<div class="viewcode-block" id="BaseRegion.is_binding_energy">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.BaseRegion.html#dodal.devices.electron_analyser.base.BaseRegion.is_binding_energy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_binding_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if the energy_mode is binding.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">BINDING</span></div>
 
 
-<div class="viewcode-block" id="AbstractBaseRegion.is_kinetic_energy">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.is_kinetic_energy">[docs]</a>
+<div class="viewcode-block" id="BaseRegion.is_kinetic_energy">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.BaseRegion.html#dodal.devices.electron_analyser.base.BaseRegion.is_kinetic_energy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns true if the energy_mode is kinetic.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span></div>
 
 
-<div class="viewcode-block" id="AbstractBaseRegion.switch_energy_mode">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.switch_energy_mode">[docs]</a>
+<div class="viewcode-block" id="BaseRegion.switch_energy_mode">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.BaseRegion.html#dodal.devices.electron_analyser.base.BaseRegion.switch_energy_mode">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">switch_energy_mode</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">energy_mode</span><span class="p">:</span> <span class="n">EnergyMode</span><span class="p">,</span>
@@ -1036,8 +1035,8 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="n">switched_r</span></div>
 
 
-<div class="viewcode-block" id="AbstractBaseRegion.prepare_for_epics">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.prepare_for_epics">[docs]</a>
+<div class="viewcode-block" id="BaseRegion.prepare_for_epics">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.BaseRegion.html#dodal.devices.electron_analyser.base.BaseRegion.prepare_for_epics">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_for_epics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares a region for epics by converting BINDING to KINETIC by calculating</span>
 <span class="sd">        new values for low_energy, centre_energy, and high_energy while also preserving</span>
@@ -1068,26 +1067,21 @@ window.runMermaid = runMermaid;</script>
 
 
 
-<span class="n">GenericRegion</span> <span class="o">=</span> <span class="n">AbstractBaseRegion</span><span class="p">[</span><span class="n">AnyAcqMode</span><span class="p">,</span> <span class="n">AnyLensMode</span><span class="p">,</span> <span class="n">AnyPassEnergy</span><span class="p">]</span>
-<span class="n">TAbstractBaseRegion</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TAbstractBaseRegion&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractBaseRegion</span><span class="p">)</span>
+<span class="n">GenericRegion</span> <span class="o">=</span> <span class="n">BaseRegion</span><span class="p">[</span><span class="n">AnyAcqMode</span><span class="p">,</span> <span class="n">AnyLensMode</span><span class="p">,</span> <span class="n">AnyPassEnergy</span><span class="p">]</span>
+<span class="n">TBaseRegion</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TBaseRegion&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">BaseRegion</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AbstractBaseSequence">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractBaseSequence.html#dodal.devices.electron_analyser.base.AbstractBaseSequence">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AbstractBaseSequence</span><span class="p">(</span>
-    <span class="n">ABC</span><span class="p">,</span>
+<div class="viewcode-block" id="BaseSequence">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.BaseSequence.html#dodal.devices.electron_analyser.base.BaseSequence">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseSequence</span><span class="p">(</span>
     <span class="n">JavaToPythonModel</span><span class="p">,</span>
-    <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">],</span>
+    <span class="n">Generic</span><span class="p">[</span><span class="n">TBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic sequence model that holds the list of region data. Specialised sequence</span>
-<span class="sd">    models should inherit this to extend functionality and define type of region to</span>
-<span class="sd">    hold.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic sequence model that holds the list of region data.&quot;&quot;&quot;</span>
 
-    <span class="n">version</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># If file format changes within prod, increment this number!</span>
-    <span class="n">regions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span>
+    <span class="n">regions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TBaseRegion</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_enabled_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_enabled_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TBaseRegion</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">enabled</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_region_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -1096,13 +1090,13 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_enabled_region_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_enabled_regions</span><span class="p">()]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_region_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TAbstractBaseRegion</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_region_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TBaseRegion</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">region</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
 
-<span class="n">GenericSequence</span> <span class="o">=</span> <span class="n">AbstractBaseSequence</span><span class="p">[</span><span class="n">GenericRegion</span><span class="p">]</span>
-<span class="n">TAbstractBaseSequence</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TAbstractBaseSequence&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractBaseSequence</span><span class="p">)</span>
+<span class="n">GenericSequence</span> <span class="o">=</span> <span class="n">BaseSequence</span><span class="p">[</span><span class="n">GenericRegion</span><span class="p">]</span>
+<span class="n">TBaseSequence</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TBaseSequence&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">BaseSequence</span><span class="p">)</span>
 </pre></div>
 
                 </article>

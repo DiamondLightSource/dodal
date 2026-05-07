@@ -90,9 +90,6 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaRegion
       ~VGScientaRegion.energy_step
       
       
-      ~VGScientaRegion.id
-      
-      
       ~VGScientaRegion.total_steps
       
       

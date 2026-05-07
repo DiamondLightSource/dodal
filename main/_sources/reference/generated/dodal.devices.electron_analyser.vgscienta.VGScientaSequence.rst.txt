@@ -62,8 +62,5 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaSequence
       
       ~VGScientaSequence.regions
       
-      
-      ~VGScientaSequence.version
-      
    
    

@@ -18,8 +18,8 @@ dodal.devices.electron\_analyser.base
    ~base.ElectronAnalyserDetector
    ~base.AbstractAnalyserDriverIO
    ~base.EnergyMode
-   ~base.AbstractBaseRegion
-   ~base.AbstractBaseSequence
+   ~base.BaseRegion
+   ~base.BaseSequence
    ~base.GenericRegion
    ~base.GenericSequence
    ~base.AbstractEnergySource

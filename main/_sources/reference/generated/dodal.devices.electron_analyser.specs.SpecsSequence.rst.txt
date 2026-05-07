@@ -59,8 +59,5 @@ dodal.devices.electron\_analyser.specs.SpecsSequence
       
       ~SpecsSequence.regions
       
-      
-      ~SpecsSequence.version
-      
    
    
