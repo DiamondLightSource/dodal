@@ -512,9 +512,12 @@ def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
 
 @pytest.mark.parametrize(
     "x_list, y_list, grid, final_shape, final_length",
-    ([[0, 1, 2], [3, 4, 5], False, [3], 4], [[0, 1, 2], [3, 4, 5, 6], True, [3, 4], 4]),
+    (
+        [[0, 10, 1], [0, 5], False, (11,), 4],
+        [[0, 10, 1], [0, 5, 1], True, (11, 6), 4],
+    ),
 )
-def test_make_list_scan_args(
+def test_make_step_scan_args_and_shape(
     x_axis: Motor,
     x_list: list,
     y_axis: Motor,
@@ -526,6 +529,7 @@ def test_make_list_scan_args(
     args, shape = _make_step_scan_args_and_shape(
         params=[x_axis, *x_list, y_axis, *y_list], grid=grid
     )
+    print(args)
     assert len(args) == final_length
     assert shape == final_shape
 
@@ -742,49 +746,6 @@ def test_make_stepped_list_num(start: float, step: float):
 def test_make_stepped_list_fails_when_given_equal_start_and_stop_values():
     with pytest.raises(ValueError):
         _make_stepped_list_step(start=1.1, stop=1.1, step=0.25)
-
-
-@pytest.mark.parametrize(
-    "x_list, y_list, grid, final_shape, final_length",
-    (
-        [[0, 1, 0.25], [0, 0.1], False, (5,), 4],
-        [
-            [0, 1, 0.25],
-            [0, 1, 0.2],
-            True,
-            (5, 6),
-            4,
-        ],
-        [[0, -1, -0.25], [0, -0.1], False, (5), 4],
-        [
-            [0, -1, -0.25],
-            [0, -1, -0.2],
-            True,
-            (
-                5,
-                6,
-            ),
-            4,
-        ],
-    ),
-)
-def test_make_step_scan_args(
-    x_axis: Motor,
-    x_list: list[float],
-    y_axis: Motor,
-    y_list: list[float],
-    grid: bool,
-    final_shape: list,
-    final_length: int,
-):
-    args, shape = _make_step_scan_args_and_shape(
-        params=[x_axis, *x_list, y_axis, *y_list], grid=grid
-    )
-    assert shape == final_shape
-    assert args == [x_axis]
-    # assert len(args) == final_length
-    # assert args[0] == x_axis
-    # assert args[2] == y_axis
 
 
 @pytest.mark.parametrize(

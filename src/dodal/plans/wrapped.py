@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from decimal import Decimal
-from typing import Annotated, Any
+from typing import Annotated, Any, TypeVar
 
 import bluesky.plans as bp
 import numpy as np
@@ -24,6 +24,8 @@ We may also need other adjustments for UI purposes, e.g.
     - Forcing uniqueness or orderedness of Readables.
     - Limits and metadata (e.g. units).
 """
+
+T = TypeVar("T")
 
 
 @attach_data_session_metadata_decorator()
@@ -60,36 +62,6 @@ def count(
     metadata = metadata or {}
     metadata["shape"] = (num,)
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)
-
-
-# def _make_num_scan_args(
-#     params: Sequence[Movable | float | int], num: int | None = None
-# ) -> list[float]:
-#     # shape = []
-#     # if num:
-#     #     shape = [num]
-#     #     for param in params:
-#     #         if len(param[1]) == 2:
-#     #             pass
-#     #         else:
-#     #             raise ValueError("You must provide 'start stop' for each motor.")
-#     # else:
-#     #     for param in params:
-#     #         if len(param[1]) == 3:
-#     #             shape.append(param[1][-1])
-#     #         else:
-#     #             raise ValueError(
-#     #                 "You must provide 'start stop num' for each motor in a grid scan."
-#     #             )
-
-#     # args = []
-#     # for param in params:
-#     #     args.append(param[0])
-#     #     args.extend(param[1])
-#     for param in params:
-#         if isinstance(param, Movable):
-
-#     return args, shape
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
@@ -392,107 +364,84 @@ def _make_stepped_list_num(start: float, step: float, num: int) -> list[float | 
 
 
 def _make_step_scan_args_and_shape(
-    params: Sequence[Movable | float | int], grid: bool
-) -> tuple[Sequence[Movable | list[float | int]], tuple[int, ...]]:
+    params: Sequence[Movable | float | int],
+    grid: bool,
+) -> tuple[list[Movable | list[float]], tuple[int, ...]]:
 
-    args: list[Movable | list[float | int]] = []
-    shape = []
-    stepped_list_length = 0
+    def require(
+        value: object,
+        expected: type[T] | tuple[type, ...],
+        name: str,
+    ) -> T:
+        expected_tuple = expected if isinstance(expected, tuple) else (expected,)
+        if not isinstance(value, expected_tuple):
+            allowed = ", ".join(t.__name__ for t in expected_tuple)
+            raise ValueError(
+                f"Parameter {name} must be one of type ({allowed}), got {type(value).__name__}"
+            )
+        return value  # type: ignore[return-value]
 
-    try:
-        for i, param in enumerate(params):
-            if isinstance(param, Movable):
-                movable = param
-                start = params[i + 1]
-                if not isinstance(start, (float, int)):
-                    raise ValueError(
-                        f"You provided movable {movable} with no start, stop, step."
-                    )
+    def parse_full_axis(
+        values: Sequence[Movable | float | int],
+    ) -> tuple[Movable, float, float, float]:
+        if len(values) != 4:
+            raise ValueError(
+                f"Full axis must be movable, start, stop, step. You provided {values}"
+            )
+        movable = require(values[0], Movable, "movable")
+        start = require(values[1], (int, float), "start")
+        stop = require(values[2], (int, float), "stop")
+        step = require(values[3], (int, float), "step")
 
-                stop = params[i + 2]
-                if not isinstance(stop, (float, int)):
-                    raise ValueError(
-                        f"You provided movable {movable} with start value {start} but no stop and step."
-                    )
+        return movable, start, stop, step
 
-                step = params[i + 3]
-                if not isinstance(step, (float, int)):
-                    raise ValueError(
-                        f"You provided movable {movable} with start value {start}, stop value {stop}  but no step value."
-                    )
+    def parse_relative_axis(
+        values: Sequence[Movable | float | int],
+    ) -> tuple[Movable, float, float]:
+        if len(values) != 3:
+            raise ValueError(
+                f"Relative axis must be movable, start, step. You provided {values}"
+            )
+        movable = require(values[0], Movable, "movable")
+        start = require(values[1], (int, float), "start")
+        step = require(values[2], (int, float), "step")
 
-                movable_values = _make_stepped_list_step(start, stop, step)
-                stepped_list_length = len(movable_values)
-                args.append(movable)
-                args.append(movable_values)
+        return movable, start, step
 
-                if not grid:
-                    break
+    if len(params) < 4:
+        raise ValueError("At least one axis must provide (movable, start, stop, step)")
 
-        if not grid:
-            # Skip first 4 values as already done them.
-            for i, param in enumerate(params[4:]):
-                if isinstance(param, Movable):
-                    movable = param
-                    start = params[i + 1]
-                    if not isinstance(start, (float, int)):
-                        raise ValueError(
-                            f"You provided movable {movable} with no start, stop, step."
-                        )
+    args: list[Movable | list[float]] = []
+    shape: list[int] = []
 
-                    step = params[i + 2]
-                    if not isinstance(step, (float, int)):
-                        raise ValueError(
-                            f"You provided movable {movable} with start value {start}, stop value {step}  but no step value."
-                        )
+    # First axis defines scan length
+    movable, start, stop, step = parse_full_axis(params[:4])
 
-                    movable_values = _make_stepped_list_num(
-                        start, step, stepped_list_length
-                    )
-                    args.append(movable)
-                    args.append(movable_values)
-                    # shape.append(len(values))
-    except IndexError as e:
-        raise ValueError("Incorrect parameters provided.") from e
+    values = _make_stepped_list_step(start, stop, step)
+    stepped_list_length = len(values)
+
+    args.extend([movable, values])
+    shape.append(stepped_list_length)
+
+    remaining = params[4:]
+
+    chunk_size = 4 if grid else 3
+
+    if len(remaining) % chunk_size != 0:
+        raise ValueError("Incorrect number of parameters for additional axes")
+
+    for i in range(0, len(remaining), chunk_size):
+        chunk = remaining[i : i + chunk_size]
+        if grid:
+            movable, start, stop, step = parse_full_axis(chunk)
+            values = _make_stepped_list_step(start, stop, step)
+            shape.append(len(values))
+        else:
+            movable, start, step = parse_relative_axis(chunk)
+            values = _make_stepped_list_num(start, step, stepped_list_length)
+        args.extend([movable, values])
 
     return args, tuple(shape)
-
-    # first_movable_param, *additional_movable_params = params
-    # if len(first_movable_param[1]) == 3:
-    #     start, stop, step = first_movable_param[1]
-    #     stepped_list = _make_stepped_list_step(start, stop, step)
-    #     stepped_list_length = len(stepped_list)
-    #     args.append(first_movable_param[0])
-    #     args.append(stepped_list)
-    #     shape.append(stepped_list_length)
-    # else:
-    #     raise ValueError(
-    #         f"You provided {len(first_movable_param[1])} parameters for {first_movable_param[0]}, rather than 3."
-    #     )
-    # for param in additional_movable_params:
-    #     if grid:
-    #         if len(param[1]) == 3:
-    #             start, stop, step = param[1]
-    #             stepped_list = _make_stepped_list_step(start, stop, step)
-    #             args.append(param[0])
-    #             args.append(stepped_list)
-    #             shape.append(len(stepped_list))
-    #         else:
-    #             raise ValueError(
-    #                 f"You provided {len(param[1])} parameters for {param[0]}, rather than 3."
-    #             )
-    #     else:
-    #         if len(param[1]) == 2:
-    #             start, step = param[1]
-    #             stepped_list = _make_stepped_list_num(start, step, stepped_list_length)
-    #             args.append(param[0])
-    #             args.append(stepped_list)
-    #         else:
-    #             raise ValueError(
-    #                 f"You provided {len(param[1])} parameters {param[0]}, rather than 2."
-    #             )
-
-    # return args, shape
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
@@ -520,11 +469,10 @@ def step_scan(
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args_and_shape(params, grid=False)
-    print(args)
     metadata = metadata or {}
     metadata["shape"] = shape
 
-    yield from bp.list_scan(tuple(detectors), *tuple(args), md=metadata)
+    yield from bp.list_scan(tuple(detectors), *tuple(args), md=metadata)  # type: ignore
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
@@ -622,6 +570,8 @@ def step_grid_rscan(
     args, shape = _make_step_scan_args_and_shape(params, grid=True)
     metadata = metadata or {}
     metadata["shape"] = shape
+
+    print(args)
 
     yield from bp.rel_list_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
