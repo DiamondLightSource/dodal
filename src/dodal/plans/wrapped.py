@@ -355,7 +355,7 @@ def _make_stepped_list_step(
 
 def _make_stepped_list_num(start: float, step: float, num: int) -> list[float | int]:
     if num <= 0:
-        raise ValueError()
+        raise ValueError("Number of steps must be greater than zero.")
     stepped_list = [start + (n * step) for n in range(num)]
     rounded_stepped_list = _round_list_elements(
         stepped_list=stepped_list, params=[start, step]
@@ -428,7 +428,7 @@ def _make_step_scan_args_and_shape(
     chunk_size = 4 if grid else 3
 
     if len(remaining) % chunk_size != 0:
-        raise ValueError("Incorrect number of parameters for additional axes")
+        raise ValueError("Incorrect number of parameters for additional axes.")
 
     for i in range(0, len(remaining), chunk_size):
         chunk = remaining[i : i + chunk_size]
