@@ -1,7 +1,6 @@
 import importlib
 import logging
 import os
-import sys
 from os import environ
 from pathlib import Path
 from types import ModuleType
@@ -92,11 +91,6 @@ def pytest_runtest_setup(item):
             set_up_all_logging_handlers(
                 LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000
             )
-
-
-def pytest_runtest_teardown():
-    if "dodal.beamlines.beamline_utils" in sys.modules:
-        sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
 
 
 @pytest.fixture
