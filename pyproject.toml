@@ -61,7 +61,7 @@ dev = [
     "pytest-timeout",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<9.1.1",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
