@@ -16,6 +16,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.testing import assert_emitted
 
+from dodal.common.enums import OpenClosed
 from dodal.devices.beamlines.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
     I10Apple2,
@@ -31,7 +32,6 @@ from dodal.devices.insertion_device import (
     InsertionDevicePolarisation,
     Pol,
     UndulatorGap,
-    UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
@@ -253,7 +253,7 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
     set_mock_value(
         mock_id_controller.apple2().gap().status, EnabledDisabledUpper.ENABLED
     )
-    set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.OPEN)
+    set_mock_value(mock_id_controller.apple2().gap().gate, OpenClosed.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
     assert (
@@ -629,11 +629,11 @@ async def test_linear_arbitrary_run_engine_scan(
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=num_point, stop=1)
     set_mock_value(
         mock_id_controller.apple2().gap().gate,
-        UndulatorGateStatus.CLOSE,
+        OpenClosed.CLOSED,
     )
     set_mock_value(
         mock_id_controller.apple2().phase().gate,
-        UndulatorGateStatus.CLOSE,
+        OpenClosed.CLOSED,
     )
     jaw_phase = get_mock_put(
         mock_id_controller.apple2().jaw_phase().jaw_phase.user_setpoint

@@ -6,6 +6,7 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
+from dodal.common.enums import OpenClosed
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
@@ -14,7 +15,6 @@ from dodal.devices.insertion_device import (
     EnabledDisabledUpper,
     EnergyMotorConvertor,
     Pol,
-    UndulatorGateStatus,
     UndulatorLockedPhaseAxes,
 )
 
@@ -34,7 +34,7 @@ async def mock_locked_phase_axes(
             btm_inner="RPQ4",
         )
     assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_phase_axes.gate, OpenClosed.CLOSED)
     set_mock_value(mock_phase_axes.top_outer.velocity, 2)
     set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
     set_mock_value(mock_phase_axes.top_outer.user_readback, 2)

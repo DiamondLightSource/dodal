@@ -7,10 +7,10 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
+from dodal.common.enums import OpenClosed
 from dodal.devices.insertion_device import (
     EnabledDisabledUpper,
     UndulatorGap,
-    UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
@@ -40,7 +40,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with init_devices(mock=True):
         mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
     assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id_gap.gate, OpenClosed.CLOSED)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
     set_mock_value(mock_id_gap.user_setpoint, "1")
@@ -59,7 +59,7 @@ async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxe
             btm_inner="RPQ4",
         )
     assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_phase_axes.gate, OpenClosed.CLOSED)
     set_mock_value(mock_phase_axes.top_outer.velocity, 2)
     set_mock_value(mock_phase_axes.top_inner.velocity, 2)
     set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
@@ -74,7 +74,7 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
         mock_jaw_phase = UndulatorJawPhase(
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_jaw_phase.gate, OpenClosed.CLOSED)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
     set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
@@ -93,7 +93,7 @@ async def mock_locked_phase_axes(
             btm_inner="RPQ4",
         )
     assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_phase_axes.gate, OpenClosed.CLOSED)
     set_mock_value(mock_phase_axes.top_outer.velocity, 2)
     set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
     set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
