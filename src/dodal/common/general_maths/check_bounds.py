@@ -33,7 +33,7 @@ def is_within_range(
         @model_validator(mode="after")
         def validate_bounds(self) -> "ValueRange":
             if self.hi < self.lo:
-                raise ValueError(f"Upper bound {self.hi} < {self.lo}")
+                raise ValueError(f"Upper bound {self.hi} < Lower bound {self.lo}")
             return self
 
     ValueRange(lo=lower_bound, hi=upper_bound)
