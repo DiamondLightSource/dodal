@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.2.4.dev7+g0beeb3135 documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.2.4.dev8+g553594d52 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=facfb66a"></script>
+    <script src="../../../../../_static/documentation_options.js?v=2cb2014a"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,9 +885,10 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.electron_analyser.base.base_detector</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Reading</span><span class="p">,</span> <span class="n">Stageable</span><span class="p">,</span> <span class="n">Triggerable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preparable</span><span class="p">,</span> <span class="n">Reading</span><span class="p">,</span> <span class="n">Stageable</span><span class="p">,</span> <span class="n">Triggerable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">event_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataKey</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncConfigurable</span><span class="p">,</span>
@@ -905,15 +906,41 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractBaseRegion</span><span class="p">,</span>
+    <span class="n">AbstractBaseSequence</span><span class="p">,</span>
     <span class="n">GenericRegion</span><span class="p">,</span>
     <span class="n">TAbstractBaseRegion</span><span class="p">,</span>
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="BaseElectronAnalyserDetector">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.BaseElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.BaseElectronAnalyserDetector">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BaseElectronAnalyserDetector</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SequenceHolder</span><span class="p">(</span><span class="n">Stageable</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper to hold the sequence data for an electron analyser.</span>
+
+<span class="sd">    Used in scans when we need to hold the state of the configured sequence of regions</span>
+<span class="sd">    to give to the electron analyser for each step of a scan.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="n">AbstractBaseSequence</span><span class="p">[</span><span class="n">AbstractBaseRegion</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">AbstractBaseSequence</span><span class="p">[</span><span class="n">AbstractBaseRegion</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="ElectronAnalyserDetector">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserDetector</span><span class="p">(</span>
     <span class="n">Device</span><span class="p">,</span>
+    <span class="n">Stageable</span><span class="p">,</span>
     <span class="n">Triggerable</span><span class="p">,</span>
     <span class="n">AsyncReadable</span><span class="p">,</span>
     <span class="n">AsyncConfigurable</span><span class="p">,</span>
@@ -934,8 +961,32 @@ window.runMermaid = runMermaid;</script>
         <span class="p">],</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">SequenceHolder</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span> <span class="o">=</span> <span class="n">controller</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElectronAnalyserDetector.stage">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare the detector for use by ensuring it is idle and ready.</span>
+
+<span class="sd">        This method asynchronously stages the detector by disarming the controller to</span>
+<span class="sd">        ensure the detector is not actively acquiring data.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Any exceptions raised by the driver&#39;s stage or controller&#39;s disarm methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">stage</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ElectronAnalyserDetector.unstage">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Disarm the detector.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">unstage</span><span class="p">())</span></div>
+
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">TAbstractBaseRegion</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -964,119 +1015,6 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">describe_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataKey</span><span class="p">]:</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">describe_configuration</span><span class="p">()</span></div>
-
-
-
-<span class="n">GenericBaseElectronAnalyserDetector</span> <span class="o">=</span> <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span>
-    <span class="n">GenericAnalyserDriverIO</span><span class="p">,</span> <span class="n">GenericRegion</span>
-<span class="p">]</span>
-
-
-<div class="viewcode-block" id="ElectronAnalyserRegionDetector">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserRegionDetector</span><span class="p">(</span>
-    <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
-    <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extends electron analyser detector to configure specific region settings before</span>
-<span class="sd">    data acquisition. It is designed to only exist inside a plan.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">controller</span><span class="p">:</span> <span class="n">ElectronAnalyserController</span><span class="p">[</span>
-            <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span>
-        <span class="p">],</span>
-        <span class="n">region</span><span class="p">:</span> <span class="n">TAbstractBaseRegion</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="n">region</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Configure region parameters on the driver first before data collection.</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
-        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span></div>
-
-
-
-<span class="c1"># Used in sm-bluesky, but will hopefully be removed along with</span>
-<span class="c1"># ElectronAnalyserRegionDetector in future. Blocked by:</span>
-<span class="c1"># https://github.com/bluesky/bluesky/pull/1978</span>
-<span class="n">GenericElectronAnalyserRegionDetector</span> <span class="o">=</span> <span class="n">ElectronAnalyserRegionDetector</span><span class="p">[</span>
-    <span class="n">GenericAnalyserDriverIO</span><span class="p">,</span> <span class="n">GenericRegion</span>
-<span class="p">]</span>
-<span class="n">TElectronAnalyserRegionDetector</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span>
-    <span class="s2">&quot;TElectronAnalyserRegionDetector&quot;</span><span class="p">,</span>
-    <span class="n">bound</span><span class="o">=</span><span class="n">ElectronAnalyserRegionDetector</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<div class="viewcode-block" id="ElectronAnalyserDetector">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserDetector</span><span class="p">(</span>
-    <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
-    <span class="n">Stageable</span><span class="p">,</span>
-    <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Electron analyser detector with the additional functionality to load a sequence</span>
-<span class="sd">    file and create a list of temporary ElectronAnalyserRegionDetector objects. These</span>
-<span class="sd">    will setup configured region settings before data acquisition.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="ElectronAnalyserDetector.stage">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare the detector for use by ensuring it is idle and ready.</span>
-
-<span class="sd">        This method asynchronously stages the detector by first disarming the controller</span>
-<span class="sd">        to ensure the detector is not actively acquiring data, then invokes the driver&#39;s</span>
-<span class="sd">        stage procedure. This ensures the detector is in a known, ready state</span>
-<span class="sd">        before use.</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            Any exceptions raised by the driver&#39;s stage or controller&#39;s disarm methods.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="ElectronAnalyserDetector.unstage">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Disarm the detector.&quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="ElectronAnalyserDetector.create_region_detector_list">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.create_region_detector_list">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">create_region_detector_list</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">regions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">]</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span>
-        <span class="n">ElectronAnalyserRegionDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">]</span>
-    <span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method can hopefully be dropped when this is merged and released.</span>
-<span class="sd">        https://github.com/bluesky/bluesky/pull/1978.</span>
-
-<span class="sd">        Create a list of detectors equal to the number of regions. Each detector is</span>
-<span class="sd">        responsible for setting up a specific region.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            regions: The list of regions to give to each region detector.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            List of ElectronAnalyserRegionDetector, equal to the number of regions in</span>
-<span class="sd">            the sequence file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="n">ElectronAnalyserRegionDetector</span><span class="p">[</span>
-                <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span>
-            <span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">regions</span>
-        <span class="p">]</span></div>
-</div>
 
 
 

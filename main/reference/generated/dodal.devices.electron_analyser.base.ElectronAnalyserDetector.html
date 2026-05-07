@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser.base.ElectronAnalyserDetector &#8212; dodal 2.2.4.dev7+g0beeb3135 documentation</title>
+    <title>dodal.devices.electron_analyser.base.ElectronAnalyserDetector &#8212; dodal 2.2.4.dev8+g553594d52 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=facfb66a"></script>
+    <script src="../../_static/documentation_options.js?v=2cb2014a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,8 +59,8 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector" href="dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector.html" />
-    <link rel="prev" title="dodal.devices.electron_analyser.base.BaseElectronAnalyserDetector" href="dodal.devices.electron_analyser.base.BaseElectronAnalyserDetector.html" />
+    <link rel="next" title="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO" href="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html" />
+    <link rel="prev" title="dodal.devices.electron_analyser.base.ElectronAnalyserController" href="dodal.devices.electron_analyser.base.ElectronAnalyserController.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -1043,9 +1043,11 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.electron_analyser.base.ElectronAnalyserDetector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.electron_analyser.base.</span></span><span class="sig-name descname"><span class="pre">ElectronAnalyserDetector</span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/base_detector.html#ElectronAnalyserDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector" title="Link to this definition">#</a></dt>
-<dd><p>Electron analyser detector with the additional functionality to load a sequence
-file and create a list of temporary ElectronAnalyserRegionDetector objects. These
-will setup configured region settings before data acquisition.</p>
+<dd><p>Detector for data acquisition of electron analyser. Can only acquire using
+settings already configured for the device.</p>
+<p>If possible, this should be changed to inherit from a StandardDetector. Currently,
+StandardDetector forces you to use a file writer which doesn’t apply here.
+See issue <a class="github reference external" href="https://github.com/bluesky/ophyd-async/issues/888">bluesky/ophyd-async#888</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1057,13 +1059,28 @@ will setup configured region settings before data acquisition.</p>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.create_region_detector_list" title="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.create_region_detector_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_region_detector_list</span></code></a>(regions)</p></td>
-<td><p>This method can hopefully be dropped when this is merged and released.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe_configuration</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_configuration</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(region)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage" title="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stage</span></code></a>()</p></td>
 <td><p>Prepare the detector for use by ensuring it is idle and ready.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage" title="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unstage</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trigger</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage" title="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unstage</span></code></a>()</p></td>
 <td><p>Disarm the detector.</p></td>
 </tr>
 </tbody>
@@ -1079,10 +1096,8 @@ will setup configured region settings before data acquisition.</p>
 <dt class="sig sig-object py" id="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage">
 <span class="sig-name descname"><span class="pre">stage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/base_detector.html#ElectronAnalyserDetector.stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage" title="Link to this definition">#</a></dt>
 <dd><p>Prepare the detector for use by ensuring it is idle and ready.</p>
-<p>This method asynchronously stages the detector by first disarming the controller
-to ensure the detector is not actively acquiring data, then invokes the driver’s
-stage procedure. This ensures the detector is in a known, ready state
-before use.</p>
+<p>This method asynchronously stages the detector by disarming the controller to
+ensure the detector is not actively acquiring data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>Any exceptions raised by the driver's stage</strong><strong> or </strong><strong>controller's disarm methods.</strong> – </p>
@@ -1104,27 +1119,6 @@ before use.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.create_region_detector_list">
-<span class="sig-name descname"><span class="pre">create_region_detector_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">TAbstractBaseRegion</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector" title="dodal.devices.electron_analyser.base.base_detector.ElectronAnalyserRegionDetector"><span class="pre">ElectronAnalyserRegionDetector</span></a><span class="p"><span class="pre">[</span></span><span class="pre">TAbstractAnalyserDriverIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">TAbstractBaseRegion</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/base_detector.html#ElectronAnalyserDetector.create_region_detector_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.create_region_detector_list" title="Link to this definition">#</a></dt>
-<dd><p>This method can hopefully be dropped when this is merged and released.
-<a class="github reference external" href="https://github.com/bluesky/bluesky/pull/1978">bluesky/bluesky#1978</a>.</p>
-<p>Create a list of detectors equal to the number of regions. Each detector is
-responsible for setting up a specific region.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>regions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractBaseRegion</span></code>, bound= <a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion" title="dodal.devices.electron_analyser.base.base_region.AbstractBaseRegion"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractBaseRegion</span></code></a>)]</span>) – The list of regions to give to each region detector.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector" title="dodal.devices.electron_analyser.base.base_detector.ElectronAnalyserRegionDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">ElectronAnalyserRegionDetector</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractAnalyserDriverIO</span></code>, bound= <a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html#dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO" title="dodal.devices.electron_analyser.base.base_driver_io.AbstractAnalyserDriverIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAnalyserDriverIO</span></code></a>), <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractBaseRegion</span></code>, bound= <a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion" title="dodal.devices.electron_analyser.base.base_region.AbstractBaseRegion"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractBaseRegion</span></code></a>)]]</span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of ElectronAnalyserRegionDetector, equal to the number of regions in
-the sequence file.</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -1140,20 +1134,20 @@ the sequence file.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.electron_analyser.base.BaseElectronAnalyserDetector.html"
+       href="dodal.devices.electron_analyser.base.ElectronAnalyserController.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.electron_analyser.base.BaseElectronAnalyserDetector</p>
+        <p class="prev-next-title">dodal.devices.electron_analyser.base.ElectronAnalyserController</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector.html"
+       href="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.electron_analyser.base.ElectronAnalyserRegionDetector</p>
+        <p class="prev-next-title">dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1179,7 +1173,6 @@ the sequence file.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector"><code class="docutils literal notranslate"><span class="pre">ElectronAnalyserDetector</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage"><code class="docutils literal notranslate"><span class="pre">ElectronAnalyserDetector.stage()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage"><code class="docutils literal notranslate"><span class="pre">ElectronAnalyserDetector.unstage()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.create_region_detector_list"><code class="docutils literal notranslate"><span class="pre">ElectronAnalyserDetector.create_region_detector_list()</span></code></a></li>
 </ul>
 </li>
 </ul>

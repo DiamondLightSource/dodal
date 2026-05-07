@@ -15,17 +15,26 @@ dodal.devices.electron\_analyser.base.ElectronAnalyserDetector
       
       
       
-      ~ElectronAnalyserDetector.create_region_detector_list
+      ~ElectronAnalyserDetector.describe
       
       
+      ~ElectronAnalyserDetector.describe_configuration
       
       
+      ~ElectronAnalyserDetector.read
       
+      
+      ~ElectronAnalyserDetector.read_configuration
+      
+      
+      ~ElectronAnalyserDetector.set
       
       
       
       ~ElectronAnalyserDetector.stage
       
+      
+      ~ElectronAnalyserDetector.trigger
       
       
       ~ElectronAnalyserDetector.unstage

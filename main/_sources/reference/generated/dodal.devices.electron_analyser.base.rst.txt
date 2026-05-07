@@ -15,9 +15,7 @@ dodal.devices.electron\_analyser.base
    :recursive:
 
    ~base.ElectronAnalyserController
-   ~base.BaseElectronAnalyserDetector
    ~base.ElectronAnalyserDetector
-   ~base.ElectronAnalyserRegionDetector
    ~base.AbstractAnalyserDriverIO
    ~base.EnergyMode
    ~base.AbstractBaseRegion
