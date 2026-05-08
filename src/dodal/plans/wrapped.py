@@ -343,6 +343,8 @@ def _make_stepped_list_step(
         raise ValueError(
             f"Start ({start}) and stop ({stop}) values cannot be the same."
         )
+    if step <= 0:
+        raise ValueError("Step size must be greater than zero.")
     if abs(step) > abs(stop - start):
         step = stop - start
     step = abs(step) * np.sign(stop - start)
@@ -357,7 +359,7 @@ def _make_stepped_list_step(
 
 def _make_stepped_list_num(start: float, step: float, num: int) -> list[float | int]:
     if num <= 0:
-        raise ValueError("Number of steps must be greater than zero.")
+        raise ValueError("Number of points must be greater than zero.")
     stepped_list = [start + (n * step) for n in range(num)]
     rounded_stepped_list = _round_list_elements(
         stepped_list=stepped_list, params=[start, step]
@@ -374,7 +376,7 @@ def require(
     if not isinstance(value, expected_tuple):
         allowed = ", ".join(t.__name__ for t in expected_tuple)
         raise ValueError(
-            f"Parameter {name} must be one of type ({allowed}), got {type(value).__name__}"
+            f"Parameter {name} must be one of type {allowed}, got {type(value).__name__}."
         )
     return value  # type: ignore[return-value]
 

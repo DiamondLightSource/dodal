@@ -1,3 +1,4 @@
+import re
 from collections.abc import Mapping, Sequence
 from typing import cast
 
@@ -33,6 +34,7 @@ from dodal.plans.wrapped import (
     num_grid_scan,
     num_rscan,
     num_scan,
+    require,
     step_grid_rscan,
     step_grid_scan,
     step_rscan,
@@ -738,9 +740,27 @@ def test_make_stepped_list_num(start: float, step: float):
     assert stepped_list[10] == 0
 
 
-def test_make_stepped_list_fails_when_given_equal_start_and_stop_values():
-    with pytest.raises(ValueError):
-        _make_stepped_list_step(start=1.1, stop=1.1, step=0.25)
+def test_make_stepped_list_num_fails_when_num_is_zero():
+    start = stop = 1.1
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"Start ({start}) and stop ({stop}) values cannot be the same."
+        ),
+    ):
+        _make_stepped_list_step(start=start, stop=stop, step=0.25)
+
+
+def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values():
+    with pytest.raises(ValueError, match="Number of points must be greater than zero."):
+        _make_stepped_list_num(start=1, step=0.1, num=0)
+
+
+def test_require_raises_error_if_not_correct_type():
+    with pytest.raises(
+        ValueError, match="Parameter test must be one of type str, got int."
+    ):
+        require(value=5, expected=str, name="test")
 
 
 @pytest.mark.parametrize(
@@ -1015,3 +1035,15 @@ def test_make_step_scan_args_and_shape_fails_with_invalid_type_args(
             [x_axis, 1, "3", 1, y_axis, 1, "4"],  # type: ignore
             grid=False,
         )
+
+
+def test_step_scan_fails_with_step_size_zero(
+    run_engine: RunEngine,
+    detectors: Sequence[StandardDetector],
+    x_axis: Motor,
+):
+    with pytest.raises(
+        ValueError,
+        match="Step size must be greater than zero.",
+    ):
+        run_engine(step_scan(detectors=detectors, params=[x_axis, 1, 5, 0]))
