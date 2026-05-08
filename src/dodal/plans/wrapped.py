@@ -185,14 +185,19 @@ def num_grid_rscan(
 
 
 def _make_list_scan_shape(
-    params: Sequence[Movable | list[float | int]],
+    params: Sequence[Movable | list[float | int]], grid: bool
 ) -> tuple[int, ...]:
+    shape = []
     for param in params:
         # List arg must all be same size. If list missing or not same size, this will
         # be validated by bp.list_scan.
         if isinstance(param, list):
-            return (len(param),)
-    return ()
+            dim = len(param)
+            shape.append(dim)
+            if not grid:
+                break
+
+    return tuple(shape)
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
@@ -220,7 +225,7 @@ def list_scan(
     Wraps bluesky.plans.list_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(params)
+    metadata["shape"] = _make_list_scan_shape(params, grid=False)
 
     # Not sure about this one
     yield from bp.list_scan(tuple(detectors), *tuple(params), md=metadata)  # type: ignore
@@ -252,11 +257,7 @@ def list_grid_scan(
     bluesky.plans.list_grid_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    shape = []
-    for param in params:
-        if isinstance(param, list):
-            shape.append(len(param))
-    metadata["shape"] = tuple(shape)
+    metadata["shape"] = _make_list_scan_shape(params, grid=False)
 
     yield from bp.list_grid_scan(
         tuple(detectors), *params, snake_axes=snake_axes, md=metadata
@@ -288,7 +289,7 @@ def list_rscan(
     Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(params)
+    metadata["shape"] = _make_list_scan_shape(params, grid=False)
     yield from bp.rel_list_scan(tuple(detectors), *params, md=metadata)
 
 
@@ -318,7 +319,7 @@ def list_grid_rscan(
     bluesky.plans.rel_list_grid_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(params)
+    metadata["shape"] = _make_list_scan_shape(params, grid=True)
     yield from bp.rel_list_grid_scan(
         tuple(detectors), *params, snake_axes=snake_axes, md=metadata
     )
@@ -396,7 +397,7 @@ def parse_relative_axis(
 ) -> tuple[Movable, float, float]:
     if len(values) != 3:
         raise ValueError(
-            f"The axis must be movable, start, step. You provided {', '.join(map(str, values))}"
+            f"The axis must be movable, start, stop. You provided {', '.join(map(str, values))}"
         )
     movable = require(values[0], Movable, "movable")
     start = require(values[1], (int, float), "start")
