@@ -268,10 +268,10 @@ def test_num_scan_with_two_axes(
 
 
 def test_num_scan_fails_when_given_wrong_number_of_params(
-    run_engine: RunEngine, detectors: Sequence[StandardDetector], x_axis: Motor
+    run_engine: RunEngine, x_axis: Motor
 ):
     with pytest.raises(ValueError):
-        run_engine(num_scan(detectors=detectors, params=[x_axis, -1, 1, 5], num=5))
+        run_engine(num_scan(detectors=[], params=[x_axis, -1, 1, 5], num=5))
 
 
 @pytest.mark.parametrize(
@@ -280,7 +280,6 @@ def test_num_scan_fails_when_given_wrong_number_of_params(
 )
 def test_num_scan_fails_when_given_bad_info(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -290,7 +289,7 @@ def test_num_scan_fails_when_given_bad_info(
     with pytest.raises(ValueError):
         run_engine(
             num_scan(
-                detectors=detectors,
+                detectors=[],
                 params=[x_axis, *x_list, y_axis, *y_list],
                 num=num,
             )
@@ -346,14 +345,11 @@ def test_num_grid_scan_when_not_snaking(
 
 def test_num_grid_scan_fails_when_given_wrong_number_of_params(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
-        run_engine(
-            num_grid_scan(detectors=detectors, params=[x_axis, 0, 1.1, 2, y_axis, 1.1])
-        )
+        run_engine(num_grid_scan(detectors=[], params=[x_axis, 0, 1.1, 2, y_axis, 1.1]))
 
 
 @pytest.mark.parametrize(
@@ -361,7 +357,6 @@ def test_num_grid_scan_fails_when_given_wrong_number_of_params(
 )
 def test_num_scan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -370,7 +365,7 @@ def test_num_scan_fails_when_asked_to_snake_slow_axis(
     with pytest.raises(ValueError):
         run_engine(
             num_grid_scan(
-                detectors=detectors,
+                detectors=[],
                 params=[x_axis, *x_list, y_axis, *y_list],
                 snake_axes=[x_axis],
             )
@@ -418,7 +413,6 @@ def test_num_rscan_with_two_axes(
 )
 def test_num_rscan_fails_when_given_bad_info(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -428,7 +422,7 @@ def test_num_rscan_fails_when_given_bad_info(
     with pytest.raises(ValueError):
         run_engine(
             num_rscan(
-                detectors=detectors,
+                detectors=[],
                 params=[x_axis, *x_list, y_axis, *y_list],
                 num=num,
             )
@@ -487,7 +481,6 @@ def test_num_grid_rscan_when_not_snaking(
 )
 def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -496,7 +489,7 @@ def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
     with pytest.raises(ValueError):
         run_engine(
             num_grid_rscan(
-                detectors=detectors,
+                detectors=[],
                 params=[x_axis, *x_list, y_axis, *y_list],
                 snake_axes=[x_axis],
             )
@@ -574,14 +567,13 @@ def test_list_scan_with_two_axes(
 
 def test_list_scan_fails_with_differnt_list_lengths(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
         run_engine(
             list_scan(
-                detectors=detectors,
+                detectors=[],
                 params=[x_axis, [1, 2, 3, 4, 5], y_axis, [1, 2, 3, 4]],
             )
         )
@@ -650,14 +642,13 @@ def test_list_rscan_with_two_axes(
 
 def test_list_rscan_fails_with_differnt_list_lengths(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
         run_engine(
             list_rscan(
-                detectors=detectors,
+                detectors=[],
                 params=[x_axis, [1, 2, 3, 4, 5], y_axis, [1, 2, 3, 4]],
             )
         )
@@ -752,8 +743,11 @@ def test_make_stepped_list_num_fails_when_num_is_zero():
 
 
 def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values():
-    with pytest.raises(ValueError, match="Number of points must be greater than zero."):
-        _make_stepped_list_num(start=1, step=0.1, num=0)
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Number of points (0) and number of steps (0) cannot be zero."),
+    ):
+        _make_stepped_list_num(start=1, step=0, num=0)
 
 
 def test_require_raises_error_if_not_correct_type():
@@ -960,7 +954,6 @@ def test_step_grid_rscan(
 @pytest.mark.parametrize("x_list, y_list", ([[0, 1], [0, 1, 0.1]], [[0], [0, 1, 0.1]]))
 def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axes(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -971,9 +964,7 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axes(
         match="The axis must be movable, start, stop, step.",
     ):
         run_engine(
-            step_grid_scan(
-                detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list]
-            )
+            step_grid_scan(detectors=[], params=[x_axis, *x_list, y_axis, *y_list])
         )
 
 
@@ -982,7 +973,6 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axes(
 )
 def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_second_axes(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -993,9 +983,7 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_second_axes(
         match="The axis must be movable, start, stop, step.",
     ):
         run_engine(
-            step_grid_scan(
-                detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list]
-            )
+            step_grid_scan(detectors=[], params=[x_axis, *x_list, y_axis, *y_list])
         )
 
 
@@ -1004,7 +992,6 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_second_axes(
 )
 def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -1014,9 +1001,7 @@ def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
         ValueError,
         match="The axis must be movable, start, stop.",
     ):
-        run_engine(
-            step_scan(detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list])
-        )
+        run_engine(step_scan(detectors=[], params=[x_axis, *x_list, y_axis, *y_list]))
 
 
 def test_make_step_scan_args_and_shape_fails_with_invalid_type_args(
@@ -1039,11 +1024,10 @@ def test_make_step_scan_args_and_shape_fails_with_invalid_type_args(
 
 def test_step_scan_fails_with_step_size_zero(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
 ):
     with pytest.raises(
         ValueError,
-        match="Step size must be greater than zero.",
+        match="Step size 0 cannot be zero.",
     ):
-        run_engine(step_scan(detectors=detectors, params=[x_axis, 1, 5, 0]))
+        run_engine(step_scan(detectors=[], params=[x_axis, 1, 5, 0]))

@@ -343,8 +343,8 @@ def _make_stepped_list_step(
         raise ValueError(
             f"Start ({start}) and stop ({stop}) values cannot be the same."
         )
-    if step <= 0:
-        raise ValueError("Step size must be greater than zero.")
+    if step == 0:
+        raise ValueError(f"Step size {step} cannot be zero.")
     if abs(step) > abs(stop - start):
         step = stop - start
     step = abs(step) * np.sign(stop - start)
@@ -358,8 +358,10 @@ def _make_stepped_list_step(
 
 
 def _make_stepped_list_num(start: float, step: float, num: int) -> list[float | int]:
-    if num <= 0:
-        raise ValueError("Number of points must be greater than zero.")
+    if num == 0 or step == 0:
+        raise ValueError(
+            f"Number of points ({num}) and number of steps ({step}) cannot be zero."
+        )
     stepped_list = [start + (n * step) for n in range(num)]
     rounded_stepped_list = _round_list_elements(
         stepped_list=stepped_list, params=[start, step]
