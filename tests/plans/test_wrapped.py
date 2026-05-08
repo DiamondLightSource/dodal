@@ -185,28 +185,6 @@ def test_count_with_no_detector_raise_error(run_engine: RunEngine):
         run_engine(count([]))
 
 
-# @pytest.mark.parametrize(
-#     "x_list, y_list, num, final_shape, final_length",
-#     (
-#         [[0.0, 1.1], [2.2, 3.3], 3, [3], 6],
-#         [[0.0, 1.1, 2], [2.2, 3.3, 3], None, [2, 3], 8],
-#     ),
-# )
-# def test_make_num_scan_args(
-#     x_axis: Motor,
-#     y_axis: Motor,
-#     x_list: list[float | int],
-#     y_list: list[float | int],
-#     num: int | None,
-#     final_shape: list[int],
-#     final_length: int,
-# ):
-#     # args, shape = _make_num_scan_args([(x_axis, x_list), (y_axis, y_list)], num=num)
-#     assert shape == final_shape
-#     assert len(args) == final_length
-#     assert args[0] == x_axis
-
-
 def _assert_emitted(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
@@ -971,10 +949,8 @@ def test_step_grid_rscan_when_not_snaking(
     _assert_emitted(run_engine_documents, detectors, num)
 
 
-@pytest.mark.parametrize(
-    "x_list, y_list", ([[0, 1, 0.1], [0, 1, 0.1, 1]], [[0, 1, 0.1], [0]])
-)
-def test_step_grid_rscan_fails_when_given_incorrect_number_of_params(
+@pytest.mark.parametrize("x_list, y_list", ([[0, 1], [0, 1, 0.1]], [[0], [0, 1, 0.1]]))
+def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axes(
     run_engine: RunEngine,
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
@@ -982,9 +958,72 @@ def test_step_grid_rscan_fails_when_given_incorrect_number_of_params(
     y_axis: Motor,
     y_list: list[float | int],
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="The axis must be movable, start, stop, step.",
+    ):
         run_engine(
-            step_grid_rscan(
+            step_grid_scan(
                 detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list]
             )
+        )
+
+
+@pytest.mark.parametrize(
+    "x_list, y_list", ([[0, 1, 0.1], [0, 1, 0.1, 1]], [[0, 1, 0.1], [0]])
+)
+def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_second_axes(
+    run_engine: RunEngine,
+    detectors: Sequence[StandardDetector],
+    x_axis: Motor,
+    x_list: list[float | int],
+    y_axis: Motor,
+    y_list: list[float | int],
+):
+    with pytest.raises(
+        ValueError,
+        match="The axis must be movable, start, stop, step.",
+    ):
+        run_engine(
+            step_grid_scan(
+                detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list]
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    "x_list, y_list", ([[0, 1, 0.1], [0, 1, 0.1]], [[0, 1, 0.1], [0]])
+)
+def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
+    run_engine: RunEngine,
+    detectors: Sequence[StandardDetector],
+    x_axis: Motor,
+    x_list: list[float | int],
+    y_axis: Motor,
+    y_list: list[float | int],
+):
+    with pytest.raises(
+        ValueError,
+        match="The axis must be movable, start, stop.",
+    ):
+        run_engine(
+            step_scan(detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list])
+        )
+
+
+def test_make_step_scan_args_and_shape_fails_with_invalid_type_args(
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(
+        ValueError,
+        match="Scan syntax only takes movables or numbers for params.",
+    ):
+        _make_step_scan_args_and_shape(
+            [x_axis, 1, "3", 1, y_axis, 1, "4", 1],  # type: ignore
+            grid=True,
+        )
+        _make_step_scan_args_and_shape(
+            [x_axis, 1, "3", 1, y_axis, 1, "4"],  # type: ignore
+            grid=False,
         )
