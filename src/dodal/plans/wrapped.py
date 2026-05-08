@@ -237,9 +237,9 @@ def list_grid_scan(
     params: Annotated[
         Sequence[Movable | list[float | int]],
         Field(
-            description="List of tuples (device, positions). For independent \
-            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
-            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
+            description="For independent trajectories, provide"
+            "'[movable1, [point1, point2, ...], movable2, [point1, point2, ...], ..., "
+            "movableN, [point1, point2, ...]]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -274,9 +274,9 @@ def list_rscan(
     params: Annotated[
         Sequence[Movable | list[float | int]],
         Field(
-            description="List of tuples (device, positions). For concurrent \
-            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
-            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
+            description="For concurrent trajectories, provide "
+            "'[movable1, [point1, point2, ...], movable2, [point1, point2, ...], ..., "
+            "movableN, [point1, point2, ...]]'. Number \
             of points for each movable must be equal."
         ),
     ],
@@ -303,9 +303,9 @@ def list_grid_rscan(
     params: Annotated[
         Sequence[Movable | list[float | int]],
         Field(
-            description="List of tuples (device, positions). For independent \
-            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
-            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'."
+            description="For independent trajectories, provide "
+            "'[movable1, [point1, point2, ...], movable2, [point1, point2, ...], ... , "
+            "movableN, [point1, point2, ...]]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -363,85 +363,81 @@ def _make_stepped_list_num(start: float, step: float, num: int) -> list[float | 
     return rounded_stepped_list
 
 
+def require(
+    value: object,
+    expected: type[T] | tuple[type[T], ...],
+    name: str,
+) -> T:
+    expected_tuple = expected if isinstance(expected, tuple) else (expected,)
+    if not isinstance(value, expected_tuple):
+        allowed = ", ".join(t.__name__ for t in expected_tuple)
+        raise ValueError(
+            f"Parameter {name} must be one of type ({allowed}), got {type(value).__name__}"
+        )
+    return value  # type: ignore[return-value]
+
+
+def parse_full_axis(
+    values: Sequence[Movable | float | int],
+) -> tuple[Movable, float, float, float]:
+    if len(values) != 4:
+        raise ValueError(
+            f"The axis must be movable, start, stop, step. You provided {values}"
+        )
+    movable = require(values[0], Movable, "movable")
+    start = require(values[1], (int, float), "start")
+    stop = require(values[2], (int, float), "stop")
+    step = require(values[3], (int, float), "step")
+    return movable, start, stop, step
+
+
+def parse_relative_axis(
+    values: Sequence[Movable | float | int],
+) -> tuple[Movable, float, float]:
+    if len(values) != 3:
+        raise ValueError(
+            f"The axis must be movable, start, step. You provided {', '.join(map(str, values))}"
+        )
+    movable = require(values[0], Movable, "movable")
+    start = require(values[1], (int, float), "start")
+    step = require(values[2], (int, float), "step")
+    return movable, start, step
+
+
 def _make_step_scan_args_and_shape(
-    params: Sequence[Movable | float | int],
-    grid: bool,
+    params: Sequence[Movable | float | int], grid: bool
 ) -> tuple[list[Movable | list[float]], tuple[int, ...]]:
-
-    def require(
-        value: object,
-        expected: type[T] | tuple[type, ...],
-        name: str,
-    ) -> T:
-        expected_tuple = expected if isinstance(expected, tuple) else (expected,)
-        if not isinstance(value, expected_tuple):
-            allowed = ", ".join(t.__name__ for t in expected_tuple)
-            raise ValueError(
-                f"Parameter {name} must be one of type ({allowed}), got {type(value).__name__}"
-            )
-        return value  # type: ignore[return-value]
-
-    def parse_full_axis(
-        values: Sequence[Movable | float | int],
-    ) -> tuple[Movable, float, float, float]:
-        if len(values) != 4:
-            raise ValueError(
-                f"Full axis must be movable, start, stop, step. You provided {values}"
-            )
-        movable = require(values[0], Movable, "movable")
-        start = require(values[1], (int, float), "start")
-        stop = require(values[2], (int, float), "stop")
-        step = require(values[3], (int, float), "step")
-
-        return movable, start, stop, step
-
-    def parse_relative_axis(
-        values: Sequence[Movable | float | int],
-    ) -> tuple[Movable, float, float]:
-        if len(values) != 3:
-            raise ValueError(
-                f"Relative axis must be movable, start, step. You provided {values}"
-            )
-        movable = require(values[0], Movable, "movable")
-        start = require(values[1], (int, float), "start")
-        step = require(values[2], (int, float), "step")
-
-        return movable, start, step
-
-    if len(params) < 4:
-        raise ValueError("At least one axis must provide (movable, start, stop, step)")
-
-    args: list[Movable | list[float]] = []
-    shape: list[int] = []
-
-    # First axis defines scan length
-    movable, start, stop, step = parse_full_axis(params[:4])
-
-    values = _make_stepped_list_step(start, stop, step)
-    stepped_list_length = len(values)
-
-    args.extend([movable, values])
-    shape.append(stepped_list_length)
-
-    remaining = params[4:]
-
-    chunk_size = 4 if grid else 3
-
-    if len(remaining) % chunk_size != 0:
-        raise ValueError("Incorrect number of parameters for additional axes.")
-
-    for i in range(0, len(remaining), chunk_size):
-        chunk = remaining[i : i + chunk_size]
-        if grid:
-            movable, start, stop, step = parse_full_axis(chunk)
-            values = _make_stepped_list_step(start, stop, step)
-            shape.append(len(values))
+    """Convert [x, 1, 4, 1, ...] to [x, [1, 2, 3, 4], ...]."""
+    list_of_movable_with_values: list[list[Movable | float | int]] = []
+    current_list: list[Movable | float | int] = []
+    for param in params:
+        if isinstance(param, Movable):
+            current_list = [param]
+            list_of_movable_with_values.append(current_list)
+        elif isinstance(param, (int, float)):
+            current_list.append(param)
         else:
-            movable, start, step = parse_relative_axis(chunk)
-            values = _make_stepped_list_num(start, step, stepped_list_length)
-        args.extend([movable, values])
+            raise ValueError(
+                f'Scan syntax only takes movables or numbers for params. You provided "{param}".'
+            )
 
-    return args, tuple(shape)
+    step_scan_args: list[Movable | list[float]] = []
+    shape = []
+    first_axis = True
+    for movable_with_values in list_of_movable_with_values:
+        if first_axis or grid:
+            movable, start, stop, step = parse_full_axis(movable_with_values)
+            movable_values = _make_stepped_list_step(start, stop, step)
+            shape.append(len(movable_values))
+            first_axis = False
+        else:
+            # If not a grid scan, expects start, stop for all other axes and use the
+            # first axis shape for the number of steps.
+            movable, start, step = parse_relative_axis(movable_with_values)
+            movable_values = _make_stepped_list_num(start, step, shape[0])
+        step_scan_args.extend([movable, movable_values])
+
+    return step_scan_args, tuple(shape)
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
@@ -455,9 +451,9 @@ def step_scan(
     params: Annotated[
         Sequence[Movable | float | int],
         Field(
-            description="List of tuples (device, parameter). For concurrent \
-            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
-            [start2, step2]), ... , (movableN, [startN, stepN])]'."
+            description="For concurrent trajectories, provide "
+            "'[movable1, start1, stop1, step1, movable2, start2, step2, ... , "
+            "movableN, startN, stepN]'."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -487,8 +483,8 @@ def step_grid_scan(
         Sequence[Movable | float | int],
         Field(
             description="List of tuples (device, parameter). For independent \
-            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
-            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]'."
+            trajectories, provide '[movable1, start1, stop1, step1, movable2, start2, "
+            "stop2, step2, ... , movableN, startN, stopN, stepN]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -521,9 +517,9 @@ def step_rscan(
     params: Annotated[
         Sequence[Movable | float | int],
         Field(
-            description="List of tuples (device, parameter). For concurrent \
-            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
-            [start2, step2]), ... , (movableN, [startN, stepN])]'."
+            description="For concurrent trajectories, provide "
+            "'[movable1, start1, stop1, step1, movable2, start2, step2, ... , "
+            "movableN, startN, stepN]'."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -553,8 +549,8 @@ def step_grid_rscan(
         Sequence[Movable | float | int],
         Field(
             description="List of tuples (device, parameter). For independent \
-            trajectories, provide '[(movable1, [start1, stop1, step1]), (movable2, \
-            [start2, stop2, step2]), ... , (movableN, [startN, stopN, stepN])]'."
+            trajectories, provide '[movable1, start1, stop1, step1, movable2, \
+            start2, stop2, step2, ... , movableN, startN, stopN, stepN]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -570,8 +566,6 @@ def step_grid_rscan(
     args, shape = _make_step_scan_args_and_shape(params, grid=True)
     metadata = metadata or {}
     metadata["shape"] = shape
-
-    print(args)
 
     yield from bp.rel_list_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
