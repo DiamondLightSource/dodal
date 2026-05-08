@@ -11,7 +11,7 @@ from pydantic import Field, NonNegativeFloat, validate_call
 from dodal.common import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
-"""This module wraps plan(s) from bluesky.plans so they are comptaible with blueapi.
+"""This module wraps plan(s) from bluesky.plans so they are compatible with blueapi.
 Required decorators are installed on plan import.
 https://github.com/DiamondLightSource/blueapi/issues/474
 
@@ -228,7 +228,6 @@ def list_scan(
     metadata = metadata or {}
     metadata["shape"] = _make_list_scan_shape(params, grid=False)
 
-    # Not sure about this one
     yield from bp.list_scan(tuple(detectors), *tuple(params), md=metadata)  # type: ignore
 
 
