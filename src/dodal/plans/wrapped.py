@@ -11,14 +11,15 @@ from pydantic import Field, NonNegativeFloat, validate_call
 from dodal.common import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
-"""This module wraps plan(s) from bluesky.plans until required handling for them is
-moved into bluesky or better handled in downstream services.
-
-Required decorators are installed on plan import
+"""This module wraps plan(s) from bluesky.plans so they are comptaible with blueapi.
+Required decorators are installed on plan import.
 https://github.com/DiamondLightSource/blueapi/issues/474
 
-Non-serialisable fields are ignored when they are optional
+Non-serialisable fields are ignored when they are optional.
 https://github.com/DiamondLightSource/blueapi/issues/711
+
+Using *args in plans is currently not supported.
+https://github.com/DiamondLightSource/blueapi/issues/1450
 
 We may also need other adjustments for UI purposes, e.g.
     - Forcing uniqueness or orderedness of Readables.
@@ -257,7 +258,7 @@ def list_grid_scan(
     bluesky.plans.list_grid_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(params, grid=False)
+    metadata["shape"] = _make_list_scan_shape(params, grid=True)
 
     yield from bp.list_grid_scan(
         tuple(detectors), *params, snake_axes=snake_axes, md=metadata
