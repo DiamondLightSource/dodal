@@ -7,6 +7,7 @@ from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
+from dodal.common.beamlines.beamline_parameters import CONFIG_SERVER_URL_ENV_VAR
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
@@ -100,7 +101,9 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    config_server_url = getenv("CONFIG_SERVER_URL", DEFAULT_CONFIG_SERVER_ENDPOINT)
+    config_server_url = getenv(
+        CONFIG_SERVER_URL_ENV_VAR, DEFAULT_CONFIG_SERVER_ENDPOINT
+    )
     client = ConfigClient(config_server_url)
     set_config_client(client)
     return client
