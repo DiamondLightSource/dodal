@@ -1,0 +1,84 @@
+dodal.devices.electron\_analyser.specs.AcquisitionMode
+======================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.specs
+
+.. autoclass:: AcquisitionMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AcquisitionMode.FIXED_TRANSMISSION
+      
+      
+      ~AcquisitionMode.SNAPSHOT
+      
+      
+      ~AcquisitionMode.FIXED_RETARDING_RATIO
+      
+      
+      ~AcquisitionMode.FIXED_ENERGY
+      
+   
+   

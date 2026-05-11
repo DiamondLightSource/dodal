@@ -1,0 +1,81 @@
+dodal.devices.aithre\_lasershaping.laser\_robot.ForceBit
+========================================================
+
+.. currentmodule:: dodal.devices.aithre_lasershaping.laser_robot
+
+.. autoclass:: ForceBit
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ForceBit.ON
+      
+      
+      ~ForceBit.NO
+      
+      
+      ~ForceBit.OFF
+      
+   
+   

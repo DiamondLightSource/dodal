@@ -1,0 +1,112 @@
+dodal.devices.electron\_analyser.base.BaseRegion
+================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: BaseRegion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~BaseRegion.before_validation
+      
+      
+      
+      
+      
+      
+      ~BaseRegion.is_binding_energy
+      
+      
+      ~BaseRegion.is_kinetic_energy
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BaseRegion.prepare_for_epics
+      
+      
+      
+      
+      ~BaseRegion.switch_energy_mode
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~BaseRegion.model_config
+      
+      
+      
+      
+      
+      ~BaseRegion.name
+      
+      
+      ~BaseRegion.enabled
+      
+      
+      ~BaseRegion.slices
+      
+      
+      ~BaseRegion.iterations
+      
+      
+      ~BaseRegion.excitation_energy_source
+      
+      
+      ~BaseRegion.lens_mode
+      
+      
+      ~BaseRegion.pass_energy
+      
+      
+      ~BaseRegion.acquisition_mode
+      
+      
+      ~BaseRegion.low_energy
+      
+      
+      ~BaseRegion.centre_energy
+      
+      
+      ~BaseRegion.high_energy
+      
+      
+      ~BaseRegion.acquire_time
+      
+      
+      ~BaseRegion.energy_step
+      
+      
+      ~BaseRegion.energy_mode
+      
+   
+   

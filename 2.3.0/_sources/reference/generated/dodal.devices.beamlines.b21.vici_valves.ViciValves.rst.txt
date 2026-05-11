@@ -1,0 +1,40 @@
+dodal.devices.beamlines.b21.vici\_valves.ViciValves
+===================================================
+
+.. currentmodule:: dodal.devices.beamlines.b21.vici_valves
+
+.. autoclass:: ViciValves
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

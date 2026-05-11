@@ -1,0 +1,40 @@
+dodal.devices.motors.XYZPitchYawRollStage
+=========================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZPitchYawRollStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

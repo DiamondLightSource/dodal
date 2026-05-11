@@ -1,0 +1,32 @@
+dodal.devices.electron\_analyser.base.ElectronAnalyserController
+================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: ElectronAnalyserController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~ElectronAnalyserController.prepare
+      
+      
+      
+      ~ElectronAnalyserController.setup_with_region
+      
+      
+      
+   
+   
+
+   
+   
+   

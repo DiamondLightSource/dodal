@@ -1,0 +1,82 @@
+dodal.devices.electron\_analyser.base.AbstractAnalyserDriverIO
+==============================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: AbstractAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AbstractAnalyserDriverIO.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~AbstractAnalyserDriverIO.acquire_time
+      
+      
+      ~AbstractAnalyserDriverIO.acquire_period
+      
+      
+      ~AbstractAnalyserDriverIO.num_images
+      
+      
+      ~AbstractAnalyserDriverIO.image_mode
+      
+      
+      ~AbstractAnalyserDriverIO.detector_state
+      
+      
+      ~AbstractAnalyserDriverIO.unique_id
+      
+      
+      ~AbstractAnalyserDriverIO.nd_attributes_file
+      
+      
+      ~AbstractAnalyserDriverIO.acquire
+      
+      
+      ~AbstractAnalyserDriverIO.array_size_x
+      
+      
+      ~AbstractAnalyserDriverIO.array_size_y
+      
+      
+      ~AbstractAnalyserDriverIO.data_type
+      
+      
+      ~AbstractAnalyserDriverIO.array_counter
+      
+      
+      ~AbstractAnalyserDriverIO.wait_for_plugins
+      
+   
+   

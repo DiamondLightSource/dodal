@@ -1,0 +1,29 @@
+dodal.devices.controllers.ConstantDeadTimeController
+====================================================
+
+.. currentmodule:: dodal.devices.controllers
+
+.. autoclass:: ConstantDeadTimeController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~ConstantDeadTimeController.get_deadtime
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   

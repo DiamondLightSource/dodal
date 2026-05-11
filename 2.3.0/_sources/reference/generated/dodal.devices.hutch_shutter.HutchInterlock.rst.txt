@@ -1,0 +1,46 @@
+dodal.devices.hutch\_shutter.HutchInterlock
+===========================================
+
+.. currentmodule:: dodal.devices.hutch_shutter
+
+.. autoclass:: HutchInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~HutchInterlock.status
+      
+      
+      ~HutchInterlock.bl_prefix
+      
+   
+   

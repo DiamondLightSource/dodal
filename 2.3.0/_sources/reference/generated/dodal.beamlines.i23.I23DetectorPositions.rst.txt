@@ -1,0 +1,81 @@
+dodal.beamlines.i23.I23DetectorPositions
+========================================
+
+.. currentmodule:: dodal.beamlines.i23
+
+.. autoclass:: I23DetectorPositions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I23DetectorPositions.IN
+      
+      
+      ~I23DetectorPositions.OUT
+      
+      
+      ~I23DetectorPositions.SAMPLE_CHANGE
+      
+   
+   

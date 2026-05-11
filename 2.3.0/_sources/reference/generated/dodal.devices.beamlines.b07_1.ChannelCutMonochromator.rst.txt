@@ -1,0 +1,43 @@
+dodal.devices.beamlines.b07\_1.ChannelCutMonochromator
+======================================================
+
+.. currentmodule:: dodal.devices.beamlines.b07_1
+
+.. autoclass:: ChannelCutMonochromator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ChannelCutMonochromator.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

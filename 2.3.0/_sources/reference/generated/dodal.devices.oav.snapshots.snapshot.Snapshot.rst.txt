@@ -1,0 +1,44 @@
+dodal.devices.oav.snapshots.snapshot.Snapshot
+=============================================
+
+.. currentmodule:: dodal.devices.oav.snapshots.snapshot
+
+.. autoclass:: Snapshot
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~Snapshot.post_processing
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

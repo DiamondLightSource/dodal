@@ -1,0 +1,40 @@
+dodal.devices.beamlines.p60.LabXraySourceReadable
+=================================================
+
+.. currentmodule:: dodal.devices.beamlines.p60
+
+.. autoclass:: LabXraySourceReadable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

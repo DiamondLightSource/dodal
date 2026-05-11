@@ -1,0 +1,41 @@
+dodal.devices.robot.BeamlineStatus
+==================================
+
+.. currentmodule:: dodal.devices.robot
+
+.. autoclass:: BeamlineStatus
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BeamlineStatus.ENABLED
+      
+      
+      ~BeamlineStatus.DISABLED
+      
+   
+   

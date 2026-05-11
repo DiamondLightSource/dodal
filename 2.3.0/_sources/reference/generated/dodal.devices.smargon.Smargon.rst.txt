@@ -1,0 +1,46 @@
+dodal.devices.smargon.Smargon
+=============================
+
+.. currentmodule:: dodal.devices.smargon
+
+.. autoclass:: Smargon
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Smargon.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Smargon.DEFERRED_MOVE_SET_TIMEOUT
+      
+      
+      
+      
+      
+   
+   

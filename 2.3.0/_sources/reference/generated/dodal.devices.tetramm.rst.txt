@@ -1,0 +1,44 @@
+dodal.devices.tetramm
+=====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~tetramm.TetrammChannels
+   ~tetramm.TetrammController
+   ~tetramm.TetrammDatasetDescriber
+   ~tetramm.TetrammDetector
+   ~tetramm.TetrammDriver
+   ~tetramm.TetrammGeometry
+   ~tetramm.TetrammRange
+   ~tetramm.TetrammResolution
+   ~tetramm.TetrammTrigger
+
+
+
+
+.. automodule:: dodal.devices.tetramm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

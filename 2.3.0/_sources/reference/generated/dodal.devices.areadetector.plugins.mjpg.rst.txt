@@ -1,0 +1,42 @@
+dodal.devices.areadetector.plugins.mjpg
+=======================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.areadetector.plugins
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~mjpg.MJPG
+
+
+
+
+.. automodule:: dodal.devices.areadetector.plugins.mjpg
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      asyncio_save_image
+   
+   
+
+   
+   
+   
