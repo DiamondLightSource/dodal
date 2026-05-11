@@ -5,7 +5,11 @@ import pytest
 from dodal.devices.beamlines.b07 import LensMode
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.specs import AcquisitionMode, SpecsSequence
+from dodal.devices.electron_analyser.specs import (
+    AcquisitionMode,
+    SpecsRegion,
+    SpecsSequence,
+)
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
@@ -81,7 +85,7 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_sequence_get_expected_enabled_region_names(
+def test_load_sequence_using_alias_field_names_has_expected_enabled_region_names(
     sequence: SpecsSequence[LensMode, PsuMode],
     expected_enabled_region_names: list[str],
 ) -> None:
@@ -90,10 +94,17 @@ def test_sequence_get_expected_enabled_region_names(
         assert region.name == expected_enabled_region_names[i]
 
 
-def test_file_loads_into_class_with_expected_values(
+def test_load_sequence_using_alias_field_names_has_expected_values(
     sequence: SpecsSequence[LensMode, PsuMode],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
-    assert len(sequence.regions) == len(expected_region_values)
-    for i, r in enumerate(sequence.regions):
-        assert_region_has_expected_values(r, expected_region_values[i])
+    for i, r in zip(sequence.regions, expected_region_values, strict=True):
+        assert_region_has_expected_values(i, r)
+
+
+def test_region_loads_using_field_names_has_expected_values(
+    expected_region_values: list[dict[str, Any]],
+) -> None:
+    for expected_region in expected_region_values:
+        r = SpecsRegion[LensMode, PsuMode].model_validate(expected_region)
+        assert_region_has_expected_values(r, expected_region)
