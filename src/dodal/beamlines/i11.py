@@ -43,7 +43,8 @@ def path_provider() -> PathProvider:
     return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
 
 
-@devices.factory()
+# Mythen detector state does not match ophyd-async see https://jira.diamond.ac.uk/browse/I11-916
+@devices.factory(skip=True)
 def mythen3(path_provider: PathProvider) -> Mythen3:
     """Mythen3 Detector from PSI."""
     return Mythen3(

@@ -35,18 +35,20 @@ def path_provider() -> PathProvider:
     return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
 
 
-@devices.factory()
+# Needs the fastCS Eiger/odin, see https://jira.diamond.ac.uk/browse/B21-330
+@devices.factory(skip=True)
 def saxs(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:",
         path_provider=path_provider,
     )
 
 
-@devices.factory()
+# Needs the fastCS Eiger/odin, see https://jira.diamond.ac.uk/browse/B21-330
+@devices.factory(skip=True)
 def waxs(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
         path_provider=path_provider,
     )
 
