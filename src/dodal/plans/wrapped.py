@@ -423,7 +423,8 @@ def _make_step_scan_args_and_shape(
             current_list.append(param)
         else:
             raise ValueError(
-                f'Scan syntax only takes movables or numbers for params. You provided "{param}".'
+                "Scan syntax only takes movables or numbers as parameters. "
+                f'You provided "{param}".'
             )
 
     step_scan_args: list[Movable | list[float]] = []
@@ -553,9 +554,9 @@ def step_grid_rscan(
     params: Annotated[
         Sequence[Movable | float | int],
         Field(
-            description="List of tuples (device, parameter). For independent \
-            trajectories, provide '[movable1, start1, stop1, step1, movable2, \
-            start2, stop2, step2, ... , movableN, startN, stopN, stepN]'."
+            description="For independent trajectories, provide "
+            "'[movable1, start1, stop1, step1, movable2, start2, stop2, step2, ... , "
+            "movableN, startN, stopN, stepN]'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported

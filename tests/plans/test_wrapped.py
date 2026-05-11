@@ -1010,7 +1010,7 @@ def test_make_step_scan_args_and_shape_fails_with_invalid_type_args(
 ):
     with pytest.raises(
         ValueError,
-        match="Scan syntax only takes movables or numbers for params.",
+        match="Scan syntax only takes movables or numbers as parameters.",
     ):
         _make_step_scan_args_and_shape(
             [x_axis, 1, "3", 1, y_axis, 1, "4", 1],  # type: ignore
