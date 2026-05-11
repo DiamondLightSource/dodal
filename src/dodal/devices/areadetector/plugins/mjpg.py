@@ -25,14 +25,22 @@ class MJPG(StandardReadable, Triggerable, ABC):
     """The MJPG areadetector plugin creates an MJPG video stream of the camera's output.
 
     This devices uses that stream to grab images. When it is triggered it will send the
-    latest image from the stream to the `post_processing` method for child classes to handle.
+    latest image from the stream to the `post_processing` method for child classes to
+    handle.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_size_pv: str = "ArraySize1_RBV",
+        y_size_pv: str = "ArraySize2_RBV",
+    ) -> None:
         self.url = epics_signal_rw(str, prefix + "JPG_URL_RBV")
+        self.video_url = epics_signal_rw(str, prefix + "MJPG_URL_RBV")
 
-        self.x_size = epics_signal_r(int, prefix + "ArraySize1_RBV")
-        self.y_size = epics_signal_r(int, prefix + "ArraySize2_RBV")
+        self.x_size = epics_signal_r(int, prefix + x_size_pv)
+        self.y_size = epics_signal_r(int, prefix + y_size_pv)
 
         with self.add_children_as_readables():
             self.filename = soft_signal_rw(str)
@@ -44,9 +52,9 @@ class MJPG(StandardReadable, Triggerable, ABC):
         super().__init__(name)
 
     async def _save_image(self, image: Image.Image):
-        """A helper function to save a given image to the path supplied by the \
-            directory and filename signals. The full resultant path is put on the \
-            last_saved_path signal
+        """A helper function to save a given image to the path supplied by the
+        directory and filename signals. The full resultant path is put on the
+        last_saved_path signal.
         """
         filename_str = await self.filename.get_value()
         directory_str = await self.directory.get_value()
@@ -60,14 +68,14 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
         await asyncio_save_image(image, path)
 
-        await self.last_saved_path.set(path, wait=True)
+        await self.last_saved_path.set(path)
 
     @AsyncStatus.wrap
     async def trigger(self):
         """This takes a snapshot image from the MJPG stream and send it to the
         post_processing method, expected to be implemented by a child of this class.
 
-        It is the responsibility of the child class to save any resulting images by \
+        It is the responsibility of the child class to save any resulting images by
         calling _save_image.
         """
         url_str = await self.url.get_value()

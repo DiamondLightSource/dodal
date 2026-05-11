@@ -56,19 +56,16 @@ class DetectorState(StrictEnum):
 class Xspress3(Device, Stageable):
     """Xpress/XpressMini is a region of interest (ROI) picker that sums the detector
     output into a scaler with user-defined regions. It is often used as a signal
-    discriminator to provide better energy resolution and signal to noise in X-ray detection experiments.
+    discriminator to provide better energy resolution and signal to noise in X-ray
+    detection experiments.
     This currently only provide staging functionality.
 
-    Parameters
-    ----------
-    prefix:
-        Beamline part of PV
-    name:
-        Name of the device
-    num_channels:
-        Number of channel xspress3 has, default is 1 for mini.
-    timeout:
-        How long to wait for before timing out for staging/arming of detector default is 1 sec
+    Args:
+        prefix (str): Beamline part of PV.
+        name (str, optional): Name of the device.
+        num_channels (int): Number of channel xspress3 has, default is 1 for mini.
+        timeout (float): How long to wait for before timing out for staging/arming of
+            detector, the default is 1 sec.
     """
 
     def __init__(

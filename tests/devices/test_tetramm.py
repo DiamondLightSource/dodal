@@ -2,9 +2,15 @@ import re
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
+from ophyd_async.core import (
+    DetectorTrigger,
+    PathProvider,
+    TriggerInfo,
+    callback_on_mock_put,
+    init_devices,
+    set_mock_value,
+)
 from ophyd_async.epics.adcore import ADFileWriteMode
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.tetramm import (
     TetrammChannels,
@@ -33,7 +39,7 @@ async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
     set_mock_value(tetramm.driver.num_channels, TetrammChannels.FOUR)
     set_mock_value(tetramm.driver.sample_time, 10e-6)
 
-    async def sample_time_from_values(value: int, _: bool):
+    async def sample_time_from_values(value: int):
         # https://millenia.cars.aps.anl.gov/software/epics/quadEMDoc.html
         # "The sample time on the TetrAMM is controlled by the following equation:
         # 10 microseconds * ValuesPerRead.""
@@ -77,14 +83,14 @@ async def test_set_exposure_updates_values_per_reading(
 async def test_set_invalid_exposure_for_number_of_values_per_reading(
     tetramm_controller: TetrammController,
 ):
-    """
-    exposure >= minimal_samples * sample_time
-    With the default values:
-    minimal_samples = 5
-    sample_time = 100_000
-    exposure >= 5 * 100_000
-    """
+    """Test invalid exposure values.
 
+    Exposure >= minimal_samples * sample_time.
+    With the default values::
+        minimal_samples = 5.
+        sample_time = 100_000.
+        exposure >= 5 * 100_000.
+    """
     with pytest.raises(
         ValueError,
         match="Tetramm exposure time must be at least 5e-05s, asked to set it to 4e-05s",

@@ -1,6 +1,5 @@
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
+from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
 
 from dodal.devices.zebra.zebra_controlled_shutter import (
     ZebraShutter,

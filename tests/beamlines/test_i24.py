@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.i24.vgonio import VerticalGoniometer
+from dodal.devices.beamlines.i24.vgonio import VerticalGoniometer
 
 
 @pytest.mark.parametrize("module_and_devices_for_beamline", ["i24"], indirect=True)

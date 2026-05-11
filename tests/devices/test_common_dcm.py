@@ -1,9 +1,6 @@
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    assert_value,
-    set_mock_value,
-)
+from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.testing import assert_value
 
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorBase,
@@ -42,5 +39,5 @@ async def test_ev_to_kev(
     energy_kev: float,
     energy_ev: float,
 ):
-    set_mock_value(dcm.energy_in_kev.user_readback, energy_kev)
-    await assert_value(dcm.energy_in_ev, energy_ev)
+    set_mock_value(dcm.energy_in_keV.user_readback, energy_kev)
+    await assert_value(dcm.energy_in_eV, energy_ev)

@@ -1,7 +1,8 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from ophyd_async.testing import set_mock_value
+from daq_config_server import ConfigClient
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.oav.oav_detector import (
     OAV,
@@ -12,10 +13,7 @@ from dodal.devices.oav.oav_detector import (
     OAVConfigBeamCentre,
     ZoomController,
 )
-from tests.test_data import (
-    TEST_DISPLAY_CONFIG,
-    TEST_OAV_ZOOM_LEVELS_XML,
-)
+from tests.devices.oav.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVELS
 
 
 @pytest.fixture()
@@ -167,15 +165,42 @@ async def test_beam_centre_signals_have_same_names(
 
 
 async def test_oav_with_null_zoom_controller(null_controller: NullZoomController):
-    oav_config = OAVConfigBeamCentre(TEST_OAV_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG)
+    oav_config = OAVConfigBeamCentre(
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
+    )
     oav = OAVBeamCentreFile("", oav_config, "", zoom_controller=null_controller)
 
     assert await oav.zoom_controller.level.get_value() == "1.0x"
 
 
-def test_setting_null_zoom_controller_raises_exception(
+async def test_oav_with_null_zoom_controller_set(null_controller: NullZoomController):
+    status = null_controller.set("1.0x")
+    await status
+    assert status.success
+    assert await null_controller.level.get_value() == "1.0x"
+
+
+async def test_oav_with_null_zoom_controller_set_zoom_level_other_than_1(
     null_controller: NullZoomController,
 ):
     with pytest.raises(Exception) as exc:
-        null_controller.set("2.0x")
+        await null_controller.set("2.0x")
     assert str(exc.value) == "Attempting to set zoom level of a null zoom controller"
+
+
+@pytest.mark.parametrize(
+    "mjpeg_prefix",
+    ["MJPG", "XTAL"],
+)
+async def test_setting_mjpeg_prefix_changes_stream_url(mjpeg_prefix):
+    oav_config = OAVConfigBeamCentre(
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
+    )
+    async with init_devices(mock=True, connect=True):
+        oav = OAVBeamCentreFile(
+            "", config=oav_config, name="oav", mjpeg_prefix=mjpeg_prefix
+        )
+    url = oav.grid_snapshot.url.source.split("mock+ca://")[1]
+    assert url.startswith(mjpeg_prefix)
+    url = oav.snapshot.url.source.split("mock+ca://")[1]
+    assert url.startswith(mjpeg_prefix)

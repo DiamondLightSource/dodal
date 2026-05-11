@@ -9,8 +9,7 @@ from aiohttp.client import ClientSession
 from aiohttp.test_utils import TestClient, TestServer, unused_port
 from aiohttp.web import Response
 from aiohttp.web_app import Application
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot import (
@@ -119,7 +118,9 @@ def assert_images_identical(left: Image.Image, right: Image.Image):
     assert all(
         left_px == right_px
         for left_px, right_px in zip(
-            iter(left.getdata()), iter(right.getdata()), strict=True
+            iter(left.get_flattened_data()),
+            iter(right.get_flattened_data()),
+            strict=True,
         )
     )
 

@@ -1,8 +1,10 @@
-from dodal.beamline_specific_utils.i05_shared import pgm as i05_pgm
-from dodal.common.beamlines.beamline_utils import device_factory
+from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.pgm import PGM
-from dodal.devices.synchrotron import Synchrotron
+from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i05_1 import XYZAzimuthPolarDefocusStage
+from dodal.devices.beamlines.i05_shared import Mj7j8Mirror
+from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -11,12 +13,25 @@ PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-
-@device_factory()
-def pgm() -> PGM:
-    return i05_pgm()
+devices = DeviceManager()
+devices.include(i05_shared_devices)
 
 
-@device_factory()
-def synchrotron() -> Synchrotron:
-    return Synchrotron()
+# will connect after https://jira.diamond.ac.uk/browse/I05-731
+@devices.factory(skip=True)
+def mj7j8() -> XYZPiezoSwitchingMirror:
+    return XYZPiezoSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
+        mirrors=Mj7j8Mirror,
+    )
+
+
+@devices.factory()
+def nano_shutter() -> HutchShutter:
+    return HutchShutter(PREFIX.beamline_prefix)
+
+
+@devices.factory
+def sm() -> XYZAzimuthPolarDefocusStage:
+    """Sample Manipulator."""
+    return XYZAzimuthPolarDefocusStage(prefix=f"{PREFIX.beamline_prefix}-EA-SM-01:")

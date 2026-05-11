@@ -22,14 +22,14 @@ def _get_zocalo_connection(environment):
 
 @dataclass
 class ZocaloStartInfo:
-    """
-    ispyb_dcid (int): The ID of the data collection in ISPyB
-    filename (str): The name of the file that the detector will store into dev/shm
-    start_frame_index (int): The index of the first image of this collection within the file
-                             written by the detector
-    number_of_frames (int): The number of frames in this collection
-    message_index (int): Which trigger this is in the detector collection e.g. 0 for the
-                         first collection after a single arm, 1 for the next...
+    """Attributes:
+    ispyb_dcid (int): The ID of the data collection in ISPyB.
+    filename (str): The name of the file that the detector will store into dev/shm.
+    start_frame_index (int): The index of the first image of this collection within
+        the file written by the detector.
+    number_of_frames (int): The number of frames in this collection.
+    message_index (int): Which trigger this is in the detector collection e.g. 0 for
+        the first collection after a single arm, 1 for the next...
     """
 
     ispyb_dcid: int
@@ -56,7 +56,8 @@ class ZocaloTrigger:
     into a plan, use the ZocaloResults ophyd device.
 
     see https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html for
-    more information about zocalo."""
+    more information about zocalo.
+    """
 
     def __init__(self, environment: str = ZOCALO_ENV):
         self.zocalo_environment: str = environment
@@ -83,10 +84,10 @@ class ZocaloTrigger:
         start_data: ZocaloStartInfo,
     ):
         """Tells the data analysis pipeline we have started a run.
-        Assumes that appropriate data has already been put into ISPyB
+        Assumes that appropriate data has already been put into ISPyB.
 
         Args:
-            start_data (ZocaloStartInfo): Data about the collection to send to zocalo
+            start_data (ZocaloStartInfo): Data about the collection to send to zocalo.
         """
         LOGGER.info(f"Starting Zocalo job {start_data}")
         data = dataclasses.asdict(start_data)
@@ -95,12 +96,11 @@ class ZocaloTrigger:
 
     def run_end(self, data_collection_id: int):
         """Tells the data analysis pipeline we have finished a run.
-        Assumes that appropriate data has already been put into ISPyB
+        Assumes that appropriate data has already been put into ISPyB.
 
         Args:
             data_collection_id (int): The ID of the data collection representing the
-                                    gridscan in ISPyB
-
+                gridscan in ISPyB.
         """
         LOGGER.info(f"Ending Zocalo job with ispyb id {data_collection_id}")
         self._send_to_zocalo(

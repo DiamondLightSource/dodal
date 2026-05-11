@@ -7,7 +7,7 @@ Code linting is handled by [ruff](https://docs.astral.sh/ruff) run under [pre-co
 You can run the above checks on all files with this command:
 
 ```
-$ tox -e pre-commit
+$ uv run tox -e pre-commit
 ```
 
 Or you can install a pre-commit hook that will run each time you do a `git commit` on just the files that have changed:

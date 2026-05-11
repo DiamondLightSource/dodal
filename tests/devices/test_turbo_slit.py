@@ -1,29 +1,26 @@
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    assert_reading,
+from ophyd_async.core import (
     get_mock_put,
-    partial_reading,
+    init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.turbo_slit import TurboSlit
-from dodal.testing.setup import patch_all_motors
 
 
 @pytest.fixture
 def slit() -> TurboSlit:
     with init_devices(mock=True):
         slit = TurboSlit(prefix="TEST-EA-TURBOSLIT:", name="turbo_slit")
-    with patch_all_motors(slit):
-        return slit
+    return slit
 
 
 async def test_turbo_slit_set(slit: TurboSlit):
     await slit.set(0.5)
 
     assert get_mock_put(slit.xfine.user_setpoint).call_count == 1
-    get_mock_put(slit.xfine.user_setpoint).assert_called_once_with(0.5, wait=True)
+    get_mock_put(slit.xfine.user_setpoint).assert_called_once_with(0.5)
 
 
 async def test_turbo_slit_read(slit: TurboSlit):

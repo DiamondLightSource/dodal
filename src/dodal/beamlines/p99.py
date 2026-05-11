@@ -1,24 +1,22 @@
+from functools import cache
 from pathlib import Path
 
+from ophyd_async.core import PathProvider
 from ophyd_async.epics.adandor import Andor2Detector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    get_path_provider,
-    set_beamline,
-    set_path_provider,
-)
+from dodal.common.beamlines.beamline_utils import set_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
+from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.filter import FilterMotor
 from dodal.devices.attenuator.filter_selections import P99FilterSelections
+from dodal.devices.beamlines.p99.andor2_point import Andor2Point
+from dodal.devices.beamlines.p99.sample_stage import SampleAngleStage
 from dodal.devices.motors import XYZStage
-from dodal.devices.p99.andor2_point import Andor2Point
-from dodal.devices.p99.sample_stage import SampleAngleStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -28,50 +26,55 @@ set_log_beamline(BL)
 set_beamline(BL)
 
 
-@device_factory()
-def angle_stage() -> SampleAngleStage:
-    return SampleAngleStage(f"{PREFIX.beamline_prefix}-MO-STAGE-01:")
+devices = DeviceManager()
 
 
-@device_factory()
-def filter() -> FilterMotor:
-    return FilterMotor(f"{PREFIX.beamline_prefix}-MO-STAGE-02:MP:", P99FilterSelections)
-
-
-@device_factory()
-def sample_stage() -> XYZStage:
-    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:")
-
-
-@device_factory()
-def lab_stage() -> XYZStage:
-    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
-
-
-set_path_provider(
-    StaticVisitPathProvider(
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticVisitPathProvider(
         BL,
         Path("/dls/p99/data/2024/cm37284-2/processing/writenData"),
         client=LocalDirectoryServiceClient(),  # RemoteDirectoryServiceClient("http://p99-control:8088/api"),
     )
-)
 
 
-@device_factory()
-def andor2_det() -> Andor2Detector:
+@devices.factory()
+def angle_stage() -> SampleAngleStage:
+    return SampleAngleStage(f"{PREFIX.beamline_prefix}-MO-STAGE-01:")
+
+
+@devices.factory()
+def filter() -> FilterMotor:
+    return FilterMotor(f"{PREFIX.beamline_prefix}-MO-STAGE-02:MP:", P99FilterSelections)
+
+
+@devices.factory()
+def sample_stage() -> XYZStage:
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:")
+
+
+@devices.factory()
+def lab_stage() -> XYZStage:
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
+
+
+@devices.factory()
+def andor2_det(path_provider: PathProvider) -> Andor2Detector:
     """Andor model:DU897_BV."""
     return Andor2Detector(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )
 
 
-@device_factory()
+@devices.factory()
 def andor2_point() -> Andor2Point:
-    """Using the andor2 as if it is a massive point detector, read the meanValue and total after
-    a picture is taken."""
+    """Using the andor2 as if it is a massive point detector, read the meanValue and
+    total after a picture is taken.
+    """
     return Andor2Point(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
         drv_suffix=CAM_SUFFIX,
@@ -79,14 +82,13 @@ def andor2_point() -> Andor2Point:
     )
 
 
-@device_factory()
-def panda() -> HDFPanda:
-    """
-    The Panda device is connected to two PMAC motors for position comparison under
-     the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
+@devices.factory()
+def panda(path_provider: PathProvider) -> HDFPanda:
+    """The Panda device is connected to two PMAC motors for position comparison under
+    the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
     This setup is used for triggering detectors during a flyscan.
     """
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
     )

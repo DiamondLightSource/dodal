@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from bluesky.protocols import Readable
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.cryostream import CryoStream
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.utils import OphydV2Device
 
@@ -16,7 +16,7 @@ def device_b() -> Motor:
     return _mock_with_name("motor")
 
 
-def device_c() -> CryoStream:
+def device_c() -> OxfordCryoStream:
     return _mock_with_name("cryo")
 
 

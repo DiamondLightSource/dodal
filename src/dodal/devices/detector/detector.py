@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
+from dodal.common.beamlines.beamline_utils import get_config_client
 from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_16M_SIZE,
     DetectorSize,
@@ -19,7 +20,8 @@ from dodal.utils import get_run_number
 
 class TriggerMode(Enum):
     """In set frames the number of frames is known at arm time. In free run they are
-    not known until the detector is unstaged."""
+    not known until the detector is unstaged.
+    """
 
     SET_FRAMES = auto()
     FREE_RUN = auto()
@@ -27,7 +29,8 @@ class TriggerMode(Enum):
 
 class DetectorParams(BaseModel):
     """Holds parameters for the detector. Provides access to a list of Dectris detector
-    sizes and a converter for distance to beam centre."""
+    sizes and a converter for distance to beam centre.
+    """
 
     # https://github.com/pydantic/pydantic/issues/8379
     # Must use model_dump(by_alias=True) if serialising!
@@ -52,7 +55,9 @@ class DetectorParams(BaseModel):
 
     @cached_property
     def beam_xy_converter(self) -> DetectorDistanceToBeamXYConverter:
-        return DetectorDistanceToBeamXYConverter(self.det_dist_to_beam_converter_path)
+        return DetectorDistanceToBeamXYConverter(
+            self.det_dist_to_beam_converter_path, get_config_client()
+        )
 
     @property
     def run_number(self) -> int:

@@ -3,19 +3,20 @@ from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import pytest
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 
+from dodal.devices.beamlines.i03.dcm import DCM
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
-from dodal.devices.i03.dcm import DCM
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
 
 
 class UndulatorGapCheckDevices:
-    def __init__(self, undulator: Undulator, dcm: DoubleCrystalMonochromatorBase):
+    def __init__(self, undulator: UndulatorInKeV, dcm: DoubleCrystalMonochromatorBase):
         self.undulator = undulator
         self.dcm = dcm
 
@@ -23,8 +24,9 @@ class UndulatorGapCheckDevices:
 @pytest.fixture
 async def mock_undulator_and_dcm() -> UndulatorGapCheckDevices:
     async with init_devices(mock=True):
-        undulator = Undulator(
+        undulator = UndulatorInKeV(
             "",
+            ConfigClient(""),
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )
         dcm = DCM("")
@@ -76,6 +78,13 @@ def y_axis() -> SimMotor:
     with init_devices(mock=True):
         y_axis = SimMotor()
     return y_axis
+
+
+@pytest.fixture
+def z_axis() -> SimMotor:
+    with init_devices(mock=True):
+        z_axis = SimMotor()
+    return z_axis
 
 
 @pytest.fixture

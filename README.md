@@ -7,8 +7,9 @@
 
 Ophyd devices and other utils that could be used across DLS beamlines
 
-Source          | <https://github.com/DiamondLightSource/dodal>
+What            | Where
 :---:           | :---:
+Source          | <https://github.com/DiamondLightSource/dodal>
 PyPI            | `pip install dls-dodal`
 Documentation   | <https://diamondlightsource.github.io/dodal>
 Releases        | <https://github.com/DiamondLightSource/dodal/releases>

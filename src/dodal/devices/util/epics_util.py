@@ -16,7 +16,7 @@ def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> Component[EpicsSig
     """Creates a `Component` around an `EpicsSignal` that waits for a callback on a put.
 
     Args:
-        pv_name (str): The name of the PV for the `EpicsSignal`
+        pv_name (str): The name of the PV for the `EpicsSignal`.
         wait (str, optional): The timeout to wait for a callback. Defaults to 3.0.
 
     Returns:
@@ -30,24 +30,24 @@ def run_functions_without_blocking(
     timeout: float = 60.0,
     associated_obj: OphydDevice | None = None,
 ) -> Status:
-    """Creates and initiates an asynchronous chaining of functions which return a status
+    """Creates and initiates an asynchronous chaining of functions which return a status.
 
     Usage:
     This function can be used to take a series of status-returning functions and run
     them all sequentially and in the background by making use of callbacks. It also
-    ensures exceptions on each returned status are propagated
+    ensures exceptions on each returned status are propagated.
 
     Args:
-    functions_to_chain( list(function - > StatusBase) ): A list of functions which each
-                                                            return a status object
-    associated_obj (Device | None): The device that should be associated with the
-                                        returned status
+        functions_to_chain (Sequence(function - > StatusBase)): A list of functions
+            which each return a status object.
+        timeout (float, optional): The timeout period, defaults to 60.
+        associated_obj (OphydDevice, optional): The device that should be associated
+            with the returned status.
 
     Returns:
-    Status: A status object which is marked as complete once all of the Status objects
-    returned by the unwrapped functions have completed.
+        Status: A status object which is marked as complete once all of the Status
+            objects returned by the unwrapped functions have completed.
     """
-
     # The returned status - marked as finished at the end of the callback chain. If any
     # intermediate statuses have an exception, the full_status will timeout.
     full_status = Status(obj=associated_obj, timeout=timeout)
