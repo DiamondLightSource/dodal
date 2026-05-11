@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.slits &#8212; dodal 2.3.1.dev1+ga832c860b documentation</title>
+    <title>dodal.devices.slits &#8212; dodal 2.3.1.dev2+gf637d5d25 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=93d2c659"></script>
+    <script src="../../../_static/documentation_options.js?v=8dc2f185"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -928,6 +928,43 @@ window.runMermaid = runMermaid;</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">x_centre</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">x_centre</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">y_centre</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">y_centre</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">x_gap</span><span class="o">=</span><span class="n">x_gap</span><span class="p">,</span> <span class="n">y_gap</span><span class="o">=</span><span class="n">y_gap</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SlitsWithIndividualBlades">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.slits.SlitsWithIndividualBlades.html#dodal.devices.slits.SlitsWithIndividualBlades">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SlitsWithIndividualBlades</span><span class="p">(</span><span class="n">Slits</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Representation of a 4-blade set of slits. Where each X/Y slit can be controlled</span>
+<span class="sd">    via the individial blade or by the gap and centres.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">x_gap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X:SIZE&quot;</span><span class="p">,</span>
+        <span class="n">y_gap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Y:SIZE&quot;</span><span class="p">,</span>
+        <span class="n">x_centre</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X:CENTRE&quot;</span><span class="p">,</span>
+        <span class="n">y_centre</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Y:CENTRE&quot;</span><span class="p">,</span>
+        <span class="n">x_minus</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X:MINUS&quot;</span><span class="p">,</span>
+        <span class="n">x_plus</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X:PLUS&quot;</span><span class="p">,</span>
+        <span class="n">y_minus</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Y:MINUS&quot;</span><span class="p">,</span>
+        <span class="n">y_plus</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Y:PLUS&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_minus</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">x_minus</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_plus</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">x_plus</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_minus</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">y_minus</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_plus</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">y_plus</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">x_gap</span><span class="o">=</span><span class="n">x_gap</span><span class="p">,</span>
+            <span class="n">y_gap</span><span class="o">=</span><span class="n">y_gap</span><span class="p">,</span>
+            <span class="n">x_centre</span><span class="o">=</span><span class="n">x_centre</span><span class="p">,</span>
+            <span class="n">y_centre</span><span class="o">=</span><span class="n">y_centre</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 
