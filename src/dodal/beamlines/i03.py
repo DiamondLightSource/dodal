@@ -60,7 +60,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.devices.zocalo import ZocaloResults, ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -290,8 +290,8 @@ def panda(path_provider: PathProvider) -> HDFPanda:
 
 
 @devices.factory()
-def sample_shutter() -> ZebraShutter:
-    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
+def sample_shutter() -> MXZebraShutter:
+    return MXZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @devices.factory()

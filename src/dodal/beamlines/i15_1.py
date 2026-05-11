@@ -18,6 +18,7 @@ from dodal.devices.hutch_shutter import (
 from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -220,4 +221,12 @@ def hutch_shutter() -> InterlockedHutchShutter:
 def gonio_interlock() -> GonioInterlock:
     return GonioInterlock(
         bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-VA-OMRON-01:INT3:ILK"
+    )
+
+
+@devices.factory()
+def fast_shutter() -> ZebraFastShutter:
+    return ZebraFastShutter(
+        set_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:SOFT_IN:B3",
+        get_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:OUT4_TTL:STA",
     )
