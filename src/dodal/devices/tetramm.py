@@ -14,16 +14,17 @@ from ophyd_async.core import (
     StrictEnum,
     TriggerInfo,
     derived_signal_r,
+    non_zero,
 )
 from ophyd_async.epics.adcore import (
     ADArmLogic,
-    ADBaseIO,
     ADHDFDataLogic,
+    NDArrayBaseIO,
     NDArrayDescription,
     NDFileHDF5IO,
     NDPluginBaseIO,
 )
-from ophyd_async.epics.core import PvSuffix, epics_signal_r
+from ophyd_async.epics.core import EpicsOptions, PvSuffix, epics_signal_r
 
 from dodal.log import LOGGER
 
@@ -56,7 +57,8 @@ class TetrammGeometry(StrictEnum):
     SQUARE = "Square"
 
 
-class TetrammDriver(ADBaseIO):
+class TetrammDriver(NDArrayBaseIO):
+    acquire: A[SignalRW[bool], PvSuffix.rbv("Acquire"), EpicsOptions(wait=non_zero)]
     range = A[SignalRW[TetrammRange], PvSuffix.rbv("Range")]
     sample_time: A[SignalR[float], PvSuffix("SampleTime_RBV")]
     values_per_reading: A[SignalRW[int], PvSuffix.rbv("ValuesPerRead")]
