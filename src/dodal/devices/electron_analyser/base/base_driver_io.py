@@ -23,8 +23,8 @@ from dodal.devices.electron_analyser.base.base_region import (
     AnyLensMode,
     AnyPassEnergy,
     GenericRegion,
-    TAbstractBaseRegion,
     TAcquisitionMode,
+    TBaseRegion,
     TLensMode,
     TPassEnergy,
 )
@@ -40,8 +40,8 @@ class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
-    Movable[TAbstractBaseRegion],
-    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
+    Movable[TBaseRegion],
+    Generic[TBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
 ):
     """Driver device that defines signals and readables that should be common to all
     electron analysers. Implementations of electron analyser devices should inherit
@@ -137,12 +137,12 @@ class AbstractAnalyserDriverIO(
 
     @abstractmethod
     @AsyncStatus.wrap
-    async def set(self, epics_region: TAbstractBaseRegion):
+    async def set(self, epics_region: TBaseRegion):
         """Move a group of signals defined in a region. Each implementation of this
         class is responsible for implementing this method correctly.
 
         Args:
-            epics_region (TAbstractBaseRegion): Contains the parameters to setup the
+            epics_region (TBaseRegion): Contains the parameters to setup the
                 driver for a scan.
         """
 

@@ -5,6 +5,9 @@ from daq_config_server import ConfigClient
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.beamlines.beamline_utils import (
+    set_config_client,
+)
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
@@ -46,8 +49,12 @@ I19_1_ZEBRA_MAPPING = ZebraMapping(
     sources=ZebraSources(),
 )
 
-ZOOM_PARAMS_FILE = "/dls_sw/i19-1/software/bluesky/jCameraManZoomLevels.xml"
-DISPLAY_CONFIG = "/dls_sw/i19-1/software/bluesky/display.configuration"
+DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/daq_configuration"
+
+ZOOM_PARAMS_FILE = (
+    "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
+)
+DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/display.configuration"
 
 devices = DeviceManager()
 
@@ -55,7 +62,9 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    return ConfigClient()
+    client = ConfigClient()
+    set_config_client(client)
+    return client
 
 
 @devices.factory()
