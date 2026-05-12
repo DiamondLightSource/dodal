@@ -5,7 +5,7 @@ from bluesky.protocols import Stageable
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
 from ophyd.signal import AttributeSignal
-from ophyd.status import AndStatus, Status, StatusBase, SubscriptionStatus
+from ophyd.status import Status, StatusBase, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
@@ -248,7 +248,7 @@ class EigerDetector(Device, Stageable):
         )
         return status
 
-    def set_cam_pvs(self) -> AndStatus:
+    def set_cam_pvs(self) -> StatusBase:
         LOGGER.info("Eiger arming: Setting eiger camera PVs...")
         assert self.detector_params is not None
         self.cam.acquire_time.set(
