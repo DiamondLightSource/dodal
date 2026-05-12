@@ -1,3 +1,12 @@
+from functools import cache
+from pathlib import Path
+
+from ophyd_async.core import (
+    PathProvider,
+    StaticPathProvider,
+    UUIDFilenameProvider,
+)
+from ophyd_async.epics.adcore import NDPluginBaseIO
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -18,6 +27,7 @@ from dodal.devices.hutch_shutter import (
 from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -32,6 +42,12 @@ Define device factory functions below this point.
 A device factory function is any function that has a return type which conforms
 to one or more Bluesky Protocols.
 """
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
 
 
 @devices.factory()
@@ -220,4 +236,19 @@ def hutch_shutter() -> InterlockedHutchShutter:
 def gonio_interlock() -> GonioInterlock:
     return GonioInterlock(
         bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-VA-OMRON-01:INT3:ILK"
+    )
+
+
+@devices.factory()
+def i0(path_provider: PathProvider) -> TetrammDetector:
+    return TetrammDetector(
+        prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:",
+        path_provider=path_provider,
+        fileio_suffix="HDF:",
+        type="Cividec Diamond XBPM",
+        plugins={
+            "stats": NDPluginBaseIO(
+                prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:SumAll:"
+            )
+        },
     )
