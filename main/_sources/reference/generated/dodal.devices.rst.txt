@@ -38,6 +38,7 @@
    dodal.devices.focusing_mirror
    dodal.devices.hutch_shutter
    dodal.devices.insertion_device
+   dodal.devices.interlocks
    dodal.devices.ipin
    dodal.devices.linkam3
    dodal.devices.motors

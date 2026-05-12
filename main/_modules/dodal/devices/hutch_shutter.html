@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.hutch_shutter &#8212; dodal 2.3.1.dev3+g604855599 documentation</title>
+    <title>dodal.devices.hutch_shutter &#8212; dodal 2.3.1.dev4+gdd687cce0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=3e0adde4"></script>
+    <script src="../../../_static/documentation_options.js?v=4238de8a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,26 +886,20 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.devices.hutch_shutter</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
-    <span class="n">EnumTypes</span><span class="p">,</span>
-    <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
-    <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
-    <span class="n">derived_signal_r</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_w</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.interlocks</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseInterlock</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
-<span class="n">HUTCH_SAFE_FOR_OPERATIONS</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Hutch is locked and can&#39;t be entered</span>
-<span class="n">PSS_SHUTTER_SUFFIX</span> <span class="o">=</span> <span class="s2">&quot;-PS-IOC-01:M14:LOP&quot;</span>
 <span class="n">EXP_SHUTTER_1_INFIX</span> <span class="o">=</span> <span class="s2">&quot;-PS-SHTR-01&quot;</span>
 <span class="n">EXP_SHUTTER_2_INFIX</span> <span class="o">=</span> <span class="s2">&quot;-PS-SHTR-02&quot;</span>
 
@@ -935,111 +929,6 @@ window.runMermaid = runMermaid;</script>
     <span class="n">OPENING</span> <span class="o">=</span> <span class="s2">&quot;Opening&quot;</span>
     <span class="n">CLOSED</span> <span class="o">=</span> <span class="s2">&quot;Closed&quot;</span>
     <span class="n">CLOSING</span> <span class="o">=</span> <span class="s2">&quot;Closing&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="InterlockState">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.InterlockState.html#dodal.devices.hutch_shutter.InterlockState">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">InterlockState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">FAILED</span> <span class="o">=</span> <span class="s2">&quot;Failed&quot;</span>
-    <span class="n">RUN_ILKS_OK</span> <span class="o">=</span> <span class="s2">&quot;Run Ilks Ok&quot;</span>
-    <span class="n">OK</span> <span class="o">=</span> <span class="s2">&quot;OK&quot;</span>
-    <span class="n">DISARMED</span> <span class="o">=</span> <span class="s2">&quot;Disarmed&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="BaseHutchInterlock">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.BaseHutchInterlock.html#dodal.devices.hutch_shutter.BaseHutchInterlock">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BaseHutchInterlock</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">):</span>
-    <span class="n">status</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="n">EnumTypes</span><span class="p">]</span>
-    <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">signal_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">EnumTypes</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">interlock_infix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">interlock_suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">pv_address</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}{</span><span class="n">interlock_infix</span><span class="si">}{</span><span class="n">interlock_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
-
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">signal_type</span><span class="p">,</span> <span class="n">pv_address</span><span class="p">)</span>
-
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">is_safe</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_safe_to_operate</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_to_operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">EnumTypes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract method to define if interlock allows shutter to operate.&quot;&quot;&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="HutchInterlock">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.HutchInterlock.html#dodal.devices.hutch_shutter.HutchInterlock">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">HutchInterlock</span><span class="p">(</span><span class="n">BaseHutchInterlock</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to check the interlock status of the hutch using PSS pv.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">interlock_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">PSS_SHUTTER_SUFFIX</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">signal_type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-            <span class="n">bl_prefix</span><span class="o">=</span><span class="n">bl_prefix</span><span class="p">,</span>
-            <span class="n">interlock_infix</span><span class="o">=</span><span class="n">shtr_infix</span><span class="p">,</span>
-            <span class="n">interlock_suffix</span><span class="o">=</span><span class="n">interlock_suffix</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_to_operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">EnumTypes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;If the status value is 0, hutch has been searched and locked and it is safe \</span>
-<span class="sd">        to operate the shutter.</span>
-<span class="sd">        If the status value is not 0 (usually set to 7), the hutch is open and the \</span>
-<span class="sd">        shutter should not be in use.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">isclose</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">status</span><span class="p">),</span> <span class="n">HUTCH_SAFE_FOR_OPERATIONS</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="PLCShutterInterlock">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.hutch_shutter.PLCShutterInterlock.html#dodal.devices.hutch_shutter.PLCShutterInterlock">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PLCShutterInterlock</span><span class="p">(</span><span class="n">BaseHutchInterlock</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to check the interlock state of the shutter using PLC pv.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">interlock_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EXP_SHUTTER_1_INFIX</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">signal_type</span><span class="o">=</span><span class="n">InterlockState</span><span class="p">,</span>
-            <span class="n">bl_prefix</span><span class="o">=</span><span class="n">bl_prefix</span><span class="p">,</span>
-            <span class="n">interlock_infix</span><span class="o">=</span><span class="n">shtr_infix</span><span class="p">,</span>
-            <span class="n">interlock_suffix</span><span class="o">=</span><span class="n">interlock_suffix</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_to_operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">EnumTypes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;If the status value is OK or Run Ilk OK, shutter is open or safe to operate.</span>
-
-<span class="sd">        If the status value is &quot;OK&quot;, valve or shutter is open and interlocks are OK to</span>
-<span class="sd">        operate. If the status value is &quot;Run Ilks Ok&quot;, the opening action can be</span>
-<span class="sd">        started. If the status value is not OK (&quot;Failed&quot; or &quot;Disarmed&quot;), interlocks have</span>
-<span class="sd">        failed and the shutter cannot be operated. Disarmed status applies only to fast</span>
-<span class="sd">        shutters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">InterlockState</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">InterlockState</span><span class="o">.</span><span class="n">RUN_ILKS_OK</span><span class="p">)</span></div>
 
 
 
@@ -1144,7 +1033,7 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">interlock</span><span class="p">:</span> <span class="n">BaseHutchInterlock</span><span class="p">,</span>
+        <span class="n">interlock</span><span class="p">:</span> <span class="n">BaseInterlock</span><span class="p">,</span>
         <span class="n">shtr_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">EXP_SHUTTER_1_INFIX</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

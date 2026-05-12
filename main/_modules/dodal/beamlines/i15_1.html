@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i15_1 &#8212; dodal 2.3.1.dev3+g604855599 documentation</title>
+    <title>dodal.beamlines.i15_1 &#8212; dodal 2.3.1.dev4+gdd687cce0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=3e0adde4"></script>
+    <script src="../../../_static/documentation_options.js?v=4238de8a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -904,14 +904,12 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i15_1.blower</span><span class="w"> </span><span class="kn">import</span> <span class="n">Blower</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i15_1.cobra</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cobra</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i15_1.cryostream</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cryostream</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i15_1.gonio_interlock</span><span class="w"> </span><span class="kn">import</span> <span class="n">GonioInterlock</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i15_1.puck_detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">PuckDetect</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i15_1.robot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Robot</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.hutch_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">HutchInterlock</span><span class="p">,</span>
     <span class="n">InterlockedHutchShutter</span><span class="p">,</span>
-    <span class="n">PLCShutterInterlock</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.interlocks</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnumPLCInterlock</span><span class="p">,</span> <span class="n">IntPLCInterlock</span><span class="p">,</span> <span class="n">PSSInterlock</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYPhiStage</span><span class="p">,</span> <span class="n">XYStage</span><span class="p">,</span> <span class="n">XYZStage</span><span class="p">,</span> <span class="n">YZStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.slits</span><span class="w"> </span><span class="kn">import</span> <span class="n">Slits</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.synchrotron</span><span class="w"> </span><span class="kn">import</span> <span class="n">Synchrotron</span>
@@ -1128,23 +1126,23 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">hutch_interlock</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HutchInterlock</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">HutchInterlock</span><span class="p">(</span><span class="n">bl_prefix</span><span class="o">=</span><span class="s2">&quot;BL15I&quot;</span><span class="p">,</span> <span class="n">interlock_suffix</span><span class="o">=</span><span class="s2">&quot;-PS-IOC-02:M11:LOP&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hutch_interlock</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PSSInterlock</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">PSSInterlock</span><span class="p">(</span><span class="n">bl_prefix</span><span class="o">=</span><span class="s2">&quot;BL15I&quot;</span><span class="p">,</span> <span class="n">interlock_suffix</span><span class="o">=</span><span class="s2">&quot;-PS-IOC-02:M11:LOP&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">hutch_shutter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">InterlockedHutchShutter</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">InterlockedHutchShutter</span><span class="p">(</span>
         <span class="n">bl_prefix</span><span class="o">=</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="p">,</span>
-        <span class="n">interlock</span><span class="o">=</span><span class="n">PLCShutterInterlock</span><span class="p">(</span>
+        <span class="n">interlock</span><span class="o">=</span><span class="n">EnumPLCInterlock</span><span class="p">(</span>
             <span class="n">bl_prefix</span><span class="o">=</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="p">,</span> <span class="n">interlock_suffix</span><span class="o">=</span><span class="s2">&quot;-PS-SHTR-01:ILKSTA&quot;</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">gonio_interlock</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">GonioInterlock</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">GonioInterlock</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gonio_interlock</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">IntPLCInterlock</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">IntPLCInterlock</span><span class="p">(</span>
         <span class="n">bl_prefix</span><span class="o">=</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="p">,</span> <span class="n">interlock_suffix</span><span class="o">=</span><span class="s2">&quot;-VA-OMRON-01:INT3:ILK&quot;</span>
     <span class="p">)</span>
 </pre></div>
