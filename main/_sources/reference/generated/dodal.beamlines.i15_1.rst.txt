@@ -26,6 +26,12 @@ dodal.beamlines.i15\_1
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+   
    
 
    

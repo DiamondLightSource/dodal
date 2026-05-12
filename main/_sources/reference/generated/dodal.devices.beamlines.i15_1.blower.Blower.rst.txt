@@ -1,0 +1,45 @@
+dodal.devices.beamlines.i15\_1.blower.Blower
+============================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.blower
+
+.. autoclass:: Blower
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~Blower.get_config
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

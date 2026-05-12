@@ -10,9 +10,13 @@ dodal.devices.beamlines.i15\_1
    :recursive:
 
    dodal.devices.beamlines.i15_1.attenuator
+   dodal.devices.beamlines.i15_1.blower
+   dodal.devices.beamlines.i15_1.cobra
+   dodal.devices.beamlines.i15_1.cryostream
    dodal.devices.beamlines.i15_1.gonio_interlock
    dodal.devices.beamlines.i15_1.puck_detector
    dodal.devices.beamlines.i15_1.robot
+   dodal.devices.beamlines.i15_1.safe_or_beam_positioner
 
 
 
