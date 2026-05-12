@@ -31,7 +31,7 @@ from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYPitchStage, XYRollStage, XYStage
-from dodal.devices.slits import Slits
+from dodal.devices.slits import Slits, SlitsWithIndividualBlades
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import UndulatorInKeV
@@ -199,18 +199,18 @@ def undulator(config_client: ConfigClient) -> UndulatorInKeV:
 
 
 @devices.factory()
-def slits_1() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
+def slits_1() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
 @devices.factory()
-def slits_2() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
+def slits_2() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
 
 
 @devices.factory()
-def slits_3() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
+def slits_3() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
 @devices.factory()
@@ -219,13 +219,13 @@ def slits_4() -> Slits:
 
 
 @devices.factory()
-def slits_5() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
+def slits_5() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
 
 
 @devices.factory()
-def slits_6() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
+def slits_6() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
 @devices.factory()
