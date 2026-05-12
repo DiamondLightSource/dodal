@@ -353,7 +353,7 @@ def test_stage_runs_successfully(
     set_up_eiger_to_stage_happily(fake_eiger)
     fake_eiger.stage()
     fake_eiger.arming_status.wait(1)  # This should complete long before 1s
-    # One log message kicking off arming, then one for each of the 13 arming stages
+    # One log message kicking off arming, then one for each of the 17 arming stages
     assert len(caplog.messages) == 18
 
 
