@@ -17,6 +17,23 @@ def fake_config_server_get_file_contents(
     reset_cached_result: bool = True,
     force_parser: Callable[[str], Any] | None = None,
 ) -> T:
+    """Fakes getting a file from the config server by reading it directly.
+
+    Args:
+        filepath (str | Path): Filepath of the file to read
+        desired_return_type (type[T], optional): Type to convert the file to. Defaults to str.
+        reset_cached_result (bool, optional): Whether or not to use the config server's cached result.
+            Does nothing here as we don't cache. Defaults to True.
+        force_parser (Callable[[str], Any] | None, optional): Use a certain converter function.
+            Only needed for the interim where the converter exists but the config server has not
+            been redeployed. Defaults to None.
+
+    Raises:
+        ValueError: Raised if an invalid type is requested
+
+    Returns:
+        T: The contents of the config file.
+    """
     filepath = Path(filepath)
     # Minimal logic required for unit tests
     with filepath.open("r") as f:

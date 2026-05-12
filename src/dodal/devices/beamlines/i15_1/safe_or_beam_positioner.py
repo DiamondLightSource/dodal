@@ -40,6 +40,7 @@ class SafeOrBeamPositioner(StandardReadable, Movable[SafeOrBeamPosition]):
         return self.config_client.get_file_contents(
             self.xpdf_parameters_path,
             desired_return_type=TemperatureControllersConfig,
+            # Can drop the config server is re-deployed made, see https://github.com/DiamondLightSource/daq-config-server/pull/173
             force_parser=TemperatureControllersConfig.from_xpdf_parameters,
         )
 
