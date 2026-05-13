@@ -1,6 +1,7 @@
 import math
 
 import pytest
+from pydantic import ValidationError
 
 from dodal.common.general_maths.material_absorption_maths import (
     attenuation_at_depth_cm,
@@ -75,13 +76,13 @@ def test_attenuation_at_depth_cm(depth_cm, absorption_coefficient_per_cm, result
 # inauspicious path
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_energy(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         photon_mass_attenuation_per_unit_length(bad_input, 1.0, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_factor(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         photon_mass_attenuation_per_unit_length(3500.0, bad_input, 1.0)
 
 
@@ -89,18 +90,18 @@ def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_factor(bad_
 def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_exponent(
     bad_input,
 ):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         photon_mass_attenuation_per_unit_length(3500.0, 1.0, bad_input)
 
 
 def test_thickness_cm_required_to_attenuate_with_transparent_medium():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         transparent_medium = 1.0e-15
         thickness_cm_required_to_attenuate(3500.0, transparent_medium)
 
 
 def test_thickness_required_to_attenuate_raises_error_for_gain():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         thickness_cm_required_to_attenuate(-1, 1)
 
 
@@ -108,7 +109,7 @@ def test_thickness_required_to_attenuate_raises_error_for_gain():
 def test_thickness_required_to_attenuate_raises_error_with_invalid_target_attenuation(
     bad_input,
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         thickness_cm_required_to_attenuate(bad_input, 1.0)
 
 
@@ -116,29 +117,29 @@ def test_thickness_required_to_attenuate_raises_error_with_invalid_target_attenu
 def test_thickness_required_to_attenuate_raises_error_with_invalid_absorption(
     bad_input,
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         thickness_cm_required_to_attenuate(1.0, bad_input)
 
 
 @pytest.mark.parametrize("bad_input", [-1, -5, -0.1])
 def test_attenuation_at_depth_raises_error_with_invalid_absorption(bad_input):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         attenuation_at_depth_cm(1.0, bad_input)
 
 
 @pytest.mark.parametrize("bad_input", [-1, -5, -0.1])
 def test_attenuation_at_depth_raises_error_for_unphysical_depths(bad_input):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         attenuation_at_depth_cm(bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_at_depth_raises_error_with_invalid_depth(bad_input):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         attenuation_at_depth_cm(bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_at_depth_raises_error_with_invalid_attenuation(bad_input):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         attenuation_at_depth_cm(1.0, bad_input)

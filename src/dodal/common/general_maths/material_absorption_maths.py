@@ -3,6 +3,7 @@ from pydantic import NonNegativeFloat, StrictFloat, validate_call
 from dodal.common.general_maths import transmission_interconversion
 
 
+@validate_call
 def photon_mass_attenuation_per_unit_length(
     energy_kev: StrictFloat,
     photon_absorption_factor_per_unit_length: StrictFloat,
@@ -24,7 +25,7 @@ def photon_mass_attenuation_per_unit_length(
     )
 
 
-@validate_call()
+@validate_call
 def attenuation_at_depth_cm(
     depth_cm: NonNegativeFloat, absorption_coefficient_per_cm: NonNegativeFloat
 ) -> float:
@@ -48,7 +49,7 @@ def attenuation_at_depth_cm(
     )
 
 
-@validate_call()
+@validate_call
 def thickness_cm_required_to_attenuate(
     target_attenuation_bn: NonNegativeFloat,
     absorption_coefficient_per_cm: StrictFloat,
