@@ -10,7 +10,7 @@ dodal.devices.beamlines.i02\_1
    :recursive:
 
    dodal.devices.beamlines.i02_1.fast_grid_scan
-   dodal.devices.beamlines.i02_1.sample_motors
+   dodal.devices.beamlines.i02_1.flux
 
 
 

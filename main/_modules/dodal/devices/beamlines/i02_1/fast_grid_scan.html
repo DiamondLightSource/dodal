@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i02_1.fast_grid_scan &#8212; dodal 2.3.1.dev4+gdd687cce0 documentation</title>
+    <title>dodal.devices.beamlines.i02_1.fast_grid_scan &#8212; dodal 2.3.1.dev5+gdfd17050f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=4238de8a"></script>
+    <script src="../../../../../_static/documentation_options.js?v=35d0cb43"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,7 +886,7 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.devices.beamlines.i02_1.fast_grid_scan</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">derived_signal_r</span><span class="p">,</span> <span class="n">soft_signal_r_and_setter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw_rbv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw_rbv</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_grid_scan</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FastGridScanCommon</span><span class="p">,</span>
@@ -912,7 +912,7 @@ window.runMermaid = runMermaid;</script>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;i02-1&#39;s EPICS interface for the 2D FGS differs slightly from the standard 3D</span>
 <span class="sd">    version:</span>
 <span class="sd">    - No Z steps, Z step sizes, or Y2 start positions, or Z2 start</span>
-<span class="sd">    - No scan valid PV - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
+<span class="sd">    - Scan valid PV needs to end with RBV</span>
 <span class="sd">    - No program_number - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa D415</span>
 
@@ -925,6 +925,8 @@ window.runMermaid = runMermaid;</script>
         <span class="c1"># This signal could be put in the common device if the prefix gets standardised.</span>
         <span class="c1"># See https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">EXPOSURE_TIME&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">SCAN_STATUS_RBV&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
 
