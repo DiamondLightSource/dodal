@@ -63,14 +63,14 @@ def idd(idd_gap: UndulatorGap, idd_phase: UndulatorLockedPhaseAxes) -> Apple2:
 
 @devices.factory()
 def idd_controller(
-    idd: Apple2, idd_epics_polynomial_device: I06EpicsPolynomialDevice
+    idd: Apple2, idd_polynomial: I06EpicsPolynomialDevice
 ) -> I06Apple2Controller:
     """I06 downstream insertion device controller."""
     return I06Apple2Controller(
         apple2=idd,
-        gap_energy_motor_lut=idd_epics_polynomial_device.energy_gap_motor_lookup,
-        phase_energy_motor_lut=idd_epics_polynomial_device.energy_phase_motor_lookup,
-        inverse_gap_energy_motor_lut=idd_epics_polynomial_device.gap_motor_energy_lookup,
+        gap_energy_motor_lut=idd_polynomial.energy_gap_motor_lookup,
+        phase_energy_motor_lut=idd_polynomial.energy_phase_motor_lookup,
+        inverse_gap_energy_motor_lut=idd_polynomial.gap_motor_energy_lookup,
     )
 
 
@@ -101,14 +101,14 @@ def idu(idu_gap: UndulatorGap, idu_phase: UndulatorLockedPhaseAxes) -> Apple2:
 
 @devices.factory()
 def idu_controller(
-    idu: Apple2, idu_epics_polynomial_device: I06EpicsPolynomialDevice
+    idu: Apple2, idu_polynomial: I06EpicsPolynomialDevice
 ) -> I06Apple2Controller:
     """I06 upstream insertion device controller."""
     return I06Apple2Controller(
         apple2=idu,
-        gap_energy_motor_lut=idu_epics_polynomial_device.energy_gap_motor_lookup,
-        phase_energy_motor_lut=idu_epics_polynomial_device.energy_phase_motor_lookup,
-        inverse_gap_energy_motor_lut=idu_epics_polynomial_device.gap_motor_energy_lookup,
+        gap_energy_motor_lut=idu_polynomial.energy_gap_motor_lookup,
+        phase_energy_motor_lut=idu_polynomial.energy_phase_motor_lookup,
+        inverse_gap_energy_motor_lut=idu_polynomial.gap_motor_energy_lookup,
     )
 
 
