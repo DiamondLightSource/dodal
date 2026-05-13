@@ -22,7 +22,8 @@ from dodal.devices.beamlines.i24.dual_backlight import DualBacklight
 from dodal.devices.beamlines.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.beamlines.i24.pmac import PMAC
 from dodal.devices.beamlines.i24.vgonio import VerticalGoniometer
-from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -139,7 +140,7 @@ def zebra() -> Zebra:
 @devices.factory()
 def shutter() -> InterlockedHutchShutter:
     return InterlockedHutchShutter(
-        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
     )
 
 
