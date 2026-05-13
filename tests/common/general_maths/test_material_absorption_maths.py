@@ -73,19 +73,19 @@ def test_attenuation_at_depth_cm(depth_cm, absorption_coefficient_per_cm, result
 
 
 # inauspicious path
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_energy(bad_input):
     with pytest.raises(TypeError):
         photon_mass_attenuation_per_unit_length(bad_input, 1.0, 1.0)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_factor(bad_input):
     with pytest.raises(TypeError):
         photon_mass_attenuation_per_unit_length(3500.0, bad_input, 1.0)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_exponent(
     bad_input,
 ):
@@ -104,7 +104,7 @@ def test_thickness_required_to_attenuate_raises_error_for_gain():
         thickness_cm_required_to_attenuate(-1, 1)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_thickness_required_to_attenuate_raises_error_with_invalid_target_attenuation(
     bad_input,
 ):
@@ -112,7 +112,7 @@ def test_thickness_required_to_attenuate_raises_error_with_invalid_target_attenu
         thickness_cm_required_to_attenuate(bad_input, 1.0)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_thickness_required_to_attenuate_raises_error_with_invalid_absorption(
     bad_input,
 ):
@@ -132,13 +132,13 @@ def test_attenuation_at_depth_raises_error_for_unphysical_depths(bad_input):
         attenuation_at_depth_cm(bad_input, 1.0)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_at_depth_raises_error_with_invalid_depth(bad_input):
     with pytest.raises(ValueError):
         attenuation_at_depth_cm(bad_input, 1.0)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_at_depth_raises_error_with_invalid_attenuation(bad_input):
     with pytest.raises(ValueError):
         attenuation_at_depth_cm(1.0, bad_input)

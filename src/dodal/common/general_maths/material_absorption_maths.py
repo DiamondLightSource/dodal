@@ -1,20 +1,20 @@
-from pydantic import NonNegativeFloat, validate_call
+from pydantic import NonNegativeFloat, StrictFloat, validate_call
 
 from dodal.common.general_maths import transmission_interconversion
 
 
 def photon_mass_attenuation_per_unit_length(
-    energy_kev: float,
-    photon_absorption_factor_per_unit_length: float,
-    energy_dependence_exponent: float,
-):
+    energy_kev: StrictFloat,
+    photon_absorption_factor_per_unit_length: StrictFloat,
+    energy_dependence_exponent: StrictFloat,
+) -> float:
     """Calculates mass attenuation per unit length.
 
     Args:
-        energy_kev (float): energy
-        photon_absorption_factor_per_unit_length (float): photon absorption factor per
-        unit length
-        energy_dependence_exponent (float): energy dependence exponent
+        energy_kev (StrictFloat): energy
+        photon_absorption_factor_per_unit_length (StrictFloat): photon absorption factor
+        per unit length
+        energy_dependence_exponent (StrictFloat): energy dependence exponent
 
     Returns:
         (float): mass attenuation per unit length.
@@ -27,7 +27,7 @@ def photon_mass_attenuation_per_unit_length(
 @validate_call()
 def attenuation_at_depth_cm(
     depth_cm: NonNegativeFloat, absorption_coefficient_per_cm: NonNegativeFloat
-):
+) -> float:
     """Calculates attenuation in Barnett units, where 1000 Bn equivalent to 1/e,
     0Bn to 1 and 2000 Bn to 1/(e^2).
 
@@ -51,14 +51,14 @@ def attenuation_at_depth_cm(
 @validate_call()
 def thickness_cm_required_to_attenuate(
     target_attenuation_bn: NonNegativeFloat,
-    absorption_coefficient_per_cm: float,
-):
+    absorption_coefficient_per_cm: StrictFloat,
+) -> float:
     """Calculates material depth in cm.
 
     Args:
-        target_attenuation_bn (float): Target attenuation to meet in Barnett attenuation
-        units.
-        absorption_coefficient_per_cm (float): absorption coefficient per cm
+        target_attenuation_bn (NonNegativeFloat): Target attenuation to meet in Barnett
+        attenuation units.
+        absorption_coefficient_per_cm (StrictFloat): absorption coefficient per cm
 
 
     Raises:
