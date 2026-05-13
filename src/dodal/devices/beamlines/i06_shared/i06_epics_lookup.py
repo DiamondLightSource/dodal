@@ -63,15 +63,7 @@ class I06EpicsPolynomialDevice(Device, Triggerable):
             Pol.PC3: "PC:HAR3",
             Pol.NC3: "NC:HAR3",
         }
-        self._inv_pol_map = {
-            Pol.LH: "BHZ",
-            Pol.LV: "BVT",
-            Pol.PC: "BPC",
-            Pol.NC: "BNC",
-            Pol.PC3: "BPC:HAR3",
-            Pol.NC3: "BNC:HAR3",
-        }
-
+        self._inv_pol_map = {a: f"B{b}" for a, b in self._pol_map.items()}
         self.energy_gap_motor_lookup = EpicsPolynomialEnergyMotorLookup(
             prefix=prefix, max_value=2200, min_value=70, poly_params=self._pol_map
         )
