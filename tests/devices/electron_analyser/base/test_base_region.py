@@ -4,11 +4,11 @@ import pytest
 
 from dodal.devices.beamlines import b07, b07_shared, i09
 from dodal.devices.electron_analyser.base import (
-    AbstractBaseRegion,
+    BaseRegion,
     EnergyMode,
     GenericRegion,
     GenericSequence,
-    TAbstractBaseRegion,
+    TBaseRegion,
     to_binding_energy,
     to_kinetic_energy,
 )
@@ -34,9 +34,7 @@ def sequence(request: pytest.FixtureRequest) -> GenericSequence:
 
 
 @pytest.fixture
-def expected_region_class(
-    sequence: GenericSequence,
-) -> type[AbstractBaseRegion]:
+def expected_region_class(sequence: GenericSequence) -> type[BaseRegion]:
     if isinstance(sequence, SpecsSequence):
         return SpecsRegion[b07.LensMode, b07_shared.PsuMode]
     elif isinstance(sequence, VGScientaSequence):
@@ -59,7 +57,7 @@ def test_sequence_get_expected_region_from_name(
 
 def test_sequence_get_expected_region_type(
     sequence: GenericSequence,
-    expected_region_class: type[TAbstractBaseRegion],
+    expected_region_class: type[TBaseRegion],
 ) -> None:
     regions = sequence.regions
     enabled_regions = sequence.get_enabled_regions()
@@ -139,7 +137,7 @@ def test_region_prepare_for_epics(region: GenericRegion, copy: bool) -> None:
     # Patch switch_energy_mode so we can spy on if it was called while also returning
     # true function return value
     with patch.object(
-        AbstractBaseRegion, "switch_energy_mode", wraps=region.switch_energy_mode
+        BaseRegion, "switch_energy_mode", wraps=region.switch_energy_mode
     ) as mock_switch_energy_mode:
         excitation_energy = 500
         original_energy_mode = region.energy_mode
