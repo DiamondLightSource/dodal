@@ -1,0 +1,35 @@
+{
+  "cobra": {
+    "beam_position": 461.5,
+    "safe_position": 2,
+    "settle_time": 600,
+    "tolerance": 5,
+    "units": "K",
+    "ramp_units": "/h",
+    "use_calibration": true,
+    "use_fast_cool": true,
+    "calibration_file": "cobra_calibration_2025-09-11.txt"
+  },
+  "blower": {
+    "beam_position": 44.7,
+    "safe_position": 2,
+    "settle_time": 0,
+    "tolerance": 5,
+    "units": "C",
+    "ramp_units": "/min",
+    "use_calibration": true,
+    "use_fast_cool": null,
+    "calibration_file": "blower_cal_10_03_2026.txt"
+  },
+  "cryostream": {
+    "beam_position": 469.9,
+    "safe_position": 0,
+    "settle_time": 600,
+    "tolerance": 0.5,
+    "units": "K",
+    "ramp_units": "/h",
+    "use_calibration": true,
+    "use_fast_cool": null,
+    "calibration_file": "cryostream_cal_2025-01-23.txt"
+  }
+}
