@@ -31,18 +31,20 @@ def test_photon_mass_attenuation_per_unit_length(
 
 # inauspicious path
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
-def test_photon_mass_attenuation_per_unit_length_errors_energy(bad_input):
+def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_energy(bad_input):
     with pytest.raises(TypeError):
         photon_mass_attenuation_per_unit_length(bad_input, 1.0, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
-def test_photon_mass_attenuation_per_unit_length_errors_absorp(bad_input):
+def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_factor(bad_input):
     with pytest.raises(TypeError):
-        photon_mass_attenuation_per_unit_length(1.0, bad_input, 1.0)
+        photon_mass_attenuation_per_unit_length(3500.0, bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
-def test_photon_mass_attenuation_per_unit_length_errors_expo(bad_input):
+def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_exponent(
+    bad_input,
+):
     with pytest.raises(TypeError):
-        photon_mass_attenuation_per_unit_length(1.0, 1.0, bad_input)
+        photon_mass_attenuation_per_unit_length(3500.0, 1.0, bad_input)
