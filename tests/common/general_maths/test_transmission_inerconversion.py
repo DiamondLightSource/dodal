@@ -98,25 +98,25 @@ def test_attenuation_from_natural_log_of_transmission(ln_t, result):
 
 
 # inauspicious:
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_natural_log_of_transmission_from_attenuation_raises_error(bad_input):
     with pytest.raises(TypeError):
         natural_log_of_transmission_from_attenuation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_transmission_from_attenutation_raises_error(bad_input):
     with pytest.raises(TypeError):
         transmission_from_attenutation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_from_transmission_raises_error(bad_input):
     with pytest.raises(TypeError):
         attenuation_from_transmission(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_from_natural_log_of_transmission_raises_error(bad_input):
     with pytest.raises(TypeError):
         attenuation_from_natural_log_of_transmission(bad_input)
