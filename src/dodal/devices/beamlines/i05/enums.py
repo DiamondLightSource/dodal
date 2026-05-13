@@ -18,8 +18,3 @@ class PassEnergy(StrictEnum):
     PE050 = "PE050"
     PE100 = "PE100"
     PE200 = "PE200"
-
-
-# ToDo
-class PsuMode(StrictEnum):
-    UNKNOWN = "UNKNOWN"
