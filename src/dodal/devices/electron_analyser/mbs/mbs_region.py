@@ -6,14 +6,13 @@ from dodal.devices.electron_analyser.base.base_region import (
     BaseRegion,
     TLensMode,
     TPassEnergy,
-    TPsuMode,
 )
 from dodal.devices.electron_analyser.mbs.mbs_enums import AcquisitionMode
 
 
 class MbsRegion(
     BaseRegion[AcquisitionMode, TLensMode, TPassEnergy],
-    Generic[TLensMode, TPsuMode, TPassEnergy],
+    Generic[TLensMode, TPassEnergy],
 ):
     # Override base class with defaults
     lens_mode: TLensMode

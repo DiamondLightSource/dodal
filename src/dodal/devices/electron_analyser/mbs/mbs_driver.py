@@ -12,33 +12,42 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
     AbstractAnalyserDriverIO,
+    ElectronAnalyserPVConfig,
 )
-from dodal.devices.electron_analyser.base.base_region import (
-    TLensMode,
-    TPassEnergy,
-    TPsuMode,
-)
+from dodal.devices.electron_analyser.base.base_region import TLensMode, TPassEnergy
 from dodal.devices.electron_analyser.mbs.mbs_enums import AcquisitionMode
 from dodal.devices.electron_analyser.mbs.mbs_region import MbsRegion
 
 
 class MbsAnalyserDriverIO(
     AbstractAnalyserDriverIO[
-        MbsRegion[TLensMode, TPsuMode, TPassEnergy],
+        MbsRegion[TLensMode, TPassEnergy],
         AcquisitionMode,
         TLensMode,
-        TPsuMode,
+        str,
         TPassEnergy,
     ],
-    Generic[TLensMode, TPsuMode, TPassEnergy],
+    Generic[TLensMode, TPassEnergy],
 ):
+    PV_CFG = ElectronAnalyserPVConfig(
+        lens_mode="LensMode",
+        pass_energy="PassEnergy",
+        acquisition_mode="AcqMode",
+        energy_step="StepSize",
+        low_energy="StartKE",
+        centre_energy="CentreKE",
+        high_energy="EndKE",
+        psu_mode="PsuMode_RBV",
+        slices="NumSlice",
+        iterations="NumExposures",
+        total_steps="NumSteps",
+    )
+
     def __init__(
         self,
         prefix: str,
         lens_mode_type: type[TLensMode],
-        psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
-        psu_suffix: str = "PsuMode",
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -48,9 +57,8 @@ class MbsAnalyserDriverIO(
             prefix=prefix,
             acquisition_mode_type=AcquisitionMode,
             lens_mode_type=lens_mode_type,
-            psu_mode_type=psu_mode_type,
+            psu_mode_type=str,
             pass_energy_type=pass_energy_type,
-            psu_suffix=psu_suffix,
             name=name,
         )
 
@@ -61,7 +69,7 @@ class MbsAnalyserDriverIO(
         return epics_signal_r(Array1D[np.float64], prefix + "EScale_RBV")
 
     @AsyncStatus.wrap
-    async def set(self, epics_region: MbsRegion[TLensMode, TPsuMode, TPassEnergy]):
+    async def set(self, epics_region: MbsRegion[TLensMode, TPassEnergy]):
         # What do we do about region name?
         coroutines = [
             self.acquisition_mode.set(epics_region.acquisition_mode),

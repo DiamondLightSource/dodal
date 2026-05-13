@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeAlias, TypeVar
+from dataclasses import dataclass
+from typing import ClassVar, Generic, TypeAlias, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -30,10 +31,27 @@ from dodal.devices.electron_analyser.base.base_region import (
 )
 from dodal.devices.electron_analyser.base.base_util import to_binding_energy
 
-AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
+AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum | str
 TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
-_PSU = "PSU_MODE"
+
+@dataclass
+class ElectronAnalyserPVConfig:
+    """Configuration for PV's. Temporary work around until PV's are standardised between
+    beamlines.
+    """
+
+    low_energy: str = "LOW_ENERGY"
+    high_energy: str = "HIGH_ENERGY"
+    centre_energy: str = "CENTRE_ENERGY"
+    slices: str = "SLICES"
+    lens_mode: str = "LENS_MODE"
+    pass_energy: str = "PASS_ENERGY"
+    energy_step: str = "STEP_SIZE"
+    iterations: str = "NumExposures"
+    acquisition_mode: str = "ACQ_MODE"
+    psu_mode: str = "PSU_MODE"
+    total_steps: str = "TOTAL_POINTS_RBV"
 
 
 class AbstractAnalyserDriverIO(
@@ -62,6 +80,8 @@ class AbstractAnalyserDriverIO(
         name (str, optional): Name of the device.
     """
 
+    PV_CFG: ClassVar[ElectronAnalyserPVConfig]
+
     def __init__(
         self,
         prefix: str,
@@ -69,7 +89,6 @@ class AbstractAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
-        psu_suffix: str = _PSU,
         name: str = "",
     ) -> None:
         self.acquisition_mode_type = acquisition_mode_type
@@ -77,7 +96,7 @@ class AbstractAnalyserDriverIO(
         self.psu_mode_type = psu_mode_type
         self.pass_energy_type = pass_energy_type
 
-        # must call first to initiate parent variables
+        # Must call first to initiate parent variables
         super().__init__(prefix=prefix, name=name)
 
         with self.add_children_as_readables():
@@ -97,21 +116,27 @@ class AbstractAnalyserDriverIO(
             self.cached_excitation_energy = soft_signal_rw(
                 float, initial_value=0, units="eV"
             )
-            self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
-            self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
-            self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
-            self.slices = epics_signal_rw(int, prefix + "SLICES")
-            self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
-            self.pass_energy = epics_signal_rw(pass_energy_type, prefix + "PASS_ENERGY")
-            self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
-            self.iterations = epics_signal_rw(int, prefix + "NumExposures")
+            self.low_energy = epics_signal_rw(float, prefix + self.PV_CFG.low_energy)
+            self.centre_energy = epics_signal_rw(
+                float, prefix + self.PV_CFG.centre_energy
+            )
+            self.high_energy = epics_signal_rw(float, prefix + self.PV_CFG.high_energy)
+            self.slices = epics_signal_rw(int, prefix + self.PV_CFG.slices)
+            self.lens_mode = epics_signal_rw(
+                lens_mode_type, prefix + self.PV_CFG.lens_mode
+            )
+            self.pass_energy = epics_signal_rw(
+                pass_energy_type, prefix + self.PV_CFG.pass_energy
+            )
+            self.energy_step = epics_signal_rw(float, prefix + self.PV_CFG.energy_step)
+            self.iterations = epics_signal_rw(int, prefix + self.PV_CFG.iterations)
             self.acquisition_mode = epics_signal_rw(
-                acquisition_mode_type, prefix + "ACQ_MODE"
+                acquisition_mode_type, prefix + self.PV_CFG.acquisition_mode
             )
             # This is used by each electron analyser, however it is not writeable for
             # all types and it depends on the electron analyser type to know if is moved
             # with region settings.
-            self.psu_mode = epics_signal_r(psu_mode_type, prefix + psu_suffix)
+            self.psu_mode = epics_signal_r(psu_mode_type, prefix + self.PV_CFG.psu_mode)
 
         # This is defined in the parent class, add it as readable configuration.
         self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
@@ -127,7 +152,7 @@ class AbstractAnalyserDriverIO(
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
-            self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
+            self.total_steps = epics_signal_r(int, prefix + self.PV_CFG.total_steps)
             self.total_time = derived_signal_r(
                 self._calculate_total_time,
                 "s",

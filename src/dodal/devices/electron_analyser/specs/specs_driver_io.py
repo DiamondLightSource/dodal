@@ -12,8 +12,8 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
-    _PSU,
     AbstractAnalyserDriverIO,
+    ElectronAnalyserPVConfig,
 )
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.specs_enums import AcquisitionMode
@@ -30,12 +30,13 @@ class SpecsAnalyserDriverIO(
     ],
     Generic[TLensMode, TPsuMode],
 ):
+    PV_CFG = ElectronAnalyserPVConfig()
+
     def __init__(
         self,
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        psu_suffix: str = _PSU,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -46,7 +47,7 @@ class SpecsAnalyserDriverIO(
         self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
         self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        self.psu_mode_w = epics_signal_w(psu_mode_type, prefix + psu_suffix)
+        self.psu_mode_w = epics_signal_w(psu_mode_type, prefix + self.PV_CFG.psu_mode)
 
         # Used to calculate the energy axis.
         self.energy_channels = epics_signal_r(
@@ -59,7 +60,6 @@ class SpecsAnalyserDriverIO(
             lens_mode_type=lens_mode_type,
             psu_mode_type=psu_mode_type,
             pass_energy_type=float,
-            psu_suffix=psu_suffix,
             name=name,
         )
 

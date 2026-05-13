@@ -2,7 +2,7 @@ from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05 import I05Goniometer
-from dodal.devices.beamlines.i05.enums import LensMode, PassEnergy, PsuMode
+from dodal.devices.beamlines.i05.enums import LensMode, PassEnergy
 from dodal.devices.beamlines.i05_shared import M4M5Mirror
 from dodal.devices.common_mirror import XYZSwitchingMirror
 from dodal.devices.electron_analyser.base.energy_sources import EnergySource
@@ -59,10 +59,9 @@ def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
 
 @devices.factory
 def analyser_driver(energy_source: EnergySource) -> MbsAnalyserDriverIO:
-    return MbsAnalyserDriverIO[LensMode, PsuMode, PassEnergy](
+    return MbsAnalyserDriverIO[LensMode, PassEnergy](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
         lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
         pass_energy_type=PassEnergy,
         # energy_source=energy_source,
     )
