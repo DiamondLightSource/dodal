@@ -36,10 +36,8 @@ def pgm() -> PlaneGratingMonochromator:
     )
 
 
-# Insertion Device
-# ------------- Downstream Insertion Device --------------------
 @devices.factory()
-def idd_epics_polynomial_device() -> I06EpicsPolynomialDevice:
+def idd_polynomial() -> I06EpicsPolynomialDevice:
     return I06EpicsPolynomialDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDD-01:")
 
 
@@ -76,9 +74,8 @@ def idd_controller(
     )
 
 
-# -------------------- Upstream Insertion Device -------------------
 @devices.factory()
-def idu_epics_polynomial_device() -> I06EpicsPolynomialDevice:
+def idu_polynomial() -> I06EpicsPolynomialDevice:
     return I06EpicsPolynomialDevice(prefix=f"{PREFIX.beamline_prefix}-OP-IDU-01:")
 
 
