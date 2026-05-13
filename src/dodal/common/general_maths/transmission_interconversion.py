@@ -1,10 +1,13 @@
 import math
 
+from pydantic import StrictFloat, validate_call
+
 CANONICAL_BARNETT_CONVERSION = -1.0e3
 REVERSE_BARNETT_CONVERSION = -1.0e-3
 
 
-def attenuation_from_natural_log_of_transmission(ln_t: float) -> float:
+@validate_call
+def attenuation_from_natural_log_of_transmission(ln_t: StrictFloat) -> float:
     """Converts from natural log of transmission fraction into Barnett attenuation units
     .
 
@@ -17,7 +20,8 @@ def attenuation_from_natural_log_of_transmission(ln_t: float) -> float:
     return CANONICAL_BARNETT_CONVERSION * ln_t
 
 
-def attenuation_from_transmission(transmission_as_fraction: float) -> float:
+@validate_call
+def attenuation_from_transmission(transmission_as_fraction: StrictFloat) -> float:
     """Converts from transmission fraction into Barnett attenuation units.
 
     Args:
@@ -30,7 +34,8 @@ def attenuation_from_transmission(transmission_as_fraction: float) -> float:
     return attenuation_from_natural_log_of_transmission(ln_t)
 
 
-def natural_log_of_transmission_from_attenuation(attenuation_bn: float) -> float:
+@validate_call
+def natural_log_of_transmission_from_attenuation(attenuation_bn: StrictFloat) -> float:
     """Converts from Barnett attenuation units into natural log of transmission fraction
     .
 
@@ -43,7 +48,8 @@ def natural_log_of_transmission_from_attenuation(attenuation_bn: float) -> float
     return REVERSE_BARNETT_CONVERSION * attenuation_bn
 
 
-def transmission_from_attenutation(attenuation_bn: float) -> float:
+@validate_call
+def transmission_from_attenutation(attenuation_bn: StrictFloat) -> float:
     """Converts from Barnett attenuation units into transmission fraction.
 
     Args:
