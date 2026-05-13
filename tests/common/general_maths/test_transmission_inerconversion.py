@@ -86,11 +86,11 @@ def test_attenuation_from_transmission(transmission_as_fraction, result):
         (
             -0.4367,
             436.7,
-        ),  # tests log from arbitrary high transmission is -1000 * log
+        ),  # tests log from arbitrary high transmission
         (
             -5.9017,
             5901.7,
-        ),  # tests log from arbitrary low transmission is -1000 * log
+        ),  # tests log from arbitrary low transmission
     ],
 )
 def test_attenuation_from_natural_log_of_transmission(ln_t, result):
