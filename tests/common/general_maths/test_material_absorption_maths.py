@@ -2,7 +2,9 @@ import math
 
 import pytest
 
-from dodal.common.general_maths import material_absorption_maths
+from dodal.common.general_maths.material_absorption_maths import (
+    photon_mass_attenuation_per_unit_length,
+)
 
 
 # happy path
@@ -22,7 +24,7 @@ def test_photon_mass_attenuation_per_unit_length(
     energy_dependence_exponent,
     result,
 ):
-    assert material_absorption_maths.photon_mass_attenuation_per_unit_length(
+    assert photon_mass_attenuation_per_unit_length(
         energy_kev, photon_absorption_factor_per_unit_length, energy_dependence_exponent
     ) == pytest.approx(result)
 
@@ -31,22 +33,16 @@ def test_photon_mass_attenuation_per_unit_length(
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
 def test_photon_mass_attenuation_per_unit_length_errors_energy(bad_input):
     with pytest.raises(TypeError):
-        material_absorption_maths.photon_mass_attenuation_per_unit_length(
-            bad_input, 1.0, 1.0
-        )
+        photon_mass_attenuation_per_unit_length(bad_input, 1.0, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
 def test_photon_mass_attenuation_per_unit_length_errors_absorp(bad_input):
     with pytest.raises(TypeError):
-        material_absorption_maths.photon_mass_attenuation_per_unit_length(
-            1.0, bad_input, 1.0
-        )
+        photon_mass_attenuation_per_unit_length(1.0, bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
 def test_photon_mass_attenuation_per_unit_length_errors_expo(bad_input):
     with pytest.raises(TypeError):
-        material_absorption_maths.photon_mass_attenuation_per_unit_length(
-            1.0, 1.0, bad_input
-        )
+        photon_mass_attenuation_per_unit_length(1.0, 1.0, bad_input)
