@@ -99,42 +99,46 @@ def test_thickness_cm_required_to_attenuate_with_transparent_medium():
         thickness_cm_required_to_attenuate(3500.0, transparent_medium)
 
 
-def test_thickness_required_to_attenuate_raises_negative_error():
+def test_thickness_required_to_attenuate_raises_error_for_gain():
     with pytest.raises(ValueError):
         thickness_cm_required_to_attenuate(-1, 1)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
-def test_thickness_cm_required_to_attenuate_target_raises_error(bad_input):
+def test_thickness_required_to_attenuate_raises_error_with_invalid_target_attenuation(
+    bad_input,
+):
     with pytest.raises(ValueError):
         thickness_cm_required_to_attenuate(bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
-def test_thickness_cm_required_to_attenuate_absorption_raises_error(bad_input):
+def test_thickness_required_to_attenuate_raises_error_with_invalid_absorption(
+    bad_input,
+):
     with pytest.raises(ValueError):
         thickness_cm_required_to_attenuate(1.0, bad_input)
 
 
 @pytest.mark.parametrize("bad_input", [-1, -5, -0.1])
-def test_attenuation_at_depth_cm_absorption_coefficient_error(bad_input):
+def test_attenuation_at_depth_raises_error_with_invalid_absorption(bad_input):
     with pytest.raises(ValueError):
         attenuation_at_depth_cm(1.0, bad_input)
 
 
 @pytest.mark.parametrize("bad_input", [-1, -5, -0.1])
-def test_attenuation_at_depth_cm_depth_raises_negative_error(bad_input):
+def test_attenuation_at_depth_raises_error_for_unphysical_depths(bad_input):
     with pytest.raises(ValueError):
         attenuation_at_depth_cm(bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
-def test_attenuation_at_depth_cm_depth_depth_raises_error(bad_input):
+def test_attenuation_at_depth_raises_error_with_invalid_depth(bad_input):
     with pytest.raises(ValueError):
         attenuation_at_depth_cm(bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
-def test_attenuation_at_depth_cm_depth_absorption_raises_error(bad_input):
+def test_attenuation_at_depth_raises_error_with_invalid_attenuation(bad_input):
     with pytest.raises(ValueError):
         attenuation_at_depth_cm(1.0, bad_input)
