@@ -1,12 +1,11 @@
-import uuid
 from typing import Generic, TypeVar
 
 from ophyd_async.core import StrictEnum
 from pydantic import Field, field_validator
 
 from dodal.devices.electron_analyser.base.base_region import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
+    BaseRegion,
+    BaseSequence,
     TLensMode,
     TPsuMode,
 )
@@ -19,7 +18,7 @@ TPassEnergyEnum = TypeVar("TPassEnergyEnum", bound=StrictEnum)
 
 
 class VGScientaRegion(
-    AbstractBaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
+    BaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
     Generic[TLensMode, TPassEnergyEnum],
 ):
     # Override defaults of base region class
@@ -32,7 +31,6 @@ class VGScientaRegion(
     acquire_time: float = Field(default=1.0, alias="step_time")
     energy_step: float = Field(default=200.0)
     # Specific to this class
-    id: str = Field(default=str(uuid.uuid4()), alias="region_id")
     total_steps: float = 13.0
     total_time: float = 13.0
     min_x: int = Field(alias="first_x_channel", default=1)
@@ -58,7 +56,7 @@ class VGScientaRegion(
 
 
 class VGScientaSequence(
-    AbstractBaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
+    BaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
     Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
     psu_mode: TPsuMode = Field(alias="element_set")
