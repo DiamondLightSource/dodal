@@ -275,43 +275,26 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
     )
 
 
-# Also tests transition from change ROI to set_detector_threshold
-@patch("ophyd.status.Status.__and__")
-def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
-    mock_and, fake_eiger: EigerDetector
+def test_unsuccessful_roi_mode_change_results_in_callback_error(
+    fake_eiger: EigerDetector,
 ):
-    bad_status = Status()
-    bad_status.set_exception(StatusError("Failed setting ROI mode True"))
-    mock_and.return_value = bad_status
-    LOGGER.error = MagicMock()
+    for signal in [
+        fake_eiger.odin.file_writer.num_col_chunks,
+        fake_eiger.odin.file_writer.num_row_chunks,
+        fake_eiger.odin.file_writer.image_width,
+        fake_eiger.odin.file_writer.image_height,
+        fake_eiger.cam.roi_mode,
+    ]:
+        bad_status = Status()
+        bad_status.set_exception(StatusError(f"Failed setting {signal.name}"))
+        signal.set = MagicMock(return_value=bad_status)
+        LOGGER.error = MagicMock()
 
-    unwrapped_funcs = [
-        lambda: fake_eiger.change_roi_mode(enable=True),
-        lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.expected_energy_ev
-        ),
-    ]
-    with pytest.raises(StatusError):
-        run_functions_without_blocking(unwrapped_funcs).wait()
-
-
-@patch("ophyd.status.Status.__and__")
-def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
-    mock_and, fake_eiger: EigerDetector
-):
-    bad_status = Status()
-    bad_status.set_exception(StatusError("Failed setting ROI mode False"))
-    mock_and.return_value = bad_status
-    LOGGER.error = MagicMock()
-
-    unwrapped_funcs = [
-        lambda: fake_eiger.change_roi_mode(enable=False),
-        lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.expected_energy_ev
-        ),
-    ]
-    with pytest.raises(StatusError):
-        run_functions_without_blocking(unwrapped_funcs).wait()
+        unwrapped_funcs = [
+            lambda: fake_eiger.change_roi_mode(enable=True),
+        ]
+        with pytest.raises(StatusError, match=f"Failed setting {signal.name}"):
+            run_functions_without_blocking(unwrapped_funcs).wait()
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_and_wait_for_odin_state")
