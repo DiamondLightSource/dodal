@@ -1,7 +1,10 @@
 """Provides functions to convert between common units for attenuation."""
 
+from pydantic import StrictFloat, validate_call
 
-def convert_percentage_to_factor(pc: float) -> float:
+
+@validate_call
+def convert_percentage_to_factor(pc: StrictFloat) -> float:
     """Takes a percentage value and converts it the corresponding multiplication factor.
 
     Args:
@@ -12,7 +15,8 @@ def convert_percentage_to_factor(pc: float) -> float:
     return pc * 1e-2
 
 
-def convert_factor_to_percentage(f: float) -> float:
+@validate_call
+def convert_factor_to_percentage(f: StrictFloat) -> float:
     """Takes a multiplication factor and converts it to the corresponding percentage.
 
     Args:
@@ -24,7 +28,8 @@ def convert_factor_to_percentage(f: float) -> float:
     return f * 1e2
 
 
-def convert_microns_to_cm(t_um: float) -> float:
+@validate_call
+def convert_microns_to_cm(t_um: StrictFloat) -> float:
     """Takes the numerical part of a distance in microns and converts this to cm.
 
     Args:
@@ -36,7 +41,8 @@ def convert_microns_to_cm(t_um: float) -> float:
     return t_um * 1e-4
 
 
-def convert_microns_to_mm(v_um: float) -> float:
+@validate_call
+def convert_microns_to_mm(v_um: StrictFloat) -> float:
     """Takes the numerical part of a distance in microns and converts this to mm.
 
     Args:
@@ -48,7 +54,8 @@ def convert_microns_to_mm(v_um: float) -> float:
     return v_um * 1e-3
 
 
-def convert_mm_to_microns(w_mm: float) -> float:
+@validate_call
+def convert_mm_to_microns(w_mm: StrictFloat) -> float:
     """Takes the numerical part of a distance in mm and converts this to microns.
 
     Args:
@@ -60,7 +67,8 @@ def convert_mm_to_microns(w_mm: float) -> float:
     return w_mm * 1e3
 
 
-def convert_mm_to_cm(x_mm: float) -> float:
+@validate_call
+def convert_mm_to_cm(x_mm: StrictFloat) -> float:
     """Takes the numerical part of a distance in mm and converts this to cm.
 
     Args:
@@ -72,7 +80,8 @@ def convert_mm_to_cm(x_mm: float) -> float:
     return x_mm * 1e-1
 
 
-def convert_cm_to_mm(y_cm: float) -> float:
+@validate_call
+def convert_cm_to_mm(y_cm: StrictFloat) -> float:
     """Takes the numerical part of a distance in cm and converts this to mm.
 
     Args:
@@ -84,7 +93,8 @@ def convert_cm_to_mm(y_cm: float) -> float:
     return y_cm * 1e1
 
 
-def convert_ev_to_kev(energy_ev: float) -> float:
+@validate_call
+def convert_ev_to_kev(energy_ev: StrictFloat) -> float:
     """Takes the numerical part of an x-ray energy in electron volts and converts this
     to keV.
 

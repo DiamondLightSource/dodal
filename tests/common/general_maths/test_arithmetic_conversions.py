@@ -1,5 +1,6 @@
 import math
 
+import pydantic
 import pytest
 
 from dodal.common.general_maths.arithmetic_conversions import (
@@ -58,71 +59,71 @@ def test_conversion_from_microns_to_centimetres(input, result):
 # The inauspicuous path
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_microns_to_cm_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_microns_to_cm(bad_input)
 
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_ev_to_kev_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_ev_to_kev(bad_input)
 
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_microns_to_mm_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_microns_to_mm(bad_input)
 
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_mm_to_microns_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_mm_to_microns(bad_input)
 
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_factor_to_percentage_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_factor_to_percentage(bad_input)
 
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_percentage_to_factor_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_percentage_to_factor(bad_input)
 
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_mm_to_cm_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_mm_to_cm(bad_input)
 
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object()],
+    ["a", [], None, math.sin, object(), False],
 )
 def test_convert_cm_to_mm_raises_error_with_bad_input(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(pydantic.ValidationError):
         convert_cm_to_mm(bad_input)
