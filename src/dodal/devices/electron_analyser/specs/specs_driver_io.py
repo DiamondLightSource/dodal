@@ -9,7 +9,7 @@ from ophyd_async.core import (
     StandardReadableFormat,
     derived_signal_r,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
     _PSU,
@@ -46,6 +46,8 @@ class SpecsAnalyserDriverIO(
         self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
         self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
+        self.psu_mode_w = epics_signal_w(psu_mode_type, prefix + psu_suffix)
+
         # Used to calculate the energy axis.
         self.energy_channels = epics_signal_r(
             int, prefix + "TOTAL_POINTS_ITERATION_RBV"
@@ -74,7 +76,7 @@ class SpecsAnalyserDriverIO(
             self.iterations.set(epics_region.iterations),
             self.acquisition_mode.set(epics_region.acquisition_mode),
             self.snapshot_values.set(epics_region.values),
-            self.psu_mode.set(epics_region.psu_mode),
+            self.psu_mode_w.set(epics_region.psu_mode),
             self.energy_mode.set(epics_region.energy_mode),
         )
         if epics_region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:

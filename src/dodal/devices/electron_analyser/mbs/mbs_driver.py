@@ -11,7 +11,6 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
-    _PSU,
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
@@ -39,7 +38,7 @@ class MbsAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
-        psu_suffix: str = _PSU,
+        psu_suffix: str = "PsuMode",
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):

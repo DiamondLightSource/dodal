@@ -108,9 +108,10 @@ class AbstractAnalyserDriverIO(
             self.acquisition_mode = epics_signal_rw(
                 acquisition_mode_type, prefix + "ACQ_MODE"
             )
-            # This is used by each electron analyser, however it depends on the electron
-            # analyser type to know if is moved with region settings.
-            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + psu_suffix)
+            # This is used by each electron analyser, however it is not writeable for
+            # all types and it depends on the electron analyser type to know if is moved
+            # with region settings.
+            self.psu_mode = epics_signal_r(psu_mode_type, prefix + psu_suffix)
 
         # This is defined in the parent class, add it as readable configuration.
         self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
