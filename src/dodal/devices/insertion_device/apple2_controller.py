@@ -1,4 +1,5 @@
 import abc
+from dataclasses import dataclass
 from math import isclose
 from typing import Generic, Protocol, TypeVar
 
@@ -36,6 +37,17 @@ class EnergyMotorConvertor(Protocol):
 
 
 Apple2Type = TypeVar("Apple2Type", bound=Apple2)
+
+
+@dataclass
+class Apple2PhaseZeroStatus:
+    top_outer: bool  # top outer
+    top_inner: bool  # top inner
+    btm_inner: bool  # btm inner
+    btm_outer: bool  # btm outer
+
+    def all_zero(self) -> bool:
+        return all(self.__dict__.values())
 
 
 class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
@@ -253,34 +265,45 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         tol = ROW_PHASE_MOTOR_TOLERANCE
         max_p = self.maximum_phase_motor_position
 
-        zero = {
-            "to": isclose(top_outer, 0.0, abs_tol=tol),
-            "ti": isclose(top_inner, 0.0, abs_tol=tol),
-            "bi": isclose(btm_inner, 0.0, abs_tol=tol),
-            "bo": isclose(btm_outer, 0.0, abs_tol=tol),
-        }
-
-        if all(zero.values()):
+        zero = Apple2PhaseZeroStatus(
+            top_outer=isclose(top_outer, 0.0, abs_tol=tol),
+            top_inner=isclose(top_inner, 0.0, abs_tol=tol),
+            btm_inner=isclose(btm_inner, 0.0, abs_tol=tol),
+            btm_outer=isclose(btm_outer, 0.0, abs_tol=tol),
+        )
+        if zero.all_zero():
             LOGGER.info("Determined polarisation: LH (Linear Horizontal).")
             return Pol.LH, 0.0
         if (
             isclose(top_outer, btm_inner, abs_tol=tol)
             and isclose(abs(top_outer), max_p, abs_tol=tol)
-            and zero["ti"]
-            and zero["bo"]
+            and zero.top_inner
+            and zero.btm_outer
         ):
             LOGGER.info("Determined polarisation: LV (Linear Vertical).")
             return Pol.LV, max_p
-        if isclose(top_outer, btm_inner, abs_tol=tol) and zero["ti"] and zero["bo"]:
+        if (
+            isclose(top_outer, btm_inner, abs_tol=tol)
+            and zero.top_inner
+            and zero.btm_outer
+        ):
             pol = Pol.PC if top_outer > 0 else Pol.NC
             LOGGER.info(f"Determined polarisation: {pol}.")
             return pol, top_outer
 
-        if isclose(top_outer, -btm_inner, abs_tol=tol) and zero["ti"] and zero["bo"]:
+        if (
+            isclose(top_outer, -btm_inner, abs_tol=tol)
+            and zero.top_inner
+            and zero.btm_outer
+        ):
             LOGGER.info("Determined polarisation: LA.")
             return Pol.LA, top_outer
 
-        if isclose(top_inner, -btm_outer, abs_tol=tol) and zero["to"] and zero["bi"]:
+        if (
+            isclose(top_inner, -btm_outer, abs_tol=tol)
+            and zero.top_outer
+            and zero.btm_inner
+        ):
             LOGGER.info("Determined polarisation: LA.")
             return Pol.LA, top_inner
 
