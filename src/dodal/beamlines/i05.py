@@ -6,7 +6,7 @@ from dodal.devices.beamlines.i05.enums import LensMode, PassEnergy
 from dodal.devices.beamlines.i05_shared import M4M5Mirror
 from dodal.devices.common_mirror import XYZSwitchingMirror
 from dodal.devices.electron_analyser.base.energy_sources import EnergySource
-from dodal.devices.electron_analyser.mbs.mbs_driver import MbsAnalyserDriverIO
+from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.temperture_controller import Lakeshore336
