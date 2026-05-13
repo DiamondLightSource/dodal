@@ -74,26 +74,29 @@ def test_attenuation_at_depth_cm(depth_cm, absorption_coefficient_per_cm, result
 
 # inauspicious path
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
-def test_photon_mass_attenuation_per_unit_length_errors_energy(bad_input):
+def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_energy(bad_input):
     with pytest.raises(TypeError):
         photon_mass_attenuation_per_unit_length(bad_input, 1.0, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
-def test_photon_mass_attenuation_per_unit_length_errors_absorp(bad_input):
+def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_factor(bad_input):
     with pytest.raises(TypeError):
-        photon_mass_attenuation_per_unit_length(1.0, bad_input, 1.0)
+        photon_mass_attenuation_per_unit_length(3500.0, bad_input, 1.0)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
-def test_photon_mass_attenuation_per_unit_length_errors_expo(bad_input):
+def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_exponent(
+    bad_input,
+):
     with pytest.raises(TypeError):
-        photon_mass_attenuation_per_unit_length(1.0, 1.0, bad_input)
+        photon_mass_attenuation_per_unit_length(3500.0, 1.0, bad_input)
 
 
-def test_thickness_cm_required_to_attenuate_too_small_coefficient():
+def test_thickness_cm_required_to_attenuate_with_transparent_medium():
     with pytest.raises(ValueError):
-        thickness_cm_required_to_attenuate(1, 1e-15)
+        transparent_medium = 1.0e-15
+        thickness_cm_required_to_attenuate(3500.0, transparent_medium)
 
 
 def test_thickness_required_to_attenuate_raises_negative_error():

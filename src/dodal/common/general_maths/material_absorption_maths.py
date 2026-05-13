@@ -28,11 +28,11 @@ def photon_mass_attenuation_per_unit_length(
 def attenuation_at_depth_cm(
     depth_cm: NonNegativeFloat, absorption_coefficient_per_cm: NonNegativeFloat
 ):
-    # TODO: check this - not sure if it really is the depth of the wedge?
-    """Calculates attenuation in Barnett units.
+    """Calculates attenuation in Barnett units, where 1000 Bn equivalent to 1/e,
+    0Bn to 1 and 2000 Bn to 1/(e^2).
 
     Args:
-        depth_cm (float): depth of wedge
+        depth_cm (float): depth of absorption
         absorption_coefficient_per_cm (float): absorption coefficient per cm
 
     Raises:
