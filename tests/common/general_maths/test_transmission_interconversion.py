@@ -1,6 +1,7 @@
 import math
 
 import pytest
+from pydantic import ValidationError
 
 from dodal.common.general_maths.transmission_interconversion import (
     attenuation_from_natural_log_of_transmission,
@@ -21,11 +22,11 @@ from dodal.common.general_maths.transmission_interconversion import (
         (
             145.1,
             0.8649358,
-        ),  # tests transmission from arbitrary weak attenuation is -1000*attenuation
+        ),  # tests transmission from arbitrary weak attenuation is weak attenuation
         (
             7221.9,
             7.3041331435179e-4,
-        ),  # tests transmission from arbitrary strong attenuation is -1000*attenuation
+        ),  # tests transmission from arbitrary strong attenuation is strong attenuation
     ],
 )
 def test_transmission_from_attenutation(attenuation_bn, result):
@@ -44,13 +45,11 @@ def test_transmission_from_attenutation(attenuation_bn, result):
         (
             712.6,
             -0.7126,
-        ),  # tests attenuation from natural log arbitrary high transmission is -1000 *
-        # attenuation
+        ),  # tests attenuation from natural log arbitrary high transmission
         (
             8034.1,
             -8.0341,
-        ),  # tests attenuation from natural log arbitrary low transmission is -1000 *
-        # attenuation
+        ),  # tests attenuation from natural log arbitrary low transmission
     ],
 )
 def test_natural_log_of_transmission_from_attenuation(attenuation_bn, result):
@@ -63,15 +62,15 @@ def test_natural_log_of_transmission_from_attenuation(attenuation_bn, result):
     "transmission_as_fraction,result",
     [
         (1, 0),  # tests attenuation from transparency is zero (canonical)
-        (0.37, 994.25227334),  # tests attenuation from 37% is close to 1000 (canonical)
+        (0.37, 994.25227334),  # tests attenuation from 37% is close to 1000
         (
             0.871,
             138.1133,
-        ),  # tests attenuation from arbitrary high transmission has expected value
+        ),  # tests attenuation from arbitrary high transmission
         (
             4.2e-4,
             7775.2558,
-        ),  # tests attenuation from arbitrary high attenuation has expected value
+        ),  # tests attenuation from arbitrary high attenuation
     ],
 )
 def test_attenuation_from_transmission(transmission_as_fraction, result):
@@ -88,11 +87,11 @@ def test_attenuation_from_transmission(transmission_as_fraction, result):
         (
             -0.4367,
             436.7,
-        ),  # tests log from arbitrary high transmission is -1000 * log
+        ),  # tests log from arbitrary high transmission
         (
             -5.9017,
             5901.7,
-        ),  # tests log from arbitrary low transmission is -1000 * log
+        ),  # tests log from arbitrary low transmission
     ],
 )
 def test_attenuation_from_natural_log_of_transmission(ln_t, result):
@@ -100,25 +99,25 @@ def test_attenuation_from_natural_log_of_transmission(ln_t, result):
 
 
 # inauspicious:
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_natural_log_of_transmission_from_attenuation_raises_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         natural_log_of_transmission_from_attenuation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_transmission_from_attenutation_raises_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         transmission_from_attenutation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_from_transmission_raises_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         attenuation_from_transmission(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object()])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_from_natural_log_of_transmission_raises_error(bad_input):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         attenuation_from_natural_log_of_transmission(bad_input)
