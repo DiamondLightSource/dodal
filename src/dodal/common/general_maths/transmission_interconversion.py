@@ -12,7 +12,7 @@ def attenuation_from_natural_log_of_transmission(ln_t: StrictFloat) -> float:
     .
 
     Args:
-        ln_t (float): natural log of transmission fraction
+        ln_t (StrictFloat): natural log of transmission fraction
 
     Returns:
         (float): Barnett attenuation units
@@ -25,7 +25,7 @@ def attenuation_from_transmission(transmission_as_fraction: StrictFloat) -> floa
     """Converts from transmission fraction into Barnett attenuation units.
 
     Args:
-        transmission_as_fraction (float): transmission fraction
+        transmission_as_fraction (StrictFloat): transmission fraction
 
     Returns:
         (float): Barnett attenuation units.
@@ -40,7 +40,7 @@ def natural_log_of_transmission_from_attenuation(attenuation_bn: StrictFloat) ->
     .
 
     Args:
-        attenuation_bn (float): Barnett attenuation units
+        attenuation_bn (StrictFloat): Barnett attenuation units
 
     Returns:
         (float): natural log of transmission fraction
@@ -53,7 +53,7 @@ def transmission_from_attenutation(attenuation_bn: StrictFloat) -> float:
     """Converts from Barnett attenuation units into transmission fraction.
 
     Args:
-        attenuation_bn (float): Barnett attenuation units
+        attenuation_bn (StrictFloat): Barnett attenuation units
 
     Returns:
         (float): transmission fraction
