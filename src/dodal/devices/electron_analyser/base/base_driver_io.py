@@ -76,7 +76,6 @@ class AbstractAnalyserDriverIO(
         pass_energy_type (type[TPassEnergy]): Can be enum or float, depending on
             electron analyser model. If enum, it determines the available pass
             energies for this device.
-        psu_suffix (str, optional): The psu infix to connect to EPICS. Defaults to PSU_MODE.
         name (str, optional): Name of the device.
     """
 
