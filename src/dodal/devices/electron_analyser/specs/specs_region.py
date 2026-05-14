@@ -34,4 +34,4 @@ class SpecsRegion(
 class SpecsSequence(
     BaseSequence[SpecsRegion[TLensMode, TPsuMode]], Generic[TLensMode, TPsuMode]
 ):
-    regions: list[SpecsRegion[TLensMode, TPsuMode]] = Field(default_factory=lambda: [])
+    pass

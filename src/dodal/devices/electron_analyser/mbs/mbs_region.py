@@ -1,9 +1,13 @@
-from typing import Generic
+from os.path import basename, split
+from typing import Generic, Self
 
-from pydantic import Field
+import xmltodict
+from pydantic import Field, field_validator
 
+from dodal.devices.beamlines.i05.enums import LensMode, PassEnergy
 from dodal.devices.electron_analyser.base.base_region import (
     BaseRegion,
+    BaseSequence,
     TLensMode,
     TPassEnergy,
 )
@@ -30,3 +34,55 @@ class MbsRegion(
 
     # Specific to this class
     deflector_x: float = 0
+
+    @staticmethod
+    def convert_pass_energy_to_analyser_string(pass_energy) -> str:
+        return f"PE{int(pass_energy):03d}"
+
+    @field_validator("pass_energy", mode="before")
+    @classmethod
+    def convert_pass_energy(cls, value):
+        return cls.convert_pass_energy_to_analyser_string(value)
+
+    @classmethod
+    def from_xml(cls, file: str) -> Self:
+        path, extension = split(file)
+        name = basename(path)
+        with open(file) as f:
+            data = xmltodict.parse(f.read())
+        region = cls.model_validate(data["ARPESScanBean"])
+        region.name = name
+        return region
+
+
+class MbsSequence(
+    BaseSequence[MbsRegion[TLensMode, TPassEnergy]], Generic[TLensMode, TPassEnergy]
+):
+    @classmethod
+    def from_xml(cls, files: list[str]) -> Self:
+        regions = []
+        annotation = cls.model_fields["regions"].annotation
+        if annotation is None:
+            raise ValueError("Please provide the LensMode and PassEnergy types.")
+
+        # Must find the region type annotation because reconstructing the generic
+        # manually doing MbsRegion[TLensMode, TPassEnergy].from_xml(file) will not work.
+        region_type = annotation.__args__[0]
+        for file in files:
+            regions.append(region_type.from_xml(file))
+        return cls.model_validate({"regions": regions})
+
+
+print(
+    MbsRegion[LensMode, PassEnergy].from_xml(
+        "/workspaces/dodal/tests/devices/electron_analyser/test_data/mbs_region1.arpes"
+    )
+)
+
+print(
+    MbsSequence[LensMode, PassEnergy].from_xml(
+        [
+            "/workspaces/dodal/tests/devices/electron_analyser/test_data/mbs_region1.arpes"
+        ],
+    )
+)

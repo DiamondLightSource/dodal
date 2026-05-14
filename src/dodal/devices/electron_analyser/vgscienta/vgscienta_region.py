@@ -60,6 +60,3 @@ class VGScientaSequence(
     Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
     psu_mode: TPsuMode = Field(alias="element_set")
-    regions: list[VGScientaRegion[TLensMode, TPassEnergyEnum]] = Field(
-        default_factory=lambda: []
-    )
