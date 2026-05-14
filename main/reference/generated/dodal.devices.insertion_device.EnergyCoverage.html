@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.EnergyCoverage &#8212; dodal 2.3.1.dev5+gdfd17050f documentation</title>
+    <title>dodal.devices.insertion_device.EnergyCoverage &#8212; dodal 2.3.1.dev6+gc3e106fde documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=35d0cb43"></script>
+    <script src="../../_static/documentation_options.js?v=a1614381"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -730,9 +730,12 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.Apple2LockedPhasesVal.html">dodal.devices.insertion_device.Apple2LockedPhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorLookup.html">dodal.devices.insertion_device.EnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html">dodal.devices.insertion_device.ConfigServerEnergyMotorLookup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html">dodal.devices.insertion_device.EnergyMotorConvertor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html">dodal.devices.insertion_device.UnstoppableMotor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html">dodal.devices.insertion_device.InsertionDeviceEnergyBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyCoverageEntry.html">dodal.devices.insertion_device.EnergyCoverageEntry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.interlocks.html">dodal.devices.interlocks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1063,7 +1066,7 @@ validated to form a valid model.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.EnergyCoverage.get_energy_index" title="dodal.devices.insertion_device.EnergyCoverage.get_energy_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_energy_index</span></code></a>(energy)</p></td>
 <td><p>Binary search assumes self.energy_entries is sorted by min_energy.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.EnergyCoverage.get_poly" title="dodal.devices.insertion_device.EnergyCoverage.get_poly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_poly</span></code></a>(energy)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.EnergyCoverage.get_poly" title="dodal.devices.insertion_device.EnergyCoverage.get_poly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_poly</span></code></a>(value)</p></td>
 <td><p>Return the numpy.poly1d polynomial applicable for the given energy.</p></td>
 </tr>
 </tbody>
@@ -1089,11 +1092,11 @@ validated to form a valid model.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.EnergyCoverage.get_poly">
-<span class="sig-name descname"><span class="pre">get_poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">poly1d</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#EnergyCoverage.get_poly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.EnergyCoverage.get_poly" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">poly1d</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#EnergyCoverage.get_poly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.EnergyCoverage.get_poly" title="Link to this definition">#</a></dt>
 <dd><p>Return the numpy.poly1d polynomial applicable for the given energy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Energy value in the same units used to create the lookup
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Energy value in the same units used to create the lookup
 table.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

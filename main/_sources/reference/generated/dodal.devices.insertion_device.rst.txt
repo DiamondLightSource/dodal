@@ -37,9 +37,12 @@ dodal.devices.insertion\_device
    ~insertion_device.Apple2LockedPhasesVal
    ~insertion_device.EnergyMotorLookup
    ~insertion_device.ConfigServerEnergyMotorLookup
+   ~insertion_device.EpicsPolynomialEnergyMotorLookup
    ~insertion_device.EnergyMotorConvertor
    ~insertion_device.UnstoppableMotor
    ~insertion_device.InsertionDeviceEnergyBase
+   ~insertion_device.EnergyCoverageEntry
+   ~insertion_device.StaticPolynomialEnergyMotorLookup
 
 
 

@@ -92,5 +92,11 @@ dodal.devices.insertion\_device.Pol
       
       ~Pol.LV3
       
+      
+      ~Pol.PC3
+      
+      
+      ~Pol.NC3
+      
    
    

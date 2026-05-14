@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple_knot_controller &#8212; dodal 2.3.1.dev5+gdfd17050f documentation</title>
+    <title>dodal.devices.insertion_device.apple_knot_controller &#8212; dodal 2.3.1.dev6+gc3e106fde documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=35d0cb43"></script>
+    <script src="../../../../_static/documentation_options.js?v=a1614381"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1063,7 +1063,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_top_bottom_phase_match</span><span class="p">()</span>
         <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_get_pol_setpoint</span><span class="p">()</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combined_move</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AppleKnotController.check_top_bottom_phase_match">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.AppleKnotController.html#dodal.devices.insertion_device.AppleKnotController.check_top_bottom_phase_match">[docs]</a>
@@ -1093,8 +1093,8 @@ window.runMermaid = runMermaid;</script>
             <span class="n">current_gap</span><span class="p">,</span> <span class="n">current_phase_top</span><span class="p">,</span> <span class="n">Pol</span><span class="o">.</span><span class="n">NONE</span>
         <span class="p">)</span>
         <span class="c1"># get target apple2 value</span>
-        <span class="n">target_gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
-        <span class="n">target_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="n">target_gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="n">target_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
         <span class="n">target_apple2_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_apple2_value</span><span class="p">(</span><span class="n">target_gap</span><span class="p">,</span> <span class="n">target_phase</span><span class="p">,</span> <span class="n">pol</span><span class="p">)</span>
         <span class="c1"># get path avoiding exclusion zone</span>
         <span class="n">manhattan_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_finder</span><span class="o">.</span><span class="n">get_apple_knot_val_path</span><span class="p">(</span>

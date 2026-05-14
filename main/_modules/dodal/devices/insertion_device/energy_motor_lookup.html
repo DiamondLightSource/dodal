@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.energy_motor_lookup &#8212; dodal 2.3.1.dev5+gdfd17050f documentation</title>
+    <title>dodal.devices.insertion_device.energy_motor_lookup &#8212; dodal 2.3.1.dev6+gc3e106fde documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=35d0cb43"></script>
+    <script src="../../../../_static/documentation_options.js?v=a1614381"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,16 +885,23 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.insertion_device.energy_motor_lookup</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Triggerable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">DeviceMock</span><span class="p">,</span> <span class="n">DeviceVector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_TIMEOUT</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.lookup_table_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EnergyCoverage</span><span class="p">,</span>
     <span class="n">LookupTable</span><span class="p">,</span>
     <span class="n">LookupTableColumnConfig</span><span class="p">,</span>
     <span class="n">convert_csv_to_lookup</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
 <div class="viewcode-block" id="EnergyMotorLookup">
@@ -924,11 +931,11 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="EnergyMotorLookup.find_value_in_lookup_table">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">find_value_in_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_value_in_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert energy and polarisation to a value from the lookup table.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            energy (float): Desired energy.</span>
+<span class="sd">            value (float): Desired energy.</span>
 <span class="sd">            pol (Pol): Polarisation mode.</span>
 
 <span class="sd">        Returns:</span>
@@ -938,8 +945,8 @@ window.runMermaid = runMermaid;</script>
         <span class="c1"># implemented it.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_lookup_table</span><span class="p">()</span>
-        <span class="n">poly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">get_poly</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
+        <span class="n">poly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">get_poly</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">poly</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 
 
@@ -977,6 +984,177 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">update_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_lut</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="StaticPolynomialEnergyMotorLookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup.html#dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StaticPolynomialEnergyMotorLookup</span><span class="p">(</span><span class="n">EnergyMotorLookup</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A lookup table where polynomial coefficients are fixed at initialization.</span>
+
+<span class="sd">    This class serves as the base for polynomial-based energy/motor conversions.</span>
+<span class="sd">    It generates an internal LookupTable by evaluating a dictionary of</span>
+<span class="sd">    polarization-specific coefficient lists across a defined value range.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        max_value (float): The maximum valid input value (e.g., Energy in eV).</span>
+<span class="sd">        min_value (float): The minimum valid input value.</span>
+<span class="sd">        poly_params (dict[Pol, list[float]]): Mapping of Polarization to a</span>
+<span class="sd">            list of polynomial coefficients (ordered by power).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">min_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">poly_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">=</span> <span class="n">min_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poly_params</span> <span class="o">=</span> <span class="n">poly_params</span>
+
+        <span class="c1"># Initialize with the static data immediately</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_entries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poly_params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">LookupTable</span><span class="p">(</span><span class="n">entries</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_entries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="n">EnergyCoverage</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">pol</span><span class="p">:</span> <span class="n">EnergyCoverage</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+                <span class="n">min_energies</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">],</span>
+                <span class="n">max_energies</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">],</span>
+                <span class="n">poly1d_params</span><span class="o">=</span><span class="p">[</span><span class="n">coeffs</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">pol</span><span class="p">,</span> <span class="n">coeffs</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="EpicsPolynomialEnergyMotorLookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html#dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EpicsPolynomialEnergyMotorLookup</span><span class="p">(</span>
+    <span class="n">Device</span><span class="p">,</span> <span class="n">Triggerable</span><span class="p">,</span> <span class="n">StaticPolynomialEnergyMotorLookup</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A specialized lookup device that synchronizes polynomial coefficients</span>
+<span class="sd">    directly from EPICS PVs.</span>
+
+<span class="sd">    This device extends the static lookup by introducing Ophyd-async signals</span>
+<span class="sd">    (DeviceVectors) to fetch live calibration data from an IOC. It allows</span>
+<span class="sd">    physics tables to be updated dynamically without restarting the control</span>
+<span class="sd">    system or manually reloading CSV files.</span>
+
+<span class="sd">    It implements the `Triggerable` protocol to allow on-demand table</span>
+<span class="sd">    regeneration within a Bluesky plan.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prefix (str): The EPICS prefix for the polynomial coefficient PVs.</span>
+<span class="sd">        max_value (float): The maximum valid input value for the lookup.</span>
+<span class="sd">        min_value (float): The minimum valid input value for the lookup.</span>
+<span class="sd">        poly_params (dict[Pol, str]): Mapping of Polarization to the PV</span>
+<span class="sd">            suffix (e.g., {Pol.LH: &quot;HZ&quot;}).</span>
+<span class="sd">        pv_start (int, optional): The starting index of the PV coefficient</span>
+<span class="sd">            (e.g., 12 for C12). Defaults to 12.</span>
+<span class="sd">        pv_end (int, optional): The ending index of the PV coefficient</span>
+<span class="sd">            (e.g., 1 for C1). Defaults to 1.</span>
+<span class="sd">        name (str, optional): Name of the device for logging and Bluesky.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        param_dict (dict[Pol, DeviceVector]): Dictionary of signals used to</span>
+<span class="sd">            fetch coefficients for each polarization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">min_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">poly_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">pv_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="n">pv_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">=</span> <span class="n">min_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_value</span>
+        <span class="k">for</span> <span class="n">pol</span><span class="p">,</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">poly_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">attr_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pol</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_params&quot;</span>
+            <span class="nb">setattr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">attr_name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_make_params</span><span class="p">(</span>
+                    <span class="n">pv_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">start</span><span class="o">=</span><span class="n">pv_start</span><span class="p">,</span>
+                    <span class="n">end</span><span class="o">=</span><span class="n">pv_end</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pv_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeviceVector</span><span class="p">:</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">DeviceVector</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">read_pv</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pv_prefix</span><span class="si">}</span><span class="s2">:C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="n">sign</span><span class="p">,</span> <span class="n">sign</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="EpicsPolynomialEnergyMotorLookup.trigger">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html#dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.trigger">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Triggering this device will update the lookup tables with the current PV values.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lookup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="EpicsPolynomialEnergyMotorLookup.update_lookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html#dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.update_lookup">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the latest polynomial coefficients from EPICS, update the lookup table,</span>
+<span class="sd">        and handle any errors that occur during the process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">vectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">poly_values</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                <span class="o">*</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vectors</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">current_coeffs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">pol</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">pol</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pols</span><span class="p">,</span> <span class="n">poly_values</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">lut</span> <span class="o">=</span> <span class="n">LookupTable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_entries</span><span class="p">(</span><span class="n">current_coeffs</span><span class="p">))</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully synced </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> from EPICS.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="EpicsPolynomialEnergyMotorLookup.update_lookup_table">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html#dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.update_lookup_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Overrides the base synchronous method to provide a warning.</span>
+<span class="sd">        Since EPICS communication is asynchronous, use &#39;await update_lookup()&#39; instead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Synchronous update_lookup_table called on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="s2">&quot;This does nothing for EPICS-based lookups. &quot;</span>
+            <span class="s2">&quot;Please use &#39;await device.update_lookup()&#39; or &#39;yield from bps.trigger(device)&#39;.&quot;</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">DeviceMock</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
+        <span class="n">force_reconnect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="n">mock</span><span class="o">=</span><span class="n">mock</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">force_reconnect</span><span class="o">=</span><span class="n">force_reconnect</span>
+        <span class="p">)</span>
+        <span class="c1"># Highjack connect to update lookup tables on connection.</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_lookup</span><span class="p">()</span></div>
 
 </pre></div>
 

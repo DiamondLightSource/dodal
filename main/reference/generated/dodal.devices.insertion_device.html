@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device &#8212; dodal 2.3.1.dev5+gdfd17050f documentation</title>
+    <title>dodal.devices.insertion_device &#8212; dodal 2.3.1.dev6+gc3e106fde documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=35d0cb43"></script>
+    <script src="../../_static/documentation_options.js?v=a1614381"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -730,9 +730,12 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.Apple2LockedPhasesVal.html">dodal.devices.insertion_device.Apple2LockedPhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorLookup.html">dodal.devices.insertion_device.EnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html">dodal.devices.insertion_device.ConfigServerEnergyMotorLookup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html">dodal.devices.insertion_device.EnergyMotorConvertor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html">dodal.devices.insertion_device.UnstoppableMotor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html">dodal.devices.insertion_device.InsertionDeviceEnergyBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyCoverageEntry.html">dodal.devices.insertion_device.EnergyCoverageEntry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.interlocks.html">dodal.devices.interlocks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1111,14 +1114,23 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html#dodal.devices.insertion_device.ConfigServerEnergyMotorLookup" title="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigServerEnergyMotorLookup</span></code></a></p></td>
 <td><p>Fetches and parses lookup table (csv) from a config server, supports dynamic updates, and validates input.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html#dodal.devices.insertion_device.EnergyMotorConvertor" title="dodal.devices.insertion_device.EnergyMotorConvertor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html#dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup" title="dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EpicsPolynomialEnergyMotorLookup</span></code></a></p></td>
+<td><p>A specialized lookup device that synchronizes polynomial coefficients directly from EPICS PVs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html#dodal.devices.insertion_device.EnergyMotorConvertor" title="dodal.devices.insertion_device.EnergyMotorConvertor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html#dodal.devices.insertion_device.UnstoppableMotor" title="dodal.devices.insertion_device.UnstoppableMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnstoppableMotor</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html#dodal.devices.insertion_device.UnstoppableMotor" title="dodal.devices.insertion_device.UnstoppableMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnstoppableMotor</span></code></a></p></td>
 <td><p>A motor that does not support stop.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html#dodal.devices.insertion_device.InsertionDeviceEnergyBase" title="dodal.devices.insertion_device.InsertionDeviceEnergyBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InsertionDeviceEnergyBase</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html#dodal.devices.insertion_device.InsertionDeviceEnergyBase" title="dodal.devices.insertion_device.InsertionDeviceEnergyBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InsertionDeviceEnergyBase</span></code></a></p></td>
 <td><p>Base class for ID energy movable device.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.EnergyCoverageEntry.html#dodal.devices.insertion_device.EnergyCoverageEntry" title="dodal.devices.insertion_device.EnergyCoverageEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyCoverageEntry</span></code></a></p></td>
+<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup.html#dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup" title="dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StaticPolynomialEnergyMotorLookup</span></code></a></p></td>
+<td><p>A lookup table where polynomial coefficients are fixed at initialization.</p></td>
 </tr>
 </tbody>
 </table>

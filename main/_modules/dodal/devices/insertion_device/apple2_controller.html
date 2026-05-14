@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 2.3.1.dev5+gdfd17050f documentation</title>
+    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 2.3.1.dev6+gc3e106fde documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=35d0cb43"></script>
+    <script src="../../../../_static/documentation_options.js?v=a1614381"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,6 +886,7 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.devices.insertion_device.apple2_controller</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">TypeVar</span>
 
@@ -905,9 +906,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">PhaseAxesType</span><span class="p">,</span>
     <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.energy_motor_lookup</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">EnergyMotorLookup</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.energy_motor_lookup</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnergyMotorLookup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
@@ -921,13 +920,24 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="EnergyMotorConvertor">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorConvertor.html#dodal.devices.insertion_device.EnergyMotorConvertor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorConvertor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position conversion.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy, motor position conversion.&quot;&quot;&quot;</span>
         <span class="o">...</span></div>
 
 
 
 <span class="n">Apple2Type</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Apple2Type&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Apple2</span><span class="p">)</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2PhaseZeroStatus</span><span class="p">:</span>
+    <span class="n">top_outer</span><span class="p">:</span> <span class="nb">bool</span>  <span class="c1"># top outer</span>
+    <span class="n">top_inner</span><span class="p">:</span> <span class="nb">bool</span>  <span class="c1"># top inner</span>
+    <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">bool</span>  <span class="c1"># btm inner</span>
+    <span class="n">btm_outer</span><span class="p">:</span> <span class="nb">bool</span>  <span class="c1"># btm outer</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="Apple2Controller">
@@ -986,6 +996,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">apple2</span><span class="p">:</span> <span class="n">Apple2Type</span><span class="p">,</span>
         <span class="n">gap_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
         <span class="n">phase_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
+        <span class="n">inverse_gap_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">maximum_gap_motor_position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span><span class="p">,</span>
         <span class="n">maximum_phase_motor_position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">,</span>
         <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
@@ -994,20 +1005,12 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">apple2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span> <span class="o">=</span> <span class="n">gap_energy_motor_converter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span> <span class="o">=</span> <span class="n">phase_energy_motor_converter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inverse_gap_energy_motor_converter</span> <span class="o">=</span> <span class="n">inverse_gap_energy_motor_converter</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">maximum_gap_motor_position</span> <span class="o">=</span> <span class="n">maximum_gap_motor_position</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span> <span class="o">=</span> <span class="n">maximum_phase_motor_position</span>
         <span class="c1"># Store the set energy for readback.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
-            <span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span>
-        <span class="p">)</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
-                <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_energy</span><span class="p">,</span>
-                <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_energy</span><span class="p">,</span>
-                <span class="n">energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span>
-                <span class="n">derived_units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">)</span>
 
         <span class="c1"># Store the polarisation for setpoint. And provide readback for LH3.</span>
         <span class="c1"># LH3 is a special case as it is indistinguishable from LH in the hardware.</span>
@@ -1036,6 +1039,16 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">btm_outer</span><span class="o">=</span><span class="n">btm_outer</span><span class="p">,</span>
                 <span class="n">gap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+                <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_energy</span><span class="p">,</span>
+                <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_energy</span><span class="p">,</span>
+                <span class="n">energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span>
+                <span class="n">pol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="p">,</span>
+                <span class="n">gap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+                <span class="n">derived_units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
+            <span class="p">)</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
@@ -1049,8 +1062,8 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the undulator motors for a given energy and polarisation.&quot;&quot;&quot;</span>
-        <span class="n">gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
-        <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="n">gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
         <span class="n">apple2_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_apple2_value</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">pol</span><span class="p">)</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting polarisation to </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">, with values: </span><span class="si">{</span><span class="n">apple2_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">=</span><span class="n">apple2_val</span><span class="p">)</span>
@@ -1058,10 +1071,12 @@ window.runMermaid = runMermaid;</script>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_get_pol_setpoint</span><span class="p">()</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_motors_from_energy_and_polarisation</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_read_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Readback for energy is just the set value.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span> <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Readback for energy is just the set value if there is no inverse converter.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse_gap_energy_motor_converter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse_gap_energy_motor_converter</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">gap</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">energy</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_get_pol_setpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pol</span><span class="p">:</span>
@@ -1089,7 +1104,7 @@ window.runMermaid = runMermaid;</script>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># This changes the pol setpoint and then changes polarisation via set energy.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_pol</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1141,57 +1156,49 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not in use, close gap or set polarisation to use this ID&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
-            <span class="n">isclose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">top_inner</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">,</span> <span class="n">btm_outer</span><span class="p">]</span>
-        <span class="p">):</span>
+        <span class="n">tol</span> <span class="o">=</span> <span class="n">ROW_PHASE_MOTOR_TOLERANCE</span>
+        <span class="n">max_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span>
+
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">Apple2PhaseZeroStatus</span><span class="p">(</span>
+            <span class="n">top_outer</span><span class="o">=</span><span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">),</span>
+            <span class="n">top_inner</span><span class="o">=</span><span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">),</span>
+            <span class="n">btm_inner</span><span class="o">=</span><span class="n">isclose</span><span class="p">(</span><span class="n">btm_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">),</span>
+            <span class="n">btm_outer</span><span class="o">=</span><span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">zero</span><span class="o">.</span><span class="n">all_zero</span><span class="p">():</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LH (Linear Horizontal).&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">,</span> <span class="mf">0.0</span>
         <span class="k">if</span> <span class="p">(</span>
-            <span class="n">isclose</span><span class="p">(</span>
-                <span class="n">top_outer</span><span class="p">,</span>
-                <span class="n">btm_inner</span><span class="p">,</span>
-                <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span>
-                <span class="nb">abs</span><span class="p">(</span><span class="n">btm_inner</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span><span class="p">,</span>
-                <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">top_outer</span><span class="p">),</span> <span class="n">max_p</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">top_inner</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">btm_outer</span>
         <span class="p">):</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LV (Linear Vertical).&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LV</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span>
+            <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LV</span><span class="p">,</span> <span class="n">max_p</span>
         <span class="k">if</span> <span class="p">(</span>
-            <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">top_outer</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
+            <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">top_inner</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">btm_outer</span>
         <span class="p">):</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: PC (Positive Circular).&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">PC</span><span class="p">,</span> <span class="n">top_outer</span>
+            <span class="n">pol</span> <span class="o">=</span> <span class="n">Pol</span><span class="o">.</span><span class="n">PC</span> <span class="k">if</span> <span class="n">top_outer</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">Pol</span><span class="o">.</span><span class="n">NC</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Determined polarisation: </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pol</span><span class="p">,</span> <span class="n">top_outer</span>
+
         <span class="k">if</span> <span class="p">(</span>
-            <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">top_outer</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
+            <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="o">-</span><span class="n">btm_inner</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">top_inner</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">btm_outer</span>
         <span class="p">):</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: NC (Negative Circular).&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">NC</span><span class="p">,</span> <span class="n">top_outer</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="o">-</span><span class="n">btm_inner</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LA (Positive Linear Arbitrary).&quot;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LA.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span><span class="p">,</span> <span class="n">top_outer</span>
+
         <span class="k">if</span> <span class="p">(</span>
-            <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="o">-</span><span class="n">btm_outer</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
+            <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="o">-</span><span class="n">btm_outer</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">top_outer</span>
+            <span class="ow">and</span> <span class="n">zero</span><span class="o">.</span><span class="n">btm_inner</span>
         <span class="p">):</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LA (Negative Linear Arbitrary).&quot;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LA.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span><span class="p">,</span> <span class="n">top_inner</span>
 
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unable to determine polarisation. Defaulting to NONE.&quot;</span><span class="p">)</span>
@@ -1220,8 +1227,8 @@ window.runMermaid = runMermaid;</script>
         <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lu</span> <span class="o">=</span> <span class="n">gap_energy_motor_lut</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_lu</span> <span class="o">=</span> <span class="n">phase_energy_motor_lut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lut</span> <span class="o">=</span> <span class="n">gap_energy_motor_lut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_lut</span> <span class="o">=</span> <span class="n">phase_energy_motor_lut</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">apple2</span><span class="o">=</span><span class="n">apple2</span><span class="p">,</span>
             <span class="n">gap_energy_motor_converter</span><span class="o">=</span><span class="n">gap_energy_motor_lut</span><span class="o">.</span><span class="n">find_value_in_lookup_table</span><span class="p">,</span>
@@ -1258,7 +1265,7 @@ window.runMermaid = runMermaid;</script>
             <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">current_pol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">)</span>
                 <span class="n">max_lh_energy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lu</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">Pol</span><span class="p">(</span><span class="s2">&quot;lh&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">max_energy</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lut</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">]</span><span class="o">.</span><span class="n">max_energy</span>
                 <span class="p">)</span>
                 <span class="n">lh_setpoint</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">max_lh_energy</span> <span class="k">if</span> <span class="n">target_energy</span> <span class="o">&gt;</span> <span class="n">max_lh_energy</span> <span class="k">else</span> <span class="n">target_energy</span>

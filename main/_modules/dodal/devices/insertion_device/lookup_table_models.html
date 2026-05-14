@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 2.3.1.dev5+gdfd17050f documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 2.3.1.dev6+gc3e106fde documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=35d0cb43"></script>
+    <script src="../../../../_static/documentation_options.js?v=a1614381"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -991,6 +991,8 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="EnergyCoverageEntry">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverageEntry.html#dodal.devices.insertion_device.EnergyCoverageEntry">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverageEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span>
         <span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span>
@@ -1000,6 +1002,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">poly</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span>
     <span class="n">grating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
+<div class="viewcode-block" id="EnergyCoverageEntry.validate_and_convert_poly">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverageEntry.html#dodal.devices.insertion_device.EnergyCoverageEntry.validate_and_convert_poly">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;poly&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_and_convert_poly</span><span class="p">(</span>
@@ -1010,12 +1014,17 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">value</span></div>
 
+
+<div class="viewcode-block" id="EnergyCoverageEntry.serialize_poly">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverageEntry.html#dodal.devices.insertion_device.EnergyCoverageEntry.serialize_poly">[docs]</a>
     <span class="nd">@field_serializer</span><span class="p">(</span><span class="s2">&quot;poly&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;plain&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">serialize_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Allow np.poly1d to work when serializing.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">coefficients</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">coefficients</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="EnergyCoverage">
@@ -1061,19 +1070,19 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="EnergyCoverage.get_poly">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage.get_poly">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the numpy.poly1d polynomial applicable for the given energy.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            energy (float): Energy value in the same units used to create the lookup</span>
+<span class="sd">            value (float): Energy value in the same units used to create the lookup</span>
 <span class="sd">                table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_energy</span> <span class="o">&lt;=</span> <span class="n">energy</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_energy</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_energy</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_energy</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Demanding energy must lie between </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_energy</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_energy</span><span class="si">}</span><span class="s2">!&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">poly_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_energy_index</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+        <span class="n">poly_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_energy_index</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">poly_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_entries</span><span class="p">[</span><span class="n">poly_index</span><span class="p">]</span><span class="o">.</span><span class="n">poly</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1136,17 +1145,17 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.LookupTable.html#dodal.devices.insertion_device.LookupTable.get_poly">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the numpy.poly1d polynomial applicable for the given energy and</span>
 <span class="sd">        polarisation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            energy (float): Energy value in the same units used to create the lookup table.</span>
+<span class="sd">            value (float): Energy value in the same units used to create the lookup table.</span>
 <span class="sd">            pol (Pol): Polarisation mode enum.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">get_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">get_poly</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 
 
