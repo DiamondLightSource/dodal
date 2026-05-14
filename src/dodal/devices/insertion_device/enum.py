@@ -10,6 +10,8 @@ class Pol(StrictEnum):
     LA = "la"
     LH3 = "lh3"
     LV3 = "lv3"
+    PC3 = "pc3"
+    NC3 = "nc3"
 
 
 class UndulatorGateStatus(StrictEnum):
