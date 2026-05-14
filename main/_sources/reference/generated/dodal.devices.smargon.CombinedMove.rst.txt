@@ -42,9 +42,6 @@ dodal.devices.smargon.CombinedMove
       ~CombinedMove.z
       
       
-      ~CombinedMove.omega
-      
-      
       ~CombinedMove.phi
       
       

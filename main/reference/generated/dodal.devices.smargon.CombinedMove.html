@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.smargon.CombinedMove &#8212; dodal 2.3.1.dev7+ge7ae19f5b documentation</title>
+    <title>dodal.devices.smargon.CombinedMove &#8212; dodal 2.3.1.dev8+gca163b99a documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=deb2db6d"></script>
+    <script src="../../_static/documentation_options.js?v=936233f3"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1048,7 +1048,66 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.smargon.CombinedMove">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.smargon.</span></span><span class="sig-name descname"><span class="pre">CombinedMove</span></span><a class="reference internal" href="../../_modules/dodal/devices/smargon.html#CombinedMove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.smargon.CombinedMove" title="Link to this definition">#</a></dt>
-<dd><p>A move on multiple axes at once using a deferred move.</p>
+<dd><p>A move on multiple axes at once using a deferred move.
+Note that omega is excluded from the list of axes here since large omega moves
+interfere with the precision of the other axes. In addition, the omega move is more
+naturally specified as a wrapped angle which would not be in keeping with the other
+axes which are specified as absolute angles.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.smargon.CombinedMove.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#dodal.devices.smargon.CombinedMove.x" title="Link to this definition">#</a></dt>
+<dd><p>target x-coordinate in mm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.smargon.CombinedMove.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#dodal.devices.smargon.CombinedMove.y" title="Link to this definition">#</a></dt>
+<dd><p>target y-coordinate in mm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.smargon.CombinedMove.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#dodal.devices.smargon.CombinedMove.z" title="Link to this definition">#</a></dt>
+<dd><p>target z-coordinate in mm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.smargon.CombinedMove.phi">
+<span class="sig-name descname"><span class="pre">phi</span></span><a class="headerlink" href="#dodal.devices.smargon.CombinedMove.phi" title="Link to this definition">#</a></dt>
+<dd><p>target phi angle in degrees</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.smargon.CombinedMove.chi">
+<span class="sig-name descname"><span class="pre">chi</span></span><a class="headerlink" href="#dodal.devices.smargon.CombinedMove.chi" title="Link to this definition">#</a></dt>
+<dd><p>target chi angle in degrees</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
@@ -1058,22 +1117,19 @@
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.smargon.CombinedMove.x" title="dodal.devices.smargon.CombinedMove.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.smargon.CombinedMove.y" title="dodal.devices.smargon.CombinedMove.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.smargon.CombinedMove.z" title="dodal.devices.smargon.CombinedMove.z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">omega</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.smargon.CombinedMove.phi" title="dodal.devices.smargon.CombinedMove.phi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">phi</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">phi</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">chi</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.smargon.CombinedMove.chi" title="dodal.devices.smargon.CombinedMove.chi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chi</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1130,7 +1186,14 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.CombinedMove"><code class="docutils literal notranslate"><span class="pre">CombinedMove</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.CombinedMove"><code class="docutils literal notranslate"><span class="pre">CombinedMove</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.CombinedMove.x"><code class="docutils literal notranslate"><span class="pre">CombinedMove.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.CombinedMove.y"><code class="docutils literal notranslate"><span class="pre">CombinedMove.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.CombinedMove.z"><code class="docutils literal notranslate"><span class="pre">CombinedMove.z</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.CombinedMove.phi"><code class="docutils literal notranslate"><span class="pre">CombinedMove.phi</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.CombinedMove.chi"><code class="docutils literal notranslate"><span class="pre">CombinedMove.chi</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
