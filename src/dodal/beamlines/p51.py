@@ -5,6 +5,7 @@ from ophyd_async.core import PathProvider
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
+from ophyd_async.fastcs.xspress import XspressDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
@@ -74,6 +75,14 @@ def panda1(path_provider: PathProvider) -> HDFPanda:
 def panda2(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=path_provider,
+    )
+
+
+@devices.factory()
+def xspress1(path_provider: PathProvider) -> HDFPanda:
+    return XspressDetector(
+        f"{PREFIX.beamline_prefix}-EA-XSP-01:",
         path_provider=path_provider,
     )
 
