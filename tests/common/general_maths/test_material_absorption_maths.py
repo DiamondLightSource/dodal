@@ -95,7 +95,7 @@ def test_photon_mass_attenuation_per_unit_length_errors_with_invalid_exponent(
 
 
 def test_thickness_cm_required_to_attenuate_with_transparent_medium():
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError):
         transparent_medium = 1.0e-15
         thickness_cm_required_to_attenuate(3500.0, transparent_medium)
 

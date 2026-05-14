@@ -1,6 +1,20 @@
-from pydantic import NonNegativeFloat, StrictFloat, validate_call
+from typing import Annotated
 
-from dodal.common.general_maths import transmission_interconversion
+from pydantic import (
+    BaseModel,
+    Field,
+    StrictFloat,
+    validate_call,
+)
+
+from dodal.common.general_maths.transmission_interconversion import (
+    attenuation_from_natural_log_of_transmission,
+    natural_log_of_transmission_from_attenuation,
+)
+
+
+class ValueCheck(BaseModel):
+    value: Annotated[StrictFloat, Field(ge=0)]
 
 
 @validate_call
@@ -27,14 +41,14 @@ def photon_mass_attenuation_per_unit_length(
 
 @validate_call
 def attenuation_at_depth_cm(
-    depth_cm: NonNegativeFloat, absorption_coefficient_per_cm: NonNegativeFloat
+    depth_cm: StrictFloat, absorption_coefficient_per_cm: StrictFloat
 ) -> float:
     """Calculates attenuation in Barnett units, where 1000 Bn equivalent to 1/e,
     0Bn to 1 and 2000 Bn to 1/(e^2).
 
     Args:
-        depth_cm (float): depth of absorption
-        absorption_coefficient_per_cm (float): absorption coefficient per cm
+        depth_cm (StrictFloat): depth of absorption
+        absorption_coefficient_per_cm (StrictFloat): absorption coefficient per cm
 
     Raises:
         ValueError: If either depth_cm or absorption_coefficient are negative, an error
@@ -43,21 +57,21 @@ def attenuation_at_depth_cm(
     Returns:
         (float): attenuation in Barnett units
     """
+    ValueCheck.model_validate({"value": depth_cm}, strict=True)
+    ValueCheck.model_validate({"value": absorption_coefficient_per_cm}, strict=True)
     ln_t = -(depth_cm * absorption_coefficient_per_cm)
-    return transmission_interconversion.attenuation_from_natural_log_of_transmission(
-        ln_t
-    )
+    return attenuation_from_natural_log_of_transmission(ln_t)
 
 
 @validate_call
 def thickness_cm_required_to_attenuate(
-    target_attenuation_bn: NonNegativeFloat,
+    target_attenuation_bn: StrictFloat,
     absorption_coefficient_per_cm: StrictFloat,
 ) -> float:
     """Calculates material depth in cm.
 
     Args:
-        target_attenuation_bn (NonNegativeFloat): Target attenuation to meet in Barnett
+        target_attenuation_bn (StrictFloat): Target attenuation to meet in Barnett
         attenuation units.
         absorption_coefficient_per_cm (StrictFloat): absorption coefficient per cm
 
@@ -75,9 +89,6 @@ def thickness_cm_required_to_attenuate(
             "Invalid absorption - this calculator is not for transparent media nor thos\
                 e with optical gain."
         )
-    ln_target_t = (
-        transmission_interconversion.natural_log_of_transmission_from_attenuation(
-            target_attenuation_bn
-        )
-    )
+    ValueCheck.model_validate({"value": target_attenuation_bn}, strict=True)
+    ln_target_t = natural_log_of_transmission_from_attenuation(target_attenuation_bn)
     return -(ln_target_t / absorption_coefficient_per_cm)
