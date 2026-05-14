@@ -5,9 +5,13 @@ import numpy as np
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
+    DeviceMock,
     SignalR,
     StandardReadableFormat,
+    callback_on_mock_put,
+    default_mock_class,
     derived_signal_r,
+    set_mock_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
@@ -20,6 +24,15 @@ from dodal.devices.electron_analyser.specs.specs_enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
 
 
+class MockSpecsAnalyserDriverIO(DeviceMock["SpecsAnalyserDriverIO"]):
+    async def connect(self, device: "SpecsAnalyserDriverIO"):
+        def _sync_psu_mode_rbv(value):
+            set_mock_value(device.psu_mode, value)
+
+        callback_on_mock_put(device.psu_mode_w, _sync_psu_mode_rbv)
+
+
+@default_mock_class(MockSpecsAnalyserDriverIO)
 class SpecsAnalyserDriverIO(
     AbstractAnalyserDriverIO[
         SpecsRegion[TLensMode, TPsuMode],
@@ -47,12 +60,11 @@ class SpecsAnalyserDriverIO(
         self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
         self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        self.psu_mode_w = epics_signal_w(psu_mode_type, prefix + self.PV_CFG.psu_mode)
-
         # Used to calculate the energy axis.
         self.energy_channels = epics_signal_r(
             int, prefix + "TOTAL_POINTS_ITERATION_RBV"
         )
+        self.psu_mode_w = epics_signal_w(psu_mode_type, prefix + self.PV_CFG.psu_mode)
 
         super().__init__(
             prefix=prefix,

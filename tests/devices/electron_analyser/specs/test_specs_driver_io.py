@@ -73,7 +73,7 @@ async def test_analyser_sets_region_correctly(
     else:
         get_mock_put(sim_driver.energy_step).assert_not_called()
 
-    get_mock_put(sim_driver.psu_mode).assert_called_once_with(region.psu_mode)
+    get_mock_put(sim_driver.psu_mode_w).assert_called_once_with(region.psu_mode)
     get_mock_put(sim_driver.snapshot_values).assert_called_once_with(region.values)
 
 
