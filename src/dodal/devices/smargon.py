@@ -69,7 +69,19 @@ class DeferMoves(StrictEnum):
 
 
 class CombinedMove(TypedDict, total=False):
-    """A move on multiple axes at once using a deferred move."""
+    """A move on multiple axes at once using a deferred move.
+    Note that omega is excluded from the list of axes here since large omega moves
+    interfere with the precision of the other axes. In addition, the omega move is more
+    naturally specified as a wrapped angle which would not be in keeping with the other
+    axes which are specified as absolute angles.
+
+    Attributes:
+        x (float): target x-coordinate in mm
+        y (float): target y-coordinate in mm
+        z (float): target z-coordinate in mm
+        phi (float): target phi angle in degrees
+        chi (float): target chi angle in degrees
+    """
 
     x: float | None
     y: float | None
