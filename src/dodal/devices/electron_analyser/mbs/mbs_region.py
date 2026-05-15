@@ -1,10 +1,9 @@
-from os.path import basename, split
+from os.path import basename, splitext
 from typing import Generic, Self
 
 import xmltodict
 from pydantic import Field, field_validator
 
-from dodal.devices.beamlines.i05.enums import LensMode, PassEnergy
 from dodal.devices.electron_analyser.base.base_region import (
     BaseRegion,
     BaseSequence,
@@ -46,12 +45,14 @@ class MbsRegion(
 
     @classmethod
     def from_xml(cls, file: str) -> Self:
-        path, extension = split(file)
-        name = basename(path)
+        name = splitext(basename(file))[0]
+
         with open(file) as f:
             data = xmltodict.parse(f.read())
+
         region = cls.model_validate(data["ARPESScanBean"])
         region.name = name
+
         return region
 
 
@@ -59,30 +60,12 @@ class MbsSequence(
     BaseSequence[MbsRegion[TLensMode, TPassEnergy]], Generic[TLensMode, TPassEnergy]
 ):
     @classmethod
-    def from_xml(cls, files: list[str]) -> Self:
+    def from_xml(cls, file: str) -> Self:
         regions = []
-        annotation = cls.model_fields["regions"].annotation
-        if annotation is None:
-            raise ValueError("Please provide the LensMode and PassEnergy types.")
-
         # Must find the region type annotation because reconstructing the generic
         # manually doing MbsRegion[TLensMode, TPassEnergy].from_xml(file) will not work.
+        annotation = cls.model_fields["regions"].annotation
+        assert annotation is not None
         region_type = annotation.__args__[0]
-        for file in files:
-            regions.append(region_type.from_xml(file))
+        regions = [region_type.from_xml(file)]
         return cls.model_validate({"regions": regions})
-
-
-print(
-    MbsRegion[LensMode, PassEnergy].from_xml(
-        "/workspaces/dodal/tests/devices/electron_analyser/test_data/mbs_region1.arpes"
-    )
-)
-
-print(
-    MbsSequence[LensMode, PassEnergy].from_xml(
-        [
-            "/workspaces/dodal/tests/devices/electron_analyser/test_data/mbs_region1.arpes"
-        ],
-    )
-)

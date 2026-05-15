@@ -1,5 +1,5 @@
 from .mbs_driver_io import MbsAnalyserDriverIO
 from .mbs_enums import AcquisitionMode
-from .mbs_region import MbsRegion
+from .mbs_region import MbsRegion, MbsSequence
 
-__all__ = ["MbsAnalyserDriverIO", "AcquisitionMode", "MbsRegion"]
+__all__ = ["MbsAnalyserDriverIO", "AcquisitionMode", "MbsRegion", "MbsSequence"]
