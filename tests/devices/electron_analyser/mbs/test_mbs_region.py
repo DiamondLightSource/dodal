@@ -31,7 +31,7 @@ def expected_xml_region_values() -> list[dict[str, Any]]:
             "high_energy": 73.814,
             "centre_energy": 73.1,
             "acquire_time": 1.0,
-            "energy_step": 0.405,
+            "energy_step": 0.000405,
             "deflector_x": 0.0,
         },
     ]

@@ -46,13 +46,12 @@ class MbsRegion(
     @classmethod
     def from_xml(cls, file: str) -> Self:
         name = splitext(basename(file))[0]
-
         with open(file) as f:
             data = xmltodict.parse(f.read())
-
         region = cls.model_validate(data["ARPESScanBean"])
         region.name = name
-
+        # Convert from meV to eV
+        region.energy_step = round(region.energy_step / 1000.0, 6)
         return region
 
 
