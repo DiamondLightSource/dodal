@@ -19,7 +19,7 @@ from dodal.devices.beamlines.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
 from dodal.devices.beamlines.i02_1.flux import Flux
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase, StationaryCrystal
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.motors import XYZOmegaStage
+from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import UndulatorInKeV
@@ -117,8 +117,12 @@ def s4_slit_gaps() -> Slits:
 
 
 @devices.factory(use_factory_name=False)
-def goniometer() -> XYZOmegaStage:
-    return XYZOmegaStage(
+def goniometer() -> XYZWrappedOmegaStage:
+    """Build the goniometer. Although the sample holders constrain omega motion to a small
+    window of angles, in practice it is usable in plans requiring WrappedAxis since the
+    amount of rotation ever requested is very limited.
+    """
+    return XYZWrappedOmegaStage(
         f"{PREFIX.beamline_prefix}-MO-",
         x_infix="SAMP-01:X",
         y_infix="GONJK-01:HEIGHT",
