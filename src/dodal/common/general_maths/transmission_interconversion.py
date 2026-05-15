@@ -2,8 +2,8 @@ import math
 
 from pydantic import StrictFloat, validate_call
 
-CANONICAL_BARNETT_CONVERSION = -1.0e3
-REVERSE_BARNETT_CONVERSION = -1.0e-3
+_CANONICAL_BARNETT_CONVERSION = -1.0e3
+_REVERSE_BARNETT_CONVERSION = -1.0e-3
 
 
 @validate_call
@@ -17,7 +17,7 @@ def attenuation_from_natural_log_of_transmission(ln_t: StrictFloat) -> float:
     Returns:
         (float): Barnett attenuation units
     """
-    return CANONICAL_BARNETT_CONVERSION * ln_t
+    return _CANONICAL_BARNETT_CONVERSION * ln_t
 
 
 @validate_call
@@ -45,7 +45,7 @@ def natural_log_of_transmission_from_attenuation(attenuation_bn: StrictFloat) ->
     Returns:
         (float): natural log of transmission fraction
     """
-    return REVERSE_BARNETT_CONVERSION * attenuation_bn
+    return _REVERSE_BARNETT_CONVERSION * attenuation_bn
 
 
 @validate_call
