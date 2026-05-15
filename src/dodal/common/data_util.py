@@ -1,5 +1,5 @@
 from os.path import isabs, isfile, join, split
-from typing import Protocol, Self, TypeVar
+from typing import Generic, Protocol, Self, TypeVar
 
 from pydantic import BaseModel
 
@@ -36,11 +36,19 @@ def save_class_to_json_file(model: BaseModel, file: str) -> None:
         f.write(model.model_dump_json())
 
 
-class JsonModelLoader(Protocol[TBaseModel]):
-    def __call__(self, file: str | None = None) -> TBaseModel: ...
+class LoadModelFromFile(Protocol[TBaseModel]):
+    def __call__(self, file: str) -> TBaseModel: ...
 
 
-class JsonLoaderConfig(BaseModel):
+class LoadModelFromJsonFile(LoadModelFromFile[TBaseModel]):
+    def __init__(self, model) -> None:
+        self._model = model
+
+    def __call__(self, file: str) -> TBaseModel:
+        return load_json_file_to_class(self._model, file)
+
+
+class ModelLoaderConfig(BaseModel):
     default_path: str
     default_file: str | None
 
@@ -60,15 +68,40 @@ class JsonLoaderConfig(BaseModel):
         self.default_path, self.default_file = split(new_file)
 
 
-def json_model_loader(
-    model: type[TBaseModel], config: JsonLoaderConfig | None = None
-) -> JsonModelLoader[TBaseModel]:
-    """Factory to create a function that loads a json file into a configured pydantic
-    model and with optional configuration for default path and file to use.
+class ModelLoader(Generic[TBaseModel]):
+    """A generic model loader that can be configured with any kind of method to read in
+    a file and convert the data into a pydantic model. It can also takes configuration
+    to handle the file paths before they are passed to the method to convert to a
+    pydantic model.
     """
 
-    def load_json(file: str | None = None) -> TBaseModel:
-        """Load a json file and return it is as the configured pydantic model.
+    def __init__(
+        self,
+        load_model_from_file: LoadModelFromFile[TBaseModel],
+        cfg: ModelLoaderConfig | None = None,
+    ):
+        self._load_model_from_file = load_model_from_file
+        self._cfg = cfg
+
+    def _handle_file_path(self, file: str | None) -> str:
+        """Handle the file path based on the configuration provided. If a default path
+        is given and a relative file path used, it will join the default path and
+        relative path together. If a default file is configured, then you don't need to
+        provide a file when using __call__.
+        """
+        if file is None:
+            if self._cfg is None or self._cfg.default_file is None:
+                raise RuntimeError(
+                    "Model loader has no default file configured and no file was provided."
+                )
+            file = self._cfg.default_file
+
+        if not isabs(file) and self._cfg is not None:
+            file = join(self._cfg.default_path, file)
+        return file
+
+    def __call__(self, file: str | None = None) -> TBaseModel:
+        """Load a file and return it is as the configured pydantic model.
 
         Args:
             file (str, optional): The file to load into a pydantic class. If None
@@ -77,16 +110,5 @@ def json_model_loader(
         Returns:
             An instance of the configurated pydantic base_model type.
         """
-        if file is None:
-            if config is None or config.default_file is None:
-                raise RuntimeError(
-                    f"{model.__name__} loader has no default file configured "
-                    "and no file was provided."
-                )
-            file = config.default_file
-
-        if not isabs(file) and config is not None:
-            file = join(config.default_path, file)
-        return load_json_file_to_class(model, file)
-
-    return load_json
+        file = self._handle_file_path(file)
+        return self._load_model_from_file(file)
