@@ -1,7 +1,7 @@
 import math
 
-import pydantic
 import pytest
+from pydantic import ValidationError
 
 from dodal.common.general_maths.transmission_interconversion import (
     attenuation_from_natural_log_of_transmission,
@@ -101,23 +101,23 @@ def test_attenuation_from_natural_log_of_transmission(ln_t, result):
 # inauspicious:
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_natural_log_of_transmission_from_attenuation_raises_error(bad_input):
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises(ValidationError):
         natural_log_of_transmission_from_attenuation(bad_input)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_transmission_from_attenutation_raises_error(bad_input):
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises(ValidationError):
         transmission_from_attenutation(bad_input)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_from_transmission_raises_error(bad_input):
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises(ValidationError):
         attenuation_from_transmission(bad_input)
 
 
 @pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
 def test_attenuation_from_natural_log_of_transmission_raises_error(bad_input):
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises(ValidationError):
         attenuation_from_natural_log_of_transmission(bad_input)
