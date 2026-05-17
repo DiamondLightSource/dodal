@@ -44,6 +44,15 @@ async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
     set_mock_value(tetramm.driver.values_per_reading, 5)
     set_mock_value(tetramm.driver.averaging_time, 10e-6)
 
+    async def stop_writer_when_triggered(value: bool):
+        """The tetramm does not disarm itself after the expected number of triggers,
+        instead we rely on the writer having received the correct number of frames.
+        Here we use the acquire being set to assume it is immediately triggered.
+        """
+        set_mock_value(tetramm.file_io.capture, False)
+
+    callback_on_mock_put(tetramm.driver.acquire, stop_writer_when_triggered)
+
     return tetramm
 
 
@@ -215,7 +224,9 @@ async def test_prepare_sets_up_writer(
     await tetramm.stage()
     await tetramm.prepare(supported_trigger_info)
 
-    assert (await tetramm.file_io.num_capture.get_value()) == 0
+    assert (
+        await tetramm.file_io.num_capture.get_value()
+    ) == supported_trigger_info.number_of_exposures
     assert (await tetramm.file_io.num_extra_dims.get_value()) == 0
     assert (await tetramm.file_io.lazy_open.get_value()) is True
     assert (await tetramm.file_io.swmr_mode.get_value()) is True

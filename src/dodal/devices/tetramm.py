@@ -1,10 +1,7 @@
-import asyncio
-from collections.abc import Sequence
 from typing import Annotated as A
 
 from ophyd_async.core import (
     AsyncStatus,
-    # DetectorController,
     DetectorTriggerLogic,
     PathProvider,
     SignalDict,
@@ -15,6 +12,7 @@ from ophyd_async.core import (
     TriggerInfo,
     derived_signal_r,
     non_zero,
+    wait_for_value,
 )
 from ophyd_async.epics.adcore import (
     ADArmLogic,
@@ -58,6 +56,10 @@ class TetrammGeometry(StrictEnum):
 
 
 class TetrammDriver(NDArrayBaseIO):
+    """Unlike other area detectors the tetramm driver does not inherit from ADBaseIO,
+    see https://github.com/epics-modules/quadEM/tree/master.
+    """
+
     acquire: A[SignalRW[bool], PvSuffix.rbv("Acquire"), EpicsOptions(wait=non_zero)]
     range = A[SignalRW[TetrammRange], PvSuffix.rbv("Range")]
     sample_time: A[SignalR[float], PvSuffix("SampleTime_RBV")]
@@ -88,15 +90,10 @@ class TetrammTriggerLogic(DetectorTriggerLogic):
 
     async def prepare_edge(self, num: int, livetime: float):
         await self.driver.trigger_mode.set(TetrammTrigger.EXT_TRIGGER)
-
-        await asyncio.gather(
-            self.set_exposure(livetime),
-            self.file_io.num_capture.set(num),
-        )
+        await self.set_exposure(livetime)
 
     async def prepare_level(self, num: int):
         await self.driver.trigger_mode.set(TetrammTrigger.EXT_TRIGGER)
-        await self.file_io.num_capture.set(num)
 
     async def set_exposure(self, exposure: float):
         sample_time = await self.driver.sample_time.get_value()
@@ -116,32 +113,44 @@ class TetrammTriggerLogic(DetectorTriggerLogic):
         await self.driver.averaging_time.set(samples * sample_time)
 
 
-class TetrammDatasetDescriber(NDArrayDescription):
-    def __init__(self, driver: TetrammDriver) -> None:
-        self._driver = driver
+class TetrammArmLogic(ADArmLogic):
+    def __init__(self, driver: NDArrayBaseIO, writer_acquire: SignalRW):
+        self.writer_acquire = writer_acquire
+        super().__init__(driver)
 
-    async def np_datatype(self) -> str:
-        return "<f8"  # IEEE 754 double precision floating point
+    async def wait_for_idle(self):
+        await wait_for_value(self.writer_acquire, False, timeout=None)
 
-    async def shape(self) -> tuple[int, int]:
-        return (
-            int(await self._driver.num_channels.get_value()),
-            int(await self._driver.to_average.get_value()),
-        )
+    async def disarm(self, on_unstage: bool):
+        await super().disarm(on_unstage)
+        if self.acquire_status:
+            await self.acquire_status
 
 
 class TetrammDetector(StandardDetector):
+    """Unlike other AreaDetectors the tetramm driver does not internally stop after the
+    expected number of triggers, instead we set the expected number of frames on the file
+    writer, which will then internally stop when it receives this number of frames, and
+    we rely on this stopping to know the detector is done.
+    """
+
     def __init__(
         self,
         prefix: str,
         path_provider: PathProvider,
         drv_suffix: str = "DRV:",
         fileio_suffix: str = "HDF5:",
-        plugins: Sequence[NDPluginBaseIO] = [],
+        plugins: dict[str, NDPluginBaseIO] | None = None,
         name: str = "",
     ):
         self.driver = TetrammDriver(prefix + drv_suffix)
         self.file_io = NDFileHDF5IO(prefix + fileio_suffix)
+
+        if plugins is None:
+            plugins = {}
+
+        for plugin_name, plugin in plugins.items():
+            setattr(self, plugin_name, plugin)
 
         def _get_num_channels(num_channels: TetrammChannels) -> int:
             return int(num_channels)
@@ -162,10 +171,10 @@ class TetrammDetector(StandardDetector):
                     data_type_signal=self.driver.data_type,
                     color_mode_signal=self.driver.color_mode,
                 ),
-                plugins=plugins,
+                plugins=list(plugins.values()),
             ),
             TetrammTriggerLogic(self.driver, self.file_io),
-            ADArmLogic(self.driver),
+            TetrammArmLogic(self.driver, self.file_io.capture),
         )
 
         # currents
@@ -191,6 +200,9 @@ class TetrammDetector(StandardDetector):
             LOGGER.info("Disarming TetrAMM from free run")
             await self._arm_logic.disarm(on_unstage=False)
         await super().prepare(value)
+        # Standard detector sets this to 0 in prepare, we must set it to the correct
+        # number here as it is used as a proxy to know when we're done
+        await self.file_io.num_capture.set(value.number_of_exposures)
         self._validate_deadtime(value)
 
     def _validate_deadtime(self, value: TriggerInfo) -> None:
