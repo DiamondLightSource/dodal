@@ -2,6 +2,7 @@ from typing import Annotated as A
 
 from ophyd_async.core import (
     AsyncStatus,
+    DetectorArmLogic,
     DetectorTriggerLogic,
     PathProvider,
     SignalDict,
@@ -12,17 +13,22 @@ from ophyd_async.core import (
     TriggerInfo,
     derived_signal_r,
     non_zero,
+    set_and_wait_for_value,
     wait_for_value,
 )
 from ophyd_async.epics.adcore import (
-    ADArmLogic,
     ADHDFDataLogic,
     NDArrayBaseIO,
     NDArrayDescription,
     NDFileHDF5IO,
     NDPluginBaseIO,
 )
-from ophyd_async.epics.core import EpicsOptions, PvSuffix, epics_signal_r
+from ophyd_async.epics.core import (
+    EpicsOptions,
+    PvSuffix,
+    epics_signal_r,
+    stop_busy_record,
+)
 
 from dodal.log import LOGGER
 
@@ -113,16 +119,24 @@ class TetrammTriggerLogic(DetectorTriggerLogic):
         await self.driver.averaging_time.set(samples * sample_time)
 
 
-class TetrammArmLogic(ADArmLogic):
-    def __init__(self, driver: NDArrayBaseIO, writer_acquire: SignalRW):
+class TetrammArmLogic(DetectorArmLogic):
+    def __init__(self, driver: TetrammDriver, writer_acquire: SignalRW):
+        self.driver = driver
         self.writer_acquire = writer_acquire
-        super().__init__(driver)
+        self.acquire_status: AsyncStatus | None = None
+
+    async def arm(self):
+        self.acquire_status = await set_and_wait_for_value(
+            self.driver.acquire,
+            True,
+            wait_for_set_completion=False,
+        )
 
     async def wait_for_idle(self):
         await wait_for_value(self.writer_acquire, False, timeout=None)
 
     async def disarm(self, on_unstage: bool):
-        await super().disarm(on_unstage)
+        await stop_busy_record(self.driver.acquire)
         if self.acquire_status:
             await self.acquire_status
 
