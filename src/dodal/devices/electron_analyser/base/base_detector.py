@@ -1,6 +1,8 @@
+import asyncio
 from typing import Generic
 
 import numpy as np
+from bluesky.protocols import Preparable, Stageable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -8,7 +10,6 @@ from ophyd_async.core import (
     DetectorTriggerLogic,
     StandardDetector,
     derived_signal_r,
-    error_if_none,
 )
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
@@ -17,16 +18,41 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 )
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.base.base_region import (
+    BaseRegion,
+    BaseSequence,
     GenericRegion,
-    TAbstractBaseRegion,
+    TBaseRegion,
 )
 from dodal.devices.electron_analyser.base.base_util import to_binding_energy
 from dodal.devices.electron_analyser.base.detector_logic import RegionLogic
 
 
+class SequenceHolder(Stageable, Preparable):
+    """Wrapper to hold the sequence data for an electron analyser.
+
+    Used in scans when we need to hold the state of the configured sequence of regions
+    to give to the electron analyser for each step of a scan.
+    """
+
+    def __init__(self):
+        self.data: BaseSequence[BaseRegion] | None = None
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: BaseSequence[BaseRegion] | None):
+        self.data = value
+
+    @AsyncStatus.wrap
+    async def stage(self):
+        pass
+
+    @AsyncStatus.wrap
+    async def unstage(self):
+        self.data = None
+
+
 class ElectronAnalyserDetector(
     StandardDetector,
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Detector for data acquisition of electron analyser. Can be configured with
     region data via set method.
@@ -50,6 +76,8 @@ class ElectronAnalyserDetector(
         # ToDo - Add data logic
         self.add_detector_logics(arm_logic, trigger_logic)
         self.add_config_signals(self.binding_energy_axis)
+
+        self.sequence = SequenceHolder()
         super().__init__(name)
 
     def _calculate_binding_energy_axis(
@@ -83,39 +111,26 @@ class ElectronAnalyserDetector(
         )
 
     @AsyncStatus.wrap
-    async def set(self, region: TAbstractBaseRegion) -> None:
+    async def set(self, region: TBaseRegion) -> None:
         """Configure detector with regions from plans."""
         await self._region_logic.setup_with_region(region)
 
-    def create_region_detector_list(
-        self, regions: list[TAbstractBaseRegion]
-    ) -> list["ElectronAnalyserDetector"]:
-        """This method can hopefully be dropped when this is merged and released.
-        https://github.com/bluesky/bluesky/pull/1978.
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        """Prepare the detector for use by ensuring it is idle and ready.
 
-        Create a list of detectors equal to the number of regions. Each detector is
-        responsible for setting up a specific region.
+        This method asynchronously stages the detector by disarming the controller to
+        ensure the detector is not actively acquiring data.
 
-        Args:
-            regions: The list of regions to give to each region detector.
-
-        Returns:
-            List of ElectronAnalyserRegionDetector, equal to the number of regions in
-            the sequence file.
+        Raises:
+            Any exceptions raised by the driver's stage or controller's disarm methods.
         """
-        arm_logic = error_if_none(self._arm_logic, "arm_logic cannot be None.")
-        trigger_logic = error_if_none(
-            self._trigger_logic, "trigger_logic cannot be None."
-        )
-        return [
-            ElectronAnalyserDetector(
-                arm_logic=arm_logic,
-                trigger_logic=trigger_logic,
-                region_logic=self._region_logic,
-                name=self.name + "_" + r.name,
-            )
-            for r in regions
-        ]
+        await asyncio.gather(super().stage(), self.sequence.stage())
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        """Disarm the detector."""
+        await asyncio.gather(super().unstage(), self.sequence.unstage())
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[

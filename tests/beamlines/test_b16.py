@@ -22,9 +22,6 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
         patch(
             "dodal.devices.beamlines.b16.detector.TiffTriggerLogic"
         ) as mock_tiff_trigger_logic,
-        patch(
-            "dodal.devices.beamlines.b16.detector.get_path_provider"
-        ) as mock_get_path_provider,
         patch("dodal.devices.beamlines.b16.detector.ADBaseIO") as mock_adbase_io,
         patch("dodal.devices.beamlines.b16.detector.ADArmLogic") as mock_arm_logic,
     ):
@@ -32,7 +29,6 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
         mock_arm_logic.return_value = mock_arm_logic_instance
 
         mock_path_provider = MagicMock(name="PathProvider")
-        mock_get_path_provider.return_value = mock_path_provider
 
         mock_tiff_trigger_logic_instance = MagicMock(name="TriggerLogic")
         mock_tiff_trigger_logic.return_value = mock_tiff_trigger_logic_instance
@@ -43,7 +39,9 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
         mock_area_detector_instance = MagicMock(name="AreaDetectorInstance")
         mock_area_detector.return_value = mock_area_detector_instance
 
-        result = software_triggered_tiff_area_detector(prefix)  # default deadtime
+        result = software_triggered_tiff_area_detector(
+            prefix, mock_path_provider
+        )  # default deadtime
 
         # Assert ADBaseIO called with correct prefix + suffix
         mock_adbase_io.assert_called_once_with(prefix + CAM_SUFFIX)

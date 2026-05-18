@@ -1,7 +1,4 @@
-from .base_detector import (
-    ElectronAnalyserDetector,
-    GenericElectronAnalyserDetector,
-)
+from .base_detector import ElectronAnalyserDetector, GenericElectronAnalyserDetector
 from .base_driver_io import (
     AbstractAnalyserDriverIO,
     GenericAnalyserDriverIO,
@@ -9,13 +6,13 @@ from .base_driver_io import (
 )
 from .base_enums import EnergyMode
 from .base_region import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
+    BaseRegion,
+    BaseSequence,
     GenericRegion,
     GenericSequence,
-    TAbstractBaseRegion,
-    TAbstractBaseSequence,
     TAcquisitionMode,
+    TBaseRegion,
+    TBaseSequence,
     TLensMode,
 )
 from .base_util import to_binding_energy, to_kinetic_energy
@@ -28,12 +25,12 @@ __all__ = [
     "GenericAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
     "EnergyMode",
-    "AbstractBaseRegion",
-    "AbstractBaseSequence",
+    "BaseRegion",
+    "BaseSequence",
     "GenericRegion",
     "GenericSequence",
-    "TAbstractBaseRegion",
-    "TAbstractBaseSequence",
+    "TBaseRegion",
+    "TBaseSequence",
     "TAcquisitionMode",
     "TLensMode",
     "to_binding_energy",

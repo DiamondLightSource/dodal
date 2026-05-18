@@ -16,9 +16,9 @@ from ophyd_async.testing import assert_configuration, partial_reading
 from dodal.devices.beamlines import b07, b07_shared, i09
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
-    AbstractBaseRegion,
-    AbstractBaseSequence,
     AbstractEnergySource,
+    BaseRegion,
+    BaseSequence,
 )
 from dodal.devices.electron_analyser.base.detector_logic import (
     ElectronAnalayserTriggerLogic,
@@ -106,7 +106,7 @@ def energy_source(request: pytest.FixtureRequest) -> AbstractEnergySource:
 
 
 @pytest.fixture
-def sequence(driver: AbstractAnalyserDriverIO) -> AbstractBaseSequence:
+def sequence(driver: AbstractAnalyserDriverIO) -> BaseSequence:
     return get_test_sequence(type(driver))
 
 
@@ -121,7 +121,7 @@ def region_logic(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_driver(
-    region: AbstractBaseRegion,
+    region: BaseRegion,
     region_logic: RegionLogic,
 ) -> None:
 
@@ -129,9 +129,9 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
 
     # Patch switch_energy_mode so we can check on calls, but still run the real function
     with patch.object(
-        AbstractBaseRegion,
+        BaseRegion,
         "prepare_for_epics",
-        side_effect=AbstractBaseRegion.prepare_for_epics,  # run the real method
+        side_effect=BaseRegion.prepare_for_epics,  # run the real method
         autospec=True,
     ) as mock_prepare_for_epics:
         await region_logic.setup_with_region(region)
@@ -154,7 +154,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_region_logic_setup_with_region_moves_selected_source_if_not_none(
-    region: AbstractBaseRegion, region_logic: RegionLogic
+    region: BaseRegion, region_logic: RegionLogic
 ) -> None:
 
     if region_logic.source_selector is not None:

@@ -95,7 +95,6 @@ def num_scan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -128,7 +127,6 @@ def num_grid_scan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -162,7 +160,6 @@ def num_rscan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -195,7 +192,6 @@ def num_grid_rscan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -247,7 +243,6 @@ def list_scan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -279,7 +274,6 @@ def list_grid_scan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -314,7 +308,6 @@ def list_rscan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -346,7 +339,6 @@ def list_grid_rscan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -459,7 +451,6 @@ def step_scan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -491,7 +482,6 @@ def step_grid_scan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -527,7 +517,6 @@ def step_rscan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[
@@ -559,7 +548,6 @@ def step_grid_rscan(
         Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
-            min_length=1,
         ),
     ],
     params: Annotated[

@@ -344,7 +344,7 @@ async def assert_armed(driver: TetrammDriver, trigger_info: TriggerInfo) -> None
         assert (await driver.averaging_time.get_value()) == averaging_time
 
 
-@patch("ophyd_async.epics.adcore._arm_logic.stop_busy_record")
+@patch("dodal.devices.tetramm.stop_busy_record")
 async def test_tetramm_disarm_calls_stop_busy_recording(
     stop_busy_record_mock: MagicMock,
     tetramm: TetrammDetector,

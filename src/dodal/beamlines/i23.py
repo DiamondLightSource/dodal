@@ -1,14 +1,18 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import InOut, PathProvider, StrictEnum
 from ophyd_async.epics.adpilatus import PilatusDetector
 
+from dodal.beamlines.aithre import DISPLAY_CONFIG, ZOOM_PARAMS_FILE
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import SixAxisGonio
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.positioner import Positioner1D
 from dodal.devices.zebra.zebra import Zebra
@@ -27,6 +31,12 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    return ConfigClient()
 
 
 @devices.fixture
@@ -59,12 +69,17 @@ def _is_i23_machine():
     return hostname.startswith("i23-ws") or hostname.startswith("i23-control")
 
 
-@devices.factory(skip=lambda: not _is_i23_machine())
-def oav_pin_tip_detection() -> PinTipDetection:
-    return PinTipDetection(
-        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        "pin_tip_detection",
+@devices.factory()
+def oav(config_client) -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
+        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
+
+
+@devices.factory()
+def pin_tip_detection() -> PinTipDetection:
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 
 @devices.factory()
