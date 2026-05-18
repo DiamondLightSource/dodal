@@ -74,7 +74,7 @@ def attenuator_y_motor() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-OP-ATTN-05:Y", "attenuator_y")
 
 
-@devices.factory()
+@devices.factory(skip=True)
 def filter_wheel() -> FilterWheel:
     """Device factory for the I19 EH-1 filter wheel indexing motor.
 
