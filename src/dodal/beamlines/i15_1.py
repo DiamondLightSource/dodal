@@ -271,6 +271,7 @@ def fast_shutter() -> ZebraFastShutter:
     return ZebraFastShutter(
         set_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:SOFT_IN:B3",
         get_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:OUT4_TTL:STA",
+    )
 
 
 @devices.factory()
