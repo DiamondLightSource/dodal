@@ -55,13 +55,34 @@ dodal.devices.electron\_analyser.base.AbstractAnalyserDriverIO
       ~AbstractAnalyserDriverIO.detector_state
       
       
+      ~AbstractAnalyserDriverIO.acquire
+      
+      
+      ~AbstractAnalyserDriverIO.wait_for_plugins
+      
+      
+      ~AbstractAnalyserDriverIO.manufacturer
+      
+      
+      ~AbstractAnalyserDriverIO.model
+      
+      
+      ~AbstractAnalyserDriverIO.serial_number
+      
+      
+      ~AbstractAnalyserDriverIO.sdk_version
+      
+      
+      ~AbstractAnalyserDriverIO.firmware_version
+      
+      
+      ~AbstractAnalyserDriverIO.port_name
+      
+      
       ~AbstractAnalyserDriverIO.unique_id
       
       
       ~AbstractAnalyserDriverIO.nd_attributes_file
-      
-      
-      ~AbstractAnalyserDriverIO.acquire
       
       
       ~AbstractAnalyserDriverIO.array_size_x
@@ -70,13 +91,31 @@ dodal.devices.electron\_analyser.base.AbstractAnalyserDriverIO
       ~AbstractAnalyserDriverIO.array_size_y
       
       
+      ~AbstractAnalyserDriverIO.array_size_z
+      
+      
+      ~AbstractAnalyserDriverIO.array_size0
+      
+      
+      ~AbstractAnalyserDriverIO.array_size1
+      
+      
+      ~AbstractAnalyserDriverIO.array_size2
+      
+      
+      ~AbstractAnalyserDriverIO.color_mode
+      
+      
       ~AbstractAnalyserDriverIO.data_type
       
       
       ~AbstractAnalyserDriverIO.array_counter
       
       
-      ~AbstractAnalyserDriverIO.wait_for_plugins
+      ~AbstractAnalyserDriverIO.ad_core_version
+      
+      
+      ~AbstractAnalyserDriverIO.driver_version
       
    
    

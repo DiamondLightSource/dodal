@@ -14,8 +14,9 @@ dodal.devices.beamlines.i24.commissioning\_jungfrau
    :toctree:
    :recursive:
 
-   ~commissioning_jungfrau.CommissioningJungfrau
+   ~commissioning_jungfrau.CommissioningJungfrauDetector
    ~commissioning_jungfrau.JungfrauCommissioningWriter
+   ~commissioning_jungfrau.JungfrauCommissioningWriterDataLogic
 
 
 

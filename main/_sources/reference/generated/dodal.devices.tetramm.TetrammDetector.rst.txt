@@ -25,6 +25,11 @@ dodal.devices.tetramm.TetrammDetector
       
       
       
+      ~TetrammDetector.prepare
+      
+      
+      
+      
       
       
       
@@ -37,6 +42,7 @@ dodal.devices.tetramm.TetrammDetector
 
    .. autosummary::
    
+      
       
       
       

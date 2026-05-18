@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.b21 &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.beamlines.b21 &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -928,25 +928,21 @@ window.runMermaid = runMermaid;</script>
 
 
 
-<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="c1"># Needs the fastCS Eiger/odin, see https://jira.diamond.ac.uk/browse/B21-330</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">saxs</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EigerDetector</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">EigerDetector</span><span class="p">(</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-EIGER-01:&quot;</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
-        <span class="n">drv_suffix</span><span class="o">=</span><span class="s2">&quot;-EA-EIGER-01:&quot;</span><span class="p">,</span>
-        <span class="n">hdf_suffix</span><span class="o">=</span><span class="s2">&quot;-EA-EIGER-01:OD:&quot;</span><span class="p">,</span>
-        <span class="n">odin_nodes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
 
 
-<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="c1"># Needs the fastCS Eiger/odin, see https://jira.diamond.ac.uk/browse/B21-330</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">waxs</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EigerDetector</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">EigerDetector</span><span class="p">(</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-EIGER-02:&quot;</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
-        <span class="n">drv_suffix</span><span class="o">=</span><span class="s2">&quot;-EA-EIGER-02:&quot;</span><span class="p">,</span>
-        <span class="n">hdf_suffix</span><span class="o">=</span><span class="s2">&quot;-EA-EIGER-02:OD:&quot;</span><span class="p">,</span>
-        <span class="n">odin_nodes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -1035,8 +1031,8 @@ window.runMermaid = runMermaid;</script>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">NXSasOAV</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-RS-ABSB-02:CAM:&quot;</span><span class="p">,</span>
-        <span class="n">drv_suffix</span><span class="o">=</span><span class="n">CAM_SUFFIX</span><span class="p">,</span>
-        <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">,</span>
+        <span class="n">driver_suffix</span><span class="o">=</span><span class="n">CAM_SUFFIX</span><span class="p">,</span>
+        <span class="n">writer_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
         <span class="n">metadata_holder</span><span class="o">=</span><span class="n">metadata_holder</span><span class="p">,</span>
     <span class="p">)</span>

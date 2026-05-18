@@ -14,7 +14,6 @@ dodal.devices.electron\_analyser.base
    :toctree:
    :recursive:
 
-   ~base.ElectronAnalyserController
    ~base.ElectronAnalyserDetector
    ~base.AbstractAnalyserDriverIO
    ~base.EnergyMode

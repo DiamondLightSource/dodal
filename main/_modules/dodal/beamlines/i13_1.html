@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i13_1 &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.beamlines.i13_1 &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -893,11 +893,11 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathProvider</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adaravis</span><span class="w"> </span><span class="kn">import</span> <span class="n">AravisDetector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.admerlin</span><span class="w"> </span><span class="kn">import</span> <span class="n">MerlinDetector</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.visit</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalDirectoryServiceClient</span><span class="p">,</span> <span class="n">StaticVisitPathProvider</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i13_1.merlin</span><span class="w"> </span><span class="kn">import</span> <span class="n">Merlin</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span>
@@ -938,18 +938,18 @@ window.runMermaid = runMermaid;</script>
 <span class="k">def</span><span class="w"> </span><span class="nf">side_camera</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AravisDetector</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">AravisDetector</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="si">}</span><span class="s2">-OP-FLOAT-03:&quot;</span><span class="p">,</span>
-        <span class="n">drv_suffix</span><span class="o">=</span><span class="s2">&quot;CAM:&quot;</span><span class="p">,</span>
-        <span class="n">fileio_suffix</span><span class="o">=</span><span class="s2">&quot;HDF5:&quot;</span><span class="p">,</span>
+        <span class="n">driver_suffix</span><span class="o">=</span><span class="s2">&quot;CAM:&quot;</span><span class="p">,</span>
+        <span class="n">writer_suffix</span><span class="o">=</span><span class="s2">&quot;HDF5:&quot;</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">merlin</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Merlin</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">Merlin</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merlin</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MerlinDetector</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">MerlinDetector</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="si">}</span><span class="s2">-EA-DET-04:&quot;</span><span class="p">,</span>
-        <span class="n">drv_suffix</span><span class="o">=</span><span class="s2">&quot;CAM:&quot;</span><span class="p">,</span>
-        <span class="n">fileio_suffix</span><span class="o">=</span><span class="s2">&quot;HDF5:&quot;</span><span class="p">,</span>
+        <span class="n">driver_suffix</span><span class="o">=</span><span class="s2">&quot;CAM:&quot;</span><span class="p">,</span>
+        <span class="n">writer_suffix</span><span class="o">=</span><span class="s2">&quot;HDF5:&quot;</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>

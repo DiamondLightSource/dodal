@@ -31,6 +31,7 @@ dodal.beamlines.i15\_1
    .. autosummary::
    
       config_client
+      path_provider
    
    
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriter &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriter &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,8 +59,8 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.beamlines.i24.dcm" href="dodal.devices.beamlines.i24.dcm.html" />
-    <link rel="prev" title="dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrau" href="dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrau.html" />
+    <link rel="next" title="dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriterDataLogic" href="dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriterDataLogic.html" />
+    <link rel="prev" title="dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrauDetector" href="dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrauDetector.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -521,6 +521,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b07.html">dodal.devices.beamlines.b07</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b07_1.html">dodal.devices.beamlines.b07_1</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b07_shared.html">dodal.devices.beamlines.b07_shared</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b16.html">dodal.devices.beamlines.b16</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b21.html">dodal.devices.beamlines.b21</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i02_1.html">dodal.devices.beamlines.i02_1</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i02_2.html">dodal.devices.beamlines.i02_2</a></li>
@@ -583,10 +584,6 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.common_mirror.XYZPiezoCollimatingMirror.html">dodal.devices.common_mirror.XYZPiezoCollimatingMirror</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.common_mirror.XYZPiezoSwitchingMirror.html">dodal.devices.common_mirror.XYZPiezoSwitchingMirror</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.common_mirror.XYZSwitchingMirror.html">dodal.devices.common_mirror.XYZSwitchingMirror</a></li>
-</ul>
-</details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.controllers.html">dodal.devices.controllers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.controllers.ConstantDeadTimeController.html">dodal.devices.controllers.ConstantDeadTimeController</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.cryostream.html">dodal.devices.cryostream</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -848,6 +845,10 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.single_trigger_detector.html">dodal.devices.single_trigger_detector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.single_trigger_detector.SingleTriggerDetector.html">dodal.devices.single_trigger_detector.SingleTriggerDetector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
@@ -879,15 +880,15 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.tetramm.html">dodal.devices.tetramm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammArmLogic.html">dodal.devices.tetramm.TetrammArmLogic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammChannels.html">dodal.devices.tetramm.TetrammChannels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammController.html">dodal.devices.tetramm.TetrammController</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDatasetDescriber.html">dodal.devices.tetramm.TetrammDatasetDescriber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDetector.html">dodal.devices.tetramm.TetrammDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDriver.html">dodal.devices.tetramm.TetrammDriver</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammGeometry.html">dodal.devices.tetramm.TetrammGeometry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammRange.html">dodal.devices.tetramm.TetrammRange</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammResolution.html">dodal.devices.tetramm.TetrammResolution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTrigger.html">dodal.devices.tetramm.TetrammTrigger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTriggerLogic.html">dodal.devices.tetramm.TetrammTriggerLogic</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.thawer.html">dodal.devices.thawer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1058,29 +1059,9 @@
 <p>The PVs on this device are responsible for writing files of a specified name
 to a specified path, marking itself as “ready to write”, and having a counter of
 frames written, which must be zero’d at the ophyd level.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path_provider</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PathProvider</span></code></span>)</p>
-</dd>
-</dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">collect_stream_docs</span></code>(name, indices_written)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_indices_written</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">observe_indices_written</span></code>(timeout)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span></code>(name[, exposures_per_event])</p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1105,20 +1086,20 @@ frames written, which must be zero’d at the ophyd level.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrau.html"
+       href="dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrauDetector.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrau</p>
+        <p class="prev-next-title">dodal.devices.beamlines.i24.commissioning_jungfrau.CommissioningJungfrauDetector</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.beamlines.i24.dcm.html"
+       href="dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriterDataLogic.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.beamlines.i24.dcm</p>
+        <p class="prev-next-title">dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriterDataLogic</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

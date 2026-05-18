@@ -15,16 +15,17 @@ dodal.devices.electron\_analyser.base.ElectronAnalyserDetector
       
       
       
-      ~ElectronAnalyserDetector.describe
       
       
-      ~ElectronAnalyserDetector.describe_configuration
       
       
-      ~ElectronAnalyserDetector.read
       
       
-      ~ElectronAnalyserDetector.read_configuration
+      
+      
+      
+      
+      
       
       
       ~ElectronAnalyserDetector.set
@@ -33,8 +34,6 @@ dodal.devices.electron\_analyser.base.ElectronAnalyserDetector
       
       ~ElectronAnalyserDetector.stage
       
-      
-      ~ElectronAnalyserDetector.trigger
       
       
       ~ElectronAnalyserDetector.unstage
@@ -48,6 +47,8 @@ dodal.devices.electron\_analyser.base.ElectronAnalyserDetector
 
    .. autosummary::
    
+      
+      
       
       
       

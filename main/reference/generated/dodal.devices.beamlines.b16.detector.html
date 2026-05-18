@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.b16.detector &#8212; dodal 2.2.4.dev4+ge74e2a96c documentation</title>
+    <title>dodal.devices.beamlines.b16.detector &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=1261bd65"></script>
+    <script src="../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.beamlines.b21" href="dodal.devices.beamlines.b21.html" />
+    <link rel="next" title="dodal.devices.beamlines.b16.detector.TiffTriggerLogic" href="dodal.devices.beamlines.b16.detector.TiffTriggerLogic.html" />
     <link rel="prev" title="dodal.devices.beamlines.b16" href="dodal.devices.beamlines.b16.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -586,10 +586,6 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.common_mirror.XYZSwitchingMirror.html">dodal.devices.common_mirror.XYZSwitchingMirror</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.controllers.html">dodal.devices.controllers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.controllers.ConstantDeadTimeController.html">dodal.devices.controllers.ConstantDeadTimeController</a></li>
-</ul>
-</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.cryostream.html">dodal.devices.cryostream</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.cryostream.CryoStreamGantry.html">dodal.devices.cryostream.CryoStreamGantry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.cryostream.CryoStreamSelection.html">dodal.devices.cryostream.CryoStreamSelection</a></li>
@@ -700,13 +696,9 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.hutch_shutter.html">dodal.devices.hutch_shutter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.BaseHutchInterlock.html">dodal.devices.hutch_shutter.BaseHutchInterlock</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.BaseHutchShutter.html">dodal.devices.hutch_shutter.BaseHutchShutter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.HutchInterlock.html">dodal.devices.hutch_shutter.HutchInterlock</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.HutchShutter.html">dodal.devices.hutch_shutter.HutchShutter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.InterlockState.html">dodal.devices.hutch_shutter.InterlockState</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.InterlockedHutchShutter.html">dodal.devices.hutch_shutter.InterlockedHutchShutter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.PLCShutterInterlock.html">dodal.devices.hutch_shutter.PLCShutterInterlock</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterDemand.html">dodal.devices.hutch_shutter.ShutterDemand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterState.html">dodal.devices.hutch_shutter.ShutterState</a></li>
 </ul>
@@ -735,9 +727,20 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.Apple2LockedPhasesVal.html">dodal.devices.insertion_device.Apple2LockedPhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorLookup.html">dodal.devices.insertion_device.EnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html">dodal.devices.insertion_device.ConfigServerEnergyMotorLookup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html">dodal.devices.insertion_device.EnergyMotorConvertor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html">dodal.devices.insertion_device.UnstoppableMotor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html">dodal.devices.insertion_device.InsertionDeviceEnergyBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyCoverageEntry.html">dodal.devices.insertion_device.EnergyCoverageEntry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.interlocks.html">dodal.devices.interlocks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.interlocks.BaseInterlock.html">dodal.devices.interlocks.BaseInterlock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.interlocks.EnumPLCInterlock.html">dodal.devices.interlocks.EnumPLCInterlock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.interlocks.IntPLCInterlock.html">dodal.devices.interlocks.IntPLCInterlock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.interlocks.PLCInterlockState.html">dodal.devices.interlocks.PLCInterlockState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.interlocks.PSSInterlock.html">dodal.devices.interlocks.PSSInterlock</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.ipin.html">dodal.devices.ipin</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -842,9 +845,14 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.single_trigger_detector.html">dodal.devices.single_trigger_detector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.single_trigger_detector.SingleTriggerDetector.html">dodal.devices.single_trigger_detector.SingleTriggerDetector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.SlitsWithIndividualBlades.html">dodal.devices.slits.SlitsWithIndividualBlades</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.SlitsY.html">dodal.devices.slits.SlitsY</a></li>
 </ul>
 </details></li>
@@ -872,15 +880,15 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.tetramm.html">dodal.devices.tetramm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammArmLogic.html">dodal.devices.tetramm.TetrammArmLogic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammChannels.html">dodal.devices.tetramm.TetrammChannels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammController.html">dodal.devices.tetramm.TetrammController</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDatasetDescriber.html">dodal.devices.tetramm.TetrammDatasetDescriber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDetector.html">dodal.devices.tetramm.TetrammDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDriver.html">dodal.devices.tetramm.TetrammDriver</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammGeometry.html">dodal.devices.tetramm.TetrammGeometry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammRange.html">dodal.devices.tetramm.TetrammRange</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammResolution.html">dodal.devices.tetramm.TetrammResolution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTrigger.html">dodal.devices.tetramm.TetrammTrigger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTriggerLogic.html">dodal.devices.tetramm.TetrammTriggerLogic</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.thawer.html">dodal.devices.thawer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1039,12 +1047,21 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-dodal.devices.beamlines.b16.detector">
-<span id="dodal-devices-beamlines-b16-detector"></span><h1>dodal.devices.beamlines.b16.detector<a class="headerlink" href="#module-dodal.devices.beamlines.b16.detector" title="Link to this heading">#</a></h1>
-<p class="rubric">Functions</p>
+  <section id="dodal-devices-beamlines-b16-detector">
+<h1>dodal.devices.beamlines.b16.detector<a class="headerlink" href="#dodal-devices-beamlines-b16-detector" title="Link to this heading">#</a></h1>
+<p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector" title="dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">software_triggered_tiff_area_detector</span></code></a>(prefix)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.beamlines.b16.detector.TiffTriggerLogic.html#dodal.devices.beamlines.b16.detector.TiffTriggerLogic" title="dodal.devices.beamlines.b16.detector.TiffTriggerLogic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TiffTriggerLogic</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric" id="module-dodal.devices.beamlines.b16.detector">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector" title="dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">software_triggered_tiff_area_detector</span></code></a>(...[, ...])</p></td>
 <td><p>Wrapper for AreaDetector with fixed dead time (defaulted to 0) and a TIFF file writer.</p></td>
 </tr>
 </tbody>
@@ -1052,7 +1069,7 @@
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.b16.detector.</span></span><span class="sig-name descname"><span class="pre">software_triggered_tiff_area_detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">deadtime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/b16/detector.html#software_triggered_tiff_area_detector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.b16.detector.</span></span><span class="sig-name descname"><span class="pre">software_triggered_tiff_area_detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PathProvider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deadtime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/b16/detector.html#software_triggered_tiff_area_detector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector" title="Link to this definition">#</a></dt>
 <dd><p>Wrapper for AreaDetector with fixed dead time (defaulted to 0)
 and a TIFF file writer.
 Most detectors in B16 could be configured like this.</p>
@@ -1060,6 +1077,7 @@ Most detectors in B16 could be configured like this.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>path_provider</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PathProvider</span></code></span>)</p></li>
 <li><p><strong>deadtime</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">0.0</span></code>)</p></li>
 </ul>
 </dd>
@@ -1088,11 +1106,11 @@ Most detectors in B16 could be configured like this.</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.beamlines.b21.html"
+       href="dodal.devices.beamlines.b16.detector.TiffTriggerLogic.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.beamlines.b21</p>
+        <p class="prev-next-title">dodal.devices.beamlines.b16.detector.TiffTriggerLogic</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

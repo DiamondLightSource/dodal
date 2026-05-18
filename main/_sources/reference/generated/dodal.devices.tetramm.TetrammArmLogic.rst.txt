@@ -1,0 +1,29 @@
+dodal.devices.tetramm.TetrammArmLogic
+=====================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammArmLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~TetrammArmLogic.arm
+      
+      
+      ~TetrammArmLogic.disarm
+      
+      
+      ~TetrammArmLogic.wait_for_idle
+      
+   
+   
+
+   
+   
+   

@@ -23,6 +23,15 @@ dodal.devices.electron\_analyser.specs.SpecsDetector
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
    
    
 
@@ -32,6 +41,8 @@ dodal.devices.electron\_analyser.specs.SpecsDetector
 
    .. autosummary::
    
+      
+      
       
       
       

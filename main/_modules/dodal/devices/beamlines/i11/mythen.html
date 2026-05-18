@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i11.mythen &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.devices.beamlines.i11.mythen &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -889,19 +889,17 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">A</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DetectorTrigger</span><span class="p">,</span>
+    <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
     <span class="n">PathProvider</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
-    <span class="n">TriggerInfo</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ADBaseController</span><span class="p">,</span>
-    <span class="n">ADHDFWriter</span><span class="p">,</span>
+    <span class="n">ADArmLogic</span><span class="p">,</span>
+    <span class="n">ADBaseIO</span><span class="p">,</span>
     <span class="n">ADImageMode</span><span class="p">,</span>
-    <span class="n">ADWriter</span><span class="p">,</span>
+    <span class="n">ADWriterType</span><span class="p">,</span>
     <span class="n">AreaDetector</span><span class="p">,</span>
-    <span class="n">NDArrayBaseIO</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PvSuffix</span>
 
@@ -945,14 +943,8 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="Mythen3Driver">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i11.mythen.Mythen3Driver.html#dodal.devices.beamlines.i11.mythen.Mythen3Driver">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Mythen3Driver</span><span class="p">(</span><span class="n">NDArrayBaseIO</span><span class="p">):</span>
-    <span class="n">acquire_time</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;AcquireTime&quot;</span><span class="p">)]</span>
-    <span class="n">acquire_period</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;AcquirePeriod&quot;</span><span class="p">)]</span>
-    <span class="n">num_images</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;NumImages&quot;</span><span class="p">)]</span>
-    <span class="n">image_mode</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">ADImageMode</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;ImageMode&quot;</span><span class="p">)]</span>
-
+<span class="k">class</span><span class="w"> </span><span class="nc">Mythen3Driver</span><span class="p">(</span><span class="n">ADBaseIO</span><span class="p">):</span>
     <span class="c1"># Non-specific PV&#39;s but with mythen3 specific values</span>
-    <span class="n">detector_state</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">Mythen3DetectorState</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;DetectorState_RBV&quot;</span><span class="p">)]</span>
     <span class="n">trigger_mode</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">Mythen3TriggerMode</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;TriggerMode&quot;</span><span class="p">)]</span>
 
     <span class="c1"># mythen3 specific PV&#39;s</span>
@@ -997,47 +989,46 @@ window.runMermaid = runMermaid;</script>
 <span class="n">_BIT_DEPTH</span> <span class="o">=</span> <span class="mi">24</span>
 
 
-<div class="viewcode-block" id="Mythen3Controller">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i11.mythen.Mythen3Controller.html#dodal.devices.beamlines.i11.mythen.Mythen3Controller">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Mythen3Controller</span><span class="p">(</span><span class="n">ADBaseController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;ADBaseController` for a Mythen3.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Mythen3TriggerLogic">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i11.mythen.Mythen3TriggerLogic.html#dodal.devices.beamlines.i11.mythen.Mythen3TriggerLogic">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Mythen3TriggerLogic</span><span class="p">(</span><span class="n">DetectorTriggerLogic</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Trigger logic for a Mythen3.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">Mythen3Driver</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span> <span class="o">=</span> <span class="n">driver</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="p">)</span>
+        <span class="c1"># super().__init__(driver=self._driver)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_values</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_DEADTIMES</span><span class="p">[</span><span class="n">_BIT_DEPTH</span><span class="p">]</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_info</span><span class="p">:</span> <span class="n">TriggerInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">exposure</span> <span class="o">:=</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">acquire_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">exposure</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">is</span> <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">INTERNAL</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Mythen3TriggerMode</span><span class="o">.</span><span class="n">INTERNAL</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">in</span> <span class="p">{</span>
-            <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">CONSTANT_GATE</span><span class="p">,</span>
-            <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">EDGE_TRIGGER</span><span class="p">,</span>
-            <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">VARIABLE_GATE</span><span class="p">,</span>
-        <span class="p">}:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Mythen3TriggerMode</span><span class="o">.</span><span class="n">EXTERNAL</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mythen3 does not support </span><span class="si">{</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">total_number_of_exposures</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">image_mode</span> <span class="o">=</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">CONTINUOUS</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">image_mode</span> <span class="o">=</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">MULTIPLE</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">livetime</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">livetime</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">acquire_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">livetime</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Mythen3TriggerMode</span><span class="o">.</span><span class="n">INTERNAL</span><span class="p">)</span>
+        <span class="n">image_mode</span> <span class="o">=</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">CONTINUOUS</span> <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">MULTIPLE</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">num_images</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">total_number_of_exposures</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">num_images</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">num</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">image_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">image_mode</span><span class="p">),</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">livetime</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">livetime</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">acquire_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">livetime</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Mythen3TriggerMode</span><span class="o">.</span><span class="n">EXTERNAL</span><span class="p">)</span>
+        <span class="n">image_mode</span> <span class="o">=</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">CONTINUOUS</span> <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">MULTIPLE</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">num_images</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">num</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">image_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">image_mode</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_edge</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="Mythen3">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i11.mythen.Mythen3.html#dodal.devices.beamlines.i11.mythen.Mythen3">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Mythen3</span><span class="p">(</span><span class="n">AreaDetector</span><span class="p">[</span><span class="n">Mythen3Controller</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Mythen3</span><span class="p">(</span><span class="n">AreaDetector</span><span class="p">[</span><span class="n">Mythen3Driver</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The detector may be configured for an external trigger on a GPIO port,</span>
 <span class="sd">    which must be done prior to preparing the detector.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1047,25 +1038,22 @@ window.runMermaid = runMermaid;</script>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">,</span>
         <span class="n">drv_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DET_SUFFIX</span><span class="p">,</span>
-        <span class="n">writer_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">ADWriter</span><span class="p">]</span> <span class="o">=</span> <span class="n">ADHDFWriter</span><span class="p">,</span>
-        <span class="n">fileio_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;HDF:&quot;</span><span class="p">,</span>
+        <span class="n">writer_type</span><span class="p">:</span> <span class="n">ADWriterType</span> <span class="o">=</span> <span class="n">ADWriterType</span><span class="o">.</span><span class="n">HDF</span><span class="p">,</span>
+        <span class="n">writer_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;HDF:&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">Mythen3Driver</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">drv_suffix</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">Mythen3Controller</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">writer_cls</span><span class="o">.</span><span class="n">with_io</span><span class="p">(</span>
-            <span class="n">prefix</span><span class="p">,</span>
-            <span class="n">path_provider</span><span class="p">,</span>
-            <span class="n">dataset_source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span>
-            <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">fileio_suffix</span><span class="p">,</span>
-        <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">controller</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="p">,</span>
-            <span class="n">writer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span>
+            <span class="n">arm_logic</span><span class="o">=</span><span class="n">ADArmLogic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">),</span>
+            <span class="n">trigger_logic</span><span class="o">=</span><span class="n">Mythen3TriggerLogic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">),</span>
+            <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
+            <span class="n">writer_type</span><span class="o">=</span><span class="n">writer_type</span><span class="p">,</span>
+            <span class="n">writer_suffix</span><span class="o">=</span><span class="n">writer_suffix</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span>  <span class="c1"># plugins=plugins # config_sigs=config_sigs</span></div>
+        <span class="p">)</span></div>
 
 </pre></div>
 

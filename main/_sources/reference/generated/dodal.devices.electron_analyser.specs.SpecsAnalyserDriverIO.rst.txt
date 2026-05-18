@@ -55,13 +55,34 @@ dodal.devices.electron\_analyser.specs.SpecsAnalyserDriverIO
       ~SpecsAnalyserDriverIO.detector_state
       
       
+      ~SpecsAnalyserDriverIO.acquire
+      
+      
+      ~SpecsAnalyserDriverIO.wait_for_plugins
+      
+      
+      ~SpecsAnalyserDriverIO.manufacturer
+      
+      
+      ~SpecsAnalyserDriverIO.model
+      
+      
+      ~SpecsAnalyserDriverIO.serial_number
+      
+      
+      ~SpecsAnalyserDriverIO.sdk_version
+      
+      
+      ~SpecsAnalyserDriverIO.firmware_version
+      
+      
+      ~SpecsAnalyserDriverIO.port_name
+      
+      
       ~SpecsAnalyserDriverIO.unique_id
       
       
       ~SpecsAnalyserDriverIO.nd_attributes_file
-      
-      
-      ~SpecsAnalyserDriverIO.acquire
       
       
       ~SpecsAnalyserDriverIO.array_size_x
@@ -70,13 +91,31 @@ dodal.devices.electron\_analyser.specs.SpecsAnalyserDriverIO
       ~SpecsAnalyserDriverIO.array_size_y
       
       
+      ~SpecsAnalyserDriverIO.array_size_z
+      
+      
+      ~SpecsAnalyserDriverIO.array_size0
+      
+      
+      ~SpecsAnalyserDriverIO.array_size1
+      
+      
+      ~SpecsAnalyserDriverIO.array_size2
+      
+      
+      ~SpecsAnalyserDriverIO.color_mode
+      
+      
       ~SpecsAnalyserDriverIO.data_type
       
       
       ~SpecsAnalyserDriverIO.array_counter
       
       
-      ~SpecsAnalyserDriverIO.wait_for_plugins
+      ~SpecsAnalyserDriverIO.ad_core_version
+      
+      
+      ~SpecsAnalyserDriverIO.driver_version
       
    
    

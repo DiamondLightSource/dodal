@@ -31,6 +31,9 @@ dodal.devices.tetramm.TetrammDriver
       ~TetrammDriver.range
       
       
+      ~TetrammDriver.acquire
+      
+      
       ~TetrammDriver.sample_time
       
       
@@ -70,13 +73,13 @@ dodal.devices.tetramm.TetrammDriver
       ~TetrammDriver.read_format
       
       
+      ~TetrammDriver.port_name
+      
+      
       ~TetrammDriver.unique_id
       
       
       ~TetrammDriver.nd_attributes_file
-      
-      
-      ~TetrammDriver.acquire
       
       
       ~TetrammDriver.array_size_x
@@ -85,13 +88,31 @@ dodal.devices.tetramm.TetrammDriver
       ~TetrammDriver.array_size_y
       
       
+      ~TetrammDriver.array_size_z
+      
+      
+      ~TetrammDriver.array_size0
+      
+      
+      ~TetrammDriver.array_size1
+      
+      
+      ~TetrammDriver.array_size2
+      
+      
+      ~TetrammDriver.color_mode
+      
+      
       ~TetrammDriver.data_type
       
       
       ~TetrammDriver.array_counter
       
       
-      ~TetrammDriver.wait_for_plugins
+      ~TetrammDriver.ad_core_version
+      
+      
+      ~TetrammDriver.driver_version
       
    
    

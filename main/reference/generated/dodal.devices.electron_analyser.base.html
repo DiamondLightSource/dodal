@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser.base &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.devices.electron_analyser.base &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.electron_analyser.base.ElectronAnalyserController" href="dodal.devices.electron_analyser.base.ElectronAnalyserController.html" />
+    <link rel="next" title="dodal.devices.electron_analyser.base.ElectronAnalyserDetector" href="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html" />
     <link rel="prev" title="dodal.devices.electron_analyser" href="dodal.devices.electron_analyser.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -521,6 +521,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b07.html">dodal.devices.beamlines.b07</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b07_1.html">dodal.devices.beamlines.b07_1</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b07_shared.html">dodal.devices.beamlines.b07_shared</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b16.html">dodal.devices.beamlines.b16</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.b21.html">dodal.devices.beamlines.b21</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i02_1.html">dodal.devices.beamlines.i02_1</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamlines.i02_2.html">dodal.devices.beamlines.i02_2</a></li>
@@ -583,10 +584,6 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.common_mirror.XYZPiezoCollimatingMirror.html">dodal.devices.common_mirror.XYZPiezoCollimatingMirror</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.common_mirror.XYZPiezoSwitchingMirror.html">dodal.devices.common_mirror.XYZPiezoSwitchingMirror</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.common_mirror.XYZSwitchingMirror.html">dodal.devices.common_mirror.XYZSwitchingMirror</a></li>
-</ul>
-</details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.controllers.html">dodal.devices.controllers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.controllers.ConstantDeadTimeController.html">dodal.devices.controllers.ConstantDeadTimeController</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.cryostream.html">dodal.devices.cryostream</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -848,6 +845,10 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.single_trigger_detector.html">dodal.devices.single_trigger_detector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.single_trigger_detector.SingleTriggerDetector.html">dodal.devices.single_trigger_detector.SingleTriggerDetector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
@@ -879,15 +880,15 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.tetramm.html">dodal.devices.tetramm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammArmLogic.html">dodal.devices.tetramm.TetrammArmLogic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammChannels.html">dodal.devices.tetramm.TetrammChannels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammController.html">dodal.devices.tetramm.TetrammController</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDatasetDescriber.html">dodal.devices.tetramm.TetrammDatasetDescriber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDetector.html">dodal.devices.tetramm.TetrammDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDriver.html">dodal.devices.tetramm.TetrammDriver</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammGeometry.html">dodal.devices.tetramm.TetrammGeometry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammRange.html">dodal.devices.tetramm.TetrammRange</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammResolution.html">dodal.devices.tetramm.TetrammResolution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTrigger.html">dodal.devices.tetramm.TetrammTrigger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTriggerLogic.html">dodal.devices.tetramm.TetrammTriggerLogic</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.thawer.html">dodal.devices.thawer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1048,37 +1049,34 @@
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.ElectronAnalyserController.html#dodal.devices.electron_analyser.base.ElectronAnalyserController" title="dodal.devices.electron_analyser.base.ElectronAnalyserController"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElectronAnalyserController</span></code></a></p></td>
-<td><p>Specialised controller for the electron analysers to provide additional setup logic such as selecting the energy source to use from requested region and giving the driver the correct region parameters.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector" title="dodal.devices.electron_analyser.base.ElectronAnalyserDetector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElectronAnalyserDetector</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector" title="dodal.devices.electron_analyser.base.ElectronAnalyserDetector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElectronAnalyserDetector</span></code></a></p></td>
 <td><p>Detector for data acquisition of electron analyser.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html#dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO" title="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AbstractAnalyserDriverIO</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html#dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO" title="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AbstractAnalyserDriverIO</span></code></a></p></td>
 <td><p>Driver device that defines signals and readables that should be common to all electron analysers.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.EnergyMode.html#dodal.devices.electron_analyser.base.EnergyMode" title="dodal.devices.electron_analyser.base.EnergyMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.EnergyMode.html#dodal.devices.electron_analyser.base.EnergyMode" title="dodal.devices.electron_analyser.base.EnergyMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.BaseRegion.html#dodal.devices.electron_analyser.base.BaseRegion" title="dodal.devices.electron_analyser.base.BaseRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseRegion</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.BaseRegion.html#dodal.devices.electron_analyser.base.BaseRegion" title="dodal.devices.electron_analyser.base.BaseRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseRegion</span></code></a></p></td>
 <td><p>Generic region model that holds the data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.BaseSequence.html#dodal.devices.electron_analyser.base.BaseSequence" title="dodal.devices.electron_analyser.base.BaseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseSequence</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.BaseSequence.html#dodal.devices.electron_analyser.base.BaseSequence" title="dodal.devices.electron_analyser.base.BaseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseSequence</span></code></a></p></td>
 <td><p>Generic sequence model that holds the list of region data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.GenericRegion.html#dodal.devices.electron_analyser.base.GenericRegion" title="dodal.devices.electron_analyser.base.GenericRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GenericRegion</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.GenericRegion.html#dodal.devices.electron_analyser.base.GenericRegion" title="dodal.devices.electron_analyser.base.GenericRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GenericRegion</span></code></a></p></td>
 <td><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRegion[StrictEnum,</span> <span class="pre">Union[SupersetEnum,</span> <span class="pre">StrictEnum],</span> <span class="pre">Union[StrictEnum,</span> <span class="pre">float]]</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.GenericSequence.html#dodal.devices.electron_analyser.base.GenericSequence" title="dodal.devices.electron_analyser.base.GenericSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GenericSequence</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.GenericSequence.html#dodal.devices.electron_analyser.base.GenericSequence" title="dodal.devices.electron_analyser.base.GenericSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GenericSequence</span></code></a></p></td>
 <td><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSequence[BaseRegion[StrictEnum,</span> <span class="pre">Union[SupersetEnum,</span> <span class="pre">StrictEnum],</span> <span class="pre">Union[StrictEnum,</span> <span class="pre">float]]]</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource" title="dodal.devices.electron_analyser.base.AbstractEnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AbstractEnergySource</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource" title="dodal.devices.electron_analyser.base.AbstractEnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AbstractEnergySource</span></code></a></p></td>
 <td><p>Abstract device that wraps an energy source signal and provides common interface via a energy signal.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.DualEnergySource.html#dodal.devices.electron_analyser.base.DualEnergySource" title="dodal.devices.electron_analyser.base.DualEnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DualEnergySource</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.DualEnergySource.html#dodal.devices.electron_analyser.base.DualEnergySource" title="dodal.devices.electron_analyser.base.DualEnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DualEnergySource</span></code></a></p></td>
 <td><p>Holds two EnergySource devices and provides a signal to read energy depending on which source is selected.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.EnergySource.html#dodal.devices.electron_analyser.base.EnergySource" title="dodal.devices.electron_analyser.base.EnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergySource</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.EnergySource.html#dodal.devices.electron_analyser.base.EnergySource" title="dodal.devices.electron_analyser.base.EnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergySource</span></code></a></p></td>
 <td><p>Wraps a signal that relates to energy and provides common interface via energy signal.</p></td>
 </tr>
 </tbody>
@@ -1162,11 +1160,11 @@ return the same value. If it is binding, convert to kinetic.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.electron_analyser.base.ElectronAnalyserController.html"
+       href="dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.electron_analyser.base.ElectronAnalyserController</p>
+        <p class="prev-next-title">dodal.devices.electron_analyser.base.ElectronAnalyserDetector</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -7,6 +7,15 @@ dodal.devices.beamlines.b16.detector
 
 
 
+.. currentmodule:: dodal.devices.beamlines.b16
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~detector.TiffTriggerLogic
+
 
 
 

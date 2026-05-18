@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.p99.andor2_point &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.devices.beamlines.p99.andor2_point &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -889,8 +889,10 @@ window.runMermaid = runMermaid;</script>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adandor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Andor2DriverIO</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDPluginBaseIO</span><span class="p">,</span> <span class="n">SingleTriggerDetector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDPluginBaseIO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.single_trigger_detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleTriggerDetector</span>
 
 
 <div class="viewcode-block" id="Andor2Point">

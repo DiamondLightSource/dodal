@@ -22,7 +22,6 @@
    dodal.devices.collimation_table
    dodal.devices.common_dcm
    dodal.devices.common_mirror
-   dodal.devices.controllers
    dodal.devices.cryostream
    dodal.devices.current_amplifiers
    dodal.devices.detector
@@ -52,6 +51,7 @@
    dodal.devices.s4_slit_gaps
    dodal.devices.scintillator
    dodal.devices.selectable_source
+   dodal.devices.single_trigger_detector
    dodal.devices.slits
    dodal.devices.smargon
    dodal.devices.status

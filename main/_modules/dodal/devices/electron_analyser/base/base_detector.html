@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,31 +886,32 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.devices.electron_analyser.base.base_detector</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preparable</span><span class="p">,</span> <span class="n">Reading</span><span class="p">,</span> <span class="n">Stageable</span><span class="p">,</span> <span class="n">Triggerable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">event_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataKey</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preparable</span><span class="p">,</span> <span class="n">Stageable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AsyncConfigurable</span><span class="p">,</span>
-    <span class="n">AsyncReadable</span><span class="p">,</span>
+    <span class="n">Array1D</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
-    <span class="n">Device</span><span class="p">,</span>
-    <span class="n">TriggerInfo</span><span class="p">,</span>
+    <span class="n">DetectorArmLogic</span><span class="p">,</span>
+    <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
+    <span class="n">StandardDetector</span><span class="p">,</span>
+    <span class="n">derived_signal_r</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_controller</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ElectronAnalyserController</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_driver_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GenericAnalyserDriverIO</span><span class="p">,</span>
     <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnergyMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseRegion</span><span class="p">,</span>
     <span class="n">BaseSequence</span><span class="p">,</span>
     <span class="n">GenericRegion</span><span class="p">,</span>
     <span class="n">TBaseRegion</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_binding_energy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.detector_logic</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegionLogic</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SequenceHolder</span><span class="p">(</span><span class="n">Stageable</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">):</span>
@@ -939,29 +940,72 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="ElectronAnalyserDetector">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserDetector</span><span class="p">(</span>
-    <span class="n">Device</span><span class="p">,</span>
-    <span class="n">Stageable</span><span class="p">,</span>
-    <span class="n">Triggerable</span><span class="p">,</span>
-    <span class="n">AsyncReadable</span><span class="p">,</span>
-    <span class="n">AsyncConfigurable</span><span class="p">,</span>
+    <span class="n">StandardDetector</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detector for data acquisition of electron analyser. Can only acquire using</span>
-<span class="sd">    settings already configured for the device.</span>
-
-<span class="sd">    If possible, this should be changed to inherit from a StandardDetector. Currently,</span>
-<span class="sd">    StandardDetector forces you to use a file writer which doesn&#39;t apply here.</span>
-<span class="sd">    See issue https://github.com/bluesky/ophyd-async/issues/888</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detector for data acquisition of electron analyser. Can be configured with</span>
+<span class="sd">    region data via set method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">controller</span><span class="p">:</span> <span class="n">ElectronAnalyserController</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TBaseRegion</span><span class="p">],</span>
+        <span class="n">arm_logic</span><span class="p">:</span> <span class="n">DetectorArmLogic</span><span class="p">,</span>
+        <span class="n">trigger_logic</span><span class="p">:</span> <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
+        <span class="n">region_logic</span><span class="p">:</span> <span class="n">RegionLogic</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_binding_energy_axis</span><span class="p">,</span>
+            <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
+            <span class="n">energy_axis</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_axis</span><span class="p">,</span>
+            <span class="n">excitation_energy</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">energy_source</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
+            <span class="n">energy_mode</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_mode</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span> <span class="o">=</span> <span class="n">region_logic</span>
+        <span class="c1"># ToDo - Add data logic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_detector_logics</span><span class="p">(</span><span class="n">arm_logic</span><span class="p">,</span> <span class="n">trigger_logic</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_config_signals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">SequenceHolder</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span> <span class="o">=</span> <span class="n">controller</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_binding_energy_axis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">energy_axis</span><span class="p">:</span> <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">energy_mode</span><span class="p">:</span> <span class="n">EnergyMode</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the binding energy axis to calibrate the spectra data. Function for</span>
+<span class="sd">        a derived signal.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            energy_axis (Array1D[np.float64]): Array data of the original energy_axis</span>
+<span class="sd">                from epics.</span>
+<span class="sd">            excitation_energy (float): The excitation energy value used for the scan of</span>
+<span class="sd">                this region.</span>
+<span class="sd">            energy_mode (EnergyMode): The energy_mode of the region that was used for</span>
+<span class="sd">                the scan of this region.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Array that is the correct axis for the spectra data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">is_binding</span> <span class="o">=</span> <span class="n">energy_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">BINDING</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">to_binding_energy</span><span class="p">(</span><span class="n">i_energy_axis</span><span class="p">,</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_binding</span>
+                <span class="k">else</span> <span class="n">i_energy_axis</span>
+                <span class="k">for</span> <span class="n">i_energy_axis</span> <span class="ow">in</span> <span class="n">energy_axis</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ElectronAnalyserDetector.set">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">TBaseRegion</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure detector with regions from plans.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span><span class="o">.</span><span class="n">setup_with_region</span><span class="p">(</span><span class="n">region</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="ElectronAnalyserDetector.stage">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage">[docs]</a>
@@ -975,7 +1019,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Raises:</span>
 <span class="sd">            Any exceptions raised by the driver&#39;s stage or controller&#39;s disarm methods.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">stage</span><span class="p">())</span></div>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">stage</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="ElectronAnalyserDetector.unstage">
@@ -983,46 +1027,14 @@ window.runMermaid = runMermaid;</script>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Disarm the detector.&quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">unstage</span><span class="p">())</span></div>
-
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">TBaseRegion</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">setup_with_region</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">TriggerInfo</span><span class="p">())</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">arm</span><span class="p">()</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">wait_for_idle</span><span class="p">()</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reading</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataKey</span><span class="p">]:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
-        <span class="c1"># Correct the shape for image</span>
-        <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span>
-        <span class="n">energy_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_axis</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
-        <span class="n">angle_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">angle_axis</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
-        <span class="n">data</span><span class="p">[</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;image&quot;</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">angle_size</span><span class="p">,</span> <span class="n">energy_size</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">data</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reading</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">read_configuration</span><span class="p">()</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">describe_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataKey</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">describe_configuration</span><span class="p">()</span></div>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">unstage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">unstage</span><span class="p">())</span></div>
+</div>
 
 
 
 <span class="n">GenericElectronAnalyserDetector</span> <span class="o">=</span> <span class="n">ElectronAnalyserDetector</span><span class="p">[</span>
     <span class="n">GenericAnalyserDriverIO</span><span class="p">,</span> <span class="n">GenericRegion</span>
 <span class="p">]</span>
-<span class="n">TElectronAnalyserDetector</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span>
-    <span class="s2">&quot;TElectronAnalyserDetector&quot;</span><span class="p">,</span>
-    <span class="n">bound</span><span class="o">=</span><span class="n">ElectronAnalyserDetector</span><span class="p">,</span>
-<span class="p">)</span>
 </pre></div>
 
                 </article>

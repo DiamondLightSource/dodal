@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.b16.detector &#8212; dodal 2.2.4.dev4+ge74e2a96c documentation</title>
+    <title>dodal.devices.beamlines.b16.detector &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=1261bd65"></script>
+    <script src="../../../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,31 +885,57 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamlines.b16.detector</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorTriggerLogic</span><span class="p">,</span> <span class="n">PathProvider</span><span class="p">,</span> <span class="n">SignalDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ADArmLogic</span><span class="p">,</span>
     <span class="n">ADBaseIO</span><span class="p">,</span>
-    <span class="n">ADTIFFWriter</span><span class="p">,</span>
+    <span class="n">ADWriterType</span><span class="p">,</span>
     <span class="n">AreaDetector</span><span class="p">,</span>
+    <span class="n">prepare_exposures</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_path_provider</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.device_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CAM_SUFFIX</span><span class="p">,</span> <span class="n">TIFF_SUFFIX</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.controllers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantDeadTimeController</span>
+
+<span class="n">ADBaseIOT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ADBaseIOT&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">ADBaseIO</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TiffTriggerLogic">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.b16.detector.TiffTriggerLogic.html#dodal.devices.beamlines.b16.detector.TiffTriggerLogic">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TiffTriggerLogic</span><span class="p">(</span><span class="n">DetectorTriggerLogic</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ADBaseIOT</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">ADBaseIOT</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadtime</span> <span class="o">=</span> <span class="n">deadtime</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">livetime</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">prepare_exposures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">livetime</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_values</span><span class="p">:</span> <span class="n">SignalDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadtime</span></div>
+
 
 
 <div class="viewcode-block" id="software_triggered_tiff_area_detector">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.b16.detector.html#dodal.devices.beamlines.b16.detector.software_triggered_tiff_area_detector">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">software_triggered_tiff_area_detector</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">software_triggered_tiff_area_detector</span><span class="p">(</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">,</span>
+    <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for AreaDetector with fixed dead time (defaulted to 0)</span>
 <span class="sd">    and a TIFF file writer.</span>
 <span class="sd">    Most detectors in B16 could be configured like this.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">ADBaseIO</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">CAM_SUFFIX</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AreaDetector</span><span class="p">(</span>
-        <span class="n">writer</span><span class="o">=</span><span class="n">ADTIFFWriter</span><span class="o">.</span><span class="n">with_io</span><span class="p">(</span>
-            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span> <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">TIFF_SUFFIX</span>
-        <span class="p">),</span>
-        <span class="n">controller</span><span class="o">=</span><span class="n">ConstantDeadTimeController</span><span class="p">(</span>
-            <span class="n">driver</span><span class="o">=</span><span class="n">ADBaseIO</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">CAM_SUFFIX</span><span class="p">),</span> <span class="n">deadtime</span><span class="o">=</span><span class="n">deadtime</span>
-        <span class="p">),</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+        <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span>
+        <span class="n">arm_logic</span><span class="o">=</span><span class="n">ADArmLogic</span><span class="p">(</span><span class="n">driver</span><span class="p">),</span>
+        <span class="n">trigger_logic</span><span class="o">=</span><span class="n">TiffTriggerLogic</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
+        <span class="n">writer_type</span><span class="o">=</span><span class="n">ADWriterType</span><span class="o">.</span><span class="n">TIFF</span><span class="p">,</span>
+        <span class="n">writer_suffix</span><span class="o">=</span><span class="n">TIFF_SUFFIX</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 </pre></div>

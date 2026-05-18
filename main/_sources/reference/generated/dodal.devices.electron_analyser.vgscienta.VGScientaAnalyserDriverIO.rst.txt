@@ -55,13 +55,34 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaAnalyserDriverIO
       ~VGScientaAnalyserDriverIO.detector_state
       
       
+      ~VGScientaAnalyserDriverIO.acquire
+      
+      
+      ~VGScientaAnalyserDriverIO.wait_for_plugins
+      
+      
+      ~VGScientaAnalyserDriverIO.manufacturer
+      
+      
+      ~VGScientaAnalyserDriverIO.model
+      
+      
+      ~VGScientaAnalyserDriverIO.serial_number
+      
+      
+      ~VGScientaAnalyserDriverIO.sdk_version
+      
+      
+      ~VGScientaAnalyserDriverIO.firmware_version
+      
+      
+      ~VGScientaAnalyserDriverIO.port_name
+      
+      
       ~VGScientaAnalyserDriverIO.unique_id
       
       
       ~VGScientaAnalyserDriverIO.nd_attributes_file
-      
-      
-      ~VGScientaAnalyserDriverIO.acquire
       
       
       ~VGScientaAnalyserDriverIO.array_size_x
@@ -70,13 +91,31 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaAnalyserDriverIO
       ~VGScientaAnalyserDriverIO.array_size_y
       
       
+      ~VGScientaAnalyserDriverIO.array_size_z
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size0
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size1
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size2
+      
+      
+      ~VGScientaAnalyserDriverIO.color_mode
+      
+      
       ~VGScientaAnalyserDriverIO.data_type
       
       
       ~VGScientaAnalyserDriverIO.array_counter
       
       
-      ~VGScientaAnalyserDriverIO.wait_for_plugins
+      ~VGScientaAnalyserDriverIO.ad_core_version
+      
+      
+      ~VGScientaAnalyserDriverIO.driver_version
       
    
    

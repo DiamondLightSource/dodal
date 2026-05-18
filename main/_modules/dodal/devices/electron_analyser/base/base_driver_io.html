@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -915,7 +915,6 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TLensMode</span><span class="p">,</span>
     <span class="n">TPassEnergy</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_binding_energy</span>
 
 <span class="n">AnyPsuMode</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">SupersetEnum</span> <span class="o">|</span> <span class="n">StrictEnum</span>
 <span class="n">TPsuMode</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TPsuMode&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AnyPsuMode</span><span class="p">)</span>
@@ -983,9 +982,6 @@ window.runMermaid = runMermaid;</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span>
                 <span class="n">EnergyMode</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cached_excitation_energy</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;eV&quot;</span>
-            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">low_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;LOW_ENERGY&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">centre_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CENTRE_ENERGY&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">high_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;HIGH_ENERGY&quot;</span><span class="p">)</span>
@@ -1007,13 +1003,6 @@ window.runMermaid = runMermaid;</script>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
             <span class="c1"># NOT used for setting up region data acquisition.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_energy_axis_signal</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_binding_energy_axis</span><span class="p">,</span>
-                <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
-                <span class="n">energy_axis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_axis</span><span class="p">,</span>
-                <span class="n">excitation_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cached_excitation_energy</span><span class="p">,</span>
-                <span class="n">energy_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span><span class="p">,</span>
-            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">angle_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_angle_axis_signal</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;TOTAL_POINTS_RBV&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
@@ -1059,36 +1048,6 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Returns:</span>
 <span class="sd">            Signal that can give us energy axis array data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_binding_energy_axis</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">energy_axis</span><span class="p">:</span> <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-        <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">energy_mode</span><span class="p">:</span> <span class="n">EnergyMode</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the binding energy axis to calibrate the spectra data. Function for</span>
-<span class="sd">        a derived signal.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            energy_axis (Array1D[np.float64]): Array data of the original energy_axis</span>
-<span class="sd">                from epics.</span>
-<span class="sd">            excitation_energy (float): The excitation energy value used for the scan of</span>
-<span class="sd">                this region.</span>
-<span class="sd">            energy_mode (EnergyMode): The energy_mode of the region that was used for</span>
-<span class="sd">                the scan of this region.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Array that is the correct axis for the spectra data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">is_binding</span> <span class="o">=</span> <span class="n">energy_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">BINDING</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">to_binding_energy</span><span class="p">(</span><span class="n">i_energy_axis</span><span class="p">,</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">is_binding</span>
-                <span class="k">else</span> <span class="n">i_energy_axis</span>
-                <span class="k">for</span> <span class="n">i_energy_axis</span> <span class="ow">in</span> <span class="n">energy_axis</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_total_time</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">total_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">step_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span>

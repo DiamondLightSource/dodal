@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.b16 &#8212; dodal 2.3.1.dev13+gabbe6e98c documentation</title>
+    <title>dodal.beamlines.b16 &#8212; dodal 2.3.1.dev14+g79c8d490f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=c42df701"></script>
+    <script src="../../../_static/documentation_options.js?v=831ff50d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -892,21 +892,16 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathProvider</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ADBaseIO</span><span class="p">,</span>
-    <span class="n">ADTIFFWriter</span><span class="p">,</span>
-    <span class="n">AreaDetector</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">AreaDetector</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.device_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CAM_SUFFIX</span><span class="p">,</span> <span class="n">TIFF_SUFFIX</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.visit</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RemoteDirectoryServiceClient</span><span class="p">,</span>
     <span class="n">StaticVisitPathProvider</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.controllers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantDeadTimeController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.b16.detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">software_triggered_tiff_area_detector</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span>
@@ -954,12 +949,8 @@ window.runMermaid = runMermaid;</script>
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">fds2</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AreaDetector</span><span class="p">:</span>
-    <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-FDS-02:&quot;</span>
-    <span class="k">return</span> <span class="n">AreaDetector</span><span class="p">(</span>
-        <span class="n">writer</span><span class="o">=</span><span class="n">ADTIFFWriter</span><span class="o">.</span><span class="n">with_io</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">path_provider</span><span class="p">,</span> <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">TIFF_SUFFIX</span><span class="p">),</span>
-        <span class="n">controller</span><span class="o">=</span><span class="n">ConstantDeadTimeController</span><span class="p">(</span>
-            <span class="n">driver</span><span class="o">=</span><span class="n">ADBaseIO</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">CAM_SUFFIX</span><span class="p">),</span> <span class="n">deadtime</span><span class="o">=</span><span class="mf">0.0</span>
-        <span class="p">),</span>
+    <span class="k">return</span> <span class="n">software_triggered_tiff_area_detector</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-FDS-02:&quot;</span><span class="p">,</span> <span class="n">path_provider</span><span class="p">,</span> <span class="n">deadtime</span><span class="o">=</span><span class="mi">0</span>
     <span class="p">)</span>
 
 
