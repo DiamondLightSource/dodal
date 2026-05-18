@@ -18,9 +18,6 @@ class AbstractEnergySource(StandardReadable):
     via a energy signal.
     """
 
-    def __init__(self, name: str = "") -> None:
-        super().__init__(name)
-
     @property
     @abstractmethod
     def energy(self) -> SignalR[float]:

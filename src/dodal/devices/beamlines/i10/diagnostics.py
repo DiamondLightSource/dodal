@@ -5,8 +5,9 @@ from ophyd_async.core import (
 )
 from ophyd_async.core import StandardReadableFormat as Format
 from ophyd_async.core._device import DeviceConnector
-from ophyd_async.epics.adaravis import AravisDriverIO
-from ophyd_async.epics.adcore import SingleTriggerDetector
+from ophyd_async.epics.adaravis import (
+    AravisDriverIO,
+)
 from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
@@ -21,6 +22,7 @@ from dodal.devices.current_amplifiers import (
     StruckScaler,
 )
 from dodal.devices.positioner import create_positioner
+from dodal.devices.single_trigger_detector import SingleTriggerDetector
 
 
 class D3Position(StrictEnum):
