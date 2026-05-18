@@ -15,7 +15,7 @@ from dodal.common.general_maths.material_absorption_maths import (
     "energy_kev,photon_absorption_factor_per_unit_length,energy_dependence_exponent,"
     "result",
     [
-        (5.042, 1.98e2, -2.717, 2.44170544),  # Arbitrary
+        (5.042, 1.98e2, -2.717, 2.44170544),  # Arbitrary Energy
         (8.3328, 2.5706e3, -2.83, 6.3708311),  # Nickel
         (11.9187, 1.48e3, -2.93, 1.03970725),  # Gold-Three
         (25.514, 6.48e3, -2.41, 2.63778077),  # Silver
