@@ -1,3 +1,5 @@
+import pytest
+
 from dodal.common.data_util import (
     LoadModelFromJsonFile,
     ModelLoader,
@@ -53,6 +55,7 @@ TEST_SEQUENCES = {
     VGScientaDetector: load_i09_vgscienta_test_sequence,
     VGScientaAnalyserDriverIO: load_i09_vgscienta_test_sequence,
     VGScientaSequence: load_i09_vgscienta_test_sequence,
+    MbsSequence: load_i05_mbs_test_xml_sequence,
 }
 
 
@@ -62,3 +65,56 @@ def get_test_sequence(key: type):
         if cls in TEST_SEQUENCES:
             return TEST_SEQUENCES[cls]()
     raise KeyError(f"Found no match with type {key}")
+
+
+SEQUENCE_TYPES = [SpecsSequence, VGScientaSequence, MbsSequence]
+
+# # Dynamically build the region test case parameters
+# REGION_TEST_CASES = []
+# for seq in SEQUENCE_TYPES:
+#     sequence = get_test_sequence(seq)
+#     for region in sequence.regions:
+#         REGION_TEST_CASES.append(
+#             pytest.param(
+#                 region,
+#                 id=f"{type(region).__name__}-{region.name}",
+#             )
+#         )
+
+
+def generate_region_test(seq):
+    region_test_cases = []
+    sequence = get_test_sequence(seq)
+    for region in sequence.regions:
+        region_test_cases.append(
+            pytest.param(
+                region,
+                id=f"{type(region).__name__}-{region.name}",
+            )
+        )
+    return region_test_cases
+
+
+REGION_TEST_CASES = [
+    generate_region_test(VGScientaSequence),
+    generate_region_test(SpecsSequence),
+    generate_region_test(MbsSequence),
+]
+
+
+# To Do - Have this work with detector.
+# def generate_detector_region_test(detector_name, seq):
+#     region_test_cases = []
+#     sequence = get_test_sequence(seq)
+#     for region in sequence.regions:
+#         region_test_cases.append(
+#             pytest.param(
+#                 detector_name,
+#                 region,
+#                 id=f"{detector_name}-{type(region).__name__}-{region.name}",
+#             )
+#         )
+#     return region_test_cases
+
+
+# DETECTOR_WITH_REGION_TEST_CASES = []

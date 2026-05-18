@@ -137,8 +137,7 @@ async def ew4000(
 
 @pytest.fixture
 def region(
-    request: pytest.FixtureRequest,
-    sequence: BaseSequence[BaseRegion],
+    request: pytest.FixtureRequest, sequence: BaseSequence[BaseRegion]
 ) -> BaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:

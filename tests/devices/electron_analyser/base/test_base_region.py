@@ -21,6 +21,7 @@ from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
     get_test_sequence,
 )
+from tests.devices.electron_analyser.helper_util.sequence import REGION_TEST_CASES
 
 
 @pytest.fixture(
@@ -89,7 +90,8 @@ def test_region_kinetic_and_binding_energy(
 
 @pytest.mark.parametrize("field", ["low_energy", "centre_energy", "high_energy"])
 @pytest.mark.parametrize("copy", [True, False])
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+# @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", REGION_TEST_CASES)
 def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
     region: GenericRegion, field: str, copy: bool
 ) -> None:
@@ -132,7 +134,7 @@ def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
 
 
 @pytest.mark.parametrize("copy", [True, False])
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", REGION_TEST_CASES)
 def test_region_prepare_for_epics(region: GenericRegion, copy: bool) -> None:
     # Patch switch_energy_mode so we can spy on if it was called while also returning
     # true function return value
