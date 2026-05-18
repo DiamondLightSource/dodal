@@ -1,20 +1,28 @@
+from functools import cache
+from pathlib import Path
+
+from daq_config_server import ConfigClient
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.motor import Motor
+from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
 from dodal.devices.beamlines.i15_1.attenuator import Attenuator
-from dodal.devices.beamlines.i15_1.gonio_interlock import GonioInterlock
+from dodal.devices.beamlines.i15_1.blower import Blower
+from dodal.devices.beamlines.i15_1.cobra import Cobra
+from dodal.devices.beamlines.i15_1.cryostream import Cryostream
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
 from dodal.devices.hutch_shutter import (
-    HutchInterlock,
     InterlockedHutchShutter,
-    PLCShutterInterlock,
 )
+from dodal.devices.interlocks import EnumPLCInterlock, IntPLCInterlock, PSSInterlock
 from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -24,6 +32,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i15-1")  # Default used when not on a live beamline
 PREFIX = BeamlinePrefix(BL, suffix="J")
+XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 
@@ -33,6 +42,22 @@ Define device factory functions below this point.
 A device factory function is any function that has a return type which conforms
 to one or more Bluesky Protocols.
 """
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticPathProvider(
+        UUIDFilenameProvider(), Path("/dls/i15-1/data/2026/cm44163-2")
+    )
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient()
+    set_config_client(client)
+    return client
 
 
 @devices.factory()
@@ -51,15 +76,12 @@ def base_y() -> Motor:
 
 
 @devices.factory()
-def blower_y() -> Motor:
-    """Same motor as blowerZ."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
-
-
-@devices.factory()
-def blower_z() -> Motor:
-    """Same motor as blowerY."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
+def blower_z(config_client: ConfigClient) -> Blower:
+    return Blower(
+        f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
+        config_client,
+        XPDF_PARAMETERS_FILEPATH,
+    )
 
 
 @devices.factory()
@@ -70,6 +92,26 @@ def bs2() -> XYStage:
 @devices.factory(skip=True)  # Currently turned off due to work on the beamline
 def clean() -> XYStage:
     return XYStage(f"{PREFIX.beamline_prefix}-MO-ABSB-01:CLEAN:")
+
+
+@devices.factory()
+def cobra(config_client: ConfigClient) -> Cobra:
+    # Interchangeable with the cryostream, they are mounted onto the same rail
+    return Cobra(
+        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
+        config_client,
+        XPDF_PARAMETERS_FILEPATH,
+    )
+
+
+@devices.factory()
+def cryostream(config_client: ConfigClient) -> Cryostream:
+    # Interchangeable with the cobra, they are mounted onto the same rail
+    return Cryostream(
+        f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X",
+        config_client,
+        XPDF_PARAMETERS_FILEPATH,
+    )
 
 
 @devices.factory()
@@ -203,23 +245,23 @@ def attenuator() -> Attenuator:
 
 
 @devices.factory()
-def hutch_interlock() -> HutchInterlock:
-    return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
+def hutch_interlock() -> PSSInterlock:
+    return PSSInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
 
 
 @devices.factory()
 def hutch_shutter() -> InterlockedHutchShutter:
     return InterlockedHutchShutter(
         bl_prefix=PREFIX.beamline_prefix,
-        interlock=PLCShutterInterlock(
+        interlock=EnumPLCInterlock(
             bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
         ),
     )
 
 
 @devices.factory()
-def gonio_interlock() -> GonioInterlock:
-    return GonioInterlock(
+def gonio_interlock() -> IntPLCInterlock:
+    return IntPLCInterlock(
         bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-VA-OMRON-01:INT3:ILK"
     )
 
@@ -229,4 +271,10 @@ def fast_shutter() -> ZebraFastShutter:
     return ZebraFastShutter(
         set_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:SOFT_IN:B3",
         get_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:OUT4_TTL:STA",
+
+
+@devices.factory()
+def fastcs_eiger(path_provider: PathProvider) -> EigerDetector:
+    return EigerDetector(
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", path_provider=path_provider
     )

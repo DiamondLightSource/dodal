@@ -83,6 +83,6 @@ def det(path_provider) -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
         path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=DET_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
     )

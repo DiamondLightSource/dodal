@@ -28,7 +28,6 @@ from dodal.devices.electron_analyser.base.base_region import (
     TLensMode,
     TPassEnergy,
 )
-from dodal.devices.electron_analyser.base.base_util import to_binding_energy
 
 AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
 TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
@@ -94,9 +93,6 @@ class AbstractAnalyserDriverIO(
             self.energy_mode = soft_signal_rw(
                 EnergyMode, initial_value=EnergyMode.KINETIC
             )
-            self.cached_excitation_energy = soft_signal_rw(
-                float, initial_value=0, units="eV"
-            )
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
@@ -118,13 +114,6 @@ class AbstractAnalyserDriverIO(
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # NOT used for setting up region data acquisition.
             self.energy_axis = self._create_energy_axis_signal(prefix)
-            self.binding_energy_axis = derived_signal_r(
-                self._calculate_binding_energy_axis,
-                "eV",
-                energy_axis=self.energy_axis,
-                excitation_energy=self.cached_excitation_energy,
-                energy_mode=self.energy_mode,
-            )
             self.angle_axis = self._create_angle_axis_signal(prefix)
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = derived_signal_r(
@@ -167,36 +156,6 @@ class AbstractAnalyserDriverIO(
         Returns:
             Signal that can give us energy axis array data.
         """
-
-    def _calculate_binding_energy_axis(
-        self,
-        energy_axis: Array1D[np.float64],
-        excitation_energy: float,
-        energy_mode: EnergyMode,
-    ) -> Array1D[np.float64]:
-        """Calculate the binding energy axis to calibrate the spectra data. Function for
-        a derived signal.
-
-        Args:
-            energy_axis (Array1D[np.float64]): Array data of the original energy_axis
-                from epics.
-            excitation_energy (float): The excitation energy value used for the scan of
-                this region.
-            energy_mode (EnergyMode): The energy_mode of the region that was used for
-                the scan of this region.
-
-        Returns:
-            Array that is the correct axis for the spectra data.
-        """
-        is_binding = energy_mode == EnergyMode.BINDING
-        return np.array(
-            [
-                to_binding_energy(i_energy_axis, EnergyMode.KINETIC, excitation_energy)
-                if is_binding
-                else i_energy_axis
-                for i_energy_axis in energy_axis
-            ]
-        )
 
     def _calculate_total_time(
         self, total_steps: int, step_time: float, iterations: int
