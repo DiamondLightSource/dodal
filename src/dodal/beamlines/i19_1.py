@@ -54,7 +54,7 @@ DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/daq_configuration"
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
-DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/display.configuration"
+DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/domain/display.configuration"
 
 devices = DeviceManager()
 
