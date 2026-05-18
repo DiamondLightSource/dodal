@@ -129,10 +129,13 @@ class CommissioningJungfrauDetector(StandardDetector):
             int,
             initial_value=detector_id,
         )
+        self.writer_logic = JungfrauCommissioningWriterDataLogic(
+            path_provider, self.writer
+        )
         self.add_detector_logics(
             JungfrauTriggerLogic(self.detector, self.acquisition_type),
             JungfrauArmLogic(self.detector),
-            JungfrauCommissioningWriterDataLogic(path_provider, self.writer),
+            self.writer_logic,
         )
         super().__init__(name=name)
 
