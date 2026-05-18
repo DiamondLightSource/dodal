@@ -178,7 +178,9 @@ class TetrammDetector(StandardDetector):
         self.add_detector_logics(
             ADHDFDataLogic(
                 writer=self.file_io,
-                driver=self.driver,  # type: ignore ?
+                # https://github.com/bluesky/ophyd-async/issues/1269 remove type: ignore
+                # when in new ophyd-async version with this change.
+                driver=self.driver,  # type: ignore
                 path_provider=path_provider,
                 description=NDArrayDescription(
                     shape_signals=[self.num_channels, self.driver.to_average],
