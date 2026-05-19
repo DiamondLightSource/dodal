@@ -13,7 +13,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import assert_configuration, partial_reading
 
-from dodal.devices.beamlines import b07, b07_shared, i09
+from dodal.devices.beamlines import b07, b07_shared, i05, i09
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractEnergySource,
@@ -24,6 +24,7 @@ from dodal.devices.electron_analyser.base.detector_logic import (
     RegionLogic,
     ShutterCoordinatorADArmLogic,
 )
+from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
 from dodal.devices.fast_shutter import GenericFastShutter
@@ -31,6 +32,7 @@ from dodal.devices.selectable_source import SourceSelector
 from tests.devices.electron_analyser.helper_util import (
     generate_fixture_regions_pair,
     load_b07_specs_test_seq,
+    load_i05_mbs_test_xml_seq,
     load_i09_vgscienta_test_seq,
 )
 
@@ -53,7 +55,14 @@ def specs_driver() -> SpecsAnalyserDriverIO[b07.LensMode, b07_shared.PsuMode]:
     return specs_driver
 
 
-@pytest.fixture(params=["specs_driver", "vgscienta_driver"])
+@pytest.fixture
+def mbs_driver() -> MbsAnalyserDriverIO[i05.LensMode, i05.PassEnergy]:
+    with init_devices(mock=True):
+        mbs_driver = MbsAnalyserDriverIO("TEST:", i05.LensMode, i05.PassEnergy)
+    return mbs_driver
+
+
+@pytest.fixture(params=["specs_driver", "vgscienta_driver", "mbs_driver"])
 def driver(request: pytest.FixtureRequest) -> AbstractAnalyserDriverIO:
     return request.getfixturevalue(request.param)
 
@@ -121,7 +130,7 @@ DRIVER_REGIONS_PAIR = [
     *generate_fixture_regions_pair(
         "vgscienta_driver", load_i09_vgscienta_test_seq().regions
     ),
-    # *generate_region_test_cases("mbs_driver", load_i05_mbs_test_xml_seq()()),
+    *generate_fixture_regions_pair("mbs_driver", load_i05_mbs_test_xml_seq().regions),
 ]
 
 
@@ -130,7 +139,6 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
     region: BaseRegion,
     region_logic: RegionLogic,
 ) -> None:
-
     region_logic.driver.set = AsyncMock()
 
     # Patch switch_energy_mode so we can check on calls, but still run the real function

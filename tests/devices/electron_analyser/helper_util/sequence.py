@@ -9,6 +9,7 @@ from dodal.devices.electron_analyser.mbs import MbsSequence
 from dodal.devices.electron_analyser.specs import SpecsSequence
 from dodal.devices.electron_analyser.vgscienta import VGScientaSequence
 from tests.devices.electron_analyser.test_data import (
+    TEST_MBS_XML_SEQUENCE,
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,
 )
@@ -26,15 +27,9 @@ load_i09_vgscienta_test_seq = ModelLoader[I09VGScientaSequence](
     LoadModelFromJsonFile(I09VGScientaSequence),
     ModelLoaderConfig.from_default_file(TEST_VGSCIENTA_SEQUENCE),
 )
-load_i05_mbs_test_seq = ModelLoader[I05MbsSequence](
-    LoadModelFromJsonFile(I05MbsSequence),
-    ModelLoaderConfig.from_default_file(TEST_VGSCIENTA_SEQUENCE),
-)
 load_i05_mbs_test_xml_seq = ModelLoader[I05MbsSequence](
     lambda file: I05MbsSequence.from_xml(file),
-    ModelLoaderConfig.from_default_file(
-        "tests/devices/electron_analyser/test_data/mbs_region1.arpes"
-    ),
+    ModelLoaderConfig.from_default_file(TEST_MBS_XML_SEQUENCE),
 )
 
 

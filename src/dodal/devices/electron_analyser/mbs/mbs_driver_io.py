@@ -70,8 +70,9 @@ class MbsAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def set(self, epics_region: MbsRegion[TLensMode, TPassEnergy]):
-        # What do we do about region name?
         coroutines = [
+            self.region_name.set(epics_region.name),
+            self.energy_mode.set(epics_region.energy_mode),
             self.acquisition_mode.set(epics_region.acquisition_mode),
             self.pass_energy.set(epics_region.pass_energy),
             self.lens_mode.set(epics_region.lens_mode),
@@ -79,14 +80,13 @@ class MbsAnalyserDriverIO(
             # used in swept and centre is used in fixed because the readback values are
             # saved into the data file.
             self.low_energy.set(epics_region.low_energy),
+            self.centre_energy.set(epics_region.centre_energy),
             self.high_energy.set(epics_region.high_energy),
-            # Does this need to go in sub class?
-            self.deflector_x.set(epics_region.deflector_x),
+            self.deflector_x.set(epics_region.deflector_x),  # go in sub class?
             self.acquire_time.set(epics_region.acquire_time),
             self.iterations.set(epics_region.iterations),
         ]
         if epics_region.acquisition_mode == AcquisitionMode.SWEPT:
-            centre_energy = (epics_region.high_energy + epics_region.low_energy) / 2.0
-            coroutines.append(self.centre_energy.set(centre_energy))
+            coroutines.append(self.energy_step.set(epics_region.energy_step))
 
         await asyncio.gather(*coroutines)
