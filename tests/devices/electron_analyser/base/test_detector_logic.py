@@ -18,7 +18,6 @@ from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractEnergySource,
     BaseRegion,
-    BaseSequence,
 )
 from dodal.devices.electron_analyser.base.detector_logic import (
     ElectronAnalayserTriggerLogic,
@@ -30,13 +29,16 @@ from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
 from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 from tests.devices.electron_analyser.helper_util import (
-    TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
+    generate_fixture_regions_pair,
+    load_b07_specs_test_seq,
+    load_i09_vgscienta_test_seq,
 )
 
 
 @pytest.fixture
-def vgscienta_driver() -> VGScientaAnalyserDriverIO:
+def vgscienta_driver() -> VGScientaAnalyserDriverIO[
+    i09.LensMode, i09.PsuMode, i09.PassEnergy
+]:
     with init_devices(mock=True):
         vgscienta_driver = VGScientaAnalyserDriverIO(
             "TEST:", i09.LensMode, i09.PsuMode, i09.PassEnergy
@@ -45,7 +47,7 @@ def vgscienta_driver() -> VGScientaAnalyserDriverIO:
 
 
 @pytest.fixture
-def specs_driver() -> SpecsAnalyserDriverIO:
+def specs_driver() -> SpecsAnalyserDriverIO[b07.LensMode, b07_shared.PsuMode]:
     with init_devices(mock=True):
         specs_driver = SpecsAnalyserDriverIO("TEST:", b07.LensMode, b07_shared.PsuMode)
     return specs_driver
@@ -106,11 +108,6 @@ def energy_source(request: pytest.FixtureRequest) -> AbstractEnergySource:
 
 
 @pytest.fixture
-def sequence(driver: AbstractAnalyserDriverIO) -> BaseSequence:
-    return get_test_sequence(type(driver))
-
-
-@pytest.fixture
 def region_logic(
     driver: AbstractAnalyserDriverIO,
     energy_source: AbstractEnergySource,
@@ -119,7 +116,16 @@ def region_logic(
     return RegionLogic(driver, energy_source, source_selector)
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+DRIVER_REGIONS_PAIR = [
+    *generate_fixture_regions_pair("specs_driver", load_b07_specs_test_seq().regions),
+    *generate_fixture_regions_pair(
+        "vgscienta_driver", load_i09_vgscienta_test_seq().regions
+    ),
+    # *generate_region_test_cases("mbs_driver", load_i05_mbs_test_xml_seq()()),
+]
+
+
+@pytest.mark.parametrize(("driver", "region"), DRIVER_REGIONS_PAIR, indirect=["driver"])
 async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_driver(
     region: BaseRegion,
     region_logic: RegionLogic,
@@ -152,7 +158,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
         region_logic.driver.set.assert_called_once_with(epics_region)
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize(("driver", "region"), DRIVER_REGIONS_PAIR, indirect=["driver"])
 async def test_region_logic_setup_with_region_moves_selected_source_if_not_none(
     region: BaseRegion, region_logic: RegionLogic
 ) -> None:

@@ -20,9 +20,6 @@ from dodal.devices.electron_analyser.specs import (
     SpecsDetector,
     SpecsRegion,
 )
-from tests.devices.electron_analyser.helper_util import (
-    get_test_sequence,
-)
 from tests.devices.electron_analyser.helper_util.sequence import load_b07_specs_test_seq
 
 
@@ -31,11 +28,6 @@ async def sim_driver(
     b07b_specs150: SpecsDetector[LensMode, PsuMode],
 ) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
     return b07b_specs150.driver
-
-
-@pytest.fixture
-def sequence(sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode]):
-    return get_test_sequence(type(sim_driver))
 
 
 @pytest.mark.parametrize("region", load_b07_specs_test_seq().get_enabled_regions())

@@ -1,7 +1,6 @@
 from .assert_func import assert_region_has_expected_values
 from .sequence import (
-    TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
+    generate_fixture_regions_pair,
     load_b07_specs_test_seq,
     load_i05_mbs_test_seq,
     load_i05_mbs_test_xml_seq,
@@ -10,8 +9,7 @@ from .sequence import (
 
 __all__ = [
     "assert_region_has_expected_values",
-    "get_test_sequence",
-    "TEST_SEQUENCE_REGION_NAMES",
+    "generate_fixture_regions_pair",
     "load_b07_specs_test_seq",
     "load_i05_mbs_test_seq",
     "load_i05_mbs_test_xml_seq",
