@@ -50,9 +50,6 @@ class MbsAnalyserDriverIO(
         pass_energy_type: type[TPassEnergy],
         name: str = "",
     ):
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.deflector_x = epics_signal_rw(float, prefix + "DeflX")
-
         super().__init__(
             prefix=prefix,
             acquisition_mode_type=AcquisitionMode,
@@ -60,6 +57,21 @@ class MbsAnalyserDriverIO(
             psu_mode_type=str,
             pass_energy_type=pass_energy_type,
             name=name,
+        )
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.deflector_x = epics_signal_rw(float, prefix + "DeflX")
+            self.dither_steps = epics_signal_rw(int, prefix + "DithSteps")
+            self.spin_offset = epics_signal_rw(float, prefix + "SpinOffs")
+            # Region origin
+            self.min_x = epics_signal_rw(int, prefix + "MinX")
+            self.min_y = epics_signal_rw(int, prefix + "MinY")
+            # Sensor size
+            self.max_x = epics_signal_r(int, prefix + "MaxSizeX_RBV")
+            self.max_y = epics_signal_r(int, prefix + "MaxSizeY_RBV")
+
+        region_size = [self.array_size_x, self.array_size_y]
+        self.add_readables(
+            region_size + [self.acquire_period], StandardReadableFormat.CONFIG_SIGNAL
         )
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
