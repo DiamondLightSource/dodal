@@ -1,0 +1,52 @@
+dodal.devices.electron\_analyser.base
+=====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~base.ElectronAnalyserDetector
+   ~base.AbstractAnalyserDriverIO
+   ~base.EnergyMode
+   ~base.BaseRegion
+   ~base.BaseSequence
+   ~base.GenericRegion
+   ~base.GenericSequence
+   ~base.AbstractEnergySource
+   ~base.DualEnergySource
+   ~base.EnergySource
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.base
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      to_binding_energy
+      to_kinetic_energy
+   
+   
+
+   
+   
+   

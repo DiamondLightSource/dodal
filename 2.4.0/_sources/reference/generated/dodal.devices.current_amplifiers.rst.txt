@@ -1,0 +1,49 @@
+dodal.devices.current\_amplifiers
+=================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~current_amplifiers.FemtoDDPCA
+   ~current_amplifiers.Femto3xxGainTable
+   ~current_amplifiers.Femto3xxRaiseTime
+   ~current_amplifiers.CurrentAmp
+   ~current_amplifiers.Femto3xxGainToCurrentTable
+   ~current_amplifiers.CurrentAmpCounter
+   ~current_amplifiers.CurrentAmpDet
+   ~current_amplifiers.SR570
+   ~current_amplifiers.SR570GainTable
+   ~current_amplifiers.SR570FineGainTable
+   ~current_amplifiers.SR570FullGainTable
+   ~current_amplifiers.SR570GainToCurrentTable
+   ~current_amplifiers.SR570RaiseTimeTable
+   ~current_amplifiers.StruckScaler
+
+
+
+
+.. automodule:: dodal.devices.current_amplifiers
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,121 @@
+dodal.devices.electron\_analyser.vgscienta.VGScientaAnalyserDriverIO
+====================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta
+
+.. autoclass:: VGScientaAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~VGScientaAnalyserDriverIO.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~VGScientaAnalyserDriverIO.acquire_time
+      
+      
+      ~VGScientaAnalyserDriverIO.acquire_period
+      
+      
+      ~VGScientaAnalyserDriverIO.num_images
+      
+      
+      ~VGScientaAnalyserDriverIO.image_mode
+      
+      
+      ~VGScientaAnalyserDriverIO.detector_state
+      
+      
+      ~VGScientaAnalyserDriverIO.acquire
+      
+      
+      ~VGScientaAnalyserDriverIO.wait_for_plugins
+      
+      
+      ~VGScientaAnalyserDriverIO.manufacturer
+      
+      
+      ~VGScientaAnalyserDriverIO.model
+      
+      
+      ~VGScientaAnalyserDriverIO.serial_number
+      
+      
+      ~VGScientaAnalyserDriverIO.sdk_version
+      
+      
+      ~VGScientaAnalyserDriverIO.firmware_version
+      
+      
+      ~VGScientaAnalyserDriverIO.port_name
+      
+      
+      ~VGScientaAnalyserDriverIO.unique_id
+      
+      
+      ~VGScientaAnalyserDriverIO.nd_attributes_file
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size_x
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size_y
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size_z
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size0
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size1
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size2
+      
+      
+      ~VGScientaAnalyserDriverIO.color_mode
+      
+      
+      ~VGScientaAnalyserDriverIO.data_type
+      
+      
+      ~VGScientaAnalyserDriverIO.array_counter
+      
+      
+      ~VGScientaAnalyserDriverIO.ad_core_version
+      
+      
+      ~VGScientaAnalyserDriverIO.driver_version
+      
+   
+   

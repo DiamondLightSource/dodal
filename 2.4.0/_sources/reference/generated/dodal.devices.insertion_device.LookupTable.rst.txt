@@ -1,0 +1,64 @@
+dodal.devices.insertion\_device.LookupTable
+===========================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: LookupTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~LookupTable.generate
+      
+      
+      ~LookupTable.get_poly
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~LookupTable.model_config
+      
+      
+      
+      
+      
+      ~LookupTable.root
+      
+   
+   

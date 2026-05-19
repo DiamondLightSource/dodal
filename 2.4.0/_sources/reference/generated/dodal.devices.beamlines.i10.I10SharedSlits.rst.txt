@@ -1,0 +1,31 @@
+dodal.devices.beamlines.i10.I10SharedSlits
+==========================================
+
+.. currentmodule:: dodal.devices.beamlines.i10
+
+.. autoclass:: I10SharedSlits
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

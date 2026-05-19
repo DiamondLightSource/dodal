@@ -1,0 +1,43 @@
+dodal.devices.selectable\_source.SourceSelector
+===============================================
+
+.. currentmodule:: dodal.devices.selectable_source
+
+.. autoclass:: SourceSelector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SourceSelector.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

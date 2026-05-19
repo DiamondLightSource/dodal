@@ -1,0 +1,40 @@
+dodal.devices.slits.SlitsWithIndividualBlades
+=============================================
+
+.. currentmodule:: dodal.devices.slits
+
+.. autoclass:: SlitsWithIndividualBlades
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

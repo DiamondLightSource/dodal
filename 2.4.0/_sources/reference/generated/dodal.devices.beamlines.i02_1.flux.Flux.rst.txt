@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i02\_1.flux.Flux
+========================================
+
+.. currentmodule:: dodal.devices.beamlines.i02_1.flux
+
+.. autoclass:: Flux
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

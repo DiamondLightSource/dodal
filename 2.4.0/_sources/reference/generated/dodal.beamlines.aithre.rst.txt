@@ -1,0 +1,33 @@
+dodal.beamlines.aithre
+======================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.aithre
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+   
+   
+
+   
+   
+   

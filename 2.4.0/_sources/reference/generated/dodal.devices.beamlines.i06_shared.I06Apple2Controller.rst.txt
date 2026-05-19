@@ -1,0 +1,41 @@
+dodal.devices.beamlines.i06\_shared.I06Apple2Controller
+=======================================================
+
+.. currentmodule:: dodal.devices.beamlines.i06_shared
+
+.. autoclass:: I06Apple2Controller
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,56 @@
+dodal.devices.current\_amplifiers.CurrentAmp
+============================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: CurrentAmp
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~CurrentAmp.decrease_gain
+      
+      
+      
+      
+      ~CurrentAmp.get_gain
+      
+      
+      ~CurrentAmp.get_lowerlimit
+      
+      
+      ~CurrentAmp.get_upperlimit
+      
+      
+      ~CurrentAmp.increase_gain
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

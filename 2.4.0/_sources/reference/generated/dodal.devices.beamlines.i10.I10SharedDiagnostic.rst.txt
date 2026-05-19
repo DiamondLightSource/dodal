@@ -1,0 +1,31 @@
+dodal.devices.beamlines.i10.I10SharedDiagnostic
+===============================================
+
+.. currentmodule:: dodal.devices.beamlines.i10
+
+.. autoclass:: I10SharedDiagnostic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

@@ -1,0 +1,31 @@
+dodal.devices.xspress3.xspress3\_channel.Xspress3Channel
+========================================================
+
+.. currentmodule:: dodal.devices.xspress3.xspress3_channel
+
+.. autoclass:: Xspress3Channel
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.turbo\_slit
+=========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~turbo_slit.TurboSlit
+
+
+
+
+.. automodule:: dodal.devices.turbo_slit
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

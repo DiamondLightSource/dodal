@@ -1,0 +1,40 @@
+dodal.devices.zebra.zebra.PulseOutput
+=====================================
+
+.. currentmodule:: dodal.devices.zebra.zebra
+
+.. autoclass:: PulseOutput
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

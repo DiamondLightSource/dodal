@@ -1,0 +1,40 @@
+dodal.devices.beamlines.p45.SampleTheta
+=======================================
+
+.. currentmodule:: dodal.devices.beamlines.p45
+
+.. autoclass:: SampleTheta
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

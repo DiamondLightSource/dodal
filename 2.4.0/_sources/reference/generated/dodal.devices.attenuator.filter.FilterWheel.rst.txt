@@ -1,0 +1,40 @@
+dodal.devices.attenuator.filter.FilterWheel
+===========================================
+
+.. currentmodule:: dodal.devices.attenuator.filter
+
+.. autoclass:: FilterWheel
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

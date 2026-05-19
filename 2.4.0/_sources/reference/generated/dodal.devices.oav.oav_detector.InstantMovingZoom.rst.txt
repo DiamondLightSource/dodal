@@ -1,0 +1,23 @@
+dodal.devices.oav.oav\_detector.InstantMovingZoom
+=================================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: InstantMovingZoom
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~InstantMovingZoom.connect
+      
+   
+   
+
+   
+   
+   

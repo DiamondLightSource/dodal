@@ -1,0 +1,84 @@
+dodal.devices.beamlines.i05\_shared.M3MJ6Mirror
+===============================================
+
+.. currentmodule:: dodal.devices.beamlines.i05_shared
+
+.. autoclass:: M3MJ6Mirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~M3MJ6Mirror.UNKNOWN
+      
+      
+      ~M3MJ6Mirror.MJ6
+      
+      
+      ~M3MJ6Mirror.M3
+      
+      
+      ~M3MJ6Mirror.REFERENCE
+      
+   
+   

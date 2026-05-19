@@ -1,0 +1,121 @@
+dodal.devices.electron\_analyser.base.AbstractAnalyserDriverIO
+==============================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: AbstractAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AbstractAnalyserDriverIO.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~AbstractAnalyserDriverIO.acquire_time
+      
+      
+      ~AbstractAnalyserDriverIO.acquire_period
+      
+      
+      ~AbstractAnalyserDriverIO.num_images
+      
+      
+      ~AbstractAnalyserDriverIO.image_mode
+      
+      
+      ~AbstractAnalyserDriverIO.detector_state
+      
+      
+      ~AbstractAnalyserDriverIO.acquire
+      
+      
+      ~AbstractAnalyserDriverIO.wait_for_plugins
+      
+      
+      ~AbstractAnalyserDriverIO.manufacturer
+      
+      
+      ~AbstractAnalyserDriverIO.model
+      
+      
+      ~AbstractAnalyserDriverIO.serial_number
+      
+      
+      ~AbstractAnalyserDriverIO.sdk_version
+      
+      
+      ~AbstractAnalyserDriverIO.firmware_version
+      
+      
+      ~AbstractAnalyserDriverIO.port_name
+      
+      
+      ~AbstractAnalyserDriverIO.unique_id
+      
+      
+      ~AbstractAnalyserDriverIO.nd_attributes_file
+      
+      
+      ~AbstractAnalyserDriverIO.array_size_x
+      
+      
+      ~AbstractAnalyserDriverIO.array_size_y
+      
+      
+      ~AbstractAnalyserDriverIO.array_size_z
+      
+      
+      ~AbstractAnalyserDriverIO.array_size0
+      
+      
+      ~AbstractAnalyserDriverIO.array_size1
+      
+      
+      ~AbstractAnalyserDriverIO.array_size2
+      
+      
+      ~AbstractAnalyserDriverIO.color_mode
+      
+      
+      ~AbstractAnalyserDriverIO.data_type
+      
+      
+      ~AbstractAnalyserDriverIO.array_counter
+      
+      
+      ~AbstractAnalyserDriverIO.ad_core_version
+      
+      
+      ~AbstractAnalyserDriverIO.driver_version
+      
+   
+   

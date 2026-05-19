@@ -1,0 +1,46 @@
+dodal.devices.eurotherm.EurothermGeneral
+========================================
+
+.. currentmodule:: dodal.devices.eurotherm
+
+.. autoclass:: EurothermGeneral
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~EurothermGeneral.locate
+      
+      
+      
+      
+      ~EurothermGeneral.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

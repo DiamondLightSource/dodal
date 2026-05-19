@@ -1,0 +1,26 @@
+dodal.devices.oav.oav\_parameters.ZoomParamsCrosshair
+=====================================================
+
+.. currentmodule:: dodal.devices.oav.oav_parameters
+
+.. autoclass:: ZoomParamsCrosshair
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ZoomParamsCrosshair.crosshair
+      
+      
+      ~ZoomParamsCrosshair.microns_per_pixel
+      
+   
+   

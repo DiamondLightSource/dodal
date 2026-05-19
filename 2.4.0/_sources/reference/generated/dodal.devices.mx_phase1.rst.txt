@@ -1,0 +1,35 @@
+dodal.devices.mx\_phase1
+========================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.mx_phase1.beamstop
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.mx_phase1
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

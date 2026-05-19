@@ -1,0 +1,23 @@
+dodal.devices.oav.oav\_parameters.ZoomParams
+============================================
+
+.. currentmodule:: dodal.devices.oav.oav_parameters
+
+.. autoclass:: ZoomParams
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ZoomParams.microns_per_pixel
+      
+   
+   
