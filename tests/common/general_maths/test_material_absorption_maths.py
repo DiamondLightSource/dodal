@@ -12,7 +12,7 @@ from dodal.common.general_maths.material_absorption_maths import (
 
 # happy path
 @pytest.mark.parametrize(
-    "energy_kev,photon_absorption_factor_per_unit_length,energy_dependence_exponent,"
+    "energy_kev, photon_absorption_factor_per_unit_length, energy_dependence_exponent, "
     "result",
     [
         (5.042, 1.98e2, -2.717, 2.44170544),  # Arbitrary Energy
@@ -33,26 +33,26 @@ def test_photon_mass_attenuation_per_unit_length(
 
 
 @pytest.mark.parametrize(
-    "target_attenuation_bn,absorption_coefficient_per_cm,result",
+    "target_attenuation_bn, absorption_coefficient_per_cm, required_cm",
     [
         (0, 2.4, 0),  # tests attenuator thickness required for transparency is zero
         (
             248.461,
             2.13,
             0.1166483568,
-        ),  # tests attenuator thickness frequired for arbitrary attenuation
+        ),  # tests attenuator thickness required for arbitrary attenuation
     ],
 )
 def test_thickness_cm_required_to_attenuate(
-    target_attenuation_bn, absorption_coefficient_per_cm, result
+    target_attenuation_bn, absorption_coefficient_per_cm, required_cm
 ):
     assert thickness_cm_required_to_attenuate(
         target_attenuation_bn, absorption_coefficient_per_cm
-    ) == pytest.approx(result, rel=1e-6)
+    ) == pytest.approx(required_cm, rel=1e-6)
 
 
 @pytest.mark.parametrize(
-    "depth_cm,absorption_coefficient_per_cm,result",
+    "depth_cm, absorption_coefficient_per_cm, result",
     [
         (
             0.5,
@@ -133,7 +133,7 @@ def test_attenuation_at_depth_raises_error_for_unphysical_depths(bad_input):
         attenuation_at_depth_cm(bad_input, 1.0)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
+@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), True])
 def test_attenuation_at_depth_raises_error_with_invalid_depth(bad_input):
     with pytest.raises(ValidationError):
         attenuation_at_depth_cm(bad_input, 1.0)
