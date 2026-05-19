@@ -7,7 +7,6 @@ from dodal.devices.electron_analyser.base.base_region import (
     BaseRegion,
     BaseSequence,
     TLensMode,
-    TPsuMode,
 )
 from dodal.devices.electron_analyser.vgscienta.vgscienta_enums import (
     AcquisitionMode,
@@ -57,6 +56,6 @@ class VGScientaRegion(
 
 class VGScientaSequence(
     BaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
-    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
+    Generic[TLensMode, TPassEnergyEnum],
 ):
-    psu_mode: TPsuMode = Field(alias="element_set")
+    pass

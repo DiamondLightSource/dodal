@@ -20,10 +20,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
     VGScientaRegion,
 )
-from tests.devices.electron_analyser.helper_util import (
-    TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
-)
+from tests.devices.electron_analyser.helper_util import load_i09_vgscienta_test_seq
 
 
 @pytest.fixture
@@ -33,12 +30,7 @@ async def sim_driver(
     return ew4000.driver
 
 
-@pytest.fixture
-def sequence(sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]):
-    return get_test_sequence(type(sim_driver))
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_i09_vgscienta_test_seq().regions)
 async def test_analyser_sets_region_correctly(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
@@ -68,7 +60,7 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.region_size_y).assert_called_once_with(region.size_y)
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_i09_vgscienta_test_seq().regions)
 async def test_analyser_sets_region_and_read_configuration_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
@@ -110,7 +102,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
     )
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_i09_vgscienta_test_seq().regions)
 async def test_analyser_sets_region_and_read_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
@@ -134,7 +126,7 @@ async def test_analyser_sets_region_and_read_is_correct(
     )
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_i09_vgscienta_test_seq().regions)
 async def test_analayser_binding_energy_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],

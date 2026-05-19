@@ -4,13 +4,13 @@ import pytest
 
 from dodal.devices.beamlines.i05 import LensMode, PassEnergy
 from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.mbs import AcquisitionMode
+from dodal.devices.electron_analyser.mbs import AcquisitionMode, MbsRegion
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
 )
 from tests.devices.electron_analyser.helper_util.sequence import (
-    load_i05_mbs_test_xml_sequence,
+    load_i05_mbs_test_xml_seq,
 )
 
 
@@ -40,6 +40,14 @@ def expected_xml_region_values() -> list[dict[str, Any]]:
 def test_mbs_sequence_from_xml(
     expected_xml_region_values: list[dict[str, Any]],
 ) -> None:
-    sequence = load_i05_mbs_test_xml_sequence()
+    sequence = load_i05_mbs_test_xml_seq()
     for i, r in zip(sequence.regions, expected_xml_region_values, strict=True):
         assert_region_has_expected_values(i, r)
+
+
+def test_mbs_region_load_using_field_names_has_expected_values(
+    expected_xml_region_values: list[dict[str, Any]],
+) -> None:
+    for expected_region in expected_xml_region_values:
+        r = MbsRegion[LensMode, PassEnergy].model_validate(expected_region)
+        assert_region_has_expected_values(r, expected_region)

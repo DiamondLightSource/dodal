@@ -23,9 +23,9 @@ from dodal.devices.electron_analyser.specs import (
     SpecsRegion,
 )
 from tests.devices.electron_analyser.helper_util import (
-    TEST_SEQUENCE_REGION_NAMES,
     get_test_sequence,
 )
+from tests.devices.electron_analyser.helper_util.sequence import load_b07_specs_test_seq
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def sequence(sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode]):
     return get_test_sequence(type(sim_driver))
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_b07_specs_test_seq().get_enabled_regions())
 async def test_analyser_sets_region_correctly(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
@@ -77,7 +77,7 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.snapshot_values).assert_called_once_with(region.values)
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_b07_specs_test_seq().get_enabled_regions())
 async def test_analyser_sets_region_and_read_configuration_is_correct(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
@@ -114,7 +114,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
     )
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_b07_specs_test_seq().get_enabled_regions())
 async def test_analyser_sets_region_and_read_is_correct(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
@@ -136,7 +136,7 @@ async def test_analyser_sets_region_and_read_is_correct(
     )
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_b07_specs_test_seq().get_enabled_regions())
 async def test_specs_analyser_binding_energy_axis(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],

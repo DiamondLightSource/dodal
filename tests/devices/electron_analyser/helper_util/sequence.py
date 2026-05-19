@@ -1,5 +1,3 @@
-import pytest
-
 from dodal.common.data_util import (
     LoadModelFromJsonFile,
     ModelLoader,
@@ -24,23 +22,27 @@ from tests.devices.electron_analyser.test_data import (
 
 TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 
+B07SpecsSequence = SpecsSequence[b07.LensMode, b07_shared.PsuMode]
+I09VGScientaSequence = VGScientaSequence[i09.LensMode, i09.PassEnergy]
+I05MbsSequence = MbsSequence[i05.LensMode, i05.PassEnergy]
 
-load_b07_specs_test_sequence = ModelLoader(
-    LoadModelFromJsonFile(SpecsSequence[b07.LensMode, b07_shared.PsuMode]),
+
+load_b07_specs_test_seq = ModelLoader[B07SpecsSequence](
+    LoadModelFromJsonFile(B07SpecsSequence),
     ModelLoaderConfig.from_default_file(TEST_SPECS_SEQUENCE),
 )
-load_i09_vgscienta_test_sequence = ModelLoader(
-    LoadModelFromJsonFile(VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy]),
+load_i09_vgscienta_test_seq = ModelLoader[I09VGScientaSequence](
+    LoadModelFromJsonFile(I09VGScientaSequence),
     ModelLoaderConfig.from_default_file(TEST_VGSCIENTA_SEQUENCE),
 )
 
-load_i05_mbs_test_sequence = ModelLoader(
-    LoadModelFromJsonFile(MbsSequence[i05.LensMode, i05.PassEnergy]),
+load_i05_mbs_test_seq = ModelLoader[I05MbsSequence](
+    LoadModelFromJsonFile(I05MbsSequence),
     ModelLoaderConfig.from_default_file(TEST_VGSCIENTA_SEQUENCE),
 )
 
-load_i05_mbs_test_xml_sequence = ModelLoader(
-    lambda file: MbsSequence[i05.LensMode, i05.PassEnergy].from_xml(file),
+load_i05_mbs_test_xml_seq = ModelLoader[I05MbsSequence](
+    lambda file: I05MbsSequence.from_xml(file),
     ModelLoaderConfig.from_default_file(
         "tests/devices/electron_analyser/test_data/mbs_region1.arpes"
     ),
@@ -49,13 +51,13 @@ load_i05_mbs_test_xml_sequence = ModelLoader(
 
 # Map to know what function to load in sequence an analyser driver should use.
 TEST_SEQUENCES = {
-    SpecsDetector: load_b07_specs_test_sequence,
-    SpecsAnalyserDriverIO: load_b07_specs_test_sequence,
-    SpecsSequence: load_b07_specs_test_sequence,
-    VGScientaDetector: load_i09_vgscienta_test_sequence,
-    VGScientaAnalyserDriverIO: load_i09_vgscienta_test_sequence,
-    VGScientaSequence: load_i09_vgscienta_test_sequence,
-    MbsSequence: load_i05_mbs_test_xml_sequence,
+    SpecsDetector: load_b07_specs_test_seq,
+    SpecsAnalyserDriverIO: load_b07_specs_test_seq,
+    SpecsSequence: load_b07_specs_test_seq,
+    VGScientaDetector: load_i09_vgscienta_test_seq,
+    VGScientaAnalyserDriverIO: load_i09_vgscienta_test_seq,
+    VGScientaSequence: load_i09_vgscienta_test_seq,
+    MbsSequence: load_i05_mbs_test_xml_seq,
 }
 
 
@@ -65,56 +67,3 @@ def get_test_sequence(key: type):
         if cls in TEST_SEQUENCES:
             return TEST_SEQUENCES[cls]()
     raise KeyError(f"Found no match with type {key}")
-
-
-SEQUENCE_TYPES = [SpecsSequence, VGScientaSequence, MbsSequence]
-
-# # Dynamically build the region test case parameters
-# REGION_TEST_CASES = []
-# for seq in SEQUENCE_TYPES:
-#     sequence = get_test_sequence(seq)
-#     for region in sequence.regions:
-#         REGION_TEST_CASES.append(
-#             pytest.param(
-#                 region,
-#                 id=f"{type(region).__name__}-{region.name}",
-#             )
-#         )
-
-
-def generate_region_test(seq):
-    region_test_cases = []
-    sequence = get_test_sequence(seq)
-    for region in sequence.regions:
-        region_test_cases.append(
-            pytest.param(
-                region,
-                id=f"{type(region).__name__}-{region.name}",
-            )
-        )
-    return region_test_cases
-
-
-REGION_TEST_CASES = [
-    generate_region_test(VGScientaSequence),
-    generate_region_test(SpecsSequence),
-    generate_region_test(MbsSequence),
-]
-
-
-# To Do - Have this work with detector.
-# def generate_detector_region_test(detector_name, seq):
-#     region_test_cases = []
-#     sequence = get_test_sequence(seq)
-#     for region in sequence.regions:
-#         region_test_cases.append(
-#             pytest.param(
-#                 detector_name,
-#                 region,
-#                 id=f"{detector_name}-{type(region).__name__}-{region.name}",
-#             )
-#         )
-#     return region_test_cases
-
-
-# DETECTOR_WITH_REGION_TEST_CASES = []

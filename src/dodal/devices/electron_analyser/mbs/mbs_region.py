@@ -2,6 +2,7 @@ from os.path import basename, splitext
 from typing import Generic, Self
 
 import xmltodict
+from ophyd_async.core import StrictEnum
 from pydantic import Field, field_validator
 
 from dodal.devices.electron_analyser.base.base_region import (
@@ -34,14 +35,13 @@ class MbsRegion(
     # Specific to this class
     deflector_x: float = 0
 
-    @staticmethod
-    def convert_pass_energy_to_analyser_string(pass_energy) -> str:
-        return f"PE{int(pass_energy):03d}"
-
     @field_validator("pass_energy", mode="before")
     @classmethod
     def convert_pass_energy(cls, value):
-        return cls.convert_pass_energy_to_analyser_string(value)
+        # Allow for using enum or int.
+        if isinstance(value, StrictEnum):
+            return value
+        return f"PE{int(value):03d}"
 
     @classmethod
     def from_xml(cls, file: str) -> Self:
