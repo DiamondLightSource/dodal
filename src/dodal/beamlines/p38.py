@@ -60,9 +60,9 @@ set_config_client(ConfigClient())
 def d3(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
+        driver_suffix="DET:",
+        writer_suffix=HDF5_SUFFIX,
         path_provider=path_provider,
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
     )
 
 
@@ -71,9 +71,9 @@ def d3(path_provider: PathProvider) -> AravisDetector:
 def d11(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
+        driver_suffix="DET:",
+        writer_suffix=HDF5_SUFFIX,
         path_provider=path_provider,
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
     )
 
 
@@ -81,9 +81,9 @@ def d11(path_provider: PathProvider) -> AravisDetector:
 def d12(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-04:",
+        driver_suffix="DET:",
+        writer_suffix=HDF5_SUFFIX,
         path_provider=path_provider,
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
     )
 
 
