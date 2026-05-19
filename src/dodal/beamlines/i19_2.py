@@ -88,10 +88,8 @@ def diffractometer() -> FourCircleDiffractometer:
 @devices.factory()
 def eiger(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-01:",
-        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 

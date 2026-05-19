@@ -11,7 +11,8 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     HutchAccessControl,
 )
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
-from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -73,7 +74,8 @@ def attenuator_y_motor() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-OP-ATTN-05:Y", "attenuator_y")
 
 
-@devices.factory()
+# Temporarily skipping as the IOC is being worked on and not in use
+@devices.factory(skip=True)
 def filter_wheel() -> FilterWheel:
     """Device factory for the I19 EH-1 filter wheel indexing motor.
 
@@ -117,13 +119,13 @@ def shutter() -> InterlockedHutchShutter:
 
     Uses:
         I19 beamline prefix extended with an infix specific to the optics hutch shutter.
-        HutchInterlock device (itself using I19 beamline prefix)
+        PSSInterlock device (itself using I19 beamline prefix)
 
     Returns:
         I19 optics hutch shutter device.
     """
     return InterlockedHutchShutter(
-        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
     )
 
 

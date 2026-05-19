@@ -104,7 +104,6 @@ def i0(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         f"{PREFIX.beamline_prefix}-DI-XBPM-02:",
         path_provider=path_provider,
-        type="Cividec Diamond XBPM",
     )
 
 

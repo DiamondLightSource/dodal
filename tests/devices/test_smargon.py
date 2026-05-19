@@ -85,56 +85,23 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
     assert await smargon.stub_offsets.to_robot_load.proc.get_value() == 0
 
 
-async def test_set_with_omega_outside_smargon_limit(
-    smargon: Smargon,
-):
-    set_mock_value(smargon.omega.low_limit_travel, -1999)
-    set_mock_value(smargon.omega.high_limit_travel, 1999)
-    set_mock_value(smargon.omega.dial_low_limit_travel, -1999)
-    set_mock_value(smargon.omega.dial_high_limit_travel, 1999)
-    await smargon.omega.set(1999)
-    with pytest.raises(MotorLimitsError):
-        await smargon.set(
-            CombinedMove(
-                x=10,
-                y=20,
-                z=30,
-                omega=200,
-                chi=15,
-                phi=25,
-            )
-        )
-    await smargon.omega.set(-1999)
-    with pytest.raises(MotorLimitsError):
-        await smargon.set(
-            CombinedMove(
-                x=10,
-                y=20,
-                z=30,
-                omega=160,
-                chi=15,
-                phi=25,
-            )
-        )
-
-
 @pytest.mark.parametrize(
-    "test_x, test_y, test_z, test_omega, test_chi, test_phi",
+    "test_x, test_y, test_z, test_chi, test_phi",
     [
-        (2000, 20, 30, 5, 15, 25),  # x goes beyond upper limit
-        (-2000, 20, 30, 5, 15, 25),  # x goes beyond lower limit
-        (10, 2000, 30, 5, 15, 25),  # y goes beyond upper limit
-        (10, -2000, 30, 5, 15, 25),  # y goes beyond lower limit
-        (10, 20, 2000, 5, 15, 25),  # z goes beyond upper limit
-        (10, 20, -2000, 5, 15, 25),  # z goes beyond lower limit
-        (10, 20, 30, 5, 2000, 25),  # chi goes beyond upper limit
-        (10, 20, 30, 5, -2000, 25),  # chi goes beyond lower limit
-        (10, 20, 30, 5, 15, 2000),  # phi goes beyond upper limit
-        (10, 20, 30, 5, 15, -2000),  # phi goes beyond lower limit
+        (2000, 20, 30, 15, 25),  # x goes beyond upper limit
+        (-2000, 20, 30, 15, 25),  # x goes beyond lower limit
+        (10, 2000, 30, 15, 25),  # y goes beyond upper limit
+        (10, -2000, 30, 15, 25),  # y goes beyond lower limit
+        (10, 20, 2000, 15, 25),  # z goes beyond upper limit
+        (10, 20, -2000, 15, 25),  # z goes beyond lower limit
+        (10, 20, 30, 2000, 25),  # chi goes beyond upper limit
+        (10, 20, 30, -2000, 25),  # chi goes beyond lower limit
+        (10, 20, 30, 15, 2000),  # phi goes beyond upper limit
+        (10, 20, 30, 15, -2000),  # phi goes beyond lower limit
     ],
 )
 async def test_given_set_with_value_outside_motor_limit(
-    smargon: Smargon, test_x, test_y, test_z, test_omega, test_chi, test_phi
+    smargon: Smargon, test_x, test_y, test_z, test_chi, test_phi
 ):
     for motor in [
         smargon.x,
@@ -154,7 +121,6 @@ async def test_given_set_with_value_outside_motor_limit(
                 x=test_x,
                 y=test_y,
                 z=test_z,
-                omega=test_omega,
                 chi=test_chi,
                 phi=test_phi,
             )
@@ -181,12 +147,11 @@ async def test_given_set_with_none_then_that_motor_does_not_move(smargon: Smargo
 
 
 async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
-    await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
+    await smargon.set(CombinedMove(x=10, y=20, z=30, chi=15, phi=25))
 
     get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10)
     get_mock_put(smargon.y.user_setpoint).assert_called_once_with(20)
     get_mock_put(smargon.z.user_setpoint).assert_called_once_with(30)
-    get_mock_put(smargon.omega.user_setpoint).assert_called_once_with(5)
     get_mock_put(smargon.chi.user_setpoint).assert_called_once_with(15)
     get_mock_put(smargon.phi.user_setpoint).assert_called_once_with(25)
 
@@ -201,26 +166,23 @@ async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smarg
     parent.attach_mock(get_mock_put(smargon.x.user_setpoint), "x")
     parent.attach_mock(get_mock_put(smargon.y.user_setpoint), "y")
     parent.attach_mock(get_mock_put(smargon.z.user_setpoint), "z")
-    parent.attach_mock(get_mock_put(smargon.omega.user_setpoint), "omega")
     parent.attach_mock(get_mock_put(smargon.chi.user_setpoint), "chi")
     parent.attach_mock(get_mock_put(smargon.phi.user_setpoint), "phi")
 
-    await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
+    await smargon.set(CombinedMove(x=10, y=20, z=30, chi=15, phi=25))
 
-    assert len(parent.mock_calls) == 8
-    assert parent.mock_calls[0] == call.defer_move(DeferMoves.ON)
+    assert len(parent.mock_calls) == 7
     parent.assert_has_calls(
         [
+            call.defer_move(DeferMoves.ON),
             call.x(10),
             call.y(20),
             call.z(30),
-            call.omega(5),
             call.chi(15),
             call.phi(25),
+            call.defer_move(DeferMoves.OFF),
         ],
-        any_order=True,
     )
-    assert parent.mock_calls[-1] == call.defer_move(DeferMoves.OFF)
 
 
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):

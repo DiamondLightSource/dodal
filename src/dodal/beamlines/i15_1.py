@@ -1,7 +1,10 @@
 from functools import cache
+from pathlib import Path
 
 from daq_config_server import ConfigClient
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.motor import Motor
+from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_config_client
@@ -14,14 +17,12 @@ from dodal.devices.beamlines.i15_1.attenuator import Attenuator
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
-from dodal.devices.beamlines.i15_1.gonio_interlock import GonioInterlock
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
 from dodal.devices.hutch_shutter import (
-    HutchInterlock,
     InterlockedHutchShutter,
-    PLCShutterInterlock,
 )
+from dodal.devices.interlocks import EnumPLCInterlock, IntPLCInterlock, PSSInterlock
 from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -40,6 +41,14 @@ Define device factory functions below this point.
 A device factory function is any function that has a return type which conforms
 to one or more Bluesky Protocols.
 """
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticPathProvider(
+        UUIDFilenameProvider(), Path("/dls/i15-1/data/2026/cm44163-2")
+    )
 
 
 @devices.fixture
@@ -235,22 +244,29 @@ def attenuator() -> Attenuator:
 
 
 @devices.factory()
-def hutch_interlock() -> HutchInterlock:
-    return HutchInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
+def hutch_interlock() -> PSSInterlock:
+    return PSSInterlock(bl_prefix="BL15I", interlock_suffix="-PS-IOC-02:M11:LOP")
 
 
 @devices.factory()
 def hutch_shutter() -> InterlockedHutchShutter:
     return InterlockedHutchShutter(
         bl_prefix=PREFIX.beamline_prefix,
-        interlock=PLCShutterInterlock(
+        interlock=EnumPLCInterlock(
             bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-PS-SHTR-01:ILKSTA"
         ),
     )
 
 
 @devices.factory()
-def gonio_interlock() -> GonioInterlock:
-    return GonioInterlock(
+def gonio_interlock() -> IntPLCInterlock:
+    return IntPLCInterlock(
         bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-VA-OMRON-01:INT3:ILK"
+    )
+
+
+@devices.factory()
+def fastcs_eiger(path_provider: PathProvider) -> EigerDetector:
+    return EigerDetector(
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", path_provider=path_provider
     )
