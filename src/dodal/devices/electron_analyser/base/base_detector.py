@@ -1,29 +1,30 @@
 import asyncio
-from typing import Generic, TypeVar
+from typing import Generic
 
-from bluesky.protocols import Preparable, Reading, Stageable, Triggerable
-from event_model import DataKey
+import numpy as np
+from bluesky.protocols import Preparable, Stageable
 from ophyd_async.core import (
-    AsyncConfigurable,
-    AsyncReadable,
+    Array1D,
     AsyncStatus,
-    Device,
-    TriggerInfo,
+    DetectorArmLogic,
+    DetectorTriggerLogic,
+    StandardDetector,
+    derived_signal_r,
 )
 
-from dodal.devices.electron_analyser.base.base_controller import (
-    ElectronAnalyserController,
-)
 from dodal.devices.electron_analyser.base.base_driver_io import (
     GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.base.base_region import (
     BaseRegion,
     BaseSequence,
     GenericRegion,
     TBaseRegion,
 )
+from dodal.devices.electron_analyser.base.base_util import to_binding_energy
+from dodal.devices.electron_analyser.base.detector_logic import RegionLogic
 
 
 class SequenceHolder(Stageable, Preparable):
@@ -50,29 +51,69 @@ class SequenceHolder(Stageable, Preparable):
 
 
 class ElectronAnalyserDetector(
-    Device,
-    Stageable,
-    Triggerable,
-    AsyncReadable,
-    AsyncConfigurable,
+    StandardDetector,
     Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
-    """Detector for data acquisition of electron analyser. Can only acquire using
-    settings already configured for the device.
-
-    If possible, this should be changed to inherit from a StandardDetector. Currently,
-    StandardDetector forces you to use a file writer which doesn't apply here.
-    See issue https://github.com/bluesky/ophyd-async/issues/888
+    """Detector for data acquisition of electron analyser. Can be configured with
+    region data via set method.
     """
 
     def __init__(
         self,
-        controller: ElectronAnalyserController[TAbstractAnalyserDriverIO, TBaseRegion],
+        arm_logic: DetectorArmLogic,
+        trigger_logic: DetectorTriggerLogic,
+        region_logic: RegionLogic,
         name: str = "",
     ):
+        self.binding_energy_axis = derived_signal_r(
+            self._calculate_binding_energy_axis,
+            "eV",
+            energy_axis=region_logic.driver.energy_axis,
+            excitation_energy=region_logic.energy_source.energy,
+            energy_mode=region_logic.driver.energy_mode,
+        )
+        self._region_logic = region_logic
+        # ToDo - Add data logic
+        self.add_detector_logics(arm_logic, trigger_logic)
+        self.add_config_signals(self.binding_energy_axis)
+
         self.sequence = SequenceHolder()
-        self._controller = controller
         super().__init__(name)
+
+    def _calculate_binding_energy_axis(
+        self,
+        energy_axis: Array1D[np.float64],
+        excitation_energy: float,
+        energy_mode: EnergyMode,
+    ) -> Array1D[np.float64]:
+        """Calculate the binding energy axis to calibrate the spectra data. Function for
+        a derived signal.
+
+        Args:
+            energy_axis (Array1D[np.float64]): Array data of the original energy_axis
+                from epics.
+            excitation_energy (float): The excitation energy value used for the scan of
+                this region.
+            energy_mode (EnergyMode): The energy_mode of the region that was used for
+                the scan of this region.
+
+        Returns:
+            Array that is the correct axis for the spectra data.
+        """
+        is_binding = energy_mode == EnergyMode.BINDING
+        return np.array(
+            [
+                to_binding_energy(i_energy_axis, EnergyMode.KINETIC, excitation_energy)
+                if is_binding
+                else i_energy_axis
+                for i_energy_axis in energy_axis
+            ]
+        )
+
+    @AsyncStatus.wrap
+    async def set(self, region: TBaseRegion) -> None:
+        """Configure detector with regions from plans."""
+        await self._region_logic.setup_with_region(region)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
@@ -84,46 +125,14 @@ class ElectronAnalyserDetector(
         Raises:
             Any exceptions raised by the driver's stage or controller's disarm methods.
         """
-        await asyncio.gather(self._controller.disarm(), self.sequence.stage())
+        await asyncio.gather(super().stage(), self.sequence.stage())
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
-        await asyncio.gather(self._controller.disarm(), self.sequence.unstage())
-
-    @AsyncStatus.wrap
-    async def set(self, region: TBaseRegion) -> None:
-        await self._controller.setup_with_region(region)
-
-    @AsyncStatus.wrap
-    async def trigger(self) -> None:
-        await self._controller.prepare(TriggerInfo())
-        await self._controller.arm()
-        await self._controller.wait_for_idle()
-
-    async def read(self) -> dict[str, Reading]:
-        return await self._controller.driver.read()
-
-    async def describe(self) -> dict[str, DataKey]:
-        data = await self._controller.driver.describe()
-        # Correct the shape for image
-        prefix = self._controller.driver.name + "-"
-        energy_size = len(await self._controller.driver.energy_axis.get_value())
-        angle_size = len(await self._controller.driver.angle_axis.get_value())
-        data[prefix + "image"]["shape"] = [angle_size, energy_size]
-        return data
-
-    async def read_configuration(self) -> dict[str, Reading]:
-        return await self._controller.driver.read_configuration()
-
-    async def describe_configuration(self) -> dict[str, DataKey]:
-        return await self._controller.driver.describe_configuration()
+        await asyncio.gather(super().unstage(), self.sequence.unstage())
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
     GenericAnalyserDriverIO, GenericRegion
 ]
-TElectronAnalyserDetector = TypeVar(
-    "TElectronAnalyserDetector",
-    bound=ElectronAnalyserDetector,
-)

@@ -190,13 +190,13 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
     return eiger
 
 
-@devices.factory()
+# ophyd-async no longer works with a mixed ADOdin and fastCS Eiger. Need to update the
+# beamline to use a fastCS Odin and Eiger
+@devices.factory(skip=True)
 def fastcs_eiger(path_provider: PathProvider) -> FastEiger:
     return FastEiger(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-02:",
-        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 

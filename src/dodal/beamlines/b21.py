@@ -35,25 +35,21 @@ def path_provider() -> PathProvider:
     return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
 
 
-@devices.factory()
+# Needs the fastCS Eiger/odin, see https://jira.diamond.ac.uk/browse/B21-330
+@devices.factory(skip=True)
 def saxs(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-01:",
-        hdf_suffix="-EA-EIGER-01:OD:",
-        odin_nodes=1,
     )
 
 
-@devices.factory()
+# Needs the fastCS Eiger/odin, see https://jira.diamond.ac.uk/browse/B21-330
+@devices.factory(skip=True)
 def waxs(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-02:",
-        hdf_suffix="-EA-EIGER-02:OD:",
-        odin_nodes=1,
     )
 
 
@@ -142,8 +138,8 @@ def wbscam(path_provider: PathProvider) -> AravisDetector:
     )
     return NXSasOAV(
         prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-02:CAM:",
-        drv_suffix=CAM_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
         path_provider=path_provider,
         metadata_holder=metadata_holder,
     )
