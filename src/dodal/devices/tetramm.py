@@ -2,7 +2,7 @@ from typing import Annotated as A
 
 from ophyd_async.core import (
     AsyncStatus,
-    DetectorArmLogic,
+    DetectorAcquireLogic,
     DetectorTriggerLogic,
     PathProvider,
     SignalDict,
@@ -119,13 +119,13 @@ class TetrammTriggerLogic(DetectorTriggerLogic):
         await self.driver.averaging_time.set(samples * sample_time)
 
 
-class TetrammArmLogic(DetectorArmLogic):
+class TetrammArmLogic(DetectorAcquireLogic):
     def __init__(self, driver: TetrammDriver, writer_acquire: SignalRW):
         self.driver = driver
         self.writer_acquire = writer_acquire
         self.acquire_status: AsyncStatus | None = None
 
-    async def arm(self):
+    async def start_acquiring(self):
         self.acquire_status = await set_and_wait_for_value(
             self.driver.acquire,
             True,
@@ -135,7 +135,7 @@ class TetrammArmLogic(DetectorArmLogic):
     async def wait_for_idle(self):
         await wait_for_value(self.writer_acquire, False, timeout=None)
 
-    async def disarm(self, on_unstage: bool):
+    async def ensure_stopped(self):
         await stop_busy_record(self.driver.acquire)
         if self.acquire_status:
             await self.acquire_status
