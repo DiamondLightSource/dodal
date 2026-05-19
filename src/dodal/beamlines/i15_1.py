@@ -1,7 +1,10 @@
 from functools import cache
+from pathlib import Path
 
 from daq_config_server import ConfigClient
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.motor import Motor
+from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_config_client
@@ -38,6 +41,14 @@ Define device factory functions below this point.
 A device factory function is any function that has a return type which conforms
 to one or more Bluesky Protocols.
 """
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticPathProvider(
+        UUIDFilenameProvider(), Path("/dls/i15-1/data/2026/cm44163-2")
+    )
 
 
 @devices.fixture
@@ -251,4 +262,11 @@ def hutch_shutter() -> InterlockedHutchShutter:
 def gonio_interlock() -> IntPLCInterlock:
     return IntPLCInterlock(
         bl_prefix=PREFIX.beamline_prefix, interlock_suffix="-VA-OMRON-01:INT3:ILK"
+    )
+
+
+@devices.factory()
+def fastcs_eiger(path_provider: PathProvider) -> EigerDetector:
+    return EigerDetector(
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", path_provider=path_provider
     )
