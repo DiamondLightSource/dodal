@@ -22,9 +22,10 @@ def photon_mass_attenuation_per_unit_length(
 
     Args:
         energy_kev (StrictFloat): energy
-        photon_absorption_factor_per_unit_length (StrictFloat greater than 0): photon
-        absorption factor per unit length
-        energy_dependence_exponent (StrictFloat less than 0): energy dependence exponent
+        photon_absorption_factor_per_unit_length(StrictFloat greater than/equal to 0): p
+        hoton absorption factor per unit length
+        energy_dependence_exponent (StrictFloat less than/equal to 0): energy
+        dependence exponent
 
     Returns:
         (float): mass attenuation per unit length.
@@ -43,8 +44,9 @@ def attenuation_at_depth_cm(
     0Bn to 1 and 2000 Bn to 1/(e^2).
 
     Args:
-        depth_cm (StrictFloat): depth of absorption
-        absorption_coefficient_per_cm (StrictFloat): absorption coefficient per cm
+        depth_cm (StrictFloat greater than/equal to 0):  depth of absorption
+        absorption_coefficient_per_cm (StrictFloat greater than/equal to 0): absorption
+        coefficient per cm
 
     Raises:
         ValueError: If either depth_cm or absorption_coefficient are negative, an error
@@ -65,9 +67,10 @@ def thickness_cm_required_to_attenuate(
     """Calculates material depth in cm.
 
     Args:
-        target_attenuation_bn (StrictFloat): Target attenuation to meet in Barnett
-        attenuation units.
-        absorption_coefficient_per_cm (StrictFloat): absorption coefficient per cm
+        target_attenuation_bn (StrictFloat greater than/equal to 0): Target attenuation
+        to meet in Barnett attenuation units.
+        absorption_coefficient_per_cm (StrictFloat greater than/equal to 0):  absorption
+        coefficient per cm
 
 
     Raises:
