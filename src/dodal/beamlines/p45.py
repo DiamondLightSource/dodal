@@ -46,9 +46,9 @@ def choppers() -> XYStage:
 def det(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-MAP-01:",
+        driver_suffix=DET_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
         path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
     )
 
 
@@ -57,9 +57,9 @@ def det(path_provider: PathProvider) -> AravisDetector:
 def diff(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-DIFF-01:",
+        driver_suffix=DET_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
         path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
     )
 
 

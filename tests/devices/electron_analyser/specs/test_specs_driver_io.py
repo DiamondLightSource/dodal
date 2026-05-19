@@ -14,8 +14,6 @@ from ophyd_async.testing import (
 
 from dodal.devices.beamlines.b07 import LensMode
 from dodal.devices.beamlines.b07_shared import PsuMode
-from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsAnalyserDriverIO,
@@ -105,11 +103,9 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}total_steps": partial_reading(ANY),
             f"{prefix}total_time": partial_reading(ANY),
             f"{prefix}energy_axis": partial_reading(ANY),
-            f"{prefix}binding_energy_axis": partial_reading(ANY),
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}snapshot_values": partial_reading(region.values),
             f"{prefix}psu_mode": partial_reading(region.psu_mode),
-            f"{prefix}cached_excitation_energy": partial_reading(0),
         },
     )
 
@@ -134,29 +130,6 @@ async def test_analyser_sets_region_and_read_is_correct(
             f"{prefix}total_intensity": partial_reading(expected_total_intensity),
         },
     )
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_specs_analyser_binding_energy_axis(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    region: SpecsRegion[LensMode, PsuMode],
-    run_engine: RunEngine,
-) -> None:
-    run_engine(bps.mv(sim_driver, region))
-
-    excitation_energy = 500
-    await sim_driver.cached_excitation_energy.set(500)
-
-    # Check binding energy is correct
-    is_region_binding = region.is_binding_energy()
-    is_driver_binding = await sim_driver.energy_mode.get_value() == EnergyMode.BINDING
-    # Catch that driver correctly reflects what region energy mode is.
-    assert is_region_binding == is_driver_binding
-    energy_axis = await sim_driver.energy_axis.get_value()
-    expected_binding_energy_axis = np.array(
-        [excitation_energy - e if is_driver_binding else e for e in energy_axis]
-    )
-    await assert_value(sim_driver.binding_energy_axis, expected_binding_energy_axis)
 
 
 async def test_specs_analyser_energy_axis(
