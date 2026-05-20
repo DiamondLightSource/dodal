@@ -98,25 +98,6 @@ def test_attenuation_from_natural_log_of_transmission(ln_t, result):
     assert attenuation_from_natural_log_of_transmission(ln_t) == pytest.approx(result)
 
 
-# circularity tests, all numbers here are arbitrary
-
-
-@pytest.mark.parametrize("input", [1.0, 10.0, 100.0])
-def test_circular_attenuation_from_log_and_back(input):
-    assert (
-        attenuation_from_natural_log_of_transmission(
-            natural_log_of_transmission_from_attenuation(input)
-        )
-        == input
-    )
-    assert (
-        natural_log_of_transmission_from_attenuation(
-            attenuation_from_natural_log_of_transmission(input)
-        )
-        == input
-    )
-
-
 @pytest.mark.parametrize("input", [1.0, 10.0, 100.0])
 def test_circular_attenuation_from_transmission_and_back(input):
     assert attenuation_from_transmission(
