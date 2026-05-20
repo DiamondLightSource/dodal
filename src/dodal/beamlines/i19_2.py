@@ -66,7 +66,7 @@ def path_provider() -> PathProvider:
 
 @devices.factory()
 def dcm() -> DCM:
-    return DCM(f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @devices.factory()

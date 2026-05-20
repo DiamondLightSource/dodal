@@ -11,3 +11,5 @@ class DCM(StandardReadable):
         with self.add_children_as_readables():
             self.energy_in_eV = epics_signal_r(float, f"{prefix}Energy")
             self.wavelength_in_a = epics_signal_r(float, f"{prefix}Wavelength")
+
+        super().__init__(prefix)
