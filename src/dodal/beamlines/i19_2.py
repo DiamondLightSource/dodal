@@ -14,6 +14,8 @@ from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+
+# from dodal.devices.beamlines.i19.access_controlled.dcm import DCM
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
@@ -61,6 +63,11 @@ def path_provider() -> PathProvider:
         BL,
         Path("/dls/i19-2/data/2026/cm44169-1/"),
     )
+
+
+# @devices.factory()
+# def dcm() -> DCM:
+#     return DCM(f"{PREFIX.beamline_prefix}-MO-DCM-01:") ?
 
 
 @devices.factory()
