@@ -6,6 +6,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.filter import FilterWheel
 from dodal.devices.attenuator.filter_selections import I19FilterOneSelections
+from dodal.devices.beamlines.i19.access_controlled.dcm import DCM
 from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
     HutchAccessControl,
@@ -22,6 +23,11 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 devices = DeviceManager()
+
+
+@devices.factory()
+def dcm() -> DCM:
+    return DCM(f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @devices.factory()
