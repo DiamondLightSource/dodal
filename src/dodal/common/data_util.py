@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from os.path import isabs, isfile, join, split
-from typing import Generic, Protocol, Self, TypeVar
+from typing import Generic, Self, TypeVar
 
 from pydantic import BaseModel
 
@@ -36,16 +37,11 @@ def save_class_to_json_file(model: BaseModel, file: str) -> None:
         f.write(model.model_dump_json())
 
 
-class LoadModelFromFile(Protocol[TBaseModel]):
-    def __call__(self, file: str) -> TBaseModel: ...
+LoadModelFromFile = Callable[[str], TBaseModel]
 
 
-class LoadModelFromJsonFile(LoadModelFromFile[TBaseModel]):
-    def __init__(self, model) -> None:
-        self._model = model
-
-    def __call__(self, file: str) -> TBaseModel:
-        return load_json_file_to_class(self._model, file)
+def json_model_loader(model: type[TBaseModel]) -> LoadModelFromFile[TBaseModel]:
+    return lambda file: load_json_file_to_class(model, file)
 
 
 class ModelLoaderConfig(BaseModel):
@@ -70,7 +66,7 @@ class ModelLoaderConfig(BaseModel):
 
 class ModelLoader(Generic[TBaseModel]):
     """A generic model loader that can be configured with any kind of method to read in
-    a file and convert the data into a pydantic model. It can also takes configuration
+    a file and convert the data into a pydantic model. It also takes configuration
     to handle the file paths before they are passed to the method to convert to a
     pydantic model.
     """

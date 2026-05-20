@@ -4,9 +4,9 @@ import pytest
 from pydantic import BaseModel
 
 from dodal.common.data_util import (
-    LoadModelFromJsonFile,
     ModelLoader,
     ModelLoaderConfig,
+    json_model_loader,
     save_class_to_json_file,
 )
 
@@ -52,7 +52,7 @@ def load_json_model_with_default_file_only(
     default_tmp_file: str,
 ) -> ModelLoader[MyModel]:
     return ModelLoader(
-        LoadModelFromJsonFile(MyModel),
+        json_model_loader(MyModel),
         ModelLoaderConfig.from_default_file(default_tmp_file),
     )
 
@@ -82,7 +82,7 @@ def load_json_model_with_default_path_only(
 ) -> ModelLoader[MyModel]:
     path, file = split(default_tmp_file)
     return ModelLoader(
-        LoadModelFromJsonFile(MyModel), ModelLoaderConfig.from_default_path(path)
+        json_model_loader(MyModel), ModelLoaderConfig.from_default_path(path)
     )
 
 
@@ -113,7 +113,7 @@ def load_json_model_with_default_path_and_file(
 ) -> ModelLoader[MyModel]:
     path, file = split(default_tmp_file)
     return ModelLoader(
-        LoadModelFromJsonFile(MyModel),
+        json_model_loader(MyModel),
         ModelLoaderConfig(default_path=path, default_file=file),
     )
 
@@ -140,7 +140,7 @@ def test_load_json_model_with_configued_path_and_file(
 
 @pytest.fixture
 def load_json_model_no_config() -> ModelLoader[MyModel]:
-    return ModelLoader(LoadModelFromJsonFile(MyModel))
+    return ModelLoader(json_model_loader(MyModel))
 
 
 def test_json_model_loader_with_no_config(
@@ -168,7 +168,7 @@ def test_updating_config_updates_factory_function(
     default_tmp_file: str, tmp_file: str, default_model: MyModel, other_model: MyModel
 ) -> None:
     config = ModelLoaderConfig.from_default_file(default_tmp_file)
-    model_loader = ModelLoader(LoadModelFromJsonFile(MyModel), config)
+    model_loader = ModelLoader(json_model_loader(MyModel), config)
 
     # Test uses default file
     model_result = model_loader()
