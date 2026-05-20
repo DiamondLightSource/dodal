@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.devices.beamlines import b07, b07_shared, i05, i09
+from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
 from dodal.devices.electron_analyser.base import (
     BaseRegion,
     EnergyMode,
@@ -59,7 +59,10 @@ def test_load_sequence_has_expected_enabled_region_names(
     [
         (load_b07_specs_test_seq(), SpecsRegion[b07.LensMode, b07_shared.PsuMode]),
         (load_i09_vgscienta_test_seq(), VGScientaRegion[i09.LensMode, i09.PassEnergy]),
-        (load_i05_mbs_test_xml_seq(), MbsRegion[i05.LensMode, i05.PassEnergy]),
+        (
+            load_i05_mbs_test_xml_seq(),
+            MbsRegion[i05_shared.LensMode, i05_shared.PassEnergy],
+        ),
     ],
 )
 def test_sequence_get_expected_region_type(

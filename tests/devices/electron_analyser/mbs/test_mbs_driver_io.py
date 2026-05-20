@@ -1,17 +1,12 @@
 from unittest.mock import ANY
 
-import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import get_mock_put, init_devices, set_mock_value
-from ophyd_async.testing import (
-    assert_configuration,
-    assert_reading,
-    partial_reading,
-)
+from ophyd_async.core import get_mock_put, init_devices
+from ophyd_async.testing import assert_configuration, partial_reading
 
-from dodal.devices.beamlines.i05 import LensMode, PassEnergy
+from dodal.devices.beamlines.i05_shared import LensMode, PassEnergy
 from dodal.devices.electron_analyser.mbs import (
     AcquisitionMode,
     MbsAnalyserDriverIO,
@@ -91,29 +86,5 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}min_y": partial_reading(0),
             f"{prefix}max_x": partial_reading(0),
             f"{prefix}max_y": partial_reading(0),
-        },
-    )
-
-
-@pytest.mark.parametrize("region", load_i05_mbs_test_xml_seq().regions)
-async def test_analyser_sets_region_and_read_is_correct(
-    sim_driver: MbsAnalyserDriverIO[LensMode, PassEnergy],
-    region: MbsRegion[LensMode, PassEnergy],
-    run_engine: RunEngine,
-) -> None:
-    run_engine(bps.mv(sim_driver, region), wait=True)
-
-    spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
-    expected_total_intensity = np.sum(spectrum)
-    set_mock_value(sim_driver.spectrum, spectrum)
-
-    prefix = sim_driver.name + "-"
-
-    await assert_reading(
-        sim_driver,
-        {
-            f"{prefix}image": partial_reading(ANY),
-            f"{prefix}spectrum": partial_reading(spectrum),
-            f"{prefix}total_intensity": partial_reading(expected_total_intensity),
         },
     )

@@ -97,13 +97,6 @@ class AbstractAnalyserDriverIO(
         # Must call first to initiate parent variables
         super().__init__(prefix=prefix, name=name)
 
-        with self.add_children_as_readables():
-            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
-            self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
-            self.total_intensity = derived_signal_r(
-                self._calculate_total_intensity, spectrum=self.spectrum
-            )
-
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
             # Used for setting up region data acquisition

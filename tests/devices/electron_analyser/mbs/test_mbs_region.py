@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.beamlines.i05 import LensMode, PassEnergy
+from dodal.devices.beamlines.i05_shared import LensMode, PassEnergy
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.mbs import AcquisitionMode, MbsRegion, MbsSequence
 from dodal.devices.selectable_source import SelectedSource

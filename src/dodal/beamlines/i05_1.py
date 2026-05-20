@@ -1,9 +1,8 @@
 from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i05.enums import LensMode, PassEnergy
 from dodal.devices.beamlines.i05_1 import XYZAzimuthPolarDefocusStage
-from dodal.devices.beamlines.i05_shared import Mj7j8Mirror
+from dodal.devices.beamlines.i05_shared import LensMode, Mj7j8Mirror, PassEnergy
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO
 from dodal.devices.hutch_shutter import HutchShutter
@@ -39,17 +38,10 @@ def sm() -> XYZAzimuthPolarDefocusStage:
     return XYZAzimuthPolarDefocusStage(prefix=f"{PREFIX.beamline_prefix}-EA-SM-01:")
 
 
-# @devices.factory
-# def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
-#     return EnergySource(pgm.energy.user_readback)
-
-
 @devices.factory
-# def analyser_driver(energy_source: EnergySource) -> MbsAnalyserDriverIO:
 def analyser_driver() -> MbsAnalyserDriverIO[LensMode, PassEnergy]:
     return MbsAnalyserDriverIO[LensMode, PassEnergy](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-04:CAM:",
         lens_mode_type=LensMode,
         pass_energy_type=PassEnergy,
-        # energy_source=energy_source,
     )

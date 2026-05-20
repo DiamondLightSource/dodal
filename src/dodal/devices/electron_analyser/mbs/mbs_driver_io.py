@@ -2,12 +2,7 @@ import asyncio
 from typing import Generic
 
 import numpy as np
-from ophyd_async.core import (
-    Array1D,
-    AsyncStatus,
-    SignalR,
-    StandardReadableFormat,
-)
+from ophyd_async.core import Array1D, AsyncStatus, SignalR, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.base.base_driver_io import (

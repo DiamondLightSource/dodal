@@ -1,16 +1,10 @@
 from unittest.mock import ANY
 
-import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import get_mock_put, set_mock_value
-from ophyd_async.testing import (
-    assert_configuration,
-    assert_reading,
-    assert_value,
-    partial_reading,
-)
+from ophyd_async.testing import assert_configuration, assert_value, partial_reading
 
 from dodal.devices.beamlines.b07 import LensMode
 from dodal.devices.beamlines.b07_shared import PsuMode
@@ -98,28 +92,6 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}snapshot_values": partial_reading(region.values),
             f"{prefix}psu_mode": partial_reading(region.psu_mode),
-        },
-    )
-
-
-@pytest.mark.parametrize("region", load_b07_specs_test_seq().get_enabled_regions())
-async def test_analyser_sets_region_and_read_is_correct(
-    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    region: SpecsRegion[LensMode, PsuMode],
-    run_engine: RunEngine,
-) -> None:
-    run_engine(bps.mv(sim_driver, region))
-    spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
-    expected_total_intensity = np.sum(spectrum)
-    set_mock_value(sim_driver.spectrum, spectrum)
-
-    prefix = sim_driver.name + "-"
-    await assert_reading(
-        sim_driver,
-        {
-            f"{prefix}image": partial_reading([]),
-            f"{prefix}spectrum": partial_reading(spectrum),
-            f"{prefix}total_intensity": partial_reading(expected_total_intensity),
         },
     )
 

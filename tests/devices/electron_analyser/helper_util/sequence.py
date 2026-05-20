@@ -3,7 +3,7 @@ from collections.abc import Sequence
 import pytest
 
 from dodal.common.data_util import LoadModelFromJsonFile, ModelLoader, ModelLoaderConfig
-from dodal.devices.beamlines import b07, b07_shared, i05, i09
+from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
 from dodal.devices.electron_analyser.base import BaseRegion
 from dodal.devices.electron_analyser.mbs import MbsSequence
 from dodal.devices.electron_analyser.specs import SpecsSequence
@@ -16,7 +16,7 @@ from tests.devices.electron_analyser.test_data import (
 
 B07SpecsSequence = SpecsSequence[b07.LensMode, b07_shared.PsuMode]
 I09VGScientaSequence = VGScientaSequence[i09.LensMode, i09.PassEnergy]
-I05MbsSequence = MbsSequence[i05.LensMode, i05.PassEnergy]
+I05MbsSequence = MbsSequence[i05_shared.LensMode, i05_shared.PassEnergy]
 
 
 load_b07_specs_test_seq = ModelLoader[B07SpecsSequence](

@@ -13,7 +13,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import assert_configuration, partial_reading
 
-from dodal.devices.beamlines import b07, b07_shared, i05, i09
+from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractEnergySource,
@@ -56,9 +56,11 @@ def specs_driver() -> SpecsAnalyserDriverIO[b07.LensMode, b07_shared.PsuMode]:
 
 
 @pytest.fixture
-def mbs_driver() -> MbsAnalyserDriverIO[i05.LensMode, i05.PassEnergy]:
+def mbs_driver() -> MbsAnalyserDriverIO[i05_shared.LensMode, i05_shared.PassEnergy]:
     with init_devices(mock=True):
-        mbs_driver = MbsAnalyserDriverIO("TEST:", i05.LensMode, i05.PassEnergy)
+        mbs_driver = MbsAnalyserDriverIO(
+            "TEST:", i05_shared.LensMode, i05_shared.PassEnergy
+        )
     return mbs_driver
 
 
