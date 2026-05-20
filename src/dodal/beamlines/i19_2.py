@@ -1,6 +1,7 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
@@ -8,6 +9,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.visit import StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
@@ -52,6 +54,14 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 )
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient()
+    set_config_client(client)
+    return client
 
 
 @devices.fixture
