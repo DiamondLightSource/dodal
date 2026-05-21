@@ -73,14 +73,6 @@ def path_provider() -> PathProvider:
     )
 
 
-@devices.fixture
-@cache
-def config_client() -> ConfigClient:
-    client = ConfigClient()
-    set_config_client(client)
-    return client
-
-
 @devices.factory()
 def attenuator_motor_squad() -> AttenuatorMotorSquad:
     return AttenuatorMotorSquad(
