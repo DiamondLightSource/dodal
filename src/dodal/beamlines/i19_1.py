@@ -13,11 +13,11 @@ from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
-from dodal.devices.beamlines.i19.access_controlled.dcm import DCM
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
+from dodal.devices.beamlines.i19.access_controlled.read_only_dcm import ReadOnlyDCM
 from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
@@ -69,8 +69,8 @@ def config_client() -> ConfigClient:
 
 
 @devices.factory()
-def dcm() -> DCM:
-    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+def read_only_dcm() -> ReadOnlyDCM:
+    return ReadOnlyDCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @devices.factory()

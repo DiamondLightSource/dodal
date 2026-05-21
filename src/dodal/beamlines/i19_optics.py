@@ -33,8 +33,8 @@ devices = DeviceManager()
 def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
     return DoubleCrystalMonochromatorWithDSpacing(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-        xtal_1=PitchAndRollCrystal,
-        xtal_2=StationaryCrystal,
+        xtal_1=StationaryCrystal,
+        xtal_2=PitchAndRollCrystal,
     )
 
 
