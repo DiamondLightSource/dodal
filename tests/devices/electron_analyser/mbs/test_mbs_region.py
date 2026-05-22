@@ -22,7 +22,6 @@ def expected_xml_region_values() -> list[dict[str, Any]]:
             "enabled": True,
             "lens_mode": LensMode.L4_ANG0_D8,
             "pass_energy": PassEnergy.PE005,
-            "slices": 1,
             "iterations": 3,
             "acquisition_mode": AcquisitionMode.SWEPT,
             "excitation_energy_source": SelectedSource.SOURCE1,
