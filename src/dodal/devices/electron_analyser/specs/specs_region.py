@@ -26,6 +26,7 @@ class SpecsRegion(
     energy_step: float = Field(default=0.1, alias="step_energy")
 
     # Specific to this class
+    slices: int = 1
     values: int = 1
     psu_mode: TPsuMode
     estimated_time_in_ms: float = 0
