@@ -5,6 +5,7 @@ from unittest.mock import ANY, AsyncMock, call, patch
 import pytest
 from ophyd_async.core import (
     SignalDict,
+    SignalR,
     StandardDetector,
     get_mock_put,
     init_devices,
@@ -14,11 +15,7 @@ from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import assert_configuration, partial_reading
 
 from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
-from dodal.devices.electron_analyser.base import (
-    AbstractAnalyserDriverIO,
-    AbstractEnergySource,
-    BaseRegion,
-)
+from dodal.devices.electron_analyser.base import AbstractAnalyserDriverIO, BaseRegion
 from dodal.devices.electron_analyser.base.detector_logic import (
     ElectronAnalayserTriggerLogic,
     RegionLogic,
@@ -113,15 +110,15 @@ async def test_shutter_arm_logic_opens_shutters(
     )
 
 
-@pytest.fixture(params=["single_energy_source", "dual_energy_source"])
-def energy_source(request: pytest.FixtureRequest) -> AbstractEnergySource:
+@pytest.fixture(params=["source_energy", "dual_source_energy"])
+def energy_source(request: pytest.FixtureRequest) -> SignalR[float]:
     return request.getfixturevalue(request.param)
 
 
 @pytest.fixture
 def region_logic(
     driver: AbstractAnalyserDriverIO,
-    energy_source: AbstractEnergySource,
+    energy_source: SignalR[float],
     source_selector: SourceSelector,
 ) -> RegionLogic:
     return RegionLogic(driver, energy_source, source_selector)
@@ -154,7 +151,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
 
         mock_prepare_for_epics.assert_called_once_with(
             region,
-            await region_logic.energy_source.energy.get_value(),
+            await region_logic.energy_source.get_value(),
         )
 
         if region_logic.source_selector is not None:
@@ -163,7 +160,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
             ).assert_called_once_with(region.excitation_energy_source)
         # Check set was called with epics_region
         epics_region = mock_prepare_for_epics.call_args[0][0].prepare_for_epics(
-            await region_logic.energy_source.energy.get_value(),
+            await region_logic.energy_source.get_value(),
         )
         region_logic.driver.set.assert_called_once_with(epics_region)
 

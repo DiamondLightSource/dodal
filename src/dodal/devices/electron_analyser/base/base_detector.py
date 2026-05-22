@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Sequence
 from typing import Generic
 
 import numpy as np
@@ -8,6 +9,7 @@ from ophyd_async.core import (
     AsyncStatus,
     DetectorArmLogic,
     DetectorTriggerLogic,
+    SignalR,
     StandardDetector,
     derived_signal_r,
 )
@@ -63,19 +65,21 @@ class ElectronAnalyserDetector(
         arm_logic: DetectorArmLogic,
         trigger_logic: DetectorTriggerLogic,
         region_logic: RegionLogic,
+        config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
+        self._region_logic = region_logic
+        # ToDo - Add data logic
+        self.add_detector_logics(arm_logic, trigger_logic)
+
         self.binding_energy_axis = derived_signal_r(
             self._calculate_binding_energy_axis,
             "eV",
             energy_axis=region_logic.driver.energy_axis,
-            excitation_energy=region_logic.energy_source.energy,
+            excitation_energy=region_logic.energy_source,
             energy_mode=region_logic.driver.energy_mode,
         )
-        self._region_logic = region_logic
-        # ToDo - Add data logic
-        self.add_detector_logics(arm_logic, trigger_logic)
-        self.add_config_signals(self.binding_energy_axis)
+        self.add_config_signals(self.binding_energy_axis, *config_sigs)
 
         self.sequence = SequenceHolder()
         super().__init__(name)

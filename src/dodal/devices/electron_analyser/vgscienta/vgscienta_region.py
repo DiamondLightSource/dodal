@@ -1,28 +1,26 @@
-from typing import Generic, TypeVar
+from typing import Generic
 
-from ophyd_async.core import StrictEnum
 from pydantic import Field, field_validator
 
 from dodal.devices.electron_analyser.base.base_region import (
     BaseRegion,
     BaseSequence,
     TLensMode,
+    TPassEnergy,
 )
 from dodal.devices.electron_analyser.vgscienta.vgscienta_enums import (
     AcquisitionMode,
     DetectorMode,
 )
 
-TPassEnergyEnum = TypeVar("TPassEnergyEnum", bound=StrictEnum)
-
 
 class VGScientaRegion(
-    BaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
-    Generic[TLensMode, TPassEnergyEnum],
+    BaseRegion[AcquisitionMode, TLensMode, TPassEnergy],
+    Generic[TLensMode, TPassEnergy],
 ):
     # Override defaults of base region class
     lens_mode: TLensMode
-    pass_energy: TPassEnergyEnum
+    pass_energy: TPassEnergy
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     centre_energy: float = Field(alias="fix_energy", default=9)
@@ -55,7 +53,7 @@ class VGScientaRegion(
 
 
 class VGScientaSequence(
-    BaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
-    Generic[TLensMode, TPassEnergyEnum],
+    BaseSequence[VGScientaRegion[TLensMode, TPassEnergy]],
+    Generic[TLensMode, TPassEnergy],
 ):
     pass

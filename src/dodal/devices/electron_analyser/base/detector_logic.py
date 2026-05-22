@@ -12,7 +12,6 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import BaseRegion
-from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
@@ -76,7 +75,7 @@ class RegionLogic:
     def __init__(
         self,
         driver: AbstractAnalyserDriverIO,
-        energy_source: AbstractEnergySource,
+        energy_source: SignalR[float],
         source_selector: SourceSelector | None = None,
     ):
         self.driver = driver
@@ -88,6 +87,6 @@ class RegionLogic:
         if self.source_selector is not None:
             await self.source_selector.set(region.excitation_energy_source)
 
-        excitation_energy = await self.energy_source.energy.get_value()
+        excitation_energy = await self.energy_source.get_value()
         epics_region = region.prepare_for_epics(excitation_energy)
         await self.driver.set(epics_region)
