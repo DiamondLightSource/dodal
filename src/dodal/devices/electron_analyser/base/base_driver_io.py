@@ -34,7 +34,7 @@ AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum | str
 TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
-@dataclass
+@dataclass(frozen=True)
 class ElectronAnalyserPVConfig:
     """Configuration for PV's. Temporary work around until PV's are standardised between
     beamlines.
