@@ -46,7 +46,7 @@ class DualEnergySource(StandardReadable):
             self.energy = derived_signal_r(
                 get_float_from_selected_source,
                 "eV",
-                selected_source=selected_source,
+                selected=selected_source,
                 s1=source1,
                 s2=source2,
             )
