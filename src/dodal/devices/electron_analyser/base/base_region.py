@@ -74,7 +74,6 @@ class BaseRegion(
 
     name: str = "New_region"
     enabled: bool = False
-    slices: int = 1
     iterations: int = 1
     excitation_energy_source: SelectedSource = SelectedSource.SOURCE1
     # These ones we need subclasses to provide sensible default values

@@ -28,6 +28,7 @@ class VGScientaRegion(
     acquire_time: float = Field(default=1.0, alias="step_time")
     energy_step: float = Field(default=200.0)
     # Specific to this class
+    slices: int = 1
     total_steps: float = 13.0
     total_time: float = 13.0
     min_x: int = Field(alias="first_x_channel", default=1)

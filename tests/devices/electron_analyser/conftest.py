@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import InOut, SignalR, init_devices, set_mock_value
 
-from dodal.devices.beamlines import b07, b07_shared, i09
+from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
 from dodal.devices.beamlines.i09 import Grating
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
@@ -12,6 +12,7 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import DualEnergySource
+from dodal.devices.electron_analyser.mbs import MbsDetector
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, FastShutter
@@ -133,6 +134,26 @@ async def ew4000(
     energy_axis = [1, 2, 3, 4, 5]
     set_mock_value(ew4000.driver.energy_axis, np.array(energy_axis, dtype=float))
     return ew4000
+
+
+@pytest.fixture
+async def i05_mbs_analyser(
+    source_energy: SignalR[float],
+    shutter1: FastShutter,
+) -> MbsDetector[i05_shared.LensMode, i05_shared.PassEnergy]:
+    with init_devices(mock=True):
+        i05_mbs_analyser = MbsDetector[i05_shared.LensMode, i05_shared.PassEnergy](
+            prefix="TEST:",
+            lens_mode_type=i05_shared.LensMode,
+            pass_energy_type=i05_shared.PassEnergy,
+            energy_source=source_energy,
+            shutter=shutter1,
+        )
+    energy_axis = [1, 2, 3, 4, 5]
+    set_mock_value(
+        i05_mbs_analyser.driver.energy_axis, np.array(energy_axis, dtype=float)
+    )
+    return i05_mbs_analyser
 
 
 @pytest.fixture
