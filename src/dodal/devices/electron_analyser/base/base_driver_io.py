@@ -191,9 +191,6 @@ class AbstractAnalyserDriverIO(
         """
         return total_steps * step_time * iterations
 
-    def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
-        return float(np.sum(spectrum, dtype=np.float64))
-
 
 GenericAnalyserDriverIO = AbstractAnalyserDriverIO[
     GenericRegion, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
