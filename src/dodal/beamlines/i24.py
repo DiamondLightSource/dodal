@@ -36,7 +36,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -174,7 +174,7 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def sample_shutter() -> ZebraShutter:
-    return ZebraShutter(
+def sample_shutter() -> MXZebraShutter:
+    return MXZebraShutter(
         f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )
