@@ -3,6 +3,7 @@ from pathlib import Path
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.epics.adcore import NDPluginBaseIO
 from ophyd_async.epics.motor import Motor
 from ophyd_async.fastcs.eiger import EigerDetector
 
@@ -27,6 +28,8 @@ from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
+from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.zebra.zebra import Zebra, ZebraMapping
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -278,4 +281,26 @@ def fast_shutter() -> ZebraFastShutter:
 def fastcs_eiger(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", path_provider=path_provider
+    )
+
+
+@devices.factory()
+def i0(path_provider: PathProvider) -> TetrammDetector:
+    return TetrammDetector(
+        prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:",
+        path_provider=path_provider,
+        fileio_suffix="HDF:",
+        plugins={
+            "stats": NDPluginBaseIO(
+                prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:SumAll:"
+            )
+        },
+    )
+
+
+@devices.factory()
+def zebra() -> Zebra:
+    return Zebra(
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
+        mapping=ZebraMapping(),
     )
