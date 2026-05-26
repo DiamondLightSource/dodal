@@ -1,0 +1,6 @@
+Units mm keV
+# y     energy
+1.455    40.05   # xtal 311
+-48.845  65.40   # xtal 220
+50.600   76.69   # xtal 111
+
