@@ -226,7 +226,7 @@ def trans() -> XYPhiStage:
     return XYPhiStage(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01:TRANS:")
 
 
-@devices.factory(skip=True)  # Currently turned off due to work on the beamline
+@devices.factory()
 def xtal(config_client: ConfigClient) -> LaueMonochrometer:
     return LaueMonochrometer(
         prefix=f"{PREFIX.beamline_prefix}-OP-LAUE-01:",
