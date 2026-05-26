@@ -3,12 +3,13 @@ from pathlib import Path
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
-from ophyd_async.epics.adcore import NDPluginBaseIO
+from ophyd_async.epics.adcore import ADWriterType, ContAcqDetector, NDPluginBaseIO
 from ophyd_async.epics.motor import Motor
 from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_config_client
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
@@ -303,4 +304,64 @@ def zebra() -> Zebra:
     return Zebra(
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=ZebraMapping(),
+    )
+
+
+@devices.factory()
+def webcam_1(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-WEB-01:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def webcam_2(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-WEB-02:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def cam_1(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-CAM-01:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def cam_2(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-CAM-02:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
+    )
+
+
+@devices.factory()
+def cam_3(path_provider: PathProvider) -> ContAcqDetector:
+    return ContAcqDetector(
+        f"{PREFIX.beamline_prefix}-DI-CAM-03:",
+        path_provider=path_provider,
+        driver_suffix=CAM_SUFFIX,
+        cb_suffix="CIRC:",
+        writer_type=ADWriterType.JPEG,
+        writer_suffix="JPEG:",
     )
