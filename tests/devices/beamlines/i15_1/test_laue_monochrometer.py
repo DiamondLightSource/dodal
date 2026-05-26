@@ -1,7 +1,8 @@
 import pytest
 from daq_config_server import ConfigClient
 from daq_config_server.models.i15_1 import XpdfCrystalLookupTable
-from ophyd_async.core import init_devices
+from ophyd_async.core import get_mock_put, init_devices
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i15_1.laue import LaueMonochrometer
 from tests.test_data import TEST_I15_1_CRYSTAL_LUT
@@ -43,3 +44,26 @@ async def test_energy_kev_gets_value_based_on_y(
 ):
     await laue_monochrometer.y.set(y)
     assert await laue_monochrometer.energy_kev.get_value() == expected_energy
+    await assert_reading(
+        laue_monochrometer,
+        {f"{laue_monochrometer.name}-energy_kev": partial_reading(expected_energy)},
+        full_match=False,
+    )
+
+
+@pytest.mark.parametrize(
+    "energy, expected_y",
+    [(40.05, 1.455), (76.69, 50.6), (65.4, -48.845)],
+)
+async def test_setting_energy_moves_y_to_expected_value(
+    laue_monochrometer: LaueMonochrometer, energy, expected_y
+):
+    await laue_monochrometer.energy_kev.set(energy)
+    get_mock_put(laue_monochrometer.y.user_setpoint).assert_called_once_with(expected_y)
+
+
+async def test_setting_energy_with_invalid_energy_raises_error(
+    laue_monochrometer: LaueMonochrometer,
+):
+    with pytest.raises(ValueError):
+        await laue_monochrometer.energy_kev.set(10)
