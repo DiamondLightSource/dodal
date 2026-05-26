@@ -14,17 +14,20 @@ from dodal.devices.electron_analyser.base import (
     GenericSequence,
 )
 from tests.devices.electron_analyser.helper_util import (
-    TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
+    generate_fixture_regions_pair,
+    load_b07_specs_test_seq,
+    load_i09_vgscienta_test_seq,
 )
 
+DETECTOR_REGIONS_PAIR = [
+    *generate_fixture_regions_pair("ew4000", load_i09_vgscienta_test_seq().regions),
+    *generate_fixture_regions_pair("b07b_specs150", load_b07_specs_test_seq().regions),
+]
 
-@pytest.fixture
-def sequence(sim_detector: GenericElectronAnalyserDetector) -> GenericSequence:
-    return get_test_sequence(type(sim_detector))
 
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize(
+    ("sim_detector", "region"), DETECTOR_REGIONS_PAIR, indirect=["sim_detector"]
+)
 async def test_base_analyser_detector_describe_configuration(
     sim_detector: GenericElectronAnalyserDetector, region: GenericRegion
 ) -> None:
@@ -46,14 +49,11 @@ async def test_base_analyser_detector_describe_configuration(
     await assert_value(sim_detector.binding_energy_axis, expected_binding_energy_axis)
 
 
-# def test_analyser_detector_set_called_region_logic_setup_with_region(
 async def test_analyser_detector_stage(
     sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
     sim_detector.sequence.stage = AsyncMock()
-
     await sim_detector.stage()
-
     sim_detector.sequence.stage.assert_awaited_once()
 
 
@@ -61,23 +61,31 @@ async def test_analyser_detector_unstage(
     sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
     sim_detector.sequence.unstage = AsyncMock()
-
     await sim_detector.unstage()
-
     sim_detector.sequence.unstage.assert_awaited_once()
 
 
+@pytest.mark.parametrize(
+    ("sim_detector", "region"), DETECTOR_REGIONS_PAIR, indirect=["sim_detector"]
+)
 def test_analyser_detector_set_called_region_logic_setup_with_region(
     sim_detector: GenericElectronAnalyserDetector,
-    sequence: GenericSequence,
+    region: GenericRegion,
     run_engine: RunEngine,
 ) -> None:
-    region = sequence.get_enabled_regions()[0]
     sim_detector._region_logic.setup_with_region = AsyncMock()
     run_engine(bps.mv(sim_detector, region), wait=True)
     sim_detector._region_logic.setup_with_region.assert_awaited_once_with(region)
 
 
+@pytest.mark.parametrize(
+    ("sim_detector", "sequence"),
+    [
+        pytest.param("ew4000", load_i09_vgscienta_test_seq()),
+        pytest.param("b07b_specs150", load_b07_specs_test_seq()),
+    ],
+    indirect=["sim_detector"],
+)
 def test_analyser_read_configuration_is_unique_per_region(
     sim_detector: GenericElectronAnalyserDetector,
     sequence: GenericSequence,

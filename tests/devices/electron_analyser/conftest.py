@@ -11,12 +11,7 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser.base import (
-    BaseRegion,
-    BaseSequence,
-    DualEnergySource,
-    EnergySource,
-)
+from dodal.devices.electron_analyser.base import DualEnergySource, EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, FastShutter
@@ -136,17 +131,6 @@ async def ew4000(
     energy_axis = [1, 2, 3, 4, 5]
     set_mock_value(ew4000.driver.energy_axis, np.array(energy_axis, dtype=float))
     return ew4000
-
-
-@pytest.fixture
-def region(
-    request: pytest.FixtureRequest,
-    sequence: BaseSequence[BaseRegion],
-) -> BaseRegion:
-    region = sequence.get_region_by_name(request.param)
-    if region is None:
-        raise ValueError("Region " + request.param + " is not found.")
-    return region
 
 
 @pytest.fixture
