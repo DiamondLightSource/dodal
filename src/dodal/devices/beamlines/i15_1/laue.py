@@ -1,11 +1,6 @@
 from daq_config_server import ConfigClient
 from daq_config_server.models.i15_1 import XpdfCrystalLookupTable
-from ophyd_async.core import (
-    SignalR,
-    StandardReadable,
-    StandardReadableFormat,
-    derived_signal_rw,
-)
+from ophyd_async.core import StandardReadable, StandardReadableFormat, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
 
