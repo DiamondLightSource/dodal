@@ -27,9 +27,9 @@ from dodal.devices.interlocks import EnumPLCInterlock, IntPLCInterlock, PSSInter
 from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.zebra.zebra import Zebra, ZebraMapping
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
