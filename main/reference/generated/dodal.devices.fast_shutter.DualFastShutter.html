@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_shutter.DualFastShutter &#8212; dodal 2.4.1.dev3+gedd85a583 documentation</title>
+    <title>dodal.devices.fast_shutter.DualFastShutter &#8212; dodal 2.4.1.dev4+g3776481f9 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=61ee8b69"></script>
+    <script src="../../_static/documentation_options.js?v=0dea22ef"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -672,6 +672,7 @@
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.fast_shutter.DualFastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html">dodal.devices.fast_shutter.FastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html">dodal.devices.fast_shutter.GenericFastShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.OpenClose.html">dodal.devices.fast_shutter.OpenClose</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.html">dodal.devices.fluorescence_detector_motion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1050,16 +1051,16 @@
 <dt class="sig sig-object py" id="dodal.devices.fast_shutter.DualFastShutter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.fast_shutter.</span></span><span class="sig-name descname"><span class="pre">DualFastShutter</span></span><a class="reference internal" href="../../_modules/dodal/devices/fast_shutter.html#DualFastShutter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_shutter.DualFastShutter" title="Link to this definition">#</a></dt>
 <dd><p>A fast shutter device that handles the positions of two other fast shutters. The
-“active” shutter is the one that corrosponds to the selected_shutter signal. For
+“active” shutter is the one that corresponds to the selected_shutter signal. For
 example, active shutter is shutter1 if selected_source is at SelectedSource.SOURCE1
 and vise versa for shutter2 and SelectedSource.SOURCE2. Whenever a move is done on
 this device, the inactive shutter is always set to the close_state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>shutter1</strong> (<a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter" title="dodal.devices.fast_shutter.GenericFastShutter"><em>GenericFastShutter</em></a>) – Active shutter that corrosponds to
+<li><p><strong>shutter1</strong> (<a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter" title="dodal.devices.fast_shutter.GenericFastShutter"><em>GenericFastShutter</em></a>) – Active shutter that corresponds to
 SelectedSource.SOURCE1.</p></li>
-<li><p><strong>shutter2</strong> (<a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter" title="dodal.devices.fast_shutter.GenericFastShutter"><em>GenericFastShutter</em></a>) – Active shutter that corrosponds to
+<li><p><strong>shutter2</strong> (<a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter" title="dodal.devices.fast_shutter.GenericFastShutter"><em>GenericFastShutter</em></a>) – Active shutter that corresponds to
 SelectedSource.SOURCE2.</p></li>
 <li><p><strong>selected_source</strong> (<em>SignalRW</em>) – Signal that decides the active shutter.</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Name of this device.</p></li>

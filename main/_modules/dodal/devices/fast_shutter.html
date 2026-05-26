@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_shutter &#8212; dodal 2.4.1.dev3+gedd85a583 documentation</title>
+    <title>dodal.devices.fast_shutter &#8212; dodal 2.4.1.dev4+g3776481f9 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=61ee8b69"></script>
+    <script src="../../../_static/documentation_options.js?v=0dea22ef"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -896,6 +896,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
+    <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">derived_signal_rw</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
 <span class="p">)</span>
@@ -904,6 +905,14 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">get_obj_from_selected_source</span>
 
 <span class="n">EnumTypesT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;EnumTypesT&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">EnumTypes</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OpenClose">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_shutter.OpenClose.html#dodal.devices.fast_shutter.OpenClose">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OpenClose</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span>
+    <span class="n">CLOSE</span> <span class="o">=</span> <span class="s2">&quot;Close&quot;</span></div>
+
 
 
 <div class="viewcode-block" id="GenericFastShutter">
@@ -1006,15 +1015,15 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_shutter.DualFastShutter.html#dodal.devices.fast_shutter.DualFastShutter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DualFastShutter</span><span class="p">(</span><span class="n">GenericFastShutter</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">EnumTypesT</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A fast shutter device that handles the positions of two other fast shutters. The</span>
-<span class="sd">    &quot;active&quot; shutter is the one that corrosponds to the selected_shutter signal. For</span>
+<span class="sd">    &quot;active&quot; shutter is the one that corresponds to the selected_shutter signal. For</span>
 <span class="sd">    example, active shutter is shutter1 if selected_source is at SelectedSource.SOURCE1</span>
 <span class="sd">    and vise versa for shutter2 and SelectedSource.SOURCE2. Whenever a move is done on</span>
 <span class="sd">    this device, the inactive shutter is always set to the close_state.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        shutter1 (GenericFastShutter): Active shutter that corrosponds to</span>
+<span class="sd">        shutter1 (GenericFastShutter): Active shutter that corresponds to</span>
 <span class="sd">            SelectedSource.SOURCE1.</span>
-<span class="sd">        shutter2 (GenericFastShutter): Active shutter that corrosponds to</span>
+<span class="sd">        shutter2 (GenericFastShutter): Active shutter that corresponds to</span>
 <span class="sd">            SelectedSource.SOURCE2.</span>
 <span class="sd">        selected_source (SignalRW): Signal that decides the active shutter.</span>
 <span class="sd">        name (str, optional): Name of this device.</span>

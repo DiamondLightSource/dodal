@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra.zebra_controlled_shutter &#8212; dodal 2.4.1.dev3+gedd85a583 documentation</title>
+    <title>dodal.devices.zebra.zebra_controlled_shutter &#8212; dodal 2.4.1.dev4+g3776481f9 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=61ee8b69"></script>
+    <script src="../../../../_static/documentation_options.js?v=0dea22ef"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -889,11 +889,21 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">DeviceMock</span><span class="p">,</span>
+    <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
+    <span class="n">YesNo</span><span class="p">,</span>
+    <span class="n">callback_on_mock_put</span><span class="p">,</span>
+    <span class="n">default_mock_class</span><span class="p">,</span>
+    <span class="n">derived_signal_rw</span><span class="p">,</span>
+    <span class="n">set_and_wait_for_other_value</span><span class="p">,</span>
+    <span class="n">set_mock_value</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericFastShutter</span><span class="p">,</span> <span class="n">OpenClose</span>
 
 
 <div class="viewcode-block" id="ZebraShutterState">
@@ -912,9 +922,9 @@ window.runMermaid = runMermaid;</script>
 
 
 
-<div class="viewcode-block" id="ZebraShutter">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter.html#dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ZebraShutter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ZebraShutterState</span><span class="p">]):</span>
+<div class="viewcode-block" id="MXZebraShutter">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter.html#dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MXZebraShutter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ZebraShutterState</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The shutter on most MX beamlines is controlled by the zebra.</span>
 
 <span class="sd">    Internally in the zebra there are two AND gates, one for manual control and one for</span>
@@ -945,6 +955,58 @@ window.runMermaid = runMermaid;</script>
             <span class="n">signal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">position_readback</span><span class="p">,</span>
             <span class="n">match</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="MockZebraFastShutter">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_controlled_shutter.MockZebraFastShutter.html#dodal.devices.zebra.zebra_controlled_shutter.MockZebraFastShutter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockZebraFastShutter</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">&quot;ZebraFastShutter&quot;</span><span class="p">]):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="s2">&quot;ZebraFastShutter&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">_set_pv</span><span class="p">,</span>  <span class="c1"># noqa: SLF001</span>
+            <span class="k">lambda</span> <span class="n">state</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">:</span> <span class="n">set_mock_value</span><span class="p">(</span>
+                <span class="n">device</span><span class="o">.</span><span class="n">_get_pv</span><span class="p">,</span>  <span class="c1"># noqa: SLF001</span>
+                <span class="mi">1</span> <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">YesNo</span><span class="o">.</span><span class="n">YES</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ZebraFastShutter">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_controlled_shutter.ZebraFastShutter.html#dodal.devices.zebra.zebra_controlled_shutter.ZebraFastShutter">[docs]</a>
+<span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">MockZebraFastShutter</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZebraFastShutter</span><span class="p">(</span><span class="n">GenericFastShutter</span><span class="p">[</span><span class="n">OpenClose</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A fast shutter controlled by the zebra that doesn&#39;t have the automatic/manual</span>
+<span class="sd">    protection on top that the MXZebraShutter does. See https://jira.diamond.ac.uk/browse/I15_1-1626</span>
+<span class="sd">    to bring them in line.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">set_pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">get_pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_pv</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">YesNo</span><span class="p">,</span> <span class="n">set_pv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_pv</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_pv</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">OpenClose</span><span class="o">.</span><span class="n">OPEN</span><span class="p">,</span> <span class="n">OpenClose</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_shutter_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalRW</span><span class="p">[</span><span class="n">OpenClose</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_shutter_state</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_shutter_state</span><span class="p">,</span>
+            <span class="n">get_pv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_pv</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_shutter_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_pv</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenClose</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OpenClose</span><span class="o">.</span><span class="n">CLOSE</span> <span class="k">if</span> <span class="n">get_pv</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">OpenClose</span><span class="o">.</span><span class="n">OPEN</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_shutter_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">OpenClose</span><span class="p">):</span>
+        <span class="n">set_value</span> <span class="o">=</span> <span class="n">YesNo</span><span class="o">.</span><span class="n">YES</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">OpenClose</span><span class="o">.</span><span class="n">OPEN</span> <span class="k">else</span> <span class="n">YesNo</span><span class="o">.</span><span class="n">NO</span>
+        <span class="n">readback_value</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">OpenClose</span><span class="o">.</span><span class="n">OPEN</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">await</span> <span class="n">set_and_wait_for_other_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_pv</span><span class="p">,</span> <span class="n">set_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pv</span><span class="p">,</span> <span class="n">readback_value</span>
         <span class="p">)</span></div>
 
 </pre></div>

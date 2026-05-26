@@ -14,7 +14,9 @@ dodal.devices.zebra.zebra\_controlled\_shutter
    :toctree:
    :recursive:
 
-   ~zebra_controlled_shutter.ZebraShutter
+   ~zebra_controlled_shutter.MXZebraShutter
+   ~zebra_controlled_shutter.MockZebraFastShutter
+   ~zebra_controlled_shutter.ZebraFastShutter
    ~zebra_controlled_shutter.ZebraShutterControl
    ~zebra_controlled_shutter.ZebraShutterState
 

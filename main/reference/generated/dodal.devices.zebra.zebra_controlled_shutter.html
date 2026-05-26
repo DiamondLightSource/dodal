@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.zebra.zebra_controlled_shutter &#8212; dodal 2.4.1.dev3+gedd85a583 documentation</title>
+    <title>dodal.devices.zebra.zebra_controlled_shutter &#8212; dodal 2.4.1.dev4+g3776481f9 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=61ee8b69"></script>
+    <script src="../../_static/documentation_options.js?v=0dea22ef"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter" href="dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter.html" />
+    <link rel="next" title="dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter" href="dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter.html" />
     <link rel="prev" title="dodal.devices.zebra.zebra_constants_mapping.ZebraTTLOutputs" href="dodal.devices.zebra.zebra_constants_mapping.ZebraTTLOutputs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -672,6 +672,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.DualFastShutter.html">dodal.devices.fast_shutter.DualFastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html">dodal.devices.fast_shutter.FastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html">dodal.devices.fast_shutter.GenericFastShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.OpenClose.html">dodal.devices.fast_shutter.OpenClose</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.html">dodal.devices.fluorescence_detector_motion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1049,8 +1050,14 @@
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter.html#dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter" title="dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZebraShutter</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter.html#dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter" title="dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MXZebraShutter</span></code></a></p></td>
 <td><p>The shutter on most MX beamlines is controlled by the zebra.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.zebra.zebra_controlled_shutter.MockZebraFastShutter.html#dodal.devices.zebra.zebra_controlled_shutter.MockZebraFastShutter" title="dodal.devices.zebra.zebra_controlled_shutter.MockZebraFastShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MockZebraFastShutter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.zebra.zebra_controlled_shutter.ZebraFastShutter.html#dodal.devices.zebra.zebra_controlled_shutter.ZebraFastShutter" title="dodal.devices.zebra.zebra_controlled_shutter.ZebraFastShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZebraFastShutter</span></code></a></p></td>
+<td><p>A fast shutter controlled by the zebra that doesn't have the automatic/manual protection on top that the MXZebraShutter does.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.zebra.zebra_controlled_shutter.ZebraShutterControl.html#dodal.devices.zebra.zebra_controlled_shutter.ZebraShutterControl" title="dodal.devices.zebra.zebra_controlled_shutter.ZebraShutterControl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZebraShutterControl</span></code></a></p></td>
 <td><p></p></td>
@@ -1083,11 +1090,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter.html"
+       href="dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.zebra.zebra_controlled_shutter.ZebraShutter</p>
+        <p class="prev-next-title">dodal.devices.zebra.zebra_controlled_shutter.MXZebraShutter</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -17,6 +17,7 @@ dodal.devices.fast\_shutter
    ~fast_shutter.DualFastShutter
    ~fast_shutter.FastShutter
    ~fast_shutter.GenericFastShutter
+   ~fast_shutter.OpenClose
 
 
 
