@@ -1,6 +1,7 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
@@ -8,6 +9,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.visit import StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
@@ -25,6 +27,7 @@ from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.motors import XYZPhiStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -51,6 +54,14 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 )
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient()
+    set_config_client(client)
+    return client
 
 
 @devices.fixture
@@ -87,10 +98,8 @@ def diffractometer() -> FourCircleDiffractometer:
 @devices.factory()
 def eiger(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-01:",
-        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 
@@ -105,6 +114,11 @@ def panda(path_provider: PathProvider) -> HDFPanda:
 @devices.factory()
 def pinhole_and_collimator() -> PinholeCollimatorControl:
     return PinholeCollimatorControl(prefix=PREFIX.beamline_prefix)
+
+
+@devices.factory()
+def serial_stages() -> XYZPhiStage:
+    return XYZPhiStage(prefix=f"{PREFIX.beamline_prefix}-MO-SRL-01:")
 
 
 @devices.factory()

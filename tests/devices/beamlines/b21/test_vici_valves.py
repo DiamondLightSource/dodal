@@ -19,13 +19,13 @@ async def vici_valves() -> ViciValves:
 async def test_vici_valves_read(
     vici_valves: ViciValves,
 ):
-    set_mock_value(vici_valves.valve_1, Valve1Positions.POS_1)
-    set_mock_value(vici_valves.valve_2, Valve2Positions.POS_2)
+    set_mock_value(vici_valves.valve_1, Valve1Positions.SEP_300)
+    set_mock_value(vici_valves.valve_2, Valve2Positions.KW_402_5)
 
     await assert_reading(
         vici_valves,
         {
-            f"{vici_valves.name}-valve_1": partial_reading(Valve1Positions.POS_1),
-            f"{vici_valves.name}-valve_2": partial_reading(Valve2Positions.POS_2),
+            f"{vici_valves.name}-valve_1": partial_reading(Valve1Positions.SEP_300),
+            f"{vici_valves.name}-valve_2": partial_reading(Valve2Positions.KW_402_5),
         },
     )

@@ -47,8 +47,8 @@ def det(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-DET-01:",
         path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=DET_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
     )
 
 

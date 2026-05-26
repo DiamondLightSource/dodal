@@ -16,13 +16,16 @@ from dodal.devices.attenuator.filter_selections import (
 from dodal.devices.beamlines.i24.aperture import Aperture
 from dodal.devices.beamlines.i24.beam_center import DetectorBeamCenter
 from dodal.devices.beamlines.i24.beamstop import Beamstop
-from dodal.devices.beamlines.i24.commissioning_jungfrau import CommissioningJungfrau
+from dodal.devices.beamlines.i24.commissioning_jungfrau import (
+    CommissioningJungfrauDetector,
+)
 from dodal.devices.beamlines.i24.dcm import DCM
 from dodal.devices.beamlines.i24.dual_backlight import DualBacklight
 from dodal.devices.beamlines.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.beamlines.i24.pmac import PMAC
 from dodal.devices.beamlines.i24.vgonio import VerticalGoniometer
-from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -139,7 +142,7 @@ def zebra() -> Zebra:
 @devices.factory()
 def shutter() -> InterlockedHutchShutter:
     return InterlockedHutchShutter(
-        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
     )
 
 
@@ -154,16 +157,14 @@ def eiger_beam_center() -> DetectorBeamCenter:
 
 
 @devices.factory()
-def commissioning_jungfrau(
+def jungfrau(
     path_provider: PathProvider,
-) -> CommissioningJungfrau:
-    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
-    device in place of Odin while the detector is in commissioning.
-    """
-    return CommissioningJungfrau(
+) -> CommissioningJungfrauDetector:
+    return CommissioningJungfrauDetector(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
         AutoMaxIncrementingPathProvider(path_provider),
+        "CAM:",
     )
 
 

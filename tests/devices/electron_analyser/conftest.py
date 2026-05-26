@@ -1,5 +1,6 @@
 from typing import Any
 
+import numpy as np
 import pytest
 from ophyd_async.core import InOut, init_devices, set_mock_value
 
@@ -11,8 +12,8 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
+    BaseRegion,
+    BaseSequence,
     DualEnergySource,
     EnergySource,
 )
@@ -132,14 +133,16 @@ async def ew4000(
             shutter=dual_fast_shutter,
             source_selector=source_selector,
         )
+    energy_axis = [1, 2, 3, 4, 5]
+    set_mock_value(ew4000.driver.energy_axis, np.array(energy_axis, dtype=float))
     return ew4000
 
 
 @pytest.fixture
 def region(
     request: pytest.FixtureRequest,
-    sequence: AbstractBaseSequence[AbstractBaseRegion],
-) -> AbstractBaseRegion:
+    sequence: BaseSequence[BaseRegion],
+) -> BaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:
         raise ValueError("Region " + request.param + " is not found.")
