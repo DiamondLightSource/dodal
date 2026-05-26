@@ -63,9 +63,6 @@ dodal.devices.electron\_analyser.base.GenericRegion
       ~GenericRegion.enabled
       
       
-      ~GenericRegion.slices
-      
-      
       ~GenericRegion.iterations
       
       
@@ -84,10 +81,10 @@ dodal.devices.electron\_analyser.base.GenericRegion
       ~GenericRegion.low_energy
       
       
-      ~GenericRegion.centre_energy
-      
-      
       ~GenericRegion.high_energy
+      
+      
+      ~GenericRegion.centre_energy
       
       
       ~GenericRegion.acquire_time

@@ -36,6 +36,9 @@ dodal.devices.electron\_analyser.specs.SpecsAnalyserDriverIO
    .. autosummary::
    
       
+      ~SpecsAnalyserDriverIO.PV_CFG
+      
+      
       
       
       

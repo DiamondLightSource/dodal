@@ -57,9 +57,6 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaSequence
       
       
       
-      ~VGScientaSequence.psu_mode
-      
-      
       ~VGScientaSequence.regions
       
    

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.specs.specs_region &#8212; dodal 2.4.1.dev5+g1d2a61af4 documentation</title>
+    <title>dodal.devices.electron_analyser.specs.specs_region &#8212; dodal 2.4.1.dev6+g171a1a4ad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=796749fd"></script>
+    <script src="../../../../../_static/documentation_options.js?v=06da6ffe"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -915,6 +915,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">energy_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;step_energy&quot;</span><span class="p">)</span>
 
     <span class="c1"># Specific to this class</span>
+    <span class="n">slices</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">values</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">psu_mode</span><span class="p">:</span> <span class="n">TPsuMode</span>
     <span class="n">estimated_time_in_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span></div>
@@ -926,7 +927,7 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecsSequence</span><span class="p">(</span>
     <span class="n">BaseSequence</span><span class="p">[</span><span class="n">SpecsRegion</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">]],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">]</span>
 <span class="p">):</span>
-    <span class="n">regions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SpecsRegion</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span></div>
+    <span class="k">pass</span></div>
 
 </pre></div>
 

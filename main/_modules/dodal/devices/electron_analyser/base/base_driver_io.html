@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.4.1.dev5+g1d2a61af4 documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_driver_io &#8212; dodal 2.4.1.dev6+g171a1a4ad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=796749fd"></script>
+    <script src="../../../../../_static/documentation_options.js?v=06da6ffe"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,7 +886,8 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.devices.electron_analyser.base.base_driver_io</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
@@ -916,10 +917,27 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TPassEnergy</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">AnyPsuMode</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">SupersetEnum</span> <span class="o">|</span> <span class="n">StrictEnum</span>
+<span class="n">AnyPsuMode</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">SupersetEnum</span> <span class="o">|</span> <span class="n">StrictEnum</span> <span class="o">|</span> <span class="nb">str</span>
 <span class="n">TPsuMode</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TPsuMode&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AnyPsuMode</span><span class="p">)</span>
 
-<span class="n">_PSU</span> <span class="o">=</span> <span class="s2">&quot;PSU_MODE&quot;</span>
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserPVConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for PV&#39;s. Temporary work around until PV&#39;s are standardised between</span>
+<span class="sd">    beamlines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">low_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;LOW_ENERGY&quot;</span>
+    <span class="n">high_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HIGH_ENERGY&quot;</span>
+    <span class="n">centre_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;CENTRE_ENERGY&quot;</span>
+    <span class="n">slices</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SLICES&quot;</span>
+    <span class="n">lens_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;LENS_MODE&quot;</span>
+    <span class="n">pass_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PASS_ENERGY&quot;</span>
+    <span class="n">energy_step</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;STEP_SIZE&quot;</span>
+    <span class="n">iterations</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NumExposures&quot;</span>
+    <span class="n">acquisition_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ACQ_MODE&quot;</span>
+    <span class="n">psu_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PSU_MODE&quot;</span>
+    <span class="n">total_steps</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TOTAL_POINTS_RBV&quot;</span>
 
 
 <div class="viewcode-block" id="AbstractAnalyserDriverIO">
@@ -946,9 +964,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        pass_energy_type (type[TPassEnergy]): Can be enum or float, depending on</span>
 <span class="sd">            electron analyser model. If enum, it determines the available pass</span>
 <span class="sd">            energies for this device.</span>
-<span class="sd">        psu_suffix (str, optional): The psu infix to connect to EPICS. Defaults to PSU_MODE.</span>
 <span class="sd">        name (str, optional): Name of the device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PV_CFG</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">ElectronAnalyserPVConfig</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -957,7 +976,6 @@ window.runMermaid = runMermaid;</script>
         <span class="n">lens_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">],</span>
         <span class="n">psu_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPsuMode</span><span class="p">],</span>
         <span class="n">pass_energy_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPassEnergy</span><span class="p">],</span>
-        <span class="n">psu_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_PSU</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_mode_type</span> <span class="o">=</span> <span class="n">acquisition_mode_type</span>
@@ -965,15 +983,8 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode_type</span> <span class="o">=</span> <span class="n">psu_mode_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pass_energy_type</span> <span class="o">=</span> <span class="n">pass_energy_type</span>
 
-        <span class="c1"># must call first to initiate parent variables</span>
+        <span class="c1"># Must call first to initiate parent variables</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IMAGE&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;INT_SPECTRUM&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">total_intensity</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_total_intensity</span><span class="p">,</span> <span class="n">spectrum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span>
-            <span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
             <span class="c1"># Read once per scan after data acquired</span>
@@ -982,20 +993,27 @@ window.runMermaid = runMermaid;</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span>
                 <span class="n">EnergyMode</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">low_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;LOW_ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">centre_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CENTRE_ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">high_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;HIGH_ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SLICES&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lens_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">lens_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;LENS_MODE&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pass_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">pass_energy_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PASS_ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy_step</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;STEP_SIZE&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NumExposures&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
-                <span class="n">acquisition_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ACQ_MODE&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">low_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">low_energy</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">centre_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">centre_energy</span>
             <span class="p">)</span>
-            <span class="c1"># This is used by each electron analyser, however it depends on the electron</span>
-            <span class="c1"># analyser type to know if is moved with region settings.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">psu_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">psu_suffix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">high_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">high_energy</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">slices</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lens_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">lens_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">lens_mode</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pass_energy</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">pass_energy_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">pass_energy</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy_step</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">energy_step</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">acquisition_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">acquisition_mode</span>
+            <span class="p">)</span>
+            <span class="c1"># This is used by each electron analyser, however it is not writeable for</span>
+            <span class="c1"># all types and it depends on the electron analyser type to know if is moved</span>
+            <span class="c1"># with region settings.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">psu_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">psu_mode</span><span class="p">)</span>
 
         <span class="c1"># This is defined in the parent class, add it as readable configuration.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">acquire_time</span><span class="p">],</span> <span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">)</span>
@@ -1004,7 +1022,7 @@ window.runMermaid = runMermaid;</script>
             <span class="c1"># NOT used for setting up region data acquisition.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_energy_axis_signal</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">angle_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_angle_axis_signal</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;TOTAL_POINTS_RBV&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">total_steps</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_total_time</span><span class="p">,</span>
                 <span class="s2">&quot;s&quot;</span><span class="p">,</span>
@@ -1063,10 +1081,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Returns:</span>
 <span class="sd">            Float: Calculated total time in seconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">total_steps</span> <span class="o">*</span> <span class="n">step_time</span> <span class="o">*</span> <span class="n">iterations</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_total_intensity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spectrum</span><span class="p">:</span> <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">total_steps</span> <span class="o">*</span> <span class="n">step_time</span> <span class="o">*</span> <span class="n">iterations</span></div>
 
 
 

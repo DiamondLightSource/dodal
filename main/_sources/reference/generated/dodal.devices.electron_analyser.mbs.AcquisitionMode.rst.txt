@@ -1,0 +1,81 @@
+dodal.devices.electron\_analyser.mbs.AcquisitionMode
+====================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.mbs
+
+.. autoclass:: AcquisitionMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AcquisitionMode.FIXED
+      
+      
+      ~AcquisitionMode.SWEPT
+      
+      
+      ~AcquisitionMode.DITHER
+      
+   
+   

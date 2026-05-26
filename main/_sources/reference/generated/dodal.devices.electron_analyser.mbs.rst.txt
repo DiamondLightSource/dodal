@@ -1,0 +1,39 @@
+dodal.devices.electron\_analyser.mbs
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~mbs.MbsAnalyserDriverIO
+   ~mbs.AcquisitionMode
+   ~mbs.MbsRegion
+   ~mbs.MbsSequence
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.mbs
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

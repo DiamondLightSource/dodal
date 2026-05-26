@@ -40,6 +40,9 @@ dodal.devices.electron\_analyser.base.AbstractAnalyserDriverIO
       
       
       
+      ~AbstractAnalyserDriverIO.PV_CFG
+      
+      
       ~AbstractAnalyserDriverIO.acquire_time
       
       

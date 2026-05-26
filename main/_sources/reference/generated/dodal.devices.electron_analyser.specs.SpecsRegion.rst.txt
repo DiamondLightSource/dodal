@@ -81,6 +81,9 @@ dodal.devices.electron\_analyser.specs.SpecsRegion
       ~SpecsRegion.energy_step
       
       
+      ~SpecsRegion.slices
+      
+      
       ~SpecsRegion.values
       
       
@@ -94,9 +97,6 @@ dodal.devices.electron\_analyser.specs.SpecsRegion
       
       
       ~SpecsRegion.enabled
-      
-      
-      ~SpecsRegion.slices
       
       
       ~SpecsRegion.iterations

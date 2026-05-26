@@ -90,6 +90,9 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaRegion
       ~VGScientaRegion.energy_step
       
       
+      ~VGScientaRegion.slices
+      
+      
       ~VGScientaRegion.total_steps
       
       
@@ -115,9 +118,6 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaRegion
       
       
       ~VGScientaRegion.enabled
-      
-      
-      ~VGScientaRegion.slices
       
       
       ~VGScientaRegion.iterations

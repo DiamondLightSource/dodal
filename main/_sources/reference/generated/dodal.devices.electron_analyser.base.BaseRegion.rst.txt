@@ -73,9 +73,6 @@ dodal.devices.electron\_analyser.base.BaseRegion
       ~BaseRegion.enabled
       
       
-      ~BaseRegion.slices
-      
-      
       ~BaseRegion.iterations
       
       
@@ -94,10 +91,10 @@ dodal.devices.electron\_analyser.base.BaseRegion
       ~BaseRegion.low_energy
       
       
-      ~BaseRegion.centre_energy
-      
-      
       ~BaseRegion.high_energy
+      
+      
+      ~BaseRegion.centre_energy
       
       
       ~BaseRegion.acquire_time

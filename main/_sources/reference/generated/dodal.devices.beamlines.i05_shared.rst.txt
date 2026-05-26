@@ -15,10 +15,12 @@ dodal.devices.beamlines.i05\_shared
    :recursive:
 
    ~i05_shared.Grating
+   ~i05_shared.LensMode
    ~i05_shared.Mj7j8Mirror
    ~i05_shared.M3MJ6Mirror
    ~i05_shared.M4M5Mirror
    ~i05_shared.PolynomCompoundMotors
+   ~i05_shared.PassEnergy
 
 
 

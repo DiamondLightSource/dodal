@@ -36,6 +36,9 @@ dodal.devices.electron\_analyser.vgscienta.VGScientaAnalyserDriverIO
    .. autosummary::
    
       
+      ~VGScientaAnalyserDriverIO.PV_CFG
+      
+      
       
       
       

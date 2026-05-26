@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.specs.specs_driver_io &#8212; dodal 2.4.1.dev5+g1d2a61af4 documentation</title>
+    <title>dodal.devices.electron_analyser.specs.specs_driver_io &#8212; dodal 2.4.1.dev6+g171a1a4ad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=796749fd"></script>
+    <script src="../../../../../_static/documentation_options.js?v=06da6ffe"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -892,23 +892,36 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Array1D</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">DeviceMock</span><span class="p">,</span>
     <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
+    <span class="n">callback_on_mock_put</span><span class="p">,</span>
+    <span class="n">default_mock_class</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
+    <span class="n">set_mock_value</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_driver_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_PSU</span><span class="p">,</span>
     <span class="n">AbstractAnalyserDriverIO</span><span class="p">,</span>
+    <span class="n">ElectronAnalyserPVConfig</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs.specs_enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs.specs_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecsRegion</span>
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">MockSpecsAnalyserDriverIO</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">&quot;SpecsAnalyserDriverIO&quot;</span><span class="p">]):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="s2">&quot;SpecsAnalyserDriverIO&quot;</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_sync_psu_mode_rbv</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">psu_mode</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">psu_mode_w</span><span class="p">,</span> <span class="n">_sync_psu_mode_rbv</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="SpecsAnalyserDriverIO">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.specs.SpecsAnalyserDriverIO.html#dodal.devices.electron_analyser.specs.SpecsAnalyserDriverIO">[docs]</a>
+<span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">MockSpecsAnalyserDriverIO</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpecsAnalyserDriverIO</span><span class="p">(</span>
     <span class="n">AbstractAnalyserDriverIO</span><span class="p">[</span>
         <span class="n">SpecsRegion</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">],</span>
@@ -919,12 +932,13 @@ window.runMermaid = runMermaid;</script>
     <span class="p">],</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">],</span>
 <span class="p">):</span>
+    <span class="n">PV_CFG</span> <span class="o">=</span> <span class="n">ElectronAnalyserPVConfig</span><span class="p">()</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">lens_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">],</span>
         <span class="n">psu_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPsuMode</span><span class="p">],</span>
-        <span class="n">psu_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_PSU</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
@@ -939,6 +953,7 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_channels</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
             <span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;TOTAL_POINTS_ITERATION_RBV&quot;</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode_w</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">psu_mode_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">PV_CFG</span><span class="o">.</span><span class="n">psu_mode</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
@@ -946,7 +961,6 @@ window.runMermaid = runMermaid;</script>
             <span class="n">lens_mode_type</span><span class="o">=</span><span class="n">lens_mode_type</span><span class="p">,</span>
             <span class="n">psu_mode_type</span><span class="o">=</span><span class="n">psu_mode_type</span><span class="p">,</span>
             <span class="n">pass_energy_type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-            <span class="n">psu_suffix</span><span class="o">=</span><span class="n">psu_suffix</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -963,7 +977,7 @@ window.runMermaid = runMermaid;</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">epics_region</span><span class="o">.</span><span class="n">iterations</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">epics_region</span><span class="o">.</span><span class="n">acquisition_mode</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_values</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">epics_region</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">epics_region</span><span class="o">.</span><span class="n">psu_mode</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psu_mode_w</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">epics_region</span><span class="o">.</span><span class="n">psu_mode</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">epics_region</span><span class="o">.</span><span class="n">energy_mode</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">epics_region</span><span class="o">.</span><span class="n">acquisition_mode</span> <span class="o">==</span> <span class="n">AcquisitionMode</span><span class="o">.</span><span class="n">FIXED_TRANSMISSION</span><span class="p">:</span>

@@ -10,6 +10,7 @@ dodal.devices.electron\_analyser
    :recursive:
 
    dodal.devices.electron_analyser.base
+   dodal.devices.electron_analyser.mbs
    dodal.devices.electron_analyser.specs
    dodal.devices.electron_analyser.vgscienta
 
