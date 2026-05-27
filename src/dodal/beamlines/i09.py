@@ -18,6 +18,7 @@ from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.scaler import ScalerController, SimpleChannelScaler
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
@@ -27,6 +28,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 BL = get_beamline_name("i09")
 I_PREFIX = BeamlinePrefix(BL, suffix="I")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
+L_PREFIX = BeamlinePrefix(BL, suffix="L")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -139,3 +141,53 @@ def intensity_protection() -> SignalRW[IntensityProtection]:
     return epics_signal_rw(
         IntensityProtection, f"{I_PREFIX.beamline_prefix}-DI-EAN-01:PROT:ILK"
     )
+
+
+@devices.factory
+def scaler1() -> ScalerController:
+    return ScalerController(f"{I_PREFIX.beamline_prefix}-EA-SCLR-01")
+
+
+@devices.factory
+def hm3amp20_1(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=2)
+
+
+@devices.factory
+def sm5amp8_1(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=3)
+
+
+@devices.factory
+def smpmamp39_1(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=4)
+
+
+@devices.factory
+def rfdamp10_1(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=5)
+
+
+@devices.factory
+def scaler2() -> ScalerController:
+    return ScalerController(f"{L_PREFIX}-VA-SCLR-01")
+
+
+@devices.factory
+def hm3amp20(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=2)
+
+
+@devices.factory
+def sm5amp8(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=3)
+
+
+@devices.factory
+def smpmamp39(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=4)
+
+
+@devices.factory
+def rfdamp10(scaler1: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler1, channel=5)
