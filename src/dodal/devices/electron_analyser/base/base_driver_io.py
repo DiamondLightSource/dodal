@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeAlias, TypeVar
+from dataclasses import dataclass
+from typing import ClassVar, Generic, TypeAlias, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -29,10 +30,27 @@ from dodal.devices.electron_analyser.base.base_region import (
     TPassEnergy,
 )
 
-AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
+AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum | str
 TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
-_PSU = "PSU_MODE"
+
+@dataclass(frozen=True)
+class ElectronAnalyserPVConfig:
+    """Configuration for PV's. Temporary work around until PV's are standardised between
+    beamlines.
+    """
+
+    low_energy: str = "LOW_ENERGY"
+    high_energy: str = "HIGH_ENERGY"
+    centre_energy: str = "CENTRE_ENERGY"
+    slices: str = "SLICES"
+    lens_mode: str = "LENS_MODE"
+    pass_energy: str = "PASS_ENERGY"
+    energy_step: str = "STEP_SIZE"
+    iterations: str = "NumExposures"
+    acquisition_mode: str = "ACQ_MODE"
+    psu_mode: str = "PSU_MODE"
+    total_steps: str = "TOTAL_POINTS_RBV"
 
 
 class AbstractAnalyserDriverIO(
@@ -57,9 +75,10 @@ class AbstractAnalyserDriverIO(
         pass_energy_type (type[TPassEnergy]): Can be enum or float, depending on
             electron analyser model. If enum, it determines the available pass
             energies for this device.
-        psu_suffix (str, optional): The psu infix to connect to EPICS. Defaults to PSU_MODE.
         name (str, optional): Name of the device.
     """
+
+    PV_CFG: ClassVar[ElectronAnalyserPVConfig]
 
     def __init__(
         self,
@@ -68,7 +87,6 @@ class AbstractAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
-        psu_suffix: str = _PSU,
         name: str = "",
     ) -> None:
         self.acquisition_mode_type = acquisition_mode_type
@@ -76,15 +94,8 @@ class AbstractAnalyserDriverIO(
         self.psu_mode_type = psu_mode_type
         self.pass_energy_type = pass_energy_type
 
-        # must call first to initiate parent variables
+        # Must call first to initiate parent variables
         super().__init__(prefix=prefix, name=name)
-
-        with self.add_children_as_readables():
-            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
-            self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
-            self.total_intensity = derived_signal_r(
-                self._calculate_total_intensity, spectrum=self.spectrum
-            )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
@@ -93,20 +104,27 @@ class AbstractAnalyserDriverIO(
             self.energy_mode = soft_signal_rw(
                 EnergyMode, initial_value=EnergyMode.KINETIC
             )
-            self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
-            self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
-            self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
-            self.slices = epics_signal_rw(int, prefix + "SLICES")
-            self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
-            self.pass_energy = epics_signal_rw(pass_energy_type, prefix + "PASS_ENERGY")
-            self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
-            self.iterations = epics_signal_rw(int, prefix + "NumExposures")
-            self.acquisition_mode = epics_signal_rw(
-                acquisition_mode_type, prefix + "ACQ_MODE"
+            self.low_energy = epics_signal_rw(float, prefix + self.PV_CFG.low_energy)
+            self.centre_energy = epics_signal_rw(
+                float, prefix + self.PV_CFG.centre_energy
             )
-            # This is used by each electron analyser, however it depends on the electron
-            # analyser type to know if is moved with region settings.
-            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + psu_suffix)
+            self.high_energy = epics_signal_rw(float, prefix + self.PV_CFG.high_energy)
+            self.slices = epics_signal_rw(int, prefix + self.PV_CFG.slices)
+            self.lens_mode = epics_signal_rw(
+                lens_mode_type, prefix + self.PV_CFG.lens_mode
+            )
+            self.pass_energy = epics_signal_rw(
+                pass_energy_type, prefix + self.PV_CFG.pass_energy
+            )
+            self.energy_step = epics_signal_rw(float, prefix + self.PV_CFG.energy_step)
+            self.iterations = epics_signal_rw(int, prefix + self.PV_CFG.iterations)
+            self.acquisition_mode = epics_signal_rw(
+                acquisition_mode_type, prefix + self.PV_CFG.acquisition_mode
+            )
+            # This is used by each electron analyser, however it is not writeable for
+            # all types and it depends on the electron analyser type to know if is moved
+            # with region settings.
+            self.psu_mode = epics_signal_r(psu_mode_type, prefix + self.PV_CFG.psu_mode)
 
         # This is defined in the parent class, add it as readable configuration.
         self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
@@ -115,7 +133,7 @@ class AbstractAnalyserDriverIO(
             # NOT used for setting up region data acquisition.
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.angle_axis = self._create_angle_axis_signal(prefix)
-            self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
+            self.total_steps = epics_signal_r(int, prefix + self.PV_CFG.total_steps)
             self.total_time = derived_signal_r(
                 self._calculate_total_time,
                 "s",
@@ -172,9 +190,6 @@ class AbstractAnalyserDriverIO(
             Float: Calculated total time in seconds.
         """
         return total_steps * step_time * iterations
-
-    def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
-        return float(np.sum(spectrum, dtype=np.float64))
 
 
 GenericAnalyserDriverIO = AbstractAnalyserDriverIO[
