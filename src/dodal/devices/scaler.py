@@ -26,6 +26,8 @@ class MockScalerController(DeviceMock["ScalerController"]):
             if value[device.counting.name]["value"] is True:
                 asyncio.create_task(_complete())
 
+        # Can't use callback_on_mock_put as this is called before the mock put, we need
+        # to simulate after mock put update.
         device.counting.subscribe_reading(_on_value)
 
 
