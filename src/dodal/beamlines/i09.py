@@ -174,20 +174,20 @@ def scaler2() -> ScalerController:
 
 
 @devices.factory
-def hm3amp20(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=2)
+def hm3amp20(scaler2: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler2, channel=2)
 
 
 @devices.factory
-def sm5amp8(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=3)
+def sm5amp8(scaler2: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler2, channel=3)
 
 
 @devices.factory
-def smpmamp39(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=4)
+def smpmamp39(scaler2: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler2, channel=4)
 
 
 @devices.factory
-def rfdamp10(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=5)
+def rfdamp10(scaler2: ScalerController) -> SimpleChannelScaler:
+    return SimpleChannelScaler(scaler2, channel=5)
