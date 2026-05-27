@@ -48,12 +48,7 @@ def test_has_misordered_inputs():
 @pytest.mark.parametrize(
     "bad_input",
     [
-        (
-            "a",
-            None,
-            math.sin,
-            object(),
-        ),
+        ("a", None, math.sin, object(), False),
     ],
 )
 def test_is_within_range_raises_error_with_bad_tested_value(
@@ -66,12 +61,7 @@ def test_is_within_range_raises_error_with_bad_tested_value(
 @pytest.mark.parametrize(
     "bad_input",
     [
-        (
-            "a",
-            None,
-            math.sin,
-            object(),
-        ),
+        ("a", None, math.sin, object(), False),
     ],
 )
 def test_is_within_range_raises_error_with_bad_upper_bound(
@@ -84,12 +74,7 @@ def test_is_within_range_raises_error_with_bad_upper_bound(
 @pytest.mark.parametrize(
     "bad_input",
     [
-        (
-            "a",
-            None,
-            math.sin,
-            object(),
-        ),
+        ("a", None, math.sin, object(), False),
     ],
 )
 def test_is_within_range_raises_error_with_bad_lower_bound(
