@@ -76,23 +76,13 @@ async def test_scaler_controller_trigger_sets_counting_true_then_false(
 
 
 async def test_simple_channel_scaler_read(hm3amp20_1: SimpleChannelScaler) -> None:
-    await assert_reading(
-        hm3amp20_1,
-        {
-            "hm3amp20_1-count": partial_reading(0),
-        },
-    )
+    await assert_reading(hm3amp20_1, {"hm3amp20_1-count": partial_reading(0)})
 
 
 async def test_simple_channel_scaler_read_configuration(
     hm3amp20_1: SimpleChannelScaler,
 ) -> None:
-    await assert_configuration(
-        hm3amp20_1,
-        {
-            "scaler1-count_period": partial_reading(0),
-        },
-    )
+    await assert_configuration(hm3amp20_1, {"scaler1-count_period": partial_reading(0)})
 
 
 async def test_simple_channel_scaler_trigger(
