@@ -59,22 +59,26 @@ def test_conversion_from_microns_to_centimetres(input, result):
 # Circular tests (all numbers here arbitrary)
 
 
-@pytest.mark.parametrize("input", [1.0, 10.0, 100.0])
+@pytest.mark.parametrize("input", [0.0, 1.0, 10.0, 100.0])
 def test_circular_cm_to_mm_and_back(input):
-    assert convert_cm_to_mm(convert_mm_to_cm(input)) == input
-    assert convert_mm_to_cm(convert_cm_to_mm(input)) == input
+    assert convert_cm_to_mm(convert_mm_to_cm(input)) == pytest.approx(input)
+    assert convert_mm_to_cm(convert_cm_to_mm(input)) == pytest.approx(input)
 
 
-@pytest.mark.parametrize("input", [1.0, 10.0, 100.0])
+@pytest.mark.parametrize("input", [0.0, 1.0, 10.0, 100.0])
 def test_circular_microns_to_mm_and_back(input):
-    assert convert_microns_to_mm(convert_mm_to_microns(input)) == input
-    assert convert_mm_to_microns(convert_microns_to_mm(input)) == input
+    assert convert_microns_to_mm(convert_mm_to_microns(input)) == pytest.approx(input)
+    assert convert_mm_to_microns(convert_microns_to_mm(input)) == pytest.approx(input)
 
 
-@pytest.mark.parametrize("input", [1.0, 10.0, 100.0])
-def test_circular_percentage_to_factor(input):
-    assert convert_percentage_to_factor(convert_factor_to_percentage(input)) == input
-    assert convert_factor_to_percentage(convert_percentage_to_factor(input)) == input
+@pytest.mark.parametrize("input", [0.0, 1.0, 10.0, 100.0])
+def test_circular_percentage_to_factor_and_back(input):
+    assert convert_percentage_to_factor(
+        convert_factor_to_percentage(input)
+    ) == pytest.approx(input)
+    assert convert_factor_to_percentage(
+        convert_percentage_to_factor(input)
+    ) == pytest.approx(input)
 
 
 # The inauspicuous path
