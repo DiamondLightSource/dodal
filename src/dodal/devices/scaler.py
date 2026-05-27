@@ -1,13 +1,12 @@
 import asyncio
 
-from bluesky.protocols import Triggerable
+from bluesky.protocols import Reading, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceMock,
     Reference,
     StandardReadable,
     StandardReadableFormat,
-    callback_on_mock_put,
     default_mock_class,
     set_and_wait_for_value,
     set_mock_value,
@@ -19,18 +18,15 @@ class MockScalerController(DeviceMock["ScalerController"]):
     async def connect(self, device: "ScalerController"):
         set_mock_value(device.counting, False)
 
-        async def _finish_after_delay():
+        async def _complete():
             await asyncio.sleep(0.2)
             set_mock_value(device.counting, False)
 
-        async def _on_put(value: bool):
-            if value is True:
-                asyncio.create_task(_finish_after_delay())
+        def _on_value(value: dict[str, Reading[bool]]):
+            if value[device.counting.name]["value"] is True:
+                asyncio.create_task(_complete())
 
-        # _on_put is called before the value is given to the signal. Therefore we must
-        # setup a delay to set the signal back to False once it is True to simulate
-        # hardware behaviour.
-        callback_on_mock_put(device.counting, _on_put)
+        device.counting.subscribe_reading(_on_value)
 
 
 @default_mock_class(MockScalerController)
@@ -52,11 +48,21 @@ class ScalerController(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
+        print("before set_and_wait")
+
         self._acquire_status = await set_and_wait_for_value(
             self.counting, True, wait_for_set_completion=True
         )
+
+        print("after set_and_wait")
+
         await self._acquire_status
+
+        print("after acquire status")
+
         await wait_for_good_state(self.counting, {False})
+
+        print("after wait_for_good_state")
 
 
 class SimpleChannelScaler(StandardReadable, Triggerable):
