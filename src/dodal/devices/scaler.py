@@ -27,7 +27,7 @@ class MockScalerController(DeviceMock["ScalerController"]):
             if value is True:
                 asyncio.create_task(_finish_after_delay())
 
-        # _on_put is called before the value given is to the signal. Therefore we must
+        # _on_put is called before the value is given to the signal. Therefore we must
         # setup a delay to set the signal back to False once it is True to simulate
         # hardware behaviour.
         callback_on_mock_put(device.counting, _on_put)
