@@ -2,7 +2,7 @@ import time
 from unittest.mock import AsyncMock, call
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import get_mock_put, init_devices
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.scaler import ScalerController, SimpleChannelScaler
@@ -83,6 +83,12 @@ async def test_simple_channel_scaler_read_configuration(
     hm3amp20_1: SimpleChannelScaler,
 ) -> None:
     await assert_configuration(hm3amp20_1, {"scaler1-count_period": partial_reading(0)})
+
+
+async def test_simple_channel_scaler_set(hm3amp20_1: SimpleChannelScaler) -> None:
+    value = 10
+    await hm3amp20_1.set(value)
+    get_mock_put(hm3amp20_1.count).assert_awaited_once_with(value)
 
 
 async def test_simple_channel_scaler_trigger(
