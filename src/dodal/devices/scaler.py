@@ -23,17 +23,20 @@ class MockScalerController(DeviceMock["ScalerController"]):
             await asyncio.sleep(0.2)
             set_mock_value(device.counting, False)
 
-        async def _on_put(value):
+        async def _on_put(value: bool):
             if value is True:
                 asyncio.create_task(_finish_after_delay())
 
+        # _on_put is called before the value given is to the signal. Therefore we must
+        # setup a delay to set the signal back to False once it is True to simulate
+        # hardware behaviour.
         callback_on_mock_put(device.counting, _on_put)
 
 
 @default_mock_class(MockScalerController)
 class ScalerController(StandardReadable, Triggerable):
-    """Scaler controller that is triggerable. It will set the counting to True and then
-    waits for it to be False.
+    """Scaler controller that is triggerable. It will set the counting signal to True
+    and then waits for it to be False.
     """
 
     def __init__(self, prefix: str, name: str = ""):

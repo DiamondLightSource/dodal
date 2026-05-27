@@ -1,4 +1,5 @@
 import time
+from unittest.mock import AsyncMock, call
 
 import pytest
 from ophyd_async.core import init_devices
@@ -92,3 +93,16 @@ async def test_simple_channel_scaler_read_configuration(
             "scaler1-count_period": partial_reading(0),
         },
     )
+
+
+async def test_simple_channel_scaler_trigger(
+    scaler1: ScalerController, hm3amp20_1: SimpleChannelScaler, sm5amp8_1
+) -> None:
+    mock_trigger = AsyncMock()
+    scaler1.trigger = mock_trigger
+
+    await hm3amp20_1.trigger()
+    mock_trigger.assert_awaited_once()
+
+    await sm5amp8_1.trigger()
+    mock_trigger.assert_has_calls([call(), call()])
