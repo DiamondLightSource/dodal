@@ -42,7 +42,7 @@ def sm() -> XYZAzimuthPolarDefocusStage:
     return XYZAzimuthPolarDefocusStage(prefix=f"{PREFIX.beamline_prefix}-EA-SM-01:")
 
 
-# Note: Currently fails due to i05-XXX
+# Note: Currently fails. Requires https://jira.diamond.ac.uk/browse/I05-764
 @devices.factory
 def analyser_slits() -> EntranceSlitInformationDevice:
     return EntranceSlitInformationDevice(f"{PREFIX.beamline_prefix}-EA-SLITS-01:POS")
