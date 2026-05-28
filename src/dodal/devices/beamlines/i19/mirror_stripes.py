@@ -20,3 +20,10 @@ class MirrorStripes(StandardReadable):
             self.stripe_choice = epics_signal_rw(StripeChoice, f"{prefix}stripeChoice")
             self.is_busy = epics_signal_r(int, f"{prefix}stripeChange:BUSY")
         super().__init__(name=name)
+
+    # This will need some mapping
+    def select_stripe_based_on_energy(self, energy_in_kev: float):
+        # Pt: 20-30 KeV
+        # Rh: 10-20 KeV
+        # Si: 5-10 KeV
+        pass
