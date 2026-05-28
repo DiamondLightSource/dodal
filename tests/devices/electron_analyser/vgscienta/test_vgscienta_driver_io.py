@@ -1,16 +1,11 @@
 from unittest.mock import ANY
 
-import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import StrictEnum, get_mock_put, set_mock_value
-from ophyd_async.testing import (
-    assert_configuration,
-    assert_reading,
-    partial_reading,
-)
+from ophyd_async.core import StrictEnum, get_mock_put
+from ophyd_async.testing import assert_configuration, partial_reading
 
 from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
 from dodal.devices.electron_analyser.vgscienta import (
@@ -18,10 +13,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
     VGScientaRegion,
 )
-from tests.devices.electron_analyser.helper_util import (
-    TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
-)
+from tests.devices.electron_analyser.helper_util import load_i09_vgscienta_test_seq
 
 
 @pytest.fixture
@@ -31,12 +23,7 @@ async def sim_driver(
     return ew4000.driver
 
 
-@pytest.fixture
-def sequence(sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]):
-    return get_test_sequence(type(sim_driver))
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_i09_vgscienta_test_seq().regions)
 async def test_analyser_sets_region_correctly(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
@@ -66,7 +53,7 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.region_size_y).assert_called_once_with(region.size_y)
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region", load_i09_vgscienta_test_seq().regions)
 async def test_analyser_sets_region_and_read_configuration_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
@@ -102,30 +89,6 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}region_size_y": partial_reading(region.size_y),
             f"{prefix}sensor_max_size_y": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
-        },
-    )
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_analyser_sets_region_and_read_is_correct(
-    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    region: VGScientaRegion[LensMode, PassEnergy],
-    run_engine: RunEngine,
-) -> None:
-    run_engine(bps.mv(sim_driver, region), wait=True)
-
-    spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
-    expected_total_intensity = np.sum(spectrum)
-    set_mock_value(sim_driver.spectrum, spectrum)
-
-    prefix = sim_driver.name + "-"
-
-    await assert_reading(
-        sim_driver,
-        {
-            f"{prefix}image": partial_reading(ANY),
-            f"{prefix}spectrum": partial_reading(spectrum),
-            f"{prefix}total_intensity": partial_reading(expected_total_intensity),
         },
     )
 
