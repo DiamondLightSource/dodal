@@ -27,8 +27,8 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
             "dodal.devices.beamlines.b16.detector.ADAcquireLogic"
         ) as mock_acquire_logic,
     ):
-        mock_arm_logic_instance = MagicMock(name="ADAcquireLogic")
-        mock_acquire_logic.return_value = mock_arm_logic_instance
+        mock_acquire_logic_instance = MagicMock(name="ADAcquireLogic")
+        mock_acquire_logic.return_value = mock_acquire_logic_instance
 
         mock_path_provider = MagicMock(name="PathProvider")
 
@@ -64,7 +64,7 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
             # writer=mock_writer,
             trigger_logic=mock_tiff_trigger_logic_instance,
             path_provider=mock_path_provider,
-            arm_logic=mock_arm_logic_instance,
+            acquire_logic=mock_acquire_logic_instance,
             writer_type=ADWriterType.TIFF,
             writer_suffix=TIFF_SUFFIX,
         )

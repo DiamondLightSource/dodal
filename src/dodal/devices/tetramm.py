@@ -211,10 +211,10 @@ class TetrammDetector(StandardDetector):
         current_trig_status = await self.driver.trigger_mode.get_value()
         if (
             current_trig_status == TetrammTrigger.FREE_RUN
-            and self._arm_logic is not None
+            and self._acquire_logic is not None
         ):  # if freerun turn off first
             LOGGER.info("Disarming TetrAMM from free run")
-            await self._arm_logic.disarm(on_unstage=False)
+            await self._acquire_logic.ensure_stopped()
         await super().prepare(value)
         # Standard detector sets this to 0 in prepare, we must set it to the correct
         # number here as it is used as a proxy to know when we're done
