@@ -10,6 +10,7 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
     HutchAccessControl,
 )
+from dodal.devices.beamlines.i19.access_controlled.mirror_stripes import MirrorStripes
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
@@ -125,6 +126,11 @@ def hfm() -> FocusingMirrorWithPiezo:
          Focusing mirror piezo device for the HFM.
     """
     return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
+
+
+@devices.factory()
+def mirror_stripes() -> MirrorStripes:
+    return MirrorStripes(f"{PREFIX.beamline_prefix}-MO-IOC-01:")
 
 
 @devices.factory()
