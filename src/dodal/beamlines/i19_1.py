@@ -69,7 +69,7 @@ def config_client() -> ConfigClient:
 
 
 @devices.factory()
-def read_only_dcm() -> ReadOnlyDCM:
+def dcm_ro() -> ReadOnlyDCM:
     return ReadOnlyDCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
