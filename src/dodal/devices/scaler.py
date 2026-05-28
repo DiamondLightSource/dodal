@@ -50,21 +50,11 @@ class ScalerController(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        print("before set_and_wait")
-
         self._acquire_status = await set_and_wait_for_value(
             self.counting, True, wait_for_set_completion=True
         )
-
-        print("after set_and_wait")
-
         await self._acquire_status
-
-        print("after acquire status")
-
         await wait_for_good_state(self.counting, {False})
-
-        print("after wait_for_good_state")
 
 
 class SimpleChannelScaler(StandardReadable, Triggerable):
