@@ -74,14 +74,6 @@ def path_provider() -> PathProvider:
     )
 
 
-@devices.fixture
-@cache
-def config_client() -> ConfigClient:
-    client = ConfigClient()
-    set_config_client(client)
-    return client
-
-
 @devices.factory()
 def dcm_ro() -> ReadOnlyDCM:
     return ReadOnlyDCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
