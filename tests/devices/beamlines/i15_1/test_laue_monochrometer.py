@@ -1,7 +1,7 @@
 import pytest
 from daq_config_server import ConfigClient
 from daq_config_server.models.i15_1 import XpdfCrystalLookupTable
-from ophyd_async.core import get_mock_put, init_devices
+from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i15_1.laue import LaueMonochrometer
