@@ -2,7 +2,7 @@ from typing import Generic, TypeVar
 
 from ophyd_async.core import DetectorTriggerLogic, PathProvider, SignalDict
 from ophyd_async.epics.adcore import (
-    ADArmLogic,
+    ADAcquireLogic,
     ADBaseIO,
     ADWriterType,
     AreaDetector,
@@ -39,7 +39,7 @@ def software_triggered_tiff_area_detector(
     return AreaDetector(
         prefix=prefix,
         driver=driver,
-        arm_logic=ADArmLogic(driver),
+        acquire_logic=ADAcquireLogic(driver),
         trigger_logic=TiffTriggerLogic(driver, deadtime),
         path_provider=path_provider,
         writer_type=ADWriterType.TIFF,
