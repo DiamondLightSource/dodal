@@ -1,7 +1,7 @@
 from .mbs_analyser_slits import (
     EntranceSlitInformation,
     EntranceSlitInformationDevice,
-    SlitPositions,
+    SlitPosition,
 )
 from .mbs_detector import MbsDetector
 from .mbs_driver_io import MbsAnalyserDriverIO
@@ -11,7 +11,7 @@ from .mbs_region import MbsRegion, MbsSequence
 __all__ = [
     "EntranceSlitInformationDevice",
     "EntranceSlitInformation",
-    "SlitPositions",
+    "SlitPosition",
     "MbsDetector",
     "MbsAnalyserDriverIO",
     "AcquisitionMode",

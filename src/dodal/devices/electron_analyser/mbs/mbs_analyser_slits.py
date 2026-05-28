@@ -11,7 +11,7 @@ from ophyd_async.epics.core import epics_signal_rw
 from pydantic import BaseModel
 
 
-class SlitPositions(StrictEnum):
+class SlitPosition(StrictEnum):
     P100_0_1_CURVED = "100 0.1 curved"
     P200_0_1_STRAIGHT = "200 0.1 straight"
     P300_0_2_CURVED = "300 0.2 curved"
@@ -31,36 +31,27 @@ class EntranceSlitInformation(BaseModel):
     shape: str = "curved"
 
     @classmethod
-    def from_slit_positions(cls, pos: SlitPositions):
+    def from_slit_positions(cls, pos: SlitPosition):
         setting, size, shape = str(pos).split()
         return cls(setting=int(setting), size=float(size), shape=shape)
 
-    def to_slit_postions(self) -> SlitPositions:
-        return SlitPositions[f"{self.size} {self.setting} {self.shape}"]
+    def to_slit_position(self) -> SlitPosition:
+        return SlitPosition(f"{self.setting} {self.size:g} {self.shape}")
 
 
 class EntranceSlitInformationDevice(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
-        self.slit_info = epics_signal_rw(SlitPositions, prefix)
+        self.slit_info = epics_signal_rw(SlitPosition, prefix)
 
-        default_positions = EntranceSlitInformation()
         with self.add_children_as_readables():
-            self.direction, self._direction_w = soft_signal_r_and_setter(
-                str, initial_value=default_positions.direction
-            )
-            self.setting, self._setting_w = soft_signal_r_and_setter(
-                int, initial_value=default_positions.setting
-            )
-            self.size, self._size_w = soft_signal_r_and_setter(
-                float, initial_value=default_positions.size
-            )
-            self.shape, self._shape_w = soft_signal_r_and_setter(
-                str, initial_value=default_positions.shape
-            )
+            self.direction, self._direction_w = soft_signal_r_and_setter(str)
+            self.setting, self._setting_w = soft_signal_r_and_setter(int)
+            self.size, self._size_w = soft_signal_r_and_setter(float)
+            self.shape, self._shape_w = soft_signal_r_and_setter(str)
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: SlitPositions):
+    async def set(self, value: SlitPosition):
         await self.slit_info.set(value)
 
     async def connect(
@@ -72,7 +63,7 @@ class EntranceSlitInformationDevice(StandardReadable):
         await super().connect(mock, timeout, force_reconnect)
 
         def _sync_soft_signals_with_epics(
-            value: dict[str, Reading[SlitPositions]],
+            value: dict[str, Reading[SlitPosition]],
         ) -> None:
             val = value[self.slit_info.name]["value"]
             new_slit_info = EntranceSlitInformation.from_slit_positions(val)
