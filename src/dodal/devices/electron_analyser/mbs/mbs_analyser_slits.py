@@ -40,9 +40,14 @@ class EntranceSlitInformation(BaseModel):
 
 
 class EntranceSlitInformationDevice(StandardReadable):
-    def __init__(self, prefix: str, name: str = ""):
-        self.slit_info = epics_signal_rw(SlitPosition, prefix)
+    """Device that connects to epics signal containing slit information from an enum
+    value. This is synced with soft signals as individual signals which can be added as
+    config_signals to give to detectors to save as nicely formatted data.
+    """
 
+    def __init__(self, pv: str, name: str = ""):
+        self.slit_info = epics_signal_rw(SlitPosition, pv)
+        # Formatted slit info as individual soft signals for metadata
         with self.add_children_as_readables():
             self.direction, self._direction_w = soft_signal_r_and_setter(str)
             self.setting, self._setting_w = soft_signal_r_and_setter(int)
