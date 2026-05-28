@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i15\_1.laue.LaueMonochrometer
+=====================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.laue
+
+.. autoclass:: LaueMonochrometer
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
