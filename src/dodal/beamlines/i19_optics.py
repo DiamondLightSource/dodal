@@ -10,7 +10,7 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
     HutchAccessControl,
 )
-from dodal.devices.beamlines.i19.access_controlled.mirror_stripes import MirrorStripes
+from dodal.devices.beamlines.i19.mirror_stripes import MirrorStripes
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
