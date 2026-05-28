@@ -1,5 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.electron_analyser.mbs import (
     EntranceSlitInformation,
@@ -48,3 +49,21 @@ async def test_slit_info_device_soft_signals_sync_with_epics(
     assert await slit_info_device.shape.get_value() == slit_info.shape
     assert await slit_info_device.size.get_value() == slit_info.size
     assert await slit_info_device.direction.get_value() == slit_info.direction
+
+
+@pytest.mark.parametrize("slit_pos", [pos.value for pos in SlitPosition])
+async def test_slit_info_device_read_and_soft_signals_sync_with_epics(
+    slit_info_device: EntranceSlitInformationDevice, slit_pos: SlitPosition
+) -> None:
+    await slit_info_device.set(slit_pos)
+    slit_info = EntranceSlitInformation.from_slit_positions(slit_pos)
+
+    await assert_reading(
+        slit_info_device,
+        {
+            "slit_info_device-size": partial_reading(slit_info.size),
+            "slit_info_device-shape": partial_reading(slit_info.shape),
+            "slit_info_device-setting": partial_reading(slit_info.setting),
+            "slit_info_device-direction": partial_reading(slit_info.direction),
+        },
+    )

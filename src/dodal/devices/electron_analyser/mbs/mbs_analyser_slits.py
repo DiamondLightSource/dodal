@@ -46,7 +46,7 @@ class EntranceSlitInformationDevice(StandardReadable):
     """
 
     def __init__(self, pv: str, name: str = ""):
-        self.slit_info = epics_signal_rw(SlitPosition, pv)
+        self.slit_pos = epics_signal_rw(SlitPosition, pv)
         # Formatted slit info as individual soft signals for metadata
         with self.add_children_as_readables():
             self.direction, self._direction_w = soft_signal_r_and_setter(str)
@@ -57,7 +57,7 @@ class EntranceSlitInformationDevice(StandardReadable):
 
     @AsyncStatus.wrap
     async def set(self, value: SlitPosition):
-        await self.slit_info.set(value)
+        await self.slit_pos.set(value)
 
     async def connect(
         self,
@@ -70,11 +70,11 @@ class EntranceSlitInformationDevice(StandardReadable):
         def _sync_soft_signals_with_epics(
             value: dict[str, Reading[SlitPosition]],
         ) -> None:
-            val = value[self.slit_info.name]["value"]
+            val = value[self.slit_pos.name]["value"]
             new_slit_info = EntranceSlitInformation.from_slit_positions(val)
             self._direction_w(new_slit_info.direction)
             self._setting_w(new_slit_info.setting)
             self._size_w(new_slit_info.size)
             self._shape_w(new_slit_info.shape)
 
-        self.slit_info.subscribe(_sync_soft_signals_with_epics)
+        self.slit_pos.subscribe(_sync_soft_signals_with_epics)
