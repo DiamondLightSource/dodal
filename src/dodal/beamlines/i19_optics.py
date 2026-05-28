@@ -24,6 +24,7 @@ from dodal.devices.common_dcm import (
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
 from dodal.devices.hutch_shutter import InterlockedHutchShutter
 from dodal.devices.interlocks import PSSInterlock
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -164,6 +165,15 @@ def shutter() -> InterlockedHutchShutter:
     """
     return InterlockedHutchShutter(
         PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
+    )
+
+
+@devices.factory()
+def undulator(config_client: ConfigClient) -> UndulatorInKeV:
+    return UndulatorInKeV(
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
+        id_gap_lookup_table_path=ID_GAP_LOOKUP,
     )
 
 
