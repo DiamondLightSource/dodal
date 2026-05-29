@@ -40,7 +40,7 @@ class ScalerController(StandardReadable, Triggerable):
     def __init__(self, prefix: str, name: str = ""):
         self.counting = epics_signal_rw(bool, prefix + ".CNT")
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.count_period = epics_signal_rw(float, prefix + ".TP")
+            self.count_time = epics_signal_rw(float, prefix + ".TP")
 
         self._acquire_status: AsyncStatus | None = None
         # Store the prefix so that the SimpleChannelScaler can reuse.
@@ -82,7 +82,7 @@ class SimpleChannelScaler(StandardReadable, Triggerable):
         scalar_controller.add_readables([self])
         # Avoid circular read configuration by specifying individual signal
         self.add_readables(
-            [scalar_controller.count_period], StandardReadableFormat.CONFIG_SIGNAL
+            [scalar_controller.count_time], StandardReadableFormat.CONFIG_SIGNAL
         )
 
     @AsyncStatus.wrap

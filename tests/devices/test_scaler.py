@@ -48,7 +48,7 @@ async def test_scaler_controller_read_with_multiple_channels(
 
 
 async def test_scaler_controller_read_configuration(scaler1: ScalerController) -> None:
-    await assert_configuration(scaler1, {"scaler1-count_period": partial_reading(0.0)})
+    await assert_configuration(scaler1, {"scaler1-count_time": partial_reading(0.0)})
 
 
 async def test_scaler_controller_trigger_waits_for_counting_to_finish(
@@ -82,7 +82,7 @@ async def test_simple_channel_scaler_read(hm3amp20_1: SimpleChannelScaler) -> No
 async def test_simple_channel_scaler_read_configuration(
     hm3amp20_1: SimpleChannelScaler,
 ) -> None:
-    await assert_configuration(hm3amp20_1, {"scaler1-count_period": partial_reading(0)})
+    await assert_configuration(hm3amp20_1, {"scaler1-count_time": partial_reading(0)})
 
 
 async def test_simple_channel_scaler_set(hm3amp20_1: SimpleChannelScaler) -> None:
