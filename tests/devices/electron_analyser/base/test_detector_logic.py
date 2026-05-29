@@ -19,7 +19,7 @@ from dodal.devices.electron_analyser.base import AbstractAnalyserDriverIO, BaseR
 from dodal.devices.electron_analyser.base.detector_logic import (
     ElectronAnalayserTriggerLogic,
     RegionLogic,
-    ShutterCoordinatorADArmLogic,
+    ShutterCoordinatorADAcquireLogic,
 )
 from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
@@ -87,12 +87,12 @@ async def test_shutter_arm_logic_opens_shutters(
     with init_devices(mock=True):
         close_shutter_idle_signal = soft_signal_rw(bool, close_shutter_idle)
 
-    shutter_arm_logic = ShutterCoordinatorADArmLogic(
+    shutter_acquire_logic = ShutterCoordinatorADAcquireLogic(
         driver, shutter, close_shutter_idle_signal
     )
 
     detector = StandardDetector()
-    detector.add_detector_logics(shutter_arm_logic)
+    detector.add_detector_logics(shutter_acquire_logic)
 
     await detector.stage()
     await detector.trigger()
@@ -104,7 +104,7 @@ async def test_shutter_arm_logic_opens_shutters(
     )
 
     # Test expected shutter calls.
-    shutter = shutter_arm_logic._shutter
+    shutter = shutter_acquire_logic._shutter
     get_mock_put(shutter.shutter_state).assert_has_awaits(
         expected_shutter_calls(shutter)
     )

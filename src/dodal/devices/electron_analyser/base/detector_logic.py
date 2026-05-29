@@ -5,7 +5,7 @@ from ophyd_async.core import (
     SignalDict,
     SignalR,
 )
-from ophyd_async.epics.adcore import ADArmLogic, ADImageMode
+from ophyd_async.epics.adcore import ADAcquireLogic, ADImageMode
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -16,8 +16,10 @@ from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
-class ShutterCoordinatorADArmLogic(ADArmLogic, Generic[TAbstractAnalyserDriverIO]):
-    """Extends the arm logic to coordinate opening shutters before acqusition with
+class ShutterCoordinatorADAcquireLogic(
+    ADAcquireLogic, Generic[TAbstractAnalyserDriverIO]
+):
+    """Extends the acquire logic to coordinate opening shutters before acquisition with
     optional configuration of when to close.
     """
 
@@ -31,10 +33,10 @@ class ShutterCoordinatorADArmLogic(ADArmLogic, Generic[TAbstractAnalyserDriverIO
         self._close_shutter_idle = close_shutter_idle
         super().__init__(driver)
 
-    async def arm(self):
+    async def start_acquiring(self):
         # Open shutter before data collection
         await self._shutter.set(self._shutter.open_state)
-        await super().arm()
+        await super().start_acquiring()
 
     async def wait_for_idle(self):
         await super().wait_for_idle()
