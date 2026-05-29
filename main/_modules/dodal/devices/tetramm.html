@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 2.4.1.dev9+gdb3289e9f documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 2.4.1.dev10+gf787f8379 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=a1a03ed7"></script>
+    <script src="../../../_static/documentation_options.js?v=3370606b"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -889,7 +889,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
-    <span class="n">DetectorArmLogic</span><span class="p">,</span>
+    <span class="n">DetectorAcquireLogic</span><span class="p">,</span>
     <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
     <span class="n">PathProvider</span><span class="p">,</span>
     <span class="n">SignalDict</span><span class="p">,</span>
@@ -1029,13 +1029,13 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="TetrammArmLogic">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammArmLogic.html#dodal.devices.tetramm.TetrammArmLogic">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TetrammArmLogic</span><span class="p">(</span><span class="n">DetectorArmLogic</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammArmLogic</span><span class="p">(</span><span class="n">DetectorAcquireLogic</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">TetrammDriver</span><span class="p">,</span> <span class="n">writer_acquire</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writer_acquire</span> <span class="o">=</span> <span class="n">writer_acquire</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">acquire_status</span><span class="p">:</span> <span class="n">AsyncStatus</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_acquiring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">acquire_status</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span>
             <span class="kc">True</span><span class="p">,</span>
@@ -1045,7 +1045,7 @@ window.runMermaid = runMermaid;</script>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_idle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">writer_acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">disarm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_unstage</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ensure_stopped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">await</span> <span class="n">stop_busy_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">acquire</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquire_status</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquire_status</span></div>
@@ -1124,10 +1124,10 @@ window.runMermaid = runMermaid;</script>
         <span class="n">current_trig_status</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">current_trig_status</span> <span class="o">==</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">FREE_RUN</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_logic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_logic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">):</span>  <span class="c1"># if freerun turn off first</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Disarming TetrAMM from free run&quot;</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_logic</span><span class="o">.</span><span class="n">disarm</span><span class="p">(</span><span class="n">on_unstage</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_logic</span><span class="o">.</span><span class="n">ensure_stopped</span><span class="p">()</span>
         <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="c1"># Standard detector sets this to 0 in prepare, we must set it to the correct</span>
         <span class="c1"># number here as it is used as a proxy to know when we&#39;re done</span>

@@ -13,10 +13,11 @@ dodal.devices.tetramm.TetrammArmLogic
    .. autosummary::
    
       
-      ~TetrammArmLogic.arm
+      
+      ~TetrammArmLogic.ensure_stopped
       
       
-      ~TetrammArmLogic.disarm
+      ~TetrammArmLogic.start_acquiring
       
       
       ~TetrammArmLogic.wait_for_idle

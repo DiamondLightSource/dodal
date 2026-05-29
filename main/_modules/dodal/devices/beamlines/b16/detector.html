@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.b16.detector &#8212; dodal 2.4.1.dev9+gdb3289e9f documentation</title>
+    <title>dodal.devices.beamlines.b16.detector &#8212; dodal 2.4.1.dev10+gf787f8379 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=a1a03ed7"></script>
+    <script src="../../../../../_static/documentation_options.js?v=3370606b"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -889,7 +889,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorTriggerLogic</span><span class="p">,</span> <span class="n">PathProvider</span><span class="p">,</span> <span class="n">SignalDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ADArmLogic</span><span class="p">,</span>
+    <span class="n">ADAcquireLogic</span><span class="p">,</span>
     <span class="n">ADBaseIO</span><span class="p">,</span>
     <span class="n">ADWriterType</span><span class="p">,</span>
     <span class="n">AreaDetector</span><span class="p">,</span>
@@ -931,7 +931,7 @@ window.runMermaid = runMermaid;</script>
     <span class="k">return</span> <span class="n">AreaDetector</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
         <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span>
-        <span class="n">arm_logic</span><span class="o">=</span><span class="n">ADArmLogic</span><span class="p">(</span><span class="n">driver</span><span class="p">),</span>
+        <span class="n">acquire_logic</span><span class="o">=</span><span class="n">ADAcquireLogic</span><span class="p">(</span><span class="n">driver</span><span class="p">),</span>
         <span class="n">trigger_logic</span><span class="o">=</span><span class="n">TiffTriggerLogic</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">),</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
         <span class="n">writer_type</span><span class="o">=</span><span class="n">ADWriterType</span><span class="o">.</span><span class="n">TIFF</span><span class="p">,</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.4.1.dev9+gdb3289e9f documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.4.1.dev10+gf787f8379 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=a1a03ed7"></script>
+    <script src="../../../../../_static/documentation_options.js?v=3370606b"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -893,7 +893,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Array1D</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
-    <span class="n">DetectorArmLogic</span><span class="p">,</span>
+    <span class="n">DetectorAcquireLogic</span><span class="p">,</span>
     <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
     <span class="n">StandardDetector</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
@@ -949,7 +949,7 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">arm_logic</span><span class="p">:</span> <span class="n">DetectorArmLogic</span><span class="p">,</span>
+        <span class="n">acquire_logic</span><span class="p">:</span> <span class="n">DetectorAcquireLogic</span><span class="p">,</span>
         <span class="n">trigger_logic</span><span class="p">:</span> <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
         <span class="n">region_logic</span><span class="p">:</span> <span class="n">RegionLogic</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -963,7 +963,7 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span> <span class="o">=</span> <span class="n">region_logic</span>
         <span class="c1"># ToDo - Add data logic</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_detector_logics</span><span class="p">(</span><span class="n">arm_logic</span><span class="p">,</span> <span class="n">trigger_logic</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_detector_logics</span><span class="p">(</span><span class="n">acquire_logic</span><span class="p">,</span> <span class="n">trigger_logic</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_config_signals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">SequenceHolder</span><span class="p">()</span>
