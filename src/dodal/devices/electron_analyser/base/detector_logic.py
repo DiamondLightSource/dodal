@@ -20,7 +20,7 @@ from dodal.devices.selectable_source import SourceSelector
 class ShutterCoordinatorADAcquireLogic(
     ADAcquireLogic, Generic[TAbstractAnalyserDriverIO]
 ):
-    """Extends the arm logic to coordinate opening shutters before acquisition with
+    """Extends the acquire logic to coordinate opening shutters before acquisition with
     optional configuration of when to close.
     """
 
