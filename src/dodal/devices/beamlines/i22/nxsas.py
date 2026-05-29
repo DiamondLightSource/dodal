@@ -101,6 +101,7 @@ class NXSasPilatus(PilatusDetector):
             driver_suffix=driver_suffix,
             writer_suffix=writer_suffix,
             name=name,
+            plugins=plugins,
         )
         self._metadata_holder = metadata_holder
 
