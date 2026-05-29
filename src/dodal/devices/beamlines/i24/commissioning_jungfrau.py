@@ -17,7 +17,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
 from ophyd_async.fastcs.core import fastcs_connector
-from ophyd_async.fastcs.jungfrau._arm_logic import JungfrauArmLogic
+from ophyd_async.fastcs.jungfrau._acquire_logic import JungfrauAcquireLogic
 from ophyd_async.fastcs.jungfrau._io import AcquisitionType, JungfrauDriverIO
 from ophyd_async.fastcs.jungfrau._trigger_logic import JungfrauTriggerLogic
 
@@ -134,7 +134,7 @@ class CommissioningJungfrauDetector(StandardDetector):
         )
         self.add_detector_logics(
             JungfrauTriggerLogic(self.detector, self.acquisition_type),
-            JungfrauArmLogic(self.detector),
+            JungfrauAcquireLogic(self.detector),
             self.writer_logic,
         )
         super().__init__(name=name)

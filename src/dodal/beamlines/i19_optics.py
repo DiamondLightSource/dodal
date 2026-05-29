@@ -10,6 +10,11 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
     HutchAccessControl,
 )
+from dodal.devices.common_dcm import (
+    DoubleCrystalMonochromatorWithDSpacing,
+    PitchAndRollCrystal,
+    StationaryCrystal,
+)
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
 from dodal.devices.hutch_shutter import InterlockedHutchShutter
 from dodal.devices.interlocks import PSSInterlock
@@ -22,6 +27,15 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 devices = DeviceManager()
+
+
+@devices.factory()
+def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
+    return DoubleCrystalMonochromatorWithDSpacing(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_1=StationaryCrystal,
+        xtal_2=PitchAndRollCrystal,
+    )
 
 
 @devices.factory()

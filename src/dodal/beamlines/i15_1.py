@@ -11,7 +11,6 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i15.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
@@ -19,6 +18,7 @@ from dodal.devices.beamlines.i15_1.attenuator import Attenuator
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
+from dodal.devices.beamlines.i15_1.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
 from dodal.devices.hutch_shutter import (
@@ -37,6 +37,9 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 BL = get_beamline_name("i15-1")  # Default used when not on a live beamline
 PREFIX = BeamlinePrefix(BL, suffix="J")
 XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
+XPDF_CRYSTAL_LUT_FILEPATH = (
+    "/dls_sw/i15-1/software/daq_configuration/xpdf_crystal_lut.txt"
+)
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 
@@ -225,9 +228,13 @@ def trans() -> XYPhiStage:
     return XYPhiStage(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01:TRANS:")
 
 
-@devices.factory(skip=True)  # Currently turned off due to work on the beamline
-def xtal() -> LaueMonochrometer:
-    return LaueMonochrometer(prefix=f"{PREFIX.beamline_prefix}-OP-LAUE-01:")
+@devices.factory()
+def xtal(config_client: ConfigClient) -> LaueMonochrometer:
+    return LaueMonochrometer(
+        prefix=f"{PREFIX.beamline_prefix}-OP-LAUE-01:",
+        config_client=config_client,
+        crystal_lut_path=XPDF_CRYSTAL_LUT_FILEPATH,
+    )
 
 
 @devices.factory()

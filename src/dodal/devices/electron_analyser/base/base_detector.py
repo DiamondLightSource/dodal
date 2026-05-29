@@ -7,7 +7,7 @@ from bluesky.protocols import Preparable, Stageable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
-    DetectorArmLogic,
+    DetectorAcquireLogic,
     DetectorTriggerLogic,
     SignalR,
     StandardDetector,
@@ -62,15 +62,13 @@ class ElectronAnalyserDetector(
 
     def __init__(
         self,
-        arm_logic: DetectorArmLogic,
+        acquire_logic: DetectorAcquireLogic,
         trigger_logic: DetectorTriggerLogic,
         region_logic: RegionLogic,
         config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
         self._region_logic = region_logic
-        # ToDo - Add data logic
-        self.add_detector_logics(arm_logic, trigger_logic)
 
         self.binding_energy_axis = derived_signal_r(
             self._calculate_binding_energy_axis,
@@ -79,6 +77,8 @@ class ElectronAnalyserDetector(
             excitation_energy=region_logic.energy_source,
             energy_mode=region_logic.driver.energy_mode,
         )
+        # ToDo - Add data logic
+        self.add_detector_logics(acquire_logic, trigger_logic)
         self.add_config_signals(self.binding_energy_axis, *config_sigs)
 
         self.sequence = SequenceHolder()
