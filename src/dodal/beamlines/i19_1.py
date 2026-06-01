@@ -43,7 +43,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
-I19_1_COMMISSIONING_INSTR_SESSION: str = "cm40638-5"
+I19_1_COMMISSIONING_INSTR_SESSION: str = "cm44168-3"
 
 I19_1_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_PILATUS=1),

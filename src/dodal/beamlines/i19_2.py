@@ -47,7 +47,7 @@ PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-I19_2_COMMISSIONING_INSTR_SESSION: str = "cm40639-5"
+I19_2_COMMISSIONING_INSTR_SESSION: str = "cm44169-3"
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(),
