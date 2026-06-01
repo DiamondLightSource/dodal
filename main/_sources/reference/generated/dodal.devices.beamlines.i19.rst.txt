@@ -14,6 +14,7 @@ dodal.devices.beamlines.i19
    dodal.devices.beamlines.i19.beamstop
    dodal.devices.beamlines.i19.diffractometer
    dodal.devices.beamlines.i19.mapt_configuration
+   dodal.devices.beamlines.i19.mirror_stripes
    dodal.devices.beamlines.i19.pin_col_stages
    dodal.devices.beamlines.i19.pin_tip
 
