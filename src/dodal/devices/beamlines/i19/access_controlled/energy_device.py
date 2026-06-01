@@ -61,6 +61,11 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
     ) -> StripeChoice:
         """Returns the correct value to set to the mirror stripes, considering the
         energy request and the invoking hutch.
+
+        Energy ranges:
+            SI: (5KeV, 10KeV]
+            RH: (10KeV, 20KeV]
+            PT: (20KeV, 30KeV]
         """
         if 5 <= energy_in_kev < 10:
             stripe = Stripes.SI
