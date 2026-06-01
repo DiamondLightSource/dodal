@@ -72,7 +72,7 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
             raise OutOfRangeEnergyRequestError(
                 f"The requested energy at {energy_in_kev} KeV is out of range"
             )
-        _choice = f"{stripe}-{self._invoking_hutch}"
+        _choice = f"{self._invoking_hutch}-{stripe}"
         return StripeChoice(_choice)
 
     @AsyncStatus.wrap
