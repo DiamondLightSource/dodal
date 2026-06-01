@@ -1,15 +1,14 @@
 from typing import Generic
 
 from ophyd_async.core import soft_signal_rw
-from ophyd_async.epics.adcore import ADArmLogic
+from ophyd_async.epics.adcore import ADAcquireLogic
 
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.base.detector_logic import (
-    ADArmLogic,
     ElectronAnalayserTriggerLogic,
     RegionLogic,
-    ShutterCoordinatorADArmLogic,
+    ShutterCoordinatorADAcquireLogic,
 )
 from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
@@ -47,10 +46,12 @@ class VGScientaDetector(
         )
         region_logic = RegionLogic(self.driver, energy_source, source_selector)
         self.close_shutter_idle = soft_signal_rw(bool, initial_value=True)
-        arm_logic = (
-            ShutterCoordinatorADArmLogic(self.driver, shutter, self.close_shutter_idle)
+        acquire_logic = (
+            ShutterCoordinatorADAcquireLogic(
+                self.driver, shutter, self.close_shutter_idle
+            )
             if shutter is not None
-            else ADArmLogic(self.driver)
+            else ADAcquireLogic(self.driver)
         )
         trigger_logic = ElectronAnalayserTriggerLogic(
             self.driver,
@@ -84,7 +85,7 @@ class VGScientaDetector(
 
         super().__init__(
             region_logic=region_logic,
-            arm_logic=arm_logic,
+            acquire_logic=acquire_logic,
             trigger_logic=trigger_logic,
             name=name,
         )
