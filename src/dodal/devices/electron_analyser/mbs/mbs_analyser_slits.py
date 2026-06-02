@@ -1,3 +1,5 @@
+from typing import Self
+
 from bluesky.protocols import Reading
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
@@ -31,7 +33,7 @@ class EntranceSlitInformation(BaseModel):
     shape: str = "curved"
 
     @classmethod
-    def from_slit_positions(cls, pos: SlitPosition):
+    def from_slit_positions(cls, pos: SlitPosition) -> Self:
         setting, size, shape = str(pos).split()
         return cls(setting=int(setting), size=float(size), shape=shape)
 
@@ -59,6 +61,17 @@ class EntranceSlitInformationDevice(StandardReadable):
     async def set(self, value: SlitPosition):
         await self.slit_pos.set(value)
 
+    def _sync_soft_signals_with_epics(
+        self,
+        value: dict[str, Reading[SlitPosition]],
+    ) -> None:
+        val = value[self.slit_pos.name]["value"]
+        new_slit_info = EntranceSlitInformation.from_slit_positions(val)
+        self._direction_w(new_slit_info.direction)
+        self._setting_w(new_slit_info.setting)
+        self._size_w(new_slit_info.size)
+        self._shape_w(new_slit_info.shape)
+
     async def connect(
         self,
         mock: bool | DeviceMock = False,
@@ -66,15 +79,6 @@ class EntranceSlitInformationDevice(StandardReadable):
         force_reconnect: bool = False,
     ) -> None:
         await super().connect(mock, timeout, force_reconnect)
-
-        def _sync_soft_signals_with_epics(
-            value: dict[str, Reading[SlitPosition]],
-        ) -> None:
-            val = value[self.slit_pos.name]["value"]
-            new_slit_info = EntranceSlitInformation.from_slit_positions(val)
-            self._direction_w(new_slit_info.direction)
-            self._setting_w(new_slit_info.setting)
-            self._size_w(new_slit_info.size)
-            self._shape_w(new_slit_info.shape)
-
-        self.slit_pos.subscribe(_sync_soft_signals_with_epics)
+        # subscribe_reading listeners are stored in a set, so repeatedly subscribing
+        # this bound method is harmless and does not create duplicate callbacks.
+        self.slit_pos.subscribe_reading(self._sync_soft_signals_with_epics)

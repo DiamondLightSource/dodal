@@ -67,3 +67,16 @@ async def test_slit_info_device_read_and_soft_signals_sync_with_epics(
             "slit_info_device-direction": partial_reading(slit_info.direction),
         },
     )
+
+
+async def test_slit_info_device_multiple_connects_has_one_subscribe(
+    slit_info_device: EntranceSlitInformationDevice,
+):
+    expected_subscribers = 1
+    number_of_subscribers = len(slit_info_device.slit_pos._get_cache()._listeners)
+    assert number_of_subscribers == expected_subscribers
+    # Test if we connect again if another subscriber is added, checking for memory leaks.
+    await slit_info_device.connect(mock=True)
+    assert (
+        len(slit_info_device.slit_pos._get_cache()._listeners) == expected_subscribers
+    )
