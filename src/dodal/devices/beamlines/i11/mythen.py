@@ -8,7 +8,7 @@ from ophyd_async.core import (
     StrictEnum,
 )
 from ophyd_async.epics.adcore import (
-    ADArmLogic,
+    ADAcquireLogic,
     ADBaseIO,
     ADImageMode,
     ADWriterType,
@@ -143,7 +143,7 @@ class Mythen3(AreaDetector[Mythen3Driver]):
         super().__init__(
             prefix=prefix,
             driver=self.driver,
-            arm_logic=ADArmLogic(self.driver),
+            acquire_logic=ADAcquireLogic(self.driver),
             trigger_logic=Mythen3TriggerLogic(self.driver),
             path_provider=path_provider,
             writer_type=writer_type,
