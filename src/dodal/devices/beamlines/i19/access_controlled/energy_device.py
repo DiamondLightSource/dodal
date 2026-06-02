@@ -40,6 +40,10 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
     directory to act as a placeholder for the instrument_session, should be passed to the
     device upon instantiation.
 
+    The plan to change the energy also involves moving the mirror stripes and the stripe
+    selection is hutch-dependent, so the choice of stripe needs to be done internally to
+    this device and passed to the plan.
+
     For details see the architecture described in
     https://diamondlightsource.github.io/i19-bluesky/main/explanations/decisions/0004-optics-blueapi-architecture.html
     """
@@ -63,9 +67,9 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
         energy request and the invoking hutch.
 
         Energy ranges:
-            SI: (5KeV, 10KeV]
-            RH: (10KeV, 20KeV]
-            PT: (20KeV, 30KeV]
+            SI: [5KeV, 10KeV)
+            RH: [10KeV, 20KeV)
+            PT: [20KeV, 30KeV)
         """
         if 5 <= energy_in_kev < 10:
             stripe = Stripes.SI
