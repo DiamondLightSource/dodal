@@ -62,16 +62,15 @@ def analyser_slits() -> EntranceSlitInformationDevice:
 def analyser(
     pgm: PlaneGratingMonochromator, analyser_slits: EntranceSlitInformationDevice
 ) -> MbsDetector[LensMode, PassEnergy]:
-    config_sigs = (
-        analyser_slits.direction,
-        analyser_slits.size,
-        analyser_slits.shape,
-        analyser_slits.setting,
-    )
     return MbsDetector[LensMode, PassEnergy](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
         lens_mode_type=LensMode,
         pass_energy_type=PassEnergy,
         energy_source=pgm.energy.user_readback,
-        config_sigs=config_sigs,
+        config_sigs=(
+            analyser_slits.direction,
+            analyser_slits.size,
+            analyser_slits.shape,
+            analyser_slits.setting,
+        ),
     )
