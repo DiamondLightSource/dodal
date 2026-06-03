@@ -1,7 +1,7 @@
 import time
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import get_mock_put, init_devices
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.beamlines.i09.scaler import ScalerController
@@ -30,6 +30,12 @@ async def test_scaler_controller_read(
 
 async def test_scaler_controller_read_configuration(scaler1: ScalerController) -> None:
     await assert_configuration(scaler1, {"scaler1-count_time": partial_reading(0.0)})
+
+
+async def test_scaler_controller_set(scaler1: ScalerController) -> None:
+    value = 1
+    await scaler1.set(value)
+    get_mock_put(scaler1.count_time).assert_awaited_once_with(value)
 
 
 async def test_scaler_controller_trigger_waits_for_counting_to_finish(
