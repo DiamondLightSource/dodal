@@ -11,6 +11,7 @@ from dodal.devices.beamlines.i09 import (
     PassEnergy,
     PsuMode,
 )
+from dodal.devices.beamlines.i09.scaler import ScalerController
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
@@ -18,7 +19,6 @@ from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.scaler import ScalerController, SimpleChannelScaler
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
@@ -149,45 +149,5 @@ def scaler1() -> ScalerController:
 
 
 @devices.factory
-def hm3amp20_1(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=2)
-
-
-@devices.factory
-def sm5amp8_1(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=3)
-
-
-@devices.factory
-def smpmamp39_1(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=4)
-
-
-@devices.factory
-def rfdamp10_1(scaler1: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler1, channel=5)
-
-
-@devices.factory
 def scaler2() -> ScalerController:
-    return ScalerController(f"{L_PREFIX}-VA-SCLR-01")
-
-
-@devices.factory
-def hm3amp20(scaler2: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler2, channel=2)
-
-
-@devices.factory
-def sm5amp8(scaler2: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler2, channel=3)
-
-
-@devices.factory
-def smpmamp39(scaler2: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler2, channel=4)
-
-
-@devices.factory
-def rfdamp10(scaler2: ScalerController) -> SimpleChannelScaler:
-    return SimpleChannelScaler(scaler2, channel=5)
+    return ScalerController(f"{L_PREFIX.beamline_prefix}-VA-SCLR-01")
