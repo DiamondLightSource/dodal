@@ -38,10 +38,10 @@ class SpecsDetector(
             prefix, lens_mode_type, psu_mode_type
         )
         region_logic = RegionLogic(self.driver, energy_source, source_selector)
-        self.close_shutter_idle = soft_signal_rw(bool, initial_value=True)
+        self.close_shutter_when_idle = soft_signal_rw(bool, initial_value=True)
         acquire_logic = (
             ShutterCoordinatorADAcquireLogic(
-                self.driver, shutter, self.close_shutter_idle
+                self.driver, shutter, self.close_shutter_when_idle
             )
             if shutter is not None
             else ADAcquireLogic(self.driver)

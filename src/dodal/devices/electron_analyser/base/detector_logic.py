@@ -27,10 +27,10 @@ class ShutterCoordinatorADAcquireLogic(
         self,
         driver: TAbstractAnalyserDriverIO,
         shutter: GenericFastShutter,
-        close_shutter_idle: SignalR[bool] | None = None,
+        close_shutter_when_idle: SignalR[bool] | None = None,
     ):
         self._shutter = shutter
-        self._close_shutter_idle = close_shutter_idle
+        self._close_shutter_when_idle = close_shutter_when_idle
         super().__init__(driver)
 
     async def start_acquiring(self):
@@ -42,8 +42,8 @@ class ShutterCoordinatorADAcquireLogic(
         await super().wait_for_idle()
         # Optionally close shutters between regions
         if (
-            self._close_shutter_idle is not None
-            and await self._close_shutter_idle.get_value()
+            self._close_shutter_when_idle is not None
+            and await self._close_shutter_when_idle.get_value()
         ):
             await self._shutter.set(self._shutter.close_state)
 
