@@ -7,7 +7,6 @@ from dodal.devices.beamlines.b07_1 import (
     LensMode,
 )
 from dodal.devices.beamlines.b07_shared import PsuMode
-from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
@@ -42,20 +41,15 @@ def ccmc() -> ChannelCutMonochromator:
     return ChannelCutMonochromator(prefix=f"{C_PREFIX.beamline_prefix}-OP-CCM-01:")
 
 
-@devices.factory()
-def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
-    return EnergySource(pgm.energy.user_readback)
-
-
 # CAM:IMAGE will fail to connect outside the beamline network,
 # see https://github.com/DiamondLightSource/dodal/issues/1852
 @devices.factory()
-def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
+def analyser(pgm: PlaneGratingMonochromator) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{C_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
-        energy_source=energy_source,
+        energy_source=pgm.energy.user_readback,
     )
 
 
