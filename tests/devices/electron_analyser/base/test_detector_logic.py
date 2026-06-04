@@ -72,7 +72,7 @@ def shutter(request: pytest.FixtureRequest) -> GenericFastShutter:
 
 
 @pytest.mark.parametrize(
-    "close_shutter_idle, expected_shutter_calls",
+    "close_shutter_when_idle_value, expected_shutter_calls",
     [
         (True, lambda s: [call(s.open_state), call(s.close_state)]),
         (False, lambda s: [call(s.open_state)]),
@@ -81,14 +81,14 @@ def shutter(request: pytest.FixtureRequest) -> GenericFastShutter:
 async def test_shutter_arm_logic_opens_shutters(
     driver: AbstractAnalyserDriverIO,
     shutter: GenericFastShutter,
-    close_shutter_idle: bool,
+    close_shutter_when_idle_value: bool,
     expected_shutter_calls: Callable[[GenericFastShutter], list[Any]],
 ):
     with init_devices(mock=True):
-        close_shutter_idle_signal = soft_signal_rw(bool, close_shutter_idle)
+        close_shutter_when_idle = soft_signal_rw(bool, close_shutter_when_idle_value)
 
     shutter_acquire_logic = ShutterCoordinatorADAcquireLogic(
-        driver, shutter, close_shutter_idle_signal
+        driver, shutter, close_shutter_when_idle
     )
 
     detector = StandardDetector()
