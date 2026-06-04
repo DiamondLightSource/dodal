@@ -44,7 +44,7 @@ async def test_scaler_controller_trigger_waits_for_counting_to_finish(
     start = time.monotonic()
     await scaler1.trigger()
     elapsed = time.monotonic() - start
-    assert elapsed >= 0.2
+    assert elapsed >= 0.01
     assert await scaler1.counting.get_value() is False
 
 

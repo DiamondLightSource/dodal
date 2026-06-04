@@ -15,7 +15,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, wait_for_goo
 
 class MockScalerController(DeviceMock["ScalerController"]):
     async def _complete(self):
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(0.01)
         set_mock_value(self._counting, False)
 
     def _on_value(self, value):
