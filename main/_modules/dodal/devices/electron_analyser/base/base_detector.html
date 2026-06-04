@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.4.1.dev12+g49a16cdac documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.4.1.dev13+gd55ff73e2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=4ba87bf4"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9fc3ac78"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -886,6 +886,7 @@ window.runMermaid = runMermaid;</script>
                   
   <h1>Source code for dodal.devices.electron_analyser.base.base_detector</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -895,6 +896,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">DetectorAcquireLogic</span><span class="p">,</span>
     <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
+    <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">StandardDetector</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
 <span class="p">)</span>
@@ -952,19 +954,21 @@ window.runMermaid = runMermaid;</script>
         <span class="n">acquire_logic</span><span class="p">:</span> <span class="n">DetectorAcquireLogic</span><span class="p">,</span>
         <span class="n">trigger_logic</span><span class="p">:</span> <span class="n">DetectorTriggerLogic</span><span class="p">,</span>
         <span class="n">region_logic</span><span class="p">:</span> <span class="n">RegionLogic</span><span class="p">,</span>
+        <span class="n">config_sigs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SignalR</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span> <span class="o">=</span> <span class="n">region_logic</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_binding_energy_axis</span><span class="p">,</span>
             <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
             <span class="n">energy_axis</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_axis</span><span class="p">,</span>
-            <span class="n">excitation_energy</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">energy_source</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
+            <span class="n">excitation_energy</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">energy_source</span><span class="p">,</span>
             <span class="n">energy_mode</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_mode</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span> <span class="o">=</span> <span class="n">region_logic</span>
         <span class="c1"># ToDo - Add data logic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_detector_logics</span><span class="p">(</span><span class="n">acquire_logic</span><span class="p">,</span> <span class="n">trigger_logic</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_config_signals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_config_signals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span><span class="p">,</span> <span class="o">*</span><span class="n">config_sigs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">SequenceHolder</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>

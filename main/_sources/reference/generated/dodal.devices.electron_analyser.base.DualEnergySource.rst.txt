@@ -33,9 +33,6 @@ dodal.devices.electron\_analyser.base.DualEnergySource
    .. autosummary::
    
       
-      ~DualEnergySource.energy
-      
-      
       
       
       

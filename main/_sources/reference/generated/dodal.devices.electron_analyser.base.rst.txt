@@ -21,9 +21,7 @@ dodal.devices.electron\_analyser.base
    ~base.BaseSequence
    ~base.GenericRegion
    ~base.GenericSequence
-   ~base.AbstractEnergySource
    ~base.DualEnergySource
-   ~base.EnergySource
 
 
 

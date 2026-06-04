@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.energy_sources &#8212; dodal 2.4.1.dev12+g49a16cdac documentation</title>
+    <title>dodal.devices.electron_analyser.base.energy_sources &#8212; dodal 2.4.1.dev13+gd55ff73e2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=4ba87bf4"></script>
+    <script src="../../../../../_static/documentation_options.js?v=9fc3ac78"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,9 +885,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.electron_analyser.base.energy_sources</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">abstractmethod</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Reference</span><span class="p">,</span>
     <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
@@ -900,43 +898,6 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">get_obj_from_selected_source</span>
 
 
-<div class="viewcode-block" id="AbstractEnergySource">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AbstractEnergySource</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract device that wraps an energy source signal and provides common interface</span>
-<span class="sd">    via a energy signal.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Signal to provide the excitation energy value in eV.&quot;&quot;&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="EnergySource">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.EnergySource.html#dodal.devices.electron_analyser.base.EnergySource">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergySource</span><span class="p">(</span><span class="n">AbstractEnergySource</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps a signal that relates to energy and provides common interface via energy</span>
-<span class="sd">    signal. It provides the name of the wrapped signal as a child signal in the</span>
-<span class="sd">    read_configuration via wrapped_device_name and adds the signal as a readable.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="n">source</span><span class="p">])</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_device_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
-                <span class="nb">str</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">name</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_source_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_ref</span><span class="p">()</span></div>
-
-
-
 <span class="k">def</span><span class="w"> </span><span class="nf">get_float_from_selected_source</span><span class="p">(</span>
     <span class="n">selected</span><span class="p">:</span> <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">s1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -946,8 +907,8 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="DualEnergySource">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.DualEnergySource.html#dodal.devices.electron_analyser.base.DualEnergySource">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DualEnergySource</span><span class="p">(</span><span class="n">AbstractEnergySource</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Holds two EnergySource devices and provides a signal to read energy depending on</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DualEnergySource</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides a signal to read energy depending on</span>
 <span class="sd">    which source is selected. The energy is the one that corrosponds to the</span>
 <span class="sd">    selected_source signal. For example, selected_source is source1 if selected_source</span>
 <span class="sd">    is at SelectedSource.SOURCE1 and vise versa for source2 and</span>
@@ -968,24 +929,23 @@ window.runMermaid = runMermaid;</script>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selected_source_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">selected_source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source1_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">source1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source2_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">source2</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source1</span> <span class="o">=</span> <span class="n">EnergySource</span><span class="p">(</span><span class="n">source1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source2</span> <span class="o">=</span> <span class="n">EnergySource</span><span class="p">(</span><span class="n">source2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+                <span class="n">get_float_from_selected_source</span><span class="p">,</span>
+                <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
+                <span class="n">selected</span><span class="o">=</span><span class="n">selected_source</span><span class="p">,</span>
+                <span class="n">s1</span><span class="o">=</span><span class="n">source1</span><span class="p">,</span>
+                <span class="n">s2</span><span class="o">=</span><span class="n">source2</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_selected_energy</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-            <span class="n">get_float_from_selected_source</span><span class="p">,</span>
-            <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
-            <span class="n">selected</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_source_ref</span><span class="p">(),</span>
-            <span class="n">s1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source1</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
-            <span class="n">s2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source2</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="n">selected_source</span><span class="p">])</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">source1</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">source2</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="n">selected_source</span><span class="p">,</span> <span class="n">source1</span><span class="p">,</span> <span class="n">source2</span><span class="p">])</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selected_energy</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 
