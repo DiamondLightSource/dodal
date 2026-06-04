@@ -11,6 +11,7 @@ from dodal.devices.beamlines.i09 import (
     PassEnergy,
     PsuMode,
 )
+from dodal.devices.beamlines.i09.scaler import ScalerController
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
@@ -27,6 +28,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 BL = get_beamline_name("i09")
 I_PREFIX = BeamlinePrefix(BL, suffix="I")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
+L_PREFIX = BeamlinePrefix(BL, suffix="L")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -139,3 +141,13 @@ def intensity_protection() -> SignalRW[IntensityProtection]:
     return epics_signal_rw(
         IntensityProtection, f"{I_PREFIX.beamline_prefix}-DI-EAN-01:PROT:ILK"
     )
+
+
+@devices.factory
+def scaler1() -> ScalerController:
+    return ScalerController(f"{I_PREFIX.beamline_prefix}-EA-SCLR-01")
+
+
+@devices.factory
+def scaler2() -> ScalerController:
+    return ScalerController(f"{L_PREFIX.beamline_prefix}-VA-SCLR-01")
