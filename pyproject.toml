@@ -24,7 +24,7 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",          # For pin-tip detection.
+    "opencv-python-headless",                                                                   # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -32,9 +32,8 @@ dependencies = [
     "scanspec>=0.7.3",
     "pyzmq==27.1.0",
     "deepdiff",
-    # Pinning daq-config-server until https://github.com/DiamondLightSource/daq-config-server/pull/183 is released
-    "daq-config-server @ git+https://github.com/DiamondLightSource/daq-config-server.git@add_i15-1_crystal_lut",     # For getting Configuration settings.
-    "mysql-connector-python == 9.5.0", # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
+    "daq-config-server @ git+https://github.com/DiamondLightSource/daq-config-server.git@main", # For getting Configuration settings.
+    "mysql-connector-python == 9.5.0",                                                          # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
 ]
 
 dynamic = ["version"]
