@@ -63,8 +63,5 @@ class ScalerController(
 
     @AsyncStatus.wrap
     async def trigger(self):
-        acquire_status = await set_and_wait_for_value(
-            self.counting, True, wait_for_set_completion=True
-        )
-        await acquire_status
+        await set_and_wait_for_value(self.counting, True, wait_for_set_completion=True)
         await wait_for_good_state(self.counting, {False})
