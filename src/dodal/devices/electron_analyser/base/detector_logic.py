@@ -1,10 +1,6 @@
 from typing import Any, Generic
 
-from ophyd_async.core import (
-    DetectorTriggerLogic,
-    SignalDict,
-    SignalR,
-)
+from ophyd_async.core import DetectorTriggerLogic, SignalDict, SignalR
 from ophyd_async.epics.adcore import ADAcquireLogic, ADImageMode
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
