@@ -12,7 +12,6 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import BaseRegion
-from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
@@ -28,10 +27,10 @@ class ShutterCoordinatorADAcquireLogic(
         self,
         driver: TAbstractAnalyserDriverIO,
         shutter: GenericFastShutter,
-        close_shutter_idle: SignalR[bool] | None = None,
+        close_shutter_when_idle: SignalR[bool] | None = None,
     ):
         self._shutter = shutter
-        self._close_shutter_idle = close_shutter_idle
+        self._close_shutter_when_idle = close_shutter_when_idle
         super().__init__(driver)
 
     async def start_acquiring(self):
@@ -43,8 +42,8 @@ class ShutterCoordinatorADAcquireLogic(
         await super().wait_for_idle()
         # Optionally close shutters between regions
         if (
-            self._close_shutter_idle is not None
-            and await self._close_shutter_idle.get_value()
+            self._close_shutter_when_idle is not None
+            and await self._close_shutter_when_idle.get_value()
         ):
             await self._shutter.set(self._shutter.close_state)
 
@@ -78,7 +77,7 @@ class RegionLogic:
     def __init__(
         self,
         driver: AbstractAnalyserDriverIO,
-        energy_source: AbstractEnergySource,
+        energy_source: SignalR[float],
         source_selector: SourceSelector | None = None,
     ):
         self.driver = driver
@@ -90,6 +89,6 @@ class RegionLogic:
         if self.source_selector is not None:
             await self.source_selector.set(region.excitation_energy_source)
 
-        excitation_energy = await self.energy_source.energy.get_value()
+        excitation_energy = await self.energy_source.get_value()
         epics_region = region.prepare_for_epics(excitation_energy)
         await self.driver.set(epics_region)
