@@ -13,7 +13,7 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
 from dodal.devices.beamlines.i19.mirror_stripes import StripeChoice
 
 
-class OutOfRangeEnergyRequestError(Exception):
+class OutOfRangeEnergyRequestError(ValueError):
     pass
 
 
