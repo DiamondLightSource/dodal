@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock
 
 import numpy as np
 import pytest
+from bluesky import RunEngine
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.epics.motor import MotorLimitsError
 from ophyd_async.testing import assert_reading, partial_reading
@@ -178,7 +179,7 @@ async def test_uvw_axis_set(
     )
 
 
-async def test_uvw_set(uvw: ToolPointMotion) -> None:
+async def test_uvw_set(uvw: ToolPointMotion, run_engine: RunEngine) -> None:
     pos = UVWTiltAzimuthMotorPositions(u=10, v=20, w=30, tilt_deg=40, azimuth_deg=50)
     await uvw.set(pos)
 
@@ -191,7 +192,6 @@ async def test_uvw_set(uvw: ToolPointMotion) -> None:
         },
         full_match=False,
     )
-
     assert await uvw.smp_ref().azimuth.user_readback.get_value() == pos.azimuth_deg
     assert await uvw.smp_ref().tilt.user_readback.get_value() == pos.tilt_deg
 
