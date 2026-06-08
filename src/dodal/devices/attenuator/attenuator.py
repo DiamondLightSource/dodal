@@ -11,7 +11,11 @@ from ophyd_async.core import (
     SubsetEnum,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
+from ophyd_async.epics.core import (
+    epics_signal_r,
+    epics_signal_rw,
+    epics_triggerable_command,
+)
 
 from dodal.devices.attenuator.filter import FilterMotor
 from dodal.log import LOGGER
@@ -65,8 +69,10 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         )
 
         self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
-        self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
-        self._change = epics_signal_x(prefix + "FANOUT")
+        self._use_current_energy = epics_triggerable_command(
+            prefix + "E2WL:USECURRENTENERGY.PROC"
+        )
+        self._change = epics_triggerable_command(prefix + "FANOUT")
 
         super().__init__(prefix, name)
 
@@ -128,7 +134,9 @@ class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
             YesNo, prefix + "AUTOMOVE"
         )
         self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
-        self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
+        self._use_current_energy = epics_triggerable_command(
+            prefix + "E2WL:USECURRENTENERGY.PROC"
+        )
 
         with self.add_children_as_readables():
             self._filters: DeviceVector[FilterMotor] = DeviceVector(
