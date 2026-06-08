@@ -182,7 +182,7 @@ class TetrammDetector(StandardDetector):
                 # when in new ophyd-async version with this change.
                 driver=self.driver,  # type: ignore
                 path_provider=path_provider,
-                description=NDArrayDescription(
+                array_description=NDArrayDescription(
                     shape_signals=[self.num_channels, self.driver.to_average],
                     data_type_signal=self.driver.data_type,
                     color_mode_signal=self.driver.color_mode,
