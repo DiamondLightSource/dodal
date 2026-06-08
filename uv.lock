@@ -820,7 +820,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.17a5" },
+    { name = "ophyd-async", extras = ["ca", "pva"], git = "https://github.com/bluesky/ophyd-async.git?rev=fix_derived_signal_all_read_only_throwing_error_with_rd_plan" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -839,7 +839,7 @@ dev = [
     { name = "ispyb" },
     { name = "mypy" },
     { name = "myst-parser" },
-    { name = "ophyd-async", extras = ["sim"], specifier = ">=0.14.0" },
+    { name = "ophyd-async", extras = ["sim"], git = "https://github.com/bluesky/ophyd-async.git?rev=fix_derived_signal_all_read_only_throwing_error_with_rd_plan" },
     { name = "pre-commit" },
     { name = "psutil" },
     { name = "pydata-sphinx-theme", specifier = ">=0.12" },
@@ -2252,8 +2252,8 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.18"
-source = { registry = "https://pypi.org/simple" }
+version = "0.19.dev8+ge77e6f428"
+source = { git = "https://github.com/bluesky/ophyd-async.git?rev=fix_derived_signal_all_read_only_throwing_error_with_rd_plan#e77e6f42822e67febbb965e6e4ef373272dfce43" }
 dependencies = [
     { name = "bluesky" },
     { name = "colorlog" },
@@ -2265,10 +2265,6 @@ dependencies = [
     { name = "scanspec" },
     { name = "stamina" },
     { name = "velocity-profile" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/51/d8/2e739ac3243dc4cbdbe2835c82a4f78419016d6bf6d503fdb68b8ae0e55c/ophyd_async-0.18.tar.gz", hash = "sha256:5a6cda1e34f9d137b235ee730266713351f0619ffe66d141e57d6b0618f66260", size = 565915, upload-time = "2026-06-04T16:28:25.042Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cd/75/cf84ce11f860acade0b6f5b54182c70d61fea7d5e8bc0013b4ece9af6787/ophyd_async-0.18-py3-none-any.whl", hash = "sha256:3c5d0924286b18e7ec579d9849147d7fe7e3dcc4621e3caf19bb853cf7c24d0f", size = 211676, upload-time = "2026-06-04T16:28:23.661Z" },
 ]
 
 [package.optional-dependencies]

@@ -16,7 +16,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async[ca,pva]>=v0.17a5",
+    "ophyd-async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@fix_derived_signal_all_read_only_throwing_error_with_rd_plan",
     "bluesky>=1.14.5",
     "pyepics",
     "pillow",
@@ -24,7 +24,7 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",                                                                   # For pin-tip detection.
+    "opencv-python-headless",                                                                                                          # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -32,8 +32,8 @@ dependencies = [
     "scanspec>=0.7.3",
     "pyzmq==27.1.0",
     "deepdiff",
-    "daq-config-server @ git+https://github.com/DiamondLightSource/daq-config-server.git@main", # For getting Configuration settings.
-    "mysql-connector-python == 9.5.0",                                                          # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
+    "daq-config-server @ git+https://github.com/DiamondLightSource/daq-config-server.git@main",                                        # For getting Configuration settings.
+    "mysql-connector-python == 9.5.0",                                                                                                 # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
 ]
 
 dynamic = ["version"]
@@ -51,7 +51,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd_async[sim]>=v0.14.0",
+    "ophyd-async[sim]@git+https://github.com/bluesky/ophyd-async.git@fix_derived_signal_all_read_only_throwing_error_with_rd_plan",
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
@@ -63,7 +63,7 @@ dev = [
     "pytest-timeout",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<7.4.6",                                                                                                                 #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
