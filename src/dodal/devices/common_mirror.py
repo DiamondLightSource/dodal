@@ -2,7 +2,7 @@ from typing import Generic, TypeVar
 
 from bluesky.protocols import Locatable, Location, Stoppable
 from ophyd_async.core import AsyncStatus, StrictEnum
-from ophyd_async.epics.core import epics_signal_rw, epics_signal_x
+from ophyd_async.epics.core import epics_signal_rw, epics_triggerable_command
 
 from dodal.devices.motors import XYZPitchYawRollStage
 
@@ -53,8 +53,12 @@ class XYZSwitchingMirror(
                 write_pv=prefix + mirror_write_suffix,
             )
 
-        self.mirror_change = epics_signal_x(write_pv=prefix + mirror_change_suffix)
-        self.mirror_abort = epics_signal_x(write_pv=prefix + mirror_abort_suffix)
+        self.mirror_change = epics_triggerable_command(
+            write_pv=prefix + mirror_change_suffix
+        )
+        self.mirror_abort = epics_triggerable_command(
+            write_pv=prefix + mirror_abort_suffix
+        )
 
         super().__init__(prefix=prefix, name=name)
 

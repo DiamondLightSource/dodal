@@ -13,6 +13,7 @@ from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import (
     callback_on_mock_put,
+    get_mock_execute,
     get_mock_put,
     init_devices,
     set_mock_put_proceeds,
@@ -114,7 +115,7 @@ async def test_given_settings_valid_when_kickoff_then_run_started(
 
     await grid_scan.kickoff()
 
-    get_mock_put(grid_scan.run_cmd).assert_called_once()
+    get_mock_execute(grid_scan.run_cmd).assert_called_once()
 
 
 async def test_waits_for_running_motion(grid_scan: FastGridScanCommon):
@@ -130,7 +131,7 @@ async def test_waits_for_running_motion(grid_scan: FastGridScanCommon):
     set_mock_value(grid_scan.motion_program.running, 0)
     set_mock_value(grid_scan.status, 1)
     await grid_scan.kickoff()
-    get_mock_put(grid_scan.run_cmd).assert_called_once()
+    get_mock_execute(grid_scan.run_cmd).assert_called_once()
 
 
 @pytest.mark.parametrize(
