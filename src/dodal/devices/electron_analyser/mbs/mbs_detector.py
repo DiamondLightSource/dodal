@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Generic
 
 from ophyd_async.core import SignalR, soft_signal_rw
@@ -32,6 +33,7 @@ class MbsDetector(
         energy_source: SignalR[float],
         shutter: GenericFastShutter | None = None,
         source_selector: SourceSelector | None = None,
+        config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
         # Make attribute of class so connect applies to driver and populates parent.
@@ -49,6 +51,7 @@ class MbsDetector(
         )
         trigger_logic = ElectronAnalayserTriggerLogic(self.driver, set())
         config_sigs = (
+            *config_sigs,
             self.driver.region_name,
             self.driver.energy_mode,
             self.driver.acquisition_mode,
