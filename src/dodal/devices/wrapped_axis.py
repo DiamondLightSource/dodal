@@ -45,7 +45,7 @@ class WrappedAxis(StandardReadable):
             self.offset_and_phase = derived_signal_rw(
                 self._get_motor_offset_and_phase,
                 self._set_motor_offset_and_phase,
-                motor_pos=real_motor,
+                motor_pos=real_motor.user_readback,
             )
         with self.add_children_as_readables():
             self.phase = derived_signal_rw(
