@@ -4,7 +4,7 @@ from ophyd_async.core import DetectorTriggerLogic, PathProvider, SignalDict
 from ophyd_async.epics.adcore import (
     ADAcquireLogic,
     ADBaseIO,
-    ADWriterType,
+    ADWriterFactory,
     AreaDetector,
     prepare_exposures,
 )
@@ -37,11 +37,9 @@ def software_triggered_tiff_area_detector(
     """
     driver = ADBaseIO(prefix + CAM_SUFFIX)
     return AreaDetector(
-        prefix=prefix,
-        driver=driver,
+        driver,
+        prefix,
+        ADWriterFactory.tiff(path_provider=path_provider, writer_suffix=TIFF_SUFFIX),
         acquire_logic=ADAcquireLogic(driver),
         trigger_logic=TiffTriggerLogic(driver, deadtime),
-        path_provider=path_provider,
-        writer_type=ADWriterType.TIFF,
-        writer_suffix=TIFF_SUFFIX,
     )
