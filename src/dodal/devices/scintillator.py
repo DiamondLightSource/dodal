@@ -38,8 +38,8 @@ class Scintillator(StandardReadable):
             self.selected_pos = derived_signal_rw(
                 self._get_selected_position,
                 self._set_selected_position,
-                y=self.y_mm,
-                z=self.z_mm,
+                y=self.y_mm.user_readback,
+                z=self.z_mm.user_readback,
             )
 
         self._aperture_scatterguard = aperture_scatterguard

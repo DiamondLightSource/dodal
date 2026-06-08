@@ -55,9 +55,9 @@ class Beamstop(StandardReadable):
             self.selected_pos = derived_signal_rw(
                 self._get_selected_position,
                 self._set_selected_position,
-                x=self.x_mm,
-                y=self.y_mm,
-                z=self.z_mm,
+                x=self.x_mm.user_readback,
+                y=self.y_mm.user_readback,
+                z=self.z_mm.user_readback,
             )
         self._in_beam_xyz_mm = [
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
