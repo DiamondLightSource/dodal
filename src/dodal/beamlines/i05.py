@@ -2,6 +2,11 @@ from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05 import I05Goniometer
+from dodal.devices.beamlines.i05_shared import LensMode, M4M5Mirror, PassEnergy
+from dodal.devices.common_mirror import XYZSwitchingMirror
+from dodal.devices.electron_analyser.mbs import MbsDetector
+from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -13,6 +18,20 @@ set_utils_beamline(BL)
 
 devices = DeviceManager()
 devices.include(i05_shared_devices)
+
+
+# will connect after https://jira.diamond.ac.uk/browse/I05-731
+@devices.factory(skip=True)
+def m4m5() -> XYZSwitchingMirror:
+    return XYZSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
+        mirrors=M4M5Mirror,
+    )
+
+
+@devices.factory()
+def hr_shutter() -> HutchShutter:
+    return HutchShutter(PREFIX.beamline_prefix)
 
 
 @devices.factory()
@@ -28,4 +47,14 @@ def sa() -> I05Goniometer:
         x_infix="SAX",
         y_infix="SAY",
         z_infix="SAZ",
+    )
+
+
+@devices.factory
+def analyser(pgm: PlaneGratingMonochromator) -> MbsDetector[LensMode, PassEnergy]:
+    return MbsDetector[LensMode, PassEnergy](
+        prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
+        lens_mode_type=LensMode,
+        pass_energy_type=PassEnergy,
+        energy_source=pgm.energy.user_readback,
     )

@@ -42,7 +42,7 @@ class Diode(StandardReadable):
             self.signal = epics_signal_r(float, prefix + "B:DIODE:I")
             self.positioner_a = create_positioner(
                 FilterAValues, prefix + "A:MP", positioner_pv_suffix=":SELECT"
-            )  # more complex, will be fixed on Tuesday 20.05.2025
+            )
             self.positioner_b = create_positioner(
                 FilterBValues, prefix + "B:MP", positioner_pv_suffix=":SELECT"
             )

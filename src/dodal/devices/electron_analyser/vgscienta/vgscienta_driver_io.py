@@ -12,35 +12,38 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
     AbstractAnalyserDriverIO,
+    ElectronAnalyserPVConfig,
 )
-from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.base.base_region import (
+    TLensMode,
+    TPassEnergy,
+    TPsuMode,
+)
 from dodal.devices.electron_analyser.vgscienta.vgscienta_enums import (
     AcquisitionMode,
     DetectorMode,
 )
-from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
-    TPassEnergyEnum,
-    VGScientaRegion,
-)
+from dodal.devices.electron_analyser.vgscienta.vgscienta_region import VGScientaRegion
 
 
 class VGScientaAnalyserDriverIO(
     AbstractAnalyserDriverIO[
-        VGScientaRegion[TLensMode, TPassEnergyEnum],
+        VGScientaRegion[TLensMode, TPassEnergy],
         AcquisitionMode,
         TLensMode,
         TPsuMode,
-        TPassEnergyEnum,
+        TPassEnergy,
     ],
-    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
+    Generic[TLensMode, TPsuMode, TPassEnergy],
 ):
+    PV_CFG = ElectronAnalyserPVConfig(psu_mode="ELEMENT_SET")
+
     def __init__(
         self,
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        pass_energy_type: type[TPassEnergyEnum],
-        psu_suffix: str = "ELEMENT_SET",
+        pass_energy_type: type[TPassEnergy],
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -61,12 +64,11 @@ class VGScientaAnalyserDriverIO(
             lens_mode_type=lens_mode_type,
             psu_mode_type=psu_mode_type,
             pass_energy_type=pass_energy_type,
-            psu_suffix=psu_suffix,
             name=name,
         )
 
     @AsyncStatus.wrap
-    async def set(self, epics_region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
+    async def set(self, epics_region: VGScientaRegion[TLensMode, TPassEnergy]):
         await asyncio.gather(
             self.region_name.set(epics_region.name),
             self.low_energy.set(epics_region.low_energy),

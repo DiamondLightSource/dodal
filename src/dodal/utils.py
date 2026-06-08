@@ -66,8 +66,11 @@ V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
 AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
 
 
-def get_beamline_name(default: str) -> str:
-    return environ.get("BEAMLINE") or default
+def get_beamline_name(default: str | None = None) -> str:
+    beamline_name = environ.get("BEAMLINE") or default
+    if beamline_name is None:
+        raise ValueError("Set BEAMLINE environment variable or provide default.")
+    return beamline_name
 
 
 def is_test_mode() -> bool:
@@ -87,6 +90,7 @@ class BeamlinePrefix:
         self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix
         self.beamline_prefix = f"BL{self.ixx[1:3]}{self.suffix}"
         self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
+        self.frontend_prefix = f"FE{self.ixx[1:3]}{self.suffix}"
 
 
 T = TypeVar("T", bound=AnyDevice)

@@ -1,5 +1,6 @@
 import pytest
 from bluesky import RunEngine
+from daq_config_server import ConfigClient
 from ophyd_async.core import init_devices
 
 from dodal.devices.oav.oav_parameters import OAVParameters
@@ -20,7 +21,7 @@ def pin_tip_detection() -> PinTipDetection:
 
 @pytest.fixture
 def params() -> OAVParameters:
-    return OAVParameters("pinTipCentring", TEST_OAV_CENTRING_JSON)
+    return OAVParameters(ConfigClient(""), "pinTipCentring", TEST_OAV_CENTRING_JSON)
 
 
 @pytest.mark.parametrize(

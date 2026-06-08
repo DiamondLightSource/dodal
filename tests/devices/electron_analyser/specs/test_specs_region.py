@@ -5,17 +5,16 @@ import pytest
 from dodal.devices.beamlines.b07 import LensMode
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.specs import AcquisitionMode, SpecsSequence
+from dodal.devices.electron_analyser.specs import (
+    AcquisitionMode,
+    SpecsRegion,
+    SpecsSequence,
+)
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
-    get_test_sequence,
 )
-
-
-@pytest.fixture
-def sequence() -> SpecsSequence[LensMode, PsuMode]:
-    return get_test_sequence(SpecsSequence[LensMode, PsuMode])
+from tests.devices.electron_analyser.helper_util.sequence import load_b07_specs_test_seq
 
 
 @pytest.fixture
@@ -81,19 +80,24 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_sequence_get_expected_enabled_region_names(
-    sequence: SpecsSequence[LensMode, PsuMode],
-    expected_enabled_region_names: list[str],
-) -> None:
-    assert sequence.get_enabled_region_names() == expected_enabled_region_names
-    for i, region in enumerate(sequence.get_enabled_regions()):
-        assert region.name == expected_enabled_region_names[i]
-
-
-def test_file_loads_into_class_with_expected_values(
-    sequence: SpecsSequence[LensMode, PsuMode],
+def test_load_sequence_using_alias_field_names_has_expected_values(
     expected_region_values: list[dict[str, Any]],
 ) -> None:
-    assert len(sequence.regions) == len(expected_region_values)
-    for i, r in enumerate(sequence.regions):
-        assert_region_has_expected_values(r, expected_region_values[i])
+    for r, expected_r in zip(
+        load_b07_specs_test_seq().regions, expected_region_values, strict=True
+    ):
+        assert_region_has_expected_values(r, expected_r)
+
+
+def test_region_loads_using_field_names_has_expected_values(
+    expected_region_values: list[dict[str, Any]],
+) -> None:
+    for expected_region in expected_region_values:
+        r = SpecsRegion[LensMode, PsuMode].model_validate(expected_region)
+        assert_region_has_expected_values(r, expected_region)
+
+    seq = SpecsSequence[LensMode, PsuMode].model_validate(
+        {"regions": expected_region_values}
+    )
+    for r, expected_r in zip(seq.regions, expected_region_values, strict=True):
+        assert_region_has_expected_values(r, expected_r)

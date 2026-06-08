@@ -1,52 +1,52 @@
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.beamlines import b07, b07_shared, i09
-from dodal.devices.electron_analyser.specs import (
-    SpecsAnalyserDriverIO,
-    SpecsDetector,
-    SpecsSequence,
-)
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaAnalyserDriverIO,
-    VGScientaDetector,
-    VGScientaSequence,
-)
+from collections.abc import Sequence
+
+import pytest
+
+from dodal.common.data_util import ModelLoader, ModelLoaderConfig, json_model_loader
+from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
+from dodal.devices.electron_analyser.base import BaseRegion
+from dodal.devices.electron_analyser.mbs import MbsSequence
+from dodal.devices.electron_analyser.specs import SpecsSequence
+from dodal.devices.electron_analyser.vgscienta import VGScientaSequence
 from tests.devices.electron_analyser.test_data import (
+    TEST_MBS_XML_SEQUENCE,
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,
 )
 
-TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
+B07SpecsSequence = SpecsSequence[b07.LensMode, b07_shared.PsuMode]
+I09VGScientaSequence = VGScientaSequence[i09.LensMode, i09.PassEnergy]
+I05MbsSequence = MbsSequence[i05_shared.LensMode, i05_shared.PassEnergy]
 
 
-def b07_specs_test_sequence_loader() -> SpecsSequence[b07.LensMode, b07_shared.PsuMode]:
-    return load_json_file_to_class(
-        SpecsSequence[b07.LensMode, b07_shared.PsuMode], TEST_SPECS_SEQUENCE
-    )
+load_b07_specs_test_seq = ModelLoader[B07SpecsSequence](
+    json_model_loader(B07SpecsSequence),
+    ModelLoaderConfig.from_default_file(TEST_SPECS_SEQUENCE),
+)
+load_i09_vgscienta_test_seq = ModelLoader[I09VGScientaSequence](
+    json_model_loader(I09VGScientaSequence),
+    ModelLoaderConfig.from_default_file(TEST_VGSCIENTA_SEQUENCE),
+)
+load_i05_mbs_test_xml_seq = ModelLoader[I05MbsSequence](
+    lambda file: I05MbsSequence.from_xml(file),
+    ModelLoaderConfig.from_default_file(TEST_MBS_XML_SEQUENCE),
+)
 
 
-def i09_vgscienta_test_sequence_loader() -> VGScientaSequence[
-    i09.LensMode, i09.PsuMode, i09.PassEnergy
-]:
-    return load_json_file_to_class(
-        VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-        TEST_VGSCIENTA_SEQUENCE,
-    )
-
-
-# Map to know what function to load in sequence an analyser driver should use.
-TEST_SEQUENCES = {
-    SpecsDetector: b07_specs_test_sequence_loader,
-    SpecsAnalyserDriverIO: b07_specs_test_sequence_loader,
-    SpecsSequence: b07_specs_test_sequence_loader,
-    VGScientaDetector: i09_vgscienta_test_sequence_loader,
-    VGScientaAnalyserDriverIO: i09_vgscienta_test_sequence_loader,
-    VGScientaSequence: i09_vgscienta_test_sequence_loader,
-}
-
-
-def get_test_sequence(key: type):
-    for cls in key.__mro__:
-        # Check for unscripted class only
-        if cls in TEST_SEQUENCES:
-            return TEST_SEQUENCES[cls]()
-    raise KeyError(f"Found no match with type {key}")
+def generate_fixture_regions_pair(
+    fixture_name: str, regions: Sequence[BaseRegion]
+) -> list:
+    """Generate a parameterised pytest with a fixture name with the assoicated regions.
+    Useful for tests where you need to test each driver or detector with the paried
+    sequence file.
+    """
+    test_cases = []
+    for region in regions:
+        test_cases.append(
+            pytest.param(
+                fixture_name,
+                region,
+                id=f"{fixture_name}-{type(region).__name__}-{region.name}",
+            )
+        )
+    return test_cases

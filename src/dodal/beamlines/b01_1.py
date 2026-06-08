@@ -88,8 +88,8 @@ def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         pv_prefix,
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
         plugins={
             "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
         },
@@ -108,8 +108,8 @@ def imaging_detector(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        driver_suffix=CAM_SUFFIX,
+        writer_suffix=HDF5_SUFFIX,
     )
 
 

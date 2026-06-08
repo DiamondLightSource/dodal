@@ -3,7 +3,12 @@ from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import pytest
-from ophyd_async.core import PathProvider, StandardDetector, init_devices
+from daq_config_server import ConfigClient
+from ophyd_async.core import (
+    PathProvider,
+    StandardDetector,
+    init_devices,
+)
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 
 from dodal.devices.beamlines.i03.dcm import DCM
@@ -25,6 +30,7 @@ async def mock_undulator_and_dcm() -> UndulatorGapCheckDevices:
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "",
+            ConfigClient(""),
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )
         dcm = DCM("")
@@ -36,24 +42,19 @@ def det(tmp_path: Path, path_provider) -> StandardDetector:
     class DevNullPatternGenerator(PatternGenerator):
         def __init__(self, sleep=asyncio.sleep):
             super().__init__(sleep)
-            self.n_images = 0
+            self._written = 0
 
         def open_file(self, path: PurePath, width: int, height: int):
-            pass
+            self._update_images_written(0)
 
-        async def write_images_to_file(
+        def setup_acquisition_parameters(
             self, exposure: float, period: float, number_of_frames: int
         ):
-            self.n_images += number_of_frames
+            self._number_of_frames = number_of_frames
 
-        def generate_point(self, channel: int = 1, high_energy: bool = False) -> float:
-            return 0.0
-
-        async def wait_for_next_index(self, timeout: float):
-            pass
-
-        def get_last_index(self) -> int:
-            return self.n_images
+        async def write_images_to_file(self):
+            self._written += 1
+            self._update_images_written(self._written)
 
         def close_file(self):
             pass
@@ -76,6 +77,13 @@ def y_axis() -> SimMotor:
     with init_devices(mock=True):
         y_axis = SimMotor()
     return y_axis
+
+
+@pytest.fixture
+def z_axis() -> SimMotor:
+    with init_devices(mock=True):
+        z_axis = SimMotor()
+    return z_axis
 
 
 @pytest.fixture

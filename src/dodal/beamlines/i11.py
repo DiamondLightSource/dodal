@@ -10,6 +10,7 @@ from dodal.devices.beamlines.i11.cyberstar_blower import (
     AutotunedCyberstarBlower,
     CyberstarBlower,
 )
+from dodal.devices.beamlines.i11.dcm import DCM
 from dodal.devices.beamlines.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
@@ -42,14 +43,15 @@ def path_provider() -> PathProvider:
     return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
 
 
-@devices.factory()
+# Mythen detector state does not match ophyd-async see https://jira.diamond.ac.uk/browse/I11-916
+@devices.factory(skip=True)
 def mythen3(path_provider: PathProvider) -> Mythen3:
     """Mythen3 Detector from PSI."""
     return Mythen3(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-07:",
         path_provider=path_provider,
         drv_suffix=DET_SUFFIX,
-        fileio_suffix="HDF:",
+        writer_suffix="HDF:",
     )
 
 
@@ -136,3 +138,11 @@ def slits_4() -> Slits:
 @devices.factory()
 def slits_5() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
+
+
+@devices.factory()
+def dcm() -> DCM:
+    return DCM(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
+    )

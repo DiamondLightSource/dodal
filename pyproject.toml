@@ -9,12 +9,14 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async[ca,pva]>=v0.15.0",
+    "ophyd-async[ca,pva]>=v0.17a5",
     "bluesky>=1.14.5",
     "pyepics",
     "pillow",
@@ -22,7 +24,7 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",          # For pin-tip detection.
+    "opencv-python-headless",                                                                   # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -30,8 +32,8 @@ dependencies = [
     "scanspec>=0.7.3",
     "pyzmq==27.1.0",
     "deepdiff",
-    "daq-config-server>=v1.1.2",       # For getting Configuration settings.
-    "mysql-connector-python == 9.5.0", # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
+    "daq-config-server @ git+https://github.com/DiamondLightSource/daq-config-server.git@main", # For getting Configuration settings.
+    "mysql-connector-python == 9.5.0",                                                          # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
 ]
 
 dynamic = ["version"]
@@ -53,7 +55,7 @@ dev = [
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
-    "pyright==1.1.408",
+    "pyright",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
@@ -206,7 +208,7 @@ commands = [
     [
         "pytest",
         "-m",
-        "not requires(instrument=\"i04\")",
+        "not requires(instrument=\"i04\") and not requires(instrument=\"i15-1\")",
         "--cov-report",
         "xml:system_cov.xml",
         "--timeout=10",

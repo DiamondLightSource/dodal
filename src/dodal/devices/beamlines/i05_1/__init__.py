@@ -1,3 +1,3 @@
-from .i05_1_motors import XYZPolarAzimuthDefocusStage
+from .i05_1_motors import XYZAzimuthPolarDefocusStage
 
-__all__ = ["XYZPolarAzimuthDefocusStage"]
+__all__ = ["XYZAzimuthPolarDefocusStage"]

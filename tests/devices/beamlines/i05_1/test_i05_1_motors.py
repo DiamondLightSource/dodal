@@ -5,7 +5,7 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.beamlines.i05_1 import XYZPolarAzimuthDefocusStage
+from dodal.devices.beamlines.i05_1 import XYZAzimuthPolarDefocusStage
 from tests.devices.beamlines.i05_shared.rotation_signal_test_util import (
     RotatedCartesianFrameTestConfig,
     assert_rotated_axes_are_orthogonal,
@@ -13,9 +13,9 @@ from tests.devices.beamlines.i05_shared.rotation_signal_test_util import (
 
 
 @pytest.fixture
-def sm() -> XYZPolarAzimuthDefocusStage:
+def sm() -> XYZAzimuthPolarDefocusStage:
     with init_devices(mock=True):
-        sm = XYZPolarAzimuthDefocusStage("TEST:")
+        sm = XYZAzimuthPolarDefocusStage("TEST:")
     return sm
 
 
@@ -35,7 +35,7 @@ def expected_perp_read(z: float, hor: float, polar_theta: float) -> float:
     return z * sin(polar_theta) + hor * cos(polar_theta)
 
 
-async def test_xyzpad_stage_read(sm: XYZPolarAzimuthDefocusStage) -> None:
+async def test_xyzpad_stage_read(sm: XYZAzimuthPolarDefocusStage) -> None:
     x, y = 10, 5
     azimuth_angle_deg = 45
     azimuth_theta = radians(azimuth_angle_deg)
@@ -73,7 +73,7 @@ async def test_xyzpad_stage_read(sm: XYZPolarAzimuthDefocusStage) -> None:
 
 
 async def test_xyzpad_hor_and_vert_set(
-    sm: XYZPolarAzimuthDefocusStage,
+    sm: XYZAzimuthPolarDefocusStage,
 ) -> None:
     frame_config = RotatedCartesianFrameTestConfig(
         i_read=sm.x.user_readback,
@@ -97,7 +97,7 @@ async def test_xyzpad_hor_and_vert_set(
 
 
 async def test_xyzpad_long_and_perp_set(
-    sm: XYZPolarAzimuthDefocusStage,
+    sm: XYZAzimuthPolarDefocusStage,
 ) -> None:
     frame_config = RotatedCartesianFrameTestConfig(
         i_read=sm.z.user_readback,
