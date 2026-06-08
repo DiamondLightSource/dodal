@@ -119,7 +119,7 @@ class SafeUndulatorMover(StandardReadable, UndulatorBase, Generic[T]):
 class UnstoppableMotorMoveLogic(MotorMoveLogic):
     async def stop(self):
         """Request to stop moving."""
-        LOGGER.warning(f"Stopping {self.readback} is not supported.")
+        LOGGER.warning(f"Stopping {self.readback.name} is not supported.")
 
 
 class UnstoppableMotor(Motor):
