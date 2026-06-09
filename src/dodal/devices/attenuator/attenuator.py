@@ -72,7 +72,7 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         self._use_current_energy = epics_triggerable_command(
             prefix + "E2WL:USECURRENTENERGY.PROC"
         )
-        self._change = epics_triggerable_command(prefix + "FANOUT")
+        self._change = epics_triggerable_command(prefix + "FANOUT.PROC")
 
         super().__init__(prefix, name)
 
