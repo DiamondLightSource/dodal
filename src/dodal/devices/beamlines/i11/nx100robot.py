@@ -49,7 +49,7 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     MIN_NUMBER_OF_SAMPLES = 1
 
     def __init__(self, prefix: str, name: str = ""):
-        self.start = epics_triggerable_command(prefix + "START")
+        self.start = epics_triggerable_command(prefix + "START.PROC")
         self.hold = epics_signal_rw(bool, prefix + "HOLD")
         self.job = epics_signal_rw(RobotJobs, prefix + "JOB")
         self.servo_on = epics_signal_rw(bool, prefix + "SVON")  # Servo on/off
