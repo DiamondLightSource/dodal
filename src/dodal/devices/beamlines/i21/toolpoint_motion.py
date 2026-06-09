@@ -190,29 +190,29 @@ class ToolPointMotion(StandardReadable, Movable, Checkable):
         u = derived_signal_rw(
             read_u,
             set_u,
-            x=self.smp_ref().x.user_readback,
-            y=self.smp_ref().y.user_readback,
-            z=self.smp_ref().z.user_readback,
-            tilt_deg=self.smp_ref().tilt.user_readback,
-            azimuth_deg=self.smp_ref().azimuth.user_readback,
+            x=self.smp_ref().x,
+            y=self.smp_ref().y,
+            z=self.smp_ref().z,
+            tilt_deg=self.smp_ref().tilt,
+            azimuth_deg=self.smp_ref().azimuth,
         )
         v = derived_signal_rw(
             read_v,
             set_v,
-            x=self.smp_ref().x.user_readback,
-            y=self.smp_ref().y.user_readback,
-            z=self.smp_ref().z.user_readback,
-            tilt_deg=self.smp_ref().tilt.user_readback,
-            azimuth_deg=self.smp_ref().azimuth.user_readback,
+            x=self.smp_ref().x,
+            y=self.smp_ref().y,
+            z=self.smp_ref().z,
+            tilt_deg=self.smp_ref().tilt,
+            azimuth_deg=self.smp_ref().azimuth,
         )
         w = derived_signal_rw(
             read_w,
             set_w,
-            x=self.smp_ref().x.user_readback,
-            y=self.smp_ref().y.user_readback,
-            z=self.smp_ref().z.user_readback,
-            tilt_deg=self.smp_ref().tilt.user_readback,
-            azimuth_deg=self.smp_ref().azimuth.user_readback,
+            x=self.smp_ref().x,
+            y=self.smp_ref().y,
+            z=self.smp_ref().z,
+            tilt_deg=self.smp_ref().tilt,
+            azimuth_deg=self.smp_ref().azimuth,
         )
         return u, v, w
 

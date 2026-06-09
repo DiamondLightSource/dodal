@@ -20,7 +20,7 @@ class LaueMonochrometer(StandardReadable):
             self.y = Motor(prefix + "Y")
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.energy_kev = derived_signal_r(self._get_energy, y=self.y.user_readback)
+            self.energy_kev = derived_signal_r(self._get_energy, y=self.y)
 
         self._config_client = config_client
         self._crystal_lut_path = crystal_lut_path
