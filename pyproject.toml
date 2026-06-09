@@ -16,7 +16,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@fix_derived_signal_all_read_only_throwing_error_with_rd_plan",
+    "ophyd-async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@add_missing_standardmovable_typing",
     "bluesky>=1.14.5",
     "pyepics",
     "pillow",
@@ -51,7 +51,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd-async[sim]@git+https://github.com/bluesky/ophyd-async.git@fix_derived_signal_all_read_only_throwing_error_with_rd_plan",
+    "ophyd-async[sim]@git+https://github.com/bluesky/ophyd-async.git@add_missing_standardmovable_typing",
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
