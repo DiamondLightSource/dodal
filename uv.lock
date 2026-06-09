@@ -820,7 +820,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], git = "https://github.com/bluesky/ophyd-async.git?rev=fix_derived_signal_all_read_only_throwing_error_with_rd_plan" },
+    { name = "ophyd-async", extras = ["ca", "pva"], git = "https://github.com/bluesky/ophyd-async.git?rev=add_missing_standardmovable_typing" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -839,7 +839,7 @@ dev = [
     { name = "ispyb" },
     { name = "mypy" },
     { name = "myst-parser" },
-    { name = "ophyd-async", extras = ["sim"], git = "https://github.com/bluesky/ophyd-async.git?rev=fix_derived_signal_all_read_only_throwing_error_with_rd_plan" },
+    { name = "ophyd-async", extras = ["sim"], git = "https://github.com/bluesky/ophyd-async.git?rev=add_missing_standardmovable_typing" },
     { name = "pre-commit" },
     { name = "psutil" },
     { name = "pydata-sphinx-theme", specifier = ">=0.12" },
@@ -2252,8 +2252,8 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.19.dev8+ge77e6f428"
-source = { git = "https://github.com/bluesky/ophyd-async.git?rev=fix_derived_signal_all_read_only_throwing_error_with_rd_plan#e77e6f42822e67febbb965e6e4ef373272dfce43" }
+version = "0.19.dev5+g886ca3f99"
+source = { git = "https://github.com/bluesky/ophyd-async.git?rev=add_missing_standardmovable_typing#886ca3f99c8c4e3ebc51a0ccbc1a5bd4f9873153" }
 dependencies = [
     { name = "bluesky" },
     { name = "colorlog" },
