@@ -443,9 +443,9 @@ def create_axis_perp_to_rotation(
     return derived_signal_rw(
         _get,
         _set,
-        i_val=motor_i.user_readback,
-        j_val=motor_j.user_readback,
-        rot_deg_value=motor_theta.user_readback,
+        i_val=motor_i,
+        j_val=motor_j,
+        rot_deg_value=motor_theta,
     )
 
 
