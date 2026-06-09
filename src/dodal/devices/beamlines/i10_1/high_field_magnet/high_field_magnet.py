@@ -1,29 +1,26 @@
 from __future__ import annotations
 
-import asyncio
+from dataclasses import dataclass, field
+from functools import cached_property
 
 from bluesky.protocols import (
     Flyable,
-    Locatable,
-    Location,
     Preparable,
-    Reading,
-    Stoppable,
-    Subscribable,
 )
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
-    Callback,
+    MovableLogic,
+    SignalR,
+    SignalRW,
+    StandardMovable,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
     SubsetEnum,
     WatchableAsyncStatus,
-    WatcherUpdate,
     derived_signal_r,
     error_if_none,
-    observe_value,
     set_and_wait_for_other_value,
     soft_signal_rw,
 )
@@ -60,13 +57,64 @@ class FlyMagInfo(BaseModel):
     sweep_rate: float = Field(frozen=True, gt=0)
 
 
+@dataclass
+class ToleranceLogic(MovableLogic[float]):
+    tolerance: SignalRW[float]
+    speed: SignalRW[float]
+    acc_time: SignalRW[float]
+    within_tolerance: SignalR[bool] = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.within_tolerance = derived_signal_r(
+            raw_to_derived=self._within_tolerance,
+            setpoint=self.setpoint,
+            readback=self.readback,
+            tolerance=self.tolerance,
+        )
+
+    def _within_tolerance(
+        self,
+        setpoint: float,
+        readback: float,
+        tolerance: float,
+    ) -> bool:
+        """Check if the readback is within the tolerance of the setpoint."""
+        return abs(setpoint - readback) < abs(tolerance)
+
+    async def stop(self):
+        current_val = await self.readback.get_value()
+        await self.setpoint.set(current_val)
+
+    async def calculate_timeout(
+        self, old_position: float, new_position: float
+    ) -> float:
+
+        try:
+            timeout = (
+                abs((new_position - old_position) / await self.speed.get_value())
+                + 2 * await self.acc_time.get_value()
+                + DEFAULT_TIMEOUT
+            )
+        except ZeroDivisionError as error:
+            msg = "Magnet has zero sweep_rate."
+            raise ValueError(msg) from error
+        return timeout
+
+    async def move(self, new_position: float, timeout: float | None) -> None:
+        await set_and_wait_for_other_value(
+            set_signal=self.setpoint,
+            set_value=new_position,
+            match_signal=self.within_tolerance,
+            match_value=True,
+            timeout=timeout,
+        )
+
+
 class HighFieldMagnet(
+    StandardMovable,
     StandardReadable,
-    Locatable[float],
-    Stoppable,
     Flyable,
     Preparable,
-    Subscribable[float],
 ):
     def __init__(
         self, prefix: str, field_tolerance: float = 0.01, name: str = ""
@@ -101,97 +149,21 @@ class HighFieldMagnet(
             write_pv=prefix + "SET:SETPOINTFIELD",
         )
 
-        self.within_tolerance = derived_signal_r(
-            raw_to_derived=self._within_tolerance,
-            setpoint=self.user_setpoint,
-            readback=self.user_readback,
-            tolerance=self.field_tolerance,
-        )
-
-        self._set_success = True
-
         self._fly_info: FlyMagInfo | None = None
 
         self._fly_status: WatchableAsyncStatus | None = None
 
         super().__init__(name=name)
 
-    def _within_tolerance(
-        self, setpoint: float, readback: float, tolerance: float
-    ) -> bool:
-        """Check if the readback is within the tolerance of the setpoint."""
-        return abs(setpoint - readback) < abs(tolerance)
-
-    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
-        super().set_name(name, child_name_separator=child_name_separator)
-        self.user_readback.set_name(name)
-
-    async def locate(self) -> Location[float]:
-        setpoint, readback = await asyncio.gather(
-            self.user_setpoint.get_value(), self.user_readback.get_value()
+    @cached_property
+    def movable_logic(self) -> MovableLogic:
+        return ToleranceLogic(
+            setpoint=self.user_setpoint,
+            readback=self.user_readback,
+            tolerance=self.field_tolerance,
+            speed=self.sweep_rate,
+            acc_time=self.ramp_up_time,
         )
-        return Location(setpoint=setpoint, readback=readback)
-
-    async def stop(self, success=False):
-        self._set_success = success
-        await self.user_readback.get_value()
-        await self.user_setpoint.set(await self.user_readback.get_value())
-
-    def subscribe_reading(self, function: Callback[dict[str, Reading[float]]]) -> None:
-        self.user_readback.subscribe_reading(function)
-
-    subscribe = subscribe_reading
-
-    def clear_sub(self, function: Callback[dict[str, Reading[float]]]) -> None:
-        """Unsubscribe."""
-        self.user_readback.clear_sub(function)
-
-    @WatchableAsyncStatus.wrap
-    async def set(
-        self,
-        new_position: float,
-    ):
-        self._set_success = True
-        (
-            old_position,
-            sweep_rate,
-            ramp_up_time,
-        ) = await asyncio.gather(
-            self.user_readback.get_value(),
-            self.sweep_rate.get_value(),
-            self.ramp_up_time.get_value(),
-        )
-
-        try:
-            timeout = (
-                abs((new_position - old_position) / sweep_rate)
-                + 2 * ramp_up_time
-                + DEFAULT_TIMEOUT
-            )
-        except ZeroDivisionError as error:
-            msg = "Magnet has zero sweep_rate."
-            raise ValueError(msg) from error
-
-        move_status = AsyncStatus(
-            set_and_wait_for_other_value(
-                set_signal=self.user_setpoint,
-                set_value=new_position,
-                match_signal=self.within_tolerance,
-                match_value=True,
-                timeout=timeout,
-            )
-        )
-        async for current_position in observe_value(
-            self.user_readback, done_status=move_status
-        ):
-            yield WatcherUpdate(
-                current=current_position,
-                initial=old_position,
-                target=new_position,
-                name=self.name,
-            )
-        if not self._set_success:
-            raise RuntimeError("Field change was stopped")
 
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMagInfo) -> None:
