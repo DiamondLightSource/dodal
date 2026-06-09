@@ -21,29 +21,6 @@ async def high_field_magnet() -> HighFieldMagnet:
     return magnet
 
 
-# async def test_within_tolerance_when_in_range(high_field_magnet: HighFieldMagnet):
-#     result = high_field_magnet._within_tolerance(
-#         setpoint=10.0, readback=10.005, tolerance=0.01
-#     )
-#     assert result is True
-
-
-# async def test_within_tolerance_when_outside_range(high_field_magnet: HighFieldMagnet):
-#     result = high_field_magnet._within_tolerance(
-#         setpoint=10.0, readback=10.02, tolerance=0.01
-#     )
-#     assert result is False
-
-
-# async def test_within_tolerance_with_negative_tolerance(
-#     high_field_magnet: HighFieldMagnet,
-# ):
-#     result = high_field_magnet._within_tolerance(
-#         setpoint=10.0, readback=9.995, tolerance=-0.01
-#     )
-#     assert result is True
-
-
 async def test_locate(high_field_magnet: HighFieldMagnet):
     set_mock_value(high_field_magnet.user_setpoint, 5.0)
     set_mock_value(high_field_magnet.user_readback, 5.0)
@@ -75,7 +52,6 @@ async def test_set_raises_runtime_error_when_stopped(
         RuntimeError, match=f"Device {high_field_magnet.name} was stopped."
     ):
         await high_field_magnet.stop(success=False)
-        set_mock_value(high_field_magnet.user_readback, 5.0)
         await status
 
 
@@ -99,7 +75,7 @@ async def test_set_raises_on_zero_sweep_rate(high_field_magnet: HighFieldMagnet)
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 0.0)
 
-    with pytest.raises(ValueError, match="Magnet has zero sweep_rate."):
+    with pytest.raises(ValueError, match="zero speed."):
         status = high_field_magnet.set(10.0)
         await status
 
