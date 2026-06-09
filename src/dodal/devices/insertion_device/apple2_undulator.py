@@ -131,11 +131,10 @@ class UnstoppableMotor(Motor):
 
     @cached_property
     def movable_logic(self) -> MovableLogic:
-        """Return MotorMoveLogic for this motor."""
         return UnstoppableMotorMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            # Safe to do because we removed stop method in movable logic.
+            # Safe to do, stop method no longer calls stop signal in movable logic.
             motor_stop=None,  # type: ignore
             low_limit_travel=self.low_limit_travel,
             high_limit_travel=self.high_limit_travel,
