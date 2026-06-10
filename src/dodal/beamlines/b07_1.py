@@ -49,8 +49,8 @@ def analyser(pgm: PlaneGratingMonochromator) -> SpecsDetector[LensMode, PsuMode]
     prefix = f"{C_PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     driver = SpecsAnalyserDriverIO(prefix, LensMode, PsuMode)
     return SpecsDetector[LensMode, PsuMode](
-        prefix=prefix,
-        driver=driver,
+        prefix,
+        driver,
         acquire_logic=ADAcquireLogic(driver),
         trigger_logic=ElectronAnalayserTriggerLogic(driver),
         region_logic=RegionLogic(driver, pgm.energy.user_readback),

@@ -62,8 +62,8 @@ def analyser(
     prefix = f"{PREFIX.beamline_prefix}-EA-DET-04:CAM:"
     driver = MbsAnalyserDriverIO(prefix, LensMode, PassEnergy)
     return MbsDetector[LensMode, PassEnergy](
-        prefix=prefix,
-        driver=driver,
+        prefix,
+        driver,
         acquire_logic=ADAcquireLogic(driver),
         trigger_logic=ElectronAnalayserTriggerLogic(driver),
         region_logic=RegionLogic(driver, pgm.energy.user_readback),
