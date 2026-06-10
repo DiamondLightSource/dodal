@@ -127,8 +127,8 @@ def ew4000(
     prefix = f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=prefix,
-        driver=driver,
+        prefix,
+        driver,
         acquire_logic=ShutterCoordinatorADAcquireLogic(
             driver, dual_fast_shutter, close_shutter_when_idle
         ),

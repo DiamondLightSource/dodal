@@ -40,5 +40,6 @@ async def test_vgscienta_detector_read_configuration(ew4000: VGScientaDetector) 
             f"{prefix}region_size_y": partial_reading(region.size_y),
             f"{prefix}sensor_max_size_y": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
+            f"{prefix}acquire_period": partial_reading(ANY),
         },
     )
