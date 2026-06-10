@@ -2,6 +2,7 @@ import asyncio
 
 import pytest
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     init_devices,
     set_mock_value,
@@ -157,3 +158,72 @@ async def test_read(high_field_magnet: HighFieldMagnet):
         high_field_magnet,
         expected_reading={"magnet": {"value": 5.0}},
     )
+
+
+async def test_tolerance_logic_within_tolerance_when_in_range(
+    high_field_magnet: HighFieldMagnet,
+):
+    result = high_field_magnet._within_tolerance(
+        setpoint=10.0, readback=10.005, tolerance=0.01
+    )
+    assert result is True
+
+
+async def test_tolerance_logic_within_tolerance_when_outside_range(
+    high_field_magnet: HighFieldMagnet,
+):
+    result = high_field_magnet._within_tolerance(
+        setpoint=10.0, readback=10.02, tolerance=0.01
+    )
+    assert result is False
+
+
+async def test_tolerance_logic_within_tolerance_with_negative_tolerance(
+    high_field_magnet: HighFieldMagnet,
+):
+    result = high_field_magnet._within_tolerance(
+        setpoint=10.0, readback=9.995, tolerance=-0.01
+    )
+    assert result is True
+
+
+async def test_tolerance_logic_stop_clears_set_success_and_restores_setpoint(
+    high_field_magnet: HighFieldMagnet,
+):
+    set_mock_value(high_field_magnet.movable_logic.readback, 7.5)
+    set_mock_value(high_field_magnet.movable_logic.readback, 1.5)
+    await high_field_magnet.stop()
+    assert high_field_magnet._set_success is False
+    assert await high_field_magnet.movable_logic.setpoint.get_value() == 1.5
+
+
+async def test_tolerance_logic_calculate_timeout(high_field_magnet: HighFieldMagnet):
+    set_mock_value(high_field_magnet.sweep_rate, 0.1)
+    set_mock_value(high_field_magnet.ramp_up_time, 0.1)
+    timeout = await high_field_magnet.movable_logic.calculate_timeout(
+        old_position=0.0, new_position=10.0
+    )
+    expected_timeout = 10.0 / 0.1 + 2 * 0.1 + DEFAULT_TIMEOUT
+    assert timeout == expected_timeout
+
+
+async def test_tolerance_logic_calculate_timeout_with_zero_speed(
+    high_field_magnet: HighFieldMagnet,
+):
+    set_mock_value(high_field_magnet.sweep_rate, 0.0)
+    with pytest.raises(ValueError, match="zero speed."):
+        await high_field_magnet.movable_logic.calculate_timeout(
+            old_position=0.0, new_position=10.0
+        )
+
+
+async def test_tolerance_logic_move(high_field_magnet: HighFieldMagnet):
+    set_mock_value(high_field_magnet.movable_logic.readback, 0.0)
+    move_task = high_field_magnet.movable_logic.move(new_position=10.0, timeout=5.0)
+    for value in [2.0, 5.0, 8.0, 9.5, 13.0]:
+        set_mock_value(high_field_magnet.movable_logic.readback, value)
+        await asyncio.sleep(0.0)
+        assert await high_field_magnet.within_tolerance.get_value() is False
+    set_mock_value(high_field_magnet.movable_logic.readback, 9.91)
+    await move_task
+    assert await high_field_magnet.within_tolerance.get_value() is True
