@@ -89,19 +89,21 @@ async def test_gap_cal_timout(
 ):
     set_mock_value(mock_id_gap.velocity, velocity)
     set_mock_value(mock_id_gap.user_readback, readback)
-    set_mock_value(mock_id_gap.user_setpoint, str(target))
+    set_mock_value(mock_id_gap.user_setpoint_str, str(target))
 
-    assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
+    assert await mock_id_gap.get_timeout_for_apple2() == pytest.approx(
+        expected_timeout, rel=0.1
+    )
 
 
 async def test_given_gate_never_closes_then_setting_gaps_times_out(
     mock_id_gap: UndulatorGap,
 ):
     callback_on_mock_put(
-        mock_id_gap.user_setpoint,
+        mock_id_gap.user_setpoint_str,
         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
-    mock_id_gap.get_timeout = AsyncMock(return_value=0.002)
+    mock_id_gap.movable_logic.get_timeout_for_apple2 = AsyncMock(return_value=0.002)
 
     with pytest.raises(TimeoutError):
         await mock_id_gap.set(2)
@@ -150,7 +152,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
         mock_phase_axes.top_outer.user_setpoint,
         lambda *_, **__: set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN),
     )
-    mock_phase_axes.get_timeout = AsyncMock(return_value=0.002)
+    mock_phase_axes.get_timeout_for_apple2 = AsyncMock(return_value=0.002)
     with pytest.raises(TimeoutError):
         await mock_phase_axes.set(set_value)
 
@@ -190,7 +192,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     set_mock_value(mock_id_gap.acceleration_time, 0.5)
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
-    get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
+    get_mock_put(mock_id_gap.user_setpoint_str).assert_awaited_once_with(
         str(fly_info.ramp_up_start_pos(0.5))
     )
 
@@ -248,7 +250,7 @@ async def test_phase_cal_timout(
     set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, target[2])
     set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, target[3])
 
-    assert await mock_phase_axes.get_timeout() == pytest.approx(
+    assert await mock_phase_axes.get_timeout_for_apple2() == pytest.approx(
         expected_timeout, rel=0.01
     )
 
@@ -284,16 +286,16 @@ async def test_phase_success_set(
     callback_on_mock_put(mock_phase_axes.set_move, lambda *_, **__: set_complete_move())
     run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
     get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1)
-    get_mock_put(mock_phase_axes.top_inner.user_setpoint).assert_called_once_with(
+    get_mock_put(mock_phase_axes.top_inner.user_setpoint_str).assert_called_once_with(
         str(set_value.top_inner)
     )
-    get_mock_put(mock_phase_axes.top_outer.user_setpoint).assert_called_once_with(
+    get_mock_put(mock_phase_axes.top_outer.user_setpoint_str).assert_called_once_with(
         str(set_value.top_outer)
     )
-    get_mock_put(mock_phase_axes.btm_inner.user_setpoint).assert_called_once_with(
+    get_mock_put(mock_phase_axes.btm_inner.user_setpoint_str).assert_called_once_with(
         str(set_value.btm_inner)
     )
-    get_mock_put(mock_phase_axes.btm_outer.user_setpoint).assert_called_once_with(
+    get_mock_put(mock_phase_axes.btm_outer.user_setpoint_str).assert_called_once_with(
         str(set_value.btm_outer)
     )
 
@@ -315,7 +317,7 @@ async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
         mock_jaw_phase.jaw_phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
-    mock_jaw_phase.get_timeout = AsyncMock(return_value=0.002)
+    mock_jaw_phase.get_timeout_for_apple2 = AsyncMock(return_value=0.002)
     with pytest.raises(TimeoutError):
         await mock_jaw_phase.set(2)
 
@@ -346,7 +348,7 @@ async def test_jaw_phase_cal_timout(
     set_mock_value(mock_jaw_phase.jaw_phase.user_readback, readback)
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, target)
 
-    assert await mock_jaw_phase.get_timeout() == pytest.approx(
+    assert await mock_jaw_phase.get_timeout_for_apple2() == pytest.approx(
         expected_timeout, rel=0.01
     )
 
