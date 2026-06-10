@@ -118,7 +118,10 @@ class UnstoppableMotor(Motor):
 
     def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix=prefix, name=name)
+
+    def ___post_init__(self):
         del self.motor_stop  # Remove motor_stop from the public interface
+        self.movable_logic.stop = self.stop
 
     async def stop(self, success=False):
         LOGGER.warning(f"Stopping {self.name} is not supported.")
