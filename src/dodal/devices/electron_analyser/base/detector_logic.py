@@ -67,7 +67,7 @@ class ElectronAnalayserTriggerLogic(
         return 0.0
 
     async def prepare_internal(self, num: int, livetime: float, deadtime: float):
-        # Only set image mode to single, num images and exposure is done with region.
+        # Only set image mode to single, num images and exposure is done with region logic.
         await self.driver.image_mode.set(ADImageMode.SINGLE)
 
 
