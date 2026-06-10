@@ -84,7 +84,11 @@ def xyz_to_uvw(
     )
 
 
-class ToolPointMotion(StandardReadable, Movable, Checkable):
+class ToolPointMotion(
+    StandardReadable,
+    Movable[XYZTiltAzimuthMotorPositions],
+    Checkable[XYZTiltAzimuthMotorPositions],
+):
     """Virtual manipulator translations of the sample stage. It is mounted on top
     of the diffractometer and circles tilt and azimuth angles. It defines three virtual
     axes u, v, and w as signals.
