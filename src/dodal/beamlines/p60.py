@@ -66,7 +66,7 @@ def energy_source(
 
 @devices.factory()
 def ew4000(
-    dual_energy_source: DualEnergySource, source_selector: SourceSelector
+    energy_source: DualEnergySource,
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     prefix = f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
@@ -75,5 +75,5 @@ def ew4000(
         driver=driver,
         acquire_logic=ADAcquireLogic(driver),
         trigger_logic=ElectronAnalayserTriggerLogic(driver),
-        region_logic=RegionLogic(driver, dual_energy_source.energy, source_selector),
+        region_logic=RegionLogic(driver, energy_source.energy),
     )

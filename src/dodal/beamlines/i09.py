@@ -122,7 +122,7 @@ def ew4000(
     dual_fast_shutter: DualFastShutter,
     dual_energy_source: DualEnergySource,
     source_selector: SourceSelector,
-    close_shutter_when_idle: SignalRW[bool],
+    ew4000_close_shutter_when_idle: SignalRW[bool],
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     prefix = f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
@@ -130,7 +130,7 @@ def ew4000(
         prefix,
         driver,
         acquire_logic=ShutterCoordinatorADAcquireLogic(
-            driver, dual_fast_shutter, close_shutter_when_idle
+            driver, dual_fast_shutter, ew4000_close_shutter_when_idle
         ),
         trigger_logic=ElectronAnalayserTriggerLogic(driver),
         region_logic=RegionLogic(driver, dual_energy_source.energy, source_selector),
