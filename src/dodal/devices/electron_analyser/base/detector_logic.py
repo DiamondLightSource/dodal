@@ -23,10 +23,10 @@ class ShutterCoordinatorADAcquireLogic(
         self,
         driver: TAbstractAnalyserDriverIO,
         shutter: GenericFastShutter,
-        _close_shutter_when_idle: SignalR[bool] | None = None,
+        close_shutter_when_idle: SignalR[bool] | None = None,
     ):
         self._shutter = shutter
-        self._close_shutter_when_idle = _close_shutter_when_idle
+        self._close_shutter_when_idle = close_shutter_when_idle
         super().__init__(driver)
 
     async def start_acquiring(self):
@@ -50,8 +50,12 @@ class ElectronAnalayserTriggerLogic(
     """Simple trigger logic for electron analyser."""
 
     def __init__(
-        self, driver: TAbstractAnalyserDriverIO, config_sigs: set[SignalR[Any]]
+        self,
+        driver: TAbstractAnalyserDriverIO,
+        config_sigs: set[SignalR[Any]] | None = None,
     ):
+        if config_sigs is None:
+            config_sigs = set()
         self.driver = driver
         self._config_sigs = config_sigs
 

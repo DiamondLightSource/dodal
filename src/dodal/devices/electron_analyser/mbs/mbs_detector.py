@@ -1,22 +1,18 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Generic
 
-from ophyd_async.core import SignalR, soft_signal_rw
-from ophyd_async.epics.adcore import ADAcquireLogic
+from ophyd_async.core import SignalR
+from ophyd_async.epics.adcore import ADAcquireLogic, ADWriterFactory, NDPluginBaseIO
 
 from dodal.devices.electron_analyser.base import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPassEnergy
 from dodal.devices.electron_analyser.base.detector_logic import (
-    ADAcquireLogic,
     ElectronAnalayserTriggerLogic,
     RegionLogic,
-    ShutterCoordinatorADAcquireLogic,
 )
 from dodal.devices.electron_analyser.mbs.mbs_driver_io import MbsAnalyserDriverIO
 from dodal.devices.electron_analyser.mbs.mbs_region import MbsRegion
-from dodal.devices.fast_shutter import GenericFastShutter
-from dodal.devices.selectable_source import SourceSelector
 
 
 class MbsDetector(
@@ -28,62 +24,53 @@ class MbsDetector(
     def __init__(
         self,
         prefix: str,
-        lens_mode_type: type[TLensMode],
-        pass_energy_type: type[TPassEnergy],
-        energy_source: SignalR[float],
-        shutter: GenericFastShutter | None = None,
-        source_selector: SourceSelector | None = None,
+        driver: MbsAnalyserDriverIO[TLensMode, TPassEnergy],
+        *writer_factories: ADWriterFactory,
+        acquire_logic: ADAcquireLogic,
+        trigger_logic: ElectronAnalayserTriggerLogic,
+        region_logic: RegionLogic,
+        plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
-        # Make attribute of class so connect applies to driver and populates parent.
-        self.driver = MbsAnalyserDriverIO[TLensMode, TPassEnergy](
-            prefix, lens_mode_type, pass_energy_type
-        )
-        region_logic = RegionLogic(self.driver, energy_source, source_selector)
-        self.close_shutter_when_idle = soft_signal_rw(bool, initial_value=True)
-        acquire_logic = (
-            ShutterCoordinatorADAcquireLogic(
-                self.driver, shutter, self.close_shutter_when_idle
-            )
-            if shutter is not None
-            else ADAcquireLogic(self.driver)
-        )
-        trigger_logic = ElectronAnalayserTriggerLogic(self.driver, set())
         config_sigs = (
             *config_sigs,
-            self.driver.region_name,
-            self.driver.energy_mode,
-            self.driver.acquisition_mode,
-            self.driver.lens_mode,
-            self.driver.low_energy,
-            self.driver.centre_energy,
-            self.driver.high_energy,
-            self.driver.deflector_x,
-            self.driver.energy_step,
-            self.driver.pass_energy,
-            self.driver.slices,
-            self.driver.iterations,
-            self.driver.total_steps,
-            self.driver.acquire_time,
-            self.driver.acquire_period,
-            self.driver.total_time,
-            self.driver.energy_axis,
-            self.driver.angle_axis,
-            self.driver.psu_mode,
-            self.driver.dither_steps,
-            self.driver.spin_offset,
-            self.driver.array_size_x,
-            self.driver.array_size_y,
-            self.driver.min_x,
-            self.driver.min_y,
-            self.driver.max_x,
-            self.driver.max_y,
+            driver.region_name,
+            driver.energy_mode,
+            driver.acquisition_mode,
+            driver.lens_mode,
+            driver.low_energy,
+            driver.centre_energy,
+            driver.high_energy,
+            driver.deflector_x,
+            driver.energy_step,
+            driver.pass_energy,
+            driver.slices,
+            driver.iterations,
+            driver.total_steps,
+            driver.acquire_time,
+            driver.acquire_period,
+            driver.total_time,
+            driver.energy_axis,
+            driver.angle_axis,
+            driver.psu_mode,
+            driver.dither_steps,
+            driver.spin_offset,
+            driver.array_size_x,
+            driver.array_size_y,
+            driver.min_x,
+            driver.min_y,
+            driver.max_x,
+            driver.max_y,
         )
         super().__init__(
+            driver,
+            prefix,
+            *writer_factories,
             region_logic=region_logic,
             acquire_logic=acquire_logic,
             trigger_logic=trigger_logic,
+            plugins=plugins,
             config_sigs=config_sigs,
             name=name,
         )

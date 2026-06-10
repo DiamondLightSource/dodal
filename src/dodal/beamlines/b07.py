@@ -1,3 +1,5 @@
+from ophyd_async.epics.adcore import ADAcquireLogic
+
 from dodal.beamlines.b07_shared import devices as b07_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -7,7 +9,11 @@ from dodal.devices.beamlines.b07 import (
     LensMode,
 )
 from dodal.devices.beamlines.b07_shared import PsuMode
-from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.electron_analyser.base.detector_logic import (
+    ElectronAnalayserTriggerLogic,
+    RegionLogic,
+)
+from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsDetector
 from dodal.devices.hutch_shutter import (
     EXP_SHUTTER_2_INFIX,
     HutchShutter,
@@ -47,15 +53,16 @@ def pgm() -> PlaneGratingMonochromator:
     )
 
 
-# CAM:IMAGE will fail to connect outside the beamline network,
-# see https://github.com/DiamondLightSource/dodal/issues/1852
 @devices.factory()
 def analyser(pgm: PlaneGratingMonochromator) -> SpecsDetector[LensMode, PsuMode]:
+    prefix = f"{B_PREFIX.beamline_prefix}-EA-DET-02:CAM:"
+    driver = SpecsAnalyserDriverIO(prefix, LensMode, PsuMode)
     return SpecsDetector[LensMode, PsuMode](
-        prefix=f"{B_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        energy_source=pgm.energy.user_readback,
+        prefix=prefix,
+        driver=driver,
+        acquire_logic=ADAcquireLogic(driver),
+        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        region_logic=RegionLogic(driver, pgm.energy.user_readback),
     )
 
 

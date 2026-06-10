@@ -1,5 +1,8 @@
+from ophyd_async.epics.adcore import ADAcquireLogic
+
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
 from dodal.devices.beamlines.p60 import (
     LabXraySource,
     LabXraySourceReadable,
@@ -8,7 +11,14 @@ from dodal.devices.beamlines.p60 import (
     PsuMode,
 )
 from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
+from dodal.devices.electron_analyser.base.detector_logic import (
+    ElectronAnalayserTriggerLogic,
+    RegionLogic,
+)
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaAnalyserDriverIO,
+    VGScientaDetector,
+)
 from dodal.devices.selectable_source import SourceSelector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -54,16 +64,16 @@ def energy_source(
     )
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/P60-13
 @devices.factory()
-def r4000(
-    energy_source: DualEnergySource,
+def ew4000(
+    dual_energy_source: DualEnergySource, source_selector: SourceSelector
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+    prefix = f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:"
+    driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
-        energy_source=energy_source.energy,
+        prefix=prefix,
+        driver=driver,
+        acquire_logic=ADAcquireLogic(driver),
+        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        region_logic=RegionLogic(driver, dual_energy_source.energy, source_selector),
     )

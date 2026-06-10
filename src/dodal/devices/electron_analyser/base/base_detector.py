@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Generic
 
 import numpy as np
@@ -10,9 +10,9 @@ from ophyd_async.core import (
     DetectorAcquireLogic,
     DetectorTriggerLogic,
     SignalR,
-    StandardDetector,
     derived_signal_r,
 )
+from ophyd_async.epics.adcore import ADWriterFactory, AreaDetector, NDPluginBaseIO
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
     GenericAnalyserDriverIO,
@@ -53,7 +53,7 @@ class SequenceHolder(Stageable, Preparable):
 
 
 class ElectronAnalyserDetector(
-    StandardDetector,
+    AreaDetector[TAbstractAnalyserDriverIO],
     Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Detector for data acquisition of electron analyser. Can be configured with
@@ -62,14 +62,18 @@ class ElectronAnalyserDetector(
 
     def __init__(
         self,
+        driver: TAbstractAnalyserDriverIO,
+        prefix: str,
+        *writer_factories: ADWriterFactory,
         acquire_logic: DetectorAcquireLogic,
         trigger_logic: DetectorTriggerLogic,
         region_logic: RegionLogic,
+        plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
+        self.sequence = SequenceHolder()
         self._region_logic = region_logic
-
         self.binding_energy_axis = derived_signal_r(
             self._calculate_binding_energy_axis,
             "eV",
@@ -77,12 +81,17 @@ class ElectronAnalyserDetector(
             excitation_energy=region_logic.energy_source,
             energy_mode=region_logic.driver.energy_mode,
         )
-        # ToDo - Add data logic
-        self.add_detector_logics(acquire_logic, trigger_logic)
-        self.add_config_signals(self.binding_energy_axis, *config_sigs)
-
-        self.sequence = SequenceHolder()
-        super().__init__(name)
+        config_sigs = (self.binding_energy_axis, *config_sigs)
+        super().__init__(
+            driver,
+            prefix,
+            *writer_factories,
+            acquire_logic=acquire_logic,
+            trigger_logic=trigger_logic,
+            plugins=plugins,
+            config_sigs=config_sigs,
+            name=name,
+        )
 
     def _calculate_binding_energy_axis(
         self,
