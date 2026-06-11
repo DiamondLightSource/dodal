@@ -8,7 +8,6 @@ from ophyd_async.core import (
     Array1D,
     AsyncStatus,
     DetectorAcquireLogic,
-    DetectorTriggerLogic,
     SignalR,
     derived_signal_r,
 )
@@ -26,7 +25,10 @@ from dodal.devices.electron_analyser.base.base_region import (
     TBaseRegion,
 )
 from dodal.devices.electron_analyser.base.base_util import to_binding_energy
-from dodal.devices.electron_analyser.base.detector_logic import RegionLogic
+from dodal.devices.electron_analyser.base.detector_logic import (
+    ElectronAnalayserTriggerLogic,
+    RegionLogic,
+)
 
 
 class SequenceHolder(Stageable, Preparable):
@@ -66,7 +68,7 @@ class ElectronAnalyserDetector(
         prefix: str,
         *writer_factories: ADWriterFactory,
         acquire_logic: DetectorAcquireLogic,
-        trigger_logic: DetectorTriggerLogic,
+        trigger_logic: ElectronAnalayserTriggerLogic[TAbstractAnalyserDriverIO],
         region_logic: RegionLogic,
         plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),
