@@ -191,7 +191,7 @@ async def test_electron_analyser_trigger_logic_prepare_internal(
     detector = StandardDetector()
     detector.add_detector_logics(trigger_logic)
     await detector.trigger()
-    get_mock_put(trigger_logic._driver.image_mode).assert_awaited_once_with(
+    get_mock_put(trigger_logic.driver.image_mode).assert_awaited_once_with(
         ADImageMode.SINGLE
     )
 
@@ -205,8 +205,8 @@ async def test_electron_analyser_trigger_logic_config_sigs(
     await assert_configuration(
         detector,
         {
-            trigger_logic._driver.lens_mode.name: partial_reading(ANY),
-            trigger_logic._driver.psu_mode.name: partial_reading(ANY),
+            trigger_logic.driver.lens_mode.name: partial_reading(ANY),
+            trigger_logic.driver.psu_mode.name: partial_reading(ANY),
         },
     )
 
