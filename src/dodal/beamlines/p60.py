@@ -52,7 +52,7 @@ def mg_kalpha_source() -> LabXraySourceReadable:
 
 
 @devices.factory()
-def energy_source(
+def dual_energy_source(
     al_kalpha_source: LabXraySourceReadable,
     mg_kalpha_source: LabXraySourceReadable,
     source_selector: SourceSelector,
@@ -66,7 +66,7 @@ def energy_source(
 
 @devices.factory()
 def ew4000(
-    energy_source: DualEnergySource,
+    dual_energy_source: DualEnergySource,
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     prefix = f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
@@ -75,5 +75,5 @@ def ew4000(
         driver=driver,
         acquire_logic=ADAcquireLogic(driver),
         trigger_logic=ElectronAnalayserTriggerLogic(driver),
-        region_logic=RegionLogic(driver, energy_source.energy),
+        region_logic=RegionLogic(driver, dual_energy_source.energy),
     )
