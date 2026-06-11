@@ -68,7 +68,7 @@ class ElectronAnalyserDetector(
         prefix: str,
         *writer_factories: ADWriterFactory,
         acquire_logic: DetectorAcquireLogic,
-        trigger_logic: ElectronAnalayserTriggerLogic[TAbstractAnalyserDriverIO],
+        trigger_logic: ElectronAnalayserTriggerLogic,
         region_logic: RegionLogic,
         plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),

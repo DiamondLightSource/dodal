@@ -180,14 +180,12 @@ async def test_region_logic_setup_with_region_moves_selected_source_if_not_none(
 @pytest.fixture
 def trigger_logic(
     driver: AbstractAnalyserDriverIO,
-) -> ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO]:
-    return ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO](
-        driver, {driver.lens_mode, driver.psu_mode}
-    )
+) -> ElectronAnalayserTriggerLogic:
+    return ElectronAnalayserTriggerLogic(driver, {driver.lens_mode, driver.psu_mode})
 
 
 async def test_electron_analyser_trigger_logic_prepare_internal(
-    trigger_logic: ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO],
+    trigger_logic: ElectronAnalayserTriggerLogic,
 ) -> None:
     detector = StandardDetector()
     detector.add_detector_logics(trigger_logic)
@@ -198,7 +196,7 @@ async def test_electron_analyser_trigger_logic_prepare_internal(
 
 
 async def test_electron_analyser_trigger_logic_config_sigs(
-    trigger_logic: ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO],
+    trigger_logic: ElectronAnalayserTriggerLogic,
 ) -> None:
     detector = StandardDetector()
     detector.add_detector_logics(trigger_logic)
@@ -213,6 +211,6 @@ async def test_electron_analyser_trigger_logic_config_sigs(
 
 
 async def test_electron_analyser_deadtime(
-    trigger_logic: ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO],
+    trigger_logic: ElectronAnalayserTriggerLogic,
 ) -> None:
     assert trigger_logic.get_deadtime(SignalDict()) == 0.0

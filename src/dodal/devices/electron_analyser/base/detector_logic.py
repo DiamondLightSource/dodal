@@ -44,14 +44,12 @@ class ShutterCoordinatorADAcquireLogic(
             await self._shutter.set(self._shutter.close_state)
 
 
-class ElectronAnalayserTriggerLogic(
-    DetectorTriggerLogic, Generic[TAbstractAnalyserDriverIO]
-):
+class ElectronAnalayserTriggerLogic(DetectorTriggerLogic):
     """Simple trigger logic for electron analyser."""
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        driver: AbstractAnalyserDriverIO,
         config_sigs: set[SignalR[Any]] | None = None,
     ):
         if config_sigs is None:
