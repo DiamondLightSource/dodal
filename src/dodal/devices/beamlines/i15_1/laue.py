@@ -12,12 +12,11 @@ class LaueMonochrometer(StandardReadable):
         crystal_lut_path: str,
         name: str = "",
     ):
-        with self.add_children_as_readables():
-            self.bend = Motor(prefix + "BENDER")
-            self.bragg = Motor(prefix + "PITCH")
-            self.roll = Motor(prefix + "ROLL")
-            self.yaw = Motor(prefix + "YAW")
-            self.y = Motor(prefix + "Y")
+        self.bend = Motor(prefix + "BENDER")
+        self.bragg = Motor(prefix + "PITCH")
+        self.roll = Motor(prefix + "ROLL")
+        self.yaw = Motor(prefix + "YAW")
+        self.y = Motor(prefix + "Y")
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy_kev = derived_signal_r(self._get_energy, y=self.y)
