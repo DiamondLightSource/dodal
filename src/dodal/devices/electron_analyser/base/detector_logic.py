@@ -56,7 +56,7 @@ class ElectronAnalayserTriggerLogic(
     ):
         if config_sigs is None:
             config_sigs = set()
-        self.driver = driver
+        self._driver = driver
         self._config_sigs = config_sigs
 
     def config_sigs(self) -> set[SignalR[Any]]:
@@ -68,7 +68,7 @@ class ElectronAnalayserTriggerLogic(
 
     async def prepare_internal(self, num: int, livetime: float, deadtime: float):
         # Only set image mode to single, num images and exposure is done with region logic.
-        await self.driver.image_mode.set(ADImageMode.SINGLE)
+        await self._driver.image_mode.set(ADImageMode.SINGLE)
 
 
 class RegionLogic:

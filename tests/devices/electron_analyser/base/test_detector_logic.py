@@ -178,23 +178,27 @@ async def test_region_logic_setup_with_region_moves_selected_source_if_not_none(
 
 
 @pytest.fixture
-def trigger_logic(driver: AbstractAnalyserDriverIO) -> ElectronAnalayserTriggerLogic:
-    return ElectronAnalayserTriggerLogic(driver, {driver.lens_mode, driver.psu_mode})
+def trigger_logic(
+    driver: AbstractAnalyserDriverIO,
+) -> ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO]:
+    return ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO](
+        driver, {driver.lens_mode, driver.psu_mode}
+    )
 
 
 async def test_electron_analyser_trigger_logic_prepare_internal(
-    trigger_logic: ElectronAnalayserTriggerLogic,
+    trigger_logic: ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO],
 ) -> None:
     detector = StandardDetector()
     detector.add_detector_logics(trigger_logic)
     await detector.trigger()
-    get_mock_put(trigger_logic.driver.image_mode).assert_awaited_once_with(
+    get_mock_put(trigger_logic._driver.image_mode).assert_awaited_once_with(
         ADImageMode.SINGLE
     )
 
 
 async def test_electron_analyser_trigger_logic_config_sigs(
-    trigger_logic: ElectronAnalayserTriggerLogic,
+    trigger_logic: ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO],
 ) -> None:
     detector = StandardDetector()
     detector.add_detector_logics(trigger_logic)
@@ -202,13 +206,13 @@ async def test_electron_analyser_trigger_logic_config_sigs(
     await assert_configuration(
         detector,
         {
-            trigger_logic.driver.lens_mode.name: partial_reading(ANY),
-            trigger_logic.driver.psu_mode.name: partial_reading(ANY),
+            trigger_logic._driver.lens_mode.name: partial_reading(ANY),
+            trigger_logic._driver.psu_mode.name: partial_reading(ANY),
         },
     )
 
 
 async def test_electron_analyser_deadtime(
-    trigger_logic: ElectronAnalayserTriggerLogic,
+    trigger_logic: ElectronAnalayserTriggerLogic[AbstractAnalyserDriverIO],
 ) -> None:
     assert trigger_logic.get_deadtime(SignalDict()) == 0.0
