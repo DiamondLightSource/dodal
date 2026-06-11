@@ -2,16 +2,17 @@ from typing import Any
 
 import numpy as np
 import pytest
-from ophyd_async.core import InOut, init_devices, set_mock_value
+from ophyd_async.core import InOut, SignalR, init_devices, set_mock_value
 
-from dodal.devices.beamlines import b07, b07_shared, i09
+from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
 from dodal.devices.beamlines.i09 import Grating
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser.base import DualEnergySource, EnergySource
+from dodal.devices.electron_analyser.base import DualEnergySource
+from dodal.devices.electron_analyser.mbs import MbsDetector
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, FastShutter
@@ -27,16 +28,13 @@ async def source_selector() -> SourceSelector:
 
 
 @pytest.fixture
-async def single_energy_source() -> EnergySource:
+async def source_energy() -> SignalR[float]:
     async with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
     await dcm.energy_in_keV.set(2.2)
-    async with init_devices(mock=True):
-        dcm_energy_source = EnergySource(dcm.energy_in_eV)
-
-    return dcm_energy_source
+    return dcm.energy_in_eV
 
 
 @pytest.fixture
@@ -55,6 +53,11 @@ async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySourc
             selected_source=source_selector.selected_source,
         )
     return dual_energy_source
+
+
+@pytest.fixture
+async def dual_source_energy(dual_energy_source: DualEnergySource) -> SignalR[float]:
+    return dual_energy_source.energy
 
 
 @pytest.fixture
@@ -96,7 +99,7 @@ def dual_fast_shutter(
 
 @pytest.fixture
 async def b07b_specs150(
-    single_energy_source: EnergySource,
+    source_energy: SignalR[float],
     shutter1: FastShutter,
 ) -> SpecsDetector[b07.LensMode, b07_shared.PsuMode]:
     with init_devices(mock=True):
@@ -104,7 +107,7 @@ async def b07b_specs150(
             prefix="TEST:",
             lens_mode_type=b07.LensMode,
             psu_mode_type=b07_shared.PsuMode,
-            energy_source=single_energy_source,
+            energy_source=source_energy,
             shutter=shutter1,
         )
     # Needed for specs so we don't get division by zero error.
@@ -114,7 +117,7 @@ async def b07b_specs150(
 
 @pytest.fixture
 async def ew4000(
-    dual_energy_source: DualEnergySource,
+    dual_source_energy: SignalR[float],
     dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
 ) -> VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy]:
@@ -124,13 +127,33 @@ async def ew4000(
             lens_mode_type=i09.LensMode,
             psu_mode_type=i09.PsuMode,
             pass_energy_type=i09.PassEnergy,
-            energy_source=dual_energy_source,
+            energy_source=dual_source_energy,
             shutter=dual_fast_shutter,
             source_selector=source_selector,
         )
     energy_axis = [1, 2, 3, 4, 5]
     set_mock_value(ew4000.driver.energy_axis, np.array(energy_axis, dtype=float))
     return ew4000
+
+
+@pytest.fixture
+async def i05_mbs_analyser(
+    source_energy: SignalR[float],
+    shutter1: FastShutter,
+) -> MbsDetector[i05_shared.LensMode, i05_shared.PassEnergy]:
+    with init_devices(mock=True):
+        i05_mbs_analyser = MbsDetector[i05_shared.LensMode, i05_shared.PassEnergy](
+            prefix="TEST:",
+            lens_mode_type=i05_shared.LensMode,
+            pass_energy_type=i05_shared.PassEnergy,
+            energy_source=source_energy,
+            shutter=shutter1,
+        )
+    energy_axis = [1, 2, 3, 4, 5]
+    set_mock_value(
+        i05_mbs_analyser.driver.energy_axis, np.array(energy_axis, dtype=float)
+    )
+    return i05_mbs_analyser
 
 
 @pytest.fixture

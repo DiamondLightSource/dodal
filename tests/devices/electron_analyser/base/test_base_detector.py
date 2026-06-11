@@ -40,9 +40,7 @@ async def test_base_analyser_detector_describe_configuration(
     # Catch that driver correctly reflects what region energy mode is.
     assert is_region_binding == is_driver_binding
     energy_axis = await driver.energy_axis.get_value()
-    excitation_energy = (
-        await sim_detector._region_logic.energy_source.energy.get_value()
-    )
+    excitation_energy = await sim_detector._region_logic.energy_source.get_value()
     expected_binding_energy_axis = np.array(
         [excitation_energy - e if is_driver_binding else e for e in energy_axis]
     )
