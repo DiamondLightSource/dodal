@@ -1,28 +1,23 @@
 from dataclasses import dataclass, field
-from typing import Any, Generic
+from typing import Any
 
 from ophyd_async.core import DetectorTriggerLogic, SignalDict, SignalR
 from ophyd_async.epics.adcore import ADAcquireLogic, ADImageMode
 
-from dodal.devices.electron_analyser.base.base_driver_io import (
-    AbstractAnalyserDriverIO,
-    TAbstractAnalyserDriverIO,
-)
+from dodal.devices.electron_analyser.base.base_driver_io import AbstractAnalyserDriverIO
 from dodal.devices.electron_analyser.base.base_region import BaseRegion
 from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
-class ShutterCoordinatorADAcquireLogic(
-    ADAcquireLogic, Generic[TAbstractAnalyserDriverIO]
-):
+class ShutterCoordinatorADAcquireLogic(ADAcquireLogic):
     """Extends the acquire logic to coordinate opening shutters before acquisition with
     optional configuration of when to close.
     """
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        driver: AbstractAnalyserDriverIO,
         shutter: GenericFastShutter,
         close_shutter_when_idle: SignalR[bool] | None = None,
     ):
