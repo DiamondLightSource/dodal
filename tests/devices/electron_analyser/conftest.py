@@ -162,7 +162,6 @@ async def ew4000(
 @pytest.fixture
 async def i05_mbs_analyser(
     source_energy: SignalR[float],
-    shutter1: FastShutter,
 ) -> MbsDetector[i05_shared.LensMode, i05_shared.PassEnergy]:
     with init_devices(mock=True):
         prefix = "TEST:"
