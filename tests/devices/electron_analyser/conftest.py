@@ -18,8 +18,8 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.base.detector_logic import (
+from dodal.devices.electron_analyser.base import (
+    DualEnergySource,
     ElectronAnalayserTriggerLogic,
     RegionLogic,
     ShutterCoordinatorADAcquireLogic,

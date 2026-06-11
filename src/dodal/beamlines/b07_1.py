@@ -6,7 +6,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.b07 import Grating, LensMode
 from dodal.devices.beamlines.b07_1 import ChannelCutMonochromator, Grating, LensMode
 from dodal.devices.beamlines.b07_shared import PsuMode
-from dodal.devices.electron_analyser.base.detector_logic import (
+from dodal.devices.electron_analyser.base import (
     ElectronAnalayserTriggerLogic,
     RegionLogic,
 )

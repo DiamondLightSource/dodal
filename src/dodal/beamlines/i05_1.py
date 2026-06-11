@@ -6,7 +6,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05_1 import XYZAzimuthPolarDefocusStage
 from dodal.devices.beamlines.i05_shared import LensMode, Mj7j8Mirror, PassEnergy
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
-from dodal.devices.electron_analyser.base.detector_logic import (
+from dodal.devices.electron_analyser.base import (
     ElectronAnalayserTriggerLogic,
     RegionLogic,
 )

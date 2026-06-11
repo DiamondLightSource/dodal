@@ -12,8 +12,8 @@ from dodal.devices.beamlines.i09 import (
     PsuMode,
 )
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
-from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.base.detector_logic import (
+from dodal.devices.electron_analyser.base import (
+    DualEnergySource,
     ElectronAnalayserTriggerLogic,
     RegionLogic,
     ShutterCoordinatorADAcquireLogic,

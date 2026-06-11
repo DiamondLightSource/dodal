@@ -15,8 +15,9 @@ from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import assert_configuration, partial_reading
 
 from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
-from dodal.devices.electron_analyser.base import AbstractAnalyserDriverIO, BaseRegion
-from dodal.devices.electron_analyser.base.detector_logic import (
+from dodal.devices.electron_analyser.base import (
+    AbstractAnalyserDriverIO,
+    BaseRegion,
     ElectronAnalayserTriggerLogic,
     RegionLogic,
     ShutterCoordinatorADAcquireLogic,

@@ -10,8 +10,8 @@ from dodal.devices.beamlines.p60 import (
     PassEnergy,
     PsuMode,
 )
-from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.base.detector_logic import (
+from dodal.devices.electron_analyser.base import (
+    DualEnergySource,
     ElectronAnalayserTriggerLogic,
     RegionLogic,
 )

@@ -5,7 +5,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09_1 import LensMode, PsuMode
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
-from dodal.devices.electron_analyser.base.detector_logic import (
+from dodal.devices.electron_analyser.base import (
     ElectronAnalayserTriggerLogic,
     RegionLogic,
 )
