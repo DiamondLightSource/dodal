@@ -28,10 +28,7 @@ class LaueMonochrometer(StandardReadable):
 
     def _get_xtal_config(self) -> XpdfCrystalLookupTable:
         return self._config_client.get_file_contents(
-            self._crystal_lut_path,
-            XpdfCrystalLookupTable,
-            # Remove once https://github.com/DiamondLightSource/daq-config-server/pull/183 is released + deployed
-            force_parser=XpdfCrystalLookupTable.from_contents,
+            self._crystal_lut_path, XpdfCrystalLookupTable
         )
 
     def _get_energy(self, y: float) -> float:
