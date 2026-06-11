@@ -131,6 +131,8 @@ filterwarnings = [
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
     "ignore:.*pkg_resources.*:DeprecationWarning",
+    # Ignore deprecation warnings about TriggerableCommand until https://github.com/bluesky/ophyd-async/issues/1292
+    # addressed
     "ignore:epics_signal_x is deprecated, use epics_triggerable_command instead:DeprecationWarning",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
