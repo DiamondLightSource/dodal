@@ -47,12 +47,5 @@ async def test_energy_kev_gets_value_based_on_y(
     await assert_reading(
         laue_monochrometer,
         {f"{laue_monochrometer.name}-energy_kev": partial_reading(expected_energy)},
-        full_match=False,
+        full_match=True,
     )
-
-
-async def test_reading_device_only_reads_energy_value(
-    laue_monochrometer: LaueMonochrometer,
-):
-    result = await laue_monochrometer.read()
-    assert list(result.keys()) == ["monocrometer-energy_kev"]
