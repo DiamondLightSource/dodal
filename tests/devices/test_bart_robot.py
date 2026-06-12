@@ -428,7 +428,7 @@ async def test_robot_unload_resets_prog_error_and_succeeds_if_error_cleared(
 
     await device.set(SAMPLE_LOCATION_EMPTY)
 
-    get_mock(device).assert_has_calls([call.reset.put(ANY), call.unload.put(ANY)])
+    get_mock(device).assert_has_calls([call.reset.put(None), call.unload.put(None)])
 
 
 async def test_robot_load_does_not_reset_if_prog_error_or_controller_error_not_retryable(
