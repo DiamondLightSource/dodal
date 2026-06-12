@@ -14,19 +14,14 @@ from typing import (
     NamedTuple,
     ParamSpec,
     Self,
+    TypeAlias,
     TypeVar,
 )
 
 from bluesky.run_engine import get_bluesky_event_loop
+from ophyd.device import Device as OphydV1Device
 from ophyd.sim import make_fake_device
-
-from dodal.common.beamlines.beamline_utils import wait_for_connection
-from dodal.utils import (
-    AnyDevice,
-    OphydV1Device,
-    OphydV2Device,
-    SkipType,
-)
+from ophyd_async.core import Device as OphydV2Device
 
 DEFAULT_TIMEOUT = 30
 NO_DOCS = "No documentation available."
@@ -34,8 +29,11 @@ NO_DOCS = "No documentation available."
 T = TypeVar("T")
 Args = ParamSpec("Args")
 
+SkipType = bool | Callable[[], bool]
+
 V1 = TypeVar("V1", bound=OphydV1Device)
 V2 = TypeVar("V2", bound=OphydV2Device)
+AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
 
 DeviceFactoryDecorator = Callable[[Callable[Args, V2]], "DeviceFactory[Args, V2]"]
 OphydInitialiser = Callable[Concatenate[V1, Args], V1 | None]
@@ -249,7 +247,7 @@ class V1DeviceFactory(Generic[Args, V1]):
     def create(self, *args: Args.args, **kwargs: Args.kwargs) -> V1:
         device = self.factory(name=self.name, prefix=self.prefix)
         if self.wait:
-            wait_for_connection(device, timeout=self.timeout)
+            device.wait_for_connection(timeout=self.timeout)
         self.post_create(device, *args, **kwargs)
         return device
 

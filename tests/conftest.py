@@ -1,7 +1,6 @@
 import importlib
 import logging
 import os
-import sys
 from os import environ
 from pathlib import Path
 from types import ModuleType
@@ -10,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from ophyd_async.core import PathProvider
 
-from dodal.common.beamlines import beamline_parameters, beamline_utils
+from dodal.common.beamlines import beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     clear_config_client,
     clear_path_provider,
@@ -24,11 +23,6 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
-from dodal.utils import (
-    DeviceInitializationController,
-    collect_factories,
-    make_all_devices,
-)
 from tests.devices.beamlines.i10.test_data import LOOKUP_TABLE_PATH
 from tests.devices.oav.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVELS
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
@@ -89,7 +83,6 @@ def patch_open_to_prevent_dls_reads_in_tests():
 
 
 def pytest_runtest_setup(item):
-    beamline_utils.clear_devices()
     if LOGGER.handlers == []:
         mock_graylog_handler = MagicMock(spec=GELFTCPHandler)
         mock_graylog_handler.return_value.level = logging.DEBUG
@@ -98,11 +91,6 @@ def pytest_runtest_setup(item):
             set_up_all_logging_handlers(
                 LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000
             )
-
-
-def pytest_runtest_teardown():
-    if "dodal.beamlines.beamline_utils" in sys.modules:
-        sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
 
 
 @pytest.fixture
@@ -135,17 +123,7 @@ def module_and_devices_for_beamline(request: pytest.FixtureRequest):
                 result.devices,
                 result.connection_errors | result.build_errors,
             )
-        else:
-            devices, exceptions = make_all_devices(
-                bl_mod,
-                include_skipped=True,
-                fake_with_ophyd_sim=True,
-            )
-        yield (bl_mod, devices, exceptions)
-        beamline_utils.clear_devices()
-        for factory in collect_factories(bl_mod).values():
-            if isinstance(factory, DeviceInitializationController):
-                factory.cache_clear()
+            yield (bl_mod, devices, exceptions)
         del bl_mod
 
 
