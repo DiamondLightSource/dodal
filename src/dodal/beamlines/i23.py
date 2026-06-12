@@ -3,6 +3,7 @@ from pathlib import Path
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import InOut, PathProvider, StrictEnum
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 from dodal.beamlines.aithre import DISPLAY_CONFIG, ZOOM_PARAMS_FILE
@@ -21,7 +22,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, get_hostname
 
@@ -83,8 +84,8 @@ def pin_tip_detection() -> PinTipDetection:
 
 
 @devices.factory()
-def shutter() -> ZebraShutter:
-    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
+def shutter() -> MXZebraShutter:
+    return MXZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @devices.factory()
@@ -103,10 +104,9 @@ def zebra() -> Zebra:
 @devices.factory()
 def pilatus(path_provider: PathProvider) -> PilatusDetector:
     return PilatusDetector(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
-        path_provider=path_provider,
+        f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix="cam1:",
-        writer_suffix=HDF5_SUFFIX,
     )
 
 

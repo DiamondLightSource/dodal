@@ -41,16 +41,3 @@ def test_driver_throws_error_with_wrong_acquisition_mode(
     acq_datatype_name = acq_datatype.__name__ if acq_datatype is not None else ""
     with pytest.raises(FailedStatus, match=f"is not a valid {acq_datatype_name}"):
         run_engine(bps.mv(sim_driver.acquisition_mode, AcquisitionModeTestEnum.TEST_1))
-
-
-def test_driver_throws_error_with_wrong_psu_mode(
-    sim_driver: GenericAnalyserDriverIO,
-    run_engine: RunEngine,
-) -> None:
-    class PsuModeTestEnum(StrictEnum):
-        TEST_1 = "Invalid mode"
-
-    psu_datatype = sim_driver.psu_mode.datatype
-    psu_datatype_name = psu_datatype.__name__ if psu_datatype is not None else ""
-    with pytest.raises(FailedStatus, match=f"is not a valid {psu_datatype_name}"):
-        run_engine(bps.mv(sim_driver.psu_mode, PsuModeTestEnum.TEST_1))

@@ -117,7 +117,7 @@ def ew4000(
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
         pass_energy_type=PassEnergy,
-        energy_source=dual_energy_source,
+        energy_source=dual_energy_source.energy,
         shutter=dual_fast_shutter,
         source_selector=source_selector,
     )

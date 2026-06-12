@@ -1,29 +1,26 @@
-from typing import Generic, TypeVar
+from typing import Generic
 
-from ophyd_async.core import StrictEnum
 from pydantic import Field, field_validator
 
 from dodal.devices.electron_analyser.base.base_region import (
     BaseRegion,
     BaseSequence,
     TLensMode,
-    TPsuMode,
+    TPassEnergy,
 )
 from dodal.devices.electron_analyser.vgscienta.vgscienta_enums import (
     AcquisitionMode,
     DetectorMode,
 )
 
-TPassEnergyEnum = TypeVar("TPassEnergyEnum", bound=StrictEnum)
-
 
 class VGScientaRegion(
-    BaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
-    Generic[TLensMode, TPassEnergyEnum],
+    BaseRegion[AcquisitionMode, TLensMode, TPassEnergy],
+    Generic[TLensMode, TPassEnergy],
 ):
     # Override defaults of base region class
     lens_mode: TLensMode
-    pass_energy: TPassEnergyEnum
+    pass_energy: TPassEnergy
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     centre_energy: float = Field(alias="fix_energy", default=9)
@@ -31,6 +28,7 @@ class VGScientaRegion(
     acquire_time: float = Field(default=1.0, alias="step_time")
     energy_step: float = Field(default=200.0)
     # Specific to this class
+    slices: int = 1
     total_steps: float = 13.0
     total_time: float = 13.0
     min_x: int = Field(alias="first_x_channel", default=1)
@@ -56,10 +54,7 @@ class VGScientaRegion(
 
 
 class VGScientaSequence(
-    BaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
-    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
+    BaseSequence[VGScientaRegion[TLensMode, TPassEnergy]],
+    Generic[TLensMode, TPassEnergy],
 ):
-    psu_mode: TPsuMode = Field(alias="element_set")
-    regions: list[VGScientaRegion[TLensMode, TPassEnergyEnum]] = Field(
-        default_factory=lambda: []
-    )
+    pass
