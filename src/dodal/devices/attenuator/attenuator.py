@@ -66,7 +66,7 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
 
         self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
         self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
-        self._change = epics_signal_x(prefix + "FANOUT.PROC")
+        self._change = epics_signal_x(prefix + "FANOUT")
 
         super().__init__(prefix, name)
 
