@@ -347,13 +347,13 @@ async def test_moving_the_robot_will_reset_controller_error_and_throw_if_error_n
         assert e.value.error_code == 40
 
     expected_load_unload_calls = (
-        [call.reset.put(ANY), call.unload.put(ANY)]
+        [call.reset.put(None), call.unload.put(None)]
         if sample_location is SAMPLE_LOCATION_EMPTY
         else [
-            call.reset.put(ANY),
+            call.reset.put(None),
             call.next_puck.put(ANY),
             call.next_pin.put(ANY),
-            call.load.put(ANY),
+            call.load.put(None),
         ]
     )
     get_mock(device).assert_has_calls(expected_load_unload_calls)
@@ -372,10 +372,10 @@ async def test_robot_load_resets_controller_error_and_succeeds_if_error_cleared(
 
     get_mock(device).assert_has_calls(
         [
-            call.reset.put(ANY),
+            call.reset.put(None),
             call.next_puck.put(ANY),
             call.next_pin.put(ANY),
-            call.load.put(ANY),
+            call.load.put(None),
         ]
     )
 
@@ -393,10 +393,10 @@ async def test_robot_load_resets_prog_error_and_succeeds_if_error_cleared(
 
     get_mock(device).assert_has_calls(
         [
-            call.reset.put(ANY),
+            call.reset.put(None),
             call.next_puck.put(ANY),
             call.next_pin.put(ANY),
-            call.load.put(ANY),
+            call.load.put(None),
         ]
     )
 
@@ -413,7 +413,7 @@ async def test_robot_unload_resets_controller_error_and_succeeds_if_error_cleare
 
     await device.set(SAMPLE_LOCATION_EMPTY)
 
-    get_mock(device).assert_has_calls([call.reset.put(ANY), call.unload.put(ANY)])
+    get_mock(device).assert_has_calls([call.reset.put(None), call.unload.put(None)])
 
 
 async def test_robot_unload_resets_prog_error_and_succeeds_if_error_cleared(
