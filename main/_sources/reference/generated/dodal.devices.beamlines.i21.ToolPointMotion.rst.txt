@@ -15,7 +15,7 @@ dodal.devices.beamlines.i21.ToolPointMotion
       
       
       
-      ~ToolPointMotion.check_motor_limits
+      ~ToolPointMotion.check_value
       
       
       

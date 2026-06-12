@@ -30,8 +30,6 @@ dodal.devices.insertion\_device.UnstoppableMotor
       
       
       
-      ~UnstoppableMotor.stop
-      
       
       
       
@@ -45,6 +43,9 @@ dodal.devices.insertion\_device.UnstoppableMotor
    .. autosummary::
    
       
+      
+      
+      ~UnstoppableMotor.movable_logic
       
       
       
