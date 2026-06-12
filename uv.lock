@@ -820,7 +820,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], git = "https://github.com/bluesky/ophyd-async.git?rev=add_missing_standardmovable_typing" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.19.1" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -839,7 +839,7 @@ dev = [
     { name = "ispyb" },
     { name = "mypy" },
     { name = "myst-parser" },
-    { name = "ophyd-async", extras = ["sim"], git = "https://github.com/bluesky/ophyd-async.git?rev=add_missing_standardmovable_typing" },
+    { name = "ophyd-async", extras = ["sim"], specifier = ">=0.19.1" },
     { name = "pre-commit" },
     { name = "psutil" },
     { name = "pydata-sphinx-theme", specifier = ">=0.12" },
@@ -2252,8 +2252,8 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.19.dev5+g886ca3f99"
-source = { git = "https://github.com/bluesky/ophyd-async.git?rev=add_missing_standardmovable_typing#886ca3f99c8c4e3ebc51a0ccbc1a5bd4f9873153" }
+version = "0.19.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bluesky" },
     { name = "colorlog" },
@@ -2265,6 +2265,10 @@ dependencies = [
     { name = "scanspec" },
     { name = "stamina" },
     { name = "velocity-profile" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7c/a5/1811d2cb16ca2a0aa0830a119ae55cd8b3435acd821b68eebe430524502d/ophyd_async-0.19.1.tar.gz", hash = "sha256:a98f3514e159b3777b9eaf3b9417a2238c4fefc5c657a82cb043174c569acc37", size = 588480, upload-time = "2026-06-11T19:09:20.064Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7f/a3/b4605ee05a6a3480ad57cf0ac15e381f99189b022362f0c08044c86227d7/ophyd_async-0.19.1-py3-none-any.whl", hash = "sha256:bb4cc6751aee46e53c588b493ce0a8905c94fbf4b5092af2f774019846af7c74", size = 228222, upload-time = "2026-06-11T19:09:18.712Z" },
 ]
 
 [package.optional-dependencies]

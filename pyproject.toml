@@ -16,7 +16,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@add_missing_standardmovable_typing",
+    "ophyd-async[ca,pva]>=0.19.1",
     "bluesky>=1.14.5",
     "pyepics",
     "pillow",
@@ -24,7 +24,7 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",                                                                                                          # For pin-tip detection.
+    "opencv-python-headless",                                                                   # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -32,8 +32,8 @@ dependencies = [
     "scanspec>=0.7.3",
     "pyzmq==27.1.0",
     "deepdiff",
-    "daq-config-server @ git+https://github.com/DiamondLightSource/daq-config-server.git@main",                                        # For getting Configuration settings.
-    "mysql-connector-python == 9.5.0",                                                                                                 # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
+    "daq-config-server @ git+https://github.com/DiamondLightSource/daq-config-server.git@main", # For getting Configuration settings.
+    "mysql-connector-python == 9.5.0",                                                          # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
 ]
 
 dynamic = ["version"]
@@ -51,7 +51,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd-async[sim]@git+https://github.com/bluesky/ophyd-async.git@add_missing_standardmovable_typing",
+    "ophyd_async[sim]>=v0.19.1",
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
@@ -63,7 +63,7 @@ dev = [
     "pytest-timeout",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",                                                                                                                 #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
@@ -131,6 +131,9 @@ filterwarnings = [
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
     "ignore:.*pkg_resources.*:DeprecationWarning",
+    # Ignore deprecation warnings about TriggerableCommand until https://github.com/bluesky/ophyd-async/issues/1292
+    # addressed
+    "ignore:epics_signal_x is deprecated, use epics_triggerable_command instead:DeprecationWarning",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests system_tests"
