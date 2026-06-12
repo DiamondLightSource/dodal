@@ -178,7 +178,7 @@ async def test_when_unloaded_then_spinner_stops_before_beam_program_loaded(
     parent_mock = get_mock(robot)
 
     expected_calls = [
-        call._spinner_load_program().put(ANY),
+        call._spinner_load_program.put(ANY),
         call._spinner_off.put(ANY),
         call.beam_load_program.put(ANY),
     ]
