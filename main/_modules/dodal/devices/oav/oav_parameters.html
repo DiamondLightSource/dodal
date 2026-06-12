@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 2.4.1.dev17+ga979c8033 documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 2.4.1.dev18+ge4c528ddd documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=ae4dbd91"></script>
+    <script src="../../../../_static/documentation_options.js?v=8e8a6983"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -894,6 +894,8 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DisplayConfig</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.pin_image_recognition</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScanDirections</span>
+
 <span class="c1"># GDA currently assumes this aspect ratio for the OAV window size.</span>
 <span class="c1"># For some beamline this doesn&#39;t affect anything as the actual OAV aspect ratio</span>
 <span class="c1"># matches. Others need to take it into account to rescale the values stored in</span>
@@ -991,7 +993,9 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;open_ksize&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;close_ksize&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_callback_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;min_callback_time&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;direction&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">:</span> <span class="n">ScanDirections</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">ScanDirections</span><span class="p">][</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_params</span><span class="p">[</span><span class="s2">&quot;direction&quot;</span><span class="p">]</span>
+        <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_tip_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;max_tip_distance&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
 <div class="viewcode-block" id="OAVParameters.get_max_tip_distance_in_pixels">
