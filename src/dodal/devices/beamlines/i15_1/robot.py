@@ -8,9 +8,9 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceMock,
+    SignalX,
     StandardReadable,
     StrictEnum,
-    TriggerableCommand,
     callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
@@ -160,9 +160,7 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
         super().__init__(name)
 
-    async def _trigger_program_and_wait_for_complete(
-        self, trigger_signal: TriggerableCommand
-    ):
+    async def _trigger_program_and_wait_for_complete(self, trigger_signal: SignalX):
         await trigger_signal.trigger()
 
         await wait_for_value(
@@ -177,7 +175,7 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
     async def _load_program_and_wait_for_loaded(
-        self, trigger_signal: TriggerableCommand, program_name: ProgramNames
+        self, trigger_signal: SignalX, program_name: ProgramNames
     ):
         await trigger_signal.trigger()
 
