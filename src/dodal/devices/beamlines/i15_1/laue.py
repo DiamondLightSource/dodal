@@ -12,12 +12,11 @@ class LaueMonochrometer(StandardReadable):
         crystal_lut_path: str,
         name: str = "",
     ):
-        with self.add_children_as_readables():
-            self.bend = Motor(prefix + "BENDER")
-            self.bragg = Motor(prefix + "PITCH")
-            self.roll = Motor(prefix + "ROLL")
-            self.yaw = Motor(prefix + "YAW")
-            self.y = Motor(prefix + "Y")
+        self.bend = Motor(prefix + "BENDER")
+        self.bragg = Motor(prefix + "PITCH")
+        self.roll = Motor(prefix + "ROLL")
+        self.yaw = Motor(prefix + "YAW")
+        self.y = Motor(prefix + "Y")
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy_kev = derived_signal_r(self._get_energy, y=self.y)
@@ -29,10 +28,7 @@ class LaueMonochrometer(StandardReadable):
 
     def _get_xtal_config(self) -> XpdfCrystalLookupTable:
         return self._config_client.get_file_contents(
-            self._crystal_lut_path,
-            XpdfCrystalLookupTable,
-            # Remove once https://github.com/DiamondLightSource/daq-config-server/pull/183 is released + deployed
-            force_parser=XpdfCrystalLookupTable.from_contents,
+            self._crystal_lut_path, XpdfCrystalLookupTable
         )
 
     def _get_energy(self, y: float) -> float:
