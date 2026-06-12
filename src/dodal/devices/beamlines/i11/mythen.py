@@ -3,7 +3,6 @@ from typing import Annotated as A
 
 from ophyd_async.core import (
     DetectorTriggerLogic,
-    PathProvider,
     SignalRW,
     StrictEnum,
 )
@@ -11,7 +10,7 @@ from ophyd_async.epics.adcore import (
     ADAcquireLogic,
     ADBaseIO,
     ADImageMode,
-    ADWriterType,
+    ADWriterFactory,
     AreaDetector,
 )
 from ophyd_async.epics.core import PvSuffix
@@ -132,21 +131,17 @@ class Mythen3(AreaDetector[Mythen3Driver]):
     def __init__(
         self,
         prefix: str,
-        path_provider: PathProvider,
+        writer_factory: ADWriterFactory,
         drv_suffix: str = DET_SUFFIX,
-        writer_type: ADWriterType = ADWriterType.HDF,
-        writer_suffix: str | None = "HDF:",
         name: str = "",
     ):
         self.driver = Mythen3Driver(prefix + drv_suffix)
 
         super().__init__(
-            prefix=prefix,
-            driver=self.driver,
+            self.driver,
+            prefix,
+            writer_factory,
             acquire_logic=ADAcquireLogic(self.driver),
             trigger_logic=Mythen3TriggerLogic(self.driver),
-            path_provider=path_provider,
-            writer_type=writer_type,
-            writer_suffix=writer_suffix,
             name=name,
         )

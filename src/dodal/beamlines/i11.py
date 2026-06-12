@@ -2,6 +2,7 @@ from functools import cache
 from pathlib import Path
 
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.epics.adcore import ADWriterFactory
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
@@ -49,9 +50,10 @@ def mythen3(path_provider: PathProvider) -> Mythen3:
     """Mythen3 Detector from PSI."""
     return Mythen3(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-07:",
-        path_provider=path_provider,
+        writer_factory=ADWriterFactory.hdf(
+            path_provider=path_provider, writer_suffix="HDF:"
+        ),
         drv_suffix=DET_SUFFIX,
-        writer_suffix="HDF:",
     )
 
 
