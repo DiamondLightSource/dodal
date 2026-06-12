@@ -17,7 +17,7 @@ from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
     epics_signal_rw_rbv,
-    epics_triggerable_command,
+    epics_signal_x,
 )
 
 from dodal.log import LOGGER
@@ -131,22 +131,22 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.sample_id = epics_signal_r(int, prefix + "CURRENT_ID_RBV")
         self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
 
-        self.load = epics_triggerable_command(prefix + "LOAD.PROC")
-        self.unload = epics_triggerable_command(prefix + "UNLD.PROC")
+        self.load = epics_signal_x(prefix + "LOAD.PROC")
+        self.unload = epics_signal_x(prefix + "UNLD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
 
         self.prog_error = ErrorStatus(prefix + "PRG")
         self.controller_error = ErrorStatus(prefix + "CNTL")
 
-        self.reset = epics_triggerable_command(prefix + "RESET.PROC")
-        self.abort = epics_triggerable_command(prefix + "ABORT.PROC")
-        self.init = epics_triggerable_command(prefix + "INIT.PROC")
-        self.soak = epics_triggerable_command(prefix + "SOAK.PROC")
-        self.home = epics_triggerable_command(prefix + "GOHM.PROC")
-        self.dry = epics_triggerable_command(prefix + "DRY.PROC")
-        self.open = epics_triggerable_command(prefix + "COLO.PROC")
-        self.close = epics_triggerable_command(prefix + "COLC.PROC")
+        self.reset = epics_signal_x(prefix + "RESET.PROC")
+        self.abort = epics_signal_x(prefix + "ABORT.PROC")
+        self.init = epics_signal_x(prefix + "INIT.PROC")
+        self.soak = epics_signal_x(prefix + "SOAK.PROC")
+        self.home = epics_signal_x(prefix + "GOHM.PROC")
+        self.dry = epics_signal_x(prefix + "DRY.PROC")
+        self.open = epics_signal_x(prefix + "COLO.PROC")
+        self.close = epics_signal_x(prefix + "COLC.PROC")
         self.cryomode_rbv = epics_signal_r(float, prefix + "CRYO_MODE_RBV")
         self.cryomode = epics_signal_rw(str, prefix + "CRYO_MODE_CTRL")
         self.gripper_temp = epics_signal_r(float, prefix + "GRIPPER_TEMP")

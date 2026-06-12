@@ -24,7 +24,7 @@ from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
     epics_signal_rw_rbv,
-    epics_triggerable_command,
+    epics_signal_x,
 )
 from pydantic import BaseModel, field_validator
 from pydantic.dataclasses import dataclass
@@ -224,8 +224,8 @@ class FastGridScanCommon(
         # once https://github.com/DiamondLightSource/mx-bluesky/issues/1203 is done
         self.scan_invalid = self._create_scan_invalid_signal(prefix)
 
-        self.run_cmd = epics_triggerable_command(f"{prefix}RUN.PROC")
-        self.stop_cmd = epics_triggerable_command(f"{prefix}STOP.PROC")
+        self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
+        self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 
         self.expected_images = self._create_expected_images_signal()

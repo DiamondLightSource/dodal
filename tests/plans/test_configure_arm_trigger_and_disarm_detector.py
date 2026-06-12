@@ -6,7 +6,7 @@ from daq_config_server import ConfigClient
 from ophyd_async.core import (
     DetectorTrigger,
     TriggerInfo,
-    callback_on_mock_execute,
+    callback_on_mock_put,
     get_mock,
     set_mock_value,
 )
@@ -47,7 +47,7 @@ async def test_configure_arm_trigger_and_disarm_detector(
         set_mock_value(fake_eiger.od.acquisition_id, filename)
         set_mock_value(fake_eiger.detector.state, "idle")
 
-    callback_on_mock_execute(
+    callback_on_mock_put(
         fake_eiger.od.fp.start_writing, set_detector_into_writing_state
     )
 
@@ -55,7 +55,7 @@ async def test_configure_arm_trigger_and_disarm_detector(
     def set_frames_written(*args, **kwargs) -> None:
         set_mock_value(fake_eiger.od.fp.frames_written, 1)
 
-    callback_on_mock_execute(fake_eiger.detector.trigger, set_frames_written)
+    callback_on_mock_put(fake_eiger.detector.trigger, set_frames_written)
 
     run_engine(
         configure_arm_trigger_and_disarm_detector(

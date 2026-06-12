@@ -7,7 +7,7 @@ from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
 from ophyd_async.core import (
-    callback_on_mock_execute,
+    callback_on_mock_put,
     get_mock,
     get_mock_execute,
     set_mock_value,
@@ -50,7 +50,7 @@ async def robot_for_unload():
         asyncio.create_task(finish_later())
 
     get_mock_execute(device.unload).side_effect = fake_unload
-    callback_on_mock_execute(device.reset, partial(clear_errors, device))
+    callback_on_mock_put(device.reset, partial(clear_errors, device))
     return device, trigger_complete, drying_complete
 
 
@@ -108,7 +108,7 @@ async def bart_robot() -> BartRobot:
     device.LOAD_TIMEOUT = 0.3  # type: ignore
     await device.connect(mock=True)
     set_mock_value(device.program_running, False)
-    callback_on_mock_execute(device.reset, partial(clear_errors, device))
+    callback_on_mock_put(device.reset, partial(clear_errors, device))
     return device
 
 

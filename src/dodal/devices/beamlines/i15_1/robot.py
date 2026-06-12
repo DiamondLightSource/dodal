@@ -11,7 +11,7 @@ from ophyd_async.core import (
     StandardReadable,
     StrictEnum,
     TriggerableCommand,
-    callback_on_mock_execute,
+    callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
     set_and_wait_for_value,
@@ -22,7 +22,7 @@ from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
     epics_signal_rw_rbv,
-    epics_triggerable_command,
+    epics_signal_x,
 )
 
 from dodal.log import LOGGER
@@ -66,14 +66,14 @@ class MockRobot(DeviceMock["Robot"]):
         def set_program(name: str, *_, **__):
             set_mock_value(device.program_name, name)
 
-        callback_on_mock_execute(
+        callback_on_mock_put(
             device.puck_load_program, partial(set_program, ProgramNames.PUCK.value)
         )
-        callback_on_mock_execute(
+        callback_on_mock_put(
             device.beam_load_program, partial(set_program, ProgramNames.BEAM.value)
         )
 
-        callback_on_mock_execute(
+        callback_on_mock_put(
             device._spinner_load_program,  # noqa: SLF001
             partial(set_program, ProgramNames.SPINNER.value),
         )
@@ -88,14 +88,14 @@ class MockRobot(DeviceMock["Robot"]):
 
             asyncio.create_task(_program_running())
 
-        callback_on_mock_execute(device.puck_pick, program_running)
-        callback_on_mock_execute(device.puck_place, program_running)
+        callback_on_mock_put(device.puck_pick, program_running)
+        callback_on_mock_put(device.puck_place, program_running)
 
-        callback_on_mock_execute(device.beam_place, program_running)
-        callback_on_mock_execute(device.beam_pick, program_running)
+        callback_on_mock_put(device.beam_place, program_running)
+        callback_on_mock_put(device.beam_pick, program_running)
 
-        callback_on_mock_execute(device._spinner_off, program_running)  # noqa: SLF001
-        callback_on_mock_execute(device._spinner_on, program_running)  # noqa: SLF001
+        callback_on_mock_put(device._spinner_off, program_running)  # noqa: SLF001
+        callback_on_mock_put(device._spinner_on, program_running)  # noqa: SLF001
 
 
 @default_mock_class(MockRobot)
@@ -135,38 +135,28 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
         self._spinner_rbv = epics_signal_r(SpinnerState, f"{robot_prefix}SPINNER_STATE")
-        self._spinner_off = epics_triggerable_command(
-            f"{robot_prefix}MOTOR:ACTION0.PROC"
-        )
-        self._spinner_on = epics_triggerable_command(
-            f"{robot_prefix}MOTOR:ACTION1.PROC"
-        )
-        self._spinner_load_program = epics_triggerable_command(
-            f"{robot_prefix}MOTOR:LOAD.PROC"
-        )
+        self._spinner_off = epics_signal_x(f"{robot_prefix}MOTOR:ACTION0.PROC")
+        self._spinner_on = epics_signal_x(f"{robot_prefix}MOTOR:ACTION1.PROC")
+        self._spinner_load_program = epics_signal_x(f"{robot_prefix}MOTOR:LOAD.PROC")
 
         self.spinner = derived_signal_rw(
             self._get_spinner_state, self._set_spinner_state, rbv=self._spinner_rbv
         )
 
-        self.puck_pick = epics_triggerable_command(f"{robot_prefix}PUCK:ACTION0.PROC")
-        self.puck_place = epics_triggerable_command(f"{robot_prefix}PUCK:ACTION1.PROC")
-        self.puck_load_program = epics_triggerable_command(
-            f"{robot_prefix}PUCK:LOAD.PROC"
-        )
+        self.puck_pick = epics_signal_x(f"{robot_prefix}PUCK:ACTION0.PROC")
+        self.puck_place = epics_signal_x(f"{robot_prefix}PUCK:ACTION1.PROC")
+        self.puck_load_program = epics_signal_x(f"{robot_prefix}PUCK:LOAD.PROC")
 
-        self.beam_pick = epics_triggerable_command(f"{robot_prefix}BEAM:ACTION0.PROC")
-        self.beam_place = epics_triggerable_command(f"{robot_prefix}BEAM:ACTION1.PROC")
-        self.beam_load_program = epics_triggerable_command(
-            f"{robot_prefix}BEAM:LOAD.PROC"
-        )
+        self.beam_pick = epics_signal_x(f"{robot_prefix}BEAM:ACTION0.PROC")
+        self.beam_place = epics_signal_x(f"{robot_prefix}BEAM:ACTION1.PROC")
+        self.beam_load_program = epics_signal_x(f"{robot_prefix}BEAM:LOAD.PROC")
 
-        self.servo_off = epics_triggerable_command(f"{robot_prefix}SOFF.PROC")
-        self.servo_on = epics_triggerable_command(f"{robot_prefix}SON.PROC")
+        self.servo_off = epics_signal_x(f"{robot_prefix}SOFF.PROC")
+        self.servo_on = epics_signal_x(f"{robot_prefix}SON.PROC")
 
-        self.reset = epics_triggerable_command(f"{robot_prefix}RESET.PROC")
+        self.reset = epics_signal_x(f"{robot_prefix}RESET.PROC")
 
-        self.home = epics_triggerable_command(f"{robot_prefix}Home.PROC")
+        self.home = epics_signal_x(f"{robot_prefix}Home.PROC")
 
         super().__init__(name)
 

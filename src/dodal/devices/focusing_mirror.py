@@ -11,11 +11,7 @@ from ophyd_async.core import (
     observe_value,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.core import (
-    epics_signal_r,
-    epics_signal_rw,
-    epics_triggerable_command,
-)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import XYPitchStage
@@ -219,7 +215,7 @@ class FocusingMirrorWithStripes(FocusingMirror):
     def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
         # apply the current set stripe setting
-        self.apply_stripe = epics_triggerable_command(prefix + "CHANGE.PROC")
+        self.apply_stripe = epics_signal_x(prefix + "CHANGE.PROC")
 
         super().__init__(prefix, name, *args, **kwargs)
 

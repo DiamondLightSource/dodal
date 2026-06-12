@@ -6,8 +6,6 @@ from ophyd_async.epics.adcore import ADAcquireLogic, ADWriterFactory, NDPluginBa
 
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
-
-#
 from dodal.devices.electron_analyser.base.detector_logic import (
     ElectronAnalayserTriggerLogic,
     RegionLogic,

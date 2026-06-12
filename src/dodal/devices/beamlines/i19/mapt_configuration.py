@@ -1,9 +1,5 @@
 from ophyd_async.core import DeviceVector, SignalR, StandardReadable, SubsetEnum
-from ophyd_async.epics.core import (
-    epics_signal_r,
-    epics_signal_rw,
-    epics_triggerable_command,
-)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 
 class MAPTConfigurationTable(StandardReadable):
@@ -39,5 +35,5 @@ class MAPTConfigurationControl(StandardReadable):
     ) -> None:
         with self.add_children_as_readables():
             self.select_config = epics_signal_rw(aperture_request, f"{prefix}")
-        self.apply_selection = epics_triggerable_command(f"{prefix}:APPLY.PROC")
+        self.apply_selection = epics_signal_x(f"{prefix}:APPLY.PROC")
         super().__init__(name)
