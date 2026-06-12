@@ -3,7 +3,7 @@ from pathlib import Path
 
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.epics.adcore import NDROIStatIO
+from ophyd_async.epics.adcore import ADWriterFactory, NDROIStatIO
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -87,9 +87,8 @@ def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
     pv_prefix = f"{PREFIX.beamline_prefix}-DI-DCAM-02:"
     return AravisDetector(
         pv_prefix,
-        path_provider=path_provider,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix=CAM_SUFFIX,
-        writer_suffix=HDF5_SUFFIX,
         plugins={
             "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
         },
@@ -107,9 +106,8 @@ def imaging_detector(path_provider: PathProvider) -> AravisDetector:
     """
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
-        path_provider=path_provider,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix=CAM_SUFFIX,
-        writer_suffix=HDF5_SUFFIX,
     )
 
 
