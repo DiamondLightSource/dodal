@@ -1,6 +1,7 @@
 import abc
 import asyncio
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Generic, TypeVar
 
 import numpy as np
@@ -10,6 +11,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     FlyMotorInfo,
+    MovableLogic,
     Reference,
     SignalR,
     SignalW,
@@ -21,7 +23,7 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor
+from ophyd_async.epics.motor import Motor, MotorMoveLogic
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device.enum import UndulatorGateStatus
@@ -113,6 +115,13 @@ class SafeUndulatorMover(StandardReadable, UndulatorBase, Generic[T]):
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
 
+@dataclass
+class UnstoppableMotorMoveLogic(MotorMoveLogic):
+    async def stop(self):
+        """Request to stop moving."""
+        LOGGER.warning(f"Stopping {self.readback.name} is not supported.")
+
+
 class UnstoppableMotor(Motor):
     """A motor that does not support stop."""
 
@@ -120,8 +129,20 @@ class UnstoppableMotor(Motor):
         super().__init__(prefix=prefix, name=name)
         del self.motor_stop  # Remove motor_stop from the public interface
 
-    async def stop(self, success=False):
-        LOGGER.warning(f"Stopping {self.name} is not supported.")
+    @cached_property
+    def movable_logic(self) -> MovableLogic:
+        return UnstoppableMotorMoveLogic(
+            readback=self.user_readback,
+            setpoint=self.user_setpoint,
+            # Safe to do, stop method no longer calls stop signal in movable logic.
+            motor_stop=None,  # type: ignore
+            low_limit_travel=self.low_limit_travel,
+            high_limit_travel=self.high_limit_travel,
+            dial_low_limit_travel=self.dial_low_limit_travel,
+            dial_high_limit_travel=self.dial_high_limit_travel,
+            velocity=self.velocity,
+            acceleration_time=self.acceleration_time,
+        )
 
 
 class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):

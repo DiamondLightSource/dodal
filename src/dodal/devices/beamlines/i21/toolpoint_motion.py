@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from math import cos, radians, sin
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Checkable, Movable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -84,7 +84,11 @@ def xyz_to_uvw(
     )
 
 
-class ToolPointMotion(StandardReadable, Movable):
+class ToolPointMotion(
+    StandardReadable,
+    Movable[XYZTiltAzimuthMotorPositions],
+    Checkable[XYZTiltAzimuthMotorPositions],
+):
     """Virtual manipulator translations of the sample stage. It is mounted on top
     of the diffractometer and circles tilt and azimuth angles. It defines three virtual
     axes u, v, and w as signals.
@@ -106,17 +110,13 @@ class ToolPointMotion(StandardReadable, Movable):
 
         super().__init__(name=name)
 
-    async def check_motor_limits(
-        self, start: XYZTiltAzimuthMotorPositions, end: XYZTiltAzimuthMotorPositions
-    ) -> None:
+    async def check_value(self, value: XYZTiltAzimuthMotorPositions) -> None:
         await asyncio.gather(
-            self.smp_ref().x.check_motor_limit(start.x, end.x),
-            self.smp_ref().y.check_motor_limit(start.y, end.y),
-            self.smp_ref().z.check_motor_limit(start.z, end.z),
-            self.smp_ref().tilt.check_motor_limit(start.tilt_deg, end.tilt_deg),
-            self.smp_ref().azimuth.check_motor_limit(
-                start.azimuth_deg, end.azimuth_deg
-            ),
+            self.smp_ref().x.check_value(value.x),
+            self.smp_ref().y.check_value(value.y),
+            self.smp_ref().z.check_value(value.z),
+            self.smp_ref().tilt.check_value(value.tilt_deg),
+            self.smp_ref().azimuth.check_value(value.azimuth_deg),
         )
 
     async def _get_xyz_motor_positions(
@@ -142,7 +142,7 @@ class ToolPointMotion(StandardReadable, Movable):
         xyz_start = await self._get_xyz_motor_positions()
         xyz_end = uvw_to_xyz(uvw_pos, self._zero)
 
-        await self.check_motor_limits(xyz_start, xyz_end)
+        await asyncio.gather(self.check_value(xyz_start), self.check_value(xyz_end))
         await asyncio.gather(
             self.smp_ref().x.set(xyz_end.x),
             self.smp_ref().y.set(xyz_end.y),
