@@ -4,7 +4,11 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
+from ophyd_async.core import (
+    callback_on_mock_execute,
+    init_devices,
+    set_mock_value,
+)
 
 from dodal.devices.attenuator.attenuator import (
     BinaryFilterAttenuator,
@@ -49,7 +53,7 @@ async def test_given_attenuator_sets_filters_to_expected_value_then_set_returns(
             )
             set_mock_value(fake_attenuator._filters_in_position[i], CALCULATED_VALUE[i])
 
-    callback_on_mock_put(fake_attenuator._change, mock_apply_values)
+    callback_on_mock_execute(fake_attenuator._change, mock_apply_values)
 
     await fake_attenuator.set(0.65)
 
@@ -68,7 +72,7 @@ async def test_attenuator_set_only_complete_once_all_filters_in_position(
         for i in range(16):
             set_mock_value(fake_attenuator._filters_in_position[i], CALCULATED_VALUE[i])
 
-    callback_on_mock_put(fake_attenuator._change, mock_apply_values)
+    callback_on_mock_execute(fake_attenuator._change, mock_apply_values)
     status = fake_attenuator.set(0.65)
     assert not status.done
     fake_set_complete.set()

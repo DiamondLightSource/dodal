@@ -7,7 +7,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
-    epics_signal_x,
+    epics_triggerable_command,
 )
 
 
@@ -61,16 +61,16 @@ class OxfordCryoStream(StandardReadable):
             self.suct_heat = epics_signal_r(float, f"{prefix}SUCTHEAT")
             self.back_pressure = epics_signal_r(float, f"{prefix}BACKPRESS")
 
-        self.purge = epics_signal_x(f"{prefix}PURGE.PROC")
-        self.hold = epics_signal_x(f"{prefix}HOLD.PROC")
-        self.start = epics_signal_x(f"{prefix}RESTART.PROC")
-        self.pause = epics_signal_x(f"{prefix}PAUSE.PROC")
-        self.resume = epics_signal_x(f"{prefix}RESUME.PROC")
-        self.end = epics_signal_x(f"{prefix}END.PROC")
-        self.stop = epics_signal_x(f"{prefix}STOP.PROC")
-        self.plat = epics_signal_x(f"{prefix}PLAT.PROC")
-        self.cool = epics_signal_x(f"{prefix}COOL.PROC")
-        self.ramp = epics_signal_x(f"{prefix}RAMP.PROC")
+        self.purge = epics_triggerable_command(f"{prefix}PURGE.PROC")
+        self.hold = epics_triggerable_command(f"{prefix}HOLD.PROC")
+        self.start = epics_triggerable_command(f"{prefix}RESTART.PROC")
+        self.pause = epics_triggerable_command(f"{prefix}PAUSE.PROC")
+        self.resume = epics_triggerable_command(f"{prefix}RESUME.PROC")
+        self.end = epics_triggerable_command(f"{prefix}END.PROC")
+        self.stop = epics_triggerable_command(f"{prefix}STOP.PROC")
+        self.plat = epics_triggerable_command(f"{prefix}PLAT.PROC")
+        self.cool = epics_triggerable_command(f"{prefix}COOL.PROC")
+        self.ramp = epics_triggerable_command(f"{prefix}RAMP.PROC")
 
         super().__init__(name)
 
