@@ -1,4 +1,3 @@
-import bluesky.plan_stubs as bps
 import pytest
 from daq_config_server import ConfigClient
 from daq_config_server.models.i15_1 import XpdfCrystalLookupTable
