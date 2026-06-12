@@ -1,3 +1,4 @@
+import bluesky.plan_stubs as bps
 import pytest
 from daq_config_server import ConfigClient
 from daq_config_server.models.i15_1 import XpdfCrystalLookupTable
@@ -49,3 +50,10 @@ async def test_energy_kev_gets_value_based_on_y(
         {f"{laue_monochrometer.name}-energy_kev": partial_reading(expected_energy)},
         full_match=False,
     )
+
+
+async def test_reading_device_only_reads_energy_value(
+    laue_monochrometer: LaueMonochrometer,
+):
+    result = await laue_monochrometer.read()
+    assert list(result.keys()) == ["monocrometer-energy_kev"]
