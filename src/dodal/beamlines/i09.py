@@ -1,4 +1,4 @@
-from ophyd_async.core import InOut, SignalRW
+from ophyd_async.core import DeviceVector, InOut, SignalRW
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
@@ -33,6 +33,13 @@ set_utils_beamline(BL)
 devices = DeviceManager()
 devices.include(i09_1_shared_devices)
 devices.include(i09_2_shared_devices)
+
+
+@devices.factory()
+def test() -> DeviceVector:
+    return DeviceVector(
+        {1: epics_signal_rw(int, "TEST:"), 2: epics_signal_rw(int, "TEST:")}
+    )
 
 
 @devices.factory()
