@@ -191,7 +191,6 @@ async def test_uvw_set(uvw: ToolPointMotion) -> None:
         },
         full_match=False,
     )
-
     assert await uvw.smp_ref().azimuth.user_readback.get_value() == pos.azimuth_deg
     assert await uvw.smp_ref().tilt.user_readback.get_value() == pos.tilt_deg
 

@@ -1,9 +1,15 @@
+from ophyd_async.epics.adcore import ADAcquireLogic
+
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09_1 import LensMode, PsuMode
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
-from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.electron_analyser.base import (
+    ElectronAnalayserTriggerLogic,
+    RegionLogic,
+)
+from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsDetector
 from dodal.devices.motors import XYZAzimuthTiltPolarStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
@@ -24,17 +30,18 @@ def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-# CAM:IMAGE will fail to connect outside the beamline network,
-# see https://github.com/DiamondLightSource/dodal/issues/1852
 @devices.factory()
 def analyser(
     dcm: DoubleCrystalMonochromatorWithDSpacing,
 ) -> SpecsDetector[LensMode, PsuMode]:
+    prefix = f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:"
+    driver = SpecsAnalyserDriverIO(prefix, LensMode, PsuMode)
     return SpecsDetector[LensMode, PsuMode](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        energy_source=dcm.energy_in_eV,
+        prefix,
+        driver,
+        acquire_logic=ADAcquireLogic(driver),
+        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        region_logic=RegionLogic(driver, dcm.energy_in_eV),
     )
 
 

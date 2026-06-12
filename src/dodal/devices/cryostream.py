@@ -4,11 +4,7 @@ from ophyd_async.core import (
     StandardReadableFormat,
     StrictEnum,
 )
-from ophyd_async.epics.core import (
-    epics_signal_r,
-    epics_signal_rw,
-    epics_signal_x,
-)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 
 class TurboEnum(StrictEnum):

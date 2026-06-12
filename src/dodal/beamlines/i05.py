@@ -1,11 +1,18 @@
+from ophyd_async.epics.adcore import ADAcquireLogic
+
 from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05 import I05Goniometer
 from dodal.devices.beamlines.i05_shared import LensMode, M4M5Mirror, PassEnergy
 from dodal.devices.common_mirror import XYZSwitchingMirror
+from dodal.devices.electron_analyser.base import (
+    ElectronAnalayserTriggerLogic,
+    RegionLogic,
+)
 from dodal.devices.electron_analyser.mbs import (
     EntranceSlitInformationDevice,
+    MbsAnalyserDriverIO,
     MbsDetector,
 )
 from dodal.devices.hutch_shutter import HutchShutter
@@ -62,11 +69,14 @@ def analyser_slits() -> EntranceSlitInformationDevice:
 def analyser(
     pgm: PlaneGratingMonochromator, analyser_slits: EntranceSlitInformationDevice
 ) -> MbsDetector[LensMode, PassEnergy]:
+    prefix = f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:"
+    driver = MbsAnalyserDriverIO(prefix, LensMode, PassEnergy)
     return MbsDetector[LensMode, PassEnergy](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
-        lens_mode_type=LensMode,
-        pass_energy_type=PassEnergy,
-        energy_source=pgm.energy.user_readback,
+        prefix,
+        driver,
+        acquire_logic=ADAcquireLogic(driver),
+        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        region_logic=RegionLogic(driver, pgm.energy.user_readback),
         config_sigs=(
             analyser_slits.direction,
             analyser_slits.size,

@@ -1,32 +1,28 @@
-from typing import Any, Generic
+from dataclasses import dataclass, field
+from typing import Any
 
 from ophyd_async.core import DetectorTriggerLogic, SignalDict, SignalR
 from ophyd_async.epics.adcore import ADAcquireLogic, ADImageMode
 
-from dodal.devices.electron_analyser.base.base_driver_io import (
-    AbstractAnalyserDriverIO,
-    TAbstractAnalyserDriverIO,
-)
+from dodal.devices.electron_analyser.base.base_driver_io import AbstractAnalyserDriverIO
 from dodal.devices.electron_analyser.base.base_region import BaseRegion
 from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
-class ShutterCoordinatorADAcquireLogic(
-    ADAcquireLogic, Generic[TAbstractAnalyserDriverIO]
-):
+class ShutterCoordinatorADAcquireLogic(ADAcquireLogic):
     """Extends the acquire logic to coordinate opening shutters before acquisition with
     optional configuration of when to close.
     """
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        driver: AbstractAnalyserDriverIO,
         shutter: GenericFastShutter,
-        _close_shutter_when_idle: SignalR[bool] | None = None,
+        close_shutter_when_idle: SignalR[bool] | None = None,
     ):
         self._shutter = shutter
-        self._close_shutter_when_idle = _close_shutter_when_idle
+        self._close_shutter_when_idle = close_shutter_when_idle
         super().__init__(driver)
 
     async def start_acquiring(self):
@@ -44,41 +40,33 @@ class ShutterCoordinatorADAcquireLogic(
             await self._shutter.set(self._shutter.close_state)
 
 
-class ElectronAnalayserTriggerLogic(
-    DetectorTriggerLogic, Generic[TAbstractAnalyserDriverIO]
-):
+@dataclass
+class ElectronAnalayserTriggerLogic(DetectorTriggerLogic):
     """Simple trigger logic for electron analyser."""
 
-    def __init__(
-        self, driver: TAbstractAnalyserDriverIO, config_sigs: set[SignalR[Any]]
-    ):
-        self.driver = driver
-        self._config_sigs = config_sigs
+    driver: AbstractAnalyserDriverIO
+    config_signals: set[SignalR[Any]] = field(default_factory=set)
+    deadtime: float = 0
 
     def config_sigs(self) -> set[SignalR[Any]]:
         """Return the signals that should appear in read_configuration."""
-        return self._config_sigs
+        return self.config_signals
 
     def get_deadtime(self, config_values: SignalDict) -> float:
-        return 0.0
+        return self.deadtime
 
     async def prepare_internal(self, num: int, livetime: float, deadtime: float):
-        # Only set image mode to single, num images and exposure is done with region.
+        # Only set image mode to single, num images and exposure is done with region logic.
         await self.driver.image_mode.set(ADImageMode.SINGLE)
 
 
+@dataclass
 class RegionLogic:
     """Logic for wrapping electron analyser driver to correctly set region data."""
 
-    def __init__(
-        self,
-        driver: AbstractAnalyserDriverIO,
-        energy_source: SignalR[float],
-        source_selector: SourceSelector | None = None,
-    ):
-        self.driver = driver
-        self.energy_source = energy_source
-        self.source_selector = source_selector
+    driver: AbstractAnalyserDriverIO
+    energy_source: SignalR[float]
+    source_selector: SourceSelector | None = None
 
     async def setup_with_region(self, region: BaseRegion) -> None:
         """Logic to correctly wrap the driver with a region."""

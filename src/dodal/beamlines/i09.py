@@ -1,4 +1,4 @@
-from ophyd_async.core import InOut, SignalRW
+from ophyd_async.core import InOut, SignalRW, soft_signal_rw
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
@@ -12,8 +12,16 @@ from dodal.devices.beamlines.i09 import (
     PsuMode,
 )
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
-from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
+from dodal.devices.electron_analyser.base import (
+    DualEnergySource,
+    ElectronAnalayserTriggerLogic,
+    RegionLogic,
+    ShutterCoordinatorADAcquireLogic,
+)
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaAnalyserDriverIO,
+    VGScientaDetector,
+)
 from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
@@ -104,22 +112,28 @@ def dual_fast_shutter(
     return DualFastShutter[InOut](fsi1, fsj1, source_selector.selected_source)
 
 
-# CAM:IMAGE will fail to connect outside the beamline network,
-# see https://github.com/DiamondLightSource/dodal/issues/1852
+@devices.factory()
+def ew4000_close_shutter_when_idle() -> SignalRW[bool]:
+    return soft_signal_rw(bool, initial_value=True)
+
+
 @devices.factory()
 def ew4000(
     dual_fast_shutter: DualFastShutter,
     dual_energy_source: DualEnergySource,
     source_selector: SourceSelector,
+    ew4000_close_shutter_when_idle: SignalRW[bool],
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+    prefix = f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:"
+    driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
-        energy_source=dual_energy_source.energy,
-        shutter=dual_fast_shutter,
-        source_selector=source_selector,
+        prefix,
+        driver,
+        acquire_logic=ShutterCoordinatorADAcquireLogic(
+            driver, dual_fast_shutter, ew4000_close_shutter_when_idle
+        ),
+        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        region_logic=RegionLogic(driver, dual_energy_source.energy, source_selector),
     )
 
 
