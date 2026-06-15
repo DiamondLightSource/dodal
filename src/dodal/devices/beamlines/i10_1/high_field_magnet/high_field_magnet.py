@@ -59,15 +59,6 @@ class ToleranceMovableLogic(MovableLogic[float]):
     acc_time: SignalRW[float]
     within_tolerance: SignalR[bool]
 
-    def _within_tolerance(
-        self,
-        setpoint: float,
-        readback: float,
-        tolerance: float,
-    ) -> bool:
-        """Check if the readback is within the tolerance of the setpoint."""
-        return abs(setpoint - readback) < abs(tolerance)
-
     async def stop(self):
         current_val = await self.readback.get_value()
         await self.setpoint.set(current_val)
