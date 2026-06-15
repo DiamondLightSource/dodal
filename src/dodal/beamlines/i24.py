@@ -1,9 +1,10 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
-from dodal.common.beamlines.beamline_utils import BL
+from dodal.common.beamlines.beamline_utils import BL, set_config_client
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
@@ -15,13 +16,16 @@ from dodal.devices.attenuator.filter_selections import (
 from dodal.devices.beamlines.i24.aperture import Aperture
 from dodal.devices.beamlines.i24.beam_center import DetectorBeamCenter
 from dodal.devices.beamlines.i24.beamstop import Beamstop
-from dodal.devices.beamlines.i24.commissioning_jungfrau import CommissioningJungfrau
+from dodal.devices.beamlines.i24.commissioning_jungfrau import (
+    CommissioningJungfrauDetector,
+)
 from dodal.devices.beamlines.i24.dcm import DCM
 from dodal.devices.beamlines.i24.dual_backlight import DualBacklight
 from dodal.devices.beamlines.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.beamlines.i24.pmac import PMAC
 from dodal.devices.beamlines.i24.vgonio import VerticalGoniometer
-from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -32,7 +36,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -45,6 +49,7 @@ DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+set_config_client(ConfigClient())
 
 I24_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
@@ -64,6 +69,12 @@ def path_provider() -> PathProvider:
         Path("/tmp"),
         client=LocalDirectoryServiceClient(),
     )
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    return ConfigClient()
 
 
 @devices.factory()
@@ -91,7 +102,7 @@ def backlight() -> DualBacklight:
 
 @devices.factory()
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:")
+    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:")
 
 
 @devices.factory()
@@ -108,10 +119,10 @@ def pmac() -> PMAC:
 
 
 @devices.factory()
-def oav() -> OAVBeamCentreFile:
+def oav(config_client) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
 
@@ -129,8 +140,10 @@ def zebra() -> Zebra:
 
 
 @devices.factory()
-def shutter() -> HutchShutter:
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+def shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
+    )
 
 
 @devices.factory()
@@ -144,16 +157,14 @@ def eiger_beam_center() -> DetectorBeamCenter:
 
 
 @devices.factory()
-def commissioning_jungfrau(
+def jungfrau(
     path_provider: PathProvider,
-) -> CommissioningJungfrau:
-    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
-    device in place of Odin while the detector is in commissioning.
-    """
-    return CommissioningJungfrau(
+) -> CommissioningJungfrauDetector:
+    return CommissioningJungfrauDetector(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
         AutoMaxIncrementingPathProvider(path_provider),
+        "CAM:",
     )
 
 
@@ -163,7 +174,7 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def sample_shutter() -> ZebraShutter:
-    return ZebraShutter(
+def sample_shutter() -> MXZebraShutter:
+    return MXZebraShutter(
         f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )

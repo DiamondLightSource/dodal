@@ -7,7 +7,7 @@ idd == id1,    idu == id2.
 
 from pathlib import Path
 
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -15,7 +15,6 @@ from dodal.devices.beamlines.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
     I10SharedSlitsDrainCurrent,
-    PiezoMirror,
 )
 from dodal.devices.beamlines.i10.i10_apple2 import (
     I10Apple2,
@@ -25,6 +24,7 @@ from dodal.devices.beamlines.i10.i10_apple2 import (
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.beamlines.i10.i10_setting_data import I10Grating
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,
@@ -63,8 +63,8 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def first_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+def first_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @devices.factory()
@@ -80,13 +80,13 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def switching_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+def switching_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 """ID"""
 
-I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+I10_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 
@@ -206,7 +206,7 @@ def idu(
 
 
 @devices.factory()
-def idu_controller(idd: I10Apple2) -> I10Apple2Controller:
+def idu_controller(idu: I10Apple2) -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     source = Source(column="Source", value="idu")
     idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
@@ -220,7 +220,7 @@ def idu_controller(idd: I10Apple2) -> I10Apple2Controller:
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(
-        apple2=idd,
+        apple2=idu,
         gap_energy_motor_lut=idu_gap_energy_motor_lut,
         phase_energy_motor_lut=idu_phase_energy_motor_lut,
     )

@@ -1,6 +1,12 @@
 """Beamline i02-1 is also known as VMXm, or I02J."""
 
+from functools import cache
+from os import getenv
+
+from daq_config_server import ConfigClient
+
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
@@ -10,16 +16,19 @@ from dodal.devices.attenuator.filter_selections import (
     I02_1FilterTwoSelections,
 )
 from dodal.devices.beamlines.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
-from dodal.devices.beamlines.i02_1.sample_motors import SampleMotors
+from dodal.devices.beamlines.i02_1.flux import Flux
+from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase, StationaryCrystal
 from dodal.devices.eiger import EigerDetector
+from dodal.devices.motors import XYZWrappedOmegaStage
+from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -30,18 +39,41 @@ set_utils_beamline(BL)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i02-1/software/daq_configuration"
 
 I02_1_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=2, TTL_XSPRESS3=3, TTL_FAST_SHUTTER=1),
+    outputs=ZebraTTLOutputs(TTL_EIGER=4),
     sources=ZebraSources(),
 )
 
+DEFAULT_CONFIG_SERVER_ENDPOINT = "https://daq-config.diamond.ac.uk"
+
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    config_server_url = getenv("CONFIG_SERVER_URL", DEFAULT_CONFIG_SERVER_ENDPOINT)
+    client = ConfigClient(config_server_url)
+    set_config_client(client)
+    return client
 
 
 @devices.v1_init(
     EigerDetector, prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", wait=False
 )
 def eiger(eiger: EigerDetector) -> EigerDetector:
+    eiger.detector_id = 101
     return eiger
+
+
+@devices.factory()
+def undulator(
+    daq_configuration_path: str, config_client: ConfigClient
+) -> UndulatorInKeV:
+    return UndulatorInKeV(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
+        id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
+    )
 
 
 @devices.factory()
@@ -65,15 +97,44 @@ def zebra() -> Zebra:
     )
 
 
-# Device not needed after https://github.com/DiamondLightSource/mx-bluesky/issues/1299
 @devices.factory()
-def zocalo() -> ZocaloResults:
-    return ZocaloResults()
+def dcm() -> DoubleCrystalMonochromatorBase:
+    return DoubleCrystalMonochromatorBase(
+        f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_1=StationaryCrystal,
+        xtal_2=StationaryCrystal,
+    )
+
+
+@devices.fixture
+def daq_configuration_path() -> str:
+    return DAQ_CONFIGURATION_PATH
 
 
 @devices.factory()
-def goniometer() -> SampleMotors:
-    return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:")
+def s4_slit_gaps() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+
+
+@devices.factory(use_factory_name=False)
+def goniometer() -> XYZWrappedOmegaStage:
+    """Build the goniometer. Although the sample holders constrain omega motion to a small
+    window of angles, in practice it is usable in plans requiring WrappedAxis since the
+    amount of rotation ever requested is very limited.
+    """
+    return XYZWrappedOmegaStage(
+        f"{PREFIX.beamline_prefix}-MO-",
+        x_infix="SAMP-01:X",
+        y_infix="GONJK-01:HEIGHT",
+        z_infix="SAMP-01:Z",
+        omega_infix="SAMP-01:OMEGA",
+        name="gonio",
+    )
+
+
+@devices.factory()
+def flux() -> Flux:
+    return Flux(f"{PREFIX.beamline_prefix}-EA-FLUX-01:")
 
 
 @devices.factory()

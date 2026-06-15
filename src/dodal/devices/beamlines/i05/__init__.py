@@ -1,3 +1,3 @@
-from dodal.devices.beamlines.i05.enums import Grating
+from .i05_motors import I05Goniometer
 
-__all__ = ["Grating"]
+__all__ = ["I05Goniometer"]

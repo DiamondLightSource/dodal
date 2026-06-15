@@ -167,19 +167,19 @@ class EnergyCoverage(BaseModel):
     def max_energy(self) -> float:
         return self.energy_entries[-1].max_energy
 
-    def get_poly(self, energy: float) -> np.poly1d:
+    def get_poly(self, value: float) -> np.poly1d:
         """Return the numpy.poly1d polynomial applicable for the given energy.
 
         Args:
-            energy (float): Energy value in the same units used to create the lookup
+            value (float): Energy value in the same units used to create the lookup
                 table.
         """
-        if not self.min_energy <= energy <= self.max_energy:
+        if not self.min_energy <= value <= self.max_energy:
             raise ValueError(
                 f"Demanding energy must lie between {self.min_energy} and {self.max_energy}!"
             )
 
-        poly_index = self.get_energy_index(energy)
+        poly_index = self.get_energy_index(value)
         if poly_index is not None:
             return self.energy_entries[poly_index].poly
         raise ValueError(
@@ -230,17 +230,17 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
 
     def get_poly(
         self,
-        energy: float,
+        value: float,
         pol: Pol,
     ) -> np.poly1d:
         """Return the numpy.poly1d polynomial applicable for the given energy and
         polarisation.
 
         Args:
-            energy (float): Energy value in the same units used to create the lookup table.
+            value (float): Energy value in the same units used to create the lookup table.
             pol (Pol): Polarisation mode enum.
         """
-        return self.root[pol].get_poly(energy)
+        return self.root[pol].get_poly(value)
 
 
 def convert_csv_to_lookup(

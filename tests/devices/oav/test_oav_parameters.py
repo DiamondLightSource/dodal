@@ -1,6 +1,7 @@
 from typing import cast
 
 import pytest
+from daq_config_server import ConfigClient
 
 from dodal.devices.oav.oav_parameters import (
     OAVConfig,
@@ -9,30 +10,27 @@ from dodal.devices.oav.oav_parameters import (
     ZoomParams,
     ZoomParamsCrosshair,
 )
-from tests.devices.oav.test_data import TEST_OAV_CENTRING_JSON
-from tests.test_data import (
+from tests.devices.oav.test_data import (
     TEST_DISPLAY_CONFIG,
-    TEST_OAV_ZOOM_LEVELS_XML,
+    TEST_OAV_CENTRING_JSON,
+    TEST_OAV_ZOOM_LEVELS,
 )
 
 
 @pytest.fixture
 def mock_parameters():
-    return OAVParameters(
-        "loopCentring",
-        TEST_OAV_CENTRING_JSON,
-    )
+    return OAVParameters(ConfigClient(""), "loopCentring", TEST_OAV_CENTRING_JSON)
 
 
 @pytest.fixture
 def mock_config() -> dict[str, ZoomParams]:
-    return OAVConfig(TEST_OAV_ZOOM_LEVELS_XML).get_parameters()
+    return OAVConfig(TEST_OAV_ZOOM_LEVELS, ConfigClient("")).get_parameters()
 
 
 @pytest.fixture
 def mock_config_with_beam_centre() -> dict[str, ZoomParamsCrosshair]:
     config = OAVConfigBeamCentre(
-        TEST_OAV_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
     ).get_parameters()
     config = cast(dict[str, ZoomParamsCrosshair], config)
     return config

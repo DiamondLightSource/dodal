@@ -93,7 +93,7 @@ async def test_when_move_out_motors_move_in_right_order(
     await pincol.set(PinColRequest.OUT)
 
     assert len(parent.mock_calls) == 2
-    parent.assert_has_calls([call.colx(3.5, wait=True), call.pinx(5.2, wait=True)])
+    parent.assert_has_calls([call.colx(3.5), call.pinx(5.2)])
 
 
 @pytest.mark.parametrize(
@@ -149,9 +149,9 @@ async def test_when_move_in_motors_move_in_right_order(
     assert len(parent.mock_calls) == 4
     parent.assert_has_calls(
         [
-            call.pinx(18, wait=True),
-            call.piny(15, wait=True),
-            call.colx(22, wait=True),
-            call.coly(13, wait=True),
+            call.pinx(18),
+            call.piny(15),
+            call.colx(22),
+            call.coly(13),
         ]
     )

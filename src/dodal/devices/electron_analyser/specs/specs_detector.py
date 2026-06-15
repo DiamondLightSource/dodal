@@ -1,23 +1,23 @@
 from typing import Generic
 
-from dodal.devices.electron_analyser.base.base_controller import (
-    ElectronAnalyserController,
-)
+from ophyd_async.core import SignalR, soft_signal_rw
+
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
-from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
-from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
-from dodal.devices.electron_analyser.specs.specs_region import (
-    SpecsRegion,
-    SpecsSequence,
+from dodal.devices.electron_analyser.base.detector_logic import (
+    ADAcquireLogic,
+    ElectronAnalayserTriggerLogic,
+    RegionLogic,
+    ShutterCoordinatorADAcquireLogic,
 )
-from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
+from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
+from dodal.devices.fast_shutter import GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 
 
 class SpecsDetector(
     ElectronAnalyserDetector[
-        SpecsSequence[TLensMode, TPsuMode],
         SpecsAnalyserDriverIO[TLensMode, TPsuMode],
         SpecsRegion[TLensMode, TPsuMode],
     ],
@@ -28,20 +28,49 @@ class SpecsDetector(
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        energy_source: AbstractEnergySource,
-        shutter: FastShutter | None = None,
+        energy_source: SignalR[float],
+        shutter: GenericFastShutter | None = None,
         source_selector: SourceSelector | None = None,
         name: str = "",
     ):
-        # Save to class so takes part with connect()
+        # Make attribute of class so connect applies to driver and populates parent.
         self.driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
             prefix, lens_mode_type, psu_mode_type
         )
-
-        controller = ElectronAnalyserController[
-            SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
-        ](self.driver, energy_source, shutter, source_selector)
-
-        sequence_class = SpecsSequence[lens_mode_type, psu_mode_type]
-
-        super().__init__(sequence_class, controller, name)
+        region_logic = RegionLogic(self.driver, energy_source, source_selector)
+        self.close_shutter_when_idle = soft_signal_rw(bool, initial_value=True)
+        acquire_logic = (
+            ShutterCoordinatorADAcquireLogic(
+                self.driver, shutter, self.close_shutter_when_idle
+            )
+            if shutter is not None
+            else ADAcquireLogic(self.driver)
+        )
+        trigger_logic = ElectronAnalayserTriggerLogic(self.driver, set())
+        config_sigs = (
+            self.driver.region_name,
+            self.driver.energy_mode,
+            self.driver.acquisition_mode,
+            self.driver.lens_mode,
+            self.driver.low_energy,
+            self.driver.centre_energy,
+            self.driver.high_energy,
+            self.driver.energy_step,
+            self.driver.pass_energy,
+            self.driver.slices,
+            self.driver.acquire_time,
+            self.driver.iterations,
+            self.driver.total_steps,
+            self.driver.total_time,
+            self.driver.energy_axis,
+            self.driver.angle_axis,
+            self.driver.snapshot_values,
+            self.driver.psu_mode,
+        )
+        super().__init__(
+            region_logic=region_logic,
+            acquire_logic=acquire_logic,
+            trigger_logic=trigger_logic,
+            config_sigs=config_sigs,
+            name=name,
+        )

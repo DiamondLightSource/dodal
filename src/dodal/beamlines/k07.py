@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from daq_config_server.client import ConfigServer
+from daq_config_server import ConfigClient
 from ophyd_async.core import StrictEnum
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -23,7 +23,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 devices = DeviceManager()
 
 
-K07_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+K07_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
 
 LOOK_UPTABLE_DIR = "/dls_sw/k07/software/gda/workspace_git/gda-diamond.git/configurations/k07/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"

@@ -1,5 +1,6 @@
 from typing import TypedDict
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -60,7 +61,7 @@ class SingleMirrorVoltage(Device):
 
     def __init__(self, prefix: str, name: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
-        self._setpoint_v = epics_signal_rw(int, prefix + "D")
+        self._setpoint_v = epics_signal_rw(int, prefix + "D", wait=False)
         self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
         super().__init__(name=name)
 
@@ -96,7 +97,7 @@ class SingleMirrorVoltage(Device):
         )
         # discard the current value (OK) so we can await a subsequent change
         await anext(demand_accepted_iterator)
-        set_status = setpoint_v.set(value, wait=False)
+        set_status = setpoint_v.set(value)
 
         # The set should always change to SLEW regardless of whether we are
         # already at the set point, then change back to OK/FAIL depending on
@@ -118,10 +119,16 @@ class SingleMirrorVoltage(Device):
 
 class MirrorVoltages(StandardReadable):
     def __init__(
-        self, prefix: str, name: str = "", *args, daq_configuration_path: str, **kwargs
+        self,
+        prefix: str,
+        name: str = "",
+        *args,
+        daq_configuration_path: str,
+        config_client: ConfigClient,
+        **kwargs,
     ):
-        self.voltage_lookup_table_path = (
-            daq_configuration_path + "/json/mirrorFocus.json"
+        self.voltage_lookup_table = config_client.get_file_contents(
+            daq_configuration_path + "/json/mirrorFocus.json", dict
         )
 
         with self.add_children_as_readables():
