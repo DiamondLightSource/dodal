@@ -103,8 +103,8 @@ class HighFieldMagnet(
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.sweep_rate = epics_signal_rw(
                 float,
-                read_pv=prefix + "RBV:FIELDsweep_rate",
-                write_pv=prefix + "SET:FIELDsweep_rate",
+                read_pv=prefix + "RBV:FIELDSWEEPRATE",
+                write_pv=prefix + "SET:FIELDSWEEPRATE",
             )
             self.sweep_type = epics_signal_rw(
                 HighFieldMangetSweepTypes,
