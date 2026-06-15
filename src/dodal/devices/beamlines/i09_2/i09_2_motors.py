@@ -1,88 +1,62 @@
-import asyncio
+from dataclasses import dataclass
+from functools import cached_property
 
-from bluesky.protocols import (
-    Locatable,
-    Location,
-    Movable,
-    Reading,
-    Stoppable,
-    Subscribable,
-)
 from ophyd_async.core import (
-    Callback,
+    MovableLogic,
+    SignalR,
+    SignalW,
+    StandardMovable,
     StandardReadable,
     StandardReadableFormat,
-    WatchableAsyncStatus,
-    WatcherUpdate,
-    observe_value,
+    derived_signal_r,
+    soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from ophyd_async.epics.motor import Motor
 
 
-class PiezoElectricMotor(
-    StandardReadable, Stoppable, Locatable[float], Subscribable[float], Movable[float]
-):
-    def __init__(self, prefix: str, name: str = ""):
+@dataclass
+class PiezoElectricMovableLogic(MovableLogic):
+    deadband: SignalR[float]
+    motor_stop: SignalW[int]
+
+    async def stop(self) -> None:
+        await self.motor_stop.set(1)
+
+    # How do provide calculate_timeout without velocity and acceleration?
+
+
+class PiezoElectricMotor(StandardMovable[float], StandardReadable):
+    """Motor like device with user_readback and user_setpoint."""
+
+    def __init__(self, prefix: str, deadband: float = 0.01, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.user_readback = epics_signal_r(float, prefix + ":POS:RD")
+            self.user_setpoint = epics_signal_rw(float, prefix + ":MOV:RD")
+            self.deadband = soft_signal_rw(float, initial_value=deadband)
 
-        self.user_setpoint = epics_signal_rw(float, prefix + ":MOV:RD")
         self.motor_stop = epics_signal_w(int, prefix + ":HLT:WR.PROC")
-
-        # Whether set() should complete successfully or not
-        self._set_success = True
-
+        self.within_threshold = derived_signal_r(
+            self._within_threshold_read,
+            setpoint=self.user_setpoint,
+            readback=self.user_readback,
+            deadband=self.deadband,
+        )
         super().__init__(name)
 
-    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
-        """Set name of the motor and its children."""
-        super().set_name(name, child_name_separator=child_name_separator)
-        # Readback should be named the same as its parent in read()
-        self.user_readback.set_name(name)
+    def _within_threshold_read(
+        self, setpoint: float, readback: float, deadband: float
+    ) -> bool:
+        return abs(setpoint - readback) < deadband
 
-    async def stop(self, success=False):
-        """Request to stop moving and return immediately."""
-        self._set_success = success
-        # Put with completion will never complete as we are waiting for completion on
-        # the move above, so need to pass wait=False
-        await self.motor_stop.set(1, wait=False)
-
-    async def locate(self) -> Location[float]:
-        """Return the current setpoint and readback of the motor."""
-        setpoint, readback = await asyncio.gather(
-            self.user_setpoint.get_value(), self.user_readback.get_value()
+    @cached_property
+    def movable_logic(self) -> PiezoElectricMovableLogic:
+        return PiezoElectricMovableLogic(
+            readback=self.user_readback,
+            setpoint=self.user_setpoint,
+            deadband=self.deadband,
+            motor_stop=self.motor_stop,
         )
-        return Location(setpoint=setpoint, readback=readback)
-
-    def subscribe_reading(self, function: Callback[dict[str, Reading[float]]]) -> None:
-        """Subscribe to reading."""
-        self.user_readback.subscribe_reading(function)
-
-    subscribe = subscribe_reading
-
-    def clear_sub(self, function: Callback[dict[str, Reading[float]]]) -> None:
-        """Unsubscribe."""
-        self.user_readback.clear_sub(function)
-
-    @WatchableAsyncStatus.wrap
-    async def set(self, new_position: float):
-        """Move motor to the given value."""
-        self._set_success = True
-
-        old_position = await self.user_setpoint.get_value()
-        move_status = self.user_setpoint.set(new_position, wait=True)
-        async for current_position in observe_value(
-            self.user_readback, done_status=move_status
-        ):
-            yield WatcherUpdate(
-                current=current_position,
-                initial=old_position,
-                target=new_position,
-                name=self.name,
-            )
-        if not self._set_success:
-            raise RuntimeError("Motor was stopped")
 
 
 class I092SampleManipulator(StandardReadable):
