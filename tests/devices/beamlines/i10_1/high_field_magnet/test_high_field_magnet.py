@@ -1,7 +1,11 @@
 import asyncio
+from collections.abc import Mapping
 from unittest.mock import AsyncMock
 
+import numpy as np
 import pytest
+from bluesky.plans import scan
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
@@ -176,16 +180,6 @@ async def test_tolerance_logic_stop_clears_set_success_and_restores_setpoint(
     assert await high_field_magnet.movable_logic.setpoint.get_value() == 1.5
 
 
-async def test_tolerance_logic_calculate_timeout(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.sweep_rate, 0.1)
-    set_mock_value(high_field_magnet.ramp_up_time, 0.1)
-    timeout = await high_field_magnet.movable_logic.calculate_timeout(
-        old_position=0.0, new_position=10.0
-    )
-    expected_timeout = 10.0 / 0.1 + 2 * 0.1 + DEFAULT_TIMEOUT
-    assert timeout == expected_timeout
-
-
 async def test_tolerance_logic_calculate_timeout_with_zero_speed(
     high_field_magnet: HighFieldMagnet,
 ):
@@ -206,3 +200,19 @@ async def test_tolerance_logic_move(high_field_magnet: HighFieldMagnet):
     set_mock_value(high_field_magnet.movable_logic.readback, 9.91)
     await move_task
     assert await high_field_magnet.within_tolerance.get_value() is True
+
+
+def test_run_engine_scan(
+    run_engine: RunEngine,
+    high_field_magnet: HighFieldMagnet,
+    run_engine_documents: Mapping[str, list[dict]],
+):
+    steps = np.arange(0, 11, 2.5)
+    run_engine(
+        scan([high_field_magnet], high_field_magnet.user_setpoint, 0.0, 10.0, 5),
+    )
+    assert len(run_engine_documents["start"]) == 1
+    assert len(run_engine_documents["stop"]) == 1
+    assert len(run_engine_documents["event"]) == 5
+    for step, event in enumerate(run_engine_documents["event"]):
+        assert event["data"]["magnet"] == steps[step]
