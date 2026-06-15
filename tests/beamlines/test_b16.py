@@ -2,7 +2,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from ophyd_async.core import SignalDict
-from ophyd_async.epics.adcore import ADWriterType
 
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
 from dodal.devices.beamlines.b16.detector import (
@@ -26,6 +25,9 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
         patch(
             "dodal.devices.beamlines.b16.detector.ADAcquireLogic"
         ) as mock_acquire_logic,
+        patch(
+            "dodal.devices.beamlines.b16.detector.ADWriterFactory"
+        ) as mock_writer_factory,
     ):
         mock_acquire_logic_instance = MagicMock(name="ADAcquireLogic")
         mock_acquire_logic.return_value = mock_acquire_logic_instance
@@ -57,16 +59,17 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
             default_deadtime,
         )
 
+        mock_writer_factory.tiff.assert_called_once_with(
+            path_provider=mock_path_provider, writer_suffix=TIFF_SUFFIX
+        )
         # Assert AreaDetector constructed with correct arguments
         mock_area_detector.assert_called_once_with(
-            prefix=prefix,
-            driver=mock_driver_instance,
+            mock_driver_instance,
+            prefix,
             # writer=mock_writer,
-            trigger_logic=mock_tiff_trigger_logic_instance,
-            path_provider=mock_path_provider,
+            mock_writer_factory.tiff.return_value,
             acquire_logic=mock_acquire_logic_instance,
-            writer_type=ADWriterType.TIFF,
-            writer_suffix=TIFF_SUFFIX,
+            trigger_logic=mock_tiff_trigger_logic_instance,
         )
 
         # The function should return the AreaDetector instance

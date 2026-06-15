@@ -3,7 +3,7 @@ from pathlib import Path
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
-from ophyd_async.epics.adcore import ADWriterType, ContAcqDetector, NDPluginBaseIO
+from ophyd_async.epics.adcore import ADWriterFactory, ContAcqDetector, NDPluginBaseIO
 from ophyd_async.epics.motor import Motor
 from ophyd_async.fastcs.eiger import EigerDetector
 
@@ -318,11 +318,9 @@ def zebra() -> Zebra:
 def webcam_1(path_provider: PathProvider) -> ContAcqDetector:
     return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-WEB-01:",
-        path_provider=path_provider,
+        ADWriterFactory.jpeg(path_provider=path_provider, writer_suffix="JPEG:"),
         driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_type=ADWriterType.JPEG,
-        writer_suffix="JPEG:",
     )
 
 
@@ -330,11 +328,9 @@ def webcam_1(path_provider: PathProvider) -> ContAcqDetector:
 def webcam_2(path_provider: PathProvider) -> ContAcqDetector:
     return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-WEB-02:",
-        path_provider=path_provider,
+        ADWriterFactory.jpeg(path_provider=path_provider, writer_suffix="JPEG:"),
         driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_type=ADWriterType.JPEG,
-        writer_suffix="JPEG:",
     )
 
 
@@ -342,11 +338,9 @@ def webcam_2(path_provider: PathProvider) -> ContAcqDetector:
 def cam_1(path_provider: PathProvider) -> ContAcqDetector:
     return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=path_provider,
+        ADWriterFactory.jpeg(path_provider=path_provider, writer_suffix="JPEG:"),
         driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_type=ADWriterType.JPEG,
-        writer_suffix="JPEG:",
     )
 
 
@@ -354,11 +348,9 @@ def cam_1(path_provider: PathProvider) -> ContAcqDetector:
 def cam_2(path_provider: PathProvider) -> ContAcqDetector:
     return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-02:",
-        path_provider=path_provider,
+        ADWriterFactory.jpeg(path_provider=path_provider, writer_suffix="JPEG:"),
         driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_type=ADWriterType.JPEG,
-        writer_suffix="JPEG:",
     )
 
 
@@ -366,9 +358,7 @@ def cam_2(path_provider: PathProvider) -> ContAcqDetector:
 def cam_3(path_provider: PathProvider) -> ContAcqDetector:
     return ContAcqDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-03:",
-        path_provider=path_provider,
+        ADWriterFactory.jpeg(path_provider=path_provider, writer_suffix="JPEG:"),
         driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
-        writer_type=ADWriterType.JPEG,
-        writer_suffix="JPEG:",
     )
