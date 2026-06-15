@@ -3,19 +3,24 @@ from __future__ import annotations
 from dataclasses import dataclass
 from functools import cached_property
 
-import ophyd_async.core
 from bluesky.protocols import (
     Flyable,
     Preparable,
 )
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
+    AsyncStatus,
     MovableLogic,
     SignalR,
     SignalRW,
+    StandardMovable,
+    StandardReadable,
     StandardReadableFormat,
+    StrictEnum,
+    SubsetEnum,
     WatchableAsyncStatus,
     derived_signal_r,
+    error_if_none,
     set_and_wait_for_other_value,
     soft_signal_rw,
 )
@@ -23,19 +28,19 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 from pydantic import BaseModel, Field
 
 
-class HighFieldMangetSweepTypes(ophyd_async.core.StrictEnum):
+class HighFieldMangetSweepTypes(StrictEnum):
     FAST = "Fast"
     SLOW = "Slow"
 
 
-class HighFieldMagnetStatus(ophyd_async.core.SubsetEnum):
+class HighFieldMagnetStatus(SubsetEnum):
     HOLD = "Hold"
     TO_SETPOINT = "To Setpoint"
     TO_ZERO = "To Zero"
     CLAMP = "Clamp"
 
 
-class HighFieldMagnetStatusRBV(ophyd_async.core.SubsetEnum):
+class HighFieldMagnetStatusRBV(SubsetEnum):
     HOLD = "Hold"
     TO_SETPOINT = "To Setpoint"
     TO_ZERO = "To Zero"
@@ -46,9 +51,7 @@ class FlyMagInfo(BaseModel):
     """Minimal set of information required to fly high field magnet."""
 
     start_position: float = Field(frozen=True)
-
     end_position: float = Field(frozen=True)
-
     sweep_rate: float = Field(frozen=True, gt=0)
 
 
@@ -89,8 +92,8 @@ class ToleranceMovableLogic(MovableLogic[float]):
 
 
 class HighFieldMagnet(
-    ophyd_async.core.StandardMovable,
-    ophyd_async.core.StandardReadable,
+    StandardMovable,
+    StandardReadable,
     Flyable,
     Preparable,
 ):
@@ -133,11 +136,8 @@ class HighFieldMagnet(
             readback=self.user_readback,
             tolerance=self.field_tolerance,
         )
-
         self._set_success = True
-
         self._fly_info: FlyMagInfo | None = None
-
         self._fly_status: WatchableAsyncStatus | None = None
 
         super().__init__(name=name)
@@ -149,7 +149,7 @@ class HighFieldMagnet(
         return abs(setpoint - readback) < abs(tolerance)
 
     @cached_property
-    def movable_logic(self) -> ophyd_async.core.MovableLogic:
+    def movable_logic(self) -> MovableLogic:
         return ToleranceMovableLogic(
             setpoint=self.user_setpoint,
             readback=self.user_readback,
@@ -159,25 +159,21 @@ class HighFieldMagnet(
             acc_time=self.ramp_up_time,
         )
 
-    @ophyd_async.core.AsyncStatus.wrap
+    @AsyncStatus.wrap
     async def prepare(self, value: FlyMagInfo) -> None:
         """Move to the beginning of a suitable run-up distance ready for a fly scan."""
         self._fly_info = value
-
         await self.set(value.start_position)
-
         await self.sweep_rate.set(abs(value.sweep_rate))
 
-    @ophyd_async.core.AsyncStatus.wrap
+    @AsyncStatus.wrap
     async def kickoff(self):
-        fly_info = ophyd_async.core.error_if_none(
+        fly_info = error_if_none(
             self._fly_info, "Magnet must be prepared before attempting to kickoff"
         )
 
         self._fly_status = self.set(fly_info.end_position)
 
-    def complete(self) -> ophyd_async.core.WatchableAsyncStatus:
-        fly_status = ophyd_async.core.error_if_none(
-            self._fly_status, "kickoff not called"
-        )
+    def complete(self) -> WatchableAsyncStatus:
+        fly_status = error_if_none(self._fly_status, "kickoff not called")
         return fly_status

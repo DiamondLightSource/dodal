@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import AsyncMock
 
 import pytest
 from ophyd_async.core import (
@@ -56,22 +57,6 @@ async def test_set_raises_runtime_error_when_stopped(
         await status
 
 
-async def test_subscribe_and_clear_sub(high_field_magnet: HighFieldMagnet):
-    """Test subscribe_reading and clear_sub for callbacks."""
-    readings = []
-
-    def callback(reading_dict):
-        readings.append(reading_dict)
-
-    high_field_magnet.subscribe_reading(callback)
-
-    set_mock_value(high_field_magnet.user_readback, 3.0)
-
-    high_field_magnet.clear_sub(callback)
-
-    assert callable(callback)
-
-
 async def test_set_raises_on_zero_sweep_rate(high_field_magnet: HighFieldMagnet):
     set_mock_value(high_field_magnet.user_readback, 0.0)
     set_mock_value(high_field_magnet.sweep_rate, 0.0)
@@ -81,23 +66,28 @@ async def test_set_raises_on_zero_sweep_rate(high_field_magnet: HighFieldMagnet)
         await status
 
 
-async def test_set_calculates_correct_timeout(high_field_magnet: HighFieldMagnet):
+@pytest.mark.parametrize(
+    "new_position,sweep_rate,ramp_up_time",
+    [
+        (10.0, 1.0, 1.0),
+        (5.0, 0.5, 0.2),
+        (20.0, 2.0, 0.5),
+    ],
+)
+async def test_set_calculates_correct_timeout(
+    high_field_magnet: HighFieldMagnet, new_position, sweep_rate, ramp_up_time
+):
     set_mock_value(high_field_magnet.user_readback, 0.0)
-    set_mock_value(high_field_magnet.sweep_rate, 1.0)
-    set_mock_value(high_field_magnet.ramp_up_time, 1.0)
+    set_mock_value(high_field_magnet.sweep_rate, sweep_rate)
+    set_mock_value(high_field_magnet.ramp_up_time, ramp_up_time)
     set_mock_value(high_field_magnet.user_setpoint, 0.0)
 
-    # Start the set operation
-    status = high_field_magnet.set(10.0)
-    assert isinstance(status, AsyncStatus) or hasattr(status, "watch")
-
-
-async def test_set_returns_watchable_async_status(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.user_readback, 0.0)
-    set_mock_value(high_field_magnet.sweep_rate, 1.0)
-
-    status = high_field_magnet.set(5.0)
-    assert status is not None
+    high_field_magnet.movable_logic.move = AsyncMock()
+    await high_field_magnet.set(new_position)
+    expected_timeout = new_position / sweep_rate + 2 * ramp_up_time + DEFAULT_TIMEOUT
+    high_field_magnet.movable_logic.move.assert_called_with(
+        new_position=new_position, timeout=expected_timeout
+    )
 
 
 async def test_prepare(high_field_magnet: HighFieldMagnet):
@@ -113,8 +103,7 @@ async def test_prepare(high_field_magnet: HighFieldMagnet):
 
 async def test_kickoff_without_prepare_raises(high_field_magnet: HighFieldMagnet):
     with pytest.raises(RuntimeError, match="Magnet must be prepared"):
-        status = high_field_magnet.kickoff()
-        await status
+        await high_field_magnet.kickoff()
 
 
 async def test_kickoff_after_prepare(high_field_magnet: HighFieldMagnet):
@@ -123,8 +112,7 @@ async def test_kickoff_after_prepare(high_field_magnet: HighFieldMagnet):
 
     fly_info = FlyMagInfo(start_position=1.0, end_position=10.0, sweep_rate=2.0)
 
-    prepare_status = high_field_magnet.prepare(fly_info)
-    await prepare_status
+    await high_field_magnet.prepare(fly_info)
 
     kickoff_status = high_field_magnet.kickoff()
     assert isinstance(kickoff_status, AsyncStatus)
@@ -141,50 +129,42 @@ async def test_complete_after_kickoff(high_field_magnet: HighFieldMagnet):
 
     fly_info = FlyMagInfo(start_position=1.0, end_position=10.0, sweep_rate=2.0)
 
-    prepare_status = high_field_magnet.prepare(fly_info)
-    await prepare_status
+    await high_field_magnet.prepare(fly_info)
 
-    kickoff_status = high_field_magnet.kickoff()
-    await kickoff_status
+    await high_field_magnet.kickoff()
 
     complete_status = high_field_magnet.complete()
     assert complete_status is high_field_magnet._fly_status
 
 
 async def test_read(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.user_setpoint, 5.0)
-    set_mock_value(high_field_magnet.user_readback, 5.0)
+    await high_field_magnet.user_setpoint.set(5.0)
     await assert_reading(
         high_field_magnet,
         expected_reading={"magnet": {"value": 5.0}},
     )
 
 
-async def test_tolerance_logic_within_tolerance_when_in_range(
-    high_field_magnet: HighFieldMagnet,
+@pytest.mark.parametrize(
+    "setpoint,readback,tolerance,expected",
+    [
+        (10.0, 10.005, 0.01, True),  # test positive tolerance
+        (10.0, 9.995, 0.01, True),
+        (10.0, 10.02, 0.01, False),
+        (10.0, 0.9, 0.01, False),
+        (10.0, 9.995, -0.01, True),  # test negative tolerance
+        (10.0, 10.0005, -0.01, True),
+        (10.0, 9.98, -0.01, False),
+        (10.0, 10.1, -0.01, False),
+    ],
+)
+async def test_tolerance_logic_within_tolerance(
+    high_field_magnet: HighFieldMagnet, setpoint, readback, tolerance, expected
 ):
     result = high_field_magnet._within_tolerance(
-        setpoint=10.0, readback=10.005, tolerance=0.01
+        setpoint=setpoint, readback=readback, tolerance=tolerance
     )
-    assert result is True
-
-
-async def test_tolerance_logic_within_tolerance_when_outside_range(
-    high_field_magnet: HighFieldMagnet,
-):
-    result = high_field_magnet._within_tolerance(
-        setpoint=10.0, readback=10.02, tolerance=0.01
-    )
-    assert result is False
-
-
-async def test_tolerance_logic_within_tolerance_with_negative_tolerance(
-    high_field_magnet: HighFieldMagnet,
-):
-    result = high_field_magnet._within_tolerance(
-        setpoint=10.0, readback=9.995, tolerance=-0.01
-    )
-    assert result is True
+    assert result is expected
 
 
 async def test_tolerance_logic_stop_clears_set_success_and_restores_setpoint(
