@@ -24,8 +24,7 @@ async def high_field_magnet() -> HighFieldMagnet:
 
 
 async def test_locate(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.user_setpoint, 5.0)
-    set_mock_value(high_field_magnet.user_readback, 5.0)
+    await high_field_magnet.user_setpoint.set(5.0)
 
     location = await high_field_magnet.locate()
     assert location["setpoint"] == 5.0
