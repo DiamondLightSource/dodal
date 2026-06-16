@@ -35,10 +35,8 @@ async def test_sm_read(sm: I092SampleManipulator) -> None:
 
 @pytest.fixture
 async def piezo_motor() -> PiezoElectricMotor:
-    piezo_motor = PiezoElectricMotor("TEST:", name="piezo_motor")
-    # Setup mock to not use default as do not want the setpoint and readback to be the
-    # same for tests so we can correctly test threshold signals.
-    await piezo_motor.connect(mock=DeviceMock())
+    with init_devices(mock=True):
+        piezo_motor = PiezoElectricMotor("TEST:")
     return piezo_motor
 
 
@@ -58,14 +56,34 @@ async def test_piezo_motor_within_threshold(
     readback: float,
     expected_within_threshold: bool,
 ) -> None:
+    # Setup mock to not use default as do not want the setpoint and readback to be the
+    # same for tests so we can correctly test threshold signals.
+    await piezo_motor.connect(mock=DeviceMock())
     set_mock_value(piezo_motor.deadband, deadband)
     set_mock_value(piezo_motor.user_setpoint, setpoint)
     set_mock_value(piezo_motor.user_readback, readback)
 
-    assert await piezo_motor.within_threshold.get_value() == expected_within_threshold
+    assert await piezo_motor.within_tolerance.get_value() == expected_within_threshold
 
 
 async def test_piezo_motor_stop(piezo_motor: PiezoElectricMotor) -> None:
     piezo_motor.motor_stop.set = AsyncMock()
     await piezo_motor.stop()
     piezo_motor.motor_stop.set.assert_awaited_once_with(1)
+
+
+async def test_piezo_motor_set(piezo_motor: PiezoElectricMotor) -> None:
+    await piezo_motor.set(4)
+    assert await piezo_motor.user_readback.get_value() == 4
+    assert await piezo_motor.user_setpoint.get_value() == 4
+
+
+async def test_tolerance_logic_move(piezo_motor: PiezoElectricMotor):
+    set_mock_value(piezo_motor.movable_logic.readback, 0.0)
+    move_task = piezo_motor.movable_logic.move(new_position=10.0, timeout=5.0)
+    for value in [2.0, 5.0, 8.0, 9.5, 13.0]:
+        set_mock_value(piezo_motor.movable_logic.readback, value)
+        assert await piezo_motor.within_tolerance.get_value() is False
+    set_mock_value(piezo_motor.movable_logic.readback, 9.91)
+    await move_task
+    assert await piezo_motor.within_tolerance.get_value() is True

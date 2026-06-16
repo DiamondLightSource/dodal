@@ -36,7 +36,7 @@ class PiezoElectricMovableLogic(MovableLogic):
     # How do provide calculate_timeout without velocity and acceleration?
 
 
-def _within_threshold_read(setpoint: float, readback: float, deadband: float) -> bool:
+def _within_tolerance_read(setpoint: float, readback: float, deadband: float) -> bool:
     return abs(setpoint - readback) < deadband
 
 
@@ -55,8 +55,8 @@ class PiezoElectricMotor(StandardMovable[float], StandardReadable):
         self.user_setpoint = epics_signal_rw(float, prefix + ":MOV:RD")
         self.deadband = soft_signal_rw(float, initial_value=deadband)
         self.motor_stop = epics_signal_w(int, prefix + ":HLT:WR.PROC")
-        self.within_threshold = derived_signal_r(
-            _within_threshold_read,
+        self.within_tolerance = derived_signal_r(
+            _within_tolerance_read,
             deadband=self.deadband,
             setpoint=self.user_setpoint,
             readback=self.user_readback,
@@ -68,7 +68,7 @@ class PiezoElectricMotor(StandardMovable[float], StandardReadable):
         return PiezoElectricMovableLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            within_tolerance=self.within_threshold,
+            within_tolerance=self.within_tolerance,
             motor_stop=self.motor_stop,
         )
 
