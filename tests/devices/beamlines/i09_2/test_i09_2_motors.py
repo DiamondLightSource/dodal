@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from ophyd_async.core import DeviceMock, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
@@ -61,3 +63,9 @@ async def test_piezo_motor_within_threshold(
     set_mock_value(piezo_motor.user_readback, readback)
 
     assert await piezo_motor.within_threshold.get_value() == expected_within_threshold
+
+
+async def test_piezo_motor_stop(piezo_motor: PiezoElectricMotor) -> None:
+    piezo_motor.motor_stop.set = AsyncMock()
+    await piezo_motor.stop()
+    piezo_motor.motor_stop.set.assert_awaited_once_with(1)
