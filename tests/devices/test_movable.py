@@ -1,7 +1,7 @@
 import pytest
 from ophyd_async.core import (
+    AsyncStatus,
     DeviceMock,
-    init_devices,
     set_mock_value,
     soft_signal_r_and_setter,
     soft_signal_rw,
@@ -25,8 +25,10 @@ class MovableWithToleranceImpl(MovableWithTolerance):
 
 @pytest.fixture
 async def movable_with_tolerance() -> MovableWithToleranceImpl:
-    with init_devices(mock=True):
-        movable_with_tolerance = MovableWithToleranceImpl()
+    movable_with_tolerance = MovableWithToleranceImpl("movable_with_tolerance")
+    # Setup mock to not use default as do not want the setpoint and readback to be the
+    # same for tests so we can correctly test threshold signal.
+    await movable_with_tolerance.connect(mock=DeviceMock())
     return movable_with_tolerance
 
 
@@ -50,9 +52,6 @@ async def test_movable_with_tolerance_within_threshold(
     readback: float,
     expected_within_threshold: bool,
 ) -> None:
-    # Setup mock to not use default as do not want the setpoint and readback to be the
-    # same for tests so we can correctly test threshold signal.
-    await movable_with_tolerance.connect(mock=DeviceMock())
     set_mock_value(movable_with_tolerance.custom_tolerance, tolerance)
     set_mock_value(movable_with_tolerance.custom_setpoint, setpoint)
     set_mock_value(movable_with_tolerance.custom_readback, readback)
@@ -62,19 +61,25 @@ async def test_movable_with_tolerance_within_threshold(
     )
 
 
-async def test_movable_with_tolerance_logic_move(
+async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_wiithin_tolerance(
     movable_with_tolerance: MovableWithToleranceImpl,
 ) -> None:
+    set_mock_value(movable_with_tolerance.custom_tolerance, 0.1)
     set_mock_value(movable_with_tolerance.movable_logic.readback, 0.0)
-    move_task = movable_with_tolerance.movable_logic.move(
-        new_position=10.0, timeout=5.0
-    )
-    for value in [2.0, 5.0, 8.0, 9.5, 13.0]:
-        set_mock_value(movable_with_tolerance.movable_logic.readback, value)
-        assert await movable_with_tolerance.within_tolerance.get_value() is False
-    set_mock_value(movable_with_tolerance.movable_logic.readback, 9.91)
-    await move_task
-    assert await movable_with_tolerance.within_tolerance.get_value() is True
+    async with AsyncStatus(
+        movable_with_tolerance.movable_logic.move(new_position=10, timeout=1)
+    ) as move_status:
+        # Start the move by setting the setpoint.
+        # Set some values between initial readback and final setpoint that are outside
+        # the threshold to test signal is correct.
+        for value in [2.0, 5.0, 9.5, 13.0]:
+            set_mock_value(movable_with_tolerance.movable_logic.readback, value)
+            assert await movable_with_tolerance.within_tolerance.get_value() is False
+        # Now move to a value within threshold. Check within_threshold is True and the
+        # status is also done as threshold reached.
+        set_mock_value(movable_with_tolerance.movable_logic.readback, 9.91)
+        assert await movable_with_tolerance.within_tolerance.get_value() is True
+        assert move_status.done is True
 
 
 async def test_movable_with_tolerance_sub_class_signal_names_are_not_renamed(
