@@ -32,6 +32,10 @@ def _within_tolerance_read(setpoint: float, readback: float, tolerance: float) -
 
 
 class MovableWithTolerance(StandardMovable[float], StandardReadable):
+    """Movable with a signal to configure the tolerance of when the device is done
+    moving if it the readback and setpoint difference is within the tolerance.
+    """
+
     def __init__(
         self,
         tolerance: SignalR[float],

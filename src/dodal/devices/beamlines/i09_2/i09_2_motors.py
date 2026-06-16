@@ -25,8 +25,8 @@ class PiezoElectricMovableLogic(MovableWithToleranceLogic):
 
 class PiezoElectricMotor(MovableWithTolerance):
     """Motor like device with user_readback, user_setpoint, and a stop signals. Has a
-    configurable deadband soft signal to configure the tolerance of when a motor is done
-    moving. For example, if deadband is configured to be 0.5, and the setpoint is 10 and
+    configurable tolerance soft signal to configure the tolerance of when a motor is done
+    moving. For example, if tolerance is configured to be 0.5, and the setpoint is 10 and
     the readback is 9.8, the motor will be done moving and stop blocking for the
     AsyncStatus.
     """

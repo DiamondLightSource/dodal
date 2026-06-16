@@ -76,11 +76,7 @@ class HighFieldMagnetMovableLogic(MovableWithToleranceLogic):
         return timeout
 
 
-class HighFieldMagnet(
-    MovableWithTolerance,
-    Flyable,
-    Preparable,
-):
+class HighFieldMagnet(MovableWithTolerance, Flyable, Preparable):
     def __init__(
         self, prefix: str, field_tolerance: float = 0.01, name: str = ""
     ) -> None:
@@ -101,6 +97,7 @@ class HighFieldMagnet(
             )
             self.ramp_up_time = soft_signal_rw(datatype=float, initial_value=1.0)
             self.field_tolerance = soft_signal_rw(float, initial_value=field_tolerance)
+
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.user_readback = epics_signal_r(float, prefix + "RBV:DEMANDFIELD")
 
@@ -113,7 +110,6 @@ class HighFieldMagnet(
             read_pv=prefix + "RBV:SETPOINTFIELD",
             write_pv=prefix + "SET:SETPOINTFIELD",
         )
-
         self._set_success = True
         self._fly_info: FlyMagInfo | None = None
         self._fly_status: WatchableAsyncStatus | None = None
@@ -124,12 +120,6 @@ class HighFieldMagnet(
             readback=self.user_readback,
             name=name,
         )
-
-    def _within_tolerance(
-        self, setpoint: float, readback: float, tolerance: float
-    ) -> bool:
-        """Check if the readback is within the tolerance of the setpoint."""
-        return abs(setpoint - readback) < abs(tolerance)
 
     @cached_property
     def movable_logic(self) -> HighFieldMagnetMovableLogic:
