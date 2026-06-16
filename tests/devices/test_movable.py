@@ -30,15 +30,6 @@ async def movable_with_tolerance() -> MovableWithToleranceImpl:
     return movable_with_tolerance
 
 
-# @pytest.mark.parametrize(
-#     "tolerance, setpoint, readback, expected_within_threshold",
-#     (
-#         (1, 10, 11.1, False),
-#         (2, 10, 7, False),
-#         (0.5, 5, 4.9, True),
-#         (0.1, 100, 100.01, True),
-#     ),
-# )
 @pytest.mark.parametrize(
     "setpoint, readback, tolerance, expected_within_threshold",
     [

@@ -28,7 +28,7 @@ class MovableWithToleranceLogic(MovableLogic[float]):
 
 
 def _within_tolerance_read(setpoint: float, readback: float, tolerance: float) -> bool:
-    return abs(setpoint - readback) < tolerance
+    return abs(setpoint - readback) < abs(tolerance)
 
 
 class MovableWithTolerance(StandardMovable[float], StandardReadable):
