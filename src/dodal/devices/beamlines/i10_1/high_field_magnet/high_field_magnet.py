@@ -10,22 +10,18 @@ from bluesky.protocols import (
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
-    MovableLogic,
-    SignalR,
     SignalRW,
-    StandardMovable,
-    StandardReadable,
     StandardReadableFormat,
     StrictEnum,
     SubsetEnum,
     WatchableAsyncStatus,
-    derived_signal_r,
     error_if_none,
-    set_and_wait_for_other_value,
     soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from pydantic import BaseModel, Field
+
+from dodal.devices.movable import MovableWithTolerance, MovableWithToleranceLogic
 
 
 class HighFieldMangetSweepTypes(StrictEnum):
@@ -56,11 +52,9 @@ class FlyMagInfo(BaseModel):
 
 
 @dataclass
-class ToleranceMovableLogic(MovableLogic[float]):
-    tolerance: SignalRW[float]
+class HighFieldMagnetMovableLogic(MovableWithToleranceLogic):
     speed: SignalRW[float]
     acc_time: SignalRW[float]
-    within_tolerance: SignalR[bool]
 
     async def stop(self):
         current_val = await self.readback.get_value()
@@ -81,19 +75,9 @@ class ToleranceMovableLogic(MovableLogic[float]):
             raise ValueError(msg) from error
         return timeout
 
-    async def move(self, new_position: float, timeout: float | None) -> None:
-        await set_and_wait_for_other_value(
-            set_signal=self.setpoint,
-            set_value=new_position,
-            match_signal=self.within_tolerance,
-            match_value=True,
-            timeout=timeout,
-        )
-
 
 class HighFieldMagnet(
-    StandardMovable,
-    StandardReadable,
+    MovableWithTolerance,
     Flyable,
     Preparable,
 ):
@@ -130,17 +114,16 @@ class HighFieldMagnet(
             write_pv=prefix + "SET:SETPOINTFIELD",
         )
 
-        self.within_tolerance = derived_signal_r(
-            raw_to_derived=self._within_tolerance,
-            setpoint=self.user_setpoint,
-            readback=self.user_readback,
-            tolerance=self.field_tolerance,
-        )
         self._set_success = True
         self._fly_info: FlyMagInfo | None = None
         self._fly_status: WatchableAsyncStatus | None = None
 
-        super().__init__(name=name)
+        super().__init__(
+            tolerance=self.field_tolerance,
+            setpoint=self.user_setpoint,
+            readback=self.user_readback,
+            name=name,
+        )
 
     def _within_tolerance(
         self, setpoint: float, readback: float, tolerance: float
@@ -149,11 +132,10 @@ class HighFieldMagnet(
         return abs(setpoint - readback) < abs(tolerance)
 
     @cached_property
-    def movable_logic(self) -> MovableLogic:
-        return ToleranceMovableLogic(
+    def movable_logic(self) -> HighFieldMagnetMovableLogic:
+        return HighFieldMagnetMovableLogic(
             setpoint=self.user_setpoint,
             readback=self.user_readback,
-            tolerance=self.field_tolerance,
             within_tolerance=self.within_tolerance,
             speed=self.sweep_rate,
             acc_time=self.ramp_up_time,
