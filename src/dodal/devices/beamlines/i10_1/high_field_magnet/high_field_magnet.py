@@ -1,12 +1,7 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from functools import cached_property
 
-from bluesky.protocols import (
-    Flyable,
-    Preparable,
-)
+from bluesky.protocols import Flyable, Preparable
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,

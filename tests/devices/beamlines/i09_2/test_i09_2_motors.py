@@ -4,10 +4,7 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.beamlines.i09_2 import (
-    I092SampleManipulator,
-    PiezoElectricMotor,
-)
+from dodal.devices.beamlines.i09_2 import I092SampleManipulator, PiezoElectricMotor
 
 
 @pytest.fixture
