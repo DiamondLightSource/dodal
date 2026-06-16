@@ -65,8 +65,7 @@ async def test_set_raises_on_zero_sweep_rate(high_field_magnet: HighFieldMagnet)
     set_mock_value(high_field_magnet.sweep_rate, 0.0)
 
     with pytest.raises(ValueError, match="zero speed."):
-        status = high_field_magnet.set(10.0)
-        await status
+        await high_field_magnet.set(10.0)
 
 
 @pytest.mark.parametrize(
@@ -144,7 +143,7 @@ async def test_read(high_field_magnet: HighFieldMagnet):
     await high_field_magnet.user_setpoint.set(5.0)
     await assert_reading(
         high_field_magnet,
-        expected_reading={"magnet": {"value": 5.0}},
+        {"magnet": partial_reading(5.0)},
     )
 
 
