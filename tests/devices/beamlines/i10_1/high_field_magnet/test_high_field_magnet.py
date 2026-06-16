@@ -12,7 +12,7 @@ from ophyd_async.core import (
     init_devices,
     set_mock_value,
 )
-from ophyd_async.testing import assert_reading
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet import (
     FlyMagInfo,
