@@ -9,7 +9,7 @@ from ophyd_async.core import (
     StandardMovable,
     StandardReadable,
     derived_signal_r,
-    wait_for_value,
+    set_and_wait_for_other_value,
 )
 
 
@@ -28,7 +28,12 @@ class MovableWithToleranceLogic(MovableLogic[float]):
         #
         # For now, set the setpoint first and then wait for within_tolerance to become
         # True for the newly requested position.
-        await wait_for_value(signal=self.within_tolerance, match=True, timeout=timeout)
+        await set_and_wait_for_other_value(
+            set_signal=self.setpoint,
+            set_value=new_position,
+            match_signal=self.within_tolerance,
+            match_value=True,
+        )
 
 
 def _within_tolerance_read(setpoint: float, readback: float, tolerance: float) -> bool:
