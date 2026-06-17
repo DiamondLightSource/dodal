@@ -18,7 +18,7 @@ class MovableWithToleranceLogic(MovableLogic[float]):
     within_tolerance: SignalR[bool]
 
     async def move(self, new_position: float, timeout: float | None) -> None:
-        await self.setpoint.set(new_position)
+        # await self.setpoint.set(new_position)
         # Don't use set_and_wait_for_other_value until we drop support for Python 3.11.
         # In Python 3.11 there appears to be a timing issue where, if within_tolerance
         # is already True (for example, because the current readback is close to the
@@ -28,11 +28,13 @@ class MovableWithToleranceLogic(MovableLogic[float]):
         #
         # For now, set the setpoint first and then wait for within_tolerance to become
         # True for the newly requested position.
+        # wait_for_value(self.within_tolerance, True, timeout)
         await set_and_wait_for_other_value(
             set_signal=self.setpoint,
             set_value=new_position,
             match_signal=self.within_tolerance,
             match_value=True,
+            timeout=timeout,
         )
 
 
