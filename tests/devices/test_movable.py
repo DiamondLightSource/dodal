@@ -69,7 +69,7 @@ async def test_movable_with_tolerance_within_threshold(
     ((0, 0, True), (0, -10, False)),
     ids=("initial_within_tolerance[True]", "initial_within_tolerance[False]"),
 )
-async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_wiithin_tolerance(
+async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_within_tolerance(
     initial_readback: float,
     initial_setpoint: float,
     initial_within_tolerance: bool,
