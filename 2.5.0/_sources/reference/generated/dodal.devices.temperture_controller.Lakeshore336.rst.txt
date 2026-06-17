@@ -1,0 +1,41 @@
+dodal.devices.temperture\_controller.Lakeshore336
+=================================================
+
+.. currentmodule:: dodal.devices.temperture_controller
+
+.. autoclass:: Lakeshore336
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,100 @@
+dodal.devices.eiger\_odin.EigerOdin
+===================================
+
+.. currentmodule:: dodal.devices.eiger_odin
+
+.. autoclass:: EigerOdin
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      ~EigerOdin.check_and_wait_for_odin_state
+      
+      
+      
+      
+      
+      ~EigerOdin.create_finished_status
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EigerOdin.stop
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EigerOdin.wait_for_odin_initialised
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~EigerOdin.component_names
+      
+      
+      
+      
+      
+      
+      
+      ~EigerOdin.fan
+      
+      
+      ~EigerOdin.file_writer
+      
+      
+      
+      
+      
+      ~EigerOdin.meta
+      
+      
+      
+      ~EigerOdin.nodes
+      
+      
+      
+      
+      
+      
+      
+      ~EigerOdin.subscriptions
+      
+      
+   
+   

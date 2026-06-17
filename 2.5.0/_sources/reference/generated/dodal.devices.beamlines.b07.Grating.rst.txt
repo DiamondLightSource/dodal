@@ -1,0 +1,87 @@
+dodal.devices.beamlines.b07.Grating
+===================================
+
+.. currentmodule:: dodal.devices.beamlines.b07
+
+.. autoclass:: Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Grating.NI_400
+      
+      
+      ~Grating.NI_1000
+      
+      
+      ~Grating.PT_600
+      
+      
+      ~Grating.AU_600
+      
+      
+      ~Grating.NO_GRATING
+      
+   
+   

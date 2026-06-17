@@ -1,0 +1,43 @@
+dodal.devices.attenuator.attenuator.BinaryFilterAttenuator
+==========================================================
+
+.. currentmodule:: dodal.devices.attenuator.attenuator
+
+.. autoclass:: BinaryFilterAttenuator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BinaryFilterAttenuator.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

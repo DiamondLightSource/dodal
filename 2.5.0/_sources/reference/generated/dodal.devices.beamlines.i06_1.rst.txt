@@ -1,0 +1,37 @@
+dodal.devices.beamlines.i06\_1
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i06_1.LEDLight
+   ~i06_1.DiffractionDichroism
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i06_1
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

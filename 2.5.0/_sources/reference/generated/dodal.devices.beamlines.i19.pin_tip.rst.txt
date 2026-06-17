@@ -1,0 +1,36 @@
+dodal.devices.beamlines.i19.pin\_tip
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i19
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~pin_tip.PinTipCentreHolder
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i19.pin_tip
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,87 @@
+dodal.devices.beamlines.i05\_shared.LensMode
+============================================
+
+.. currentmodule:: dodal.devices.beamlines.i05_shared
+
+.. autoclass:: LensMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LensMode.L4_ANG0_D8
+      
+      
+      ~LensMode.L4_ANG1_D6
+      
+      
+      ~LensMode.L4_ANG3_D9
+      
+      
+      ~LensMode.L4M_ANG0_D7
+      
+      
+      ~LensMode.L4M_SPAT_5
+      
+   
+   
