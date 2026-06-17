@@ -20,12 +20,15 @@ class PiezoElectricMovableLogic(MovableWithToleranceLogic):
     async def stop(self) -> None:
         await self.motor_stop.set(1)
 
-    # How do provide calculate_timeout without velocity and acceleration?
+    def calculate_timeout(self, old_position: float, new_position: float) -> float:  # type: ignore
+        # Bug: should allow return None.
+        # See https://github.com/bluesky/ophyd-async/pull/1300
+        return None  # type: ignore
 
 
 class PiezoElectricMotor(MovableWithTolerance):
     """Motor like device with user_readback, user_setpoint, and a stop signals. Has a
-    configurable tolerance soft signal to configure the tolerance of when a motor is done
+    configurable tolerance soft signal to configure the tolerance of when a devuce is done
     moving. For example, if tolerance is configured to be 0.5, and the setpoint is 10 and
     the readback is 9.8, the motor will be done moving and stop blocking for the
     AsyncStatus.
