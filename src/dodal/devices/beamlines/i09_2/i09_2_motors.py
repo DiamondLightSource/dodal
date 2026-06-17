@@ -20,7 +20,9 @@ class PiezoElectricMovableLogic(MovableWithToleranceLogic):
     async def stop(self) -> None:
         await self.motor_stop.set(1)
 
-    def calculate_timeout(self, old_position: float, new_position: float) -> float:  # type: ignore
+    async def calculate_timeout(
+        self, old_position: float, new_position: float
+    ) -> float:
         # Bug: should allow return None.
         # See https://github.com/bluesky/ophyd-async/pull/1300
         return None  # type: ignore
