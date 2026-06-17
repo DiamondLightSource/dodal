@@ -8,7 +8,8 @@ To make a new release, please follow this checklist:
 - Choose a new PEP440 compliant release number (see <https://peps.python.org/pep-0440/>) (The release version should 
   look like `{major}.{minor}.{patch}`). See [Deciding release numbers](#Deciding release numbers) if you're unsure on 
   what the release version should be.
-- Ensure that dependencies in pyproject.toml refer to release versions and not branches, otherwise the release will be rejected by PyPI 
+- Ensure that dependencies in pyproject.toml refer to release versions and not branches, otherwise the release will be rejected by PyPI
+- If you updated the pyproject.toml, also run a `uv sync` to ensure that dependencies are updated, and then merge the changes back to ``main``
 - Go to the GitHub [release] page
 - Choose `Draft New Release`
 - Click `Choose Tag` and supply the new tag you chose (click create new tag)
