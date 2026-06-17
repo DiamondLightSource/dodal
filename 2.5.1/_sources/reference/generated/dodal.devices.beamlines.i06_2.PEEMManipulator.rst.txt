@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i06\_2.PEEMManipulator
+==============================================
+
+.. currentmodule:: dodal.devices.beamlines.i06_2
+
+.. autoclass:: PEEMManipulator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

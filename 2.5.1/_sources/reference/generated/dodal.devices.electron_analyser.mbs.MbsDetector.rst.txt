@@ -1,0 +1,50 @@
+dodal.devices.electron\_analyser.mbs.MbsDetector
+================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.mbs
+
+.. autoclass:: MbsDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   

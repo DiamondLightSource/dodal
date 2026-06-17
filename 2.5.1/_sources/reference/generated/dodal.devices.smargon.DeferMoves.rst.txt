@@ -1,0 +1,78 @@
+dodal.devices.smargon.DeferMoves
+================================
+
+.. currentmodule:: dodal.devices.smargon
+
+.. autoclass:: DeferMoves
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DeferMoves.ON
+      
+      
+      ~DeferMoves.OFF
+      
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.aithre\_lasershaping.goniometer
+=============================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.aithre_lasershaping
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~goniometer.Goniometer
+
+
+
+
+.. automodule:: dodal.devices.aithre_lasershaping.goniometer
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

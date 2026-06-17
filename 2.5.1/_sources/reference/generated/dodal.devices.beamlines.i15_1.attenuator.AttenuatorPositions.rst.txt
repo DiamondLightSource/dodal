@@ -1,0 +1,96 @@
+dodal.devices.beamlines.i15\_1.attenuator.AttenuatorPositions
+=============================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.attenuator
+
+.. autoclass:: AttenuatorPositions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AttenuatorPositions.from_float
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AttenuatorPositions.TRANS_100
+      
+      
+      ~AttenuatorPositions.TRANS_50
+      
+      
+      ~AttenuatorPositions.TRANS_10
+      
+      
+      ~AttenuatorPositions.TRANS_1
+      
+      
+      ~AttenuatorPositions.TRANS_0_1
+      
+      
+      ~AttenuatorPositions.TRANS_0_01
+      
+      
+      ~AttenuatorPositions.TRANS_0_001
+      
+   
+   

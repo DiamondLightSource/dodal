@@ -1,0 +1,41 @@
+dodal.devices.insertion\_device.Apple2EnforceLHMoveController
+=============================================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: Apple2EnforceLHMoveController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

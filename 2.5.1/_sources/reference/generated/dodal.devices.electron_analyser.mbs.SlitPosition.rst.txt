@@ -1,0 +1,102 @@
+dodal.devices.electron\_analyser.mbs.SlitPosition
+=================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.mbs
+
+.. autoclass:: SlitPosition
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SlitPosition.P100_0_1_CURVED
+      
+      
+      ~SlitPosition.P200_0_1_STRAIGHT
+      
+      
+      ~SlitPosition.P300_0_2_CURVED
+      
+      
+      ~SlitPosition.P400_0_2_STRAIGHT
+      
+      
+      ~SlitPosition.P500_0_2_STRAIGHT
+      
+      
+      ~SlitPosition.P600_0_3_STRAIGHT
+      
+      
+      ~SlitPosition.P700_0_5_STRAIGHT
+      
+      
+      ~SlitPosition.P800_0_8_STRAIGHT
+      
+      
+      ~SlitPosition.P850_3_HOLE
+      
+      
+      ~SlitPosition.P900_1_5_STRAIGHT
+      
+   
+   

@@ -1,0 +1,45 @@
+dodal.devices.beamlines.i15\_1.cobra.Cobra
+==========================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.cobra
+
+.. autoclass:: Cobra
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~Cobra.get_config
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

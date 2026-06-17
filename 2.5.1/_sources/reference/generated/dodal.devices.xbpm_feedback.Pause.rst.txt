@@ -1,0 +1,78 @@
+dodal.devices.xbpm\_feedback.Pause
+==================================
+
+.. currentmodule:: dodal.devices.xbpm_feedback
+
+.. autoclass:: Pause
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Pause.PAUSE
+      
+      
+      ~Pause.RUN
+      
+   
+   
