@@ -64,15 +64,26 @@ async def test_movable_with_tolerance_within_threshold(
     )
 
 
+@pytest.mark.parametrize(
+    "initial_readback, initial_setpoint, initial_within_tolerance",
+    ((0, 0, True), (0, -10, False)),
+    ids=("initial_within_tolerance[True]", "initial_within_tolerance[False]"),
+)
 async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_wiithin_tolerance(
+    initial_readback: float,
+    initial_setpoint: float,
+    initial_within_tolerance: bool,
     movable_with_tolerance: MovableWithToleranceImpl,
 ) -> None:
     set_mock_value(movable_with_tolerance.custom_tolerance, 0.1)
-    setpoint = 10
 
-    # Needed for python 3.11, tolerance can't be already True
-    set_mock_value(movable_with_tolerance.movable_logic.readback, -10)
-    assert await movable_with_tolerance.within_tolerance.get_value() is False
+    set_mock_value(movable_with_tolerance.movable_logic.setpoint, initial_setpoint)
+    set_mock_value(movable_with_tolerance.movable_logic.readback, initial_readback)
+    assert (
+        await movable_with_tolerance.movable_logic.within_tolerance.get_value()
+        is initial_within_tolerance
+    )
+    setpoint = 10
 
     async with AsyncStatus(
         movable_with_tolerance.movable_logic.move(new_position=setpoint, timeout=1)
@@ -81,6 +92,9 @@ async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_w
         # had a chance to execute its first steps.
         await wait_for_value(
             movable_with_tolerance.movable_logic.setpoint, setpoint, timeout=1
+        )
+        assert (
+            await movable_with_tolerance.movable_logic.setpoint.get_value() == setpoint
         )
         # Set some values between initial readback and final setpoint that are outside
         # the threshold to test signal is correct and status hasn't completed.
