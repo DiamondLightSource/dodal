@@ -696,8 +696,8 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.3.3.dev4+g0b988e177"
-source = { git = "https://github.com/DiamondLightSource/daq-config-server.git?rev=main#0b988e177f949a8c6d8a0c2bf5faf1c4c3352b94" }
+version = "1.3.6"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
     { name = "fastapi" },
@@ -710,6 +710,10 @@ dependencies = [
     { name = "urllib3" },
     { name = "uvicorn" },
     { name = "xmltodict" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/95/74/56eddf2a44efd981cc5678e74fd777f37c045a7f9b71b01143ee8be45715/daq_config_server-1.3.6.tar.gz", hash = "sha256:ec25a69eca6fbeca309f04763d53728000e39d509a3f43353b76721985e34ee2", size = 232081, upload-time = "2026-06-10T13:30:53.252Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/65/0a/f225277d9b0133b6cd0e68f19d93af67db1fd76c9ccea9026563d53f2ffa/daq_config_server-1.3.6-py3-none-any.whl", hash = "sha256:948933c4d7f79ea609cff5774aeef3578ffda582d623e8d5bdf9aadf89df36b7", size = 33132, upload-time = "2026-06-10T13:30:52.176Z" },
 ]
 
 [[package]]
@@ -813,14 +817,14 @@ requires-dist = [
     { name = "aiohttp" },
     { name = "bluesky", specifier = ">=1.14.5" },
     { name = "click" },
-    { name = "daq-config-server", git = "https://github.com/DiamondLightSource/daq-config-server.git?rev=main" },
+    { name = "daq-config-server", specifier = ">=1.3.6" },
     { name = "deepdiff" },
     { name = "graypy" },
     { name = "mysql-connector-python", specifier = "==9.5.0" },
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.17a5" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.19.2" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -839,7 +843,7 @@ dev = [
     { name = "ispyb" },
     { name = "mypy" },
     { name = "myst-parser" },
-    { name = "ophyd-async", extras = ["sim"], specifier = ">=0.14.0" },
+    { name = "ophyd-async", extras = ["sim"], specifier = ">=0.19.2" },
     { name = "pre-commit" },
     { name = "psutil" },
     { name = "pydata-sphinx-theme", specifier = ">=0.12" },
@@ -2252,7 +2256,7 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.17a5"
+version = "0.19.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bluesky" },
@@ -2266,9 +2270,9 @@ dependencies = [
     { name = "stamina" },
     { name = "velocity-profile" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1d/3c/127aeba71467a5dab69d21cbdcc7a7dfe294e826f6883af0b741ace01dbe/ophyd_async-0.17a5.tar.gz", hash = "sha256:f0eb30de946148479a1e33822e535542f47da0d9854da7d5ffa579990f650508", size = 557024, upload-time = "2026-05-20T08:21:08.682Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/d9/bc09637a5caff453a205fa3c26474f497964618b72074413a6315d36725b/ophyd_async-0.19.2.tar.gz", hash = "sha256:138dcd5ac2ccc30194c9d74525aefb291b8a0be2ef3468a60e294f0fcea5495a", size = 588686, upload-time = "2026-06-16T15:31:31.055Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/a7/a87c4f373082674d2429af6912d2b0c113269063ee089eeb400effcc6bb6/ophyd_async-0.17a5-py3-none-any.whl", hash = "sha256:8175483b6ce5823cc3aff358afdd370bc08e1b2caf9f9e0cc4af9dc5b1802d8b", size = 208907, upload-time = "2026-05-20T08:21:06.899Z" },
+    { url = "https://files.pythonhosted.org/packages/90/36/96ac313cc51e147556e80d2388ca7c55672d13c06cb87353d8d607125284/ophyd_async-0.19.2-py3-none-any.whl", hash = "sha256:2cdd5ce876ce00246d043c581b1bb4074984822a879a330637a3188ace8e1f3e", size = 228241, upload-time = "2026-06-16T15:31:29.546Z" },
 ]
 
 [package.optional-dependencies]

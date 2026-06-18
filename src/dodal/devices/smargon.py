@@ -132,9 +132,7 @@ class Smargon(XYZWrappedOmegaStage, Movable):
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None and isinstance(new_setpoint, int | float):
                     axis = getattr(self, motor_name)
-                    await axis.check_motor_limit(
-                        await axis.user_setpoint.get_value(), new_setpoint
-                    )
+                    await axis.check_value(new_setpoint)
                     put_completion = await set_and_wait_for_value(
                         axis.user_setpoint,
                         new_setpoint,

@@ -1,10 +1,6 @@
 from typing import Any, Generic
 
-from ophyd_async.core import (
-    DetectorTriggerLogic,
-    SignalDict,
-    SignalR,
-)
+from ophyd_async.core import DetectorTriggerLogic, SignalDict, SignalR
 from ophyd_async.epics.adcore import ADAcquireLogic, ADImageMode
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
@@ -27,10 +23,10 @@ class ShutterCoordinatorADAcquireLogic(
         self,
         driver: TAbstractAnalyserDriverIO,
         shutter: GenericFastShutter,
-        close_shutter_when_idle: SignalR[bool] | None = None,
+        _close_shutter_when_idle: SignalR[bool] | None = None,
     ):
         self._shutter = shutter
-        self._close_shutter_when_idle = close_shutter_when_idle
+        self._close_shutter_when_idle = _close_shutter_when_idle
         super().__init__(driver)
 
     async def start_acquiring(self):
