@@ -89,11 +89,12 @@ def beamstop() -> BeamStop:
 
 
 @devices.factory()
-def energy_device() -> AccessControlledEnergyComposite:
+def energy_device(config_client: ConfigClient) -> AccessControlledEnergyComposite:
     """Access controlled composite device to enable changing the energy from EH1."""
     return AccessControlledEnergyComposite(
         dcm_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         hutch=HutchState.EH1,
+        config_client=config_client,
         instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )
 

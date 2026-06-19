@@ -1,7 +1,11 @@
 from enum import StrEnum
+from pathlib import Path
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import AsyncStatus, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_r
+from pydantic import BaseModel
+from pydantic.dataclasses import dataclass
 
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import (
     HutchState,
@@ -11,6 +15,12 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
 )
 from dodal.devices.beamlines.i19.mirror_stripes import StripeChoice
+
+MIRROR_ENERGY_FILE_PATH = Path(
+    "/dls_sw/i19-1/software/i19-acquisition/i19-shared/json/MirrorEnergyRanges.json"
+)
+
+CHANGE_ENERGY_PLAN_NAME = "change_energy_plan"
 
 
 class OutOfRangeEnergyRequestError(ValueError):
@@ -23,7 +33,25 @@ class Stripes(StrEnum):
     PT = "Pt"
 
 
-CHANGE_ENERGY_PLAN_NAME = "change_energy_plan"
+@dataclass
+class EnergyRange:
+    name: Stripes
+    upper: float
+    lower: float
+
+
+class MirrorEnergyRanges(BaseModel):
+    silicon: EnergyRange
+    rhodium: EnergyRange
+    platinum: EnergyRange
+
+    def get_stripe_material_from_energy(self, energy_in_kev: float) -> Stripes:
+        for val in self.model_dump().values():
+            if val["lower"] <= energy_in_kev < val["upper"]:
+                return Stripes(val["name"])
+        raise OutOfRangeEnergyRequestError(
+            f"The requested energy at {energy_in_kev} KeV is out of range"
+        )
 
 
 class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
@@ -52,9 +80,13 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
         self,
         dcm_prefix: str,
         hutch: HutchState,
+        config_client: ConfigClient,
         instrument_session: str = "",
         name: str = "",
     ) -> None:
+        self.mirror_energies = config_client.get_file_contents(
+            MIRROR_ENERGY_FILE_PATH, desired_return_type=dict
+        )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy_in_kev = epics_signal_r(float, f"{dcm_prefix}ENERGY")
             self.wavelength_in_a = epics_signal_r(float, f"{dcm_prefix}WAVELENGTH")
@@ -67,21 +99,14 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
         energy request and the invoking hutch.
 
         Energy ranges:
-            SI: [5KeV, 10KeV)
-            RH: [10KeV, 20KeV)
-            PT: [20KeV, 30KeV)
+            Si: [5KeV, 10KeV)
+            Rh: [10KeV, 20KeV)
+            Pt: [20KeV, 30KeV)
         """
-        if 5 <= energy_in_kev < 10:
-            stripe = Stripes.SI
-        elif 10 <= energy_in_kev < 20:
-            stripe = Stripes.RH
-        elif 20 <= energy_in_kev < 30:
-            stripe = Stripes.PT
-        else:
-            raise OutOfRangeEnergyRequestError(
-                f"The requested energy at {energy_in_kev} KeV is out of range"
-            )
-        _choice = f"{self._invoking_hutch}-{stripe}"
+        _stripe = MirrorEnergyRanges(
+            **self.mirror_energies
+        ).get_stripe_material_from_energy(energy_in_kev)
+        _choice = f"{self._invoking_hutch}-{_stripe}"
         return StripeChoice(_choice)
 
     @AsyncStatus.wrap

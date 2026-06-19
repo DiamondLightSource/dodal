@@ -1,7 +1,9 @@
 import json
-from unittest.mock import AsyncMock, patch
+from typing import Any
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from daq_config_server import ConfigClient
 from ophyd_async.core import SignalR, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -11,16 +13,26 @@ from dodal.devices.beamlines.i19.access_controlled.blueapi_device import (
 )
 from dodal.devices.beamlines.i19.access_controlled.energy_device import (
     AccessControlledEnergyComposite,
+    MirrorEnergyRanges,
     OutOfRangeEnergyRequestError,
+    Stripes,
 )
 from dodal.devices.beamlines.i19.mirror_stripes import StripeChoice
+
+MIRROR_ENERGIES: dict[str, Any] = {
+    "silicon": {"name": "Si", "lower": 5.0, "upper": 10.0},
+    "rhodium": {"name": "Rh", "lower": 10.0, "upper": 20.0},
+    "platinum": {"name": "Pt", "lower": 20.0, "upper": 30.0},
+}
 
 
 @pytest.fixture
 def eh1_energy_device() -> AccessControlledEnergyComposite:
+    mock_client = MagicMock()
+    mock_client.get_file_contents = MagicMock(return_value=MIRROR_ENERGIES)
     with init_devices(mock=True):
         device = AccessControlledEnergyComposite(
-            "", HutchState.EH1, "cm12345-1", "mock_eh1_energy"
+            "", HutchState.EH1, mock_client, "cm12345-1", "mock_eh1_energy"
         )
     device.url = "http://test.url"
     set_mock_value(device.energy_in_kev, 17.9973)
@@ -30,9 +42,11 @@ def eh1_energy_device() -> AccessControlledEnergyComposite:
 
 @pytest.fixture
 def eh2_energy_device() -> AccessControlledEnergyComposite:
+    mock_client = MagicMock()
+    mock_client.get_file_contents = MagicMock(return_value=MIRROR_ENERGIES)
     with init_devices(mock=True):
         device = AccessControlledEnergyComposite(
-            "", HutchState.EH2, "cm12345-1", "mock_eh1_energy"
+            "", HutchState.EH2, mock_client, "cm12345-1", "mock_eh1_energy"
         )
     device.url = "http://test.url"
     set_mock_value(device.energy_in_kev, 17.9973)
@@ -40,10 +54,29 @@ def eh2_energy_device() -> AccessControlledEnergyComposite:
     return device
 
 
+def test_mirror_energy_ranges_model():
+    model = MirrorEnergyRanges(**MIRROR_ENERGIES)
+
+    assert model.silicon.name == "Si"
+    assert model.rhodium.lower == 10.0 and model.rhodium.upper == 20.0
+
+
+@pytest.mark.parametrize(
+    "energy_request, expected_stripe",
+    [(8, Stripes.SI), (17, Stripes.RH), (25, Stripes.PT)],
+)
+def test_get_stripe_from_energy_model(energy_request: float, expected_stripe: Stripes):
+    stripe = MirrorEnergyRanges(**MIRROR_ENERGIES).get_stripe_material_from_energy(
+        energy_request
+    )
+
+    assert stripe == expected_stripe
+
+
 @pytest.mark.parametrize("hutch_name", [HutchState.EH1, HutchState.EH2])
 def test_device_created_without_errors(hutch_name: HutchState):
     test_device = AccessControlledEnergyComposite(
-        "", hutch_name, "cm12345-1", "fake-device"
+        "", hutch_name, ConfigClient(""), "cm12345-1", "fake-device"
     )
     assert isinstance(test_device, AccessControlledEnergyComposite)
     assert isinstance(test_device.energy_in_kev, SignalR)
