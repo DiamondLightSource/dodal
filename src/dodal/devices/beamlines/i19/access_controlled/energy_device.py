@@ -80,9 +80,9 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
         instrument_session: str = "",
         name: str = "",
     ) -> None:
-        self.mirror_energies = config_client.get_file_contents(
-            mirror_energy_config, desired_return_type=dict
-        )
+        self._config_client = config_client
+        self._mirror_energy_config = mirror_energy_config
+
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy_in_kev = epics_signal_r(float, f"{dcm_prefix}ENERGY")
             self.wavelength_in_a = epics_signal_r(float, f"{dcm_prefix}WAVELENGTH")
@@ -99,10 +99,14 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
             Rh: [10KeV, 20KeV)
             Pt: [20KeV, 30KeV)
         """
-        _stripe = MirrorEnergyRanges(
-            **self.mirror_energies
-        ).get_stripe_material_from_energy(energy_in_kev)
-        _choice = f"{self._invoking_hutch}-{_stripe}"
+        mirror_energies = self._config_client.get_file_contents(
+            self._mirror_energy_config, desired_return_type=dict
+        )
+
+        stripe = MirrorEnergyRanges(**mirror_energies).get_stripe_material_from_energy(
+            energy_in_kev
+        )
+        _choice = f"{self._invoking_hutch}-{stripe}"
         return StripeChoice(_choice)
 
     @AsyncStatus.wrap
