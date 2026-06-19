@@ -3,7 +3,6 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from daq_config_server import ConfigClient
 from ophyd_async.core import SignalR, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -76,7 +75,7 @@ def test_get_stripe_from_energy_model(energy_request: float, expected_stripe: St
 @pytest.mark.parametrize("hutch_name", [HutchState.EH1, HutchState.EH2])
 def test_device_created_without_errors(hutch_name: HutchState):
     test_device = AccessControlledEnergyComposite(
-        "", hutch_name, ConfigClient(""), "cm12345-1", "fake-device"
+        "", hutch_name, MagicMock(), "cm12345-1", "fake-device"
     )
     assert isinstance(test_device, AccessControlledEnergyComposite)
     assert isinstance(test_device.energy_in_kev, SignalR)
