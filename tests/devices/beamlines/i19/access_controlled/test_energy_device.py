@@ -95,11 +95,13 @@ async def test_energy_and_wavelength_can_be_read_from_device(
     )
 
 
+@pytest.mark.parametrize("out_of_bounds_energy", [2.0, 31.0])
 def test_get_stripe_choice_errors_if_energy_out_of_bounds(
+    out_of_bounds_energy: float,
     eh2_energy_device: AccessControlledEnergyComposite,
 ):
     with pytest.raises(OutOfRangeEnergyRequestError):
-        eh2_energy_device._get_stripe_choice_from_energy_request(2.0)
+        eh2_energy_device._get_stripe_choice_from_energy_request(out_of_bounds_energy)
 
 
 @pytest.mark.parametrize(
