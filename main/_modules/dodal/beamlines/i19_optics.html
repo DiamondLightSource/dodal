@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i19_optics &#8212; dodal 2.5.1.dev1+g641e0a478 documentation</title>
+    <title>dodal.beamlines.i19_optics &#8212; dodal 2.5.2.dev1+ga727b5c68 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=05c3296e"></script>
+    <script src="../../../_static/documentation_options.js?v=dcd8dc80"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -924,15 +924,8 @@ window.runMermaid = runMermaid;</script>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 <span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 
-<span class="c1"># For the moment pointing to the daq_configuration path in i19-1 which has links to the</span>
-<span class="c1"># common optics configuration, as it&#39;s already present in the daq-config-server.</span>
-<span class="c1"># The correct path will have to wait for this PR</span>
-<span class="c1"># https://github.com/DiamondLightSource/daq-config-server/pull/186 to be merged and</span>
-<span class="c1"># a subsequent release</span>
-<span class="n">DAQ_CONFIGURATION_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i19-1/software/daq_configuration&quot;</span>
-<span class="n">ID_GAP_LOOKUP</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DAQ_CONFIGURATION_PATH</span><span class="si">}</span><span class="s2">/lookup-shared/energy_to_id_gap_look_up_table.txt&quot;</span>
-<span class="p">)</span>
+<span class="n">DAQ_CONFIGURATION_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i19-1/software/i19-acquisition/i19-shared&quot;</span>
+<span class="n">ID_GAP_LOOKUP</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DAQ_CONFIGURATION_PATH</span><span class="si">}</span><span class="s2">/lookup/energy_to_id_gap_look_up_table.txt&quot;</span>
 
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
 
