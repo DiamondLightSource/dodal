@@ -18,17 +18,12 @@ class MovableWithToleranceLogic(MovableLogic[float]):
     within_tolerance: SignalR[bool]
 
     async def move(self, new_position: float, timeout: float | None) -> None:
-        # Don't use set_and_wait_for_other_value until we drop support for Python 3.11.
-        # In Python 3.11 there appears to be a timing issue where, if within_tolerance
-        # is already True (for example, because the current readback is close to the
-        # current setpoint), the wait condition can be satisfied before the new setpoint
-        # is applied. This can cause the move task to complete immediately instead of
-        # waiting for the new target position to be reached.
-        #
-        # For now, set the setpoint first and then wait for within_tolerance to become
-        # True for the newly requested position.
-        await self.setpoint.set(new_position)
-        await wait_for_value(self.within_tolerance, True, timeout)
+        await self.setpoint.set(new_position, timeout=timeout)
+        await wait_for_value(self.setpoint, new_position, timeout=timeout)
+        # Once setpoint is at new position, we can check for tolerance signal to see if
+        # true now as the within_tolerance window has updated to the new setpoint
+        # position. Now it doesn't matter if motor steps are small or large.
+        await wait_for_value(self.within_tolerance, True, timeout=timeout)
 
 
 def _within_tolerance_read(setpoint: float, readback: float, tolerance: float) -> bool:
