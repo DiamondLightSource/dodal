@@ -31,7 +31,12 @@ def eh1_energy_device() -> AccessControlledEnergyComposite:
     mock_client.get_file_contents = MagicMock(return_value=MIRROR_ENERGIES)
     with init_devices(mock=True):
         device = AccessControlledEnergyComposite(
-            "", HutchState.EH1, mock_client, "cm12345-1", "mock_eh1_energy"
+            "",
+            HutchState.EH1,
+            "/path/to/config",
+            mock_client,
+            "cm12345-1",
+            "mock_eh1_energy",
         )
     device.url = "http://test.url"
     set_mock_value(device.energy_in_kev, 17.9973)
@@ -45,7 +50,12 @@ def eh2_energy_device() -> AccessControlledEnergyComposite:
     mock_client.get_file_contents = MagicMock(return_value=MIRROR_ENERGIES)
     with init_devices(mock=True):
         device = AccessControlledEnergyComposite(
-            "", HutchState.EH2, mock_client, "cm12345-1", "mock_eh1_energy"
+            "",
+            HutchState.EH2,
+            "/path/to/config",
+            mock_client,
+            "cm12345-1",
+            "mock_eh1_energy",
         )
     device.url = "http://test.url"
     set_mock_value(device.energy_in_kev, 17.9973)
@@ -75,7 +85,7 @@ def test_get_stripe_from_energy_model(energy_request: float, expected_stripe: St
 @pytest.mark.parametrize("hutch_name", [HutchState.EH1, HutchState.EH2])
 def test_device_created_without_errors(hutch_name: HutchState):
     test_device = AccessControlledEnergyComposite(
-        "", hutch_name, MagicMock(), "cm12345-1", "fake-device"
+        "", hutch_name, "/path/to/config", MagicMock(), "cm12345-1", "fake-device"
     )
     assert isinstance(test_device, AccessControlledEnergyComposite)
     assert isinstance(test_device.energy_in_kev, SignalR)
