@@ -60,6 +60,9 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/domain/display.configuration"
 
+SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
+MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
+
 devices = DeviceManager()
 
 
@@ -94,6 +97,7 @@ def energy_device(config_client: ConfigClient) -> AccessControlledEnergyComposit
     return AccessControlledEnergyComposite(
         dcm_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         hutch=HutchState.EH1,
+        mirror_energy_config=MIRROR_ENERGY_FILE_PATH,
         config_client=config_client,
         instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )

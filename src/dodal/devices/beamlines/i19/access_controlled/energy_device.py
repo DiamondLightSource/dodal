@@ -1,5 +1,4 @@
 from enum import StrEnum
-from pathlib import Path
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import AsyncStatus, StandardReadableFormat
@@ -15,10 +14,6 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
 )
 from dodal.devices.beamlines.i19.mirror_stripes import StripeChoice
-
-MIRROR_ENERGY_FILE_PATH = Path(
-    "/dls_sw/i19-1/software/i19-acquisition/i19-shared/json/MirrorEnergyRanges.json"
-)
 
 CHANGE_ENERGY_PLAN_NAME = "change_energy_plan"
 
@@ -80,12 +75,13 @@ class AccessControlledEnergyComposite(OpticsBlueAPIDevice):
         self,
         dcm_prefix: str,
         hutch: HutchState,
+        mirror_energy_config: str,
         config_client: ConfigClient,
         instrument_session: str = "",
         name: str = "",
     ) -> None:
         self.mirror_energies = config_client.get_file_contents(
-            MIRROR_ENERGY_FILE_PATH, desired_return_type=dict
+            mirror_energy_config, desired_return_type=dict
         )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy_in_kev = epics_signal_r(float, f"{dcm_prefix}ENERGY")
