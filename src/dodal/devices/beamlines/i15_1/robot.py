@@ -81,7 +81,7 @@ class MockRobot(DeviceMock["Robot"]):
         def program_running(*_, **__):
             async def _program_running():
                 set_mock_value(device.program_running, ProgramRunning.PROGRAM_RUNNING)
-                await asyncio.sleep(5)
+                await asyncio.sleep(0.01)
                 set_mock_value(
                     device.program_running, ProgramRunning.NO_PROGRAM_RUNNING
                 )
