@@ -35,9 +35,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
-ID_GAP_LOOKUP = (
-    f"{DAQ_CONFIGURATION_PATH}/lookup-shared/energy_to_id_gap_look_up_table.txt"
-)
+ID_GAP_LOOKUP = f"{DAQ_CONFIGURATION_PATH}/lookup/energy_to_id_gap_look_up_table.txt"
 
 devices = DeviceManager()
 
