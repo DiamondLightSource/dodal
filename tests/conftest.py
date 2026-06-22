@@ -1,14 +1,20 @@
 import importlib
+import json
 import logging
 import os
 import sys
+from collections.abc import Callable
 from os import environ
 from pathlib import Path
 from types import ModuleType
+from typing import Any, TypeVar
 from unittest.mock import MagicMock, patch
 
 import pytest
+from daq_config_server import ConfigClient
+from daq_config_server.models import ConfigModel
 from ophyd_async.core import PathProvider
+from pydantic import TypeAdapter
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.beamlines.beamline_utils import (
@@ -89,6 +95,36 @@ def patch_open_to_prevent_dls_reads_in_tests():
 
     with patch("builtins.open", side_effect=patched_open):
         yield []
+
+
+def _is_banned(path: Path) -> bool:
+    try:
+        resolved = path.resolve()
+    except Exception:
+        resolved = path
+
+    return resolved.is_absolute() and any(
+        resolved.is_relative_to(banned) for banned in BANNED_PATHS
+    )
+
+
+@pytest.fixture(autouse=True)
+def block_dls_access_in_config_client():
+
+    original = ConfigClient.get_file_contents
+
+    def guarded(self, file_path, *args, **kwargs):
+        # --- normalize path safely ---
+        path = Path(file_path)
+
+        if _is_banned(path):
+            raise AssertionError(f"Forbidden config access blocked in test: {path}")
+
+        # --- delegate to whatever is currently installed ---
+        return original(self, file_path, *args, **kwargs)
+
+    with patch.object(ConfigClient, "get_file_contents", new=guarded):
+        yield
 
 
 def pytest_runtest_setup(item):
@@ -175,6 +211,64 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
         det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore
     )
+
+
+T = TypeVar("T", str, dict, ConfigModel)
+
+
+def fake_config_server_get_file_contents(
+    file_path: str | Path,
+    desired_return_type: type[T] = str,
+    reset_cached_result: bool = True,
+    force_parser: Callable[[str], Any] | None = None,
+) -> T:
+    """Fakes getting a file from the config server by reading it directly.
+
+    Args:
+        file_path (str | Path): Filepath of the file to read
+        desired_return_type (type[T], optional): Type to convert the file to. Defaults to str.
+        reset_cached_result (bool, optional): Whether or not to use the config server's cached result.
+            Does nothing here as we don't cache. Defaults to True.
+        force_parser (Callable[[str], Any] | None, optional): Use a certain converter function.
+            Only needed for the interim where the converter exists but the config server has not
+            been redeployed. Defaults to None.
+
+    Raises:
+        ValueError: Raised if an invalid type is requested
+
+    Returns:
+        T: The contents of the config file.
+    """
+    filepath = Path(file_path)
+    if filepath.is_absolute():
+        for p in BANNED_PATHS:
+            assert not filepath.is_relative_to(p), (
+                f"Attempt to open {filepath} from inside a unit test"
+            )
+    # Minimal logic required for unit tests
+    with filepath.open("r") as f:
+        contents = f.read()
+    if force_parser:
+        return TypeAdapter(desired_return_type).validate_python(force_parser(contents))
+    if desired_return_type is str:
+        return contents  # type: ignore
+    if desired_return_type is dict:
+        return json.loads(contents)
+    if issubclass(desired_return_type, ConfigModel):
+        return desired_return_type.model_validate(json.loads(contents))
+    raise ValueError("Invalid return type requested")
+
+
+@pytest.fixture
+def mock_config_client() -> ConfigClient:
+    # Don't actually talk to central service during unit tests, and reset caches between test
+    mock_config_client = ConfigClient()
+    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
+
+    mock_config_client.get_file_contents.side_effect = (
+        fake_config_server_get_file_contents
+    )
+    return mock_config_client
 
 
 @pytest.fixture(autouse=True)

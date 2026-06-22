@@ -9,11 +9,11 @@ from tests.test_data import TEST_I15_1_CRYSTAL_LUT
 
 
 @pytest.fixture
-def laue_monochrometer():
+def laue_monochrometer(mock_config_client: ConfigClient):
     with init_devices(mock=True):
         monocrometer = LaueMonochrometer(
             prefix="",
-            config_client=ConfigClient(""),
+            config_client=mock_config_client,
             crystal_lut_path=TEST_I15_1_CRYSTAL_LUT,
         )
     return monocrometer

@@ -17,8 +17,8 @@ from tests.devices.detector.test_data import (
 
 
 @pytest.fixture(autouse=True)
-def always_set_config_client():
-    set_config_client(ConfigClient("test"))
+def always_set_config_client(mock_config_client: ConfigClient):
+    set_config_client(mock_config_client)
 
 
 @pytest.fixture(scope="function")

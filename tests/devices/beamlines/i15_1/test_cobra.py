@@ -7,8 +7,10 @@ from dodal.devices.beamlines.i15_1.cobra import Cobra
 from tests.test_data import TEST_XPDF_LOCAL_PARAMETERS
 
 
-def test_cobra_config_client_reads_config_file_successfully():
-    cobra = Cobra("", ConfigClient(""), TEST_XPDF_LOCAL_PARAMETERS)
+def test_cobra_config_client_reads_config_file_successfully(
+    mock_config_client: ConfigClient,
+):
+    cobra = Cobra("", mock_config_client, TEST_XPDF_LOCAL_PARAMETERS)
     assert cobra.get_config() == TemperatureControllerParams(
         beam_position=461.5,
         safe_position=2.0,

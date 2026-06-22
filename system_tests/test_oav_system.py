@@ -15,8 +15,8 @@ TEST_GRID_NUM_BOXES_Y = 6
 
 
 @pytest.fixture
-async def oav() -> OAV:
-    oav_config = OAVConfig(TEST_OAV_ZOOM_LEVELS, ConfigClient(""))
+async def oav(mock_config_client: ConfigClient) -> OAV:
+    oav_config = OAVConfig(TEST_OAV_ZOOM_LEVELS, mock_config_client)
     async with init_devices(connect=True):
         oav = OAV("", config=oav_config, name="oav")
     return oav
@@ -35,9 +35,9 @@ def take_snapshot_with_grid(oav: OAV, snapshot_filename, snapshot_directory):
 
 # We need to find a better way of integrating this, see https://github.com/DiamondLightSource/mx-bluesky/issues/183
 @pytest.mark.skip(reason="Don't want to actually take snapshots during testing.")
-def test_grid_overlay(run_engine: RunEngine):
+def test_grid_overlay(run_engine: RunEngine, mock_config_client: ConfigClient):
     beamline = "BL03I"
-    oav_params = OAVConfig(TEST_OAV_ZOOM_LEVELS, ConfigClient(""))
+    oav_params = OAVConfig(TEST_OAV_ZOOM_LEVELS, mock_config_client)
     oav = OAV(name="oav", prefix=f"{beamline}", config=oav_params)
     snapshot_filename = "snapshot"
     snapshot_directory = "."

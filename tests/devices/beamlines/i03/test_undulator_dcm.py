@@ -48,17 +48,17 @@ def flush_event_loop_on_finish():
 
 
 @pytest.fixture(autouse=True)
-def always_set_config_client():
-    set_config_client(ConfigClient("test"))
+def always_set_config_client(mock_config_client: ConfigClient):
+    set_config_client(mock_config_client)
 
 
 @pytest.fixture
-async def fake_undulator_dcm() -> UndulatorDCM:
+async def fake_undulator_dcm(mock_config_client: ConfigClient) -> UndulatorDCM:
     async with init_devices(mock=True):
         baton = Baton("BATON-01:")
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             poles=80,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -70,7 +70,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             undulator,
             dcm,
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
-            config_client=ConfigClient(""),
+            config_client=mock_config_client,
             name="undulator_dcm",
         )
     return undulator_dcm

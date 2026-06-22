@@ -10,9 +10,9 @@ from tests.devices.oav.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVEL
 
 
 @pytest.fixture
-async def oav() -> OAVBeamCentreFile:
+async def oav(mock_config_client: ConfigClient) -> OAVBeamCentreFile:
     oav_config = OAVConfigBeamCentre(
-        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, mock_config_client
     )
     async with init_devices(mock=True, connect=True):
         oav = OAVBeamCentreFile("", config=oav_config, name="oav")
@@ -27,8 +27,8 @@ async def oav() -> OAVBeamCentreFile:
 
 
 @pytest.fixture
-async def oav_beam_centre_pv_roi() -> OAVBeamCentrePV:
-    oav_config = OAVConfig(TEST_OAV_ZOOM_LEVELS, ConfigClient(""))
+async def oav_beam_centre_pv_roi(mock_config_client: ConfigClient) -> OAVBeamCentrePV:
+    oav_config = OAVConfig(TEST_OAV_ZOOM_LEVELS, mock_config_client)
     async with init_devices(mock=True, connect=True):
         oav = OAVBeamCentrePV("", config=oav_config, name="oav")
     zoom_levels_list = ["1.0x", "3.0x", "5.0x", "7.5x", "10.0x"]
@@ -42,8 +42,8 @@ async def oav_beam_centre_pv_roi() -> OAVBeamCentrePV:
 
 
 @pytest.fixture
-async def oav_beam_centre_pv_fs() -> OAVBeamCentrePV:
-    oav_config = OAVConfig(TEST_OAV_ZOOM_LEVELS, ConfigClient(""))
+async def oav_beam_centre_pv_fs(mock_config_client: ConfigClient) -> OAVBeamCentrePV:
+    oav_config = OAVConfig(TEST_OAV_ZOOM_LEVELS, mock_config_client)
     async with init_devices(mock=True, connect=True):
         oav = OAVBeamCentrePV(
             "", config=oav_config, name="oav", mjpeg_prefix="XTAL", overlay_channel=3

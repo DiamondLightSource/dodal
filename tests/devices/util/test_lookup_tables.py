@@ -21,10 +21,11 @@ from tests.devices.util.test_data import (
 )
 
 
-async def test_energy_to_distance_table_correct_format():
-    config_server = ConfigClient("")
+async def test_energy_to_distance_table_correct_format(
+    mock_config_client: ConfigClient,
+):
     table = np.array(
-        config_server.get_file_contents(
+        mock_config_client.get_file_contents(
             TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT, UndulatorEnergyGapLookupTable
         ).rows
     )

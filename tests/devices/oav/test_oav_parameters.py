@@ -18,19 +18,21 @@ from tests.devices.oav.test_data import (
 
 
 @pytest.fixture
-def mock_parameters():
-    return OAVParameters(ConfigClient(""), "loopCentring", TEST_OAV_CENTRING_JSON)
+def mock_parameters(mock_config_client: ConfigClient):
+    return OAVParameters(mock_config_client, "loopCentring", TEST_OAV_CENTRING_JSON)
 
 
 @pytest.fixture
-def mock_config() -> dict[str, ZoomParams]:
-    return OAVConfig(TEST_OAV_ZOOM_LEVELS, ConfigClient("")).get_parameters()
+def mock_config(mock_config_client: ConfigClient) -> dict[str, ZoomParams]:
+    return OAVConfig(TEST_OAV_ZOOM_LEVELS, mock_config_client).get_parameters()
 
 
 @pytest.fixture
-def mock_config_with_beam_centre() -> dict[str, ZoomParamsCrosshair]:
+def mock_config_with_beam_centre(
+    mock_config_client: ConfigClient,
+) -> dict[str, ZoomParamsCrosshair]:
     config = OAVConfigBeamCentre(
-        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, mock_config_client
     ).get_parameters()
     config = cast(dict[str, ZoomParamsCrosshair], config)
     return config

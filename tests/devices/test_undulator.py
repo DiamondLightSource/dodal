@@ -33,12 +33,12 @@ LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
 
 
 @pytest.fixture
-async def undulator() -> UndulatorInKeV:
+async def undulator(mock_config_client: ConfigClient) -> UndulatorInKeV:
     async with init_devices(mock=True):
         baton = Baton("BATON-01")
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             poles=80,
             length=2.0,
@@ -113,11 +113,11 @@ async def test_configuration_includes_configuration_fields(undulator: UndulatorI
     )
 
 
-async def test_poles_not_propagated_if_not_supplied():
+async def test_poles_not_propagated_if_not_supplied(mock_config_client: ConfigClient):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             length=2.0,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -126,11 +126,11 @@ async def test_poles_not_propagated_if_not_supplied():
     assert "undulator-poles" not in (await undulator.read_configuration())
 
 
-async def test_length_not_propagated_if_not_supplied():
+async def test_length_not_propagated_if_not_supplied(mock_config_client: ConfigClient):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             poles=80,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -151,7 +151,7 @@ def test_correct_closest_distance_to_energy_from_table(energy, expected_output):
 
 
 async def test_when_gap_access_is_disabled_set_then_error_is_raised(
-    undulator,
+    undulator: UndulatorInKeV,
 ):
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.DISABLED)
     with pytest.raises(AccessError):

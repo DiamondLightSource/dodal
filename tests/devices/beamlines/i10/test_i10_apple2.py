@@ -57,7 +57,7 @@ from tests.devices.insertion_device.util import (
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 
-# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+# mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 

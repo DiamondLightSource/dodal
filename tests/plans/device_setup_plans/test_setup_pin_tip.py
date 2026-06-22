@@ -20,8 +20,8 @@ def pin_tip_detection() -> PinTipDetection:
 
 
 @pytest.fixture
-def params() -> OAVParameters:
-    return OAVParameters(ConfigClient(""), "pinTipCentring", TEST_OAV_CENTRING_JSON)
+def params(mock_config_client: ConfigClient) -> OAVParameters:
+    return OAVParameters(mock_config_client, "pinTipCentring", TEST_OAV_CENTRING_JSON)
 
 
 @pytest.mark.parametrize(

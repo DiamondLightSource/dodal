@@ -28,10 +28,13 @@ def patch_config_paths(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
-def reset_config_client():
-    set_config_client(ConfigClient(""))
+def reset_config_client(mock_config_client: ConfigClient):
+    original = ConfigClient.get_file_contents
+    ConfigClient.get_file_contents = mock_config_client.get_file_contents  # type: ignore
+    set_config_client(mock_config_client)
     yield
     clear_config_client()
+    ConfigClient.get_file_contents = original
 
 
 @pytest.mark.parametrize(

@@ -7,16 +7,16 @@ from bluesky import FailedStatus
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import run_decorator
 from bluesky.run_engine import RunEngine
+from daq_config_server import ConfigClient
 from ophyd_async.core import get_mock, get_mock_put, set_mock_value
 
 from dodal.devices.beamlines.i03 import Beamstop, BeamstopPositions
-from dodal.testing.fixtures.config_server import fake_config_server_get_file_contents
 from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
 
 
 @pytest.fixture
-def beamline_parameters() -> dict[str, Any]:
-    return fake_config_server_get_file_contents(TEST_BEAMLINE_PARAMETERS_TXT, dict)
+def beamline_parameters(mock_config_client: ConfigClient) -> dict[str, Any]:
+    return mock_config_client.get_file_contents(TEST_BEAMLINE_PARAMETERS_TXT, dict)
 
 
 @pytest.mark.parametrize(

@@ -7,8 +7,10 @@ from dodal.devices.beamlines.i15_1.blower import Blower
 from tests.test_data import TEST_XPDF_LOCAL_PARAMETERS
 
 
-def test_blower_config_client_reads_config_file_successfully():
-    blower = Blower("", ConfigClient(""), TEST_XPDF_LOCAL_PARAMETERS)
+def test_blower_config_client_reads_config_file_successfully(
+    mock_config_client: ConfigClient,
+):
+    blower = Blower("", mock_config_client, TEST_XPDF_LOCAL_PARAMETERS)
     assert blower.get_config() == TemperatureControllerParams(
         beam_position=44.7,
         safe_position=2.0,
