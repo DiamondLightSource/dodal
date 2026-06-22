@@ -58,7 +58,7 @@ async def test_int_plc_interlock_is_readable(int_plc_interlock: IntPLCInterlock)
         int_plc_interlock,
         {
             f"{int_plc_interlock.name}-is_safe": partial_reading(True),
-            f"{int_plc_interlock.name}-status": partial_reading(1),
+            f"{int_plc_interlock.name}-status": partial_reading(65535),
         },
     )
 
