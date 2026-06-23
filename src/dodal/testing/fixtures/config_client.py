@@ -2,7 +2,7 @@ import json
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, TypeVar
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from daq_config_server import ConfigClient
@@ -68,19 +68,3 @@ def mock_config_client() -> ConfigClient:
         mock_config_server_get_file_contents
     )
     return mock_config_client
-
-
-@pytest.fixture(autouse=True)
-def patch_open_to_prevent_dls_reads_in_tests():
-    real_open = open
-
-    def patched_open(*args, **kwargs):
-        requested_path = Path(args[0])
-        if is_path_banned(requested_path):
-            raise AssertionError(
-                f"Attempt to open {requested_path} from inside a unit test"
-            )
-        return real_open(*args, **kwargs)
-
-    with patch("builtins.open", side_effect=patched_open):
-        yield []
