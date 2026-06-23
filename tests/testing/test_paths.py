@@ -4,6 +4,8 @@ import pytest
 
 from dodal.testing.paths import is_path_banned
 
+BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
+
 
 @pytest.mark.parametrize(
     "path, expected_result",
@@ -15,4 +17,4 @@ from dodal.testing.paths import is_path_banned
     ],
 )
 def test_is_path_banned(path: Path, expected_result: bool) -> None:
-    assert is_path_banned(path) is expected_result
+    assert is_path_banned(path, BANNED_PATHS) is expected_result

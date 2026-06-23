@@ -94,33 +94,30 @@ def reset_path_provider():
     clear_path_provider()
 
 
+BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
+
+
+@pytest.fixture(autouse=True)
+def config_client_banned_paths():
+    from dodal.testing.fixtures.config_client import MOCK_CONFIG_CLIENT_BANNED_PATHS
+
+    MOCK_CONFIG_CLIENT_BANNED_PATHS.extend(BANNED_PATHS)
+
+
 @pytest.fixture(autouse=True)
 def patch_open_to_prevent_dls_reads_in_tests():
-    real_open = open
+    unpatched_open = open
 
     def patched_open(*args, **kwargs):
         requested_path = Path(args[0])
-        if is_path_banned(requested_path):
+        if is_path_banned(requested_path, BANNED_PATHS):
             raise AssertionError(
                 f"Attempt to open {requested_path} from inside a unit test"
             )
-        return real_open(*args, **kwargs)
+        return unpatched_open(*args, **kwargs)
 
     with patch("builtins.open", side_effect=patched_open):
         yield []
-
-
-@pytest.fixture(autouse=True)
-def block_dls_access_in_config_client():
-
-    def patch_get_file_contents(self, file_path, *args, **kwargs):
-        path = Path(file_path)
-        if is_path_banned(path):
-            raise AssertionError(f"Forbidden config access blocked in test: {path}")
-        return ConfigClient.get_file_contents(self, file_path, *args, **kwargs)
-
-    with patch.object(ConfigClient, "get_file_contents", new=patch_get_file_contents):
-        yield
 
 
 def pytest_runtest_setup(item):

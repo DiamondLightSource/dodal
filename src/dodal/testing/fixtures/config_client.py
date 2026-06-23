@@ -22,6 +22,8 @@ MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION: dict[
     str, Callable[[str], ConfigModel]
 ] = {}
 
+MOCK_CONFIG_CLIENT_BANNED_PATHS: list[Path] = []
+
 
 def mock_config_server_get_file_contents(
     file_path: str | Path,
@@ -46,14 +48,13 @@ def mock_config_server_get_file_contents(
     Returns:
         T: The contents of the config file.
     """
-    requested_path = Path(file_path)
-    if requested_path.is_absolute():
-        if is_path_banned(requested_path):
-            raise AssertionError(
-                f"Attempt to open {requested_path} from inside a unit test"
-            )
+    requested_file = Path(file_path)
+    if is_path_banned(requested_file, MOCK_CONFIG_CLIENT_BANNED_PATHS):
+        raise AssertionError(
+            f"Attempt to open {requested_file} from inside a unit test using ConfigClient"
+        )
     # Minimal logic required for unit tests
-    with requested_path.open("r") as f:
+    with requested_file.open("r") as f:
         contents = f.read()
     if force_parser:
         return TypeAdapter(desired_return_type).validate_python(force_parser(contents))
@@ -62,8 +63,8 @@ def mock_config_server_get_file_contents(
     if desired_return_type is dict:
         return json.loads(contents)
     if issubclass(desired_return_type, ConfigModel):
-        if str(requested_path) in MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION:
-            callable = MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION[str(requested_path)]
+        if str(requested_file) in MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION:
+            callable = MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION[str(requested_file)]
             return callable(contents)  # type: ignore
         return desired_return_type.model_validate(json.loads(contents))
     raise ValueError("Invalid return type requested")

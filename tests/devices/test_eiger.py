@@ -4,6 +4,7 @@ import threading
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
+from daq_config_server import ConfigClient
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
@@ -31,7 +32,7 @@ class StatusError(Exception):
 
 
 @pytest.fixture(autouse=True)
-def always_set_config_client(mock_config_client):
+def always_set_config_client(mock_config_client: ConfigClient):
     set_config_client(mock_config_client)
 
 
