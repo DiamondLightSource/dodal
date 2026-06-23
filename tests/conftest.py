@@ -1,20 +1,15 @@
 import importlib
-import json
 import logging
 import os
 import sys
-from collections.abc import Callable
 from os import environ
 from pathlib import Path
 from types import ModuleType
-from typing import Any, TypeVar
 from unittest.mock import MagicMock, patch
 
 import pytest
 from daq_config_server import ConfigClient
-from daq_config_server.models import ConfigModel
 from ophyd_async.core import PathProvider
-from pydantic import TypeAdapter
 
 from dodal.common.beamlines import beamline_utils
 from dodal.common.beamlines.beamline_utils import (
@@ -30,6 +25,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
+from dodal.testing.paths import is_path_banned
 from dodal.utils import (
     DeviceInitializationController,
     collect_factories,
@@ -81,12 +77,15 @@ MOCK_ATTRIBUTES_TABLE: dict[str, dict[str, str]] = {
     },
 }
 
-BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
 environ["DODAL_TEST_MODE"] = "true"
 
 
 # Add run_engine and util fixtures to be used in tests
-pytest_plugins = ["dodal.testing.fixtures.run_engine", "dodal.testing.fixtures.utils"]
+pytest_plugins = [
+    "dodal.testing.fixtures.run_engine",
+    "dodal.testing.fixtures.utils",
+    "dodal.testing.fixtures.config_client",
+]
 
 
 @pytest.fixture(autouse=True)
@@ -95,82 +94,13 @@ def reset_path_provider():
     clear_path_provider()
 
 
-T = TypeVar("T", str, dict, ConfigModel)
-
-
-def fake_config_server_get_file_contents(
-    file_path: str | Path,
-    desired_return_type: type[T] = str,
-    reset_cached_result: bool = True,
-    force_parser: Callable[[str], Any] | None = None,
-) -> T:
-    """Fakes getting a file from the config server by reading it directly.
-
-    Args:
-        file_path (str | Path): Filepath of the file to read
-        desired_return_type (type[T], optional): Type to convert the file to. Defaults to str.
-        reset_cached_result (bool, optional): Whether or not to use the config server's cached result.
-            Does nothing here as we don't cache. Defaults to True.
-        force_parser (Callable[[str], Any] | None, optional): Use a certain converter function.
-            Only needed for the interim where the converter exists but the config server has not
-            been redeployed. Defaults to None.
-
-    Raises:
-        ValueError: Raised if an invalid type is requested
-
-    Returns:
-        T: The contents of the config file.
-    """
-    filepath = Path(file_path)
-    if filepath.is_absolute():
-        for p in BANNED_PATHS:
-            assert not filepath.is_relative_to(p), (
-                f"Attempt to open {filepath} from inside a unit test"
-            )
-    # Minimal logic required for unit tests
-    with filepath.open("r") as f:
-        contents = f.read()
-    if force_parser:
-        return TypeAdapter(desired_return_type).validate_python(force_parser(contents))
-    if desired_return_type is str:
-        return contents  # type: ignore
-    if desired_return_type is dict:
-        return json.loads(contents)
-    if issubclass(desired_return_type, ConfigModel):
-        return desired_return_type.model_validate(json.loads(contents))
-    raise ValueError("Invalid return type requested")
-
-
-@pytest.fixture
-def mock_config_client() -> ConfigClient:
-    # Don't actually talk to central service during unit tests, and reset caches between test
-    mock_config_client = ConfigClient()
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    mock_config_client.get_file_contents.side_effect = (
-        fake_config_server_get_file_contents
-    )
-    return mock_config_client
-
-
-def _is_banned(path: Path) -> bool:
-    try:
-        resolved = path.resolve()
-    except Exception:
-        resolved = path
-
-    return resolved.is_absolute() and any(
-        resolved.is_relative_to(banned) for banned in BANNED_PATHS
-    )
-
-
 @pytest.fixture(autouse=True)
 def patch_open_to_prevent_dls_reads_in_tests():
     real_open = open
 
     def patched_open(*args, **kwargs):
         requested_path = Path(args[0])
-        if _is_banned(requested_path):
+        if is_path_banned(requested_path):
             raise AssertionError(
                 f"Attempt to open {requested_path} from inside a unit test"
             )
@@ -185,7 +115,7 @@ def block_dls_access_in_config_client():
 
     def patch_get_file_contents(self, file_path, *args, **kwargs):
         path = Path(file_path)
-        if _is_banned(path):
+        if is_path_banned(path):
             raise AssertionError(f"Forbidden config access blocked in test: {path}")
         return ConfigClient.get_file_contents(self, file_path, *args, **kwargs)
 

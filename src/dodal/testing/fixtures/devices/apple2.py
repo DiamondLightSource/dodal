@@ -1,7 +1,4 @@
-from unittest.mock import MagicMock
-
 import pytest
-from daq_config_server import ConfigClient
 from ophyd_async.core import (
     init_devices,
     set_mock_value,
@@ -19,20 +16,7 @@ from dodal.devices.insertion_device.apple2_undulator import (
     UndulatorLockedPhaseAxes,
 )
 
-
-@pytest.fixture
-def mock_config_client() -> ConfigClient:
-    mock_config_client = ConfigClient()
-
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        with open(file_path) as f:
-            return f.read()
-
-    mock_config_client.get_file_contents.side_effect = my_side_effect
-    return mock_config_client
+pytest_plugins = ["dodal.testing.fixtures.config_client"]
 
 
 @pytest.fixture
