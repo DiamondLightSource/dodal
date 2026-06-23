@@ -2,12 +2,15 @@ from abc import ABC, abstractmethod
 from math import isclose
 
 from ophyd_async.core import (
+    DeviceMock,
     EnumTypes,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    default_mock_class,
     derived_signal_r,
+    set_mock_value,
 )
 from ophyd_async.epics.core import epics_signal_r
 
@@ -81,6 +84,12 @@ class PSSInterlock(BaseInterlock):
         return isclose(float(status), PSS_SAFE_FOR_OPERATIONS, abs_tol=5e-2)
 
 
+class MockIntPLCInterlock(DeviceMock["IntPLCInterlock"]):
+    async def connect(self, device: "IntPLCInterlock") -> None:
+        set_mock_value(device.status, PLC_SAFE_FOR_OPERATIONS)
+
+
+@default_mock_class(MockIntPLCInterlock)
 class IntPLCInterlock(BaseInterlock):
     """Device to check the interlock state using integer PLC pv."""
 
