@@ -24,7 +24,7 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",                                                                   # For pin-tip detection.
+    "opencv-python-headless",          # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -32,8 +32,8 @@ dependencies = [
     "scanspec>=0.7.3",
     "pyzmq==27.1.0",
     "deepdiff",
-    "daq-config-server >= 1.3.6", # For getting Configuration settings.
-    "mysql-connector-python == 9.5.0",                                                          # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
+    "daq-config-server >= 1.3.6",      # For getting Configuration settings.
+    "mysql-connector-python == 9.5.0", # Can unpin once https://github.com/DiamondLightSource/ispyb-api/pull/244 is merged and released
 ]
 
 dynamic = ["version"]
@@ -113,9 +113,10 @@ typeCheckingMode = "standard"
 reportMissingImports = false  # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]
-# Run pytest with all our checkers, and don't spam us with massive tracebacks on error
+# Run pytest with all our checkers
 asyncio_mode = "auto"
-timeout = 1
+timeout = 1.5
+timeout_method = "signal" # Alllow us to see full stack trace of where it timed out to make debugging easier.
 markers = [
     "requires: marks tests as requiring other infrastructure",
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
