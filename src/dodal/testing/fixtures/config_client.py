@@ -15,8 +15,9 @@ T = TypeVar("T", str, dict, ConfigModel)
 
 TModel = TypeVar("TModel", bound=ConfigModel)
 
-# Test can register a specific file path with an assoicated file contents to model
-# conversion function.
+# Tests can register a specific file path with an assoicated file contents to model
+# conversion function. This should be moved to daq-config-server.
+# See https://github.com/DiamondLightSource/daq-config-server/issues/194
 MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION: dict[
     str, Callable[[str], ConfigModel]
 ] = {}
