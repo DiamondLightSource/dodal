@@ -13,6 +13,14 @@ from dodal.testing.paths import is_path_banned
 
 T = TypeVar("T", str, dict, ConfigModel)
 
+TModel = TypeVar("TModel", bound=ConfigModel)
+
+# Test can register a specific file path with an assoicated file contents to model
+# conversion function.
+MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION: dict[
+    str, Callable[[str], ConfigModel]
+] = {}
+
 
 def mock_config_server_get_file_contents(
     file_path: str | Path,
@@ -53,6 +61,9 @@ def mock_config_server_get_file_contents(
     if desired_return_type is dict:
         return json.loads(contents)
     if issubclass(desired_return_type, ConfigModel):
+        if str(requested_path) in MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION:
+            callable = MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION[str(requested_path)]
+            return callable(contents)  # type: ignore
         return desired_return_type.model_validate(json.loads(contents))
     raise ValueError("Invalid return type requested")
 
