@@ -17,6 +17,7 @@ dodal.devices.interlocks
    ~interlocks.BaseInterlock
    ~interlocks.EnumPLCInterlock
    ~interlocks.IntPLCInterlock
+   ~interlocks.MockIntPLCInterlock
    ~interlocks.PLCInterlockState
    ~interlocks.PSSInterlock
 
