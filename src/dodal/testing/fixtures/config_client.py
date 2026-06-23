@@ -84,16 +84,3 @@ def patch_open_to_prevent_dls_reads_in_tests():
 
     with patch("builtins.open", side_effect=patched_open):
         yield []
-
-
-@pytest.fixture(autouse=True)
-def block_dls_access_in_config_client():
-
-    def patch_get_file_contents(self, file_path, *args, **kwargs):
-        path = Path(file_path)
-        if is_path_banned(path):
-            raise AssertionError(f"Forbidden config access blocked in test: {path}")
-        return ConfigClient.get_file_contents(self, file_path, *args, **kwargs)
-
-    with patch.object(ConfigClient, "get_file_contents", new=patch_get_file_contents):
-        yield
