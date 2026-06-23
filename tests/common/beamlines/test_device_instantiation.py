@@ -17,6 +17,9 @@ def follows_bluesky_protocols(obj: Any) -> bool:
     set(all_beamline_modules()),
     indirect=True,
 )
+# Increase timeout for this specific test as running inividually can take over a second
+# to import everything so causes tests to fail.
+@pytest.mark.timeout(2)
 def test_device_creation(module_and_devices_for_beamline):
     """Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.

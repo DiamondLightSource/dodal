@@ -115,7 +115,7 @@ reportMissingImports = false  # Ignore missing stubs in imported modules
 [tool.pytest.ini_options]
 # Run pytest with all our checkers
 asyncio_mode = "auto"
-timeout = 1.5
+timeout = 1
 timeout_method = "signal" # Alllow us to see full stack trace of where it timed out to make debugging easier.
 markers = [
     "requires: marks tests as requiring other infrastructure",
