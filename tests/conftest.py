@@ -25,7 +25,6 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
-from dodal.testing.paths import is_path_banned
 from dodal.utils import (
     DeviceInitializationController,
     collect_factories,
@@ -77,15 +76,23 @@ MOCK_ATTRIBUTES_TABLE: dict[str, dict[str, str]] = {
     },
 }
 
+BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
 environ["DODAL_TEST_MODE"] = "true"
 
 
-# Add run_engine and util fixtures to be used in tests
+# Add run_engine, util fixtures, and mock_config_client to be used in tests
 pytest_plugins = [
     "dodal.testing.fixtures.run_engine",
     "dodal.testing.fixtures.utils",
     "dodal.testing.fixtures.config_client",
 ]
+
+
+def is_path_banned(path: Path, banned_paths: list[Path]) -> bool:
+    resolved = path.resolve()
+    return resolved.is_absolute() and any(
+        resolved.is_relative_to(banned) for banned in banned_paths
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -94,30 +101,31 @@ def reset_path_provider():
     clear_path_provider()
 
 
-BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
-
-
-@pytest.fixture(autouse=True)
-def config_client_banned_paths():
-    from dodal.testing.fixtures.config_client import MOCK_CONFIG_CLIENT_BANNED_PATHS
-
-    MOCK_CONFIG_CLIENT_BANNED_PATHS.extend(BANNED_PATHS)
-
-
 @pytest.fixture(autouse=True)
 def patch_open_to_prevent_dls_reads_in_tests():
     unpatched_open = open
+    unpatched_path_open = Path.open
 
-    def patched_open(*args, **kwargs):
-        requested_path = Path(args[0])
+    def check_path(path: str | Path):
+        requested_path = Path(path)
         if is_path_banned(requested_path, BANNED_PATHS):
             raise AssertionError(
                 f"Attempt to open {requested_path} from inside a unit test"
             )
-        return unpatched_open(*args, **kwargs)
 
-    with patch("builtins.open", side_effect=patched_open):
-        yield []
+    def patched_open(file, *args, **kwargs):
+        check_path(file)
+        return unpatched_open(file, *args, **kwargs)
+
+    def patched_path_open(self: Path, *args, **kwargs):
+        check_path(self)
+        return unpatched_path_open(self, *args, **kwargs)
+
+    with (
+        patch("builtins.open", side_effect=patched_open),
+        patch.object(Path, "open", patched_path_open),
+    ):
+        yield
 
 
 def pytest_runtest_setup(item):
@@ -157,8 +165,8 @@ async def static_path_provider(
 def module_and_devices_for_beamline(
     mock_config_client: ConfigClient, request: pytest.FixtureRequest
 ):
-    # Swap all ConfigClient instances with the mock one method.
-    # Prevents dls paths used, open local files rather than from service.
+    # Swap all ConfigClient get_file_contents instances with the mock one method.
+    # Open local files for tests rather than from service.
     original_config_client = ConfigClient.get_file_contents
     ConfigClient.get_file_contents = mock_config_client.get_file_contents  # type: ignore
 
@@ -188,7 +196,6 @@ def module_and_devices_for_beamline(
                 factory.cache_clear()
         del bl_mod
 
-        clear_config_client()
         # Set back the ConfigClient instance with the original one.
         ConfigClient.get_file_contents = original_config_client
 
@@ -215,3 +222,9 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
         det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore
     )
+
+
+@pytest.fixture(autouse=True)
+def reset_config_client():
+    yield
+    clear_config_client()

@@ -9,8 +9,6 @@ from daq_config_server import ConfigClient
 from daq_config_server.models import ConfigModel
 from pydantic import TypeAdapter
 
-from dodal.testing.paths import is_path_banned
-
 T = TypeVar("T", str, dict, ConfigModel)
 
 TModel = TypeVar("TModel", bound=ConfigModel)
@@ -21,8 +19,6 @@ TModel = TypeVar("TModel", bound=ConfigModel)
 MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION: dict[
     str, Callable[[str], ConfigModel]
 ] = {}
-
-MOCK_CONFIG_CLIENT_BANNED_PATHS: list[Path] = []
 
 
 def mock_config_server_get_file_contents(
@@ -49,10 +45,6 @@ def mock_config_server_get_file_contents(
         T: The contents of the config file.
     """
     requested_file = Path(file_path)
-    if is_path_banned(requested_file, MOCK_CONFIG_CLIENT_BANNED_PATHS):
-        raise AssertionError(
-            f"Attempt to open {requested_file} from inside a unit test using ConfigClient"
-        )
     # Minimal logic required for unit tests
     with requested_file.open("r") as f:
         contents = f.read()
