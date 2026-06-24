@@ -157,8 +157,42 @@ def my_device(config_client: ConfigClient) -> MyDevice:
     )
 ```
 
-### Using the default test fixture
+### Directly mocking return values
 
+If a test does not need to exercise file parsing logic, it is often simpler to mock the ConfigClient response directly rather than creating a test file and configuring a parser.
+
+```python
+from unittest.mock import MagicMock
+
+from daq_config_server.models.lookup_tables.insertion_device import (
+    UndulatorEnergyGapLookupTable,
+)
+
+@pytest.fixture
+def mock_config_client():
+    mock_config_client = MagicMock()
+    mock_config_client.get_file_contents = MagicMock(
+        return_value=UndulatorEnergyGapLookupTable(
+            rows=[
+                [5700, 5.4606],
+                [7000, 6.045],
+                [9700, 6.404],
+            ],
+        )
+    )
+    return mock_config_client
+```
+This approach is appropriate when:
+
+* The test only cares about the behaviour of the device or component consuming the configuration data.
+* The contents of the configuration file are not relevant to the test.
+* The parsing logic is tested elsewhere.
+
+In these cases, mocking the return value directly avoids unnecessary coupling to file formats or test data files.
+
+Use the below method if you need the data to come from a file for a unit test.
+
+### Using the mock_config_client fixture to read files
 Unit tests should not communicate with the real daq-config-server or read files from the DLS filesystem.
 
 Dodal provides a `mock_config_client` fixture in `dodal.testing.fixtures.config_client`. This fixture replaces the real service with a lightweight implementation that reads test files directly from the local filesystem.
