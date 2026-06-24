@@ -315,7 +315,7 @@ If the device creation tests fail because a beamline attempts to access a file u
 For example:
 
 ```python
-MOCK_ATTRIBUTES_TABLE= { 
+MOCK_ATTRIBUTES_TABLE = { 
     ...
     "iXX: {
         "MY_CONFIGURATION_FILE": TEST_MY_CONFIGURATION_FILE
