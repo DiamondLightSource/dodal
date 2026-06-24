@@ -35,8 +35,6 @@ from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_data import TEST_LUT_TXT
 from tests.test_data import I04_BEAMLINE_PARAMETERS, TEST_BEAMLINE_PARAMETERS_TXT
 
-# ToDo - Make documentation so clearer for beamlines on how to fix tests by mocking the
-# paths needed.
 MOCK_ATTRIBUTES_TABLE: dict[str, dict[str, str]] = {
     "i03": {
         "BEAMLINE_PARAMETERS_PATH": TEST_BEAMLINE_PARAMETERS_TXT,

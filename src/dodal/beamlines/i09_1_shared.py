@@ -33,7 +33,7 @@ LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/co
 
 
 @devices.fixture
-def config_client() -> ConfigClient:
+def iconfig_client() -> ConfigClient:
     return ConfigClient()
 
 
@@ -65,12 +65,12 @@ def ienergy_order() -> UndulatorOrder:
 def iidenergy(
     ienergy_order: UndulatorOrder,
     iid: UndulatorInMm,
-    config_client: ConfigClient,
+    iconfig_client: ConfigClient,
 ) -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
         undulator_order=ienergy_order,
         undulator=iid,
-        config_server=config_client,
+        config_server=iconfig_client,
         filepath=LOOK_UPTABLE_FILE,
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
