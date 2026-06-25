@@ -34,15 +34,8 @@ PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-# For the moment pointing to the daq_configuration path in i19-1 which has links to the
-# common optics configuration, as it's already present in the daq-config-server.
-# The correct path will have to wait for this PR
-# https://github.com/DiamondLightSource/daq-config-server/pull/186 to be merged and
-# a subsequent release
-DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/daq_configuration"
-ID_GAP_LOOKUP = (
-    f"{DAQ_CONFIGURATION_PATH}/lookup-shared/energy_to_id_gap_look_up_table.txt"
-)
+DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
+ID_GAP_LOOKUP = f"{DAQ_CONFIGURATION_PATH}/lookup/energy_to_id_gap_look_up_table.txt"
 
 devices = DeviceManager()
 
