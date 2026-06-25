@@ -5,6 +5,7 @@ from unittest.mock import ANY, AsyncMock, call, patch
 import pytest
 from ophyd_async.core import (
     SignalDict,
+    SignalR,
     StandardDetector,
     get_mock_put,
     init_devices,
@@ -14,15 +15,11 @@ from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import assert_configuration, partial_reading
 
 from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
-from dodal.devices.electron_analyser.base import (
-    AbstractAnalyserDriverIO,
-    AbstractEnergySource,
-    BaseRegion,
-)
+from dodal.devices.electron_analyser.base import AbstractAnalyserDriverIO, BaseRegion
 from dodal.devices.electron_analyser.base.detector_logic import (
     ElectronAnalayserTriggerLogic,
     RegionLogic,
-    ShutterCoordinatorADArmLogic,
+    ShutterCoordinatorADAcquireLogic,
 )
 from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
@@ -75,7 +72,7 @@ def shutter(request: pytest.FixtureRequest) -> GenericFastShutter:
 
 
 @pytest.mark.parametrize(
-    "close_shutter_idle, expected_shutter_calls",
+    "close_shutter_when_idle_value, expected_shutter_calls",
     [
         (True, lambda s: [call(s.open_state), call(s.close_state)]),
         (False, lambda s: [call(s.open_state)]),
@@ -84,18 +81,18 @@ def shutter(request: pytest.FixtureRequest) -> GenericFastShutter:
 async def test_shutter_arm_logic_opens_shutters(
     driver: AbstractAnalyserDriverIO,
     shutter: GenericFastShutter,
-    close_shutter_idle: bool,
+    close_shutter_when_idle_value: bool,
     expected_shutter_calls: Callable[[GenericFastShutter], list[Any]],
 ):
     with init_devices(mock=True):
-        close_shutter_idle_signal = soft_signal_rw(bool, close_shutter_idle)
+        close_shutter_when_idle = soft_signal_rw(bool, close_shutter_when_idle_value)
 
-    shutter_arm_logic = ShutterCoordinatorADArmLogic(
-        driver, shutter, close_shutter_idle_signal
+    shutter_acquire_logic = ShutterCoordinatorADAcquireLogic(
+        driver, shutter, close_shutter_when_idle
     )
 
     detector = StandardDetector()
-    detector.add_detector_logics(shutter_arm_logic)
+    detector.add_detector_logics(shutter_acquire_logic)
 
     await detector.stage()
     await detector.trigger()
@@ -107,21 +104,21 @@ async def test_shutter_arm_logic_opens_shutters(
     )
 
     # Test expected shutter calls.
-    shutter = shutter_arm_logic._shutter
+    shutter = shutter_acquire_logic._shutter
     get_mock_put(shutter.shutter_state).assert_has_awaits(
         expected_shutter_calls(shutter)
     )
 
 
-@pytest.fixture(params=["single_energy_source", "dual_energy_source"])
-def energy_source(request: pytest.FixtureRequest) -> AbstractEnergySource:
+@pytest.fixture(params=["source_energy", "dual_source_energy"])
+def energy_source(request: pytest.FixtureRequest) -> SignalR[float]:
     return request.getfixturevalue(request.param)
 
 
 @pytest.fixture
 def region_logic(
     driver: AbstractAnalyserDriverIO,
-    energy_source: AbstractEnergySource,
+    energy_source: SignalR[float],
     source_selector: SourceSelector,
 ) -> RegionLogic:
     return RegionLogic(driver, energy_source, source_selector)
@@ -154,7 +151,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
 
         mock_prepare_for_epics.assert_called_once_with(
             region,
-            await region_logic.energy_source.energy.get_value(),
+            await region_logic.energy_source.get_value(),
         )
 
         if region_logic.source_selector is not None:
@@ -163,7 +160,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
             ).assert_called_once_with(region.excitation_energy_source)
         # Check set was called with epics_region
         epics_region = mock_prepare_for_epics.call_args[0][0].prepare_for_epics(
-            await region_logic.energy_source.energy.get_value(),
+            await region_logic.energy_source.get_value(),
         )
         region_logic.driver.set.assert_called_once_with(epics_region)
 

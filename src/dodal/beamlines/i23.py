@@ -3,6 +3,7 @@ from pathlib import Path
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import InOut, PathProvider, StrictEnum
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 from dodal.beamlines.aithre import DISPLAY_CONFIG, ZOOM_PARAMS_FILE
@@ -103,10 +104,9 @@ def zebra() -> Zebra:
 @devices.factory()
 def pilatus(path_provider: PathProvider) -> PilatusDetector:
     return PilatusDetector(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
-        path_provider=path_provider,
+        f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix="cam1:",
-        writer_suffix=HDF5_SUFFIX,
     )
 
 

@@ -8,6 +8,7 @@ TEST_BEAMLINE_PARAMETERS_TXT = join(TEST_DATA_PATH, "test_beamline_parameters.tx
 TEST_DISPLAY_CONFIG = join(TEST_DATA_PATH, "test_display.configuration")
 TEST_OAV_ZOOM_LEVELS_XML = join(TEST_DATA_PATH, "test_oav_zoom_levels.xml")
 TEST_XPDF_LOCAL_PARAMETERS = join(TEST_DATA_PATH, "test_xpdfLocalParameters.xml")
+TEST_I15_1_CRYSTAL_LUT = join(TEST_DATA_PATH, "test_i15-1_crystal_y_energy_lut.txt")
 
 __all__ = [
     "BAD_BEAMLINE_PARAMETERS",
@@ -16,4 +17,5 @@ __all__ = [
     "TEST_DISPLAY_CONFIG",
     "TEST_OAV_ZOOM_LEVELS_XML",
     "TEST_XPDF_LOCAL_PARAMETERS",
+    "TEST_I15_1_CRYSTAL_LUT",
 ]

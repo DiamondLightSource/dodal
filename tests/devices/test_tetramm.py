@@ -172,7 +172,7 @@ async def test_disarm_disarms_driver(
         )
     )
     assert (await tetramm.driver.acquire.get_value()) == 1
-    await tetramm._arm_logic.disarm(on_unstage=False)  # type: ignore
+    await tetramm._acquire_logic.ensure_stopped()  # type: ignore
     assert (await tetramm.driver.acquire.get_value()) == 0
 
 
@@ -294,12 +294,12 @@ async def test_tetramm_controller(
             deadtime=VALID_TEST_DEADTIME,
         )
     )
-    await tetramm._arm_logic.arm()  # type: ignore
-    await tetramm._arm_logic.wait_for_idle()  # type:ignore
+    await tetramm._acquire_logic.start_acquiring()  # type: ignore
+    await tetramm._acquire_logic.wait_for_idle()  # type:ignore
 
     assert await tetramm.driver.acquire.get_value() is True
 
-    await tetramm._arm_logic.disarm(on_unstage=False)  # type: ignore
+    await tetramm._acquire_logic.ensure_stopped()  # type: ignore
 
     assert await tetramm.driver.acquire.get_value() is False
 
@@ -318,7 +318,7 @@ async def test_tetramm_prepare_when_freerunning(
     set_mock_value(tetramm.driver.trigger_mode, TetrammTrigger.FREE_RUN)
     set_mock_value(tetramm.driver.acquire, True)
 
-    with patch.object(tetramm._arm_logic, "disarm") as mock_disarm:
+    with patch.object(tetramm._acquire_logic, "ensure_stopped") as mock_stop:
         await tetramm.prepare(
             TriggerInfo(
                 number_of_events=1,
@@ -327,7 +327,7 @@ async def test_tetramm_prepare_when_freerunning(
                 deadtime=VALID_TEST_DEADTIME,
             )
         )
-        mock_disarm.assert_called_once()
+        mock_stop.assert_called_once()
 
 
 async def assert_armed(driver: TetrammDriver, trigger_info: TriggerInfo) -> None:
@@ -349,5 +349,5 @@ async def test_tetramm_disarm_calls_stop_busy_recording(
     stop_busy_record_mock: MagicMock,
     tetramm: TetrammDetector,
 ):
-    await tetramm._arm_logic.disarm(on_unstage=False)  # type: ignore
+    await tetramm._acquire_logic.ensure_stopped()  # type: ignore
     stop_busy_record_mock.assert_called_once()

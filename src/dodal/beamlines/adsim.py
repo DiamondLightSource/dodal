@@ -1,3 +1,4 @@
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.epics.adsimdetector import SimDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -82,7 +83,6 @@ def stage() -> XThetaStage:
 def det(path_provider) -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=path_provider,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix=DET_SUFFIX,
-        writer_suffix=HDF5_SUFFIX,
     )
