@@ -1,4 +1,5 @@
 import math
+from collections.abc import Callable
 
 import pytest
 from pydantic import ValidationError
@@ -9,6 +10,8 @@ from dodal.common.general_maths.transmission_interconversion import (
     natural_log_of_transmission_from_attenuation,
     transmission_from_attenutation,
 )
+
+from .operator_inversion_pairing import OperatorInversionPairing
 
 
 @pytest.mark.parametrize(
@@ -80,7 +83,7 @@ def test_attenuation_from_transmission(transmission_as_fraction, result):
 
 
 @pytest.mark.parametrize(
-    "ln_t,result",
+    "ln_t, result",
     [
         (-1, 1000),  # tests negative unity log of transmission is 1000 (canonical)
         (0, 0),  # tests natural log of transparency is zero (canonical)
@@ -101,24 +104,50 @@ def test_attenuation_from_natural_log_of_transmission(ln_t, result):
 # Circular tests (all numbers here arbitrary)
 
 
-@pytest.mark.parametrize("input", [1.0, 10.0, 100.0])
-def test_circular_attenuation_from_log_and_back(input):
-    assert attenuation_from_natural_log_of_transmission(
-        natural_log_of_transmission_from_attenuation(input)
-    ) == pytest.approx(input)
-    assert natural_log_of_transmission_from_attenuation(
-        attenuation_from_natural_log_of_transmission(input)
-    ) == pytest.approx(input)
+# with different ranges of valid input - the argument values must differ for each direction
+@pytest.mark.parametrize(
+    "f, g, numerical_args",
+    [
+        (
+            attenuation_from_natural_log_of_transmission,
+            natural_log_of_transmission_from_attenuation,
+            [-0.075, -1.2, -6.3],
+        ),
+        (
+            natural_log_of_transmission_from_attenuation,
+            attenuation_from_natural_log_of_transmission,
+            [0.04, 0.91, 2.02, 5.7],
+        ),
+    ],
+)
+def test_attenuation_log_transmssion_conversions_reciprocate_as_expected(
+    f: Callable[[float], float],
+    g: Callable[[float], float],
+    numerical_args: list[float],
+):
+    op_pair = OperatorInversionPairing(f, g)
+    for x in numerical_args:
+        assert op_pair.composed_operator_is_consistent_with_identity_operator(x)
 
 
-@pytest.mark.parametrize("input", [1.0, 10.0, 100.0])
-def test_circular_attenuation_from_transmission_and_back(input):
-    assert attenuation_from_transmission(
-        transmission_from_attenutation(input)
-    ) == pytest.approx(input)
-    assert transmission_from_attenutation(
-        attenuation_from_transmission(input)
-    ) == pytest.approx(input)
+@pytest.mark.parametrize(
+    "f, g, numerical_args",
+    [
+        (
+            attenuation_from_transmission,
+            transmission_from_attenutation,
+            [0.92, 0.68, 0.147, 0.00013],
+        )
+    ],
+)
+def test_transmission_attenuation_conversions_pair_off_to_form_identity_operation(
+    f: Callable[[float], float],
+    g: Callable[[float], float],
+    numerical_args: list[float],
+):
+    for op_pair in [OperatorInversionPairing(f, g), OperatorInversionPairing(g, f)]:
+        for x in numerical_args:
+            assert op_pair.composed_operator_is_consistent_with_identity_operator(x)
 
 
 # inauspicious:
