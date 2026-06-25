@@ -20,20 +20,13 @@ class PiezoElectricMovableLogic(MovableWithToleranceLogic):
     async def stop(self) -> None:
         await self.motor_stop.set(1)
 
-    async def calculate_timeout(
-        self, old_position: float, new_position: float
-    ) -> float:
-        # Bug: should allow return None.
-        # See https://github.com/bluesky/ophyd-async/pull/1300
-        return None  # type: ignore
-
 
 class PiezoElectricMotor(MovableWithTolerance):
-    """Motor like device with user_readback, user_setpoint, and a stop signals. Has a
-    configurable tolerance soft signal to configure the tolerance of when a devuce is done
-    moving. For example, if tolerance is configured to be 0.5, and the setpoint is 10 and
-    the readback is 9.8, the motor will be done moving and stop blocking for the
-    AsyncStatus.
+    """A piezoelectric positioning stage with configurable move tolerance.
+
+    This device exposes EPICS signals for readback, setpoint, and motion stop commands.
+    Motion completion is determined by comparing the readback and setpoint positions
+    using a configurable tolerance.
     """
 
     def __init__(self, prefix: str, tolerance: float = 0.01, name: str = ""):
