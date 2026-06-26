@@ -17,7 +17,7 @@ def follows_bluesky_protocols(obj: Any) -> bool:
     set(all_beamline_modules()),
     indirect=True,
 )
-# Increase timeout for this specific test as running inividually can take over a second
+# Increase timeout for this specific test as running individually can take over a second
 # to import everything so causes tests to fail.
 @pytest.mark.timeout(2)
 def test_device_creation(module_and_devices_for_beamline):
@@ -42,7 +42,7 @@ def test_device_creation(module_and_devices_for_beamline):
     set(all_beamline_modules()),
     indirect=True,
 )
-# Increase timeout for this specific test as running inividually can take over a second
+# Increase timeout for this specific test as running individually can take over a second
 # to import everything so causes tests to fail.
 @pytest.mark.timeout(2)
 def test_devices_are_identical(module_and_devices_for_beamline):
