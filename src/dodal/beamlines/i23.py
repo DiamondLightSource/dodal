@@ -10,9 +10,13 @@ from dodal.beamlines.aithre import DISPLAY_CONFIG, ZOOM_PARAMS_FILE
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import SixAxisGonio
-from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_detector import (
+    NullZoomController,
+    OAVBeamCentreFile,
+)
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.positioner import Positioner1D
@@ -25,6 +29,12 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, get_hostname
+
+ZOOM_PARAMS_FILE = (
+    "/dls_sw/i23/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
+)
+DISPLAY_CONFIG = "/dls_sw/i23/software/daq_configuration/domain/display.configuration"
+I23_CONFIG_SERVER_ENDPOINT = "https://i23-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i23")
 PREFIX = BeamlinePrefix(BL)
@@ -72,11 +82,12 @@ def _is_i23_machine():
 
 @devices.factory()
 def oav(config_client) -> OAVBeamCentreFile:
+    zoom = NullZoomController()
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
+        zoom_controller=zoom,
     )
-
 
 @devices.factory()
 def pin_tip_detection() -> PinTipDetection:
@@ -89,8 +100,8 @@ def shutter() -> MXZebraShutter:
 
 
 @devices.factory()
-def gonio() -> SixAxisGonio:
-    return SixAxisGonio(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
+def gonio() -> XYZWrappedOmegaStage:
+    return XYZWrappedOmegaStage(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
 
 
 @devices.factory()
