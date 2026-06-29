@@ -13,10 +13,7 @@ from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvi
 from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import SixAxisGonio
-from dodal.devices.oav.oav_detector import (
-    NullZoomController,
-    OAVBeamCentreFile,
-)
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.positioner import Positioner1D
@@ -82,11 +79,11 @@ def _is_i23_machine():
 
 @devices.factory()
 def oav(config_client) -> OAVBeamCentreFile:
-    zoom = NullZoomController()
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
-        zoom_controller=zoom,
+        percentage_prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:ZOOM:",
+        level_prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:CAM:",
     )
 
 @devices.factory()
