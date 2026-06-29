@@ -4,6 +4,9 @@ from unittest.mock import patch
 import pytest
 from daq_config_server import ConfigClient
 from daq_config_server.models.lookup_tables import GenericLookupTable
+from daq_config_server.models.lookup_tables.insertion_device import (
+    parse_i09_hu_undulator_energy_gap_lut,
+)
 
 from dodal.devices.beamlines.i09_1_shared import (
     calculate_energy_i09_hu,
@@ -20,6 +23,7 @@ def lut(
         file_path=TEST_HARD_UNDULATOR_LUT,
         desired_return_type=GenericLookupTable,
         reset_cached_result=True,
+        force_parser=parse_i09_hu_undulator_energy_gap_lut,
     )
 
 

@@ -38,7 +38,7 @@ devices = DeviceManager()
 
 @devices.fixture
 def jconfig_client() -> ConfigClient:
-    return ConfigClient(url="https://daq-config.diamond.ac.uk")
+    return ConfigClient()
 
 
 @devices.factory()

@@ -22,9 +22,6 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 devices = DeviceManager()
 
-
-K07_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
-
 LOOK_UPTABLE_DIR = "/dls_sw/k07/software/gda/workspace_git/gda-diamond.git/configurations/k07/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
 PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
@@ -35,6 +32,11 @@ BL = get_beamline_name("k07")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient()
 
 
 @devices.factory()
@@ -92,20 +94,21 @@ def id(
 @devices.factory(skip=True)
 def id_controller(
     id: Apple2[UndulatorPhaseAxes],
+    config_client: ConfigClient,
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """I21 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=id,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(grating=K07_GRATING_COLUMNS),
-            config_client=K07_CONF_CLIENT,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(
                 grating=K07_GRATING_COLUMNS, poly_deg=K07_PHASE_POLY_DEG_COLUMNS
             ),
-            config_client=K07_CONF_CLIENT,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         units="eV",
