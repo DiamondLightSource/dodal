@@ -104,8 +104,16 @@ class ZoomController(BaseZoomController):
 
     DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 2
 
-    def __init__(self, prefix: str, name: str = "", percentage_prefix: str = "", level_prefix: str = "") -> None:
-        self.percentage = epics_signal_rw(float, f"{percentage_prefix or prefix}ZOOMPOSCMD")
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        percentage_prefix: str = "",
+        level_prefix: str = "",
+    ) -> None:
+        self.percentage = epics_signal_rw(
+            float, f"{percentage_prefix or prefix}ZOOMPOSCMD"
+        )
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
         self.level = epics_signal_rw(str, f"{level_prefix or prefix}MP:SELECT")
@@ -182,7 +190,7 @@ class OAV(StandardReadable):
         if not zoom_controller:
             if percentage_prefix:
                 self.zoom_controller = ZoomController(
-                "", name, percentage_prefix, level_prefix
+                    "", name, percentage_prefix, level_prefix
                 )
             else:
                 self.zoom_controller = ZoomController(

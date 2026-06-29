@@ -85,6 +85,7 @@ def oav(config_client) -> OAVBeamCentreFile:
         level_prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:CAM:",
     )
 
+
 @devices.factory()
 def pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
