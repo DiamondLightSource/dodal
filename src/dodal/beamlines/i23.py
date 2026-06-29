@@ -10,9 +10,8 @@ from dodal.beamlines.aithre import DISPLAY_CONFIG, ZOOM_PARAMS_FILE
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.device_manager import DeviceManager
-from dodal.devices.motors import SixAxisGonio
+from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection

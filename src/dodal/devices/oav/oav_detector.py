@@ -27,7 +27,7 @@ from dodal.devices.oav.oav_parameters import (
 from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
 from dodal.log import LOGGER
-from dataclasses import dataclass
+
 
 class Coords(IntEnum):
     X = 0
