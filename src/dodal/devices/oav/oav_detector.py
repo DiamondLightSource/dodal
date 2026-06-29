@@ -108,15 +108,15 @@ class ZoomController(BaseZoomController):
         self,
         prefix: str,
         name: str = "",
-        percentage_prefix: str = "",
-        level_prefix: str = "",
+        percentage_prefix: str = "FZOOM:",
+        level_prefix: str = "FZOOM:",
     ) -> None:
         self.percentage = epics_signal_rw(
-            float, f"{percentage_prefix or prefix}ZOOMPOSCMD"
+            float, f"{prefix}{percentage_prefix}ZOOMPOSCMD"
         )
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
-        self.level = epics_signal_rw(str, f"{level_prefix or prefix}MP:SELECT")
+        self.level = epics_signal_rw(str, f"{prefix}{level_prefix}MP:SELECT")
 
         super().__init__(name=name)
 
@@ -144,7 +144,7 @@ class ZoomControllerWithBeamCentres(ZoomController):
 
         self.beam_centres = DeviceVector(
             {
-                i: BeamCentreForZoom(prefix, *level_to_centre_mapping[i])
+                i: BeamCentreForZoom(f"{prefix}FZOOM:", *level_to_centre_mapping[i])
                 for i in range(len(level_to_centre_mapping))
             }
         )
@@ -174,8 +174,6 @@ class OAV(StandardReadable):
         name: str = "",
         mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
-        percentage_prefix: str = "",
-        level_prefix: str = "",
         x_direction: int = -1,
         y_direction: int = -1,
         z_direction: int = 1,
@@ -188,14 +186,7 @@ class OAV(StandardReadable):
         _bl_prefix = prefix.split("-")[0]
 
         if not zoom_controller:
-            if percentage_prefix:
-                self.zoom_controller = ZoomController(
-                    "", name, percentage_prefix, level_prefix
-                )
-            else:
-                self.zoom_controller = ZoomController(
-                    f"{_bl_prefix}-EA-OAV-01:FZOOM:", name
-                )
+            self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:", name)
         else:
             self.zoom_controller = zoom_controller
 
@@ -273,8 +264,6 @@ class OAVBeamCentreFile(OAV):
         name: str = "",
         mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
-        percentage_prefix: str = "",
-        level_prefix: str = "",
         mjpg_x_size_pv: str = "ArraySize1_RBV",
         mjpg_y_size_pv: str = "ArraySize2_RBV",
         x_direction: int = -1,
@@ -287,8 +276,6 @@ class OAVBeamCentreFile(OAV):
             name=name,
             mjpeg_prefix=mjpeg_prefix,
             zoom_controller=zoom_controller,
-            percentage_prefix=percentage_prefix,
-            level_prefix=level_prefix,
             mjpg_x_size_pv=mjpg_x_size_pv,
             mjpg_y_size_pv=mjpg_y_size_pv,
             x_direction=x_direction,
