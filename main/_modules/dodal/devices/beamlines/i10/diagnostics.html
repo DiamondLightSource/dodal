@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i10.diagnostics &#8212; dodal 2.5.2.dev6+gb3d163a0a documentation</title>
+    <title>dodal.devices.beamlines.i10.diagnostics &#8212; dodal 2.5.2.dev7+g700c0b312 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=c2184275"></script>
+    <script src="../../../../../_static/documentation_options.js?v=e0b03bd8"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -891,7 +891,6 @@ window.runMermaid = runMermaid;</script>
     <span class="n">StrictEnum</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadableFormat</span> <span class="k">as</span> <span class="n">Format</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core._device</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceConnector</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adaravis</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AravisDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1097,30 +1096,36 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">I10Diagnostic5ADet</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Diagnostic 5a detection with drain current and photo diode.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">connector</span><span class="p">:</span> <span class="n">DeviceConnector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drain_current_amp</span> <span class="o">=</span> <span class="n">FemtoDDPCA</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IAMP-06:&quot;</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;GAIN&quot;</span><span class="p">,</span>
+            <span class="n">gain_table</span><span class="o">=</span><span class="n">Femto3xxGainTable</span><span class="p">,</span>
+            <span class="n">gain_to_current_table</span><span class="o">=</span><span class="n">Femto3xxGainToCurrentTable</span><span class="p">,</span>
+            <span class="n">raise_timetable</span><span class="o">=</span><span class="n">Femto3xxRaiseTime</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drain_counter</span> <span class="o">=</span> <span class="n">StruckScaler</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SCLR-02:SCALER2&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.S17&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drain_current</span> <span class="o">=</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
-            <span class="n">current_amp</span><span class="o">=</span><span class="n">FemtoDDPCA</span><span class="p">(</span>
-                <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IAMP-06:&quot;</span><span class="p">,</span>
-                <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;GAIN&quot;</span><span class="p">,</span>
-                <span class="n">gain_table</span><span class="o">=</span><span class="n">Femto3xxGainTable</span><span class="p">,</span>
-                <span class="n">gain_to_current_table</span><span class="o">=</span><span class="n">Femto3xxGainToCurrentTable</span><span class="p">,</span>
-                <span class="n">raise_timetable</span><span class="o">=</span><span class="n">Femto3xxRaiseTime</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">counter</span><span class="o">=</span><span class="n">StruckScaler</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SCLR-02:SCALER2&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.S17&quot;</span><span class="p">),</span>
+            <span class="n">current_amp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">drain_current_amp</span><span class="p">,</span>
+            <span class="n">counter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">drain_counter</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diode_current_amp</span> <span class="o">=</span> <span class="n">FemtoDDPCA</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IAMP-05:&quot;</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;GAIN&quot;</span><span class="p">,</span>
+            <span class="n">gain_table</span><span class="o">=</span><span class="n">Femto3xxGainTable</span><span class="p">,</span>
+            <span class="n">gain_to_current_table</span><span class="o">=</span><span class="n">Femto3xxGainToCurrentTable</span><span class="p">,</span>
+            <span class="n">raise_timetable</span><span class="o">=</span><span class="n">Femto3xxRaiseTime</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diode_current</span> <span class="o">=</span> <span class="n">StruckScaler</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SCLR-02:SCALER2&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.S18&quot;</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">diode</span> <span class="o">=</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
-            <span class="n">FemtoDDPCA</span><span class="p">(</span>
-                <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IAMP-05:&quot;</span><span class="p">,</span>
-                <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;GAIN&quot;</span><span class="p">,</span>
-                <span class="n">gain_table</span><span class="o">=</span><span class="n">Femto3xxGainTable</span><span class="p">,</span>
-                <span class="n">gain_to_current_table</span><span class="o">=</span><span class="n">Femto3xxGainToCurrentTable</span><span class="p">,</span>
-                <span class="n">raise_timetable</span><span class="o">=</span><span class="n">Femto3xxRaiseTime</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">counter</span><span class="o">=</span><span class="n">StruckScaler</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SCLR-02:SCALER2&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.S18&quot;</span><span class="p">),</span>
+            <span class="n">current_amp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">diode_current_amp</span><span class="p">,</span>
+            <span class="n">counter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">diode_current</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connector</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 
