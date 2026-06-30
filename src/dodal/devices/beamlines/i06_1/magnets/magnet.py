@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    SignalR,
     SignalRW,
     StandardReadable,
     StrictEnum,
@@ -42,12 +43,6 @@ class MagnetPosition:
     z: float
 
 
-# class SphericalCoorindates(StandardReadable):
-
-#     def __init__(self, x: SignalR[float], y: SignalR[float], z: SignalR[float]):
-#         self.theta =
-
-
 def read_theta(x: float, z: float) -> float:
     theta = math.degrees(math.atan2(-x, z))
     return theta % 360
@@ -78,10 +73,8 @@ def write_z(rho: float, theta: float, phi: float) -> float:
     return rho * math.sin(phi) * math.cos(theta)
 
 
-# Need to add spherical and cartesian coordinates
-class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
+class CartesianCoordinates(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
-
         # Demand values
         self.xi = epics_signal_rw(float, prefix + "X:DMD")
         self.yi = epics_signal_rw(float, prefix + "Y:DMD")
@@ -91,11 +84,27 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
         self.xo = epics_signal_r(float, prefix + "X:RBV")
         self.yo = epics_signal_r(float, prefix + "Y:RBV")
         self.zo = epics_signal_r(float, prefix + "Z:RBV")
+        super().__init__(name)
 
-        # Spherical coordinates
-        self.theta = derived_signal_r(read_theta, x=self.xo, z=self.zo)
-        self.rho = derived_signal_r(read_rho, x=self.xo, y=self.yo, z=self.zo)
-        self.phi = derived_signal_r(read_phi, x=self.xo, y=self.yo, z=self.zo)
+
+class SphericalCoorindates(StandardReadable):
+    def __init__(
+        self, xo: SignalR[float], yo: SignalR[float], zo: SignalR[float], name: str = ""
+    ):
+        self.theta = derived_signal_r(read_theta, x=xo, z=zo)
+        self.rho = derived_signal_r(read_rho, x=xo, y=yo, z=zo)
+        self.phi = derived_signal_r(read_phi, x=xo, y=yo, z=zo)
+        super().__init__(name)
+
+
+# Need to add spherical and cartesian coordinates
+class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
+    def __init__(self, prefix: str, name: str = ""):
+
+        self.cartesian = CartesianCoordinates(prefix)
+        self.spherical = SphericalCoorindates(
+            self.cartesian.xo, self.cartesian.yo, self.cartesian.zo
+        )
 
         self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
@@ -113,9 +122,9 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
     @AsyncStatus.wrap
     async def set(self, value: MagnetPosition):
         await asyncio.gather(
-            self.xi.set(value.x),
-            self.yi.set(value.y),
-            self.zi.set(value.z),
+            self.cartesian.xi.set(value.x),
+            self.cartesian.yi.set(value.y),
+            self.cartesian.zi.set(value.z),
         )
         await self._ramp()
 
