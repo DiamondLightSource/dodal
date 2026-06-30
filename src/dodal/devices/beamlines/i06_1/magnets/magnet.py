@@ -84,13 +84,13 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
 
         # Demand values
         self.xi = epics_signal_rw(float, prefix + "X:DMD")
-        self.yi = epics_signal_rw(float, prefix + "X:DMD")
-        self.zi = epics_signal_rw(float, prefix + "X:DMD")
+        self.yi = epics_signal_rw(float, prefix + "Y:DMD")
+        self.zi = epics_signal_rw(float, prefix + "Z:DMD")
 
         # Readback values
         self.xo = epics_signal_r(float, prefix + "X:RBV")
-        self.yo = epics_signal_r(float, prefix + "X:RBV")
-        self.zo = epics_signal_r(float, prefix + "X:RBV")
+        self.yo = epics_signal_r(float, prefix + "Y:RBV")
+        self.zo = epics_signal_r(float, prefix + "Z:RBV")
 
         # Spherical coordinates
         self.theta = derived_signal_r(read_theta, x=self.xo, z=self.zo)
