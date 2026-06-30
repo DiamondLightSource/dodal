@@ -2,6 +2,7 @@ from dodal.beamlines.i06_shared import devices as i06_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
+from dodal.devices.beamlines.i06_1.magnets.magnet import SuperConductingMagnet
 from dodal.devices.motors import XYThetaStage
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
@@ -34,3 +35,8 @@ def xabs() -> XYThetaStage:
 @devices.factory()
 def dd() -> DiffractionDichroism:
     return DiffractionDichroism(f"{PREFIX.beamline_prefix}-EA-DDIFF-01:")
+
+
+@devices.factory()
+def superconducting_magnet() -> SuperConductingMagnet:
+    return SuperConductingMagnet(f"{PREFIX.beamline_prefix}-EA-MAG-01:")
