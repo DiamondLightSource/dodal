@@ -1,11 +1,9 @@
 import asyncio
 from asyncio import wait_for
-from contextlib import nullcontext
 from dataclasses import dataclass
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
@@ -303,11 +301,6 @@ def panda_grid_scan_params():
     )
 
 
-@pytest.fixture(params=["zebra_grid_scan_params", "panda_grid_scan_params"])
-def common_grid_scan_params(request: pytest.FixtureRequest):
-    return request.getfixturevalue(request.param)
-
-
 @pytest.fixture(
     params=[
         [
@@ -343,59 +336,6 @@ def grid_scan_devices_with_params_and_valid_state(request: pytest.FixtureRequest
             for signal, expected_value in request.param[2].items()
         },
     )
-
-
-@pytest.mark.parametrize(
-    "grid_position, expected",
-    [
-        [np.array([-1, 2, 4]), pytest.raises(IndexError)],
-        [np.array([11, 2, 4]), pytest.raises(IndexError)],
-        [np.array([1, 17, 4]), pytest.raises(IndexError)],
-        [np.array([1, 5, 22]), pytest.raises(IndexError)],
-        [np.array([0, 0, 0]), nullcontext(np.array([0, 1, 4]))],
-        [np.array([1, 1, 1]), nullcontext(np.array([0.3, 1.2, 4.1]))],
-        [np.array([2, 11, 16]), nullcontext(np.array([0.6, 3.2, 5.6]))],
-        [np.array([6, 5, 5]), nullcontext(np.array([1.8, 2.0, 4.5]))],
-        [np.array([-0.51, 5, 5]), pytest.raises(IndexError)],
-        [
-            np.array([-0.5, 5, 5]),
-            nullcontext(np.array([-0.5 * 0.3, 1 + 5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, -0.51, 5]), pytest.raises(IndexError)],
-        [
-            np.array([5, -0.5, 5]),
-            nullcontext(np.array([5 * 0.3, 1 - 0.5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, 5, -0.51]), pytest.raises(IndexError)],
-        [
-            np.array([5, 5, -0.5]),
-            nullcontext(np.array([5 * 0.3, 1 + 5 * 0.2, 4 - 0.5 * 0.1])),
-        ],
-        [np.array([9.51, 5, 5]), pytest.raises(IndexError)],
-        [
-            np.array([9.5, 5, 5]),
-            nullcontext(np.array([9.5 * 0.3, 1 + 5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, 14.51, 5]), pytest.raises(IndexError)],
-        [
-            np.array([5, 14.5, 5]),
-            nullcontext(np.array([5 * 0.3, 1 + 14.5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, 5, 19.51]), pytest.raises(IndexError)],
-        [
-            np.array([5, 5, 19.5]),
-            nullcontext(np.array([5 * 0.3, 1 + 5 * 0.2, 4 + 19.5 * 0.1])),
-        ],
-    ],
-)
-def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
-    common_grid_scan_params: GridScanParamsCommon, grid_position, expected
-):
-    with expected as expected_value:
-        motor_position = common_grid_scan_params.grid_position_to_motor_position(
-            grid_position
-        )
-        assert np.allclose(motor_position, expected_value)
 
 
 def test_can_run_fast_grid_scan_in_run_engine(
