@@ -1,16 +1,17 @@
 import asyncio
 import math
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    SignalR,
-    SignalRW,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     derived_signal_r,
     soft_signal_rw,
+    wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
@@ -36,13 +37,6 @@ class MagnetLimitStatus(StrictEnum):
     OK = "OK"
 
 
-@dataclass
-class MagnetPosition:
-    x: float
-    y: float
-    z: float
-
-
 def read_theta(x: float, z: float) -> float:
     theta = math.degrees(math.atan2(-x, z))
     return theta % 360
@@ -56,77 +50,98 @@ def read_phi(x: float, y: float, z: float) -> float:
     return math.degrees(math.atan2(math.hypot(x, z), y))
 
 
-def write_x(rho: float, theta: float, phi: float, x: SignalRW[float]) -> float:
-    theta = math.radians(theta)
-    phi = math.radians(phi)
-    x.set(-rho * math.sin(phi) * math.sin(theta))
+@dataclass
+class MagnetPosition:
+    x: float
+    y: float
+    z: float
 
-
-def write_y(rho: float, theta: float, phi: float) -> float:
-    phi = math.radians(phi)
-    return rho * math.cos(phi)
-
-
-def write_z(rho: float, theta: float, phi: float) -> float:
-    theta = math.radians(theta)
-    phi = math.radians(phi)
-    return rho * math.sin(phi) * math.cos(theta)
-
-
-class CartesianCoordinates(StandardReadable):
-    def __init__(self, prefix: str, name: str = ""):
-        # Demand values
-        self.xi = epics_signal_rw(float, prefix + "X:DMD")
-        self.yi = epics_signal_rw(float, prefix + "Y:DMD")
-        self.zi = epics_signal_rw(float, prefix + "Z:DMD")
-
-        # Readback values
-        self.xo = epics_signal_r(float, prefix + "X:RBV")
-        self.yo = epics_signal_r(float, prefix + "Y:RBV")
-        self.zo = epics_signal_r(float, prefix + "Z:RBV")
-        super().__init__(name)
-
-
-class SphericalCoorindates(StandardReadable):
-    def __init__(
-        self, xo: SignalR[float], yo: SignalR[float], zo: SignalR[float], name: str = ""
-    ):
-        self.theta = derived_signal_r(read_theta, x=xo, z=zo)
-        self.rho = derived_signal_r(read_rho, x=xo, y=yo, z=zo)
-        self.phi = derived_signal_r(read_phi, x=xo, y=yo, z=zo)
-        super().__init__(name)
-
-
-# Need to add spherical and cartesian coordinates
-class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
-    def __init__(self, prefix: str, name: str = ""):
-
-        self.cartesian = CartesianCoordinates(prefix)
-        self.spherical = SphericalCoorindates(
-            self.cartesian.xo, self.cartesian.yo, self.cartesian.zo
+    def to_spherical(self) -> "SphericalMagnetPosition":
+        return SphericalMagnetPosition(
+            rho=read_rho(self.x, self.y, self.z),
+            theta=read_theta(self.x, self.z),
+            phi=read_phi(self.x, self.y, self.z),
         )
 
-        self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
+
+@dataclass(frozen=True)
+class SphericalMagnetPosition:
+    rho: float
+    theta: float  # degrees
+    phi: float  # degrees
+
+    def to_cartesian(self) -> MagnetPosition:
+        theta = math.radians(self.theta)
+        phi = math.radians(self.phi)
+
+        return MagnetPosition(
+            x=-self.rho * math.sin(phi) * math.sin(theta),
+            y=self.rho * math.cos(phi),
+            z=self.rho * math.sin(phi) * math.cos(theta),
+        )
+
+
+class MagnetAxis(StandardReadable, Movable[float]):
+    def __init__(
+        self,
+        prefix: str,
+        axis: str,
+        magnet_set_within_boundary: Callable[[], Awaitable[None]],
+        name: str = "",
+    ):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.readback = epics_signal_r(float, prefix + "RBV")
+
+        with self.add_children_as_readables():
+            self.demand = epics_signal_rw(float, prefix + "DMD")
+
+        self._axis = axis
+        self._magnet_set_within_boundary = magnet_set_within_boundary
+
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        values = {self._axis: value}
+        await self._magnet_set_within_boundary(**values)
+
+
+class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            # Cartesian and real pv values
+            self.x = MagnetAxis(prefix + "X:", "x", self.set_within_boundary)
+            self.y = MagnetAxis(prefix + "Y:", "y", self.set_within_boundary)
+            self.z = MagnetAxis(prefix + "Z:", "z", self.set_within_boundary)
+
+            # Spherical representations of x, y, z
+            self.theta = derived_signal_r(
+                read_theta, x=self.x.readback, z=self.z.readback
+            )
+            self.rho = derived_signal_r(
+                read_rho, x=self.x.readback, y=self.y.readback, z=self.z.readback
+            )
+            self.phi = derived_signal_r(
+                read_phi, x=self.x.readback, y=self.y.readback, z=self.z.readback
+            )
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
+            self.timeout = soft_signal_rw(float, initial_value=300)
+            self.delay = soft_signal_rw(float, initial_value=0.1)
+
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
 
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
         self.start_ramp = epics_signal_x(prefix + "STARTRAMP.PROC")
 
-        self.tolerance = soft_signal_rw(float, initial_value=0)
-        self.timeout = soft_signal_rw(float, initial_value=300)
-        self.delay = soft_signal_rw(float, initial_value=5)
-
         super().__init__(name)
 
-    # Without boundary
     @AsyncStatus.wrap
-    async def set(self, value: MagnetPosition):
-        await asyncio.gather(
-            self.cartesian.xi.set(value.x),
-            self.cartesian.yi.set(value.y),
-            self.cartesian.zi.set(value.z),
-        )
-        await self._ramp()
+    async def set(self, value: MagnetPosition | SphericalMagnetPosition):
+        if isinstance(value, SphericalMagnetPosition):
+            value = value.to_cartesian()
+        await self.set_within_boundary(x=value.x, y=value.y, z=value.z)
 
     async def _ramp(self):
         await self.start_ramp.trigger(timeout=1)
@@ -134,56 +149,53 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
         # Is this still needed?
         await asyncio.sleep(await self.delay.get_value())
 
-        ramp_status, limit_status = await asyncio.gather(
-            self.ramp_status.get_value(),
-            self.limit_status.get_value(),
-        )
+        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=10)
 
-        if (
-            ramp_status == MagnetRampStatus.RAMP_MADE
-            and limit_status == MagnetLimitStatus.OK
-        ):
-            return
+        if await self.limit_status.get_value() == MagnetLimitStatus.VIOLTATION:
+            raise RuntimeError(
+                f"{self.limit_status.name} is at position {MagnetLimitStatus.VIOLTATION}"
+            )
 
-        if ramp_status == MagnetRampStatus.RAMPING:
-            raise RuntimeError("Magnet still ramping")
-
-        if limit_status == MagnetLimitStatus.VIOLTATION:
-            raise RuntimeError("Magnet limit violation")
-
-    async def set_within_boundary(self, value: MagnetPosition):
+    async def set_within_boundary(
+        self, x: float | None = None, y: float | None = None, z: float | None = None
+    ):
         """Move magnet while ensuring field magnitude never increases before decreases
         have completed.
         """
+        if x is None and y is None and z is None:
+            raise RuntimeError("Args x, y, and z cannot all be None at the same time.")
+
         # For keeping the magnitude constrained to avoid quench, always do the decreasing before increasing motors
         x0, y0, z0 = await asyncio.gather(
-            self.xo.get_value(),
-            self.yo.get_value(),
-            self.zo.get_value(),
+            self.x.readback.get_value(),
+            self.y.readback.get_value(),
+            self.z.readback.get_value(),
         )
-        x1, y1, z1 = value.x, value.y, value.z
+        x = x0 if x is None else x
+        y = y0 if y is None else y
+        z = z0 if z is None else z
 
-        dx = abs(x1) - abs(x0)
-        dy = abs(y1) - abs(y0)
-        dz = abs(z1) - abs(z0)
+        dx = abs(x) - abs(x0)
+        dy = abs(y) - abs(y0)
+        dz = abs(z) - abs(z0)
 
         # Decrease Z first
         if dz < 0:
-            await self.zi.set(z1)
+            await self.z.demand.set(z)
             await self._ramp()
         # Then decrease X
         if dx < 0:
-            await self.xi.set(x1)
+            await self.x.demand.set(x)
             await self._ramp()
         # Then decrease Y
         if dy < 0:
-            await self.yi.set(y1)
+            await self.y.demand.set(y)
             await self._ramp()
         # Finally perform all increases together
         if dx > 0 or dy > 0 or dz > 0:
             await asyncio.gather(
-                self.xi.set(x1),
-                self.yi.set(y1),
-                self.zi.set(z1),
+                self.x.demand.set(x),
+                self.y.demand.set(y),
+                self.z.demand.set(z),
             )
             await self._ramp()
