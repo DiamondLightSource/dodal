@@ -81,6 +81,7 @@ class SphericalMagnetPosition:
         )
 
 
+# ToDo - Use StandardMovable
 class MagnetAxis(StandardReadable, Movable[float]):
     def __init__(
         self,
@@ -144,12 +145,10 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
         await self.set_within_boundary(x=value.x, y=value.y, z=value.z)
 
     async def _ramp(self):
-        await self.start_ramp.trigger(timeout=1)
-        # Due to EPICS flaw, after the callback, still need to wait for a few second for the magnet settle down
-        # Is this still needed?
-        await asyncio.sleep(await self.delay.get_value())
-
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=10)
+        # ToDo - Use TimeoutCalculated from ophyd-async in new release.
+        timeout = await self.timeout.get_value()
+        await self.start_ramp.trigger(timeout=timeout)
+        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout)
 
         if await self.limit_status.get_value() == MagnetLimitStatus.VIOLTATION:
             raise RuntimeError(
