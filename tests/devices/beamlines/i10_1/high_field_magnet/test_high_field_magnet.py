@@ -88,8 +88,6 @@ async def test_set_calculates_correct_timeout(
     high_field_magnet.movable_logic.move = AsyncMock()
     with patch("ophyd_async.core._movable.MoveTimeout") as mock_timeout_calculator:
         await high_field_magnet.set(new_position)
-        print(mock_timeout_calculator.call_args)
-        print(mock_timeout_calculator.call_count)
         expected_timeout = (
             new_position / sweep_rate + 2 * ramp_up_time + DEFAULT_TIMEOUT
         )
