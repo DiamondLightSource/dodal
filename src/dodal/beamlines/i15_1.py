@@ -280,7 +280,7 @@ def gonio_interlock() -> IntPLCInterlock:
 @devices.factory()
 def fast_shutter() -> ZebraFastShutter:
     return ZebraFastShutter(
-        set_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:SOFT_IN:B3",
+        set_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:SOFT_IN:B4",
         get_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:OUT4_TTL:STA",
     )
 
