@@ -1,4 +1,5 @@
 import math
+from collections.abc import Callable
 
 import pydantic
 import pytest
@@ -13,6 +14,8 @@ from dodal.common.general_maths.arithmetic_conversions import (
     convert_mm_to_microns,
     convert_percentage_to_factor,
 )
+
+from .operator_inversion_pairing import OperatorInversionPairing
 
 
 # expected success tests (the 'Happy Path'): All numbers here are arbitrary
@@ -56,29 +59,51 @@ def test_conversion_from_microns_to_centimetres(input, result):
     assert convert_microns_to_cm(input) == pytest.approx(result)
 
 
-# Circular tests (all numbers here arbitrary)
+# Circular "sanity check" tests, exercise pairs of reciprocating functions
+# proving the result of applying a function and its inverse results in the original value
 
 
-@pytest.mark.parametrize("input", [0.0, 1.0, 10.0, 100.0])
-def test_circular_cm_to_mm_and_back(input):
-    assert convert_cm_to_mm(convert_mm_to_cm(input)) == pytest.approx(input)
-    assert convert_mm_to_cm(convert_cm_to_mm(input)) == pytest.approx(input)
-
-
-@pytest.mark.parametrize("input", [0.0, 1.0, 10.0, 100.0])
-def test_circular_microns_to_mm_and_back(input):
-    assert convert_microns_to_mm(convert_mm_to_microns(input)) == pytest.approx(input)
-    assert convert_mm_to_microns(convert_microns_to_mm(input)) == pytest.approx(input)
-
-
-@pytest.mark.parametrize("input", [0.0, 1.0, 10.0, 100.0])
-def test_circular_percentage_to_factor_and_back(input):
-    assert convert_percentage_to_factor(
-        convert_factor_to_percentage(input)
-    ) == pytest.approx(input)
-    assert convert_factor_to_percentage(
-        convert_percentage_to_factor(input)
-    ) == pytest.approx(input)
+@pytest.mark.parametrize(
+    "f, g, numerical_args",
+    [
+        (
+            convert_ev_to_kev,
+            lambda k: k * 1000.0,
+            [16.83, 0.0, 0.037, 1.0, 6.208, 18, 12345.6, 28906.4],
+        ),
+        (
+            convert_mm_to_cm,
+            convert_cm_to_mm,
+            [-16.83, 0.0, 0.037, 1.0, 6.208, 18, 102.99],
+        ),
+        (
+            convert_microns_to_cm,
+            lambda x: convert_mm_to_microns(convert_cm_to_mm(x)),
+            [-6.119, 0.0, 0.764, 1.02, 62.45, 12754, 3154.59],
+        ),
+        (
+            convert_microns_to_mm,
+            convert_mm_to_microns,
+            [-12.38, 0.0, 0.307, 1.0, 6.45, 24, 231.089],
+        ),
+        (
+            convert_factor_to_percentage,
+            convert_percentage_to_factor,
+            [0.0, 1.0, 0.5, 0.367, 27.404, 100.0, 99.8, 53.647],
+        ),
+    ],
+)
+def test_reciprocal_function_pairs_nest_consistent_with_identity(
+    f: Callable[[float], float],
+    g: Callable[[float], float],
+    numerical_args: list[float],
+):
+    for op_pair in [
+        OperatorInversionPairing(f, g),
+        OperatorInversionPairing(g, f),
+    ]:
+        for x in numerical_args:
+            assert op_pair.composed_operator_is_consistent_with_identity_operator(x)
 
 
 # The inauspicuous path
