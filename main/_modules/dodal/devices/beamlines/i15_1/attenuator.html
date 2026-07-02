@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.attenuator &#8212; dodal 2.5.2.dev9+g27bb8493b documentation</title>
+    <title>dodal.devices.beamlines.i15_1.attenuator &#8212; dodal 2.5.2.dev10+g95e5a1766 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=de4219ad"></script>
+    <script src="../../../../../_static/documentation_options.js?v=7dbe727c"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -904,29 +904,17 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TRANS_1</span> <span class="o">=</span> <span class="s2">&quot;1%&quot;</span>
     <span class="n">TRANS_0_1</span> <span class="o">=</span> <span class="s2">&quot;0.1%&quot;</span>
     <span class="n">TRANS_0_01</span> <span class="o">=</span> <span class="s2">&quot;0.01%&quot;</span>
-    <span class="n">TRANS_0_001</span> <span class="o">=</span> <span class="s2">&quot;0.001%&quot;</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_float</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="n">string_representation</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">%&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">AttenuatorPositions</span><span class="p">(</span><span class="n">string_representation</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">string_representation</span><span class="si">}</span><span class="s2"> is not a valid transmission. Options are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">AttenuatorPositions</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+    <span class="n">TRANS_0_001</span> <span class="o">=</span> <span class="s2">&quot;0.001%&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="Attenuator">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.attenuator.Attenuator.html#dodal.devices.beamlines.i15_1.attenuator.Attenuator">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Attenuator</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="n">AttenuatorPositions</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Attenuator</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">AttenuatorPositions</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A device to change the attenuation of the beam.</span>
 
 <span class="sd">    This can be done by doing:</span>
 
-<span class="sd">    &gt;&gt;&gt; bps.mv(attenuator, 10)</span>
-<span class="sd">    or</span>
 <span class="sd">    &gt;&gt;&gt; bps.mv(attenuator, AttenuatorPositions.TRANS_10)</span>
 
 <span class="sd">    Where 10 is the transmission in percent.</span>
@@ -945,13 +933,11 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="Attenuator.set">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.attenuator.Attenuator.html#dodal.devices.beamlines.i15_1.attenuator.Attenuator.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">AttenuatorPositions</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">AttenuatorPositions</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the transmission to the specified percentage.</span>
 
 <span class="sd">        Will raise ValueError if the percentage is not possible.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">AttenuatorPositions</span><span class="o">.</span><span class="n">from_float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 

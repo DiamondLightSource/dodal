@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.5.2.dev9+g27bb8493b documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.5.2.dev10+g95e5a1766 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=de4219ad"></script>
+    <script src="../../../../../_static/documentation_options.js?v=7dbe727c"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -888,7 +888,7 @@ window.runMermaid = runMermaid;</script>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span><span class="p">,</span> <span class="n">StrEnum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
@@ -919,8 +919,22 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.SampleLocation.html#dodal.devices.beamlines.i15_1.robot.SampleLocation">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SampleLocation</span><span class="p">:</span>
+    <span class="n">MAX_PUCK</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">MAX_POSITION</span> <span class="o">=</span> <span class="mi">22</span>
+
     <span class="n">puck</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">position</span><span class="p">:</span> <span class="nb">int</span></div>
+    <span class="n">position</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">puck</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_PUCK</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">puck</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Puck must be between 1 and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_PUCK</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">puck</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_POSITION</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;position must be between 1 and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_POSITION</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
 
 
 
@@ -933,6 +947,14 @@ window.runMermaid = runMermaid;</script>
     <span class="n">PUCK</span> <span class="o">=</span> <span class="s2">&quot;PUCK.MB6&quot;</span>
     <span class="n">BEAM</span> <span class="o">=</span> <span class="s2">&quot;BEAM.MB6&quot;</span>
     <span class="n">SPINNER</span> <span class="o">=</span> <span class="s2">&quot;MOTOR.MB6&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ErrorCodes">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.robot.ErrorCodes.html#dodal.devices.beamlines.i15_1.robot.ErrorCodes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorCodes</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">NO_SAMPLE</span> <span class="o">=</span> <span class="mi">9030</span>
+    <span class="n">OK</span> <span class="o">=</span> <span class="mi">0</span></div>
 
 
 
@@ -1103,6 +1125,14 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
 
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">puck_pick</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller_err_code</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
+            <span class="o">==</span> <span class="n">ErrorCodes</span><span class="o">.</span><span class="n">NO_SAMPLE</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Robot load failed, no sample found at puck </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">puck</span><span class="si">}</span><span class="s2">, position </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">position</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_program_and_wait_for_loaded</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">beam_load_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">BEAM</span>

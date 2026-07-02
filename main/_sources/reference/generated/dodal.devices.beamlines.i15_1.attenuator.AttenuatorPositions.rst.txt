@@ -59,9 +59,6 @@ dodal.devices.beamlines.i15\_1.attenuator.AttenuatorPositions
       
       
       
-      
-      ~AttenuatorPositions.from_float
-      
    
    
 

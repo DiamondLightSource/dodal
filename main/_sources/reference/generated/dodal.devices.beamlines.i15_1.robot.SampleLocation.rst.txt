@@ -17,6 +17,12 @@ dodal.devices.beamlines.i15\_1.robot.SampleLocation
    .. autosummary::
    
       
+      ~SampleLocation.MAX_POSITION
+      
+      
+      ~SampleLocation.MAX_PUCK
+      
+      
       ~SampleLocation.puck
       
       
