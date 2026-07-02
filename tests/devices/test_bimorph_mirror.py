@@ -6,7 +6,7 @@ from unittest.mock import ANY, call, patch
 import pytest
 from ophyd_async.core import (
     callback_on_mock_put,
-    get_mock_put,
+    get_mock_execute,
     init_devices,
     set_mock_value,
     walk_rw_signals,
@@ -96,7 +96,7 @@ async def test_set_channels_triggers_alltrgt_proc(
     mirror_with_mocked_put: BimorphMirror,
     valid_bimorph_values: list[float],
 ):
-    mock_alltrgt_proc = get_mock_put(mirror_with_mocked_put.commit_target_voltages)
+    mock_alltrgt_proc = get_mock_execute(mirror_with_mocked_put.commit_target_voltages)
 
     mock_alltrgt_proc.assert_not_called()
 

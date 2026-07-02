@@ -7,9 +7,9 @@ from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
 from ophyd_async.core import (
-    callback_on_mock_put,
+    callback_on_mock_execute,
     get_mock,
-    get_mock_put,
+    get_mock_execute,
     set_mock_value,
 )
 
@@ -49,8 +49,8 @@ async def robot_for_unload():
         await trigger_complete.wait()
         asyncio.create_task(finish_later())
 
-    get_mock_put(device.unload).side_effect = fake_unload
-    callback_on_mock_put(device.reset, partial(clear_errors, device))
+    get_mock_execute(device.unload).side_effect = fake_unload
+    callback_on_mock_execute(device.reset, partial(clear_errors, device))
     return device, trigger_complete, drying_complete
 
 
@@ -108,7 +108,7 @@ async def bart_robot() -> BartRobot:
     device.LOAD_TIMEOUT = 0.3  # type: ignore
     await device.connect(mock=True)
     set_mock_value(device.program_running, False)
-    callback_on_mock_put(device.reset, partial(clear_errors, device))
+    callback_on_mock_execute(device.reset, partial(clear_errors, device))
     return device
 
 
@@ -277,7 +277,7 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
     assert status.success
     assert (await device.next_puck.get_value()) == 15
     assert (await device.next_pin.get_value()) == 10
-    get_mock_put(device.load).assert_called_once()
+    get_mock_execute(device.load).assert_called_once()
 
 
 async def test_waiting_for_beamline_status_raises_error_when_prog_error(
@@ -347,13 +347,13 @@ async def test_moving_the_robot_will_reset_controller_error_and_throw_if_error_n
         assert e.value.error_code == 40
 
     expected_load_unload_calls = (
-        [call.reset.put(None), call.unload.put(None)]
+        [call.reset.execute(), call.unload.execute()]
         if sample_location is SAMPLE_LOCATION_EMPTY
         else [
-            call.reset.put(None),
+            call.reset.execute(),
             call.next_puck.put(ANY),
             call.next_pin.put(ANY),
-            call.load.put(None),
+            call.load.execute(),
         ]
     )
     get_mock(device).assert_has_calls(expected_load_unload_calls)
@@ -372,10 +372,10 @@ async def test_robot_load_resets_controller_error_and_succeeds_if_error_cleared(
 
     get_mock(device).assert_has_calls(
         [
-            call.reset.put(None),
+            call.reset.execute(),
             call.next_puck.put(ANY),
             call.next_pin.put(ANY),
-            call.load.put(None),
+            call.load.execute(),
         ]
     )
 
@@ -393,10 +393,10 @@ async def test_robot_load_resets_prog_error_and_succeeds_if_error_cleared(
 
     get_mock(device).assert_has_calls(
         [
-            call.reset.put(None),
+            call.reset.execute(),
             call.next_puck.put(ANY),
             call.next_pin.put(ANY),
-            call.load.put(None),
+            call.load.execute(),
         ]
     )
 
@@ -413,7 +413,7 @@ async def test_robot_unload_resets_controller_error_and_succeeds_if_error_cleare
 
     await device.set(SAMPLE_LOCATION_EMPTY)
 
-    get_mock(device).assert_has_calls([call.reset.put(None), call.unload.put(None)])
+    get_mock(device).assert_has_calls([call.reset.execute(), call.unload.execute()])
 
 
 async def test_robot_unload_resets_prog_error_and_succeeds_if_error_cleared(
@@ -428,7 +428,7 @@ async def test_robot_unload_resets_prog_error_and_succeeds_if_error_cleared(
 
     await device.set(SAMPLE_LOCATION_EMPTY)
 
-    get_mock(device).assert_has_calls([call.reset.put(None), call.unload.put(None)])
+    get_mock(device).assert_has_calls([call.reset.execute(), call.unload.execute()])
 
 
 async def test_robot_load_does_not_reset_if_prog_error_or_controller_error_not_retryable(
@@ -443,7 +443,7 @@ async def test_robot_load_does_not_reset_if_prog_error_or_controller_error_not_r
     with pytest.raises(RobotLoadError) as e:
         await robot.set(SampleLocation(1, 2))
 
-    get_mock_put(robot.reset).assert_not_called()
+    get_mock_execute(robot.reset).assert_not_called()
     assert e.value.error_code == 123
 
     set_mock_value(robot.prog_error.code, ProgErrorCode.SAMPLE_POSITION_NOT_READY)
@@ -452,7 +452,7 @@ async def test_robot_load_does_not_reset_if_prog_error_or_controller_error_not_r
     with pytest.raises(RobotLoadError):
         await robot.set(SampleLocation(1, 2))
 
-    get_mock_put(robot.reset).assert_not_called()
+    get_mock_execute(robot.reset).assert_not_called()
     assert e.value.error_code == 123
 
 
@@ -463,7 +463,7 @@ async def test_unloading_the_robot_waits_for_drying_to_complete(robot_for_unload
 
     await asyncio.sleep(0.1)
     assert not unload_status.done
-    get_mock_put(robot.unload).assert_called_once()
+    get_mock_execute(robot.unload).assert_called_once()
 
     trigger_completed.set()
     await unload_status

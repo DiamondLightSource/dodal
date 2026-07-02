@@ -2,8 +2,9 @@ from unittest.mock import ANY, call
 
 import pytest
 from ophyd_async.core import (
-    callback_on_mock_put,
+    callback_on_mock_execute,
     get_mock,
+    get_mock_execute,
     get_mock_put,
     init_devices,
     set_mock_value,
@@ -48,7 +49,7 @@ async def test_puck_program_loaded_before_position_selected(robot: Robot) -> Non
     parent_mock = get_mock(robot)
 
     expected_calls = [
-        call.puck_load_program.put(ANY),
+        call.puck_load_program.execute(),
         call.puck_sel.put(ANY),
         call.pos_sel.put(ANY),
     ]
@@ -63,19 +64,19 @@ async def test_given_wrong_puck_program_gets_loaded_robot_times_out(robot: Robot
     def change_to_wrong_program(*_, **__):
         set_mock_value(robot.program_name, "BAD PROGRAM")
 
-    callback_on_mock_put(robot.puck_load_program, change_to_wrong_program)
+    callback_on_mock_execute(robot.puck_load_program, change_to_wrong_program)
 
     with pytest.raises(TimeoutError):
         await robot.set(SampleLocation(puck=1, position=2))
 
-    get_mock_put(robot.puck_pick).assert_not_called()
+    get_mock_execute(robot.puck_pick).assert_not_called()
 
 
 async def test_given_puck_program_doesnt_start_then_robot_times_out(robot: Robot):
     def do_nothing(*_, **__):
         pass
 
-    callback_on_mock_put(robot.puck_pick, do_nothing)
+    callback_on_mock_execute(robot.puck_pick, do_nothing)
 
     with pytest.raises(TimeoutError):
         await robot.set(SampleLocation(puck=1, position=2))
@@ -85,7 +86,7 @@ async def test_given_puck_program_doesnt_stop_then_robot_times_out(robot: Robot)
     def infinite_program(*_, **__):
         set_mock_value(robot.program_running, ProgramRunning.PROGRAM_RUNNING)
 
-    callback_on_mock_put(robot.puck_pick, infinite_program)
+    callback_on_mock_execute(robot.puck_pick, infinite_program)
 
     with pytest.raises(TimeoutError):
         await robot.set(SampleLocation(puck=1, position=2))
@@ -99,11 +100,11 @@ async def test_when_robot_loaded_puck_picked_then_beam_placed(robot: Robot) -> N
 
     calls = parent_mock.mock_calls
 
-    puck_program_loaded = calls.index(call.puck_load_program.put(ANY))
-    puck_picked = calls.index(call.puck_pick.put(ANY))
+    puck_program_loaded = calls.index(call.puck_load_program.execute())
+    puck_picked = calls.index(call.puck_pick.execute())
 
-    beam_program_loaded = calls.index(call.beam_load_program.put(ANY))
-    beam_placed = calls.index(call.beam_place.put(ANY))
+    beam_program_loaded = calls.index(call.beam_load_program.execute())
+    beam_placed = calls.index(call.beam_place.execute())
 
     assert puck_program_loaded < puck_picked < beam_program_loaded < beam_placed
 
@@ -112,19 +113,19 @@ async def test_given_wrong_beam_program_gets_loaded_robot_times_out(robot: Robot
     def change_to_wrong_program(*_, **__):
         set_mock_value(robot.program_name, "BAD PROGRAM")
 
-    callback_on_mock_put(robot.beam_load_program, change_to_wrong_program)
+    callback_on_mock_execute(robot.beam_load_program, change_to_wrong_program)
 
     with pytest.raises(TimeoutError):
         await robot.set(SampleLocation(puck=1, position=2))
 
-    get_mock_put(robot.beam_place).assert_not_called()
+    get_mock_execute(robot.beam_place).assert_not_called()
 
 
 async def test_given_beam_program_doesnt_start_then_robot_times_out(robot: Robot):
     def do_nothing(*_, **__):
         pass
 
-    callback_on_mock_put(robot.beam_place, do_nothing)
+    callback_on_mock_execute(robot.beam_place, do_nothing)
 
     with pytest.raises(TimeoutError):
         await robot.set(SampleLocation(puck=1, position=2))
@@ -134,7 +135,7 @@ async def test_given_beam_program_doesnt_stop_then_robot_times_out(robot: Robot)
     def infinite_program(*_, **__):
         set_mock_value(robot.program_running, ProgramRunning.PROGRAM_RUNNING)
 
-    callback_on_mock_put(robot.beam_place, infinite_program)
+    callback_on_mock_execute(robot.beam_place, infinite_program)
 
     with pytest.raises(TimeoutError):
         await robot.set(SampleLocation(puck=1, position=2))
@@ -178,9 +179,9 @@ async def test_when_unloaded_then_spinner_stops_before_beam_program_loaded(
     parent_mock = get_mock(robot)
 
     expected_calls = [
-        call._spinner_load_program.put(ANY),
-        call._spinner_off.put(ANY),
-        call.beam_load_program.put(ANY),
+        call._spinner_load_program.execute(),
+        call._spinner_off.execute(),
+        call.beam_load_program.execute(),
     ]
 
     parent_mock.assert_has_calls(expected_calls, any_order=False)
@@ -190,12 +191,12 @@ async def test_given_wrong_spinner_program_gets_loaded_then_times_out(robot: Rob
     def change_to_wrong_program(*_, **__):
         set_mock_value(robot.program_name, "BAD PROGRAM")
 
-    callback_on_mock_put(robot._spinner_load_program, change_to_wrong_program)
+    callback_on_mock_execute(robot._spinner_load_program, change_to_wrong_program)
 
     with pytest.raises(TimeoutError):
         await robot.spinner.set(SpinnerState.OFF)
 
-    get_mock_put(robot._spinner_off).assert_not_called()
+    get_mock_execute(robot._spinner_off).assert_not_called()
 
 
 async def test_given_spinner_stop_program_doesnt_start_then_times_out(
@@ -204,7 +205,7 @@ async def test_given_spinner_stop_program_doesnt_start_then_times_out(
     def do_nothing(*_, **__):
         pass
 
-    callback_on_mock_put(robot._spinner_off, do_nothing)
+    callback_on_mock_execute(robot._spinner_off, do_nothing)
 
     with pytest.raises(TimeoutError):
         await robot.spinner.set(SpinnerState.OFF)
@@ -216,7 +217,7 @@ async def test_given_spinner_stop_program_doesnt_stop_then_times_out(
     def infinite_program(*_, **__):
         set_mock_value(robot.program_running, ProgramRunning.PROGRAM_RUNNING)
 
-    callback_on_mock_put(robot._spinner_off, infinite_program)
+    callback_on_mock_execute(robot._spinner_off, infinite_program)
 
     with pytest.raises(TimeoutError):
         await robot.spinner.set(SpinnerState.OFF)
@@ -234,7 +235,7 @@ async def test_given_spinner_is_already_in_state_then_dont_change_it(
 
     await robot.spinner.set(initial_state)
 
-    get_mock_put(robot._spinner_load_program).assert_not_called()
+    get_mock_execute(robot._spinner_load_program).assert_not_called()
 
 
 async def test_when_robot_unloaded_beam_picked_then_puck_placed(robot: Robot) -> None:
@@ -247,11 +248,11 @@ async def test_when_robot_unloaded_beam_picked_then_puck_placed(robot: Robot) ->
 
     calls = parent_mock.mock_calls
 
-    beam_program_loaded = calls.index(call.beam_load_program.put(ANY))
-    beam_picked = calls.index(call.beam_pick.put(ANY))
+    beam_program_loaded = calls.index(call.beam_load_program.execute())
+    beam_picked = calls.index(call.beam_pick.execute())
 
-    puck_program_loaded = calls.index(call.puck_load_program.put(ANY))
-    puck_placed = calls.index(call.puck_place.put(ANY))
+    puck_program_loaded = calls.index(call.puck_load_program.execute())
+    puck_placed = calls.index(call.puck_place.execute())
 
     assert beam_program_loaded < beam_picked < puck_program_loaded < puck_placed
 
