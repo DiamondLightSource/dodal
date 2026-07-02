@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import Mapping
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import numpy as np
 import pytest
@@ -12,6 +12,7 @@ from ophyd_async.core import (
     init_devices,
     set_mock_value,
 )
+from ophyd_async.core._movable import MoveTimeout
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet import (
@@ -85,11 +86,15 @@ async def test_set_calculates_correct_timeout(
     set_mock_value(high_field_magnet.user_setpoint, 0.0)
 
     high_field_magnet.movable_logic.move = AsyncMock()
-    await high_field_magnet.set(new_position)
-    expected_timeout = new_position / sweep_rate + 2 * ramp_up_time + DEFAULT_TIMEOUT
-    high_field_magnet.movable_logic.move.assert_called_with(
-        new_position=new_position, timeout=expected_timeout
-    )
+    with patch("ophyd_async.core._movable.MoveTimeout") as mock_timeout_calculator:
+        await high_field_magnet.set(new_position)
+        expected_timeout = (
+            new_position / sweep_rate + 2 * ramp_up_time + DEFAULT_TIMEOUT
+        )
+        mock_timeout_calculator.assert_called_once_with(expected_timeout)
+        high_field_magnet.movable_logic.move.assert_called_with(
+            new_position=new_position, timeout=mock_timeout_calculator.return_value
+        )
 
 
 async def test_prepare(high_field_magnet: HighFieldMagnet):
@@ -191,7 +196,9 @@ async def test_tolerance_logic_calculate_timeout_with_zero_speed(
 
 async def test_tolerance_logic_move(high_field_magnet: HighFieldMagnet):
     set_mock_value(high_field_magnet.movable_logic.readback, 0.0)
-    move_task = high_field_magnet.movable_logic.move(new_position=10.0, timeout=5.0)
+    move_task = high_field_magnet.movable_logic.move(
+        new_position=10.0, timeout=MoveTimeout(5.0)
+    )
     for value in [2.0, 5.0, 8.0, 9.5, 13.0]:
         set_mock_value(high_field_magnet.movable_logic.readback, value)
         await asyncio.sleep(0.0)
