@@ -5,6 +5,7 @@ from dodal.devices.beamlines.i10 import I10JDiagnostic, I10JSlits
 from dodal.devices.beamlines.i10_1 import (
     ElectromagnetMagnetField,
     ElectromagnetStage,
+    HighFieldMagnet,
     I10JScalerCard,
 )
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
@@ -16,6 +17,7 @@ from dodal.devices.current_amplifiers import (
     Femto3xxRaiseTime,
     FemtoDDPCA,
 )
+from dodal.devices.motors import XYPitchStage
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -231,4 +233,24 @@ def hfm_sr570_scaler_diode_2(
     return CurrentAmpDet(
         current_amp=hfm_sr570_diode_2,
         counter=hfm_scaler_card.fy2,
+    )
+
+
+"""I10J Hight Field Magnet Devices"""
+
+
+@devices.factory()
+def high_field_magnet_stage() -> XYPitchStage:
+    return XYPitchStage(
+        prefix=f"{PREFIX.beamline_prefix}-EA-MAG-01:",
+        x_infix="X",
+        y_infix="INSERT:Y",
+        pitch_infix="INSERT:ROTY",
+    )
+
+
+@devices.factory()
+def high_field_magnet() -> HighFieldMagnet:
+    return HighFieldMagnet(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SMC-01:",
     )

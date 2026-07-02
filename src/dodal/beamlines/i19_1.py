@@ -13,6 +13,9 @@ from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
+)
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
@@ -43,7 +46,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
-I19_1_COMMISSIONING_INSTR_SESSION: str = "cm40638-5"
+I19_1_COMMISSIONING_INSTR_SESSION: str = "cm44168-3"
 
 I19_1_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_PILATUS=1),
@@ -56,6 +59,9 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/domain/display.configuration"
+
+SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
+MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
 
 devices = DeviceManager()
 
@@ -83,6 +89,18 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 @devices.factory()
 def beamstop() -> BeamStop:
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
+
+
+@devices.factory()
+def energy_device(config_client: ConfigClient) -> AccessControlledEnergyComposite:
+    """Access controlled composite device to enable changing the energy from EH1."""
+    return AccessControlledEnergyComposite(
+        dcm_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        hutch=HutchState.EH1,
+        mirror_energy_config=MIRROR_ENERGY_FILE_PATH,
+        config_client=config_client,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
+    )
 
 
 @devices.fixture
@@ -165,9 +183,6 @@ def zebra() -> Zebra:
 
 @devices.factory()
 def hfm_piezo() -> AccessControlledPiezoActuator:
-    """Get the i19-1 access controlled hfm piezo device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
         mirror_type=FocusingMirrorName.HFM,
@@ -178,9 +193,6 @@ def hfm_piezo() -> AccessControlledPiezoActuator:
 
 @devices.factory()
 def vfm_piezo() -> AccessControlledPiezoActuator:
-    """Get the i19-1 access controlled vfm piezo device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
         mirror_type=FocusingMirrorName.VFM,
