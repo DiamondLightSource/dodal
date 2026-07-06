@@ -107,6 +107,7 @@ class MagnetAxis(StandardReadable, Movable[float]):
         await self._magnet_set_within_boundary(**values)
 
 
+# Add support for GDA SuperconductingMagnetControllerClass as well
 class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
@@ -198,3 +199,13 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
                 self.z.demand.set(z),
             )
             await self._ramp()
+
+
+class SuperconductingMagnetController(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.in_ = epics_signal_rw(float, prefix + ":SET:DMD:RAMPRATE:TPM")
+            self.out = epics_signal_rw(float, prefix + ":STS:RAMPRATE:TPM")
+            self.limit = epics_signal_rw(float, prefix + ":LIM:RAMPRATE:TPM")
+
+        super().__init__(name)
