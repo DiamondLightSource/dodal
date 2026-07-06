@@ -18,6 +18,7 @@ from ophyd_async.core import (
     StandardReadableFormat,
     StrictEnum,
     SubsetEnum,
+    TimeoutCalculator,
     WatchableAsyncStatus,
     derived_signal_r,
     error_if_none,
@@ -81,13 +82,13 @@ class ToleranceMovableLogic(MovableLogic[float]):
             raise ValueError(msg) from error
         return timeout
 
-    async def move(self, new_position: float, timeout: float | None) -> None:
+    async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         await set_and_wait_for_other_value(
             set_signal=self.setpoint,
             set_value=new_position,
             match_signal=self.within_tolerance,
             match_value=True,
-            timeout=timeout,
+            timeout=timeout(),
         )
 
 

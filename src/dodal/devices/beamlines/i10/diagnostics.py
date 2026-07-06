@@ -4,7 +4,6 @@ from ophyd_async.core import (
     StrictEnum,
 )
 from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.core._device import DeviceConnector
 from ophyd_async.epics.adaravis import (
     AravisDriverIO,
 )
@@ -196,27 +195,33 @@ class I10JDiagnostic(Device):
 class I10Diagnostic5ADet(Device):
     """Diagnostic 5a detection with drain current and photo diode."""
 
-    def __init__(
-        self, prefix: str, name: str = "", connector: DeviceConnector | None = None
-    ) -> None:
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.drain_current_amp = FemtoDDPCA(
+            prefix=prefix + "IAMP-06:",
+            suffix="GAIN",
+            gain_table=Femto3xxGainTable,
+            gain_to_current_table=Femto3xxGainToCurrentTable,
+            raise_timetable=Femto3xxRaiseTime,
+        )
+        self.drain_counter = StruckScaler(
+            prefix=prefix + "SCLR-02:SCALER2", suffix=".S17"
+        )
         self.drain_current = CurrentAmpDet(
-            current_amp=FemtoDDPCA(
-                prefix=prefix + "IAMP-06:",
-                suffix="GAIN",
-                gain_table=Femto3xxGainTable,
-                gain_to_current_table=Femto3xxGainToCurrentTable,
-                raise_timetable=Femto3xxRaiseTime,
-            ),
-            counter=StruckScaler(prefix=prefix + "SCLR-02:SCALER2", suffix=".S17"),
+            current_amp=self.drain_current_amp,
+            counter=self.drain_counter,
+        )
+        self.diode_current_amp = FemtoDDPCA(
+            prefix=prefix + "IAMP-05:",
+            suffix="GAIN",
+            gain_table=Femto3xxGainTable,
+            gain_to_current_table=Femto3xxGainToCurrentTable,
+            raise_timetable=Femto3xxRaiseTime,
+        )
+        self.diode_current = StruckScaler(
+            prefix=prefix + "SCLR-02:SCALER2", suffix=".S18"
         )
         self.diode = CurrentAmpDet(
-            FemtoDDPCA(
-                prefix=prefix + "IAMP-05:",
-                suffix="GAIN",
-                gain_table=Femto3xxGainTable,
-                gain_to_current_table=Femto3xxGainToCurrentTable,
-                raise_timetable=Femto3xxRaiseTime,
-            ),
-            counter=StruckScaler(prefix=prefix + "SCLR-02:SCALER2", suffix=".S18"),
+            current_amp=self.diode_current_amp,
+            counter=self.diode_current,
         )
-        super().__init__(name, connector)
+        super().__init__(name=name)
