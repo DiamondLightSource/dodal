@@ -261,3 +261,28 @@ async def test_after_robot_unload_new_0_0_is_put_in_index_pvs(robot: Robot):
 
     assert await robot.current_sample.puck.get_value() == 0
     assert await robot.current_sample.position.get_value() == 0
+
+
+async def test_given_no_pin_in_location_when_loaded_then_sensible_error(
+    robot: Robot,
+) -> None:
+    set_mock_value(robot.current_sample.puck, 0)
+    set_mock_value(robot.current_sample.position, 0)
+    set_mock_value(robot.controller_err_code, 9030.0)
+
+    set_location = SampleLocation(puck=1, position=2)
+    with pytest.raises(ValueError) as e:
+        await robot.set(set_location)
+
+    assert "no sample found at puck 1, position 2" in str(e.value)
+
+    assert await robot.current_sample.puck.get_value() != 1
+    assert await robot.current_sample.position.get_value() != 2
+
+
+@pytest.mark.parametrize("puck, position", [(90, 2), (10, 24), (-9, 8)])
+async def test_when_puck_or_position_out_of_bounds_then_error_raised(
+    puck: int, position: int
+) -> None:
+    with pytest.raises(ValueError):
+        SampleLocation(puck, position)
