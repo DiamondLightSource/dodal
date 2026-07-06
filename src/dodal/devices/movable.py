@@ -26,7 +26,7 @@ class MovableWithToleranceLogic(MovableLogic[float]):
         await wait_for_value(self.within_tolerance, True, timeout=timeout())
 
 
-def _within_tolerance_read(setpoint: float, readback: float, tolerance: float) -> bool:
+def _is_within_tolerance(setpoint: float, readback: float, tolerance: float) -> bool:
     return abs(setpoint - readback) < abs(tolerance)
 
 
@@ -44,7 +44,7 @@ class MovableWithTolerance(StandardMovable[float], StandardReadable):
         name: str = "",
     ):
         self.within_tolerance = derived_signal_r(
-            _within_tolerance_read,
+            _is_within_tolerance,
             tolerance=self.tolerance,
             setpoint=self.user_setpoint,
             readback=self.user_readback,

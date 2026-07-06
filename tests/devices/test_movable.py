@@ -91,9 +91,6 @@ async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_w
         await wait_for_value(
             movable_with_tolerance.movable_logic.setpoint, setpoint, timeout=1
         )
-        assert (
-            await movable_with_tolerance.movable_logic.setpoint.get_value() == setpoint
-        )
         # Set some values between initial readback and final setpoint that are outside
         # the threshold to test signal is correct and status hasn't completed.
         for value in [2.0, 5.0, 9.5, 13.0]:
