@@ -8,6 +8,7 @@ from ophyd_async.core import (
     SignalRW,
     StandardMovable,
     StandardReadable,
+    TimeoutCalculator,
     derived_signal_r,
     wait_for_value,
 )
@@ -17,13 +18,13 @@ from ophyd_async.core import (
 class MovableWithToleranceLogic(MovableLogic[float]):
     within_tolerance: SignalR[bool]
 
-    async def move(self, new_position: float, timeout: float | None) -> None:
-        await self.setpoint.set(new_position, timeout=timeout)
-        await wait_for_value(self.setpoint, new_position, timeout=timeout)
+    async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
+        await self.setpoint.set(new_position, timeout=timeout())
+        await wait_for_value(self.setpoint, new_position, timeout=timeout())
         # Once setpoint is at new position, we can check for tolerance signal to see if
         # true now as the within_tolerance window has updated to the new setpoint
         # position. Now it doesn't matter if motor steps are small or large.
-        await wait_for_value(self.within_tolerance, True, timeout=timeout)
+        await wait_for_value(self.within_tolerance, True, timeout=timeout())
 
 
 def _within_tolerance_read(setpoint: float, readback: float, tolerance: float) -> bool:

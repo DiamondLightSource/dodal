@@ -9,6 +9,7 @@ from ophyd_async.core import (
     soft_signal_rw,
     wait_for_value,
 )
+from ophyd_async.core._movable import MoveTimeout
 
 from dodal.devices.movable import MovableWithTolerance
 
@@ -86,7 +87,9 @@ async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_w
     setpoint = 10
 
     async with AsyncStatus(
-        movable_with_tolerance.movable_logic.move(new_position=setpoint, timeout=1)
+        movable_with_tolerance.movable_logic.move(
+            new_position=setpoint, timeout=MoveTimeout(1)
+        )
     ) as move_status:
         # This prevents a race where the test proceeds before the move coroutine has
         # had a chance to execute its first steps.

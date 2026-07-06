@@ -8,7 +8,6 @@ from os import environ
 from pathlib import Path
 from typing import TypedDict
 
-import colorlog
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
 from ophyd.log import logger as ophyd_logger
@@ -26,22 +25,13 @@ DEFAULT_GRAYLOG_PORT = 12231
 
 # Temporarily duplicated https://github.com/bluesky/ophyd-async/issues/550
 DEFAULT_FORMAT = (
-    "%(log_color)s[%(levelname)1.1s %(asctime)s.%(msecs)03d "
-    "%(module)s:%(lineno)d] %(message)s"
+    "%(levelname)1.1s %(asctime)s.%(msecs)03d %(module)s:%(lineno)d] %(message)s"
 )
 
 DEFAULT_DATE_FORMAT = "%y%m%d %H:%M:%S"
 
-DEFAULT_LOG_COLORS = {
-    "DEBUG": "cyan",
-    "INFO": "green",
-    "WARNING": "yellow",
-    "ERROR": "red",
-    "CRITICAL": "red,bg_white",
-}
 
-
-class ColoredFormatterWithDeviceName(colorlog.ColoredFormatter):
+class FormatterWithDeviceName(logging.Formatter):
     def format(self, record):
         message = super().format(record)
         if device_name := getattr(record, "ophyd_async_device_name", None):
@@ -49,8 +39,8 @@ class ColoredFormatterWithDeviceName(colorlog.ColoredFormatter):
         return message
 
 
-DEFAULT_FORMATTER = ColoredFormatterWithDeviceName(
-    fmt=DEFAULT_FORMAT, datefmt=DEFAULT_DATE_FORMAT, log_colors=DEFAULT_LOG_COLORS
+DEFAULT_FORMATTER = FormatterWithDeviceName(
+    fmt=DEFAULT_FORMAT, datefmt=DEFAULT_DATE_FORMAT
 )
 
 

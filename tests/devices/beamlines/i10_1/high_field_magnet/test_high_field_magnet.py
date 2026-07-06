@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import Mapping
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import numpy as np
 import pytest
@@ -85,11 +85,15 @@ async def test_set_calculates_correct_timeout(
     set_mock_value(high_field_magnet.user_setpoint, 0.0)
 
     high_field_magnet.movable_logic.move = AsyncMock()
-    await high_field_magnet.set(new_position)
-    expected_timeout = new_position / sweep_rate + 2 * ramp_up_time + DEFAULT_TIMEOUT
-    high_field_magnet.movable_logic.move.assert_called_with(
-        new_position=new_position, timeout=expected_timeout
-    )
+    with patch("ophyd_async.core._movable.MoveTimeout") as mock_timeout_calculator:
+        await high_field_magnet.set(new_position)
+        expected_timeout = (
+            new_position / sweep_rate + 2 * ramp_up_time + DEFAULT_TIMEOUT
+        )
+        mock_timeout_calculator.assert_called_once_with(expected_timeout)
+        high_field_magnet.movable_logic.move.assert_called_with(
+            new_position=new_position, timeout=mock_timeout_calculator.return_value
+        )
 
 
 async def test_prepare(high_field_magnet: HighFieldMagnet):
