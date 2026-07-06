@@ -3,7 +3,6 @@ from functools import cached_property
 
 from ophyd_async.core import (
     MovableLogic,
-    Reference,
     SignalR,
     SignalRW,
     StandardMovable,
@@ -36,29 +35,26 @@ class MovableWithTolerance(StandardMovable[float], StandardReadable):
     moving if it the readback and setpoint difference is within the tolerance.
     """
 
+    tolerance: SignalR[float]
+    user_setpoint: SignalRW[float]
+    user_readback: SignalR[float]
+
     def __init__(
         self,
-        tolerance: SignalR[float],
-        setpoint: SignalRW[float],
-        readback: SignalR[float],
         name: str = "",
     ):
-        # Use reference so sub classes still have flexibility to name signals to what
-        # they want.
-        self._setpoint_ref = Reference(setpoint)
-        self._readback_ref = Reference(readback)
         self.within_tolerance = derived_signal_r(
             _within_tolerance_read,
-            tolerance=tolerance,
-            setpoint=setpoint,
-            readback=readback,
+            tolerance=self.tolerance,
+            setpoint=self.user_setpoint,
+            readback=self.user_readback,
         )
         super().__init__(name)
 
     @cached_property
     def movable_logic(self) -> MovableWithToleranceLogic:
         return MovableWithToleranceLogic(
-            readback=self._readback_ref(),
-            setpoint=self._setpoint_ref(),
+            readback=self.user_readback,
+            setpoint=self.user_setpoint,
             within_tolerance=self.within_tolerance,
         )

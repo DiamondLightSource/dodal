@@ -36,12 +36,7 @@ class PiezoElectricMotor(MovableWithTolerance):
         self.user_setpoint = epics_signal_rw(float, prefix + ":MOV:RD")
         self.tolerance = soft_signal_rw(float, initial_value=tolerance)
         self.motor_stop = epics_signal_w(int, prefix + ":HLT:WR.PROC")
-        super().__init__(
-            tolerance=self.tolerance,
-            setpoint=self.user_setpoint,
-            readback=self.user_readback,
-            name=name,
-        )
+        super().__init__(name=name)
 
     @cached_property
     def movable_logic(self) -> PiezoElectricMovableLogic:

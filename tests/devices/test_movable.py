@@ -16,15 +16,10 @@ from dodal.devices.movable import MovableWithTolerance
 
 class MovableWithToleranceImpl(MovableWithTolerance):
     def __init__(self, name: str = ""):
-        self.custom_tolerance = soft_signal_rw(float)
-        self.custom_setpoint = soft_signal_rw(float)
-        self.custom_readback, _ = soft_signal_r_and_setter(float)
-        super().__init__(
-            tolerance=self.custom_tolerance,
-            setpoint=self.custom_setpoint,
-            readback=self.custom_readback,
-            name=name,
-        )
+        self.tolerance = soft_signal_rw(float)
+        self.user_setpoint = soft_signal_rw(float)
+        self.user_readback, _ = soft_signal_r_and_setter(float)
+        super().__init__(name=name)
 
 
 @pytest.fixture
@@ -56,9 +51,9 @@ async def test_movable_with_tolerance_within_threshold(
     readback: float,
     expected_within_threshold: bool,
 ) -> None:
-    set_mock_value(movable_with_tolerance.custom_tolerance, tolerance)
-    set_mock_value(movable_with_tolerance.custom_setpoint, setpoint)
-    set_mock_value(movable_with_tolerance.custom_readback, readback)
+    set_mock_value(movable_with_tolerance.tolerance, tolerance)
+    set_mock_value(movable_with_tolerance.user_setpoint, setpoint)
+    set_mock_value(movable_with_tolerance.user_readback, readback)
     assert (
         await movable_with_tolerance.within_tolerance.get_value()
         == expected_within_threshold
@@ -76,7 +71,7 @@ async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_w
     initial_within_tolerance: bool,
     movable_with_tolerance: MovableWithToleranceImpl,
 ) -> None:
-    set_mock_value(movable_with_tolerance.custom_tolerance, 0.1)
+    set_mock_value(movable_with_tolerance.tolerance, 0.1)
 
     set_mock_value(movable_with_tolerance.movable_logic.setpoint, initial_setpoint)
     set_mock_value(movable_with_tolerance.movable_logic.readback, initial_readback)
@@ -115,18 +110,3 @@ async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_w
         # and transitioned to a finished state before asserting `done`.
         await asyncio.wait_for(move_status.task, timeout=1)
         assert move_status.done is True
-
-
-async def test_movable_with_tolerance_sub_class_signal_names_are_not_renamed(
-    movable_with_tolerance: MovableWithToleranceImpl,
-) -> None:
-    assert (
-        movable_with_tolerance.custom_setpoint.name
-        == "movable_with_tolerance-custom_setpoint"
-    )
-    assert (
-        movable_with_tolerance.custom_tolerance.name
-        == "movable_with_tolerance-custom_tolerance"
-    )
-    # Readback is the exception as renamed by StandardMovable to be device name
-    assert movable_with_tolerance.custom_readback.name == "movable_with_tolerance"

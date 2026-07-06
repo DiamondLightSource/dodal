@@ -91,7 +91,7 @@ class HighFieldMagnet(MovableWithTolerance, Flyable, Preparable):
                 read_pv=prefix + "STS:ACTIVITY",
             )
             self.ramp_up_time = soft_signal_rw(datatype=float, initial_value=1.0)
-            self.field_tolerance = soft_signal_rw(float, initial_value=field_tolerance)
+            self.tolerance = soft_signal_rw(float, initial_value=field_tolerance)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.user_readback = epics_signal_r(float, prefix + "RBV:DEMANDFIELD")
@@ -109,12 +109,7 @@ class HighFieldMagnet(MovableWithTolerance, Flyable, Preparable):
         self._fly_info: FlyMagInfo | None = None
         self._fly_status: WatchableAsyncStatus | None = None
 
-        super().__init__(
-            tolerance=self.field_tolerance,
-            setpoint=self.user_setpoint,
-            readback=self.user_readback,
-            name=name,
-        )
+        super().__init__(name=name)
 
     @cached_property
     def movable_logic(self) -> HighFieldMagnetMovableLogic:
