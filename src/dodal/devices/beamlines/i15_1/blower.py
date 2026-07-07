@@ -46,6 +46,10 @@ class Blower(SafeOrBeamPositioner):
         return temperature_rbv
 
     async def _set_temperature(self, temperature: float):
+        """Sets the temperature on the blower.
+
+        A negative or 0 temperature will turn the blower off.
+        """
         pneumatic_state = await self._pneumatic.get_value()
         if temperature > 0 and pneumatic_state != ValveState.OPEN:
             raise ValueError("Blower cannot be turned on pneumatic is not open")

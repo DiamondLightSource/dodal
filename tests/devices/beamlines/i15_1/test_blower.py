@@ -4,6 +4,7 @@ from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllerParams,
 )
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.common.enums import ValveState
 from dodal.devices.beamlines.i15_1.blower import Blower
@@ -56,3 +57,16 @@ async def test_given_pneumatic_is_closed_then_temperature_can_be_turned_off(
 
     await blower.temperature.set(0)
     get_mock_put(blower._temperature_sp).assert_called_once_with(0)
+
+
+async def test_when_temperature_is_read_then_read_underlying_pv(
+    blower: Blower,
+):
+    set_mock_value(blower._temperature_rbv, 100)
+
+    await assert_reading(
+        blower.temperature,
+        {
+            "blower-temperature": partial_reading(100),
+        },
+    )
