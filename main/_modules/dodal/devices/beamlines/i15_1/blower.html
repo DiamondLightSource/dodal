@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.blower &#8212; dodal 2.5.2.dev10+g95e5a1766 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.blower &#8212; dodal 2.5.2.dev11+g765dd537d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=7dbe727c"></script>
+    <script src="../../../../../_static/documentation_options.js?v=aaf6c1c3"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,16 +885,65 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamlines.i15_1.blower</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models.i15_1.xpdf_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models.i15_1.xpdf_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TemperatureControllerParams</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">derived_signal_rw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValveState</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i15_1.safe_or_beam_positioner</span><span class="w"> </span><span class="kn">import</span> <span class="n">SafeOrBeamPositioner</span>
 
 
 <div class="viewcode-block" id="Blower">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.blower.Blower.html#dodal.devices.beamlines.i15_1.blower.Blower">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Blower</span><span class="p">(</span><span class="n">SafeOrBeamPositioner</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Blows hot air on to the sample, can be moved out of the beam to allow room for</span>
+<span class="sd">    a robot load. Temperatures are set in C.</span>
+
+<span class="sd">    For safety reasons the heater should only be turned on (set to a &gt;0 temperature) if</span>
+<span class="sd">    the given pneumatic is open to allow airflow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">motion_pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pneumatic_pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
+        <span class="n">xpdf_parameters_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temperature_sp</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temperature_rbv</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PV:RBV&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_temperature</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_temperature</span><span class="p">,</span>
+                <span class="n">temperature_rbv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_temperature_rbv</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pneumatic</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ValveState</span><span class="p">,</span> <span class="n">pneumatic_pv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramp_rate_c_per_sec</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RR&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RR:RBV&quot;</span>
+        <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">motion_pv</span><span class="p">,</span> <span class="n">config_client</span><span class="p">,</span> <span class="n">xpdf_parameters_path</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature_rbv</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">temperature_rbv</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the temperature on the blower.</span>
+
+<span class="sd">        A negative or 0 temperature will turn the blower off.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pneumatic_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pneumatic</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">temperature</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pneumatic_state</span> <span class="o">!=</span> <span class="n">ValveState</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Blower cannot be turned on pneumatic is not open&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temperature_sp</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemperatureControllerParams</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_full_config</span><span class="p">()</span><span class="o">.</span><span class="n">blower</span></div>
 

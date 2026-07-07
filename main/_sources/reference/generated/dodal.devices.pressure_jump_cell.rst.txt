@@ -28,7 +28,6 @@ dodal.devices.pressure\_jump\_cell
    ~pressure_jump_cell.ValveControl
    ~pressure_jump_cell.ValveControlRequest
    ~pressure_jump_cell.ValveOpenSeqRequest
-   ~pressure_jump_cell.ValveState
 
 
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i15_1.blower.Blower &#8212; dodal 2.5.2.dev10+g95e5a1766 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.blower.Blower &#8212; dodal 2.5.2.dev11+g765dd537d documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=7dbe727c"></script>
+    <script src="../../_static/documentation_options.js?v=aaf6c1c3"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -817,7 +817,6 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.ValveControl.html">dodal.devices.pressure_jump_cell.ValveControl</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.ValveControlRequest.html">dodal.devices.pressure_jump_cell.ValveControlRequest</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.ValveOpenSeqRequest.html">dodal.devices.pressure_jump_cell.ValveOpenSeqRequest</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.ValveState.html">dodal.devices.pressure_jump_cell.ValveState</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.qbpm.html">dodal.devices.qbpm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1058,10 +1057,16 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.beamlines.i15_1.blower.Blower">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.i15_1.blower.</span></span><span class="sig-name descname"><span class="pre">Blower</span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i15_1/blower.html#Blower"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i15_1.blower.Blower" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Blows hot air on to the sample, can be moved out of the beam to allow room for
+a robot load. Temperatures are set in C.</p>
+<p>For safety reasons the heater should only be turned on (set to a &gt;0 temperature) if
+the given pneumatic is open to allow airflow.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>motion_pv</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>pneumatic_pv</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
 <li><p><strong>config_client</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigClient</span></code></span>)</p></li>
 <li><p><strong>xpdf_parameters_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
 </ul>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pressure_jump_cell &#8212; dodal 2.5.2.dev10+g95e5a1766 documentation</title>
+    <title>dodal.devices.pressure_jump_cell &#8212; dodal 2.5.2.dev11+g765dd537d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=7dbe727c"></script>
+    <script src="../../../_static/documentation_options.js?v=aaf6c1c3"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -907,6 +907,8 @@ window.runMermaid = runMermaid;</script>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValveState</span>
+
 <span class="n">OPENSEQ_PULSE_LENGTH</span> <span class="o">=</span> <span class="mf">0.2</span>
 
 
@@ -953,17 +955,6 @@ window.runMermaid = runMermaid;</script>
     <span class="n">EMPTY</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">FORWARD</span> <span class="o">=</span> <span class="s2">&quot;Forward&quot;</span>
     <span class="n">REVERSE</span> <span class="o">=</span> <span class="s2">&quot;Reverse&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="ValveState">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.ValveState.html#dodal.devices.pressure_jump_cell.ValveState">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ValveState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">FAULT</span> <span class="o">=</span> <span class="s2">&quot;Fault&quot;</span>
-    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span>
-    <span class="n">OPENING</span> <span class="o">=</span> <span class="s2">&quot;Opening&quot;</span>
-    <span class="n">CLOSED</span> <span class="o">=</span> <span class="s2">&quot;Closed&quot;</span>
-    <span class="n">CLOSING</span> <span class="o">=</span> <span class="s2">&quot;Closing&quot;</span></div>
 
 
 
