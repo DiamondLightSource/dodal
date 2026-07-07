@@ -4,7 +4,6 @@ from typing import Generic
 from ophyd_async.core import SignalR
 from ophyd_async.epics.adcore import ADAcquireLogic, ADWriterFactory, NDPluginBaseIO
 
-from dodal.devices.electron_analyser.base import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPassEnergy
 from dodal.devices.electron_analyser.base.detector_logic import (
