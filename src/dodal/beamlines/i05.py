@@ -7,7 +7,7 @@ from dodal.devices.beamlines.i05 import I05Goniometer
 from dodal.devices.beamlines.i05_shared import LensMode, M4M5Mirror, PassEnergy
 from dodal.devices.common_mirror import XYZSwitchingMirror
 from dodal.devices.electron_analyser.base import (
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 from dodal.devices.electron_analyser.mbs import (
@@ -75,7 +75,7 @@ def analyser(
         prefix,
         driver,
         acquire_logic=ADAcquireLogic(driver),
-        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        trigger_logic=ElectronAnalyserTriggerLogic(driver),
         region_logic=RegionLogic(driver, pgm.energy.user_readback),
         config_sigs=(
             analyser_slits.direction,

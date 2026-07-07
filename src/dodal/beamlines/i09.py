@@ -15,7 +15,7 @@ from dodal.devices.beamlines.i09.scaler import ScalerController
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
     ShutterCoordinatorADAcquireLogic,
 )
@@ -134,7 +134,7 @@ def ew4000(
         acquire_logic=ShutterCoordinatorADAcquireLogic(
             driver, dual_fast_shutter, ew4000_close_shutter_when_idle
         ),
-        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        trigger_logic=ElectronAnalyserTriggerLogic(driver),
         region_logic=RegionLogic(driver, dual_energy_source.energy, source_selector),
     )
 

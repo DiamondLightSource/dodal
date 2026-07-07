@@ -26,7 +26,7 @@ from dodal.devices.electron_analyser.base.base_region import (
 )
 from dodal.devices.electron_analyser.base.base_util import to_binding_energy
 from dodal.devices.electron_analyser.base.detector_logic import (
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 
@@ -68,7 +68,7 @@ class ElectronAnalyserDetector(
         prefix: str,
         *writer_factories: ADWriterFactory,
         acquire_logic: DetectorAcquireLogic,
-        trigger_logic: ElectronAnalayserTriggerLogic,
+        trigger_logic: ElectronAnalyserTriggerLogic,
         region_logic: RegionLogic,
         plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),

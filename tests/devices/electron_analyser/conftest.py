@@ -20,7 +20,7 @@ from dodal.devices.common_dcm import (
 )
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
     ShutterCoordinatorADAcquireLogic,
 )
@@ -123,7 +123,7 @@ async def b07b_specs150(
             prefix,
             driver,
             acquire_logic=ADAcquireLogic(driver),
-            trigger_logic=ElectronAnalayserTriggerLogic(driver),
+            trigger_logic=ElectronAnalyserTriggerLogic(driver),
             region_logic=RegionLogic(driver, source_energy),
         )
     # Needed for specs so we don't get division by zero error.
@@ -149,7 +149,7 @@ async def ew4000(
             acquire_logic=ShutterCoordinatorADAcquireLogic(
                 driver, dual_fast_shutter, close_shutter_when_idle
             ),
-            trigger_logic=ElectronAnalayserTriggerLogic(driver),
+            trigger_logic=ElectronAnalyserTriggerLogic(driver),
             region_logic=RegionLogic(
                 driver, dual_energy_source.energy, source_selector
             ),
@@ -170,7 +170,7 @@ async def i05_mbs_analyser(
             prefix,
             driver,
             acquire_logic=ADAcquireLogic(driver),
-            trigger_logic=ElectronAnalayserTriggerLogic(driver),
+            trigger_logic=ElectronAnalyserTriggerLogic(driver),
             region_logic=RegionLogic(driver, source_energy),
         )
     energy_axis = [1, 2, 3, 4, 5]

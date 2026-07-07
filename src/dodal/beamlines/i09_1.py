@@ -6,7 +6,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09_1 import LensMode, PsuMode
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import (
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsDetector
@@ -40,7 +40,7 @@ def analyser(
         prefix,
         driver,
         acquire_logic=ADAcquireLogic(driver),
-        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        trigger_logic=ElectronAnalyserTriggerLogic(driver),
         region_logic=RegionLogic(driver, dcm.energy_in_eV),
     )
 

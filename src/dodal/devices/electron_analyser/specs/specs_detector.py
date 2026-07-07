@@ -7,7 +7,7 @@ from ophyd_async.epics.adcore import ADAcquireLogic, ADWriterFactory, NDPluginBa
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.base.detector_logic import (
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
@@ -27,7 +27,7 @@ class SpecsDetector(
         driver: SpecsAnalyserDriverIO[TLensMode, TPsuMode],
         *writer_factories: ADWriterFactory,
         acquire_logic: ADAcquireLogic,
-        trigger_logic: ElectronAnalayserTriggerLogic,
+        trigger_logic: ElectronAnalyserTriggerLogic,
         region_logic: RegionLogic,
         plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),

@@ -11,7 +11,7 @@ from dodal.devices.electron_analyser.base.base_region import (
     TPsuMode,
 )
 from dodal.devices.electron_analyser.base.detector_logic import (
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
@@ -33,7 +33,7 @@ class VGScientaDetector(
         driver: VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergy],
         *writer_factories: ADWriterFactory,
         acquire_logic: ADAcquireLogic,
-        trigger_logic: ElectronAnalayserTriggerLogic,
+        trigger_logic: ElectronAnalyserTriggerLogic,
         region_logic: RegionLogic,
         plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),

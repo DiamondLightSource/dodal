@@ -8,7 +8,7 @@ from dodal.devices.electron_analyser.base import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPassEnergy
 from dodal.devices.electron_analyser.base.detector_logic import (
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 from dodal.devices.electron_analyser.mbs.mbs_driver_io import MbsAnalyserDriverIO
@@ -27,7 +27,7 @@ class MbsDetector(
         driver: MbsAnalyserDriverIO[TLensMode, TPassEnergy],
         *writer_factories: ADWriterFactory,
         acquire_logic: ADAcquireLogic,
-        trigger_logic: ElectronAnalayserTriggerLogic,
+        trigger_logic: ElectronAnalyserTriggerLogic,
         region_logic: RegionLogic,
         plugins: Mapping[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),

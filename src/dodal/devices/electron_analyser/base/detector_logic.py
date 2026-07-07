@@ -41,7 +41,7 @@ class ShutterCoordinatorADAcquireLogic(ADAcquireLogic):
 
 
 @dataclass
-class ElectronAnalayserTriggerLogic(DetectorTriggerLogic):
+class ElectronAnalyserTriggerLogic(DetectorTriggerLogic):
     """Simple trigger logic for electron analyser."""
 
     driver: AbstractAnalyserDriverIO

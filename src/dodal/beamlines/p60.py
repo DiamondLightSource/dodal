@@ -12,7 +12,7 @@ from dodal.devices.beamlines.p60 import (
 )
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 from dodal.devices.electron_analyser.vgscienta import (
@@ -74,6 +74,6 @@ def ew4000(
         prefix=prefix,
         driver=driver,
         acquire_logic=ADAcquireLogic(driver),
-        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        trigger_logic=ElectronAnalyserTriggerLogic(driver),
         region_logic=RegionLogic(driver, dual_energy_source.energy),
     )

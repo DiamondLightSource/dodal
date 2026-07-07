@@ -10,7 +10,7 @@ from dodal.devices.beamlines.b07 import (
 )
 from dodal.devices.beamlines.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import (
-    ElectronAnalayserTriggerLogic,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsDetector
@@ -61,7 +61,7 @@ def analyser(pgm: PlaneGratingMonochromator) -> SpecsDetector[LensMode, PsuMode]
         prefix,
         driver,
         acquire_logic=ADAcquireLogic(driver),
-        trigger_logic=ElectronAnalayserTriggerLogic(driver),
+        trigger_logic=ElectronAnalyserTriggerLogic(driver),
         region_logic=RegionLogic(driver, pgm.energy.user_readback),
     )
 
