@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from pydantic import ValidationError
@@ -23,6 +23,7 @@ def create_det_params_with_dir_and_prefix(directory: str | Path, prefix="test"):
         use_roi_mode=False,
         det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE,
+        run_number=123456,
     )
 
 
@@ -72,43 +73,6 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(
     assert params.beam_xy_converter.lookup_file == "a fake directory"
 
 
-def test_run_number_correct_when_not_specified(tmp_path):
-    params = DetectorParams(
-        expected_energy_ev=100,
-        exposure_time_s=1.0,
-        directory=str(tmp_path),
-        prefix="test",
-        detector_distance=1.0,
-        omega_start=0.0,
-        omega_increment=0.0,
-        num_images_per_trigger=1,
-        num_triggers=1,
-        use_roi_mode=False,
-        det_dist_to_beam_converter_path="a fake directory",
-        detector_size_constants=EIGER2_X_16M_SIZE,
-    )
-    assert params.run_number == 1
-
-
-def test_run_number_correct_when_specified(tmp_path):
-    params = DetectorParams(
-        expected_energy_ev=100,
-        exposure_time_s=1.0,
-        directory=str(tmp_path),
-        run_number=6,
-        prefix="test",
-        detector_distance=1.0,
-        omega_start=0.0,
-        omega_increment=0.0,
-        num_images_per_trigger=1,
-        num_triggers=1,
-        use_roi_mode=False,
-        det_dist_to_beam_converter_path="a fake directory",
-        detector_size_constants=EIGER2_X_16M_SIZE,
-    )
-    assert params.run_number == 6
-
-
 def test_detector_params_is_serialisable(tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
@@ -123,9 +87,9 @@ def test_detector_params_is_serialisable(tmp_path):
         use_roi_mode=False,
         det_dist_to_beam_converter_path="a fake directory",
         detector_size_constants=EIGER2_X_16M_SIZE,
+        run_number=123456,
     )
     json = params.model_dump_json()
-    assert '"run_number"' not in json
     new_params = DetectorParams.model_validate_json(json)
     assert new_params == params
 
@@ -155,19 +119,3 @@ def test_detector_params_deserialisation_unchanged(tmp_path: Path):
     assert '"run_number": 17' in json
     new_params = DetectorParams.model_validate_json(json)
     assert new_params.run_number == 17
-
-
-@patch("os.listdir")
-def test_prefix_is_used_to_determine_run_number(
-    mock_listdir: MagicMock, tmp_path: Path
-):
-    foos = (f"foo_{i}.nxs" for i in range(4))
-    bars = (f"bar_{i}.nxs" for i in range(7))
-    bazs = (f"baz_{i}.nxs" for i in range(23, 29))
-    files = [*foos, *bars, *bazs]
-    mock_listdir.return_value = files
-
-    assert create_det_params_with_dir_and_prefix(tmp_path, "foo").run_number == 4
-    assert create_det_params_with_dir_and_prefix(tmp_path, "bar").run_number == 7
-    assert create_det_params_with_dir_and_prefix(tmp_path, "baz").run_number == 29
-    assert create_det_params_with_dir_and_prefix(tmp_path, "qux").run_number == 1
