@@ -16,6 +16,11 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
+from dodal.devices.beamlines.i06_1.magnets.ramp import (
+    RampMagnetController,
+    RampMagnetControllerGroup,
+)
+
 
 class MagnetModes(StrictEnum):
     UNIAXIAL_X = "UNIAXIAL_X"
@@ -82,29 +87,6 @@ class SphericalMagnetPosition:
         )
 
 
-class RampMagnetController(StandardReadable):
-    def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables():
-            self.out = epics_signal_rw(float, prefix + "STS:RAMPRATE:TPM")
-        self.in_ = epics_signal_rw(float, prefix + "SET:DMD:RAMPRATE:TPM")
-        self.limit = epics_signal_rw(float, prefix + "LIM:RAMPRATE:TPM")
-        super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: float):
-        await self.in_.set(value)
-
-
-class RampMagnetControllerGroup(StandardReadable):
-    def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables():
-            self.x = RampMagnetController(prefix + "-01:")
-            self.y = RampMagnetController(prefix + "-02:")
-            self.z = RampMagnetController(prefix + "-03:")
-
-        super().__init__(name)
-
-
 # ToDo - Use StandardMovable?
 class MagnetAxis(StandardReadable, Movable[float]):
     def __init__(
@@ -134,7 +116,7 @@ class MagnetAxis(StandardReadable, Movable[float]):
         await self._magnet_set_within_boundary(**values)
 
 
-# Add support for GDA SuperconductingMagnetControllerClass as well
+# Add spherical coordinate write values.
 class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
     def __init__(
         self, prefix: str, ramp_controllers: RampMagnetControllerGroup, name: str = ""
