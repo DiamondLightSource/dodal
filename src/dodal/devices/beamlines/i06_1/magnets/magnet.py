@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    Reference,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -81,20 +82,46 @@ class SphericalMagnetPosition:
         )
 
 
-# ToDo - Use StandardMovable
+class RampMagnetController(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.out = epics_signal_rw(float, prefix + "STS:RAMPRATE:TPM")
+        self.in_ = epics_signal_rw(float, prefix + "SET:DMD:RAMPRATE:TPM")
+        self.limit = epics_signal_rw(float, prefix + "LIM:RAMPRATE:TPM")
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        await self.in_.set(value)
+
+
+class RampMagnetControllerGroup(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.x = RampMagnetController(prefix + "-01:")
+            self.y = RampMagnetController(prefix + "-02:")
+            self.z = RampMagnetController(prefix + "-03:")
+
+        super().__init__(name)
+
+
+# ToDo - Use StandardMovable?
 class MagnetAxis(StandardReadable, Movable[float]):
     def __init__(
         self,
         prefix: str,
         axis: str,
+        ramp_controller: RampMagnetController,
         magnet_set_within_boundary: Callable[[], Awaitable[None]],
         name: str = "",
     ):
+        # Used in fastfieldscan, need to add fly scan logic.
+        self.ramp_controller_ref = Reference(ramp_controller)
+
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, prefix + "RBV")
 
-        with self.add_children_as_readables():
-            self.demand = epics_signal_rw(float, prefix + "DMD")
+        self.demand = epics_signal_rw(float, prefix + "DMD")
 
         self._axis = axis
         self._magnet_set_within_boundary = magnet_set_within_boundary
@@ -109,12 +136,20 @@ class MagnetAxis(StandardReadable, Movable[float]):
 
 # Add support for GDA SuperconductingMagnetControllerClass as well
 class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(
+        self, prefix: str, ramp_controllers: RampMagnetControllerGroup, name: str = ""
+    ):
         with self.add_children_as_readables():
             # Cartesian and real pv values
-            self.x = MagnetAxis(prefix + "X:", "x", self.set_within_boundary)
-            self.y = MagnetAxis(prefix + "Y:", "y", self.set_within_boundary)
-            self.z = MagnetAxis(prefix + "Z:", "z", self.set_within_boundary)
+            self.x = MagnetAxis(
+                prefix + "X:", "x", ramp_controllers.x, self.set_within_boundary
+            )
+            self.y = MagnetAxis(
+                prefix + "Y:", "y", ramp_controllers.y, self.set_within_boundary
+            )
+            self.z = MagnetAxis(
+                prefix + "Z:", "z", ramp_controllers.y, self.set_within_boundary
+            )
 
             # Spherical representations of x, y, z
             self.theta = derived_signal_r(
@@ -166,6 +201,7 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
             raise RuntimeError("Args x, y, and z cannot all be None at the same time.")
 
         # For keeping the magnitude constrained to avoid quench, always do the decreasing before increasing motors
+        # Can this be simplified?
         x0, y0, z0 = await asyncio.gather(
             self.x.readback.get_value(),
             self.y.readback.get_value(),
@@ -199,13 +235,3 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
                 self.z.demand.set(z),
             )
             await self._ramp()
-
-
-class SuperconductingMagnetController(StandardReadable):
-    def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables():
-            self.in_ = epics_signal_rw(float, prefix + ":SET:DMD:RAMPRATE:TPM")
-            self.out = epics_signal_rw(float, prefix + ":STS:RAMPRATE:TPM")
-            self.limit = epics_signal_rw(float, prefix + ":LIM:RAMPRATE:TPM")
-
-        super().__init__(name)
