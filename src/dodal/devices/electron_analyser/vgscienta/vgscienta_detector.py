@@ -40,6 +40,7 @@ class VGScientaDetector(
         name: str = "",
     ):
         config_sigs = (
+            *config_sigs,
             driver.region_name,
             driver.energy_mode,
             driver.acquisition_mode,
