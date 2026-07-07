@@ -55,7 +55,7 @@ def pgm() -> PlaneGratingMonochromator:
 
 @devices.factory()
 def analyser(pgm: PlaneGratingMonochromator) -> SpecsDetector[LensMode, PsuMode]:
-    prefix = f"{B_PREFIX.beamline_prefix}-EA-DET-02:CAM:"
+    prefix = f"{B_PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     driver = SpecsAnalyserDriverIO(prefix, LensMode, PsuMode)
     return SpecsDetector[LensMode, PsuMode](
         prefix,
