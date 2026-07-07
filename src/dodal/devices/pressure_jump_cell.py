@@ -20,6 +20,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.common.enums import ValveState
+
 OPENSEQ_PULSE_LENGTH = 0.2
 
 
@@ -52,14 +54,6 @@ class PumpMotorDirectionState(StrictEnum):
     EMPTY = ""
     FORWARD = "Forward"
     REVERSE = "Reverse"
-
-
-class ValveState(StrictEnum):
-    FAULT = "Fault"
-    OPEN = "Open"
-    OPENING = "Opening"
-    CLOSED = "Closed"
-    CLOSING = "Closing"
 
 
 class FastValveState(StrictEnum):
