@@ -54,7 +54,6 @@ class MbsDetector(
             driver.angle_axis,
             driver.psu_mode,
             driver.dither_steps,
-            driver.spin_offset,
             driver.array_size_x,
             driver.array_size_y,
             driver.min_x,
