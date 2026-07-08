@@ -18,7 +18,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 
 from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
     MagnetAxisRampRateController,
-    MagnetAxisRampRateControllerGroup,
+    MagnetThreeAxesRampRateController,
 )
 
 
@@ -121,7 +121,7 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
     def __init__(
         self,
         prefix: str,
-        ramp_controllers: MagnetAxisRampRateControllerGroup,
+        ramp_controllers: MagnetThreeAxesRampRateController,
         name: str = "",
     ):
         with self.add_children_as_readables():
