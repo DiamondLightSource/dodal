@@ -10,14 +10,14 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
-    derived_signal_r,
+    derived_signal_rw,
     soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
-from dodal.devices.beamlines.i06_1.magnets.ramp import (
-    RampMagnetController,
+from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
+    RampMagnetAxisController,
     RampMagnetControllerGroup,
 )
 
@@ -62,8 +62,8 @@ class MagnetPosition:
     y: float
     z: float
 
-    def to_spherical(self) -> "SphericalMagnetPosition":
-        return SphericalMagnetPosition(
+    def to_spherical(self) -> "MagnetSphericalPosition":
+        return MagnetSphericalPosition(
             rho=read_rho(self.x, self.y, self.z),
             theta=read_theta(self.x, self.z),
             phi=read_phi(self.x, self.y, self.z),
@@ -71,7 +71,7 @@ class MagnetPosition:
 
 
 @dataclass(frozen=True)
-class SphericalMagnetPosition:
+class MagnetSphericalPosition:
     rho: float
     theta: float  # degrees
     phi: float  # degrees
@@ -93,7 +93,7 @@ class MagnetAxis(StandardReadable, Movable[float]):
         self,
         prefix: str,
         axis: str,
-        ramp_controller: RampMagnetController,
+        ramp_controller: RampMagnetAxisController,
         magnet_set_within_boundary: Callable[[], Awaitable[None]],
         name: str = "",
     ):
@@ -132,16 +132,23 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
             self.z = MagnetAxis(
                 prefix + "Z:", "z", ramp_controllers.y, self.set_within_boundary
             )
-
             # Spherical representations of x, y, z
-            self.theta = derived_signal_r(
-                read_theta, x=self.x.readback, z=self.z.readback
+            self.theta = derived_signal_rw(
+                read_theta, self._set_rho, x=self.x.readback, z=self.z.readback
             )
-            self.rho = derived_signal_r(
-                read_rho, x=self.x.readback, y=self.y.readback, z=self.z.readback
+            self.rho = derived_signal_rw(
+                read_rho,
+                self._set_rho,
+                x=self.x.readback,
+                y=self.y.readback,
+                z=self.z.readback,
             )
-            self.phi = derived_signal_r(
-                read_phi, x=self.x.readback, y=self.y.readback, z=self.z.readback
+            self.phi = derived_signal_rw(
+                read_phi,
+                self._set_phi,
+                x=self.x.readback,
+                y=self.y.readback,
+                z=self.z.readback,
             )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -156,9 +163,24 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
 
         super().__init__(name)
 
+    async def _set_rho(self, rho: float):
+        theta, phi = await asyncio.gather(self.theta.get_value(), self.phi.get_value())
+        spherical_pos = MagnetSphericalPosition(rho=rho, theta=theta, phi=phi)
+        await self.set(spherical_pos)
+
+    async def _set_theta(self, theta: float):
+        rho, phi = await asyncio.gather(self.rho.get_value(), self.phi.get_value())
+        spherical_pos = MagnetSphericalPosition(rho=rho, theta=theta, phi=phi)
+        await self.set(spherical_pos)
+
+    async def _set_phi(self, phi: float):
+        rho, theta = await asyncio.gather(self.rho.get_value(), self.theta.get_value())
+        spherical_pos = MagnetSphericalPosition(rho=rho, theta=theta, phi=phi)
+        await self.set(spherical_pos)
+
     @AsyncStatus.wrap
-    async def set(self, value: MagnetPosition | SphericalMagnetPosition):
-        if isinstance(value, SphericalMagnetPosition):
+    async def set(self, value: MagnetPosition | MagnetSphericalPosition):
+        if isinstance(value, MagnetSphericalPosition):
             value = value.to_cartesian()
         await self.set_within_boundary(x=value.x, y=value.y, z=value.z)
 

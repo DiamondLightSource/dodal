@@ -2,7 +2,7 @@ from dodal.beamlines.i06_shared import devices as i06_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
-from dodal.devices.beamlines.i06_1.magnets.magnet import (
+from dodal.devices.beamlines.i06_1.magnets.superconducting_magnet import (
     RampMagnetControllerGroup,
     SuperConductingMagnet,
 )
@@ -21,12 +21,12 @@ devices.include(i06_shared_devices)
 
 
 @devices.factory()
-def diff_cooling_temperature_controller() -> Lakeshore336:
+def ls336() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")
 
 
 @devices.factory()
-def diff_heating_temperature_controller() -> Lakeshore336:
+def ls336_2() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:")
 
 
