@@ -2,8 +2,8 @@ from dodal.beamlines.i06_shared import devices as i06_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
-from dodal.devices.beamlines.i06_1.magnets.superconducting_magnet import (
-    RampMagnetControllerGroup,
+from dodal.devices.beamlines.i06_1.magnets import (
+    MagnetAxisRampRateControllerGroup,
     SuperConductingMagnet,
 )
 from dodal.devices.motors import XYThetaStage
@@ -41,10 +41,10 @@ def dd() -> DiffractionDichroism:
 
 
 @devices.factory()
-def mag_ramp_rate() -> RampMagnetControllerGroup:
-    return RampMagnetControllerGroup(f"{PREFIX.beamline_prefix}-EA-SMC")
+def mag_ramp_rate() -> MagnetAxisRampRateControllerGroup:
+    return MagnetAxisRampRateControllerGroup(f"{PREFIX.beamline_prefix}-EA-SMC")
 
 
 @devices.factory()
-def scmc(mag_ramp_rate: RampMagnetControllerGroup) -> SuperConductingMagnet:
+def scmc(mag_ramp_rate: MagnetAxisRampRateControllerGroup) -> SuperConductingMagnet:
     return SuperConductingMagnet(f"{PREFIX.beamline_prefix}-EA-MAG-01:", mag_ramp_rate)

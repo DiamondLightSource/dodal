@@ -17,8 +17,8 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
-    RampMagnetAxisController,
-    RampMagnetControllerGroup,
+    MagnetAxisRampRateController,
+    MagnetAxisRampRateControllerGroup,
 )
 
 
@@ -93,7 +93,7 @@ class MagnetAxis(StandardReadable, Movable[float]):
         self,
         prefix: str,
         axis: str,
-        ramp_controller: RampMagnetAxisController,
+        ramp_controller: MagnetAxisRampRateController,
         magnet_set_within_boundary: Callable[[], Awaitable[None]],
         name: str = "",
     ):
@@ -119,7 +119,10 @@ class MagnetAxis(StandardReadable, Movable[float]):
 # Add spherical coordinate write values.
 class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
     def __init__(
-        self, prefix: str, ramp_controllers: RampMagnetControllerGroup, name: str = ""
+        self,
+        prefix: str,
+        ramp_controllers: MagnetAxisRampRateControllerGroup,
+        name: str = "",
     ):
         with self.add_children_as_readables():
             # Cartesian and real pv values
@@ -134,21 +137,17 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
             )
             # Spherical representations of x, y, z
             self.theta = derived_signal_rw(
-                read_theta, self._set_rho, x=self.x.readback, z=self.z.readback
+                read_theta, self._set_rho, x=self.x, z=self.z
             )
             self.rho = derived_signal_rw(
-                read_rho,
-                self._set_rho,
-                x=self.x.readback,
-                y=self.y.readback,
-                z=self.z.readback,
+                read_rho, self._set_rho, x=self.x, y=self.y, z=self.z
             )
             self.phi = derived_signal_rw(
                 read_phi,
                 self._set_phi,
-                x=self.x.readback,
-                y=self.y.readback,
-                z=self.z.readback,
+                x=self.x,
+                y=self.y,
+                z=self.z,
             )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -204,7 +203,8 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
         if x is None and y is None and z is None:
             raise RuntimeError("Args x, y, and z cannot all be None at the same time.")
 
-        # For keeping the magnitude constrained to avoid quench, always do the decreasing before increasing motors
+        # For keeping the magnitude constrained to avoid quench, always do the
+        # decreasing before increasing motors
         # Can this be simplified?
         x0, y0, z0 = await asyncio.gather(
             self.x.readback.get_value(),
