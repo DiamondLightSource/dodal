@@ -72,6 +72,9 @@ dodal.devices.electron\_analyser.mbs.AcquisitionMode
       ~AcquisitionMode.FIXED
       
       
+      ~AcquisitionMode.FIXED_TRIGD
+      
+      
       ~AcquisitionMode.SWEPT
       
       

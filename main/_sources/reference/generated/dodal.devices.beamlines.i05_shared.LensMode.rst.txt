@@ -83,5 +83,14 @@ dodal.devices.beamlines.i05\_shared.LensMode
       
       ~LensMode.L4M_SPAT_5
       
+      
+      ~LensMode.L5ANG0D3
+      
+      
+      ~LensMode.L5ANG0D46
+      
+      
+      ~LensMode.L5ANG0D4
+      
    
    

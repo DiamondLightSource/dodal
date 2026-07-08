@@ -21,6 +21,9 @@ dodal.devices.electron\_analyser.base
    ~base.BaseSequence
    ~base.GenericRegion
    ~base.GenericSequence
+   ~base.ElectronAnalyserTriggerLogic
+   ~base.RegionLogic
+   ~base.ShutterCoordinatorADAcquireLogic
    ~base.DualEnergySource
 
 

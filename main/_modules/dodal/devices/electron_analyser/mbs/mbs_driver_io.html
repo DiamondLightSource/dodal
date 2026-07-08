@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.mbs.mbs_driver_io &#8212; dodal 2.5.2.dev11+g765dd537d documentation</title>
+    <title>dodal.devices.electron_analyser.mbs.mbs_driver_io &#8212; dodal 2.5.2.dev12+ge9a073c8a documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=aaf6c1c3"></script>
+    <script src="../../../../../_static/documentation_options.js?v=6e254763"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -921,7 +921,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">low_energy</span><span class="o">=</span><span class="s2">&quot;StartKE&quot;</span><span class="p">,</span>
         <span class="n">centre_energy</span><span class="o">=</span><span class="s2">&quot;CentreKE&quot;</span><span class="p">,</span>
         <span class="n">high_energy</span><span class="o">=</span><span class="s2">&quot;EndKE&quot;</span><span class="p">,</span>
-        <span class="n">psu_mode</span><span class="o">=</span><span class="s2">&quot;PsuMode_RBV&quot;</span><span class="p">,</span>
+        <span class="n">psu_mode</span><span class="o">=</span><span class="s2">&quot;Connection_RBV&quot;</span><span class="p">,</span>
         <span class="n">slices</span><span class="o">=</span><span class="s2">&quot;NumSlice&quot;</span><span class="p">,</span>
         <span class="n">iterations</span><span class="o">=</span><span class="s2">&quot;NumExposures&quot;</span><span class="p">,</span>
         <span class="n">total_steps</span><span class="o">=</span><span class="s2">&quot;NumSteps&quot;</span><span class="p">,</span>
@@ -945,7 +945,6 @@ window.runMermaid = runMermaid;</script>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">deflector_x</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DeflX&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dither_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DithSteps&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spin_offset</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SpinOffs&quot;</span><span class="p">)</span>
             <span class="c1"># Region origin</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">min_x</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MinX&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">min_y</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MinY&quot;</span><span class="p">)</span>
