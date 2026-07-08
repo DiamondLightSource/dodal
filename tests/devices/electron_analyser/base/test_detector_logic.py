@@ -15,9 +15,10 @@ from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import assert_configuration, partial_reading
 
 from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
-from dodal.devices.electron_analyser.base import AbstractAnalyserDriverIO, BaseRegion
-from dodal.devices.electron_analyser.base.detector_logic import (
-    ElectronAnalayserTriggerLogic,
+from dodal.devices.electron_analyser.base import (
+    AbstractAnalyserDriverIO,
+    BaseRegion,
+    ElectronAnalyserTriggerLogic,
     RegionLogic,
     ShutterCoordinatorADAcquireLogic,
 )
@@ -178,12 +179,14 @@ async def test_region_logic_setup_with_region_moves_selected_source_if_not_none(
 
 
 @pytest.fixture
-def trigger_logic(driver: AbstractAnalyserDriverIO) -> ElectronAnalayserTriggerLogic:
-    return ElectronAnalayserTriggerLogic(driver, {driver.lens_mode, driver.psu_mode})
+def trigger_logic(
+    driver: AbstractAnalyserDriverIO,
+) -> ElectronAnalyserTriggerLogic:
+    return ElectronAnalyserTriggerLogic(driver, {driver.lens_mode, driver.psu_mode})
 
 
 async def test_electron_analyser_trigger_logic_prepare_internal(
-    trigger_logic: ElectronAnalayserTriggerLogic,
+    trigger_logic: ElectronAnalyserTriggerLogic,
 ) -> None:
     detector = StandardDetector()
     detector.add_detector_logics(trigger_logic)
@@ -194,7 +197,7 @@ async def test_electron_analyser_trigger_logic_prepare_internal(
 
 
 async def test_electron_analyser_trigger_logic_config_sigs(
-    trigger_logic: ElectronAnalayserTriggerLogic,
+    trigger_logic: ElectronAnalyserTriggerLogic,
 ) -> None:
     detector = StandardDetector()
     detector.add_detector_logics(trigger_logic)
@@ -209,6 +212,6 @@ async def test_electron_analyser_trigger_logic_config_sigs(
 
 
 async def test_electron_analyser_deadtime(
-    trigger_logic: ElectronAnalayserTriggerLogic,
+    trigger_logic: ElectronAnalyserTriggerLogic,
 ) -> None:
     assert trigger_logic.get_deadtime(SignalDict()) == 0.0

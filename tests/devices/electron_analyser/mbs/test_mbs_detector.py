@@ -35,7 +35,6 @@ async def test_mbs_detector_read_configuration(i05_mbs_analyser: MbsDetector) ->
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
             f"{prefix}dither_steps": partial_reading(ANY),
-            f"{prefix}spin_offset": partial_reading(ANY),
             f"{prefix}array_size_x": partial_reading(ANY),
             f"{prefix}array_size_y": partial_reading(ANY),
             f"{prefix}min_x": partial_reading(ANY),
