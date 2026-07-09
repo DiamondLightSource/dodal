@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import AsyncMock, call
 
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
@@ -209,3 +210,68 @@ async def test_scmc_raises_error_if_limit_status_is_violation(
     set_mock_value(scmc.limit_status, MagnetLimitStatus.VIOLTATION)
     with pytest.raises(RuntimeError):
         await scmc.x.set(10)
+
+
+@pytest.mark.parametrize(
+    "initial, target, expected_calls",
+    [
+        (
+            MagnetPosition(x=10, y=10, z=10),
+            MagnetPosition(x=20, y=5, z=2),
+            [
+                call.z(2),
+                call.ramp(),
+                call.y(5),
+                call.ramp(),
+                call.x(20),
+                call.y(5),
+                call.z(2),
+                call.ramp(),
+            ],
+        ),
+        (
+            MagnetPosition(x=10, y=10, z=10),
+            MagnetPosition(x=5, y=20, z=2),
+            [
+                call.z(2),
+                call.ramp(),
+                call.x(5),
+                call.ramp(),
+                call.x(5),
+                call.y(20),
+                call.z(2),
+                call.ramp(),
+            ],
+        ),
+        (
+            MagnetPosition(x=10, y=10, z=10),
+            MagnetPosition(x=5, y=2, z=20),
+            [
+                call.x(5),
+                call.ramp(),
+                call.y(2),
+                call.ramp(),
+                call.x(5),
+                call.y(2),
+                call.z(20),
+                call.ramp(),
+            ],
+        ),
+    ],
+)
+async def test_scmc_set_decreases_before_increases(
+    scmc: SuperConductingMagnet,
+    initial: MagnetPosition,
+    target: MagnetPosition,
+    expected_calls,
+) -> None:
+    await scmc.set(initial)
+
+    calls = []
+    scmc.x.demand.set = AsyncMock(side_effect=lambda v: calls.append(call.x(v)))
+    scmc.y.demand.set = AsyncMock(side_effect=lambda v: calls.append(call.y(v)))
+    scmc.z.demand.set = AsyncMock(side_effect=lambda v: calls.append(call.z(v)))
+    scmc._ramp = AsyncMock(side_effect=lambda: calls.append(call.ramp()))
+
+    await scmc.set(target)
+    assert calls == expected_calls
