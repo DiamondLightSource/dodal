@@ -164,11 +164,11 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
                 prefix + "Y:", "y", ramp_controllers.y, self.set_within_boundary
             )
             self.z = MagnetAxis(
-                prefix + "Z:", "z", ramp_controllers.y, self.set_within_boundary
+                prefix + "Z:", "z", ramp_controllers.z, self.set_within_boundary
             )
             # Spherical representations of x, y, z
             self.theta = derived_signal_rw(
-                read_theta, self._set_rho, x=self.x, z=self.z
+                read_theta, self._set_theta, x=self.x, z=self.z
             )
             self.rho = derived_signal_rw(
                 read_rho, self._set_rho, x=self.x, y=self.y, z=self.z
@@ -193,20 +193,33 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
 
         super().__init__(name)
 
-    async def _set_rho(self, rho: float):
-        theta, phi = await asyncio.gather(self.theta.get_value(), self.phi.get_value())
-        spherical_pos = MagnetSphericalPosition(rho=rho, theta=theta, phi=phi)
+    async def _set_spherical(
+        self,
+        rho: float | None = None,
+        theta: float | None = None,
+        phi: float | None = None,
+    ):
+        x, y, z = await asyncio.gather(
+            self.x.readback.get_value(),
+            self.y.readback.get_value(),
+            self.z.readback.get_value(),
+        )
+        current = MagnetPosition(x=x, y=y, z=z).to_spherical()
+        spherical_pos = MagnetSphericalPosition(
+            rho=current.rho if rho is None else rho,
+            theta=current.theta if theta is None else theta,
+            phi=current.phi if phi is None else phi,
+        )
         await self.set(spherical_pos)
+
+    async def _set_rho(self, rho: float):
+        await self._set_spherical(rho=rho)
 
     async def _set_theta(self, theta: float):
-        rho, phi = await asyncio.gather(self.rho.get_value(), self.phi.get_value())
-        spherical_pos = MagnetSphericalPosition(rho=rho, theta=theta, phi=phi)
-        await self.set(spherical_pos)
+        await self._set_spherical(theta=theta)
 
     async def _set_phi(self, phi: float):
-        rho, theta = await asyncio.gather(self.rho.get_value(), self.theta.get_value())
-        spherical_pos = MagnetSphericalPosition(rho=rho, theta=theta, phi=phi)
-        await self.set(spherical_pos)
+        await self._set_spherical(phi=phi)
 
     @AsyncStatus.wrap
     async def set(self, value: MagnetPosition | MagnetSphericalPosition):

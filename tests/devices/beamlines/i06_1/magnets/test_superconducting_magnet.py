@@ -165,6 +165,44 @@ async def test_scmc_set_using_cartesian(
     assert phi == pytest.approx(spherical.phi)
 
 
+@pytest.mark.parametrize(
+    "axis, value, expected_spherical",
+    [
+        ("rho", 2, MagnetSphericalPosition(rho=2, theta=20, phi=30)),
+        ("theta", 40, MagnetSphericalPosition(rho=1, theta=40, phi=30)),
+        ("phi", 60, MagnetSphericalPosition(rho=1, theta=20, phi=60)),
+    ],
+)
+async def test_scmc_spherical_axis_set(
+    scmc: SuperConductingMagnet,
+    axis: str,
+    value: float,
+    expected_spherical: MagnetSphericalPosition,
+) -> None:
+    # Start from a non-singular position.
+    await scmc.set(MagnetSphericalPosition(rho=1, theta=20, phi=30))
+    await getattr(scmc, axis).set(value)
+
+    rho, theta, phi = await asyncio.gather(
+        scmc.rho.get_value(),
+        scmc.theta.get_value(),
+        scmc.phi.get_value(),
+    )
+    assert rho == pytest.approx(expected_spherical.rho)
+    assert theta == pytest.approx(expected_spherical.theta)
+    assert phi == pytest.approx(expected_spherical.phi)
+
+    expected_cartesian = expected_spherical.to_cartesian()
+    x, y, z = await asyncio.gather(
+        scmc.x.readback.get_value(),
+        scmc.y.readback.get_value(),
+        scmc.z.readback.get_value(),
+    )
+    assert x == pytest.approx(expected_cartesian.x)
+    assert y == pytest.approx(expected_cartesian.y)
+    assert z == pytest.approx(expected_cartesian.z)
+
+
 async def test_scmc_raises_error_if_limit_status_is_violation(
     scmc: SuperConductingMagnet,
 ) -> None:
