@@ -2,15 +2,22 @@ import asyncio
 import math
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from functools import cached_property
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceMock,
+    MovableLogic,
     Reference,
+    StandardMovable,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    callback_on_mock_put,
+    default_mock_class,
     derived_signal_rw,
+    set_mock_value,
     soft_signal_rw,
     wait_for_value,
 )
@@ -39,8 +46,8 @@ class MagnetRampStatus(StrictEnum):
 
 
 class MagnetLimitStatus(StrictEnum):
-    VIOLTATION = "VIOLATION"
     OK = "OK"
+    VIOLTATION = "VIOLATION"
 
 
 def read_theta(x: float, z: float) -> float:
@@ -56,7 +63,7 @@ def read_phi(x: float, y: float, z: float) -> float:
     return math.degrees(math.atan2(math.hypot(x, z), y))
 
 
-@dataclass
+@dataclass(kw_only=True)
 class MagnetPosition:
     x: float
     y: float
@@ -70,7 +77,7 @@ class MagnetPosition:
         )
 
 
-@dataclass(frozen=True)
+@dataclass(kw_only=True)
 class MagnetSphericalPosition:
     rho: float
     theta: float  # degrees
@@ -87,8 +94,20 @@ class MagnetSphericalPosition:
         )
 
 
-# ToDo - Use StandardMovable?
-class MagnetAxis(StandardReadable, Movable[float]):
+@dataclass
+class MagnetAxisMovableLogic(MovableLogic[float]):
+    axis: str
+    magnet_set_within_boundary: Callable[[], Awaitable[None]]
+
+    async def move(
+        self, new_position: float, timeout: Callable[[], float | None]
+    ) -> None:
+        values = {self.axis: new_position}
+        # ToDo - feed timeout to here?
+        await self.magnet_set_within_boundary(**values)
+
+
+class MagnetAxis(StandardReadable, StandardMovable[float]):
     def __init__(
         self,
         prefix: str,
@@ -102,21 +121,33 @@ class MagnetAxis(StandardReadable, Movable[float]):
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, prefix + "RBV")
-
         self.demand = epics_signal_rw(float, prefix + "DMD")
 
-        self._axis = axis
-        self._magnet_set_within_boundary = magnet_set_within_boundary
-
+        self._movable_logic = MagnetAxisMovableLogic(
+            readback=self.readback,
+            setpoint=self.demand,
+            axis=axis,
+            magnet_set_within_boundary=magnet_set_within_boundary,
+        )
         super().__init__(name)
 
-    @AsyncStatus.wrap
-    async def set(self, value: float):
-        values = {self._axis: value}
-        await self._magnet_set_within_boundary(**values)
+    @cached_property
+    def movable_logic(self) -> MagnetAxisMovableLogic:
+        return self._movable_logic
 
 
-# Add spherical coordinate write values.
+class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
+    async def connect(self, device: "SuperConductingMagnet"):
+
+        def _set_ramp_status(value):
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+
+        callback_on_mock_put(device.start_ramp, _set_ramp_status)
+        set_mock_value(device.limit_status, MagnetLimitStatus.OK)
+
+
+@default_mock_class(MockSuperConductingMagnet)
 class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
     def __init__(
         self,
