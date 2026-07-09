@@ -183,13 +183,13 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
-            self.timeout = soft_signal_rw(float, initial_value=300)
             self.delay = soft_signal_rw(float, initial_value=0.1)
 
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
 
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
         self.start_ramp = epics_signal_x(prefix + "STARTRAMP.PROC")
+        self.timeout = 600
 
         super().__init__(name)
 
@@ -229,9 +229,8 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
 
     async def _ramp(self):
         # ToDo - Use TimeoutCalculated from ophyd-async in new release.
-        timeout = await self.timeout.get_value()
-        await self.start_ramp.trigger(timeout=timeout)
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout)
+        await self.start_ramp.trigger(timeout=self.timeout)
+        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, self.timeout)
 
         if await self.limit_status.get_value() == MagnetLimitStatus.VIOLTATION:
             raise RuntimeError(
