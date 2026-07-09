@@ -83,9 +83,11 @@ def base_y() -> Motor:
 
 
 @devices.factory()
-def blower_z(config_client: ConfigClient) -> Blower:
+def blower(config_client: ConfigClient) -> Blower:
     return Blower(
+        f"{PREFIX.beamline_prefix}-EA-BLOW-01:",
         f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
+        f"{PREFIX.beamline_prefix}-DI-PHDGN-03:STA",
         config_client,
         XPDF_PARAMETERS_FILEPATH,
     )
