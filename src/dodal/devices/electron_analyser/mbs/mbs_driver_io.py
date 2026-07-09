@@ -32,7 +32,7 @@ class MbsAnalyserDriverIO(
         low_energy="StartKE",
         centre_energy="CentreKE",
         high_energy="EndKE",
-        psu_mode="PsuMode_RBV",
+        psu_mode="Connection_RBV",
         slices="NumSlice",
         iterations="NumExposures",
         total_steps="NumSteps",
@@ -56,7 +56,6 @@ class MbsAnalyserDriverIO(
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.deflector_x = epics_signal_rw(float, prefix + "DeflX")
             self.dither_steps = epics_signal_rw(int, prefix + "DithSteps")
-            self.spin_offset = epics_signal_rw(float, prefix + "SpinOffs")
             # Region origin
             self.min_x = epics_signal_rw(int, prefix + "MinX")
             self.min_y = epics_signal_rw(int, prefix + "MinY")
