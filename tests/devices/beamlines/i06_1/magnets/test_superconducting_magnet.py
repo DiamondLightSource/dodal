@@ -257,6 +257,18 @@ async def test_scmc_raises_error_if_limit_status_is_violation(
                 call.ramp(),
             ],
         ),
+        (
+            MagnetPosition(x=10, y=10, z=10),
+            MagnetPosition(x=5, y=5, z=2),
+            [
+                call.z(2),
+                call.ramp(),
+                call.x(5),
+                call.ramp(),
+                call.y(5),
+                call.ramp(),
+            ],
+        ),
     ],
 )
 async def test_scmc_set_decreases_before_increases(
@@ -275,3 +287,10 @@ async def test_scmc_set_decreases_before_increases(
 
     await scmc.set(target)
     assert calls == expected_calls
+
+
+async def test_scmc_set_within_boundary_raises_error_if_all_values_none(
+    scmc: SuperConductingMagnet,
+) -> None:
+    with pytest.raises(RuntimeError):
+        await scmc.set_within_boundary()
