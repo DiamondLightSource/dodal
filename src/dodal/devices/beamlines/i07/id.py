@@ -1,4 +1,5 @@
 import numpy as np
+from daq_config_server import ConfigClient
 
 from dodal.devices.undulator import UndulatorInKeV, UndulatorOrder
 from dodal.devices.util.lookup_tables import energy_distance_table
@@ -13,11 +14,12 @@ class InsertionDevice(UndulatorInKeV):
         self,
         prefix: str,
         harmonic: UndulatorOrder,
+        config_client: ConfigClient,
         id_gap_lookup_table_path: str = "/dls_sw/i07/software/gda/config/lookupTables/"
         + "IIDCalibrationTable.txt",
         name: str = "",
     ):
-        super().__init__(prefix, id_gap_lookup_table_path, name=name)
+        super().__init__(prefix, config_client, id_gap_lookup_table_path, name=name)
         self.harmonic = harmonic
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:

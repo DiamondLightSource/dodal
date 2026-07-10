@@ -18,6 +18,7 @@ from dodal.utils import (
     collect_factories,
     filter_ophyd_devices,
     get_beamline_based_on_environment_variable,
+    get_beamline_name,
     get_hostname,
     get_run_number,
     is_v2_device_type,
@@ -484,3 +485,11 @@ def test_filter_ophyd_devices_raises_for_extra_types():
 )
 def test_is_v2_device_type(input: Any, expected_result: bool):
     assert is_v2_device_type(input) == expected_result
+
+
+def test_get_beamline_name_raises_error_if_environment_variable_not_set_and_no_default_given(
+    monkeypatch,
+):
+    monkeypatch.delenv("BEAMLINE", raising=False)
+    with pytest.raises(ValueError):
+        get_beamline_name()

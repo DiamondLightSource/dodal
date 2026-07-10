@@ -2,8 +2,10 @@ from ophyd_async.core import (
     StandardReadableFormat,
 )
 from ophyd_async.epics.adandor import Andor2DriverIO
-from ophyd_async.epics.adcore import NDPluginBaseIO, SingleTriggerDetector
+from ophyd_async.epics.adcore import NDPluginBaseIO
 from ophyd_async.epics.core import epics_signal_r
+
+from dodal.devices.single_trigger_detector import SingleTriggerDetector
 
 
 class Andor2Point(SingleTriggerDetector):

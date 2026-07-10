@@ -1,3 +1,7 @@
+from functools import cache
+
+from daq_config_server import ConfigClient
+
 from dodal.device_manager import DeviceManager
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
 from dodal.devices.aithre_lasershaping.laser_robot import LaserRobot
@@ -12,6 +16,12 @@ PREFIX = "LA18L"
 
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    return ConfigClient()
 
 
 @devices.factory()
@@ -31,12 +41,16 @@ def robot() -> LaserRobot:
 
 
 @devices.factory()
-def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
+def oav(
+    config_client: ConfigClient, params: OAVConfigBeamCentre | None = None
+) -> OAVBeamCentreFile:
     config = (
         params
         if params is not None
         else OAVConfigBeamCentre(
-            zoom_params_file=ZOOM_PARAMS_FILE, display_config_file=DISPLAY_CONFIG
+            zoom_params_file=ZOOM_PARAMS_FILE,
+            display_config_file=DISPLAY_CONFIG,
+            config_client=config_client,
         )
     )
     return OAVBeamCentreFile(

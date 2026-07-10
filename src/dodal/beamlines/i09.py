@@ -1,19 +1,31 @@
-from ophyd_async.core import InOut
+from ophyd_async.core import InOut, SignalRW, soft_signal_rw
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i09.enums import LensMode, PassEnergy, PsuMode
-from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
-from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
-from dodal.devices.hutch_shutter import (
-    EXP_SHUTTER_2_INFIX,
-    HutchShutter,
+from dodal.devices.beamlines.i09 import (
+    IntensityProtection,
+    LensMode,
+    PassEnergy,
+    PsuMode,
 )
-from dodal.devices.motors import XYZPolarAzimuthStage
+from dodal.devices.beamlines.i09.scaler import ScalerController
+from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
+from dodal.devices.electron_analyser.base import (
+    DualEnergySource,
+    ElectronAnalyserTriggerLogic,
+    RegionLogic,
+    ShutterCoordinatorADAcquireLogic,
+)
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaAnalyserDriverIO,
+    VGScientaDetector,
+)
+from dodal.devices.fast_shutter import DualFastShutter, FastShutter
+from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
+from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
@@ -24,6 +36,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 BL = get_beamline_name("i09")
 I_PREFIX = BeamlinePrefix(BL, suffix="I")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
+L_PREFIX = BeamlinePrefix(BL, suffix="L")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -77,8 +90,8 @@ def dual_energy_source(
 
 
 @devices.factory()
-def fsi1() -> GenericFastShutter[InOut]:
-    return GenericFastShutter[InOut](
+def fsi1() -> FastShutter[InOut]:
+    return FastShutter[InOut](
         f"{I_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL",
         open_state=InOut.OUT,
         close_state=InOut.IN,
@@ -86,8 +99,8 @@ def fsi1() -> GenericFastShutter[InOut]:
 
 
 @devices.factory()
-def fsj1() -> GenericFastShutter[InOut]:
-    return GenericFastShutter[InOut](
+def fsj1() -> FastShutter[InOut]:
+    return FastShutter[InOut](
         f"{J_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL",
         open_state=InOut.OUT,
         close_state=InOut.IN,
@@ -96,27 +109,33 @@ def fsj1() -> GenericFastShutter[InOut]:
 
 @devices.factory()
 def dual_fast_shutter(
-    fsi1: GenericFastShutter, fsj1: GenericFastShutter, source_selector: SourceSelector
+    fsi1: FastShutter, fsj1: FastShutter, source_selector: SourceSelector
 ) -> DualFastShutter[InOut]:
     return DualFastShutter[InOut](fsi1, fsj1, source_selector.selected_source)
 
 
-# CAM:IMAGE will fail to connect outside the beamline network,
-# see https://github.com/DiamondLightSource/dodal/issues/1852
+@devices.factory()
+def ew4000_close_shutter_when_idle() -> SignalRW[bool]:
+    return soft_signal_rw(bool, initial_value=True)
+
+
 @devices.factory()
 def ew4000(
     dual_fast_shutter: DualFastShutter,
     dual_energy_source: DualEnergySource,
     source_selector: SourceSelector,
+    ew4000_close_shutter_when_idle: SignalRW[bool],
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+    prefix = f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:"
+    driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
-        energy_source=dual_energy_source,
-        shutter=dual_fast_shutter,
-        source_selector=source_selector,
+        prefix,
+        driver,
+        acquire_logic=ShutterCoordinatorADAcquireLogic(
+            driver, dual_fast_shutter, ew4000_close_shutter_when_idle
+        ),
+        trigger_logic=ElectronAnalyserTriggerLogic(driver),
+        region_logic=RegionLogic(driver, dual_energy_source.energy, source_selector),
     )
 
 
@@ -126,6 +145,23 @@ def lakeshore() -> Lakeshore336:
 
 
 @devices.factory()
-def smpm() -> XYZPolarAzimuthStage:
+def smpm() -> XYZAzimuthPolarStage:
     """Sample Manipulator."""
-    return XYZPolarAzimuthStage(prefix=f"{I_PREFIX.beamline_prefix}-MO-SMPM-01:")
+    return XYZAzimuthPolarStage(prefix=f"{I_PREFIX.beamline_prefix}-MO-SMPM-01:")
+
+
+@devices.factory
+def intensity_protection() -> SignalRW[IntensityProtection]:
+    return epics_signal_rw(
+        IntensityProtection, f"{I_PREFIX.beamline_prefix}-DI-EAN-01:PROT:ILK"
+    )
+
+
+@devices.factory
+def scaler1() -> ScalerController:
+    return ScalerController(f"{I_PREFIX.beamline_prefix}-EA-SCLR-01")
+
+
+@devices.factory
+def scaler2() -> ScalerController:
+    return ScalerController(f"{L_PREFIX.beamline_prefix}-VA-SCLR-01")

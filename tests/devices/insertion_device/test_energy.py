@@ -178,7 +178,7 @@ async def test_beam_energy_kickoff_set_correct_delay(
     mock_pgm.energy.kickoff = AsyncMock()
     await mock_beam_energy.prepare(fly_info)
     await mock_beam_energy.kickoff()
-    mock_sleep.assert_awaited_once_with(pgm_acc_time - id_acc_time)
+    mock_sleep.assert_called_with(pgm_acc_time - id_acc_time)
     mock_id_gap.kickoff.assert_awaited_once()
     mock_pgm.energy.kickoff.assert_awaited_once()
 

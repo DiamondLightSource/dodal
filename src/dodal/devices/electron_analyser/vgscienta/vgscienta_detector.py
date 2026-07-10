@@ -1,47 +1,79 @@
+from collections.abc import Mapping, Sequence
 from typing import Generic
 
-from dodal.devices.electron_analyser.base.base_controller import (
-    ElectronAnalyserController,
-)
+from ophyd_async.core import SignalR
+from ophyd_async.epics.adcore import ADAcquireLogic, ADWriterFactory, NDPluginBaseIO
+
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
-from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
-from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
+from dodal.devices.electron_analyser.base.base_region import (
+    TLensMode,
+    TPassEnergy,
+    TPsuMode,
+)
+from dodal.devices.electron_analyser.base.detector_logic import (
+    ElectronAnalyserTriggerLogic,
+    RegionLogic,
+)
 from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
     VGScientaAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
-    TPassEnergyEnum,
-    VGScientaRegion,
-)
-from dodal.devices.fast_shutter import FastShutter
-from dodal.devices.selectable_source import SourceSelector
+from dodal.devices.electron_analyser.vgscienta.vgscienta_region import VGScientaRegion
 
 
 class VGScientaDetector(
     ElectronAnalyserDetector[
-        VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
-        VGScientaRegion[TLensMode, TPassEnergyEnum],
+        VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergy],
+        VGScientaRegion[TLensMode, TPassEnergy],
     ],
-    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
+    Generic[TLensMode, TPsuMode, TPassEnergy],
 ):
     def __init__(
         self,
         prefix: str,
-        lens_mode_type: type[TLensMode],
-        psu_mode_type: type[TPsuMode],
-        pass_energy_type: type[TPassEnergyEnum],
-        energy_source: AbstractEnergySource,
-        shutter: FastShutter | None = None,
-        source_selector: SourceSelector | None = None,
+        driver: VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergy],
+        *writer_factories: ADWriterFactory,
+        acquire_logic: ADAcquireLogic,
+        trigger_logic: ElectronAnalyserTriggerLogic,
+        region_logic: RegionLogic,
+        plugins: Mapping[str, NDPluginBaseIO] | None = None,
+        config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
-        # Make attribute of class so connect applies to driver and populates parent.
-        self.driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
-            prefix, lens_mode_type, psu_mode_type, pass_energy_type
+        config_sigs = (
+            *config_sigs,
+            driver.region_name,
+            driver.energy_mode,
+            driver.acquisition_mode,
+            driver.lens_mode,
+            driver.low_energy,
+            driver.centre_energy,
+            driver.high_energy,
+            driver.energy_step,
+            driver.pass_energy,
+            driver.slices,
+            driver.iterations,
+            driver.total_steps,
+            driver.acquire_time,
+            driver.total_time,
+            driver.energy_axis,
+            driver.angle_axis,
+            driver.detector_mode,
+            driver.region_min_x,
+            driver.region_size_x,
+            driver.sensor_max_size_x,
+            driver.region_min_y,
+            driver.region_size_y,
+            driver.sensor_max_size_y,
+            driver.psu_mode,
         )
-        controller = ElectronAnalyserController[
-            VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
-            VGScientaRegion[TLensMode, TPassEnergyEnum],
-        ](self.driver, energy_source, shutter, source_selector)
-
-        super().__init__(controller, name)
+        super().__init__(
+            driver,
+            prefix,
+            *writer_factories,
+            region_logic=region_logic,
+            acquire_logic=acquire_logic,
+            trigger_logic=trigger_logic,
+            plugins=plugins,
+            config_sigs=config_sigs,
+            name=name,
+        )

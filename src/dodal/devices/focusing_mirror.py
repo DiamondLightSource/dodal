@@ -1,5 +1,6 @@
 from typing import TypedDict
 
+from daq_config_server import ConfigClient
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -10,11 +11,7 @@ from ophyd_async.core import (
     observe_value,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.core import (
-    epics_signal_r,
-    epics_signal_rw,
-    epics_signal_x,
-)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import XYPitchStage
@@ -118,10 +115,16 @@ class SingleMirrorVoltage(Device):
 
 class MirrorVoltages(StandardReadable):
     def __init__(
-        self, prefix: str, name: str = "", *args, daq_configuration_path: str, **kwargs
+        self,
+        prefix: str,
+        name: str = "",
+        *args,
+        daq_configuration_path: str,
+        config_client: ConfigClient,
+        **kwargs,
     ):
-        self.voltage_lookup_table_path = (
-            daq_configuration_path + "/json/mirrorFocus.json"
+        self.voltage_lookup_table = config_client.get_file_contents(
+            daq_configuration_path + "/json/mirrorFocus.json", dict
         )
 
         with self.add_children_as_readables():
