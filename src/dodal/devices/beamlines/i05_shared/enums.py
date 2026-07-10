@@ -35,6 +35,9 @@ class LensMode(StrictEnum):
     L4_ANG3_D9 = "L4Ang3d9"
     L4M_ANG0_D7 = "L4MAng0d7"
     L4M_SPAT_5 = "L4MSpat5"
+    L5ANG0D3 = "L5Ang0d3"
+    L5ANG0D46 = "L5Ang0d46"
+    L5ANG0D4 = "L5Ang0d4"
 
 
 class PassEnergy(StrictEnum):

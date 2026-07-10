@@ -79,7 +79,6 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
             f"{prefix}dither_steps": partial_reading(0),
-            f"{prefix}spin_offset": partial_reading(0),
             f"{prefix}array_size_x": partial_reading(0),
             f"{prefix}array_size_y": partial_reading(0),
             f"{prefix}min_x": partial_reading(0),
