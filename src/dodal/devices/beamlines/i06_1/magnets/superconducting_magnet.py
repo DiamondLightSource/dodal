@@ -4,7 +4,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from functools import cached_property
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceMock,
@@ -14,14 +14,17 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    WatchableAsyncStatus,
     callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
+    error_if_none,
     set_mock_value,
     soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
+from pydantic import BaseModel, Field
 
 from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
     MagnetAxisRampRateController,
@@ -94,6 +97,12 @@ class MagnetSphericalPosition:
         )
 
 
+class FlyMagnetInfo(BaseModel):
+    start_position: float = Field(frozen=True)
+    end_position: float = Field(frozen=True)
+    ramp_rate: float = Field(frozen=True, gt=0)
+
+
 @dataclass
 class MagnetAxisMovableLogic(MovableLogic[float]):
     axis: str
@@ -107,17 +116,17 @@ class MagnetAxisMovableLogic(MovableLogic[float]):
         await self.magnet_set_within_boundary(**values)
 
 
-class MagnetAxis(StandardReadable, StandardMovable[float]):
+class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
     def __init__(
         self,
         prefix: str,
         axis: str,
-        ramp_controller: MagnetAxisRampRateController,
+        ramp_rate: MagnetAxisRampRateController,
         magnet_set_within_boundary: Callable[[], Awaitable[None]],
         name: str = "",
     ):
         # Used in fastfieldscan, need to add fly scan logic.
-        self.ramp_controller_ref = Reference(ramp_controller)
+        self.ramp_rate_ref = Reference(ramp_rate)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, prefix + "RBV")
@@ -129,11 +138,36 @@ class MagnetAxis(StandardReadable, StandardMovable[float]):
             axis=axis,
             magnet_set_within_boundary=magnet_set_within_boundary,
         )
+
+        self._fly_info: FlyMagnetInfo | None = None
+        self._fly_status: WatchableAsyncStatus | None = None
         super().__init__(name)
 
     @cached_property
     def movable_logic(self) -> MagnetAxisMovableLogic:
         return self._movable_logic
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMagnetInfo):
+        self._fly_info = value
+        await self.ramp_rate_ref().set(value.ramp_rate)
+        await self.set(value.start_position)
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        fly_info = error_if_none(
+            self._fly_info,
+            f"{self.name} must be prepared before attempting to kickoff.",
+        )
+        self._fly_status = self.set(fly_info.end_position)
+        # Reset state so prepare must be called with each kickoff again.
+        self._fly_info = None
+
+    def complete(self) -> WatchableAsyncStatus:
+        """Return a ``Status`` and mark it done when acquisition has completed."""
+        fly_status = error_if_none(self._fly_status, f"{self.name} kickoff not called.")
+        self._fly_status = None
+        return fly_status
 
 
 class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):

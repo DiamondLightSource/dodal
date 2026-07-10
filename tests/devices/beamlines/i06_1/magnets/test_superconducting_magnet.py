@@ -6,6 +6,9 @@ from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i06_1.magnets import (
+    FlyMagnetInfo,
+    MagnetAxis,
+    MagnetAxisRampRateController,
     MagnetLimitStatus,
     MagnetPosition,
     MagnetSphericalPosition,
@@ -294,3 +297,48 @@ async def test_scmc_set_within_boundary_raises_error_if_all_values_none(
 ) -> None:
     with pytest.raises(RuntimeError):
         await scmc.set_within_boundary()
+
+
+@pytest.mark.parametrize("axis", ["x", "y", "z"])
+async def test_scmc_axis_with_ramp_rate_wired_correctly_with_prepare(
+    scmc: SuperConductingMagnet,
+    ramp_rate: MagnetThreeAxesRampRateController,
+    axis: str,
+) -> None:
+    magnet_axis: MagnetAxis = getattr(scmc, axis)
+    ramp_axis: MagnetAxisRampRateController = getattr(ramp_rate, axis)
+
+    fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=4)
+    await magnet_axis.prepare(fly_info)
+    assert await magnet_axis.demand.get_value() == fly_info.start_position
+    assert await ramp_axis.demand.get_value() == fly_info.ramp_rate
+
+
+async def test_scmc_axis_kickoff_and_complete(scmc: SuperConductingMagnet) -> None:
+    fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=4)
+    assert scmc.x._fly_info is None
+    await scmc.x.prepare(fly_info)
+    assert scmc.x._fly_info is fly_info
+    assert scmc.x._fly_status is None
+    await scmc.x.kickoff()
+    assert scmc.x._fly_info is None
+    await scmc.x.complete()
+    assert await scmc.x.readback.get_value() == fly_info.end_position
+
+
+async def test_scmc_axis_kickoff_and_complete_raises_error_without_prepare(
+    scmc: SuperConductingMagnet,
+):
+    # Do multiple times to make sure you cannot kickoff or prepare without preparing
+    # each time
+    for _ in range(3):
+        with pytest.raises(RuntimeError):
+            await scmc.x.kickoff()
+
+        with pytest.raises(RuntimeError):
+            await scmc.x.complete()
+
+        fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=4)
+        await scmc.x.prepare(fly_info)
+        await scmc.x.kickoff()
+        await scmc.x.complete()
