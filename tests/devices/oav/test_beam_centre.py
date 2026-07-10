@@ -157,7 +157,7 @@ async def test_real_image_gives_expected_centre(
                 [3, 13, 23, 33, 43],
                 [4, 14, 24, 34, 44],
             ],
-        ),
+        ),  # using a large ROI will give the full image
         ((2, 2), (4, 2), [[1, 11, 21, 31], [2, 12, 22, 32]]),
         ((1, 1), (3, 1), [[1, 11, 21]]),
         ((1, 4), (1, 3), [[13], [14]]),
