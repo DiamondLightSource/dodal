@@ -117,6 +117,16 @@ class MagnetAxisMovableLogic(MovableLogic[float]):
 
 
 class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
+    """Represents one cartesian axis of a superconducting vector magnet.
+
+    Although each axis can be moved independently, all moves are delegated to
+    the parent :class:`SuperConductingMagnet` so that coordinated motion can
+    enforce safe field transitions before updating the underlying demand PVs.
+
+    Each axis is associated with a :class:`MagnetAxisRampRateController`, which is used
+    to configure the axis ramp rate during preparation for fly scans.
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -125,7 +135,6 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         magnet_set_within_boundary: Callable[[], Awaitable[None]],
         name: str = "",
     ):
-        # Used in fastfieldscan, need to add fly scan logic.
         self.ramp_rate_ref = Reference(ramp_rate)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -160,7 +169,6 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
             f"{self.name} must be prepared before attempting to kickoff.",
         )
         self._fly_status = self.set(fly_info.end_position)
-        # Reset state so prepare must be called with each kickoff again.
         self._fly_info = None
 
     def complete(self) -> WatchableAsyncStatus:
@@ -183,6 +191,17 @@ class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
 
 @default_mock_class(MockSuperConductingMagnet)
 class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
+    """A three-axis superconducting vector magnet.
+
+    The magnet exposes three independent cartesian axes (``x``, ``y`` and ``z``)
+    together with derived spherical coordinates (``rho``, ``theta`` and ``phi``).
+    Positions may be set using either cartesian or spherical coordinates.
+
+    To minimise the risk of quenching the magnet, moves are performed by first
+    applying any decreases in field magnitude (in Z, X, Y order) before applying
+    all increases together.
+    """
+
     def __init__(
         self,
         prefix: str,

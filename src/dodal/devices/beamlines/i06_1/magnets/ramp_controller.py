@@ -15,8 +15,13 @@ class RampRateMovableLogic(MovableLogic[float]):
         await self.setpoint.set(new_position, timeout=timeout())
 
 
-# Equivalent to GDA SuperconductingMagnetControllerClass
 class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
+    """Controls the ramp rate of a single superconducting magnet axis.
+
+    Exposes the readback ramp rate, demand ramp rate and the maximum
+    permitted ramp rate for one magnet axis.
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_rw(float, prefix + "STS:RAMPRATE:TPM")
@@ -30,6 +35,13 @@ class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
 
 
 class MagnetThreeAxesRampRateController(StandardReadable):
+    """Groups the ramp rate controllers for the x, y and z magnet axes.
+
+    This device is passed to :class:`SuperConductingMagnet` so that each
+    :class:`MagnetAxis` can configure its own ramp rate during preparation for
+    fly scans.
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.x = MagnetAxisRampRateController(prefix + "-01:")
