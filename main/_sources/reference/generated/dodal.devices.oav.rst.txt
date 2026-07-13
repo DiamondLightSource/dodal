@@ -9,6 +9,7 @@ dodal.devices.oav
    :toctree:
    :recursive:
 
+   dodal.devices.oav.beam_centre
    dodal.devices.oav.oav_calculations
    dodal.devices.oav.oav_detector
    dodal.devices.oav.oav_parameters
