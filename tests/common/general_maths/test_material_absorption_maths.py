@@ -161,6 +161,8 @@ def test_attenuation_at_depth_cm(depth_cm, absorption_coefficient_per_cm, result
 
 
 # inauspicious path
+
+
 @pytest.mark.parametrize("negative_energy", [-0.1, -12.3, -9739.43])
 def test_photon_mass_attenuation_per_unit_length_errors_with_negative_energy(
     negative_energy,
