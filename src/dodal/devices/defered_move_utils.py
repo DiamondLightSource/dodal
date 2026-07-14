@@ -28,7 +28,7 @@ async def _deferred_move(signal: SignalW[DeferMoves]):
 
 def combined_move_to_motor_setpoints(
     combined_move: Mapping[str, Any], device: StandardReadable
-):
+) -> dict[Motor, float]:
     motor_moves = {}
     for motor_name, new_setpoint in combined_move.items():
         if new_setpoint is not None and isinstance(new_setpoint, float | int):
