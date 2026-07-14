@@ -153,7 +153,7 @@ async def test_scmc_raises_error_if_limit_status_is_violation(
 ) -> None:
     await scmc.mode.set(MagnetModes.UNIAXIAL_X)
     set_mock_value(scmc.limit_status, MagnetLimitStatus.VIOLTATION)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(MagnetPositionError):
         await scmc.cart.x.set(1)
 
 
