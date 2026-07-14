@@ -59,7 +59,7 @@ async def do_deferred_move(
 
     async with _deferred_move(defer_signal):
         for axis, value in moves.items():
-            # A regular motor move would do this internally but we ned to set the
+            # A regular motor move would do this internally but we need to set the
             # user_setpoint (see below)
             await axis.check_value(value)
 
