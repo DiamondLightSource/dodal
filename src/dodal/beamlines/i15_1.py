@@ -18,6 +18,7 @@ from dodal.devices.beamlines.i15_1.attenuator import Attenuator
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
+from dodal.devices.beamlines.i15_1.hexapod import Hexapod
 from dodal.devices.beamlines.i15_1.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
@@ -25,7 +26,7 @@ from dodal.devices.hutch_shutter import (
     InterlockedHutchShutter,
 )
 from dodal.devices.interlocks import EnumPLCInterlock, IntPLCInterlock, PSSInterlock
-from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
+from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -139,19 +140,10 @@ def f2y() -> Motor:
 
 
 @devices.factory()
-def hexapod() -> XYZStage:
-    return XYZStage(
+def hexapod() -> Hexapod:
+    return Hexapod(
         f"{PREFIX.beamline_prefix}-MO-HEX-01:",
-    )
-
-
-@devices.factory()
-def hexapod_rotation() -> XYZStage:
-    return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-HEX-01:",
-        x_infix="RX",
-        y_infix="RY",
-        z_infix="RZ",
+        f"{PREFIX.beamline_prefix}-MO-STEP-05:CS2:DeferMoves",
     )
 
 
