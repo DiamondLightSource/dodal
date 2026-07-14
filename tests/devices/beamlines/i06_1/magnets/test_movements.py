@@ -50,34 +50,24 @@ def test_cartesian_and_spherical_conversion_is_correct(
     assert result.z == pytest.approx(cartesian.z)
 
 
-# def test_spherical_movement_decreases_z_then_x_then_y():
-#     move_stragegy = SphericalMovement()
+def test_spherical_movement_decreases_z_then_x_then_y():
+    move_stragegy = SphericalMovement()
 
-#     steps = move_stragegy.moves(
-#         current=MagnetPosition(x=10, y=10, z=10),
-#         target=MagnetPosition(x=5, y=5, z=2),
-#     )
-#     assert steps == [MagnetStep(z=2), MagnetStep(x=5), MagnetStep(y=5)]
-
-
-# def test_spherical_movement_adds_final_combined_increase():
-#     move_stragegy = SphericalMovement()
-
-#     steps = move_stragegy.moves(
-#         current=MagnetPosition(x=10, y=10, z=10),
-#         target=MagnetPosition(x=20, y=5, z=2),
-#     )
-#     assert steps == [MagnetStep(z=2), MagnetStep(y=5), MagnetStep(x=20, y=5, z=2)]
+    steps = move_stragegy.moves(
+        current=MagnetPosition(x=10, y=10, z=10),
+        target=MagnetPosition(x=5, y=5, z=2),
+    )
+    assert steps == [MagnetStep(z=2), MagnetStep(x=5), MagnetStep(y=5)]
 
 
-# @pytest.mark.parametrize(
-#     "target", [MagnetPosition(x=0, y=1, z=0), MagnetPosition(x=0, y=-1, z=0)]
-# )
-# def test_planar_xz_rejects_y(target):
-#     move_stragegy = PlanarXZMovement()
+def test_spherical_movement_adds_final_combined_increase():
+    move_stragegy = SphericalMovement()
 
-#     with pytest.raises(ValueError):
-#         move_stragegy.moves(current=MagnetPosition(x=0, y=0, z=0), target=target)
+    steps = move_stragegy.moves(
+        current=MagnetPosition(x=10, y=10, z=10),
+        target=MagnetPosition(x=20, y=5, z=2),
+    )
+    assert steps == [MagnetStep(z=2), MagnetStep(y=5), MagnetStep(x=20, y=5, z=2)]
 
 
 @pytest.mark.parametrize(
