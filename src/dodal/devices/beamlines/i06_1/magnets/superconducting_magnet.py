@@ -1,8 +1,8 @@
 import asyncio
-import math
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
+from typing import Protocol
 
 from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
@@ -13,88 +13,45 @@ from ophyd_async.core import (
     StandardMovable,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     WatchableAsyncStatus,
     callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
     error_if_none,
     set_mock_value,
-    soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 from pydantic import BaseModel, Field
 
+from dodal.devices.beamlines.i06_1.magnets.enums import (
+    MagnetLimitStatus,
+    MagnetModes,
+    MagnetRampStatus,
+)
+from dodal.devices.beamlines.i06_1.magnets.movement import (
+    CubicMovement,
+    MagnetPosition,
+    MagnetPositionError,
+    MagnetSphericalPosition,
+    MagnetStep,
+    MovementStrategy,
+    PlanarXZMovement,
+    QuadrantXYMovement,
+    SphericalMovement,
+    UniaxialMovement,
+    read_phi,
+    read_rho,
+    read_theta,
+)
 from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
     MagnetAxisRampRateController,
     MagnetThreeAxesRampRateController,
 )
 
 
-class MagnetModes(StrictEnum):
-    UNIAXIAL_X = "UNIAXIAL_X"
-    UNIAXIAL_Y = "UNIAXIAL_Y"
-    UNIAXIAL_Z = "UNIAXIAL_Z"
-    SPHERICAL = "SPHERICAL"
-    PLANAR_XZ = "PLANAR_XZ"
-    QUADRANT_XY = "QUADRANT_XY"
-    CUBIC = "CUBIC"
-    UNDEFINED = "UNDEFINED"
-
-
-class MagnetRampStatus(StrictEnum):
-    RAMPING = "RAMPING"
-    RAMP_MADE = "RAMP MADE"
-
-
-class MagnetLimitStatus(StrictEnum):
-    OK = "OK"
-    VIOLTATION = "VIOLATION"
-
-
-def read_theta(x: float, z: float) -> float:
-    theta = math.degrees(math.atan2(-x, z))
-    return theta % 360
-
-
-def read_rho(x: float, y: float, z: float) -> float:
-    return math.hypot(x, y, z)
-
-
-def read_phi(x: float, y: float, z: float) -> float:
-    return math.degrees(math.atan2(math.hypot(x, z), y))
-
-
-@dataclass(kw_only=True)
-class MagnetPosition:
-    x: float
-    y: float
-    z: float
-
-    def to_spherical(self) -> "MagnetSphericalPosition":
-        return MagnetSphericalPosition(
-            rho=read_rho(self.x, self.y, self.z),
-            theta=read_theta(self.x, self.z),
-            phi=read_phi(self.x, self.y, self.z),
-        )
-
-
-@dataclass(kw_only=True)
-class MagnetSphericalPosition:
-    rho: float
-    theta: float  # degrees
-    phi: float  # degrees
-
-    def to_cartesian(self) -> MagnetPosition:
-        theta = math.radians(self.theta)
-        phi = math.radians(self.phi)
-
-        return MagnetPosition(
-            x=-self.rho * math.sin(phi) * math.sin(theta),
-            y=self.rho * math.cos(phi),
-            z=self.rho * math.sin(phi) * math.cos(theta),
-        )
+class MagnetMoveWithinBoundary(Protocol):
+    async def __call__(self, x: float | None, y: float | None, z: float | None): ...
 
 
 class FlyMagnetInfo(BaseModel):
@@ -106,7 +63,7 @@ class FlyMagnetInfo(BaseModel):
 @dataclass
 class MagnetAxisMovableLogic(MovableLogic[float]):
     axis: str
-    magnet_set_within_boundary: Callable[[], Awaitable[None]]
+    magnet_set_within_boundary: MagnetMoveWithinBoundary
 
     async def move(
         self, new_position: float, timeout: Callable[[], float | None]
@@ -132,7 +89,7 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         prefix: str,
         axis: str,
         ramp_rate: MagnetAxisRampRateController,
-        magnet_set_within_boundary: Callable[[], Awaitable[None]],
+        magnet_set_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
     ):
         self.ramp_rate_ref = Reference(ramp_rate)
@@ -178,73 +135,61 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         return fly_status
 
 
-class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
-    async def connect(self, device: "SuperConductingMagnet"):
-
-        def _set_ramp_status(value):
-            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
-            set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
-
-        callback_on_mock_put(device.start_ramp, _set_ramp_status)
-        set_mock_value(device.limit_status, MagnetLimitStatus.OK)
-
-
-@default_mock_class(MockSuperConductingMagnet)
-class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
-    """A three-axis superconducting vector magnet.
-
-    The magnet exposes three independent cartesian axes (``x``, ``y`` and ``z``)
-    together with derived spherical coordinates (``rho``, ``theta`` and ``phi``).
-    Positions may be set using either cartesian or spherical coordinates.
-
-    To minimise the risk of quenching the magnet, moves are performed by first
-    applying any decreases in field magnitude (in Z, X, Y order) before applying
-    all increases together.
-    """
-
+class MagnetCartesianCoorindates(StandardReadable, Movable[MagnetPosition]):
     def __init__(
         self,
         prefix: str,
-        ramp_controllers: MagnetThreeAxesRampRateController,
+        ramp_rate: MagnetThreeAxesRampRateController,
+        set_mag_within_boundary: MagnetMoveWithinBoundary,
+        name: str = "",
+    ) -> None:
+        self._set_mag_within_boundary = set_mag_within_boundary
+        with self.add_children_as_readables():
+            self.x = MagnetAxis(
+                prefix + "X:", "x", ramp_rate.x, set_mag_within_boundary
+            )
+            self.y = MagnetAxis(
+                prefix + "Y:", "y", ramp_rate.y, set_mag_within_boundary
+            )
+            self.z = MagnetAxis(
+                prefix + "Z:", "z", ramp_rate.z, set_mag_within_boundary
+            )
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: MagnetPosition):
+        await self._set_mag_within_boundary(x=value.x, y=value.y, z=value.z)
+
+
+class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
+    def __init__(
+        self,
+        cart: MagnetCartesianCoorindates,
+        set_mag_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
     ):
         with self.add_children_as_readables():
-            # Cartesian and real pv values
-            self.x = MagnetAxis(
-                prefix + "X:", "x", ramp_controllers.x, self.set_within_boundary
-            )
-            self.y = MagnetAxis(
-                prefix + "Y:", "y", ramp_controllers.y, self.set_within_boundary
-            )
-            self.z = MagnetAxis(
-                prefix + "Z:", "z", ramp_controllers.z, self.set_within_boundary
-            )
-            # Spherical representations of x, y, z
             self.theta = derived_signal_rw(
-                read_theta, self._set_theta, x=self.x, z=self.z
+                read_theta, self._set_theta, x=cart.x, z=cart.z
             )
             self.rho = derived_signal_rw(
-                read_rho, self._set_rho, x=self.x, y=self.y, z=self.z
+                read_rho, self._set_rho, x=cart.x, y=cart.y, z=cart.z
             )
             self.phi = derived_signal_rw(
                 read_phi,
                 self._set_phi,
-                x=self.x,
-                y=self.y,
-                z=self.z,
+                x=cart.x,
+                y=cart.y,
+                z=cart.z,
             )
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
-            self.delay = soft_signal_rw(float, initial_value=0.1)
-
-        self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
-
-        self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
-        self.start_ramp = epics_signal_x(prefix + "STARTRAMP.PROC")
-        self.timeout = 600
-
+        self._set_mag_within_boundary = set_mag_within_boundary
+        self._cart_ref = Reference(cart)
         super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: MagnetSphericalPosition):
+        cart = value.to_cartesian()
+        await self._set_mag_within_boundary(x=cart.x, y=cart.y, z=cart.z)
 
     async def _set_spherical(
         self,
@@ -253,9 +198,9 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
         phi: float | None = None,
     ):
         x, y, z = await asyncio.gather(
-            self.x.readback.get_value(),
-            self.y.readback.get_value(),
-            self.z.readback.get_value(),
+            self._cart_ref().x.readback.get_value(),
+            self._cart_ref().y.readback.get_value(),
+            self._cart_ref().z.readback.get_value(),
         )
         current = MagnetPosition(x=x, y=y, z=z).to_spherical()
         spherical_pos = MagnetSphericalPosition(
@@ -274,64 +219,118 @@ class SuperConductingMagnet(StandardReadable, Movable[MagnetPosition]):
     async def _set_phi(self, phi: float):
         await self._set_spherical(phi=phi)
 
-    @AsyncStatus.wrap
-    async def set(self, value: MagnetPosition | MagnetSphericalPosition):
-        if isinstance(value, MagnetSphericalPosition):
-            value = value.to_cartesian()
-        await self.set_within_boundary(x=value.x, y=value.y, z=value.z)
+
+MODE_MOVEMENT_STRATEGY: dict[MagnetModes, MovementStrategy] = {
+    MagnetModes.SPHERICAL: SphericalMovement(),
+    MagnetModes.CUBIC: CubicMovement(),
+    MagnetModes.PLANAR_XZ: PlanarXZMovement(),
+    MagnetModes.QUADRANT_XY: QuadrantXYMovement(),
+    MagnetModes.UNIAXIAL_X: UniaxialMovement("x", limit=2.0),
+    MagnetModes.UNIAXIAL_Y: UniaxialMovement("y", limit=2.0),
+    MagnetModes.UNIAXIAL_Z: UniaxialMovement("z", limit=6.0),
+}
+
+
+class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
+    async def connect(self, device: "SuperConductingMagnet"):
+
+        def _set_ramp_status(value):
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+
+        def _set_mode(value):
+            # Whenever mode is changed, ioc automatically sets everything to zero and ramps
+            set_mock_value(device.cart.x.demand, 0.0)
+            set_mock_value(device.cart.y.demand, 0.0)
+            set_mock_value(device.cart.z.demand, 0.0)
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+
+        callback_on_mock_put(device.mode, _set_mode)
+        callback_on_mock_put(device.start_ramp, _set_ramp_status)
+        set_mock_value(device.limit_status, MagnetLimitStatus.OK)
+        set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+
+
+@default_mock_class(MockSuperConductingMagnet)
+class SuperConductingMagnet(StandardReadable):
+    """A three-axis superconducting vector magnet.
+
+    The magnet exposes three independent cartesian axes (``x``, ``y`` and ``z``)
+    together with derived spherical coordinates (``rho``, ``theta`` and ``phi``).
+    Positions may be set using either cartesian or spherical coordinates.
+
+    To minimise the risk of quenching the magnet, moves are performed by first
+    applying any decreases in field magnitude (in Z, X, Y order) before applying
+    all increases together.
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        ramp_controllers: MagnetThreeAxesRampRateController,
+        name: str = "",
+    ):
+        with self.add_children_as_readables():
+            self.cart = MagnetCartesianCoorindates(
+                prefix, ramp_controllers, self.set_within_boundary
+            )
+            self.sph = MagnetSphericalCoordinates(self.cart, self.set_within_boundary)
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
+
+        self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
+
+        self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
+        self.start_ramp = epics_signal_x(prefix + "STARTRAMP.PROC")
+        self.timeout = 600
+
+        super().__init__(name)
 
     async def _ramp(self):
+        # Setting invalid demand values should put the limit status in violation state.
+        # Block ramp if in violation state.
+        if await self.limit_status.get_value() == MagnetLimitStatus.VIOLTATION:
+            raise MagnetPositionError(
+                f"{self.limit_status.name} is at {MagnetLimitStatus.VIOLTATION}"
+            )
         # ToDo - Use TimeoutCalculated from ophyd-async in new release.
         await self.start_ramp.trigger(timeout=self.timeout)
         await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, self.timeout)
 
-        if await self.limit_status.get_value() == MagnetLimitStatus.VIOLTATION:
-            raise RuntimeError(
-                f"{self.limit_status.name} is at position {MagnetLimitStatus.VIOLTATION}"
-            )
+    async def _apply_step(self, step: MagnetStep) -> None:
+        tasks = []
+        if step.x is not None:
+            tasks.append(self.cart.x.demand.set(step.x))
+        if step.y is not None:
+            tasks.append(self.cart.y.demand.set(step.y))
+        if step.z is not None:
+            tasks.append(self.cart.z.demand.set(step.z))
+
+        await asyncio.gather(*tasks)
+        await self._ramp()
 
     async def set_within_boundary(
-        self, x: float | None = None, y: float | None = None, z: float | None = None
+        self,
+        x: float | None = None,
+        y: float | None = None,
+        z: float | None = None,
     ):
-        """Move magnet while ensuring field magnitude never increases before decreases
-        have completed.
-        """
         if x is None and y is None and z is None:
-            raise RuntimeError("Args x, y, and z cannot all be None at the same time.")
-
-        # For keeping the magnitude constrained to avoid quench, always do the
-        # decreasing before increasing motors
-        # Can this be simplified?
-        x0, y0, z0 = await asyncio.gather(
-            self.x.readback.get_value(),
-            self.y.readback.get_value(),
-            self.z.readback.get_value(),
+            raise MagnetPositionError("x, y, and z cannot all be None.")
+        current = MagnetPosition(
+            x=await self.cart.x.readback.get_value(),
+            y=await self.cart.y.readback.get_value(),
+            z=await self.cart.z.readback.get_value(),
         )
-        x = x0 if x is None else x
-        y = y0 if y is None else y
-        z = z0 if z is None else z
+        target = MagnetPosition(
+            x=current.x if x is None else x,
+            y=current.y if y is None else y,
+            z=current.z if z is None else z,
+        )
+        mode = await self.mode.get_value()
+        movement_strategy = MODE_MOVEMENT_STRATEGY[mode]
 
-        dx = abs(x) - abs(x0)
-        dy = abs(y) - abs(y0)
-        dz = abs(z) - abs(z0)
-
-        # Decrease Z first
-        if dz < 0:
-            await self.z.demand.set(z)
-            await self._ramp()
-        # Then decrease X
-        if dx < 0:
-            await self.x.demand.set(x)
-            await self._ramp()
-        # Then decrease Y
-        if dy < 0:
-            await self.y.demand.set(y)
-            await self._ramp()
-        # Finally perform all increases together
-        if dx > 0 or dy > 0 or dz > 0:
-            await asyncio.gather(
-                self.x.demand.set(x),
-                self.y.demand.set(y),
-                self.z.demand.set(z),
-            )
-            await self._ramp()
+        for step in movement_strategy.moves(current, target):
+            await self._apply_step(step)
