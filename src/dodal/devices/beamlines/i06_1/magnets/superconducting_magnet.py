@@ -136,6 +136,17 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
 
 
 class MagnetCartesianCoorindates(StandardReadable, Movable[MagnetPosition]):
+    """Cartesian interface to the superconducting magnet.
+
+    Exposes the physical X, Y and Z magnet axes as individual movable signals,
+    together with a grouped ``MagnetPosition`` interface for moving all three axes
+    simultaneously.
+
+    Individual axis moves and grouped cartesian moves are delegated to the parent
+    ``SuperConductingMagnet``, which applies the active movement strategy for the
+    current operating mode before commanding the hardware.
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -162,6 +173,18 @@ class MagnetCartesianCoorindates(StandardReadable, Movable[MagnetPosition]):
 
 
 class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
+    """Spherical coordinate interface to the superconducting magnet.
+
+    Exposes the magnet field in spherical coordinates using the derived signals
+    ``rho``, ``theta`` and ``phi``. These signals are calculated from the
+    underlying cartesian magnet axes and may also be written individually or as a
+    complete ``MagnetSphericalPosition``.
+
+    Writes are converted to cartesian coordinates before being delegated to the
+    parent ``SuperConductingMagnet``, allowing the active movement strategy to
+    determine a safe sequence of cartesian moves.
+    """
+
     def __init__(
         self,
         cart: MagnetCartesianCoorindates,
@@ -256,13 +279,15 @@ class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
 class SuperConductingMagnet(StandardReadable):
     """A three-axis superconducting vector magnet.
 
-    The magnet exposes three independent cartesian axes (``x``, ``y`` and ``z``)
-    together with derived spherical coordinates (``rho``, ``theta`` and ``phi``).
-    Positions may be set using either cartesian or spherical coordinates.
+    The magnet provides both cartesian and spherical coordinate interfaces for
+    reading and setting the magnetic field. Cartesian coordinates expose the
+    physical X, Y and Z magnet axes, while spherical coordinates provide the
+    equivalent field magnitude and orientation.
 
-    To minimise the risk of quenching the magnet, moves are performed by first
-    applying any decreases in field magnitude (in Z, X, Y order) before applying
-    all increases together.
+    The permitted operating region and the sequence of axis movements are
+    determined by the current magnet operating mode. Each operating mode uses a
+    dedicated movement strategy to validate requested positions and generate a
+    safe sequence of cartesian magnet moves before ramping the field.
     """
 
     def __init__(
@@ -295,11 +320,19 @@ class SuperConductingMagnet(StandardReadable):
             raise MagnetPositionError(
                 f"{self.limit_status.name} is at {MagnetLimitStatus.VIOLTATION}"
             )
+        self.log.info("About to start ramping the magnet.")
         # ToDo - Use TimeoutCalculated from ophyd-async in new release.
         await self.start_ramp.trigger(timeout=self.timeout)
         await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, self.timeout)
+        self.log.info("Ramping complete.")
 
     async def _apply_step(self, step: MagnetStep) -> None:
+        """Apply a single movement step and wait for the magnet ramp to complete.
+
+        A movement step may update one or more cartesian axes simultaneously. Once
+        the requested demand values have been written, the magnet is instructed to
+        ramp and this method waits for the ramp to complete before returning.
+        """
         tasks = []
         if step.x is not None:
             tasks.append(self.cart.x.demand.set(step.x))
@@ -317,6 +350,14 @@ class SuperConductingMagnet(StandardReadable):
         y: float | None = None,
         z: float | None = None,
     ):
+        """Move the magnet to a new cartesian position.
+
+        Any coordinates left as ``None`` retain their current values. The requested
+        target position is validated against the current magnet operating mode and
+        converted into a sequence of movement steps by the corresponding movement
+        strategy. Each step is then applied sequentially until the requested target
+        position is reached.
+        """
         if x is None and y is None and z is None:
             raise MagnetPositionError("x, y, and z cannot all be None.")
         current = MagnetPosition(
@@ -331,6 +372,10 @@ class SuperConductingMagnet(StandardReadable):
         )
         mode = await self.mode.get_value()
         movement_strategy = MODE_MOVEMENT_STRATEGY[mode]
+
+        self.log.debug(
+            f"Attempting move in mode {mode} with parameters {target}. Current position is {current}"
+        )
 
         for step in movement_strategy.moves(current, target):
             await self._apply_step(step)
