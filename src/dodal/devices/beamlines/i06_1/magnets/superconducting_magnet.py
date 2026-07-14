@@ -129,7 +129,6 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         self._fly_info = None
 
     def complete(self) -> WatchableAsyncStatus:
-        """Return a ``Status`` and mark it done when acquisition has completed."""
         fly_status = error_if_none(self._fly_status, f"{self.name} kickoff not called.")
         self._fly_status = None
         return fly_status
