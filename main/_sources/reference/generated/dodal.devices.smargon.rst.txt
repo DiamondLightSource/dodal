@@ -15,7 +15,6 @@ dodal.devices.smargon
    :recursive:
 
    ~smargon.CombinedMove
-   ~smargon.DeferMoves
    ~smargon.Smargon
    ~smargon.StubOffsets
    ~smargon.StubPosition

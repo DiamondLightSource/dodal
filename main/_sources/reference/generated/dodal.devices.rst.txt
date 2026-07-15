@@ -24,6 +24,7 @@
    dodal.devices.common_mirror
    dodal.devices.cryostream
    dodal.devices.current_amplifiers
+   dodal.devices.defered_move_utils
    dodal.devices.detector
    dodal.devices.diamond_filter
    dodal.devices.eiger

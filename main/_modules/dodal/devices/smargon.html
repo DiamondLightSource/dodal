@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.smargon &#8212; dodal 2.5.2.dev13+gf94d2fde9 documentation</title>
+    <title>dodal.devices.smargon &#8212; dodal 2.5.2.dev14+gc8aa74205 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=3c2425ec"></script>
+    <script src="../../../_static/documentation_options.js?v=58c278ed"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,8 +885,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.smargon</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">cast</span>
 
@@ -894,13 +893,16 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
-    <span class="n">StrictEnum</span><span class="p">,</span>
-    <span class="n">set_and_wait_for_value</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.defered_move_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DeferMoves</span><span class="p">,</span>
+    <span class="n">combined_move_to_motor_setpoints</span><span class="p">,</span>
+    <span class="n">do_deferred_move</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZWrappedOmegaStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.util.epics_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">SetWhenEnabled</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
@@ -956,14 +958,6 @@ window.runMermaid = runMermaid;</script>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_robot_load</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="DeferMoves">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.DeferMoves.html#dodal.devices.smargon.DeferMoves">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DeferMoves</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">ON</span> <span class="o">=</span> <span class="s2">&quot;Defer On&quot;</span>
-    <span class="n">OFF</span> <span class="o">=</span> <span class="s2">&quot;Defer Off&quot;</span></div>
 
 
 
@@ -1031,24 +1025,15 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        axes will move at the same time. The put callbacks on the axes themselves will</span>
 <span class="sd">        only come back after the motion on that axis finished.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Doing smargon move...&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">defer_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">DeferMoves</span><span class="o">.</span><span class="n">ON</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">finished_moving</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">motor_name</span><span class="p">,</span> <span class="n">new_setpoint</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">new_setpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_setpoint</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
-                    <span class="n">axis</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_name</span><span class="p">)</span>
-                    <span class="k">await</span> <span class="n">axis</span><span class="o">.</span><span class="n">check_value</span><span class="p">(</span><span class="n">new_setpoint</span><span class="p">)</span>
-                    <span class="n">put_completion</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span>
-                        <span class="n">axis</span><span class="o">.</span><span class="n">user_setpoint</span><span class="p">,</span>
-                        <span class="n">new_setpoint</span><span class="p">,</span>
-                        <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFERRED_MOVE_SET_TIMEOUT</span><span class="p">,</span>
-                        <span class="n">wait_for_set_completion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="n">finished_moving</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">put_completion</span><span class="p">)</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">defer_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">DeferMoves</span><span class="o">.</span><span class="n">OFF</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">finished_moving</span><span class="p">)</span></div>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Doing smargon deferred move&quot;</span><span class="p">)</span>
+
+        <span class="n">motor_moves</span> <span class="o">=</span> <span class="n">combined_move_to_motor_setpoints</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">do_deferred_move</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">defer_move</span><span class="p">,</span>
+            <span class="n">motor_moves</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFERRED_MOVE_SET_TIMEOUT</span><span class="p">,</span>
+        <span class="p">)</span></div>
 </div>
 
 </pre></div>
