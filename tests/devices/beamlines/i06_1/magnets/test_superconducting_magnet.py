@@ -181,7 +181,7 @@ async def test_scmc_axis_with_ramp_rate_wired_correctly_with_prepare(
     magnet_axis: MagnetAxis = getattr(scmc.cart, axis)
     ramp_axis: MagnetAxisRampRateController = getattr(ramp_rate, axis)
 
-    fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=4)
+    fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=1.5)
     await magnet_axis.prepare(fly_info)
     assert await magnet_axis.demand.get_value() == fly_info.start_position
     assert await ramp_axis.demand.get_value() == fly_info.ramp_rate
@@ -191,7 +191,7 @@ async def test_scmc_axis_kickoff_and_complete(
     scmc: SuperConductingMagnetController,
 ) -> None:
     await scmc.mode.set(MagnetModes.UNIAXIAL_X)
-    fly_info = FlyMagnetInfo(start_position=1, end_position=2, ramp_rate=4)
+    fly_info = FlyMagnetInfo(start_position=1, end_position=2, ramp_rate=2)
     assert scmc.cart.x._fly_info is None
     await scmc.cart.x.prepare(fly_info)
     assert scmc.cart.x._fly_info is fly_info
@@ -215,7 +215,7 @@ async def test_scmc_axis_kickoff_and_complete_raises_error_without_prepare(
         with pytest.raises(RuntimeError):
             await scmc.cart.x.complete()
 
-        fly_info = FlyMagnetInfo(start_position=1, end_position=2, ramp_rate=4)
+        fly_info = FlyMagnetInfo(start_position=1, end_position=2, ramp_rate=1)
         await scmc.cart.x.prepare(fly_info)
         await scmc.cart.x.kickoff()
         await scmc.cart.x.complete()

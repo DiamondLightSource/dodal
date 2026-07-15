@@ -24,9 +24,20 @@ async def test_magx_ramp_rate_read(
 async def test_magx_ramp_rate_set(
     magx_ramp_rate: MagnetAxisRampRateController,
 ) -> None:
-    ramp_rate = 10
+    ramp_rate = 1
     await magx_ramp_rate.set(ramp_rate)
     assert await magx_ramp_rate.readback.get_value() == ramp_rate
+
+
+async def test_magx_ramp_rate_set_above_limit_throws_error(
+    magx_ramp_rate: MagnetAxisRampRateController,
+) -> None:
+    ramp_rate = 10
+    with pytest.raises(
+        ValueError,
+        match=f"Requested ramp rate {ramp_rate} exceeds the maximum limit of 2.0 for device {magx_ramp_rate.name}.",
+    ):
+        await magx_ramp_rate.set(ramp_rate)
 
 
 @pytest.fixture

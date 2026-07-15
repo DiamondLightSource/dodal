@@ -264,6 +264,8 @@ class MockSuperConductingMagnetController(
             set_mock_value(device.cart.z.readback, z_d)
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
+        callback_on_mock_put(device.start_ramp, _trigger_start_ramp)
+
         async def _set_mode(value):
             # Whenever mode is set, ioc automatically sets everything to zero and
             # triggers a ramp.
@@ -273,7 +275,6 @@ class MockSuperConductingMagnetController(
             await _trigger_start_ramp(value)
 
         callback_on_mock_put(device.mode, _set_mode)
-        callback_on_mock_put(device.start_ramp, _trigger_start_ramp)
         set_mock_value(device.limit_status, MagnetLimitStatus.OK)
         set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
@@ -328,10 +329,9 @@ class SuperConductingMagnetController(StandardReadable):
     async def _ramp(self):
         # Setting invalid demand values should put the limit status in violation state.
         # Block ramp if in violation state.
-        if await self.limit_status.get_value() == MagnetLimitStatus.VIOLTATION:
-            raise MagnetPositionError(
-                f"{self.limit_status.name} is at {MagnetLimitStatus.VIOLTATION}"
-            )
+        limit_status = await self.limit_status.get_value()
+        if limit_status == MagnetLimitStatus.VIOLTATION:
+            raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
         await self.start_ramp.trigger(timeout=self.timeout)
         await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, self.timeout)
@@ -353,7 +353,6 @@ class SuperConductingMagnetController(StandardReadable):
             tasks.append(self.cart.y.demand.set(step.y))
         if step.z is not None:
             tasks.append(self.cart.z.demand.set(step.z))
-
         self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
         await self._ramp()
