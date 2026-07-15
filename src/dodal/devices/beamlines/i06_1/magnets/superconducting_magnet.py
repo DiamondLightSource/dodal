@@ -73,6 +73,9 @@ class MagnetAxisMovableLogic(MovableLogic[float]):
         await self.magnet_set_within_boundary(**values)
 
 
+@default_mock_class(DeviceMock)
+# Don't want to sync readback and setpoint. IOC behaviour will move readback to demand
+# once start_ramp is triggered. This logic lives in the SuperConductingMagnet.
 class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
     """Represents one cartesian axis of a superconducting vector magnet.
 
@@ -254,22 +257,36 @@ MODE_MOVEMENT_STRATEGY: dict[MagnetModes, MovementStrategy] = {
 
 
 class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
+    """Add additional callback logic to our device to get the mock behaviour to simulate
+    the hardware as best we can.
+    """
+
     async def connect(self, device: "SuperConductingMagnet"):
 
-        def _set_ramp_status(value):
+        async def _trigger_start_ramp(value):
+            # Whenever ramp is triggered for the ioc, readback values move to the
+            # demand values. Simulate this behaviour here.
+            x_d, y_d, z_d = await asyncio.gather(
+                device.cart.x.demand.get_value(),
+                device.cart.y.demand.get_value(),
+                device.cart.z.demand.get_value(),
+            )
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
+            set_mock_value(device.cart.x.readback, x_d)
+            set_mock_value(device.cart.y.readback, y_d)
+            set_mock_value(device.cart.z.readback, z_d)
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
-        def _set_mode(value):
-            # Whenever mode is changed, ioc automatically sets everything to zero and ramps
+        async def _set_mode(value):
+            # Whenever mode is set, ioc automatically sets everything to zero and
+            # triggers a ramp.
             set_mock_value(device.cart.x.demand, 0.0)
             set_mock_value(device.cart.y.demand, 0.0)
             set_mock_value(device.cart.z.demand, 0.0)
-            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
-            set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+            await _trigger_start_ramp(value)
 
         callback_on_mock_put(device.mode, _set_mode)
-        callback_on_mock_put(device.start_ramp, _set_ramp_status)
+        callback_on_mock_put(device.start_ramp, _trigger_start_ramp)
         set_mock_value(device.limit_status, MagnetLimitStatus.OK)
         set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
