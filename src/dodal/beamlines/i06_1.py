@@ -21,12 +21,12 @@ devices.include(i06_shared_devices)
 
 
 @devices.factory()
-def ls336() -> Lakeshore336:
+def ls336_cooling() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")
 
 
 @devices.factory()
-def ls336_2() -> Lakeshore336:
+def ls336_heating() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:")
 
 
