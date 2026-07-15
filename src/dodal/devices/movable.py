@@ -10,6 +10,8 @@ from ophyd_async.core import (
 
 @dataclass
 class MovableWithToleranceLogic(MovableLogic[float]):
+    """Movable logic that completes once the readback is within a configured tolerance."""
+
     tolerance: SignalR[float]
 
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
@@ -26,4 +28,5 @@ class MovableWithToleranceLogic(MovableLogic[float]):
 
 
 def is_within_tolerance(setpoint: float, readback: float, tolerance: float) -> bool:
+    """Return whether the readback is within the specified tolerance of the setpoint."""
     return abs(setpoint - readback) < abs(tolerance)
