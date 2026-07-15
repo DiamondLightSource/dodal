@@ -93,7 +93,7 @@ class HighFieldMagnet(StandardMovable[float], StandardReadable, Flyable, Prepara
                 read_pv=prefix + "STS:ACTIVITY",
             )
             self.ramp_up_time = soft_signal_rw(datatype=float, initial_value=1.0)
-            self.tolerance = soft_signal_rw(float, initial_value=field_tolerance)
+            self.field_tolerance = soft_signal_rw(float, initial_value=field_tolerance)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.user_readback = epics_signal_r(float, prefix + "RBV:DEMANDFIELD")
@@ -120,7 +120,7 @@ class HighFieldMagnet(StandardMovable[float], StandardReadable, Flyable, Prepara
             readback=self.user_readback,
             speed=self.sweep_rate,
             acc_time=self.ramp_up_time,
-            tolerance=self.tolerance,
+            tolerance=self.field_tolerance,
         )
 
     @AsyncStatus.wrap
