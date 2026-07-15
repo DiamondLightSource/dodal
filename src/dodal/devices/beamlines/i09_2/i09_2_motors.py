@@ -3,6 +3,7 @@ from functools import cached_property
 
 from ophyd_async.core import (
     SignalW,
+    StandardMovable,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_rw,
@@ -10,7 +11,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.movable import MovableWithTolerance, MovableWithToleranceLogic
+from dodal.devices.movable import MovableWithToleranceLogic
 
 
 @dataclass
@@ -21,7 +22,7 @@ class PiezoElectricMovableLogic(MovableWithToleranceLogic):
         await self.motor_stop.set(1)
 
 
-class PiezoElectricMotor(MovableWithTolerance):
+class PiezoElectricMotor(StandardMovable[float], StandardReadable):
     """A piezoelectric positioning stage with configurable move tolerance.
 
     This device exposes EPICS signals for readback, setpoint, and motion stop commands.
@@ -43,7 +44,7 @@ class PiezoElectricMotor(MovableWithTolerance):
         return PiezoElectricMovableLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            within_tolerance=self.within_tolerance,
+            tolerance=self.tolerance,
             motor_stop=self.motor_stop,
         )
 

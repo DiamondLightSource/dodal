@@ -6,6 +6,8 @@ from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     SignalRW,
+    StandardMovable,
+    StandardReadable,
     StandardReadableFormat,
     StrictEnum,
     SubsetEnum,
@@ -16,7 +18,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from pydantic import BaseModel, Field
 
-from dodal.devices.movable import MovableWithTolerance, MovableWithToleranceLogic
+from dodal.devices.movable import MovableWithToleranceLogic
 
 
 class HighFieldMangetSweepTypes(StrictEnum):
@@ -71,7 +73,7 @@ class HighFieldMagnetMovableLogic(MovableWithToleranceLogic):
         return timeout
 
 
-class HighFieldMagnet(MovableWithTolerance, Flyable, Preparable):
+class HighFieldMagnet(StandardMovable[float], StandardReadable, Flyable, Preparable):
     def __init__(
         self, prefix: str, field_tolerance: float = 0.01, name: str = ""
     ) -> None:
@@ -116,9 +118,9 @@ class HighFieldMagnet(MovableWithTolerance, Flyable, Preparable):
         return HighFieldMagnetMovableLogic(
             setpoint=self.user_setpoint,
             readback=self.user_readback,
-            within_tolerance=self.within_tolerance,
             speed=self.sweep_rate,
             acc_time=self.ramp_up_time,
+            tolerance=self.tolerance,
         )
 
     @AsyncStatus.wrap
