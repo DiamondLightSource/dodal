@@ -9,7 +9,7 @@ from .superconducting_magnet import (
     MagnetLimitStatus,
     MagnetModes,
     MagnetRampStatus,
-    SuperConductingMagnet,
+    SuperConductingMagnetController,
 )
 
 __all__ = [
@@ -23,5 +23,5 @@ __all__ = [
     "MagnetLimitStatus",
     "MagnetModes",
     "MagnetRampStatus",
-    "SuperConductingMagnet",
+    "SuperConductingMagnetController",
 ]

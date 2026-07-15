@@ -75,12 +75,12 @@ class MagnetAxisMovableLogic(MovableLogic[float]):
 
 @default_mock_class(DeviceMock)
 # Don't want to sync readback and setpoint. IOC behaviour will move readback to demand
-# once start_ramp is triggered. This logic lives in the SuperConductingMagnet.
+# once start_ramp is triggered. This logic lives in the SuperConductingMagnetController.
 class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
     """Represents one cartesian axis of a superconducting vector magnet.
 
     Although each axis can be moved independently, all moves are delegated to
-    the parent :class:`SuperConductingMagnet` so that coordinated motion can
+    the parent :class:`SuperConductingMagnetController` so that coordinated motion can
     enforce safe field transitions before updating the underlying demand PVs.
 
     Each axis is associated with a :class:`MagnetAxisRampRateController`, which is used
@@ -145,7 +145,7 @@ class MagnetCartesianCoorindates(StandardReadable, Movable[MagnetPosition]):
     simultaneously.
 
     Individual axis moves and grouped cartesian moves are delegated to the parent
-    ``SuperConductingMagnet``, which applies the active movement strategy for the
+    ``SuperConductingMagnetController``, which applies the active movement strategy for the
     current operating mode before commanding the hardware.
     """
 
@@ -183,7 +183,7 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
     complete ``MagnetSphericalPosition``.
 
     Writes are converted to cartesian coordinates before being delegated to the
-    parent ``SuperConductingMagnet``, allowing the active movement strategy to
+    parent ``SuperConductingMagnetController``, allowing the active movement strategy to
     determine a safe sequence of cartesian moves.
     """
 
@@ -256,12 +256,14 @@ MODE_MOVEMENT_STRATEGY: dict[MagnetModes, MovementStrategy] = {
 }
 
 
-class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
+class MockSuperConductingMagnetController(
+    DeviceMock["SuperConductingMagnetController"]
+):
     """Add additional callback logic to our device to get the mock behaviour to simulate
     the hardware as best we can.
     """
 
-    async def connect(self, device: "SuperConductingMagnet"):
+    async def connect(self, device: "SuperConductingMagnetController"):
 
         async def _trigger_start_ramp(value):
             # Whenever ramp is triggered for the ioc, readback values move to the
@@ -291,8 +293,8 @@ class MockSuperConductingMagnet(DeviceMock["SuperConductingMagnet"]):
         set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
 
-@default_mock_class(MockSuperConductingMagnet)
-class SuperConductingMagnet(StandardReadable):
+@default_mock_class(MockSuperConductingMagnetController)
+class SuperConductingMagnetController(StandardReadable):
     """A three-axis superconducting vector magnet.
 
     The magnet provides both cartesian and spherical coordinate interfaces for

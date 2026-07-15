@@ -37,7 +37,7 @@ class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
 class MagnetThreeAxesRampRateController(StandardReadable):
     """Groups the ramp rate controllers for the x, y and z magnet axes.
 
-    This device is passed to :class:`SuperConductingMagnet` so that each
+    This device is passed to :class:`SuperConductingMagnetController` so that each
     :class:`MagnetAxis` can configure its own ramp rate during preparation for
     fly scans.
     """
