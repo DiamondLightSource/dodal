@@ -1,5 +1,4 @@
 import asyncio
-from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Protocol
@@ -13,6 +12,7 @@ from ophyd_async.core import (
     StandardMovable,
     StandardReadable,
     StandardReadableFormat,
+    TimeoutCalculator,
     WatchableAsyncStatus,
     callback_on_mock_put,
     default_mock_class,
@@ -65,11 +65,8 @@ class MagnetAxisMovableLogic(MovableLogic[float]):
     axis: str
     magnet_set_within_boundary: MagnetMoveWithinBoundary
 
-    async def move(
-        self, new_position: float, timeout: Callable[[], float | None]
-    ) -> None:
+    async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         values = {self.axis: new_position}
-        # ToDo - feed timeout to here?
         await self.magnet_set_within_boundary(**values)
 
 
@@ -107,7 +104,6 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
             axis=axis,
             magnet_set_within_boundary=magnet_set_within_boundary,
         )
-
         self._fly_info: FlyMagnetInfo | None = None
         self._fly_status: WatchableAsyncStatus | None = None
         super().__init__(name)
@@ -323,7 +319,6 @@ class SuperConductingMagnetController(StandardReadable):
             self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
 
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
-
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
         self.start_ramp = epics_signal_x(prefix + "STARTRAMP.PROC")
         self.timeout = 600
@@ -395,10 +390,8 @@ class SuperConductingMagnetController(StandardReadable):
             raise ValueError(
                 f"No movement strategy has been configured for device {self.name} for mode {mode}."
             )
-
         self.log.debug(
             f"Attempting move in mode {mode} with parameters {target}. Current position is {current}"
         )
-
         for step in movement_strategy.moves(current, target):
             await self._apply_step(step)
