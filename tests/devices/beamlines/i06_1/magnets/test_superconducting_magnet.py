@@ -20,9 +20,6 @@ from dodal.devices.beamlines.i06_1.magnets import (
     SuperConductingMagnetController,
     movement,
 )
-from dodal.devices.beamlines.i06_1.magnets.superconducting_magnet import (
-    MODE_MOVEMENT_STRATEGY,
-)
 from tests.devices.beamlines.i06_1.magnets.utils import (
     EXPECTED_CARTESIAN_SPHERICAL_CONVERSION,
 )
@@ -260,6 +257,18 @@ async def test_scmc_mock_device_behaviour(
     ]
 
 
+async def test_scmc_no_movement_strategy_for_mode(
+    scmc: SuperConductingMagnetController,
+) -> None:
+    mode = await scmc.mode.get_value()
+    with patch.dict(scmc._MODE_MOVEMENT_STRATEGY, {}, clear=True):
+        with pytest.raises(
+            ValueError,
+            match=f"No movement strategy has been configured for device scmc for mode {mode}",
+        ):
+            await scmc.cart.x.set(5)
+
+
 @pytest.mark.parametrize(
     "mode,expected",
     [
@@ -272,16 +281,20 @@ async def test_scmc_mock_device_behaviour(
         (MagnetModes.UNIAXIAL_Z, movement.UniaxialMovement),
     ],
 )
-async def test_magnet_mode_to_movement_strategy_configuration(
-    mode: MagnetModes, expected: type[movement.MovementStrategy]
+async def test_scmc_magnet_mode_to_movement_strategy_configuration(
+    scmc: SuperConductingMagnetController,
+    mode: MagnetModes,
+    expected: type[movement.MovementStrategy],
 ) -> None:
-    assert isinstance(MODE_MOVEMENT_STRATEGY[mode], expected)
+    assert isinstance(scmc._MODE_MOVEMENT_STRATEGY[mode], expected)
 
 
-async def test_magnet_mode_to_uniaxial_movement_strategy_configuration():
-    assert MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X].axis == "x"  # type:ignore
-    assert MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Y].axis == "y"  # type:ignore
-    assert MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Z].axis == "z"  # type:ignore
+async def test_scmc_magnet_mode_to_uniaxial_movement_strategy_configuration(
+    scmc: SuperConductingMagnetController,
+) -> None:
+    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X].axis == "x"  # type:ignore
+    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Y].axis == "y"  # type:ignore
+    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Z].axis == "z"  # type:ignore
 
 
 async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
@@ -300,7 +313,7 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
     ]
     movement_strategy.moves.return_value = mov_str_return_values
 
-    MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X] = movement_strategy
+    scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X] = movement_strategy
 
     scmc._ramp = AsyncMock()
 

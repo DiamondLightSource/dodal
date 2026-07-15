@@ -245,17 +245,6 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
         await self._set_spherical(phi=phi)
 
 
-MODE_MOVEMENT_STRATEGY: dict[MagnetModes, MovementStrategy] = {
-    MagnetModes.SPHERICAL: SphericalMovement(),
-    MagnetModes.CUBIC: CubicMovement(),
-    MagnetModes.PLANAR_XZ: PlanarXZMovement(),
-    MagnetModes.QUADRANT_XY: QuadrantXYMovement(),
-    MagnetModes.UNIAXIAL_X: UniaxialMovement("x", limit=2.0),
-    MagnetModes.UNIAXIAL_Y: UniaxialMovement("y", limit=2.0),
-    MagnetModes.UNIAXIAL_Z: UniaxialMovement("z", limit=6.0),
-}
-
-
 class MockSuperConductingMagnetController(
     DeviceMock["SuperConductingMagnetController"]
 ):
@@ -308,6 +297,16 @@ class SuperConductingMagnetController(StandardReadable):
     safe sequence of cartesian magnet moves before ramping the field.
     """
 
+    _MODE_MOVEMENT_STRATEGY: dict[MagnetModes, MovementStrategy] = {
+        MagnetModes.SPHERICAL: SphericalMovement(),
+        MagnetModes.CUBIC: CubicMovement(),
+        MagnetModes.PLANAR_XZ: PlanarXZMovement(),
+        MagnetModes.QUADRANT_XY: QuadrantXYMovement(),
+        MagnetModes.UNIAXIAL_X: UniaxialMovement("x", limit=2.0),
+        MagnetModes.UNIAXIAL_Y: UniaxialMovement("y", limit=2.0),
+        MagnetModes.UNIAXIAL_Z: UniaxialMovement("z", limit=6.0),
+    }
+
     def __init__(
         self,
         prefix: str,
@@ -339,10 +338,11 @@ class SuperConductingMagnetController(StandardReadable):
                 f"{self.limit_status.name} is at {MagnetLimitStatus.VIOLTATION}"
             )
         self.log.info("About to start ramping the magnet.")
-        # ToDo - Use TimeoutCalculated from ophyd-async in new release.
         await self.start_ramp.trigger(timeout=self.timeout)
         await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, self.timeout)
-        self.log.info("Ramping complete.")
+        self.log.info(
+            f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
+        )
 
     async def _apply_step(self, step: MagnetStep) -> None:
         """Apply a single movement step and wait for the magnet ramp to complete.
@@ -359,6 +359,7 @@ class SuperConductingMagnetController(StandardReadable):
         if step.z is not None:
             tasks.append(self.cart.z.demand.set(step.z))
 
+        self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
         await self._ramp()
 
@@ -389,7 +390,11 @@ class SuperConductingMagnetController(StandardReadable):
             z=current.z if z is None else z,
         )
         mode = await self.mode.get_value()
-        movement_strategy = MODE_MOVEMENT_STRATEGY[mode]
+        movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
+        if movement_strategy is None:
+            raise ValueError(
+                f"No movement strategy has been configured for device {self.name} for mode {mode}."
+            )
 
         self.log.debug(
             f"Attempting move in mode {mode} with parameters {target}. Current position is {current}"
