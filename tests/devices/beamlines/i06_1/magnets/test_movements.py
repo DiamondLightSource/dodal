@@ -182,6 +182,13 @@ def test_uniaxial_rejects_other_axes(axis: str, target: MagnetPosition) -> None:
         UniaxialMovement(axis, limit=5).moves(MagnetPosition(x=0, y=0, z=0), target)
 
 
+def test_uniaxial_raise_error_when_above_limit() -> None:
+    current = MagnetPosition(x=0, y=0, z=0)
+    target = MagnetPosition(x=10, y=0, z=0)
+    with pytest.raises(MagnetPositionError):
+        UniaxialMovement("x", limit=5).moves(current, target)
+
+
 def test_quadrant_xy_sequence() -> None:
     current = MagnetPosition(x=1, y=0.5, z=0)
     target = MagnetPosition(x=1.5, y=1, z=0)

@@ -1,4 +1,5 @@
 import asyncio
+import math
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
@@ -145,6 +146,42 @@ async def test_scmc_cart_set_using_cartesian(
     assert rho == pytest.approx(spherical.rho)
     assert theta == pytest.approx(spherical.theta)
     assert phi == pytest.approx(spherical.phi)
+
+
+@pytest.mark.parametrize(
+    "axes, values, expected_rho, expected_phi, expected_theta, expected_x, expected_y, expected_z",
+    [
+        (("rho",), (1,), 1, 0, 0, 0, 1, 0),
+        (("rho", "phi"), (1, 90), 1, 90, 0, 0, 0, 1),
+        (("rho", "phi", "theta"), (1, 45, 45), 1, 45, 45, -0.5, math.sqrt(2) / 2, 0.5),
+    ],
+)
+async def test_scmc_spherical_individual_axis_set(
+    scmc: SuperConductingMagnetController,
+    axes: tuple[str],
+    values: tuple[float],
+    expected_rho: float,
+    expected_phi: float,
+    expected_theta: float,
+    expected_x: float,
+    expected_y: float,
+    expected_z: float,
+) -> None:
+    await scmc.mode.set(MagnetModes.SPHERICAL)
+    for axis, value in zip(axes, values, strict=True):
+        await getattr(scmc.sph, axis).set(value)
+
+    await assert_reading(
+        scmc,
+        {
+            "scmc-cart-x": partial_reading(expected_x),
+            "scmc-cart-y": partial_reading(expected_y),
+            "scmc-cart-z": partial_reading(expected_z),
+            "scmc-sph-rho": partial_reading(expected_rho),
+            "scmc-sph-phi": partial_reading(expected_phi),
+            "scmc-sph-theta": partial_reading(expected_theta),
+        },
+    )
 
 
 async def test_scmc_raises_error_if_limit_status_is_violation(
