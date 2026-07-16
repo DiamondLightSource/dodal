@@ -1,4 +1,3 @@
-import asyncio
 from functools import cached_property
 
 import pytest
@@ -123,5 +122,5 @@ async def test_movable_with_tolerance_logic_moves_to_setpoint_and_is_done_when_w
         # Wait for the underlying move task to complete so no race condition.
         # This ensures the status has fully processed the tolerance condition
         # and transitioned to a finished state before asserting `done`.
-        await asyncio.wait_for(move_status.task, timeout=1)
+        await move_status
         assert move_status.done is True
