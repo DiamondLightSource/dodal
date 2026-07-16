@@ -9,9 +9,6 @@ from dodal.devices.beamlines.i10_1 import (
     I10JScalerCard,
 )
 from dodal.devices.beamlines.i10_1.high_field_magnet.temperature_controller import (
-    BasePID,
-    HighFieldMagnetHeater,
-    HighFieldMagnetTemperatureSensor,
     TemperatureController,
 )
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
@@ -264,51 +261,20 @@ def high_field_magnet() -> HighFieldMagnet:
 
 @devices.factory()
 def hfm_temp() -> TemperatureController:
-    sensor = HighFieldMagnetTemperatureSensor(
+    return TemperatureController.from_prefix(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:"
-    )
-    heater = HighFieldMagnetHeater(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
-    pid = BasePID(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
-    )
-    return TemperatureController(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
-        suffix="TTEMP:SET",
-        sensor=sensor,
-        heater=heater,
-        pid=pid,
     )
 
 
 @devices.factory()
 def hfm_vti() -> TemperatureController:
-    prefix = f"{PREFIX.beamline_prefix}-EA-TCTRL-02:"
-    sensor = HighFieldMagnetTemperatureSensor(prefix=prefix)
-    heater = HighFieldMagnetHeater(prefix=prefix)
-    pid = BasePID(
-        prefix=prefix,
-    )
-    return TemperatureController(
-        prefix=prefix,
-        suffix="TTEMP:SET",
-        sensor=sensor,
-        heater=heater,
-        pid=pid,
+    return TemperatureController.from_prefix(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:"
     )
 
 
 @devices.factory()
 def hfm_he3() -> TemperatureController:
-    prefix = f"{PREFIX.beamline_prefix}-EA-TCTRL-03:"
-    sensor = HighFieldMagnetTemperatureSensor(prefix=prefix)
-    heater = HighFieldMagnetHeater(prefix=prefix)
-    pid = BasePID(
-        prefix=prefix,
-    )
-    return TemperatureController(
-        prefix=prefix,
-        suffix="TTEMP:SET",
-        sensor=sensor,
-        heater=heater,
-        pid=pid,
+    return TemperatureController.from_prefix(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:"
     )

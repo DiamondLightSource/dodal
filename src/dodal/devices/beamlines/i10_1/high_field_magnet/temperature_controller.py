@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import cached_property
 
@@ -43,8 +46,11 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable):
-    temperature: SignalR[float]
+class BaseTemperatureSensor(StandardReadable, ABC):
+    @property
+    @abstractmethod
+    def temperature(self) -> SignalR[float]:
+        pass
 
 
 class HeaterMode(StrictEnum):
@@ -53,14 +59,32 @@ class HeaterMode(StrictEnum):
 
 
 class HighFieldMagnetTemperatureSensor(BaseTemperatureSensor):
-    def __init__(self, prefix: str, suffix: str = "STEMP", name: str = ""):
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.temperature = epics_signal_r(float, prefix + suffix)
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.config_readback_2 = epics_signal_r(float, prefix + suffix + "2")
-            self.config_readback_3 = epics_signal_r(float, prefix + suffix + "3")
+    def __init__(
+        self,
+        prefix: str,
+        suffix: str = "STEMP",
+        config_suffixes: list[str] | None = None,
+        name: str = "",
+    ):
+        config_suffixes = config_suffixes or ["2", "3"]
 
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self._temperature = epics_signal_r(float, prefix + suffix)
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            for sfx in config_suffixes:
+                signal_name = f"config_{sfx}"
+                if hasattr(self, signal_name):
+                    raise AttributeError(
+                        f"Cannot add configuration signal '{signal_name}': attribute already exists."
+                    )
+                signal = epics_signal_r(float, prefix + suffix + sfx)
+                setattr(self, signal_name, signal)
         super().__init__(name=name)
+
+    @property
+    def temperature(self) -> SignalR[float]:
+        return self._temperature
 
 
 class HighFieldMagnetHeater(BaseHeater):
@@ -102,4 +126,27 @@ class TemperatureController(StandardReadable, StandardMovable):
             setpoint=self.user_setpoint,
             readback=self.sensor.temperature,
             tolerance=self.tolerance,
+        )
+
+    @classmethod
+    def from_prefix(
+        cls,
+        prefix: str,
+        suffix: str = "TTEMP:SET",
+        config_suffixes: list[str] | None = None,
+        name: str = "",
+    ) -> TemperatureController:
+        """Helper factory to instantiate the entire stack from a single prefix."""
+        sensor = HighFieldMagnetTemperatureSensor(
+            prefix=prefix, config_suffixes=config_suffixes
+        )
+        heater = HighFieldMagnetHeater(prefix=prefix)
+        pid = BasePID(prefix=prefix)
+        return cls(
+            prefix=prefix,
+            suffix=suffix,
+            sensor=sensor,
+            heater=heater,
+            pid=pid,
+            name=name,
         )
