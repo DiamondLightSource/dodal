@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet &#8212; dodal 2.5.2.dev14+gc8aa74205 documentation</title>
+    <title>dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet &#8212; dodal 2.5.2.dev15+g0e7c63fc3 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../../_static/documentation_options.js?v=58c278ed"></script>
+    <script src="../../../../../../_static/documentation_options.js?v=f041455b"></script>
     <script src="../../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,35 +885,27 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Flyable</span><span class="p">,</span>
-    <span class="n">Preparable</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Preparable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
-    <span class="n">MovableLogic</span><span class="p">,</span>
-    <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardMovable</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">SubsetEnum</span><span class="p">,</span>
-    <span class="n">TimeoutCalculator</span><span class="p">,</span>
     <span class="n">WatchableAsyncStatus</span><span class="p">,</span>
-    <span class="n">derived_signal_r</span><span class="p">,</span>
     <span class="n">error_if_none</span><span class="p">,</span>
-    <span class="n">set_and_wait_for_other_value</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.movable</span><span class="w"> </span><span class="kn">import</span> <span class="n">MovableWithToleranceLogic</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">HighFieldMangetSweepTypes</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
@@ -944,11 +936,9 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">ToleranceMovableLogic</span><span class="p">(</span><span class="n">MovableLogic</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
-    <span class="n">tolerance</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HighFieldMagnetMovableLogic</span><span class="p">(</span><span class="n">MovableWithToleranceLogic</span><span class="p">):</span>
     <span class="n">speed</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
     <span class="n">acc_time</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="n">within_tolerance</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">current_val</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
@@ -969,24 +959,10 @@ window.runMermaid = runMermaid;</script>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
         <span class="k">return</span> <span class="n">timeout</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_position</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">TimeoutCalculator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">await</span> <span class="n">set_and_wait_for_other_value</span><span class="p">(</span>
-            <span class="n">set_signal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">setpoint</span><span class="p">,</span>
-            <span class="n">set_value</span><span class="o">=</span><span class="n">new_position</span><span class="p">,</span>
-            <span class="n">match_signal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">within_tolerance</span><span class="p">,</span>
-            <span class="n">match_value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">(),</span>
-        <span class="p">)</span>
-
 
 <div class="viewcode-block" id="HighFieldMagnet">
 <a class="viewcode-back" href="../../../../../../reference/generated/dodal.devices.beamlines.i10_1.HighFieldMagnet.html#dodal.devices.beamlines.i10_1.HighFieldMagnet">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">HighFieldMagnet</span><span class="p">(</span>
-    <span class="n">StandardMovable</span><span class="p">,</span>
-    <span class="n">StandardReadable</span><span class="p">,</span>
-    <span class="n">Flyable</span><span class="p">,</span>
-    <span class="n">Preparable</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HighFieldMagnet</span><span class="p">(</span><span class="n">StandardMovable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1007,6 +983,7 @@ window.runMermaid = runMermaid;</script>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ramp_up_time</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">field_tolerance</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">field_tolerance</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;RBV:DEMANDFIELD&quot;</span><span class="p">)</span>
 
@@ -1019,34 +996,20 @@ window.runMermaid = runMermaid;</script>
             <span class="n">read_pv</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;RBV:SETPOINTFIELD&quot;</span><span class="p">,</span>
             <span class="n">write_pv</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SET:SETPOINTFIELD&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">within_tolerance</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-            <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_within_tolerance</span><span class="p">,</span>
-            <span class="n">setpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="p">,</span>
-            <span class="n">readback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-            <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_tolerance</span><span class="p">,</span>
-        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_success</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fly_info</span><span class="p">:</span> <span class="n">FlyMagInfo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fly_status</span><span class="p">:</span> <span class="n">WatchableAsyncStatus</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_within_tolerance</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">setpoint</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">readback</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the readback is within the tolerance of the setpoint.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">setpoint</span> <span class="o">-</span> <span class="n">readback</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tolerance</span><span class="p">)</span>
-
     <span class="nd">@cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">movable_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MovableLogic</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ToleranceMovableLogic</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">movable_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HighFieldMagnetMovableLogic</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HighFieldMagnetMovableLogic</span><span class="p">(</span>
             <span class="n">setpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="p">,</span>
             <span class="n">readback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-            <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_tolerance</span><span class="p">,</span>
-            <span class="n">within_tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">within_tolerance</span><span class="p">,</span>
             <span class="n">speed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep_rate</span><span class="p">,</span>
             <span class="n">acc_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ramp_up_time</span><span class="p">,</span>
+            <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_tolerance</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="HighFieldMagnet.prepare">

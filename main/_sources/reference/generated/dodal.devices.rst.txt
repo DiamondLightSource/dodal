@@ -42,6 +42,7 @@
    dodal.devices.ipin
    dodal.devices.linkam3
    dodal.devices.motors
+   dodal.devices.movable
    dodal.devices.mx_phase1
    dodal.devices.oav
    dodal.devices.pgm
