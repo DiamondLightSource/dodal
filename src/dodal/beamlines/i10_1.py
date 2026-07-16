@@ -8,6 +8,12 @@ from dodal.devices.beamlines.i10_1 import (
     HighFieldMagnet,
     I10JScalerCard,
 )
+from dodal.devices.beamlines.i10_1.high_field_magnet.temperature_controller import (
+    BasePID,
+    HighFieldMagnetHeater,
+    HighFieldMagnetTemperatureSensor,
+    TemperatureController,
+)
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import (
     SR570,
@@ -253,4 +259,56 @@ def high_field_magnet_stage() -> XYPitchStage:
 def high_field_magnet() -> HighFieldMagnet:
     return HighFieldMagnet(
         prefix=f"{PREFIX.beamline_prefix}-EA-SMC-01:",
+    )
+
+
+@devices.factory()
+def hfm_temp() -> TemperatureController:
+    sensor = HighFieldMagnetTemperatureSensor(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:"
+    )
+    heater = HighFieldMagnetHeater(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
+    pid = BasePID(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
+    )
+    return TemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
+        suffix="TTEMP:SET",
+        sensor=sensor,
+        heater=heater,
+        pid=pid,
+    )
+
+
+@devices.factory()
+def hfm_vti() -> TemperatureController:
+    prefix = f"{PREFIX.beamline_prefix}-EA-TCTRL-02:"
+    sensor = HighFieldMagnetTemperatureSensor(prefix=prefix)
+    heater = HighFieldMagnetHeater(prefix=prefix)
+    pid = BasePID(
+        prefix=prefix,
+    )
+    return TemperatureController(
+        prefix=prefix,
+        suffix="TTEMP:SET",
+        sensor=sensor,
+        heater=heater,
+        pid=pid,
+    )
+
+
+@devices.factory()
+def hfm_he3() -> TemperatureController:
+    prefix = f"{PREFIX.beamline_prefix}-EA-TCTRL-03:"
+    sensor = HighFieldMagnetTemperatureSensor(prefix=prefix)
+    heater = HighFieldMagnetHeater(prefix=prefix)
+    pid = BasePID(
+        prefix=prefix,
+    )
+    return TemperatureController(
+        prefix=prefix,
+        suffix="TTEMP:SET",
+        sensor=sensor,
+        heater=heater,
+        pid=pid,
     )
