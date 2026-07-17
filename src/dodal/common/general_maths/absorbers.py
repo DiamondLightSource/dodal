@@ -15,7 +15,7 @@ XrayEnergy = Annotated[
 
 @runtime_checkable
 class FixedDepth(Protocol):
-    def calculate_absorption_bn(self, xray_energy_kev: XrayEnergy) -> float:
+    def calculate_absorption_bn(self, *, xray_energy_kev: XrayEnergy) -> float:
         """Calculates absorption for a flat absorber of fixed depth.
 
         Typical use case is a foil absorber in a filter wheel.
@@ -29,11 +29,30 @@ class FixedDepth(Protocol):
         """
         ...
 
+@runtime_checkable
+class WedgeMotorScaleSpec(Protocol):
+
+    tolerance_mm: StrictFloat = 5.0e-3
+    # the following must be specified by individual child instance
+    out_mm: StrictFloat
+    threshold_mm: StrictFloat
+    max_mm: StrictFloat
+
+    def is_position_consistent_with_absorber_removed(self, *, motor_position_mm) -> bool:
+        """Because interpretation could have either direction polarity, leave to child instance.
+
+        Args:
+            motor_position_mm: The motor position to interpret with respect to the out location
+        """
+        return not motor_position_mm > self.out_mm + self.tolerance_mm
+
 
 @runtime_checkable
 class VariableDepth(Protocol):
+
     def calculate_absorption_bn(
         self,
+        *,
         xray_energy_kev: XrayEnergy,
         motor_position_mm: StrictFloat,
     ) -> float:
@@ -63,10 +82,9 @@ class Absorber:
     Attributes:
         material_absorption_model: Material specific model for photon mass attenuation calculation.
     """
-
     material_absorption_model: AbsorptionCalculator
 
-    def _attenuation_bn(self, xray_energy_kev, thickness_cm):
+    def _attenuation_bn(self, *, xray_energy_kev, thickness_cm):
         """Common internal conversion calculator.
 
         Extracts material photon mass attenuation from material calculator,
@@ -100,7 +118,7 @@ class FoilAbsorber(Absorber, FixedDepth):
     geometry_model: ThicknessProvider
 
     @validate_call
-    def calculate_absorption_bn(self, xray_energy_kev: XrayEnergy) -> float:
+    def calculate_absorption_bn(self, *, xray_energy_kev: XrayEnergy) -> float:
         # see Protocol API for FixedDepth (absorber)
         _thickness_cm = self.geometry_model.get_thickness_cm()
         return self._attenuation_bn(
@@ -113,6 +131,7 @@ class WedgeAbsorber(Absorber, VariableDepth):
     """System level representation of an foil absorbing filter, typically wheel mounted.
 
     Attributes:
+        motor_scale: Motor axis usage model imposes restrictions.
         geometry_model: Shape model implementing the TaperedGeometryProvider protocol.
 
     Returns:
@@ -124,10 +143,12 @@ class WedgeAbsorber(Absorber, VariableDepth):
     @validate_call
     def calculate_absorption_bn(
         self,
+        *,
         xray_energy_kev: XrayEnergy,
         motor_position_mm: StrictFloat,
     ) -> float:
         # see Protocol API for VariableDepth (absorber)
+
         _thickness_cm = self.geometry_model.thickness_cm_at_motor_position_mm(
             motor_position_mm=motor_position_mm
         )

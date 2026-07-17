@@ -3,8 +3,12 @@ from typing import Annotated
 
 from pydantic import Field, StrictFloat, validate_call
 
-_CANONICAL_BARNETT_CONVERSION = -1.0e3
-_REVERSE_BARNETT_CONVERSION = -1.0e-3
+Attenuation_Bn = Annotated[StrictFloat, Field(ge=0.0)]
+
+CANONICAL_NON_ABSORPTION: Attenuation_Bn = 0.0
+
+_CANONICAL_BARNETT_CONVERSION: Attenuation_Bn = -1.0e3
+_REVERSE_BARNETT_CONVERSION: float = -1.0e-3
 
 
 @validate_call

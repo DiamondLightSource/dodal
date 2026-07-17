@@ -7,6 +7,7 @@ from pydantic import (
     StrictFloat,
     validate_call,
 )
+from pydantic.dataclasses import dataclass
 
 from dodal.common.general_maths.transmission_interconversion import (
     attenuation_from_natural_log_of_transmission,
@@ -77,6 +78,7 @@ class PolynomialAbsorptionCorrection(AbsorptionCalculator):
         super().__init__(_calculate_correction)
 
 
+@dataclass(kw_only=True, frozen=True)
 class SingleRollOffAbsorptionCalculator(AbsorptionCalculator):
     """Simplest physics model for mass attenuation per cm as a function of x-ray energy in keV.
     Typically appropriate where one element dominates the absorption,
@@ -90,6 +92,7 @@ class SingleRollOffAbsorptionCalculator(AbsorptionCalculator):
 
     def __init__(
         self,
+        *,
         material_factor_per_cm: Annotated[StrictFloat, Field(gt=0)],
         roll_off: Annotated[StrictFloat, Field(lt=0)],
     ):
