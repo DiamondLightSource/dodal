@@ -132,7 +132,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             btm_outer = phase.btm_outer.user_readback
         else:
             # If locked phase axes make the locked phase 0.
-            top_inner = btm_outer = 0
+            top_inner = btm_outer = 0.0
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Hardware backed read/write for polarisation.

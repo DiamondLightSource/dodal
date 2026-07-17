@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from ophyd_async.core import init_devices
 
 from dodal.devices.beamlines.i06_shared import I06Apple2Controller
 from dodal.devices.insertion_device import (
@@ -13,16 +14,19 @@ from dodal.devices.insertion_device import (
 )
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
+# add mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
+
 
 @pytest.fixture
 async def mock_apple2(
     mock_id_gap: UndulatorGap,
     mock_phase_axes: UndulatorPhaseAxes,
 ) -> Apple2[UndulatorPhaseAxes]:
-    mock_apple2 = Apple2[UndulatorPhaseAxes](
-        id_gap=mock_id_gap,
-        id_phase=mock_phase_axes,
-    )
+    with init_devices(mock=True):
+        mock_apple2 = Apple2[UndulatorPhaseAxes](
+            id_gap=mock_id_gap, id_phase=mock_phase_axes
+        )
     return mock_apple2
 
 
@@ -38,12 +42,13 @@ async def mock_i06_controller(
     mock_inverse_gap_energy_motor_lut.find_value_in_lookup_table = MagicMock(
         return_value=100
     )
-    mock_i06_controller = I06Apple2Controller(
-        apple2=mock_apple2,
-        gap_energy_motor_lut=mock_gap_energy_motor_lut,
-        phase_energy_motor_lut=mock_phase_energy_motor_lut,
-        inverse_gap_energy_motor_lut=mock_inverse_gap_energy_motor_lut,
-    )
+    with init_devices(mock=True):
+        mock_i06_controller = I06Apple2Controller(
+            apple2=mock_apple2,
+            gap_energy_motor_lut=mock_gap_energy_motor_lut,
+            phase_energy_motor_lut=mock_phase_energy_motor_lut,
+            inverse_gap_energy_motor_lut=mock_inverse_gap_energy_motor_lut,
+        )
     return mock_i06_controller
 
 

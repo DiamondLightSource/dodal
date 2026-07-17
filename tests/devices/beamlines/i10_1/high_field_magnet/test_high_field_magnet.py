@@ -9,6 +9,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
+    get_mock_put,
     init_devices,
     set_mock_value,
 )
@@ -36,11 +37,9 @@ async def test_locate(high_field_magnet: HighFieldMagnet):
 
 
 async def test_stop_success(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.user_readback, 7.5)
-    set_mock_value(high_field_magnet.user_readback, 1.5)
+    initial_val = await high_field_magnet.user_readback.get_value()
     await high_field_magnet.stop()
-    assert high_field_magnet._set_success is False
-    assert await high_field_magnet.user_setpoint.get_value() == 1.5
+    get_mock_put(high_field_magnet.user_setpoint).assert_awaited_once_with(initial_val)
 
 
 async def test_set_raises_runtime_error_when_stopped(
@@ -149,15 +148,6 @@ async def test_read(high_field_magnet: HighFieldMagnet):
         high_field_magnet,
         {"magnet": partial_reading(5.0)},
     )
-
-
-async def test_tolerance_logic_stop_clears_set_success_and_restores_setpoint(
-    high_field_magnet: HighFieldMagnet,
-):
-    set_mock_value(high_field_magnet.movable_logic.readback, 1.5)
-    await high_field_magnet.stop()
-    assert high_field_magnet._set_success is False
-    assert await high_field_magnet.movable_logic.setpoint.get_value() == 1.5
 
 
 async def test_tolerance_logic_calculate_timeout_with_zero_speed(

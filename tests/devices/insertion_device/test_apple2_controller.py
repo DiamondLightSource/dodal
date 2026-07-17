@@ -135,12 +135,13 @@ async def mock_energy_readback_controller(
     configured_phase: float,
     configured_energy: float,
 ) -> DummyEnergyReadbackApple2Controller:
-    mock_locked_controller = DummyEnergyReadbackApple2Controller(
-        apple2=mock_locked_apple2,
-        gap_energy_motor_converter=lambda value, pol: configured_gap,
-        phase_energy_motor_converter=lambda value, pol: configured_phase,
-        inverse_gap_energy_motor_converter=lambda value, pol: configured_energy,
-    )
+    with init_devices(mock=True):
+        mock_locked_controller = DummyEnergyReadbackApple2Controller(
+            apple2=mock_locked_apple2,
+            gap_energy_motor_converter=lambda value, pol: configured_gap,
+            phase_energy_motor_converter=lambda value, pol: configured_phase,
+            inverse_gap_energy_motor_converter=lambda value, pol: configured_energy,
+        )
     return mock_locked_controller
 
 
