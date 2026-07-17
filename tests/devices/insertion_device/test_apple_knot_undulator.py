@@ -56,8 +56,6 @@ async def test_id_set_energy_const_pol(
     initial_phase_top_outer: float,
     expected_pol: Pol,
 ):
-    await mock_locked_apple2.connect(mock=True)
-    await mock_apple_knot_i05_controller.connect(mock=True)
     set_mock_value(
         mock_locked_apple2.phase().top_outer.user_readback, initial_phase_top_outer
     )
