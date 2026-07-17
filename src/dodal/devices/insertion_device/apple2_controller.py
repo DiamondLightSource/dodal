@@ -128,31 +128,22 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         phase = self.apple2().phase()
         # check if undulator phase is unlocked.
         if isinstance(phase, UndulatorPhaseAxes):
-            self.top_inner = phase.top_inner.user_readback
-            self.btm_outer = phase.btm_outer.user_readback
+            top_inner = phase.top_inner.user_readback
+            btm_outer = phase.btm_outer.user_readback
         else:
             # If locked phase axes make the locked phase 0.
-            self.top_inner = soft_signal_rw(float, initial_value=0.0)
-            self.btm_outer = soft_signal_rw(float, initial_value=0.0)
+            top_inner = btm_outer = 0
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Hardware backed read/write for polarisation.
-
-            print(self.polarisation_setpoint.name)
-            print(phase.top_outer.user_readback.name)
-            print(self.top_inner.name)
-            print(phase.btm_inner.user_readback.name)
-            print(self.btm_outer.name)
-            print(self.apple2().gap().user_readback.name)
-
             self.polarisation = derived_signal_rw(
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,
                 pol=self.polarisation_setpoint,
                 top_outer=phase.top_outer.user_readback,
-                top_inner=self.top_inner,
+                top_inner=top_inner,
                 btm_inner=phase.btm_inner.user_readback,
-                btm_outer=self.btm_outer,
+                btm_outer=btm_outer,
                 gap=self.apple2().gap().user_readback,
             )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
