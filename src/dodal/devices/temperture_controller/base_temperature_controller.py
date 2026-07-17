@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import cached_property
+from typing import Generic, TypeVar
 
 from ophyd_async.core import (
     SignalR,
@@ -10,7 +11,6 @@ from ophyd_async.core import (
     StandardMovable,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_rw
@@ -53,18 +53,19 @@ class BaseTemperatureSensor(StandardReadable, ABC):
         pass
 
 
-class HeaterMode(StrictEnum):
-    MANUAL = "Manual"
-    AUTO = "Auto"
+SensorT = TypeVar("SensorT", bound=BaseTemperatureSensor)
+HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
-class TemperatureController(StandardReadable, StandardMovable):
+class TemperatureController(
+    StandardReadable, StandardMovable, Generic[SensorT, HeaterT]
+):
     def __init__(
         self,
         prefix: str,
         suffix: str,
-        sensor: BaseTemperatureSensor,
-        heater: BaseHeater,
+        sensor: SensorT,
+        heater: HeaterT,
         pid: PID,
         name: str = "",
     ):

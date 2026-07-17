@@ -1,8 +1,7 @@
-from .basic_temperature_controller import (
+from .base_temperature_controller import (
     PID,
     BaseHeater,
     BaseTemperatureSensor,
-    HeaterMode,
     TemperatureController,
 )
 from .lakeshore.lakeshore import Lakeshore, Lakeshore336, Lakeshore340
@@ -13,7 +12,6 @@ __all__ = [
     "Lakeshore",
     "BaseHeater",
     "BaseTemperatureSensor",
-    "HeaterMode",
     "PID",
     "TemperatureController",
 ]

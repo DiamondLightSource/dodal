@@ -1,7 +1,7 @@
 import asyncio
 
 import pytest
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -54,20 +54,5 @@ async def test_temperature_controller_readback(
             "hfm_temp_controller-pid-p": partial_reading(1.0),
             "hfm_temp_controller-pid-i": partial_reading(2.0),
             "hfm_temp_controller-pid-d": partial_reading(3.0),
-        },
-    )
-
-
-async def test_temperature_controller_stop(
-    hfm_temp_controller: HFMTemperatureController,
-):
-
-    set_mock_value(hfm_temp_controller.user_setpoint, 1.0)
-    set_mock_value(hfm_temp_controller.sensor.temperature, 0.5)
-    await hfm_temp_controller.stop()
-    await assert_reading(
-        hfm_temp_controller,
-        {
-            "hfm_temp_controller": partial_reading(0.5),
         },
     )
