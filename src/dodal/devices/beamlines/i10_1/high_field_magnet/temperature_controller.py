@@ -25,7 +25,7 @@ class TemperatureMovableLogic(MovableWithToleranceLogic):
         await self.setpoint.set(current_val)
 
 
-class BasePID(StandardReadable):
+class PID(StandardReadable):
     def __init__(
         self,
         prefix: str,
@@ -90,14 +90,15 @@ class HighFieldMagnetTemperatureSensor(BaseTemperatureSensor):
 class HighFieldMagnetHeater(BaseHeater):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.setpoint = epics_signal_rw(float, prefix + "MANV:SET")
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.output = epics_signal_r(float, prefix + "HEATERP")
             self.mode = epics_signal_rw(
                 HeaterMode,
                 read_pv=prefix + "ACTIVITY",
                 write_pv=prefix + "ACTIVITY:SET",
             )
+            self.setpoint = epics_signal_rw(float, prefix + "MANV:SET")
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.output = epics_signal_r(float, prefix + "HEATERP")
+
         super().__init__(name=name)
 
 
@@ -108,16 +109,19 @@ class TemperatureController(StandardReadable, StandardMovable):
         suffix: str,
         sensor: BaseTemperatureSensor,
         heater: BaseHeater,
-        pid: BasePID,
+        pid: PID,
         name: str = "",
     ):
+
+        self.pid = pid
+        self.heater = heater
         with self.add_children_as_readables():
-            self.heater = heater
-            self.pid = pid
             self.sensor = sensor
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.tolerance = soft_signal_rw(float, initial_value=0.1)
             self.user_setpoint = epics_signal_rw(float, prefix + suffix)
+
         super().__init__(name=name)
 
     @cached_property
@@ -141,7 +145,7 @@ class TemperatureController(StandardReadable, StandardMovable):
             prefix=prefix, config_suffixes=config_suffixes
         )
         heater = HighFieldMagnetHeater(prefix=prefix)
-        pid = BasePID(prefix=prefix)
+        pid = PID(prefix=prefix)
         return cls(
             prefix=prefix,
             suffix=suffix,
