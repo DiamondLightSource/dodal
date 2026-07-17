@@ -2,7 +2,6 @@ import asyncio
 
 import pytest
 from ophyd_async.core import (
-    SignalR,
     StandardReadableFormat,
     init_devices,
     set_mock_value,
@@ -21,12 +20,8 @@ from dodal.devices.temperture_controller import (
 class MinimalMockSensor(BaseTemperatureSensor):
     def __init__(self, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self._temperature = epics_signal_r(float, "prefix + suffix)")
+            self.temperature = epics_signal_r(float, "prefix + suffix)")
         super().__init__(name=name)
-
-    @property
-    def temperature(self) -> SignalR[float]:
-        return self._temperature
 
 
 class MockHeater(BaseHeater):

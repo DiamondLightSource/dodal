@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from ophyd_async.core import (
-    SignalR,
     StandardReadableFormat,
     StrictEnum,
 )
@@ -31,7 +30,7 @@ class HighFieldMagnetTemperatureSensor(BaseTemperatureSensor):
         config_suffixes = config_suffixes or ["2", "3"]
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self._temperature = epics_signal_r(float, prefix + suffix)
+            self.temperature = epics_signal_r(float, prefix + suffix)
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             for sfx in config_suffixes:
@@ -43,10 +42,6 @@ class HighFieldMagnetTemperatureSensor(BaseTemperatureSensor):
                 signal = epics_signal_r(float, prefix + suffix + sfx)
                 setattr(self, signal_name, signal)
         super().__init__(name=name)
-
-    @property
-    def temperature(self) -> SignalR[float]:
-        return self._temperature
 
 
 class HighFieldMagnetHeater(BaseHeater):

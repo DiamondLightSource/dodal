@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Generic, TypeVar
@@ -46,11 +45,8 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable, ABC):
-    @property
-    @abstractmethod
-    def temperature(self) -> SignalR[float]:
-        pass
+class BaseTemperatureSensor(StandardReadable):
+    temperature: SignalR[float]
 
 
 SensorT = TypeVar("SensorT", bound=BaseTemperatureSensor)
