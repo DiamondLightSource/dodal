@@ -45,7 +45,6 @@ class SpecsDetector(
             driver.energy_step,
             driver.pass_energy,
             driver.slices,
-            driver.acquire_time,
             driver.iterations,
             driver.total_steps,
             driver.total_time,

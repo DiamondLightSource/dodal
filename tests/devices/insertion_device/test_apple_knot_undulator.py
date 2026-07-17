@@ -1,8 +1,5 @@
 import pytest
-from ophyd_async.core import (
-    init_devices,
-    set_mock_value,
-)
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.beamlines.i05_shared import (
     energy_to_gap_converter,
@@ -59,6 +56,8 @@ async def test_id_set_energy_const_pol(
     initial_phase_top_outer: float,
     expected_pol: Pol,
 ):
+    await mock_locked_apple2.connect(mock=True)
+    await mock_apple_knot_i05_controller.connect(mock=True)
     set_mock_value(
         mock_locked_apple2.phase().top_outer.user_readback, initial_phase_top_outer
     )

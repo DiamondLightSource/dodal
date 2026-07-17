@@ -422,11 +422,12 @@ async def mock_locked_controller(
     configured_gap: float,
     configured_phase: float,
 ) -> DummyLockedApple2Controller:
-    mock_locked_controller = DummyLockedApple2Controller(
-        apple2=mock_locked_apple2,
-        gap_energy_motor_converter=lambda value, pol: configured_gap,
-        phase_energy_motor_converter=lambda value, pol: configured_phase,
-    )
+    with init_devices(mock=True):
+        mock_locked_controller = DummyLockedApple2Controller(
+            apple2=mock_locked_apple2,
+            gap_energy_motor_converter=lambda value, pol: configured_gap,
+            phase_energy_motor_converter=lambda value, pol: configured_phase,
+        )
     return mock_locked_controller
 
 
