@@ -14,7 +14,7 @@ from dodal.devices.insertion_device import (
 )
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
-# add mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+# add mock_id_gap, mock_phase and mock_phase_axes
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
