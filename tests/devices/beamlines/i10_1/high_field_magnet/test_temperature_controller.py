@@ -56,3 +56,12 @@ async def test_temperature_controller_readback(
             "hfm_temp_controller-pid-d": partial_reading(3.0),
         },
     )
+
+
+async def test_repeat_config_signal():
+    with pytest.raises(AttributeError, match="Cannot add configuration signal"):
+        HFMTemperatureController(
+            prefix="I10J-MAGNET-01:TEMP:",
+            suffix="TTEMP:SET",
+            config_suffixes=["2", "2"],
+        )
