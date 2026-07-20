@@ -55,7 +55,7 @@ class CryoconM32Sensor(BaseTemperatureSensor):
         super().__init__(name=name)
 
     def _create_config_signals(self, prefix: str, attr_prefix: str) -> None:
-        """Helper to dynamically generate flat configuration attributes."""
+        """Helper to generate all the config signals."""
         suffixes = ["MIN", "MAX", "SLOPE", "OFFSET"]
         for sfx in suffixes:
             attr_name = f"{attr_prefix}_{sfx.lower()}"
