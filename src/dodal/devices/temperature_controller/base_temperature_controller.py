@@ -58,8 +58,7 @@ class TemperatureController(
 ):
     def __init__(
         self,
-        prefix: str,
-        suffix: str,
+        setpoint: SignalRW[float],
         sensor: SensorT,
         heater: HeaterT,
         pid: PID,
@@ -73,7 +72,7 @@ class TemperatureController(
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.tolerance = soft_signal_rw(float, initial_value=0.1)
-            self.user_setpoint = epics_signal_rw(float, prefix + suffix)
+            self.user_setpoint = setpoint
 
         super().__init__(name=name)
 

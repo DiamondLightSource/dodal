@@ -35,10 +35,10 @@ class MockTemperatureController(TemperatureController):
     def __init__(self, name: str = ""):
         sensor = MinimalMockSensor()
         heater = MockHeater()
+        setpoint = epics_signal_rw(float, "prefix + suffix:SET")
         pid = PID(prefix="TEST-PID:")
         super().__init__(
-            prefix="TEST-CTRL:",
-            suffix="SET",
+            setpoint=setpoint,
             sensor=sensor,
             heater=heater,
             pid=pid,

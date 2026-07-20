@@ -71,10 +71,10 @@ class HFMTemperatureController(TemperatureController):
             prefix=prefix, config_suffixes=config_suffixes
         )
         heater = HighFieldMagnetHeater(prefix=prefix)
+        setpoint = epics_signal_rw(float, prefix + suffix)
         pid = PID(prefix=prefix)
         super().__init__(
-            prefix=prefix,
-            suffix=suffix,
+            setpoint=setpoint,
             sensor=sensor,
             heater=heater,
             pid=pid,
