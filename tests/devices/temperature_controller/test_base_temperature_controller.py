@@ -22,7 +22,7 @@ class MinimalMockSensor(BaseTemperatureSensor):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.sensor = epics_signal_r(float, "prefix + suffix)")
             self.sensor2 = epics_signal_r(float, "prefix + suffix2)")
-        self.not_a_sensor = 5
+        self.sensor88 = 5
         super().__init__(name=name)
 
 
@@ -152,7 +152,9 @@ async def test_temperature_controller_set_active_readback_with_invalid_sensor(
     mock_controller: MockTemperatureController,
 ):
     with pytest.raises(AttributeError):
-        await mock_controller.sensor.set_active_readback("invalid_sensor")
+        await mock_controller.sensor.set_active_readback("sensor888")
 
     with pytest.raises(TypeError):
-        await mock_controller.sensor.set_active_readback("not_a_sensor")
+        await mock_controller.sensor.set_active_readback("sensor88")
+    with pytest.raises(ValueError):
+        await mock_controller.sensor.set_active_readback("sensor8_1")

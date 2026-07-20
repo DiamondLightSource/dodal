@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
@@ -66,6 +67,11 @@ class BaseTemperatureSensor(StandardReadable, Movable):
     def set_active_readback(self, sensor_name: str | None) -> None:
 
         if sensor_name is not None:
+            if not re.match(r"^sensor\d*$", sensor_name):
+                raise ValueError(
+                    f"Invalid readback target '{sensor_name}'. "
+                    f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2')."
+                )
             if not hasattr(self, sensor_name):
                 raise AttributeError(
                     f" '{sensor_name}' is not a valid attribute of {self.__class__.__name__}"
