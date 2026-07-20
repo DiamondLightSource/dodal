@@ -9,7 +9,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.temperture_controller import (
+from dodal.devices.temperature_controller import (
     PID,
     BaseHeater,
     BaseTemperatureSensor,

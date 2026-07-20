@@ -21,7 +21,7 @@ from dodal.devices.current_amplifiers import (
     FemtoDDPCA,
 )
 from dodal.devices.motors import XYPitchStage
-from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
+from dodal.devices.temperature_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

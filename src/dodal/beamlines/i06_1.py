@@ -3,7 +3,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
 from dodal.devices.motors import XYThetaStage
-from dodal.devices.temperture_controller import Lakeshore336
+from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

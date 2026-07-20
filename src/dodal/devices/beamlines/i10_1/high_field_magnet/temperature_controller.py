@@ -6,7 +6,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.temperture_controller import (
+from dodal.devices.temperature_controller import (
     PID,
     BaseHeater,
     BaseTemperatureSensor,
