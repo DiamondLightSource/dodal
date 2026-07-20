@@ -27,7 +27,6 @@ async def test_temperature_controller_readback(
     scm_temp_controller: SCMTemperatureController,
 ):
     await scm_temp_controller.set(1.0)
-
     await assert_reading(
         scm_temp_controller,
         {
@@ -35,11 +34,22 @@ async def test_temperature_controller_readback(
             "scm_temp_controller-sensor-sensor2": partial_reading(0.0),
         },
     )
+
     await assert_configuration(
         scm_temp_controller,
         {
             "scm_temp_controller-tolerance": partial_reading(0.1),
             "scm_temp_controller-user_setpoint": partial_reading(1.0),
+            "scm_temp_controller-sensor-sensor_slope": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor_offset": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor_min": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor_max": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor2_slope": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor2_offset": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor2_min": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor2_max": partial_reading(0.0),
+            "scm_temp_controller-ramp_rate": partial_reading(0.0),
+            "scm_temp_controller-ramp_mode": partial_reading(""),
         },
     )
     await asyncio.gather(
