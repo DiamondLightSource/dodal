@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Generic, TypeVar
 
 from bluesky.protocols import Movable
@@ -48,43 +46,36 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable, ABC, Movable):
-    @property
-    @abstractmethod
-    def temperature(self) -> SignalR[float]:
-        pass
+class BaseTemperatureSensor(StandardReadable, Movable):
+    sensor: SignalR[float]
 
     def __init__(self, name: str = ""):
-        self._active_attr_name: str | None = None
-
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self._auto_temp = self.temperature
-
+        self._active_sensor_name: str | None = None
         super().__init__(name=name)
 
     @property
     def active_sensor(self) -> SignalR[float]:
-        if self._active_attr_name is not None:
-            return getattr(self, self._active_attr_name)
-        return self.temperature
+        if self._active_sensor_name is not None:
+            return getattr(self, self._active_sensor_name)
+        return self.sensor
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
         self.set_active_readback(value)
 
-    def set_active_readback(self, attr_name: str | None) -> None:
+    def set_active_readback(self, sensor_name: str | None) -> None:
 
-        if attr_name is not None:
-            if not hasattr(self, attr_name):
+        if sensor_name is not None:
+            if not hasattr(self, sensor_name):
                 raise AttributeError(
-                    f" '{attr_name}' is not a valid attribute of {self.__class__.__name__}"
+                    f" '{sensor_name}' is not a valid attribute of {self.__class__.__name__}"
                 )
-            if not isinstance(getattr(self, attr_name), SignalR):
+            if not isinstance(getattr(self, sensor_name), SignalR):
                 raise TypeError(
-                    f"Attribute '{attr_name}' must be an instance of SignalR, got {type(getattr(self, attr_name))}"
+                    f"Attribute '{sensor_name}' must be an instance of SignalR, got {type(getattr(self, sensor_name))}"
                 )
 
-        self._active_attr_name = attr_name
+        self._active_sensor_name = sensor_name
 
 
 SensorT = TypeVar("SensorT", bound=BaseTemperatureSensor)
@@ -114,8 +105,9 @@ class TemperatureController(
 
         super().__init__(name=name)
 
-    @cached_property
-    def movable_logic(self) -> TemperatureMovableLogic:
+    @property
+    def movable_logic(self) -> TemperatureMovableLogic:  # type: ignore[override]
+        """Readback needed to be the active sensor, hence not cached_property."""
         return TemperatureMovableLogic(
             setpoint=self.user_setpoint,
             readback=self.sensor.active_sensor,

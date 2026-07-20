@@ -2,7 +2,6 @@ import asyncio
 
 import pytest
 from ophyd_async.core import (
-    SignalR,
     StandardReadableFormat,
     init_devices,
     set_mock_value,
@@ -21,12 +20,10 @@ from dodal.devices.temperature_controller import (
 class MinimalMockSensor(BaseTemperatureSensor):
     def __init__(self, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self._pv_temperature = epics_signal_r(float, "prefix + suffix)")
+            self.sensor = epics_signal_r(float, "prefix + suffix)")
+            self.sensor2 = epics_signal_r(float, "prefix + suffix2)")
+        self.not_a_sensor = 5
         super().__init__(name=name)
-
-    @property
-    def temperature(self) -> SignalR[float]:
-        return self._pv_temperature
 
 
 class MockHeater(BaseHeater):
@@ -61,14 +58,42 @@ def mock_controller() -> MockTemperatureController:
 async def test_temperature_movable(mock_controller: MockTemperatureController):
 
     set_mock_value(mock_controller.tolerance, 0.5)
-    set_mock_value(mock_controller.sensor.temperature, 10.0)
+    set_mock_value(mock_controller.sensor.sensor, 10.0)
 
     status = mock_controller.set(20.0)
     assert not status.done
-    set_mock_value(mock_controller.sensor.temperature, 19.4)
+    set_mock_value(mock_controller.sensor.sensor, 19.4)
 
     assert not status.done
-    set_mock_value(mock_controller.sensor.temperature, 19.8)
+    set_mock_value(mock_controller.sensor.sensor, 19.8)
+    await status
+    assert status.done
+    assert status.success
+
+
+async def test_temperature_movable_with_different_sensor(
+    mock_controller: MockTemperatureController,
+):
+
+    set_mock_value(mock_controller.tolerance, 0.5)
+    set_mock_value(mock_controller.sensor.sensor, 10.0)
+
+    status = mock_controller.set(20.0)
+    assert not status.done
+    set_mock_value(mock_controller.sensor.sensor, 19.4)
+
+    assert not status.done
+    set_mock_value(mock_controller.sensor.sensor, 19.8)
+    await status
+    assert status.done
+    assert status.success
+    await mock_controller.sensor.set("sensor2")
+    status = mock_controller.set(18.8)
+    assert not status.done
+    set_mock_value(mock_controller.sensor.sensor2, 19.4)
+
+    assert not status.done
+    set_mock_value(mock_controller.sensor.sensor2, 18.7)
     await status
     assert status.done
     assert status.success
@@ -82,6 +107,7 @@ async def test_temperature_controller_readback(
         mock_controller,
         {
             "mock_controller": partial_reading(1.0),
+            "mock_controller-sensor-sensor2": partial_reading(0.0),
         },
     )
     await assert_configuration(
@@ -106,16 +132,27 @@ async def test_temperature_controller_readback(
     )
 
 
-async def test_temperature_controller_stop(
+async def test_temperature_controller_stop_with_different_sensor(
     mock_controller: MockTemperatureController,
 ):
-
     set_mock_value(mock_controller.user_setpoint, 1.0)
-    set_mock_value(mock_controller.sensor.temperature, 0.5)
+    set_mock_value(mock_controller.sensor.sensor, 0.5)
     await mock_controller.stop()
-    await assert_reading(
-        mock_controller,
-        {
-            "mock_controller": partial_reading(0.5),
-        },
-    )
+    assert await mock_controller.user_setpoint.get_value() == 0.5
+
+    await mock_controller.sensor.set("sensor2")
+    set_mock_value(mock_controller.sensor.sensor2, 8.8)
+    set_mock_value(mock_controller.user_setpoint, 6.0)
+    assert await mock_controller.user_setpoint.get_value() == 6.0
+    await mock_controller.stop()
+    assert await mock_controller.user_setpoint.get_value() == 8.8
+
+
+async def test_temperature_controller_set_active_readback_with_invalid_sensor(
+    mock_controller: MockTemperatureController,
+):
+    with pytest.raises(AttributeError):
+        await mock_controller.sensor.set_active_readback("invalid_sensor")
+
+    with pytest.raises(TypeError):
+        await mock_controller.sensor.set_active_readback("not_a_sensor")
