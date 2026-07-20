@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Generic, TypeVar
 
+from bluesky.protocols import Movable
 from ophyd_async.core import (
+    AsyncStatus,
     SignalR,
     SignalRW,
     StandardMovable,
@@ -45,8 +48,43 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable):
-    temperature: SignalR[float]
+class BaseTemperatureSensor(StandardReadable, ABC, Movable):
+    @property
+    @abstractmethod
+    def temperature(self) -> SignalR[float]:
+        pass
+
+    def __init__(self, name: str = ""):
+        self._active_attr_name: str | None = None
+
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self._auto_temp = self.temperature
+
+        super().__init__(name=name)
+
+    @property
+    def active_sensor(self) -> SignalR[float]:
+        if self._active_attr_name is not None:
+            return getattr(self, self._active_attr_name)
+        return self.temperature
+
+    @AsyncStatus.wrap
+    async def set(self, value: str) -> None:
+        self.set_active_readback(value)
+
+    def set_active_readback(self, attr_name: str | None) -> None:
+
+        if attr_name is not None:
+            if not hasattr(self, attr_name):
+                raise AttributeError(
+                    f" '{attr_name}' is not a valid attribute of {self.__class__.__name__}"
+                )
+            if not isinstance(getattr(self, attr_name), SignalR):
+                raise TypeError(
+                    f"Attribute '{attr_name}' must be an instance of SignalR, got {type(getattr(self, attr_name))}"
+                )
+
+        self._active_attr_name = attr_name
 
 
 SensorT = TypeVar("SensorT", bound=BaseTemperatureSensor)
@@ -80,6 +118,6 @@ class TemperatureController(
     def movable_logic(self) -> TemperatureMovableLogic:
         return TemperatureMovableLogic(
             setpoint=self.user_setpoint,
-            readback=self.sensor.temperature,
+            readback=self.sensor.active_sensor,
             tolerance=self.tolerance,
         )
