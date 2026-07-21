@@ -9,11 +9,8 @@ from dodal.devices.beamlines.i06_1.magnets import (
     MagnetThreeAxesRampRateController,
     SuperConductingMagnetController,
 )
-from dodal.devices.beamlines.i06_1.scaler_card import (
-    ScalerCardChannels,
-    ScalerCardController,
-)
 from dodal.devices.motors import XYThetaStage
+from dodal.devices.scaler_card import ScalerCardChannels, ScalerCardController
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -77,6 +74,7 @@ def mag_detectors(scaler2: ScalerCardController):
     return ScalerCardChannels(
         DeviceVector(
             {
+                # Change to DeviceMap when on ophyd-async 0.20
                 0: epics_signal_r(float, prefix + "TEYC-RAW"),  # TEY
                 1: epics_signal_r(float, prefix + "FDUC-RAW"),  # FDU
                 2: epics_signal_r(float, prefix + "FDDC-RAW"),  # FDD
