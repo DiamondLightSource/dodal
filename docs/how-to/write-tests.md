@@ -130,7 +130,7 @@ For example, an insertion device may use a calibration file containing polynomia
 ```python
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.device_manager import DeviceManager
 from dodal.devices.my_device import MyDevice
@@ -203,7 +203,7 @@ Most tests only need to depend on this fixture:
 import pytest
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from dodal.devices.my_device import MyDevice
 from ophyd_async.core import init_devices
 
@@ -252,7 +252,7 @@ For example:
 
 ```python
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables.insertion_device import (
     parse_i09_hu_undulator_energy_gap_lut,
 )

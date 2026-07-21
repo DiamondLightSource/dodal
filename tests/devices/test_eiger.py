@@ -4,7 +4,7 @@ import threading
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure

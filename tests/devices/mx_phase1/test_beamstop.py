@@ -7,7 +7,7 @@ from bluesky import FailedStatus
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import run_decorator
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import get_mock, get_mock_put, set_mock_value
 
 from dodal.devices.beamlines.i03 import Beamstop, BeamstopPositions

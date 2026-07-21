@@ -8,7 +8,7 @@ from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider
 
 from dodal.common.beamlines import beamline_utils

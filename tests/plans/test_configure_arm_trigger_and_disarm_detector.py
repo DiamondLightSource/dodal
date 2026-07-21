@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import (
     DetectorTrigger,
     TriggerInfo,

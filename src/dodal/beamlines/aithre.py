@@ -1,6 +1,6 @@
 from functools import cache
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.device_manager import DeviceManager
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer

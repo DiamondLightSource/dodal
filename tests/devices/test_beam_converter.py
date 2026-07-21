@@ -2,7 +2,7 @@ from math import isclose
 from unittest.mock import Mock
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables import DetectorXYLookupTable
 
 from dodal.devices.detector.det_dist_to_beam_converter import (

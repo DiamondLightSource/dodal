@@ -2,7 +2,7 @@ import asyncio
 from pathlib import Path
 
 from bluesky.protocols import Triggerable
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import AsyncStatus, Device, DeviceMock, DeviceVector
 from ophyd_async.epics.core import epics_signal_rw
 

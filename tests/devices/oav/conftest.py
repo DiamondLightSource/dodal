@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile, OAVBeamCentrePV

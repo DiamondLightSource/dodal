@@ -6,7 +6,7 @@ from typing import Any, TypeVar
 from unittest.mock import MagicMock
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models import ConfigModel
 from pydantic import TypeAdapter
 

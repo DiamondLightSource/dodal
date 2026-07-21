@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import (
     AsyncStatus,
     Device,

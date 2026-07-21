@@ -1,7 +1,7 @@
 from typing import cast
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.devices.oav.oav_parameters import (
     OAVConfig,

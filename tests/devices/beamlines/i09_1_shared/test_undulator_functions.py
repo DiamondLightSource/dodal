@@ -2,7 +2,7 @@ import re
 from unittest.mock import patch
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables import GenericLookupTable
 from daq_config_server.models.lookup_tables.insertion_device import (
     parse_i09_hu_undulator_energy_gap_lut,
