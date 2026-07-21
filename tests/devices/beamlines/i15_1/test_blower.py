@@ -1,5 +1,5 @@
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllerParams,
 )

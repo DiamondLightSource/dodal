@@ -3,7 +3,7 @@ from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import (
     PathProvider,
     StandardDetector,

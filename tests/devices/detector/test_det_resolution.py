@@ -3,7 +3,7 @@ from unittest import mock
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from numpy import isclose
 
 from dodal.common.beamlines.beamline_utils import set_config_client

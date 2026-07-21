@@ -3,7 +3,7 @@ import re
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_reading,

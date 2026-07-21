@@ -1,5 +1,5 @@
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.beamlines import i03, i04, i19_1, i19_2
 

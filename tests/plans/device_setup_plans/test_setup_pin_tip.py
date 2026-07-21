@@ -1,6 +1,6 @@
 import pytest
 from bluesky import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import init_devices
 
 from dodal.devices.oav.oav_parameters import OAVParameters

@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
