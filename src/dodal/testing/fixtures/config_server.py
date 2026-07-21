@@ -54,7 +54,7 @@ def mock_config_server():
     # Don't actually talk to central service during unit tests, and reset caches between test
 
     with patch(
-        "daq_config_server.app.client.ConfigClient.get_file_contents",
+        "daq_config_server.client.ConfigClient.get_file_contents",
         side_effect=fake_config_server_get_file_contents,
     ):
         yield
