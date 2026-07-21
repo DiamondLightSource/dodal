@@ -141,8 +141,7 @@ class BaseTemperatureSensor(StandardReadable, Movable):
                     f"Available sensors on {self.name}: [{available_sensors}]"
                 )
             LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
-        else:
-            LOGGER.info(f"Resetting active sensor on {self.name} to default ('sensor')")
+
         self._active_sensor_name = sensor_name
 
 

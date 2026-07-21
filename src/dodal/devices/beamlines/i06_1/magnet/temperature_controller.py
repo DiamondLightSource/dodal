@@ -136,8 +136,8 @@ class SCMTemperatureController(TemperatureController):
         name: str = "",
     ):
 
-        sensor: CryoconM32Sensor = CryoconM32Sensor(prefix=prefix)
-        heater: CryoconM32Heater = CryoconM32Heater(prefix=prefix, infix=infix)
+        sensor = CryoconM32Sensor(prefix=prefix)
+        heater = CryoconM32Heater(prefix=prefix, infix=infix)
         setpoint = epics_signal_dmd_sts(float, prefix, infix, "SETPOINT")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
