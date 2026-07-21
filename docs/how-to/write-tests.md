@@ -157,45 +157,10 @@ def my_device(config_client: ConfigClient) -> MyDevice:
     )
 ```
 
-### Directly mocking return values
-
-If a test does not need to exercise file parsing logic, it is often simpler to mock the ConfigClient response directly rather than creating a test file and configuring a parser.
-
-```python
-from unittest.mock import MagicMock
-
-from daq_config_server.models.lookup_tables.insertion_device import (
-    UndulatorEnergyGapLookupTable,
-)
-
-@pytest.fixture
-def mock_config_client():
-    mock_config_client = MagicMock()
-    mock_config_client.get_file_contents = MagicMock(
-        return_value=UndulatorEnergyGapLookupTable(
-            rows=[
-                [5700, 5.4606],
-                [7000, 6.045],
-                [9700, 6.404],
-            ],
-        )
-    )
-    return mock_config_client
-```
-This approach is appropriate when:
-
-* The test only cares about the behaviour of the device or component consuming the configuration data.
-* The contents of the configuration file are not relevant to the test.
-* The parsing logic is tested elsewhere.
-
-In these cases, mocking the return value directly avoids unnecessary coupling to file formats or test data files.
-
-Use the below method if you need the data to come from a file for a unit test.
-
 ### Using the mock_config_client fixture to read files
 Unit tests should not communicate with the real daq-config-server or read files from the DLS filesystem.
 
-Dodal provides a `mock_config_client` fixture in `dodal.testing.fixtures.config_client`. This fixture replaces the real service with a lightweight implementation that reads test files directly from the local filesystem.
+Dodal provides a `mock_config_client` fixture in `dodal.testing.fixtures.config_client`. This fixture creates the ConfigClient and puts it into a mock mode. This reads test files directly from the local filesystem.
 
 Most tests only need to depend on this fixture:
 
@@ -217,71 +182,36 @@ def my_device(mock_config_client: ConfigClient) -> MyDevice:
         )
 ```
 
-### Default file parsing behaviour
+### Mocking configuration files
 
-The mocked `ConfigClient.get_file_contents()` supports the same return types commonly used by production code:
-
-| Requested type         | Behaviour                                                         |
-| ---------------------- | ----------------------------------------------------------------- |
-| `str`                  | Returns the raw file contents                                     |
-| `dict`                 | Parses the file as JSON and returns a dictionary                  |
-| `ConfigModel` subclass | Parses the file as JSON and validates it using `model_validate()` |
-
-For example, if the requested return type is a `ConfigModel` subclass:
-
-```python
-config_client.get_file_contents(
-    path,
-    desired_return_type=MyConfigModel,
-)
-```
-
-the mock implementation will perform:
-
-```python
-MyConfigModel.model_validate(json.loads(contents))
-```
-
-### Registering a custom parser
-
-Some configuration file formats are not JSON-based and require custom parsing logic. For these cases, tests can register a parser using `MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION`.
-
-This registry maps a file path to a function that converts the file contents into a `ConfigModel`.
+Some configuration files are not JSON-based and require custom parsing logic. These can be provided to the `ConfigClient` mock by adding the configuration path and its parsed model to the `path_to_mock_data` fixture.
 
 For example:
 
 ```python
-import pytest
-from daq_config_server.client import ConfigClient
-from daq_config_server.models.lookup_tables.insertion_device import (
-    parse_i09_hu_undulator_energy_gap_lut,
-)
-
-from dodal.testing.fixtures.config_client import (
-    MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION,
-)
-from tests.devices.beamlines.i09_1_shared.test_data import (
-    TEST_HARD_UNDULATOR_LUT,
-)
-
-
 @pytest.fixture
-def mock_config_client(mock_config_client: ConfigClient):
-    MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION[
-        TEST_HARD_UNDULATOR_LUT
-    ] = parse_i09_hu_undulator_energy_gap_lut
-
-    yield mock_config_client
-
-    MOCK_CONFIG_CLIENT_PATH_TO_MODEL_CONVERSION.pop(
-        TEST_HARD_UNDULATOR_LUT,
-        None,
-    )
+def path_to_mock_data() -> dict:
+    return {
+        TEST_HARD_UNDULATOR_LUT: parse_i09_hu_undulator_energy_gap_lut(
+            Path(TEST_HARD_UNDULATOR_LUT).read_text()
+        )
+    }
 ```
 
-When `get_file_contents()` is called for `TEST_HARD_UNDULATOR_LUT`, the registered parser will be used instead of the default JSON parsing behaviour.
+The mock `ConfigClient` is then configured with this data:
 
-This mechanism exists as a temporary workaround for configuration formats that are not yet directly supported by daq-config-server.
+```python
+@pytest.fixture
+def mock_config_client(path_to_mock_data) -> ConfigClient:
+    config_client = ConfigClient()
+    config_client.configure_mock(path_to_mock_data)
+    return config_client
+```
+
+When `get_file_contents()` is called for `TEST_HARD_UNDULATOR_LUT`, the mock client returns the configured model without accessing the file or configuration service.
+
+This approach can be used for any configuration format that requires custom parsing.
+
 
 ## Testing beamline module imports and device creation
 
@@ -304,18 +234,8 @@ These files are not available in unit test environments and must not be accessed
 
 To allow beamline import and device creation tests to run without access to the DLS filesystem, the `module_and_devices_for_beamline` fixture performs two forms of mocking:
 
-1. Replaces `ConfigClient.get_file_contents()` with the `mock_config_client` implementation.
+1. Configures `ConfigClient` with mock configuration data using `configure_mock()`.
 2. Replaces known module-level file path constants with paths to test data files.
-
-### Mocking `ConfigClient`
-
-Before importing the beamline module, the fixture replaces the production implementation:
-
-```python
-ConfigClient.get_file_contents = mock_config_client.get_file_contents
-```
-
-This ensures that any configuration requested through the daq-config-server client is loaded from local test files rather than the real service.
 
 ### Mocking beamline file paths
 
