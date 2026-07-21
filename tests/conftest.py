@@ -82,8 +82,19 @@ environ["DODAL_TEST_MODE"] = "true"
 pytest_plugins = [
     "dodal.testing.fixtures.run_engine",
     "dodal.testing.fixtures.utils",
-    "dodal.testing.fixtures.config_client",
 ]
+
+
+@pytest.fixture
+def path_to_mock_data() -> dict:
+    return {}
+
+
+@pytest.fixture
+def mock_config_client(path_to_mock_data) -> ConfigClient:
+    config_client = ConfigClient()
+    config_client.configure_mock(path_to_mock_data)
+    return config_client
 
 
 def is_path_banned(path: Path, banned_paths: list[Path]) -> bool:

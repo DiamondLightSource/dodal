@@ -1,8 +1,5 @@
 import pytest
-from ophyd_async.core import (
-    init_devices,
-    set_mock_value,
-)
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.insertion_device import (
     EnabledDisabledUpper,
@@ -15,8 +12,6 @@ from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     UndulatorLockedPhaseAxes,
 )
-
-pytest_plugins = ["dodal.testing.fixtures.config_client"]
 
 
 @pytest.fixture
