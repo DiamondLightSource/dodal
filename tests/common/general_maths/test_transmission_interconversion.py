@@ -151,25 +151,33 @@ def test_transmission_attenuation_conversions_pair_off_to_form_identity_operatio
 
 
 # inauspicious:
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
+@pytest.mark.parametrize(
+    "bad_input", ["a", [], None, KeyError(), math.sin, object(), False, True]
+)
 def test_natural_log_of_transmission_from_attenuation_raises_error(bad_input):
     with pytest.raises(ValidationError):
         natural_log_of_transmission_from_attenuation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
+@pytest.mark.parametrize(
+    "bad_input", ["a", [], None, KeyError(), math.sin, object(), False, True]
+)
 def test_transmission_from_attenutation_raises_error(bad_input):
     with pytest.raises(ValidationError):
         transmission_from_attenutation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
+@pytest.mark.parametrize(
+    "bad_input", ["a", [], None, KeyError(), math.sin, object(), False, True]
+)
 def test_attenuation_from_transmission_raises_error(bad_input):
     with pytest.raises(ValidationError):
         attenuation_from_transmission(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
+@pytest.mark.parametrize(
+    "bad_input", ["a", [], None, KeyError(), math.sin, object(), False, True]
+)
 def test_attenuation_from_natural_log_of_transmission_raises_error(bad_input):
     with pytest.raises(ValidationError):
         attenuation_from_natural_log_of_transmission(bad_input)

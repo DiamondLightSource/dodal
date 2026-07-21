@@ -1,11 +1,11 @@
 """Provides functions to convert between common units for attenuation."""
 
 from numpy.polynomial import polynomial
-from pydantic import StrictFloat, validate_call
+from pydantic import StrictFloat, StrictInt, validate_call
 
 
 @validate_call
-def convert_percentage_to_factor(pc: StrictFloat) -> float:
+def convert_percentage_to_factor(pc: StrictFloat | StrictInt) -> float:
     """Takes a percentage value and converts it the corresponding multiplication factor.
 
     Args:
@@ -17,7 +17,7 @@ def convert_percentage_to_factor(pc: StrictFloat) -> float:
 
 
 @validate_call
-def convert_factor_to_percentage(f: StrictFloat) -> float:
+def convert_factor_to_percentage(f: StrictFloat | StrictInt) -> float:
     """Takes a multiplication factor and converts it to the corresponding percentage.
 
     Args:
@@ -30,7 +30,7 @@ def convert_factor_to_percentage(f: StrictFloat) -> float:
 
 
 @validate_call
-def convert_microns_to_cm(t_um: StrictFloat) -> float:
+def convert_microns_to_cm(t_um: StrictFloat | StrictInt) -> float:
     """Takes the numerical part of a distance in microns and converts this to cm.
 
     Args:
@@ -43,7 +43,7 @@ def convert_microns_to_cm(t_um: StrictFloat) -> float:
 
 
 @validate_call
-def convert_microns_to_mm(v_um: StrictFloat) -> float:
+def convert_microns_to_mm(v_um: StrictFloat | StrictInt) -> float:
     """Takes the numerical part of a distance in microns and converts this to mm.
 
     Args:
@@ -56,7 +56,7 @@ def convert_microns_to_mm(v_um: StrictFloat) -> float:
 
 
 @validate_call
-def convert_mm_to_microns(w_mm: StrictFloat) -> float:
+def convert_mm_to_microns(w_mm: StrictFloat | StrictInt) -> float:
     """Takes the numerical part of a distance in mm and converts this to microns.
 
     Args:
@@ -82,7 +82,7 @@ def convert_mm_to_cm(x_mm: StrictFloat) -> float:
 
 
 @validate_call
-def convert_cm_to_mm(y_cm: StrictFloat) -> float:
+def convert_cm_to_mm(y_cm: StrictFloat | StrictInt) -> float:
     """Takes the numerical part of a distance in cm and converts this to mm.
 
     Args:
@@ -95,7 +95,7 @@ def convert_cm_to_mm(y_cm: StrictFloat) -> float:
 
 
 @validate_call
-def convert_ev_to_kev(energy_ev: StrictFloat) -> float:
+def convert_ev_to_kev(energy_ev: StrictFloat | StrictInt) -> float:
     """Takes the numerical part of an x-ray energy in electron volts and converts this
     to keV.
 
@@ -110,7 +110,9 @@ def convert_ev_to_kev(energy_ev: StrictFloat) -> float:
 
 @validate_call
 def get_straight_line_y(
-    line_offset: StrictFloat, line_gradient: StrictFloat, x: StrictFloat
+    line_offset: StrictFloat | StrictInt,
+    line_gradient: StrictFloat | StrictInt,
+    x: StrictFloat | StrictInt,
 ) -> float:
     """Convenient internal conversion method which delegates to numpy for a 1st order polynomial (line).
 

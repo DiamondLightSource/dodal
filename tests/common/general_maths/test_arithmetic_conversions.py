@@ -20,42 +20,81 @@ from .operator_inversion_pairing import OperatorInversionPairing
 
 
 # expected success tests (the 'Happy Path'): All numbers here are arbitrary
-@pytest.mark.parametrize("input,result", [(1.0, 0.1), (100.0, 10.0)])
+@pytest.mark.parametrize(
+    "input,result",
+    [(1.0, 0.1), (100.0, 10.0), (22, 2.2), (-67, -6.7), (0, 0), (-105.2, -10.52)],
+)
 def test_conversion_from_millimetres_to_centimetres(input, result):
     assert convert_mm_to_cm(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1.0, 10), (0.1, 1.0)])
+@pytest.mark.parametrize(
+    "input,result",
+    [(1.0, 10.0), (10.0, 100.0), (44, 440), (-6.7, -67.0), (0, 0), (-10.52, -105.2)],
+)
 def test_conversion_from_centimetres_to_millimetres(input, result):
     assert convert_cm_to_mm(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(0.01, 1.0), (1.0, 100.0)])
+@pytest.mark.parametrize(
+    "input,result",
+    [(0.01, 1.0), (1.0, 100.0), (0, 0), (1.534, 153.4), (1, 100), (-0.5, -50.0)],
+)
 def test_conversion_to_percentage_from_factor(input, result):
     assert convert_factor_to_percentage(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1.0, 0.01), (100, 1.0)])
+@pytest.mark.parametrize(
+    "input,result",
+    [
+        (1.0, 0.01),
+        (100, 1.0),
+        (0, 0),
+        (86.8, 0.868),
+        (12, 0.12),
+        (-6, -0.06),
+        (-14.7, -0.147),
+    ],
+)
 def test_conversion_to_factor_from_percentage(input, result):
     assert convert_percentage_to_factor(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1000.0, 1.0), (10000.0, 10.0)])
+@pytest.mark.parametrize(
+    "input,result",
+    [(1000.0, 1.0), (10000.0, 10.0), (0, 0), (12000, 12), (-1489, -1.489), (13, 0.013)],
+)
 def test_conversion_from_microns_to_millimeters(input, result):
     assert convert_microns_to_mm(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1.0, 1000.0), (10, 10000.0)])
+@pytest.mark.parametrize(
+    "input,result",
+    [
+        (1.0, 1000.0),
+        (10, 10000.0),
+        (0, 0),
+        (17, 17000),
+        (-19, -19000),
+        (0.026, 26),
+        (0.00054, 0.54),
+    ],
+)
 def test_conversion_from_millimeters_to_microns(input, result):
     assert convert_mm_to_microns(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1000, 1.0), (100, 0.1)])
+@pytest.mark.parametrize(
+    "input,result", [(0, 0), (1000, 1.0), (100, 0.1), (12345.8, 12.3458)]
+)
 def test_conversion_from_electronvolts_to_kiloelectronvolts(input, result):
     assert convert_ev_to_kev(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(10000.0, 1.0), (1000, 0.1)])
+@pytest.mark.parametrize(
+    "input,result",
+    [(10000.0, 1.0), (1000, 0.1), (0, 0), (5, 0.0005), (52.06, 0.005206)],
+)
 def test_conversion_from_microns_to_centimetres(input, result):
     assert convert_microns_to_cm(input) == pytest.approx(result)
 
@@ -75,6 +114,10 @@ def test_conversion_from_microns_to_centimetres(input, result):
         (0.0, 3.2, -11.6, -37.12),
         (0.1, -3.2, -11.6, 37.22),
         (5.2, 0.0, -8.64, 5.2),
+        (4, 12.2, 88.6, 1084.92),
+        (-1.2, 0, 5.3, -1.2),
+        (-1.2, 2, 6.1, 11),
+        (7.8, 1.91, -4, 0.16),
     ],
 )
 def test_straight_line_conversion(c, m, x, expected_y):
@@ -93,12 +136,12 @@ def test_straight_line_conversion(c, m, x, expected_y):
         (
             convert_ev_to_kev,
             lambda k: k * 1000.0,
-            [16.83, 0.0, 0.037, 1.0, 6.208, 18, 12345.6, 28906.4],
+            [16.83, 0.0, 0.037, 1.0, 6.208, 18, 12345.6, 14283, 28906.4],
         ),
         (
             convert_mm_to_cm,
             convert_cm_to_mm,
-            [-16.83, 0.0, 0.037, 1.0, 6.208, 18, 102.99],
+            [-16.83, 0.0, 0.037, 1.0, 6.208, 18, 102.99, 16],
         ),
         (
             convert_microns_to_cm,
@@ -135,7 +178,7 @@ def test_reciprocal_function_pairs_nest_consistent_with_identity(
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_microns_to_cm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -144,7 +187,7 @@ def test_convert_microns_to_cm_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_ev_to_kev_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -153,7 +196,7 @@ def test_convert_ev_to_kev_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_microns_to_mm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -162,7 +205,7 @@ def test_convert_microns_to_mm_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_mm_to_microns_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -171,7 +214,7 @@ def test_convert_mm_to_microns_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), True],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_factor_to_percentage_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -180,7 +223,7 @@ def test_convert_factor_to_percentage_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_percentage_to_factor_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -189,7 +232,7 @@ def test_convert_percentage_to_factor_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_mm_to_cm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -198,7 +241,7 @@ def test_convert_mm_to_cm_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), True],
+    ["", "a", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_convert_cm_to_mm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -207,7 +250,7 @@ def test_convert_cm_to_mm_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.log, object(), False],
+    ["", "a", [], None, math.log, object(), KeyError(), False, True],
 )
 def test_straight_line_calculator_raises_error_with_bad_offset(bad_input):
     _probe_x = 11.1
@@ -218,7 +261,7 @@ def test_straight_line_calculator_raises_error_with_bad_offset(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.sin, object(), True],
+    ["", "B", [], None, math.sin, object(), KeyError(), False, True],
 )
 def test_straight_line_calculator_raises_error_with_bad_gradient(bad_input):
     _probe_x = -11.1
@@ -229,7 +272,7 @@ def test_straight_line_calculator_raises_error_with_bad_gradient(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["", "a", [], None, math.tan, object(), False],
+    ["", "W", [], None, math.tan, object(), AttributeError(), True, False],
 )
 def test_straight_line_calculator_raises_error_with_bad_x_value(bad_input):
     _line_offset = 0.1
