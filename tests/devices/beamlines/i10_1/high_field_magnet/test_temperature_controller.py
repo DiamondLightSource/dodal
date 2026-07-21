@@ -32,8 +32,8 @@ async def test_temperature_controller_readback(
         hfm_temp_controller,
         {
             "hfm_temp_controller": partial_reading(1.0),
-            "hfm_temp_controller-sensor2": partial_reading(0.0),
-            "hfm_temp_controller-sensor3": partial_reading(0.0),
+            "hfm_temp_controller-sensor-sensor2": partial_reading(0.0),
+            "hfm_temp_controller-sensor-sensor3": partial_reading(0.0),
         },
     )
     await assert_configuration(

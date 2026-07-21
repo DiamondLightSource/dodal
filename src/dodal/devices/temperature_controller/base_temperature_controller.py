@@ -137,7 +137,7 @@ class BaseTemperatureSensor(StandardReadable, Movable):
                 )
                 raise ValueError(
                     f"Invalid readback target '{sensor_name}'. "
-                    f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2')."
+                    f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2'). "
                     f"Available sensors on {self.name}: [{available_sensors}]"
                 )
             LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
