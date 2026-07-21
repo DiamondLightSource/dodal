@@ -114,7 +114,7 @@ def idd_phase() -> UndulatorPhaseAxes:
 def idd_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        move_pv="RPQ1",
+        move_pv="JAW",
     )
 
 
@@ -194,7 +194,7 @@ def idu_phase() -> UndulatorPhaseAxes:
 def idu_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-        move_pv="RPQ1",
+        move_pv="JAW",
     )
 
 

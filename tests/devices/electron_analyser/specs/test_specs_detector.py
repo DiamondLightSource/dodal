@@ -35,5 +35,6 @@ async def test_specs_detector_read_configuration(b07b_specs150: SpecsDetector) -
             f"{prefix}energy_axis": partial_reading(ANY),
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
+            f"{prefix}acquire_period": partial_reading(ANY),
         },
     )
