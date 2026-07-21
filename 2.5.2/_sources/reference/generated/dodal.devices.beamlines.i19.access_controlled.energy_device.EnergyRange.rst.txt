@@ -1,0 +1,29 @@
+dodal.devices.beamlines.i19.access\_controlled.energy\_device.EnergyRange
+=========================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.access_controlled.energy_device
+
+.. autoclass:: EnergyRange
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnergyRange.name
+      
+      
+      ~EnergyRange.upper
+      
+      
+      ~EnergyRange.lower
+      
+   
+   

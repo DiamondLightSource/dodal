@@ -1,0 +1,23 @@
+dodal.devices.zebra.zebra.InstantArmMock
+========================================
+
+.. currentmodule:: dodal.devices.zebra.zebra
+
+.. autoclass:: InstantArmMock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~InstantArmMock.connect
+      
+   
+   
+
+   
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.beamlines.i06\_2
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i06_2.PEEMManipulator
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i06_2
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

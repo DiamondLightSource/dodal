@@ -1,0 +1,78 @@
+dodal.devices.cryostream.CryoStreamSelection
+============================================
+
+.. currentmodule:: dodal.devices.cryostream
+
+.. autoclass:: CryoStreamSelection
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~CryoStreamSelection.CRYOJET
+      
+      
+      ~CryoStreamSelection.HC1
+      
+   
+   

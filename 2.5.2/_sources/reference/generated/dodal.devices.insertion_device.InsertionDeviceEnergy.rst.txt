@@ -1,0 +1,55 @@
+dodal.devices.insertion\_device.InsertionDeviceEnergy
+=====================================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: InsertionDeviceEnergy
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~InsertionDeviceEnergy.complete
+      
+      
+      
+      
+      
+      ~InsertionDeviceEnergy.get_id_acceleration_time
+      
+      
+      ~InsertionDeviceEnergy.kickoff
+      
+      
+      ~InsertionDeviceEnergy.prepare
+      
+      
+      
+      
+      ~InsertionDeviceEnergy.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

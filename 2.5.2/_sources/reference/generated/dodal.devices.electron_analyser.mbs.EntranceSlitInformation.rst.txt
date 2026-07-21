@@ -1,0 +1,73 @@
+dodal.devices.electron\_analyser.mbs.EntranceSlitInformation
+============================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.mbs
+
+.. autoclass:: EntranceSlitInformation
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~EntranceSlitInformation.from_slit_positions
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EntranceSlitInformation.to_slit_position
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EntranceSlitInformation.model_config
+      
+      
+      
+      
+      
+      ~EntranceSlitInformation.direction
+      
+      
+      ~EntranceSlitInformation.setting
+      
+      
+      ~EntranceSlitInformation.size
+      
+      
+      ~EntranceSlitInformation.shape
+      
+   
+   

@@ -1,0 +1,44 @@
+dodal.devices.oav.beam\_centre.beam\_centre
+===========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.oav.beam_centre
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~beam_centre.CentreEllipseMethod
+
+
+
+
+.. automodule:: dodal.devices.oav.beam_centre.beam_centre
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      convert_image_to_binary
+      get_roi
+      round_half_up
+   
+   
+
+   
+   
+   

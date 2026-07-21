@@ -1,0 +1,33 @@
+dodal.beamlines.i18
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i18
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      path_provider
+   
+   
+
+   
+   
+   
