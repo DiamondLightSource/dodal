@@ -1,7 +1,7 @@
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import init_devices
 from tests.devices.oav.test_data import TEST_OAV_ZOOM_LEVELS
 
