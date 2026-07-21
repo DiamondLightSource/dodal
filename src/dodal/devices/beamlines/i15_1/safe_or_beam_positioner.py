@@ -21,13 +21,17 @@ class SafeOrBeamPosition(StrictEnum):
 
 class SafeOrBeamPositioner(StandardReadable, Movable[SafeOrBeamPosition]):
     def __init__(
-        self, prefix: str, config_client: ConfigClient, xpdf_parameters_path: str
+        self,
+        prefix: str,
+        config_client: ConfigClient,
+        xpdf_parameters_path: str,
+        name: str = "",
     ):
         self.config_client = config_client
         self.xpdf_parameters_path = xpdf_parameters_path
         with self.add_children_as_readables():
             self.motor = Motor(prefix=prefix)
-        super().__init__(prefix)
+        super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: SafeOrBeamPosition):
