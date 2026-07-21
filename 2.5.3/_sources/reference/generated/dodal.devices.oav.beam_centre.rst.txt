@@ -1,0 +1,35 @@
+dodal.devices.oav.beam\_centre
+==============================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.oav.beam_centre.beam_centre
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.oav.beam_centre
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

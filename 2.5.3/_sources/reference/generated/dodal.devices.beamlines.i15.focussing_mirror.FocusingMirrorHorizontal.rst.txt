@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i15.focussing\_mirror.FocusingMirrorHorizontal
+======================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15.focussing_mirror
+
+.. autoclass:: FocusingMirrorHorizontal
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

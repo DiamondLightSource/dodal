@@ -1,0 +1,36 @@
+dodal.devices.tetramm.TetrammTriggerLogic
+=========================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammTriggerLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~TetrammTriggerLogic.get_deadtime
+      
+      
+      ~TetrammTriggerLogic.prepare_edge
+      
+      
+      
+      
+      ~TetrammTriggerLogic.prepare_level
+      
+      
+      ~TetrammTriggerLogic.set_exposure
+      
+   
+   
+
+   
+   
+   

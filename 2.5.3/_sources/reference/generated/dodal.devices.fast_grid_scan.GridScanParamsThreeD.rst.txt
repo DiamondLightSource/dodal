@@ -1,0 +1,100 @@
+dodal.devices.fast\_grid\_scan.GridScanParamsThreeD
+===================================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: GridScanParamsThreeD
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~GridScanParamsThreeD.model_config
+      
+      
+      
+      
+      
+      
+      
+      ~GridScanParamsThreeD.z_axis
+      
+      
+      ~GridScanParamsThreeD.z2_start_mm
+      
+      
+      ~GridScanParamsThreeD.y2_start_mm
+      
+      
+      ~GridScanParamsThreeD.z_step_size_mm
+      
+      
+      ~GridScanParamsThreeD.z_steps
+      
+      
+      ~GridScanParamsThreeD.x_steps
+      
+      
+      ~GridScanParamsThreeD.y_steps
+      
+      
+      ~GridScanParamsThreeD.x_step_size_mm
+      
+      
+      ~GridScanParamsThreeD.y_step_size_mm
+      
+      
+      ~GridScanParamsThreeD.x_start_mm
+      
+      
+      ~GridScanParamsThreeD.y1_start_mm
+      
+      
+      ~GridScanParamsThreeD.z1_start_mm
+      
+      
+      ~GridScanParamsThreeD.set_stub_offsets
+      
+      
+      ~GridScanParamsThreeD.transmission_fraction
+      
+   
+   

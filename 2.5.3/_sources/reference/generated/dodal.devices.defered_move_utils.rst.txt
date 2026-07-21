@@ -1,0 +1,43 @@
+dodal.devices.defered\_move\_utils
+==================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~defered_move_utils.DeferMoves
+
+
+
+
+.. automodule:: dodal.devices.defered_move_utils
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      combined_move_to_motor_setpoints
+      do_deferred_move
+   
+   
+
+   
+   
+   

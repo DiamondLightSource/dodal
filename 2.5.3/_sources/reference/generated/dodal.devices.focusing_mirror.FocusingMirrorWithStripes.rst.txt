@@ -1,0 +1,43 @@
+dodal.devices.focusing\_mirror.FocusingMirrorWithStripes
+========================================================
+
+.. currentmodule:: dodal.devices.focusing_mirror
+
+.. autoclass:: FocusingMirrorWithStripes
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~FocusingMirrorWithStripes.energy_to_stripe
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

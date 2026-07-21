@@ -1,0 +1,38 @@
+dodal.devices.xspress3.xspress3\_channel
+========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.xspress3
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~xspress3_channel.AcquireState
+   ~xspress3_channel.Xspress3Channel
+   ~xspress3_channel.Xspress3ROIChannel
+
+
+
+
+.. automodule:: dodal.devices.xspress3.xspress3_channel
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

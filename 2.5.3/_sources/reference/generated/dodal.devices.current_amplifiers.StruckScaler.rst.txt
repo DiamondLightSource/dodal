@@ -1,0 +1,59 @@
+dodal.devices.current\_amplifiers.StruckScaler
+==============================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: StruckScaler
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~StruckScaler.get_count
+      
+      
+      ~StruckScaler.get_count_per_sec
+      
+      
+      ~StruckScaler.get_voltage_per_sec
+      
+      
+      ~StruckScaler.prepare
+      
+      
+      
+      
+      
+      ~StruckScaler.stage
+      
+      
+      ~StruckScaler.trigger
+      
+      
+      ~StruckScaler.unstage
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
