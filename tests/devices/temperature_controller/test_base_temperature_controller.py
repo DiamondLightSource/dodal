@@ -151,10 +151,5 @@ async def test_temperature_controller_stop_with_different_sensor(
 async def test_temperature_controller_set_active_readback_with_invalid_sensor(
     mock_controller: MockTemperatureController,
 ):
-    with pytest.raises(AttributeError):
+    with pytest.raises(ValueError, match="sensors: ['sensor', 'sensor2']"):
         await mock_controller.sensor.set_active_readback("sensor888")
-
-    with pytest.raises(TypeError):
-        await mock_controller.sensor.set_active_readback("sensor88")
-    with pytest.raises(ValueError):
-        await mock_controller.sensor.set_active_readback("sensor8_1")

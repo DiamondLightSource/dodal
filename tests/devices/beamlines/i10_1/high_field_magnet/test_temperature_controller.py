@@ -32,13 +32,13 @@ async def test_temperature_controller_readback(
         hfm_temp_controller,
         {
             "hfm_temp_controller": partial_reading(1.0),
+            "hfm_temp_controller-sensor2": partial_reading(0.0),
+            "hfm_temp_controller-sensor3": partial_reading(0.0),
         },
     )
     await assert_configuration(
         hfm_temp_controller,
         {
-            "hfm_temp_controller-sensor-config_2": partial_reading(0.0),
-            "hfm_temp_controller-sensor-config_3": partial_reading(0.0),
             "hfm_temp_controller-tolerance": partial_reading(0.1),
             "hfm_temp_controller-user_setpoint": partial_reading(1.0),
         },
@@ -56,12 +56,3 @@ async def test_temperature_controller_readback(
             "hfm_temp_controller-pid-d": partial_reading(3.0),
         },
     )
-
-
-async def test_repeat_config_signal():
-    with pytest.raises(AttributeError, match="Cannot add configuration signal"):
-        HFMTemperatureController(
-            prefix="I10J-MAGNET-01:TEMP:",
-            suffix="TTEMP:SET",
-            config_suffixes=["2", "2"],
-        )

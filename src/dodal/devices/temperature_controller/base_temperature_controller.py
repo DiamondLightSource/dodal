@@ -1,3 +1,7 @@
+"""Base classes and devices for temperature control in Dodal."""
+
+from __future__ import annotations
+
 import re
 from dataclasses import dataclass
 from typing import Generic, TypeVar
@@ -15,16 +19,37 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.movable import MovableWithToleranceLogic
+from dodal.log import LOGGER
 
 
 @dataclass
 class TemperatureMovableLogic(MovableWithToleranceLogic):
+    """Movable logic for temperature setpoints with tolerance matching.
+
+    Overrides the default stop behavior to safely halt temperature changes by
+    setting the target setpoint to the current readback value.
+    """
+
     async def stop(self):
+        """Stop any active temperature move by setting the setpoint to the current readback value."""
         current_val = await self.readback.get_value()
+        LOGGER.info(
+            f"Stopping temperature move: setting setpoint to current readback value ({current_val})"
+        )
         await self.setpoint.set(current_val)
 
 
 class PID(StandardReadable):
+    """PID controller parameters represented as read-write EPICS signals.
+
+    Args:
+        prefix: Base EPICS PV prefix for the PID records.
+        suffix_p: Suffix for the Proportional gain PV. Defaults to "P".
+        suffix_i: Suffix for the Integral gain PV. Defaults to "I".
+        suffix_d: Suffix for the Derivative gain PV. Defaults to "D".
+        name: Name of the device instance. Defaults to "".
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -41,11 +66,24 @@ class PID(StandardReadable):
 
 
 class BaseHeater(StandardReadable):
+    """Base interface for a hardware temperature heater unit.
+
+    Attributes:
+        setpoint: Signal controlling the heater power setpoint.
+        output: Read-only signal indicating current heater output level.
+    """
+
     setpoint: SignalRW[float]
     output: SignalR[float]
 
 
 class BaseTemperatureSensor(StandardReadable, Movable):
+    """Base interface for temperature sensors supporting dynamic readback targeting.
+
+    Attributes:
+        sensor: Default readback signal for the primary temperature sensor channel.
+    """
+
     sensor: SignalR[float]
 
     def __init__(self, name: str = ""):
@@ -60,25 +98,55 @@ class BaseTemperatureSensor(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
+        """Select the active sensor channel.
+
+        Args:
+            value: Attribute name of the target sensor (e.g., 'sensor', 'sensor2').
+        """
         self.set_active_readback(value)
 
-    def set_active_readback(self, sensor_name: str | None) -> None:
+    def _get_available_sensors(self) -> list[str]:
+        """Inspect instance attributes for valid sensor signal names.
 
+        Returns:
+            Sorted list of attribute names matching the pattern `sensor<int>` that are SignalR instances.
+        """
+        return sorted(
+            [
+                attr
+                for attr in dir(self)
+                if re.match(r"^sensor\d*$", attr)
+                and isinstance(getattr(self, attr, None), SignalR)
+            ]
+        )
+
+    def set_active_readback(self, sensor_name: str | None) -> None:
+        """Set the active sensor for set temperature readback.
+
+        Args:
+            sensor_name: Target sensor attribute name (e.g., 'sensor', 'sensor2') or `None` to reset to default.
+
+        Raises:
+            ValueError: If `sensor_name` is provided but is not present in available sensor signals.
+        """
         if sensor_name is not None:
-            if not re.match(r"^sensor\d*$", sensor_name):
+            available = self._get_available_sensors()
+            if sensor_name not in available:
+                available_sensors = (
+                    ", ".join(f"'{s}'" for s in available) if available else "none"
+                )
                 raise ValueError(
                     f"Invalid readback target '{sensor_name}'. "
                     f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2')."
+                    f"Available sensors on {self.__class__.__name__}: [{available_sensors}]"
                 )
-            if not hasattr(self, sensor_name):
-                raise AttributeError(
-                    f" '{sensor_name}' is not a valid attribute of {self.__class__.__name__}"
-                )
-            if not isinstance(getattr(self, sensor_name), SignalR):
-                raise TypeError(
-                    f"Attribute '{sensor_name}' must be an instance of SignalR, got {type(getattr(self, sensor_name))}"
-                )
-
+            LOGGER.info(
+                f"Setting active sensor on {self.name or self.__class__.__name__} to: '{sensor_name}'"
+            )
+        else:
+            LOGGER.info(
+                f"Resetting active sensor on {self.name or self.__class__.__name__} to default ('sensor')"
+            )
         self._active_sensor_name = sensor_name
 
 
@@ -89,6 +157,16 @@ HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 class TemperatureController(
     StandardReadable, StandardMovable, Generic[SensorT, HeaterT]
 ):
+    """Temperature controller tying together sensor, heater, and PID units.
+
+    Args:
+        setpoint: Signal controlling the user target setpoint.
+        sensor: Temperature sensor sub-device instance.
+        heater: Heater sub-device instance.
+        pid: PID controller sub-device instance.
+        name: Name of the controller device instance. Defaults to "".
+    """
+
     def __init__(
         self,
         setpoint: SignalRW[float],

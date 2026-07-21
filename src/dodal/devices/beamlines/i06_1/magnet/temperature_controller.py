@@ -1,5 +1,8 @@
+"""Cryocon M32 temperature sensor, heater, and controller devices."""
+
 from ophyd_async.core import (
     SignalRW,
+    StandardReadable,
     StandardReadableFormat,
     StrictEnum,
 )
@@ -38,7 +41,40 @@ class HeaterMode(StrictEnum):
     RAMP = "RampP"
 
 
+class CryoconM32SensorConfig(StandardReadable):
+    """Configuration signal group for a Cryocon M32 sensor channel.
+
+    Attributes:
+        min: Minimum valid sensor temperature reading.
+        max: Maximum valid sensor temperature reading.
+        slope: Temperature slope.
+        offset: Temperature offset value.
+
+    Args:
+        prefix: Base EPICS PV prefix including status path and sensor channel (e.g. "PREFIX:STS:T1:").
+        name: Name of the configuration block instance. Defaults to "".
+    """
+
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.min = epics_signal_r(float, prefix + "MIN")
+            self.max = epics_signal_r(float, prefix + "MAX")
+            self.slope = epics_signal_r(float, prefix + "SLOPE")
+            self.offset = epics_signal_r(float, prefix + "OFFSET")
+        super().__init__(name)
+
+
 class CryoconM32Sensor(BaseTemperatureSensor):
+    """Cryocon M32 dual-channel temperature sensor.
+
+    Provides two primary temperature readback channels (`sensor` and `sensor2`)
+    and their associated calibration configurations (`sensor_config` and `sensor2_config`).
+
+    Args:
+        prefix: Base EPICS PV prefix for the sensor controller.
+        name: Name of the sensor device instance. Defaults to "".
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -48,22 +84,28 @@ class CryoconM32Sensor(BaseTemperatureSensor):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.sensor = epics_signal_r(float, prefix + "STS:T1")
             self.sensor2 = epics_signal_r(float, prefix + "STS:T2")
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self._create_config_signals(prefix=prefix + "STS:T1", attr_prefix="sensor")
-            self._create_config_signals(prefix=prefix + "STS:T2", attr_prefix="sensor2")
+        with self.add_children_as_readables():
+            self.sensor_config = CryoconM32SensorConfig(prefix + "STS:T1")
+            self.sensor2_config = CryoconM32SensorConfig(prefix + "STS:T2")
 
         super().__init__(name=name)
 
-    def _create_config_signals(self, prefix: str, attr_prefix: str) -> None:
-        """Helper to generate all the config signals."""
-        suffixes = ["MIN", "MAX", "SLOPE", "OFFSET"]
-        for sfx in suffixes:
-            attr_name = f"{attr_prefix}_{sfx.lower()}"
-            signal = epics_signal_r(float, f"{prefix}:{sfx}")
-            setattr(self, attr_name, signal)
-
 
 class CryoconM32Heater(BaseHeater):
+    """Cryocon M32 heater.
+
+    Attributes:
+        setpoint: Manual output signal.
+        output_range: Heater power range setting (Low, Medium, High).
+        mode: Active control mode setting (Off, PID, Manual, Table, Ramp).
+        output: Current heater power readback signal.
+
+    Args:
+        prefix: Base EPICS PV prefix for the heater unit.
+        infix: Loop/channel infix (e.g. "LOOP1:").
+        name: Name of the heater. Defaults to "".
+    """
+
     def __init__(self, prefix: str, infix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.setpoint = epics_signal_dmd_sts(float, prefix, infix, "MANUAL")
@@ -79,6 +121,14 @@ class CryoconM32Heater(BaseHeater):
 
 
 class SCMTemperatureController(TemperatureController):
+    """Super Conducting Magnet (SCM) Cryocon M32 temperature controller.
+
+    Args:
+        prefix: Base EPICS PV prefix for the temperature controller.
+        infix: Controller loop channel infix. Defaults to "LOOP1:".
+        name: Name of the controller instance. Defaults to "".
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -86,8 +136,8 @@ class SCMTemperatureController(TemperatureController):
         name: str = "",
     ):
 
-        sensor = CryoconM32Sensor(prefix=prefix)
-        heater = CryoconM32Heater(prefix=prefix, infix=infix)
+        sensor: CryoconM32Sensor = CryoconM32Sensor(prefix=prefix)
+        heater: CryoconM32Heater = CryoconM32Heater(prefix=prefix, infix=infix)
         setpoint = epics_signal_dmd_sts(float, prefix, infix, "SETPOINT")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
