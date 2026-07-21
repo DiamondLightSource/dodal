@@ -47,7 +47,7 @@ async def undulator_in_mm() -> UndulatorInMm:
 
 @pytest.fixture
 async def hu_id_energy(
-    mock_config_client_with_data: ConfigClient,
+    mock_config_client: ConfigClient,
     undulator_order: UndulatorOrder,
     undulator_in_mm: UndulatorInMm,
 ) -> HardInsertionDeviceEnergy:
@@ -55,7 +55,7 @@ async def hu_id_energy(
         hu_id_energy = HardInsertionDeviceEnergy(
             undulator_order=undulator_order,
             undulator=undulator_in_mm,
-            config_server=mock_config_client_with_data,
+            config_server=mock_config_client,
             filepath=TEST_HARD_UNDULATOR_LUT,
             gap_to_energy_func=calculate_energy_i09_hu,
             energy_to_gap_func=calculate_gap_i09_hu,
@@ -183,7 +183,6 @@ async def test_hu_energy_set_both_dcm_and_id_energy(
 
 
 async def test_hu_energy_move_energy_fails(
-    run_engine: RunEngine,
     hu_energy: HardEnergy,
 ):
     energy_value = 5.15

@@ -1,5 +1,4 @@
 from collections.abc import Generator
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -30,6 +29,15 @@ from tests.devices.test_data import (
 )
 
 LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
+
+
+@pytest.fixture
+def path_to_mock_data() -> dict:
+    return {
+        TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT: UndulatorEnergyGapLookupTable(
+            rows=[[0, 10], [10000, 20]]
+        )
+    }
 
 
 @pytest.fixture
@@ -161,9 +169,6 @@ async def test_when_gap_access_is_disabled_set_then_error_is_raised(
 async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_mode_enabled(
     undulator_in_commissioning_mode: UndulatorInKeV,
 ):
-    undulator_in_commissioning_mode.config_server.get_file_contents = MagicMock(
-        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10, 20]])
-    )
     set_mock_value(
         undulator_in_commissioning_mode.gap_access, EnabledDisabledUpper.DISABLED
     )
@@ -177,9 +182,6 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
     undulator: UndulatorInKeV,
 ):
-    undulator.config_server.get_file_contents = MagicMock(
-        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10000, 20]])
-    )
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)
 

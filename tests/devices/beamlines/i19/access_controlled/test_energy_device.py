@@ -3,6 +3,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import SignalR, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -26,15 +27,20 @@ MIRROR_ENERGIES: dict[str, Any] = {
 
 
 @pytest.fixture
-def eh1_energy_device() -> AccessControlledEnergyComposite:
-    mock_client = MagicMock()
-    mock_client.get_file_contents = MagicMock(return_value=MIRROR_ENERGIES)
+def path_to_mock_data() -> dict:
+    return {"/path/to/config": MIRROR_ENERGIES}
+
+
+@pytest.fixture
+def eh1_energy_device(
+    mock_config_client: ConfigClient,
+) -> AccessControlledEnergyComposite:
     with init_devices(mock=True):
         device = AccessControlledEnergyComposite(
             "",
             HutchState.EH1,
             "/path/to/config",
-            mock_client,
+            mock_config_client,
             "cm12345-1",
             "mock_eh1_energy",
         )
@@ -45,15 +51,15 @@ def eh1_energy_device() -> AccessControlledEnergyComposite:
 
 
 @pytest.fixture
-def eh2_energy_device() -> AccessControlledEnergyComposite:
-    mock_client = MagicMock()
-    mock_client.get_file_contents = MagicMock(return_value=MIRROR_ENERGIES)
+def eh2_energy_device(
+    mock_config_client: ConfigClient,
+) -> AccessControlledEnergyComposite:
     with init_devices(mock=True):
         device = AccessControlledEnergyComposite(
             "",
             HutchState.EH2,
             "/path/to/config",
-            mock_client,
+            mock_config_client,
             "cm12345-1",
             "mock_eh1_energy",
         )

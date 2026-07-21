@@ -86,23 +86,20 @@ async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
     assert fake_undulator_dcm.dcm_fixed_offset_mm == 25.6
 
 
+@pytest.fixture
+def path_to_mock_data() -> dict:
+    return {
+        TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT: UndulatorEnergyGapLookupTable(
+            rows=[[5700, 5.4606], [7000, 6.045], [9700, 6.404]],
+        )
+    }
+
+
 @patch("dodal.devices.undulator.LOGGER")
 async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_logger: MagicMock,
     fake_undulator_dcm: UndulatorDCM,
 ):
-    mock_config_server = MagicMock()
-    mock_config_server.get_file_contents = MagicMock(
-        return_value=UndulatorEnergyGapLookupTable(
-            rows=[
-                [5700, 5.4606],
-                [7000, 6.045],
-                [9700, 6.404],
-            ],
-        )
-    )
-    fake_undulator_dcm.undulator_ref().config_server = mock_config_server
-
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
     set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_keV.user_readback, 5.7)
 
