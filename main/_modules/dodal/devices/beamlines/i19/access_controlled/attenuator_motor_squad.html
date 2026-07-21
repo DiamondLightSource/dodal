@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad &#8212; dodal 2.5.3.dev1+gedea41f0d documentation</title>
+    <title>dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad &#8212; dodal 2.5.4.dev1+gb012bbb9d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../../_static/documentation_options.js?v=6fa36410"></script>
+    <script src="../../../../../../_static/documentation_options.js?v=a0de9feb"></script>
     <script src="../../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,11 +885,18 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Self</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Self</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">model_validator</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">PositiveInt</span><span class="p">,</span> <span class="n">StringConstraints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseModel</span><span class="p">,</span>
+    <span class="n">ConfigDict</span><span class="p">,</span>
+    <span class="n">Field</span><span class="p">,</span>
+    <span class="n">StrictFloat</span><span class="p">,</span>
+    <span class="n">StrictInt</span><span class="p">,</span>
+    <span class="n">model_validator</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringConstraints</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i19.access_controlled.blueapi_device</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OpticsBlueAPIDevice</span><span class="p">,</span>
@@ -898,14 +905,20 @@ window.runMermaid = runMermaid;</script>
     <span class="n">ACCESS_DEVICE_NAME</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">PermittedKeyStr</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StringConstraints</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;^[A-Za-z0-9-_]*$&quot;</span><span class="p">)]</span>
+<span class="n">PermittedKeyStr</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StringConstraints</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;^[A-Za-z0-9-_]+$&quot;</span><span class="p">)]</span>
 
 
-<div class="viewcode-block" id="AttenuatorMotorPositionDemands">
-<a class="viewcode-back" href="../../../../../../reference/generated/dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositionDemands.html#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositionDemands">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AttenuatorMotorPositionDemands</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">continuous_demands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">indexed_demands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<div class="viewcode-block" id="AttenuatorMotorPositions">
+<a class="viewcode-back" href="../../../../../../reference/generated/dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.html#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AttenuatorMotorPositions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">continuous_demands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">StrictFloat</span> <span class="o">|</span> <span class="n">StrictInt</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">indexed_demands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">StrictInt</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">no_keys_clash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
@@ -918,7 +931,9 @@ window.runMermaid = runMermaid;</script>
             <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Common </span><span class="si">{</span><span class="n">ks</span><span class="si">}</span><span class="s2"> found in distinct motor demands: </span><span class="si">{</span><span class="n">common_keys</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">validated_complete_demand</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validated_complete_demand</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">StrictInt</span> <span class="o">|</span> <span class="n">StrictFloat</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_demands</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexed_demands</span></div>
 
 
@@ -944,7 +959,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">AttenuatorMotorPositionDemands</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">AttenuatorMotorPositions</span><span class="p">):</span>
         <span class="n">request_params</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;operate_motor_squad_plan&quot;</span><span class="p">,</span>
             <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
