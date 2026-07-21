@@ -121,46 +121,10 @@ async def test_my_device_read(sim_my_device: MyDevice, run_engine: RunEngine) ->
     )
 ```
 
-## Mocking `ConfigClient`
-
-Beamlines and devices may depend on the daq-config-server `ConfigClient` to retrieve configuration files. These files are often stored on the DLS filesystem and contain configuration data that determines device behaviour.
-
-For example, an insertion device may use a calibration file containing polynomial coefficients that convert photon energy into insertion device gap for different polarisation modes. A device may retrieve this information using a `ConfigClient`:
-
-```python
-from pathlib import Path
-
-from daq_config_server.client import ConfigClient
-
-from dodal.device_manager import DeviceManager
-from dodal.devices.my_device import MyDevice
-
-LOOKUPTABLE_DIR = (
-    "/dls_sw/iXX/software/gda/workspace_git/"
-    "gda-diamond.git/configurations/iXX/lookupTables"
-)
-LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
-
-devices = DeviceManager()
-
-
-@devices.fixture
-def config_client() -> ConfigClient:
-    return ConfigClient()
-
-
-@devices.factory()
-def my_device(config_client: ConfigClient) -> MyDevice:
-    return MyDevice(
-        config_client=config_client,
-        path=Path(LOOKUPTABLE_DIR, LOOKUP_FILE_NAME),
-    )
-```
-
-### Using the mock_config_client fixture to read files
+## Using the mock_config_client fixture to read files
 Unit tests should not communicate with the real daq-config-server or read files from the DLS filesystem.
 
-Dodal provides a `mock_config_client` fixture in `dodal.testing.fixtures.config_client`. This fixture creates the ConfigClient and puts it into a mock mode. This reads test files directly from the local filesystem.
+Dodal provides a `mock_config_client` fixture in `conftest.py`. This fixture creates the ConfigClient and puts it into a mock mode. This reads test files directly from the local filesystem.
 
 Most tests only need to depend on this fixture:
 
