@@ -1,6 +1,6 @@
 from functools import cache
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import (

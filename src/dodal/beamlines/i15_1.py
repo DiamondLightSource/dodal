@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adcore import ADWriterFactory, ContAcqDetector, NDPluginBaseIO
 from ophyd_async.epics.motor import Motor

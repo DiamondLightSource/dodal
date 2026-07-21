@@ -1,4 +1,4 @@
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import get_config_client, set_config_client
 from dodal.device_manager import DeviceManager

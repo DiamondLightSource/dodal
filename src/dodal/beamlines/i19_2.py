@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda

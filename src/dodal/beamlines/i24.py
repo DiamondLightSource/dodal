@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
 from dodal.common.beamlines.beamline_utils import BL, set_config_client
