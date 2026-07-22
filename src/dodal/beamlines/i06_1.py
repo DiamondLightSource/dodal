@@ -70,6 +70,9 @@ def scaler2() -> ScalerCardController:
 
 @devices.factory()
 def mag_dets(scaler2: ScalerCardController):
+    """Used to measure during a fly scan of a MagnetAxis for the
+    SuperConductingMagnetController device.
+    """
     prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
     return ScalerCardChannels(
         channels=DeviceVector(
