@@ -69,7 +69,7 @@ def scaler2() -> ScalerCardController:
 
 
 @devices.factory()
-def mag_detectors(scaler2: ScalerCardController):
+def mag_dets(scaler2: ScalerCardController):
     prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
     return ScalerCardChannels(
         DeviceVector(
