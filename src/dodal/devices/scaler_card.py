@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import MutableMapping
 from typing import Generic, TypeVar
 
 from bluesky.protocols import Movable, Reading, Triggerable
@@ -17,13 +18,13 @@ from ophyd_async.epics.core import epics_signal_rw
 
 
 class MockScalerCardController(DeviceMock["ScalerCardController"]):
-    async def _complete(self):
-        await asyncio.sleep(0.01)
-        set_mock_value(self._counting, False)
-
     def _on_value(self, value: dict[str, Reading[bool]]):
+        async def _complete():
+            await asyncio.sleep(0.01)
+            set_mock_value(self._counting, False)
+
         if value[self._counting.name]["value"]:
-            asyncio.create_task(self._complete())
+            asyncio.create_task(_complete())
 
     async def connect(self, device):
         self._counting = device.start_count
@@ -38,7 +39,7 @@ class MockScalerCardController(DeviceMock["ScalerCardController"]):
 
 @default_mock_class(MockScalerCardController)
 class ScalerCardController(StandardReadable, Triggerable, Movable[float]):
-    """Control a scaler card and its integration time.
+    """Control a scaler card and its readable channels.
 
     The scaler card is configured with an integration time and can be
     triggered to start a counting period. The counting period is complete
@@ -70,29 +71,39 @@ T = TypeVar("T", bound=Device)
 
 
 class ScalerCardChannels(StandardReadable, Triggerable, Movable[float], Generic[T]):
-    """Expose the channels of a scaler card as a readable device.
+    """Expose a logical group of channels from a scaler card.
 
-    The channels are read from the supplied device and the scaler card
-    controller is used to configure and trigger the acquisition. Calling
-    :meth:`set` sets the scaler integration time, while :meth:`trigger`
-    starts a count and waits for it to complete.
+    The channels are exposed as a readable device and are associated with a
+    :class:`ScalerCardController` that controls the underlying scaler card. Multiple
+    instances of this class can share the same controller, allowing different groups of
+    scaler channels to be exposed as separate logical devices while being acquired by
+    the same physical scaler card. The channels are also added as readbales with the
+    controller, so the controller exposes all channels associated with the scaler card.
+    This allows the controller to represent the complete set of scaler channels, while
+    each  :class:`ScalerCardChannels` instance provides access to only its associated
+    group. Calling :meth:`set` sets the scaler integration time via the controller,
+    while :meth:`trigger` starts the controller count and waits for it to complete.
     """
 
     def __init__(self, channels: T, controller: ScalerCardController, name: str = ""):
         with self.add_children_as_readables():
             self.channel = channels
 
-        controller.add_readables([channels])
+        # ophyd-async DeviceVector/DeviceMap case
+        if isinstance(channels, MutableMapping):
+            controller.add_readables(list(channels.values()))
+        else:
+            controller.add_readables([channels])
 
         self.controller_ref = Reference(controller)
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        """Set the scaler integration time."""
+        """Set the scaler integration time on the controller."""
         await self.controller_ref().set(value)
 
     @AsyncStatus.wrap
     async def trigger(self):
-        """Start a scaler count and wait for it to complete."""
+        """Start a scaler count on the controller and wait for it to complete."""
         await self.controller_ref().trigger()

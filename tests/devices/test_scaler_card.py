@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
+from bluesky.protocols import Reading
 from ophyd_async.core import (
     DeviceVector,
     StandardReadable,
@@ -58,13 +59,13 @@ class MultiChannelExample(StandardReadable):
 
 @pytest.fixture
 def scaler3(scaler_controller: ScalerCardController):
-    """Multi channel example with sub devices."""
+    """Multi channel example with sub device."""
     with init_devices(mock=True):
-        scaler2 = ScalerCardChannels(
+        scaler3 = ScalerCardChannels(
             channels=MultiChannelExample(),
             controller=scaler_controller,
         )
-    return scaler2
+    return scaler3
 
 
 async def test_scaler1_single_channel_read(
@@ -92,8 +93,8 @@ async def test_scaler3_multi_channel_read(
     await assert_reading(
         scaler3,
         {
-            "scaler2-channel-hm3amp20": partial_reading(0),
-            "scaler2-channel-sm5amp8": partial_reading(0),
+            "scaler3-channel-hm3amp20": partial_reading(0),
+            "scaler3-channel-sm5amp8": partial_reading(0),
         },
     )
 
@@ -103,6 +104,31 @@ async def test_scaler_controller_read_configuration(
 ) -> None:
     await assert_configuration(
         scaler_controller, {"scaler_controller-integration_time": partial_reading(0.0)}
+    )
+
+
+async def test_scaler_controller_read_when_used_with_channel(
+    scaler_controller: ScalerCardController, scaler1: ScalerCardChannels
+) -> None:
+    await assert_reading(scaler_controller, {"scaler1-channel": partial_reading(0)})
+
+
+async def test_scaler_controller_read_when_used_with_multiple_channels(
+    scaler_controller: ScalerCardController,
+    scaler1: ScalerCardChannels,
+    scaler2: ScalerCardController,
+    scaler3: ScalerCardController,
+) -> None:
+    await assert_reading(
+        scaler_controller,
+        {
+            "scaler1-channel": partial_reading(0),
+            "scaler2-channel-0": partial_reading(0),
+            "scaler2-channel-1": partial_reading(0),
+            "scaler2-channel-2": partial_reading(0),
+            "scaler3-channel-hm3amp20": partial_reading(0),
+            "scaler3-channel-sm5amp8": partial_reading(0),
+        },
     )
 
 
@@ -135,15 +161,17 @@ async def test_scaler_card_channels_trigger_calls_controller_trigger(
 async def test_scaler_controller_trigger_sets_counting_true_then_false(
     scaler_controller: ScalerCardController,
 ) -> None:
-    values = []
-    scaler_controller.start_count.subscribe(values.append)
-    await scaler_controller.trigger()
-    scaler_controller.start_count.clear_sub(values.append)
-
     states = []
     expected_states = [False, True, False]
-    for v in values:
-        states.append(v[scaler_controller.start_count.name]["value"])
+
+    def sub(readings: dict[str, Reading[bool]]):
+        val = readings[scaler_controller.start_count.name]["value"]
+        states.append(val)
+
+    scaler_controller.start_count.subscribe(sub)
+    await scaler_controller.trigger()
+    scaler_controller.start_count.clear_sub(sub)
+
     assert states == expected_states
 
 
@@ -161,9 +189,9 @@ async def test_scaler_controller_multiple_connects_has_one_subscribe(
             == expected_subscribers
         )
 
-    def dummy(value):
+    def dummy_sub(value):
         pass
 
     # Now subscribe to make sure it does go up and not checking the wrong thing.
-    scaler_controller.start_count.subscribe(dummy)
+    scaler_controller.start_count.subscribe(dummy_sub)
     assert len(scaler_controller.start_count._get_cache()._listeners) == 2
