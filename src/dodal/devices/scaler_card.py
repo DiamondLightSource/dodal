@@ -95,6 +95,9 @@ class ScalerCardChannels(StandardReadable, Triggerable, Movable[float], Generic[
         else:
             controller.add_readables([channels])
 
+        self.add_readables(
+            [controller.integration_time], StandardReadableFormat.CONFIG_SIGNAL
+        )
         self.controller_ref = Reference(controller)
         super().__init__(name)
 

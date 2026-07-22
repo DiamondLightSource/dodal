@@ -1,3 +1,4 @@
+import asyncio
 from unittest.mock import AsyncMock
 
 import pytest
@@ -68,34 +69,49 @@ def scaler3(scaler_controller: ScalerCardController):
     return scaler3
 
 
-async def test_scaler1_single_channel_read(
+async def test_scaler1_single_channel_read_and_configuration(
     scaler1: ScalerCardChannels,
 ) -> None:
-    await assert_reading(scaler1, {"scaler1-channel": partial_reading(0)})
-
-
-async def test_scaler2_multi_channel_read(
-    scaler2: ScalerCardChannels,
-) -> None:
-    await assert_reading(
-        scaler2,
-        {
-            "scaler2-channel-0": partial_reading(0),
-            "scaler2-channel-1": partial_reading(0),
-            "scaler2-channel-2": partial_reading(0),
-        },
+    await asyncio.gather(
+        assert_reading(scaler1, {"scaler1-channel": partial_reading(0)}),
+        assert_configuration(
+            scaler1, {"scaler_controller-integration_time": partial_reading(0)}
+        ),
     )
 
 
-async def test_scaler3_multi_channel_read(
+async def test_scaler2_multi_channel_read_and_configuration(
+    scaler2: ScalerCardChannels,
+) -> None:
+    await asyncio.gather(
+        assert_reading(
+            scaler2,
+            {
+                "scaler2-channel-0": partial_reading(0),
+                "scaler2-channel-1": partial_reading(0),
+                "scaler2-channel-2": partial_reading(0),
+            },
+        ),
+        assert_configuration(
+            scaler2, {"scaler_controller-integration_time": partial_reading(0)}
+        ),
+    )
+
+
+async def test_scaler3_multi_channel_read_and_configuration(
     scaler3: ScalerCardChannels,
 ) -> None:
-    await assert_reading(
-        scaler3,
-        {
-            "scaler3-channel-hm3amp20": partial_reading(0),
-            "scaler3-channel-sm5amp8": partial_reading(0),
-        },
+    await asyncio.gather(
+        assert_reading(
+            scaler3,
+            {
+                "scaler3-channel-hm3amp20": partial_reading(0),
+                "scaler3-channel-sm5amp8": partial_reading(0),
+            },
+        ),
+        assert_configuration(
+            scaler3, {"scaler_controller-integration_time": partial_reading(0)}
+        ),
     )
 
 
