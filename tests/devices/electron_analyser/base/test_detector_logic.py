@@ -140,7 +140,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
     region: BaseRegion,
     region_logic: RegionLogic,
 ) -> None:
-    set_mock_attr(region_logic.driver, "set", AsyncMock())
+    mock_set = set_mock_attr(region_logic.driver, "set", AsyncMock())
 
     # Patch switch_energy_mode so we can check on calls, but still run the real function
     with patch.object(
@@ -164,7 +164,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
         epics_region = mock_prepare_for_epics.call_args[0][0].prepare_for_epics(
             await region_logic.energy_source.get_value(),
         )
-        region_logic.driver.set.assert_called_once_with(epics_region)
+        mock_set.assert_called_once_with(epics_region)
 
 
 @pytest.mark.parametrize(("driver", "region"), DRIVER_REGIONS_PAIR, indirect=["driver"])

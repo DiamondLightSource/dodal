@@ -199,22 +199,22 @@ async def test_uvw_check_value_calls_all_motors(
     uvw: ToolPointMotion,
 ) -> None:
     smp = uvw.smp_ref()
-    set_mock_attr(smp.x, "check_value", AsyncMock())
-    set_mock_attr(smp.y, "check_value", AsyncMock())
-    set_mock_attr(smp.z, "check_value", AsyncMock())
-    set_mock_attr(smp.tilt, "check_value", AsyncMock())
-    set_mock_attr(smp.azimuth, "check_value", AsyncMock())
+    mock_check_x = set_mock_attr(smp.x, "check_value", AsyncMock())
+    mock_check_y = set_mock_attr(smp.y, "check_value", AsyncMock())
+    mock_check_z = set_mock_attr(smp.z, "check_value", AsyncMock())
+    mock_check_tilt = set_mock_attr(smp.tilt, "check_value", AsyncMock())
+    mock_check_azimuth = set_mock_attr(smp.azimuth, "check_value", AsyncMock())
 
     values = XYZTiltAzimuthMotorPositions(
         x=1.0, y=2.0, z=3.0, tilt_deg=10.0, azimuth_deg=20.0
     )
     await uvw.check_value(values)
 
-    smp.x.check_value.assert_awaited_once_with(values.x)
-    smp.y.check_value.assert_awaited_once_with(values.y)
-    smp.z.check_value.assert_awaited_once_with(values.z)
-    smp.tilt.check_value.assert_awaited_once_with(values.tilt_deg)
-    smp.azimuth.check_value.assert_awaited_once_with(values.azimuth_deg)
+    mock_check_x.assert_awaited_once_with(values.x)
+    mock_check_y.assert_awaited_once_with(values.y)
+    mock_check_z.assert_awaited_once_with(values.z)
+    mock_check_tilt.assert_awaited_once_with(values.tilt_deg)
+    mock_check_azimuth.assert_awaited_once_with(values.azimuth_deg)
 
 
 async def test_check_values_raises_on_failure(

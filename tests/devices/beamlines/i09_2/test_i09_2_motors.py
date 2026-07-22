@@ -38,9 +38,9 @@ async def piezo_motor() -> PiezoElectricMotor:
 
 
 async def test_piezo_motor_stop(piezo_motor: PiezoElectricMotor) -> None:
-    set_mock_attr(piezo_motor.motor_stop, "set", AsyncMock())
+    mock_set = set_mock_attr(piezo_motor.motor_stop, "set", AsyncMock())
     await piezo_motor.stop()
-    piezo_motor.motor_stop.set.assert_awaited_once_with(1)
+    mock_set.assert_awaited_once_with(1)
 
 
 async def test_piezo_motor_set(piezo_motor: PiezoElectricMotor) -> None:

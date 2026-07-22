@@ -29,12 +29,10 @@ async def test_polarisation_set_calls_controller_methods(
     mock_id_controller: DummyApple2Controller,
     mock_id_polarisation: InsertionDevicePolarisation,
 ):
-    set_mock_attr(mock_id_controller.polarisation, "set", AsyncMock())
+    mock_set = set_mock_attr(mock_id_controller.polarisation, "set", AsyncMock())
     pol = Pol.PC
     await mock_id_polarisation.set(pol=pol)
-    mock_id_controller.polarisation.set.assert_called_once_with(
-        pol, timeout=MAXIMUM_MOVE_TIME
-    )
+    mock_set.assert_called_once_with(pol, timeout=MAXIMUM_MOVE_TIME)
 
 
 async def test_insertion_device_polarisation_locate(

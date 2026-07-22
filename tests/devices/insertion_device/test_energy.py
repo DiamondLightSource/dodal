@@ -44,26 +44,24 @@ async def test_mock_beam_controller_set_moves_both_devices(
     mock_id_energy: InsertionDeviceEnergy,
     mock_pgm: PlaneGratingMonochromator,
 ):
-    set_mock_attr(mock_id_energy, "set", AsyncMock())
-    set_mock_attr(mock_pgm.energy, "set", AsyncMock())
+    mock_id_energy_set = set_mock_attr(mock_id_energy, "set", AsyncMock())
+    mock_pgm_energy_set = set_mock_attr(mock_pgm.energy, "set", AsyncMock())
 
     await mock_beam_energy.set(100.0)
 
-    mock_id_energy.set.assert_called_once_with(energy=100.0)
-    mock_pgm.energy.set.assert_called_once_with(100.0)
+    mock_id_energy_set.assert_called_once_with(energy=100.0)
+    mock_pgm_energy_set.assert_called_once_with(100.0)
 
 
 async def test_insertion_device_energy_set(
     mock_id_energy: InsertionDeviceEnergy,
     mock_id_controller: DummyApple2Controller,
 ):
-    set_mock_attr(mock_id_controller.energy, "set", AsyncMock())
+    mock_set = set_mock_attr(mock_id_controller.energy, "set", AsyncMock())
 
     await mock_id_energy.set(1500.0)
 
-    mock_id_controller.energy.set.assert_awaited_once_with(
-        1500.0, timeout=MAXIMUM_MOVE_TIME
-    )
+    mock_set.assert_awaited_once_with(1500.0, timeout=MAXIMUM_MOVE_TIME)
 
 
 @pytest.mark.parametrize(
@@ -90,7 +88,7 @@ async def test_insertion_device_energy_prepare_success(
         mock_id_controller.apple2().gap().acceleration_time, acceleration_time
     )
     mock_id_controller._polarisation_setpoint_set(Pol.LH)
-    set_mock_attr(mock_id_energy, "set", AsyncMock())
+    mock_set = set_mock_attr(mock_id_energy, "set", AsyncMock())
     mid_gap_position = end_gap + start_gap / 2.0
     mock_id_controller.gap_energy_motor_converter = Mock(
         side_effect=[start_gap, end_gap, mid_gap_position]
@@ -101,7 +99,7 @@ async def test_insertion_device_energy_prepare_success(
     await mock_id_energy.prepare(fly_info)
     velocity = (end_gap - start_gap) / time_for_move
     ramp_up_start = start_gap - acceleration_time * velocity / 2.0
-    mock_id_energy.set.assert_awaited_once_with(energy=750)
+    mock_set.assert_awaited_once_with(energy=750)
     get_mock_put(
         mock_id_controller.apple2().gap().user_setpoint
     ).assert_awaited_once_with(str(ramp_up_start))
@@ -113,18 +111,18 @@ async def test_insertion_deviceenergy_kickoff_call_gap_kickoff(
     mock_id_energy: InsertionDeviceEnergy,
     mock_id_gap: UndulatorGap,
 ):
-    set_mock_attr(mock_id_gap, "kickoff", AsyncMock())
+    mock_kickoff = set_mock_attr(mock_id_gap, "kickoff", AsyncMock())
     await mock_id_energy.kickoff()
-    mock_id_gap.kickoff.assert_awaited_once()
+    mock_kickoff.assert_awaited_once()
 
 
 def test_insertion_device_energy_complete_call_gap_complete(
     mock_id_energy: InsertionDeviceEnergy,
     mock_id_gap: UndulatorGap,
 ):
-    set_mock_attr(mock_id_gap, "complete", MagicMock())
+    mock_complete = set_mock_attr(mock_id_gap, "complete", MagicMock())
     mock_id_energy.complete()
-    mock_id_gap.complete.assert_called_once()
+    mock_complete.assert_called_once()
 
 
 async def test_insertion_device_energy_prepare_success_in_run_engine(
@@ -145,11 +143,11 @@ async def test_beam_energy_prepare_success(
     mock_id_energy: InsertionDeviceEnergy,
 ):
     fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
-    set_mock_attr(mock_id_energy, "prepare", AsyncMock())
-    set_mock_attr(mock_pgm.energy, "prepare", AsyncMock())
+    mock_id_energy_prepare = set_mock_attr(mock_id_energy, "prepare", AsyncMock())
+    mock_pgm_energy_prepare = set_mock_attr(mock_pgm.energy, "prepare", AsyncMock())
     run_engine(prepare(mock_beam_energy, fly_info))
-    mock_id_energy.prepare.assert_awaited_once_with(fly_info)
-    mock_pgm.energy.prepare.assert_awaited_once_with(fly_info)
+    mock_id_energy_prepare.assert_awaited_once_with(fly_info)
+    mock_pgm_energy_prepare.assert_awaited_once_with(fly_info)
 
 
 @patch("asyncio.sleep", new_callable=AsyncMock)
@@ -175,13 +173,13 @@ async def test_beam_energy_kickoff_set_correct_delay(
     set_mock_value(mock_pgm.energy.high_limit_travel, 1000)
     set_mock_value(mock_pgm.energy.acceleration_time, pgm_acc_time)
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_attr(mock_id_gap, "kickoff", AsyncMock())
-    set_mock_attr(mock_pgm.energy, "kickoff", AsyncMock())
+    mock_id_gap_kickoff = set_mock_attr(mock_id_gap, "kickoff", AsyncMock())
+    mock_pgm_energy_kickoff = set_mock_attr(mock_pgm.energy, "kickoff", AsyncMock())
     await mock_beam_energy.prepare(fly_info)
     await mock_beam_energy.kickoff()
     mock_sleep.assert_called_with(pgm_acc_time - id_acc_time)
-    mock_id_gap.kickoff.assert_awaited_once()
-    mock_pgm.energy.kickoff.assert_awaited_once()
+    mock_id_gap_kickoff.assert_awaited_once()
+    mock_pgm_energy_kickoff.assert_awaited_once()
 
 
 @patch("asyncio.sleep", new_callable=AsyncMock)

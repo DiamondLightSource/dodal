@@ -157,9 +157,11 @@ async def test_stop_xyz_switching_mirror(
     xyz_switching_mirror: XYZSwitchingMirror,
     run_engine: RunEngine,
 ):
-    set_mock_attr(xyz_switching_mirror.mirror_abort, "trigger", AsyncMock())
+    mock_trigger = set_mock_attr(
+        xyz_switching_mirror.mirror_abort, "trigger", AsyncMock()
+    )
     run_engine(stop(xyz_switching_mirror))
-    xyz_switching_mirror.mirror_abort.trigger.assert_awaited_once()
+    mock_trigger.assert_awaited_once()
 
 
 @pytest.mark.parametrize(
@@ -233,6 +235,8 @@ async def test_stop_xyz_piezo_switching_mirror(
     xyz_piezo_switching_mirror: XYZPiezoSwitchingMirror,
     run_engine: RunEngine,
 ):
-    set_mock_attr(xyz_piezo_switching_mirror.mirror_abort, "trigger", AsyncMock())
+    mock_trigger = set_mock_attr(
+        xyz_piezo_switching_mirror.mirror_abort, "trigger", AsyncMock()
+    )
     run_engine(stop(xyz_piezo_switching_mirror))
-    xyz_piezo_switching_mirror.mirror_abort.trigger.assert_awaited_once()
+    mock_trigger.assert_awaited_once()

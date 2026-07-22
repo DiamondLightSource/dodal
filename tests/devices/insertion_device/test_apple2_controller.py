@@ -185,7 +185,7 @@ async def test_id_controller_energy_sets_correct_values(
     configured_gap: float,
     configured_phase: float,
 ):
-    set_mock_attr(mock_locked_apple2, "set", AsyncMock())
+    mock_set = set_mock_attr(mock_locked_apple2, "set", AsyncMock())
     mock_locked_controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
     await mock_locked_controller.energy.set(100.0)
     expected_val = Apple2Val(
@@ -195,7 +195,7 @@ async def test_id_controller_energy_sets_correct_values(
         ),
         gap=configured_gap,
     )
-    mock_locked_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
+    mock_set.assert_awaited_once_with(id_motor_values=expected_val)
 
 
 async def test_id_controller_energy_read_correct_values_using_readback(

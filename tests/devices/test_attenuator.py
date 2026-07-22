@@ -97,8 +97,10 @@ async def test_enum_attenuator_set():
         await asyncio.sleep(MOCK_TIMEOUT_S / 2)
         await attenuator._filters[0].done_move.set(0)
 
-    set_mock_attr(attenuator._auto_move_on_desired_transmission_set, "set", AsyncMock())
-    set_mock_attr(attenuator._use_current_energy, "trigger", AsyncMock())
+    mock_set = set_mock_attr(
+        attenuator._auto_move_on_desired_transmission_set, "set", AsyncMock()
+    )
+    mock_trigger = set_mock_attr(attenuator._use_current_energy, "trigger", AsyncMock())
     set_mock_attr(
         attenuator._desired_transmission,
         "set",
@@ -110,7 +112,5 @@ async def test_enum_attenuator_set():
     await attenuator._filters[0].done_move.set(1)
     await attenuator._filters[1].done_move.set(1)
     await status
-    attenuator._auto_move_on_desired_transmission_set.set.assert_awaited_once_with(
-        YesNo.YES
-    )
-    attenuator._use_current_energy.trigger.assert_called_once()
+    mock_set.assert_awaited_once_with(YesNo.YES)
+    mock_trigger.assert_called_once()
