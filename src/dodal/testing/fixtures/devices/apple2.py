@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 from daq_config_server import ConfigClient
 from ophyd_async.core import (
@@ -24,8 +22,6 @@ from dodal.devices.insertion_device.apple2_undulator import (
 def mock_config_client() -> ConfigClient:
     mock_config_client = ConfigClient()
 
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
     def my_side_effect(
         file_path, desired_return_type=str, reset_cached_result=False, force_parser=None
     ) -> str:
@@ -33,7 +29,7 @@ def mock_config_client() -> ConfigClient:
         with open(file_path) as f:
             return f.read()
 
-    mock_config_client.get_file_contents.side_effect = my_side_effect
+    mock_config_client.get_file_contents = my_side_effect  # type: ignore
     return mock_config_client
 
 
