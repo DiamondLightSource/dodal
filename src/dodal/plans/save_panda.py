@@ -1,4 +1,5 @@
 import argparse
+import importlib
 import os
 import sys
 from argparse import ArgumentParser
@@ -12,7 +13,7 @@ from ophyd_async.plan_stubs import (
 )
 
 from dodal.beamlines import module_name_for_beamline
-from dodal.utils import make_device
+from dodal.device_manager import DeviceFactory, DeviceManager
 
 
 def main(argv: list[str] | None = None):
@@ -70,19 +71,25 @@ def main(argv: list[str] | None = None):
     return 0
 
 
+def _build_panda(beamline, device_name) -> Device:
+    print(f"Building {device_name} for beamline {beamline}")
+    module_name = module_name_for_beamline(beamline)
+    mod = importlib.import_module("dodal.beamlines." + module_name)
+    device_manager: DeviceManager = mod.devices
+    return cast(DeviceFactory, device_manager[device_name]).build(
+        connect_immediately=True
+    )
+
+
 def _save_panda(beamline, device_name, output_directory, file_name):
     run_engine = RunEngine()
-    print("Creating devices...")
-    module_name = module_name_for_beamline(beamline)
+
     try:
-        devices = make_device(
-            f"dodal.beamlines.{module_name}", device_name, connect_immediately=True
-        )
+        panda = _build_panda(beamline, device_name)
     except Exception as error:
         sys.stderr.write(f"Couldn't create device {device_name}: {error}\n")
         sys.exit(1)
 
-    panda = devices[device_name]
     print(
         f"Saving to {output_directory}/{file_name} from {device_name} on {beamline}..."
     )
