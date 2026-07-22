@@ -27,7 +27,7 @@ def mock_config_client() -> ConfigClient:
     mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
 
     def my_side_effect(
-        file_path, desired_return_type, reset_cached_result, force_parser
+        file_path, desired_return_type=str, reset_cached_result=False, force_parser=None
     ) -> str:
         assert reset_cached_result is True
         with open(file_path) as f:
