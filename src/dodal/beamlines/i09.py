@@ -170,7 +170,7 @@ def scaler1_controller() -> ScalerCardController:
 def scaler1(scaler1_controller: ScalerCardController):
     prefix = f"{I_PREFIX.beamline_prefix}-EA-SCLR-01"
     return ScalerCardChannels(
-        DeviceVector(
+        channels=DeviceVector(
             {  # Change to DeviceMap when on ophyd-async 0.20
                 0: epics_signal_r(float, prefix + ".S2"),  # hm3amp20
                 1: epics_signal_r(float, prefix + ".S3"),  # sm5amp8
@@ -178,7 +178,7 @@ def scaler1(scaler1_controller: ScalerCardController):
                 3: epics_signal_r(float, prefix + ".S5"),  # rfdamp10
             }
         ),
-        scaler1_controller,
+        controller=scaler1_controller,
     )
 
 
@@ -195,7 +195,7 @@ def scaler2_controller() -> ScalerCardController:
 def scaler2(scaler2_controller: ScalerCardController):
     prefix = f"{L_PREFIX.beamline_prefix}-VA-SCLR-01"
     return ScalerCardChannels(
-        DeviceVector(
+        channels=DeviceVector(
             {
                 # Change to DeviceMap when on ophyd-async 0.20
                 0: epics_signal_r(float, prefix + ".S2"),  # hm3amp20
@@ -204,5 +204,5 @@ def scaler2(scaler2_controller: ScalerCardController):
                 3: epics_signal_r(float, prefix + ".S5"),  # rfdamp10
             }
         ),
-        scaler2_controller,
+        controller=scaler2_controller,
     )

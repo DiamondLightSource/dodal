@@ -72,7 +72,7 @@ def scaler2() -> ScalerCardController:
 def mag_dets(scaler2: ScalerCardController):
     prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
     return ScalerCardChannels(
-        DeviceVector(
+        channels=DeviceVector(
             {
                 # Change to DeviceMap when on ophyd-async 0.20
                 0: epics_signal_r(float, prefix + "TEYC-RAW"),  # TEY
@@ -82,5 +82,5 @@ def mag_dets(scaler2: ScalerCardController):
                 4: epics_signal_r(float, prefix + "FIELDC-RAW"),  # FFZ
             }
         ),
-        scaler2,
+        controller=scaler2,
     )
