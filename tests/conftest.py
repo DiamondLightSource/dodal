@@ -69,11 +69,6 @@ pytest_plugins = [
 
 
 @pytest.fixture(autouse=True)
-def _allowed_bluesky_attr():
-    os.environ["OPHYD_ASYNC_ALLOW_RESERVED_ATTRS"] = "YES"
-
-
-@pytest.fixture(autouse=True)
 def reset_path_provider():
     yield
     clear_path_provider()
