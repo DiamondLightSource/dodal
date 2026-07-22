@@ -10,6 +10,7 @@ from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_value,
 )
 from ophyd_async.testing import (
@@ -461,7 +462,7 @@ async def test_id_controller_energy_sets_correct_values(
     configured_gap: float,
     configured_phase: float,
 ):
-    mock_locked_apple2.set = AsyncMock()
+    set_mock_attr(mock_locked_apple2, "set", AsyncMock())
     mock_locked_controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
     await mock_locked_controller.energy.set(100.0)
     expected_val = Apple2Val(

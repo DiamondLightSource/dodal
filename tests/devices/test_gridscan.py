@@ -15,6 +15,7 @@ from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_put_proceeds,
     set_mock_value,
 )
@@ -459,7 +460,7 @@ async def test_timeout_on_complete_triggers_stop_and_logs_error(
     zebra_fast_grid_scan: ZebraFastGridScanThreeD,
 ):
     zebra_fast_grid_scan.COMPLETE_STATUS = 0.01
-    zebra_fast_grid_scan.stop_cmd.trigger = AsyncMock()
+    set_mock_attr(zebra_fast_grid_scan.stop_cmd, "trigger", AsyncMock())
     set_mock_value(zebra_fast_grid_scan.status, 1)
     with pytest.raises(TimeoutError):
         await zebra_fast_grid_scan.complete()

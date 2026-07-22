@@ -4,7 +4,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
+from ophyd_async.core import (
+    callback_on_mock_put,
+    init_devices,
+    set_mock_attr,
+    set_mock_value,
+)
 
 from dodal.devices.attenuator.attenuator import (
     BinaryFilterAttenuator,
@@ -92,10 +97,12 @@ async def test_enum_attenuator_set():
         await asyncio.sleep(MOCK_TIMEOUT_S / 2)
         await attenuator._filters[0].done_move.set(0)
 
-    attenuator._auto_move_on_desired_transmission_set.set = AsyncMock()
-    attenuator._use_current_energy.trigger = AsyncMock()
-    attenuator._desired_transmission.set = AsyncMock(
-        side_effect=_move_filter_after_short_delay
+    set_mock_attr(attenuator._auto_move_on_desired_transmission_set, "set", AsyncMock())
+    set_mock_attr(attenuator._use_current_energy, "trigger", AsyncMock())
+    set_mock_attr(
+        attenuator._desired_transmission,
+        "set",
+        AsyncMock(side_effect=_move_filter_after_short_delay),
     )
     status = attenuator.set(0.2)
     await asyncio.sleep(MOCK_TIMEOUT_S)

@@ -12,6 +12,7 @@ from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_value,
 )
 from ophyd_async.testing import assert_emitted
@@ -266,7 +267,7 @@ async def test_fail_i10_apple2_controller_set_energy_has_default(
     mock_id_energy: InsertionDeviceEnergy,
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.energy.set = AsyncMock()
+    set_mock_attr(mock_id_controller.energy, "set", AsyncMock())
     await mock_id_energy.set(600)
     mock_id_controller.energy.set.assert_awaited_once_with(
         600, timeout=MAXIMUM_MOVE_TIME
@@ -389,7 +390,7 @@ async def test_id_polarisation_set_has_default_timeout(
     mock_id_controller: I10Apple2Controller,
 ):
     set_mock_value(mock_id_controller._energy, 700)
-    mock_id_controller.polarisation.set = AsyncMock()
+    set_mock_attr(mock_id_controller.polarisation, "set", AsyncMock())
     await mock_id_pol.set(Pol.LV)
     mock_id_controller.polarisation.set.assert_awaited_once_with(
         Pol.LV, timeout=MAXIMUM_MOVE_TIME
@@ -539,7 +540,7 @@ async def test_linear_arbitrary_pol_set_default_timeout(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.linear_arbitrary_angle.set = AsyncMock()
+    set_mock_attr(mock_id_controller.linear_arbitrary_angle, "set", AsyncMock())
     await mock_linear_arbitrary_angle.set(60)
     mock_id_controller.linear_arbitrary_angle.set.assert_awaited_once_with(
         60, timeout=MAXIMUM_MOVE_TIME

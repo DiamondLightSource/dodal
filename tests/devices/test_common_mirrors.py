@@ -4,7 +4,12 @@ import pytest
 from bluesky.plan_stubs import mv, stop
 from bluesky.protocols import Location
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import StrictEnum, init_devices, set_mock_value
+from ophyd_async.core import (
+    StrictEnum,
+    init_devices,
+    set_mock_attr,
+    set_mock_value,
+)
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.common_mirror import (
@@ -152,7 +157,7 @@ async def test_stop_xyz_switching_mirror(
     xyz_switching_mirror: XYZSwitchingMirror,
     run_engine: RunEngine,
 ):
-    xyz_switching_mirror.mirror_abort.trigger = AsyncMock()
+    set_mock_attr(xyz_switching_mirror.mirror_abort, "trigger", AsyncMock())
     run_engine(stop(xyz_switching_mirror))
     xyz_switching_mirror.mirror_abort.trigger.assert_awaited_once()
 
@@ -228,6 +233,6 @@ async def test_stop_xyz_piezo_switching_mirror(
     xyz_piezo_switching_mirror: XYZPiezoSwitchingMirror,
     run_engine: RunEngine,
 ):
-    xyz_piezo_switching_mirror.mirror_abort.trigger = AsyncMock()
+    set_mock_attr(xyz_piezo_switching_mirror.mirror_abort, "trigger", AsyncMock())
     run_engine(stop(xyz_piezo_switching_mirror))
     xyz_piezo_switching_mirror.mirror_abort.trigger.assert_awaited_once()

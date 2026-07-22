@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 import numpy as np
 import pytest
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import init_devices, set_mock_attr, set_mock_value
 from ophyd_async.epics.motor import MotorLimitsError
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -199,11 +199,11 @@ async def test_uvw_check_value_calls_all_motors(
     uvw: ToolPointMotion,
 ) -> None:
     smp = uvw.smp_ref()
-    smp.x.check_value = AsyncMock()
-    smp.y.check_value = AsyncMock()
-    smp.z.check_value = AsyncMock()
-    smp.tilt.check_value = AsyncMock()
-    smp.azimuth.check_value = AsyncMock()
+    set_mock_attr(smp.x, "check_value", AsyncMock())
+    set_mock_attr(smp.y, "check_value", AsyncMock())
+    set_mock_attr(smp.z, "check_value", AsyncMock())
+    set_mock_attr(smp.tilt, "check_value", AsyncMock())
+    set_mock_attr(smp.azimuth, "check_value", AsyncMock())
 
     values = XYZTiltAzimuthMotorPositions(
         x=1.0, y=2.0, z=3.0, tilt_deg=10.0, azimuth_deg=20.0

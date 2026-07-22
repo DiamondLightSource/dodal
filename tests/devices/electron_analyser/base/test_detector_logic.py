@@ -9,6 +9,7 @@ from ophyd_async.core import (
     StandardDetector,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADImageMode
@@ -139,7 +140,7 @@ async def test_region_logic_setup_with_region_sets_region_for_epics_and_sets_dri
     region: BaseRegion,
     region_logic: RegionLogic,
 ) -> None:
-    region_logic.driver.set = AsyncMock()
+    set_mock_attr(region_logic.driver, "set", AsyncMock())
 
     # Patch switch_energy_mode so we can check on calls, but still run the real function
     with patch.object(

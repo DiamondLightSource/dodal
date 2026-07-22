@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from daq_config_server import ConfigClient
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import init_devices, set_mock_attr, set_mock_value
 
 from dodal.devices.oav.oav_detector import (
     OAV,
@@ -24,8 +24,12 @@ def null_controller() -> NullZoomController:
 async def test_zoom_controller():
     zoom_controller = ZoomController("", "zoom_controller")
     await zoom_controller.connect(mock=True)
-    zoom_controller.level.describe = AsyncMock(
-        return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}}
+    set_mock_attr(
+        zoom_controller.level,
+        "describe",
+        AsyncMock(
+            return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}}
+        ),
     )
     status = zoom_controller.set("3.0x")
     await status
