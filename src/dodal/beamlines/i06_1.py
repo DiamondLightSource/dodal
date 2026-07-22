@@ -60,7 +60,7 @@ def scmc(
 
 
 @devices.factory()
-def scaler2() -> ScalerCardController:
+def scaler2_controller() -> ScalerCardController:
     return ScalerCardController(
         f"{I_PREFIX.beamline_prefix}-DI-8512-02:",
         start_count_suffix="STARTCOUNT",
@@ -69,21 +69,43 @@ def scaler2() -> ScalerCardController:
 
 
 @devices.factory()
-def mag_dets(scaler2: ScalerCardController):
-    """Used to measure during a fly scan of a MagnetAxis for the
-    SuperConductingMagnetController device.
-    """
-    prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
+def mag_scaler2(scaler2_controller: ScalerCardController):
+    """Magnet scaler card channels for scaler2_controller."""
+    mag_prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
+    current_amp_pv = f"{I_PREFIX.beamline_prefix}-DI-IAMP-04:I1C-RAW"
     return ScalerCardChannels(
         channels=DeviceVector(
             {
                 # Change to DeviceMap when on ophyd-async 0.20
-                0: epics_signal_r(float, prefix + "TEYC-RAW"),  # TEY
-                1: epics_signal_r(float, prefix + "FDUC-RAW"),  # FDU
-                2: epics_signal_r(float, prefix + "FDDC-RAW"),  # FDD
-                3: epics_signal_r(float, prefix + "90DC-RAW"),  # D90
-                4: epics_signal_r(float, prefix + "FIELDC-RAW"),  # FFZ
+                0: epics_signal_r(float, mag_prefix + "TEYC-RAW"),  # tey
+                1: epics_signal_r(float, current_amp_pv),  # i0
+                2: epics_signal_r(float, mag_prefix + "FDUC-RAW"),  # FDU
+                3: epics_signal_r(float, mag_prefix + "FDDC-RAW"),  # FDD
+                4: epics_signal_r(float, mag_prefix + "90DC-RAW"),  # D90
+                5: epics_signal_r(float, mag_prefix + "FIELDC-RAW"),  # FFZ
             }
         ),
-        controller=scaler2,
+        controller=scaler2_controller,
+    )
+
+
+@devices.factory()
+def ppj_scaler2(scaler2_controller: ScalerCardController):
+    """Patch Panel J channels for scaler2_controller."""
+    prefix = f"{J_PREFIX.beamline_prefix}-EA-USER-01:"
+    return ScalerCardChannels(
+        channels=DeviceVector(
+            {
+                # Change to DeviceMap when on ophyd-async 0.20
+                1: epics_signal_r(float, prefix + "SC1-RAW"),  # ca61sr
+                2: epics_signal_r(float, prefix + "SC2-RAW"),  # ca62sr
+                3: epics_signal_r(float, prefix + "SC3-RAW"),  # ca63sr
+                4: epics_signal_r(float, prefix + "SC4-RAW"),  # ca64sr
+                5: epics_signal_r(float, prefix + "SC5-RAW"),  # ca65sr
+                6: epics_signal_r(float, prefix + "SC6-RAW"),  # ca66sr
+                7: epics_signal_r(float, prefix + "SC7-RAW"),  # ca67sr
+                8: epics_signal_r(float, prefix + "SC8-RAW"),  # ca68sr
+            }
+        ),
+        controller=scaler2_controller,
     )
