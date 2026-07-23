@@ -118,7 +118,7 @@ class PlanarXZMovement(MovementStrategy):
         hypot = math.hypot(target.x, target.z)
         if hypot > self.LIMIT:
             raise MagnetPositionError(
-                f"Outside XZ operating region. math.hypot(x={target.x}, y={target.y}) = {hypot}. Limit is {self.LIMIT}"
+                f"Outside XZ operating region. math.hypot(x={target.x}, z={target.z}) = {hypot}. Limit is {self.LIMIT}"
             )
 
         return [MagnetStep(x=target.x, z=target.z)]
