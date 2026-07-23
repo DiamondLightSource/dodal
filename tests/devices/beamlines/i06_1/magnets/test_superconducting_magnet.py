@@ -3,6 +3,8 @@ import math
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
+from bluesky import FailedStatus, RunEngine
+from bluesky.plan_stubs import mv
 from bluesky.protocols import Reading
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
@@ -363,3 +365,15 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
 
         assert mock_apply_step.call_args_list == expected_apply_step_calls
         assert scmc._ramp.call_count == len(mov_str_return_values)
+
+
+async def test_external_parallel_moves_for_scmc_raise_error(
+    scmc: SuperConductingMagnetController, run_engine: RunEngine
+) -> None:
+    run_engine(mv(scmc.mode, MagnetModes.CUBIC))
+    # Coordinated parallel move of axes submitted together is okay.
+    run_engine(mv(scmc.cart, MagnetPosition(x=1, y=1, z=1)))
+
+    # Coordinated parallel move on axes done separately fails.
+    with pytest.raises(FailedStatus):
+        run_engine(mv(scmc.cart.x, 0.5, scmc.cart.y, 0.5))
