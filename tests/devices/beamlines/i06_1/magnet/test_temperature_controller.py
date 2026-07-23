@@ -31,7 +31,7 @@ async def test_temperature_controller_readback(
         scm_temp_controller,
         {
             "scm_temp_controller": partial_reading(1.0),
-            "scm_temp_controller-sensor-sensor2": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel2": partial_reading(0.0),
         },
     )
 
@@ -40,14 +40,14 @@ async def test_temperature_controller_readback(
         {
             "scm_temp_controller-tolerance": partial_reading(0.1),
             "scm_temp_controller-user_setpoint": partial_reading(1.0),
-            "scm_temp_controller-sensor-sensor_config-slope": partial_reading(0.0),
-            "scm_temp_controller-sensor-sensor_config-offset": partial_reading(0.0),
-            "scm_temp_controller-sensor-sensor_config-min": partial_reading(0.0),
-            "scm_temp_controller-sensor-sensor_config-max": partial_reading(0.0),
-            "scm_temp_controller-sensor-sensor2_config-slope": partial_reading(0.0),
-            "scm_temp_controller-sensor-sensor2_config-offset": partial_reading(0.0),
-            "scm_temp_controller-sensor-sensor2_config-min": partial_reading(0.0),
-            "scm_temp_controller-sensor-sensor2_config-max": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel1-slope": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel1-offset": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel1-min": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel1-max": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel2-slope": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel2-offset": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel2-min": partial_reading(0.0),
+            "scm_temp_controller-sensor-channel2-max": partial_reading(0.0),
             "scm_temp_controller-ramp_rate": partial_reading(0.0),
             "scm_temp_controller-ramp_mode": partial_reading(""),
         },
