@@ -310,19 +310,23 @@ class SuperConductingMagnetController(StandardReadable):
         ramp_controllers: MagnetThreeAxesRampRateController,
         name: str = "",
     ):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
+
         with self.add_children_as_readables():
             self.cart = MagnetCartesianCoordinates(
                 prefix, ramp_controllers, self.set_within_boundary
             )
             self.sph = MagnetSphericalCoordinates(self.cart, self.set_within_boundary)
 
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
-
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
         self.start_ramp = epics_signal_x(prefix + "STARTRAMP.PROC")
         self.timeout = 600
+
+        # Used to block parallel moves that are not submitted together. Allows us to
+        # always be sure we safely move the magnet using coordinated logic.
+        self._moving = False
 
         super().__init__(name)
 
@@ -371,27 +375,36 @@ class SuperConductingMagnetController(StandardReadable):
         strategy. Each step is then applied sequentially until the requested target
         position is reached.
         """
-        if x is None and y is None and z is None:
-            raise MagnetPositionError("x, y, and z cannot all be None.")
-        x0, y0, z0, mode = await asyncio.gather(
-            self.cart.x.readback.get_value(),
-            self.cart.y.readback.get_value(),
-            self.cart.z.readback.get_value(),
-            self.mode.get_value(),
-        )
-        current = MagnetPosition(x=x0, y=y0, z=z0)
-        target = MagnetPosition(
-            x=current.x if x is None else x,
-            y=current.y if y is None else y,
-            z=current.z if z is None else z,
-        )
-        movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
-        if movement_strategy is None:
-            raise ValueError(
-                f"No movement strategy has been configured for device {self.name} for mode {mode}."
+        if self._moving:
+            raise RuntimeError(
+                f"Cannot do move for {self.name}. It is already moving. For simultaneous "
+                f"moving of axes, please use {self.cart.name} or {self.sph.name}."
             )
-        self.log.debug(
-            f"Attempting move in mode {mode} with parameters {target}. Current position is {current}"
-        )
-        for step in movement_strategy.moves(current, target):
-            await self._apply_step(step)
+        try:
+            self._moving = True
+            if x is None and y is None and z is None:
+                raise MagnetPositionError("x, y, and z cannot all be None.")
+            x0, y0, z0, mode = await asyncio.gather(
+                self.cart.x.readback.get_value(),
+                self.cart.y.readback.get_value(),
+                self.cart.z.readback.get_value(),
+                self.mode.get_value(),
+            )
+            current = MagnetPosition(x=x0, y=y0, z=z0)
+            target = MagnetPosition(
+                x=current.x if x is None else x,
+                y=current.y if y is None else y,
+                z=current.z if z is None else z,
+            )
+            movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
+            if movement_strategy is None:
+                raise ValueError(
+                    f"No movement strategy has been configured for device {self.name} for mode {mode}."
+                )
+            self.log.debug(
+                f"Attempting move in mode {mode} with parameters {target}. Current position is {current}"
+            )
+            for step in movement_strategy.moves(current, target):
+                await self._apply_step(step)
+        finally:
+            self._moving = False
