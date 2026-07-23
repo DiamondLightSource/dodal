@@ -33,8 +33,8 @@ class RampRateMovableLogic(MovableLogic[float]):
 class MockMagnetAxisRampRateController(InstantMovableMock):
     async def connect(self, device: StandardMovable):
         await super().connect(device)
-        # Extend to set a sensible default value for the limit.
-        set_mock_value(device.limit, 2)  # type: ignore
+        # Extend to set a sensible default value for the ramp limit.
+        set_mock_value(device.ramp_limit, 2)  # type: ignore
 
 
 @default_mock_class(MockMagnetAxisRampRateController)
