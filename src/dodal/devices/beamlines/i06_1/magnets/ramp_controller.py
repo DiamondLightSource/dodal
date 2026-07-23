@@ -49,13 +49,14 @@ class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, prefix + "STS:RAMPRATE:TPM")
         self.demand = epics_signal_rw(float, prefix + "SET:DMD:RAMPRATE:TPM")
-        self.limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
+        self.ramp_limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
+        self.axis_limit = epics_signal_r(float, prefix + "LIM:FIELD:NOW")
         super().__init__(name)
 
     @cached_property
     def movable_logic(self) -> RampRateMovableLogic:
         return RampRateMovableLogic(
-            readback=self.readback, setpoint=self.demand, limit=self.limit
+            readback=self.readback, setpoint=self.demand, limit=self.ramp_limit
         )
 
 
