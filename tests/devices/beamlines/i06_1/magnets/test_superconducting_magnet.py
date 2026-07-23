@@ -377,3 +377,6 @@ async def test_external_parallel_moves_for_scmc_raise_error(
     # Coordinated parallel move on axes done separately fails.
     with pytest.raises(FailedStatus):
         run_engine(mv(scmc.cart.x, 0.5, scmc.cart.y, 0.5))
+
+    # Check after a blocked move and the first move finished, we can still do another move.
+    run_engine(mv(scmc.cart, MagnetPosition(x=0.1, y=0.2, z=0.3)))
