@@ -12,7 +12,7 @@ from ophyd_async.core import (
     default_mock_class,
     set_mock_value,
 )
-from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 @dataclass
@@ -47,9 +47,9 @@ class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.readback = epics_signal_rw(float, prefix + "STS:RAMPRATE:TPM")
+            self.readback = epics_signal_r(float, prefix + "STS:RAMPRATE:TPM")
         self.demand = epics_signal_rw(float, prefix + "SET:DMD:RAMPRATE:TPM")
-        self.limit = epics_signal_rw(float, prefix + "LIM:RAMPRATE:TPM")
+        self.limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
         super().__init__(name)
 
     @cached_property

@@ -133,7 +133,7 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         return fly_status
 
 
-class MagnetCartesianCoorindates(StandardReadable, Movable[MagnetPosition]):
+class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
     """Cartesian interface to the superconducting magnet.
 
     Exposes the physical X, Y and Z magnet axes as individual movable signals,
@@ -185,7 +185,7 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
 
     def __init__(
         self,
-        cart: MagnetCartesianCoorindates,
+        cart: MagnetCartesianCoordinates,
         set_mag_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
     ):
@@ -311,7 +311,7 @@ class SuperConductingMagnetController(StandardReadable):
         name: str = "",
     ):
         with self.add_children_as_readables():
-            self.cart = MagnetCartesianCoorindates(
+            self.cart = MagnetCartesianCoordinates(
                 prefix, ramp_controllers, self.set_within_boundary
             )
             self.sph = MagnetSphericalCoordinates(self.cart, self.set_within_boundary)
@@ -330,7 +330,7 @@ class SuperConductingMagnetController(StandardReadable):
         # Setting invalid demand values should put the limit status in violation state.
         # Block ramp if in violation state.
         limit_status = await self.limit_status.get_value()
-        if limit_status == MagnetLimitStatus.VIOLTATION:
+        if limit_status == MagnetLimitStatus.VIOLATION:
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
         await self.start_ramp.trigger(timeout=self.timeout)
@@ -373,17 +373,18 @@ class SuperConductingMagnetController(StandardReadable):
         """
         if x is None and y is None and z is None:
             raise MagnetPositionError("x, y, and z cannot all be None.")
-        current = MagnetPosition(
-            x=await self.cart.x.readback.get_value(),
-            y=await self.cart.y.readback.get_value(),
-            z=await self.cart.z.readback.get_value(),
+        x0, y0, z0, mode = await asyncio.gather(
+            self.cart.x.readback.get_value(),
+            self.cart.y.readback.get_value(),
+            self.cart.z.readback.get_value(),
+            self.mode.get_value(),
         )
+        current = MagnetPosition(x=x0, y=y0, z=z0)
         target = MagnetPosition(
             x=current.x if x is None else x,
             y=current.y if y is None else y,
             z=current.z if z is None else z,
         )
-        mode = await self.mode.get_value()
         movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
         if movement_strategy is None:
             raise ValueError(

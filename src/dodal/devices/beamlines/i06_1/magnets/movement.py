@@ -118,7 +118,7 @@ class PlanarXZMovement(MovementStrategy):
         hypot = math.hypot(target.x, target.z)
         if hypot > self.LIMIT:
             raise MagnetPositionError(
-                f"Outside XZ operating region. math.hypot(x={target.x}, y={target.y}) = {hypot}. Limit is {self.LIMIT}"
+                f"Outside XZ operating region. math.hypot(x={target.x}, z={target.z}) = {hypot}. Limit is {self.LIMIT}"
             )
 
         return [MagnetStep(x=target.x, z=target.z)]
@@ -149,7 +149,7 @@ class UniaxialMovement(MovementStrategy):
 
 
 class QuadrantXYMovement(MovementStrategy):
-    """Start from zero field in all axes. Appy 2.o T in + y direction. Move field
+    """Start from zero field in all axes. Appy 2.0 T in + y direction. Move field
     direction through positive quadrant to 2.0 T in the +x direction. At all times
     | B | <= 2.0 T. Ramp field back to zero in x direction.
     """

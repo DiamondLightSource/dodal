@@ -19,4 +19,4 @@ class MagnetRampStatus(StrictEnum):
 
 class MagnetLimitStatus(StrictEnum):
     OK = "OK"
-    VIOLTATION = "VIOLATION"
+    VIOLATION = "VIOLATION"
