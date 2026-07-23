@@ -65,3 +65,10 @@ async def test_temperature_controller_readback(
             "scm_temp_controller-pid-d": partial_reading(3.0),
         },
     )
+
+    await assert_reading(
+        scm_temp_controller.sensor.sensor2,
+        {
+            "scm_temp_controller-sensor-channel2": partial_reading(0.0),
+        },
+    )
