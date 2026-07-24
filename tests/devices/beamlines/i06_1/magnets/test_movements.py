@@ -49,6 +49,11 @@ def test_cartesian_and_spherical_conversion_is_correct(
     assert result.z == pytest.approx(cartesian.z)
 
 
+def test_all_none_values_for_magnet_position_request_raises_error():
+    with pytest.raises(ValueError):
+        MagnetPositionRequest()
+
+
 # Doesn't matter order we decrease?
 # def test_spherical_movement_decreases_z_then_x_then_y() -> None:
 #     move_stragegy = SphericalMovement()
