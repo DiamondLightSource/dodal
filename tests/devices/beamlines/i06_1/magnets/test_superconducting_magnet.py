@@ -196,22 +196,16 @@ async def test_scmc_raises_error_if_limit_status_is_violation(
 
 
 @pytest.mark.parametrize(
-    "axis, mode",
-    [
-        ("x", MagnetModes.UNIAXIAL_X),
-        ("y", MagnetModes.UNIAXIAL_Y),
-        ("z", MagnetModes.UNIAXIAL_Z),
-    ],
+    "mode", [MagnetModes.UNIAXIAL_X, MagnetModes.UNIAXIAL_Y, MagnetModes.UNIAXIAL_Z]
 )
 async def test_scmc_axis_with_ramp_rate_wired_correctly_with_prepare(
     scmc: SuperConductingMagnetController,
     ramp_rate: MagnetThreeAxesRampRateController,
-    axis: str,
     mode: MagnetModes,
 ) -> None:
     await scmc.mode.set(mode)
-    magnet_axis: MagnetAxis = getattr(scmc.cart, axis)
-    ramp_axis: MagnetAxisRampRateController = getattr(ramp_rate, axis)
+    magnet_axis: MagnetAxis = getattr(scmc.cart, mode.axis_alias)
+    ramp_axis: MagnetAxisRampRateController = getattr(ramp_rate, mode.axis_alias)
 
     fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=1.5)
     await magnet_axis.prepare(fly_info)
@@ -302,7 +296,7 @@ async def test_scmc_no_movement_strategy_for_mode(
 
 
 @pytest.mark.parametrize(
-    "mode,expected",
+    "mode, expected",
     [
         (MagnetModes.SPHERICAL, movement.SphericalMovement),
         (MagnetModes.CUBIC, movement.CubicMovement),
@@ -324,9 +318,18 @@ async def test_scmc_magnet_mode_to_movement_strategy_configuration(
 async def test_scmc_magnet_mode_to_uniaxial_movement_strategy_configuration(
     scmc: SuperConductingMagnetController,
 ) -> None:
-    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X].axis == "x"  # type:ignore
-    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Y].axis == "y"  # type:ignore
-    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Z].axis == "z"  # type:ignore
+    assert (
+        scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X].mode  # type:ignore
+        == MagnetModes.UNIAXIAL_X
+    )
+    assert (
+        scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Y].mode  # type:ignore
+        == MagnetModes.UNIAXIAL_Y
+    )
+    assert (
+        scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Z].mode  # type:ignore
+        == MagnetModes.UNIAXIAL_Z
+    )
 
 
 async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(

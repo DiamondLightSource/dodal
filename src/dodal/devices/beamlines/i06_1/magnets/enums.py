@@ -11,6 +11,18 @@ class MagnetModes(StrictEnum):
     CUBIC = "CUBIC"
     UNDEFINED = "UNDEFINED"
 
+    @property
+    def axis_alias(self) -> str:
+        match self:
+            case MagnetModes.UNIAXIAL_X:
+                return "x"
+            case MagnetModes.UNIAXIAL_Y:
+                return "y"
+            case MagnetModes.UNIAXIAL_Z:
+                return "z"
+            case _:
+                raise ValueError(f"Invalid uniaxial mode {self}")
+
 
 class MagnetRampStatus(StrictEnum):
     RAMP_MADE = "RAMP MADE"

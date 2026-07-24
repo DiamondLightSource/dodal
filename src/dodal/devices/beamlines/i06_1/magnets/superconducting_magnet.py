@@ -303,9 +303,9 @@ class SuperConductingMagnetController(StandardReadable):
         MagnetModes.CUBIC: CubicMovement(),
         MagnetModes.PLANAR_XZ: PlanarXZMovement(),
         MagnetModes.QUADRANT_XY: QuadrantXYMovement(),
-        MagnetModes.UNIAXIAL_X: UniaxialMovement("x", limit=2.0),
-        MagnetModes.UNIAXIAL_Y: UniaxialMovement("y", limit=2.0),
-        MagnetModes.UNIAXIAL_Z: UniaxialMovement("z", limit=6.0),
+        MagnetModes.UNIAXIAL_X: UniaxialMovement(MagnetModes.UNIAXIAL_X, 2.0),
+        MagnetModes.UNIAXIAL_Y: UniaxialMovement(MagnetModes.UNIAXIAL_Y, 2.0),
+        MagnetModes.UNIAXIAL_Z: UniaxialMovement(MagnetModes.UNIAXIAL_Z, 6.0),
     }
 
     def __init__(
