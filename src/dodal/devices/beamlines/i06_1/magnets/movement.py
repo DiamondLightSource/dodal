@@ -62,7 +62,9 @@ class MagnetPositionRequest:
             raise ValueError("At least one of x, y, or z must be specified.")
 
     def total_position(self, current: MagnetPosition) -> MagnetPosition:
-        """Use a current position to fill in empty values."""
+        """Use a current position to fill in empty values. Useful when needing to know
+        total position for future moves if they are within limits.
+        """
         return MagnetPosition(
             x=current.x if self.x is None else self.x,
             y=current.y if self.y is None else self.y,
