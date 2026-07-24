@@ -195,13 +195,6 @@ async def test_scmc_raises_error_if_limit_status_is_violation(
         await scmc.cart.x.set(1)
 
 
-async def test_scmc_set_within_boundary_raises_error_if_all_values_none(
-    scmc: SuperConductingMagnetController,
-) -> None:
-    with pytest.raises(MagnetPositionError):
-        await scmc.set_within_boundary()
-
-
 @pytest.mark.parametrize(
     "axis, mode",
     [
@@ -343,14 +336,14 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
     movement_strategy = MagicMock()
 
     mov_str_return_values = [
-        movement.MagnetStep(z=2),
-        movement.MagnetStep(x=1, y=2, z=3),
+        movement.MagnetPositionRequest(z=2),
+        movement.MagnetPositionRequest(x=1, y=2, z=3),
     ]
     expected_apply_step_calls = [
-        call(movement.MagnetStep(z=2)),
-        call(movement.MagnetStep(x=1, y=2, z=3)),
+        call(movement.MagnetPositionRequest(z=2)),
+        call(movement.MagnetPositionRequest(x=1, y=2, z=3)),
     ]
-    movement_strategy.moves.return_value = mov_str_return_values
+    movement_strategy.move_steps.return_value = mov_str_return_values
 
     scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X] = movement_strategy
 

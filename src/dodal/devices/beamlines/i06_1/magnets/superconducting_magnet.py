@@ -33,8 +33,8 @@ from dodal.devices.beamlines.i06_1.magnets.movement import (
     CubicMovement,
     MagnetPosition,
     MagnetPositionError,
+    MagnetPositionRequest,
     MagnetSphericalPosition,
-    MagnetStep,
     MovementStrategy,
     PlanarXZMovement,
     QuadrantXYMovement,
@@ -51,7 +51,7 @@ from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
 
 
 class MagnetMoveWithinBoundary(Protocol):
-    async def __call__(self, x: float | None, y: float | None, z: float | None): ...
+    async def __call__(self, pos: MagnetPositionRequest): ...
 
 
 class FlyMagnetInfo(BaseModel):
@@ -67,7 +67,7 @@ class MagnetAxisMovableLogic(MovableLogic[float]):
 
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         values = {self.axis: new_position}
-        await self.magnet_set_within_boundary(**values)
+        await self.magnet_set_within_boundary(MagnetPositionRequest(**values))
 
 
 @default_mock_class(DeviceMock)
@@ -167,7 +167,9 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
 
     @AsyncStatus.wrap
     async def set(self, value: MagnetPosition):
-        await self._set_mag_within_boundary(x=value.x, y=value.y, z=value.z)
+        await self._set_mag_within_boundary(
+            MagnetPositionRequest(x=value.x, y=value.y, z=value.z)
+        )
 
 
 class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
@@ -210,7 +212,9 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
     @AsyncStatus.wrap
     async def set(self, value: MagnetSphericalPosition):
         cart = value.to_cartesian()
-        await self._set_mag_within_boundary(x=cart.x, y=cart.y, z=cart.z)
+        await self._set_mag_within_boundary(
+            MagnetPositionRequest(x=cart.x, y=cart.y, z=cart.z)
+        )
 
     async def _set_spherical(
         self,
@@ -343,7 +347,7 @@ class SuperConductingMagnetController(StandardReadable):
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
 
-    async def _apply_step(self, step: MagnetStep) -> None:
+    async def _apply_step(self, step: MagnetPositionRequest) -> None:
         """Apply a single movement step and wait for the magnet ramp to complete.
 
         A movement step may update one or more cartesian axes simultaneously. Once
@@ -361,12 +365,7 @@ class SuperConductingMagnetController(StandardReadable):
         await asyncio.gather(*tasks)
         await self._ramp()
 
-    async def set_within_boundary(
-        self,
-        x: float | None = None,
-        y: float | None = None,
-        z: float | None = None,
-    ):
+    async def set_within_boundary(self, pos: MagnetPositionRequest):
         """Move the magnet to a new cartesian position.
 
         Any coordinates left as ``None`` retain their current values. The requested
@@ -382,8 +381,6 @@ class SuperConductingMagnetController(StandardReadable):
             )
         try:
             self._moving = True
-            if x is None and y is None and z is None:
-                raise MagnetPositionError("x, y, and z cannot all be None.")
             x0, y0, z0, mode = await asyncio.gather(
                 self.cart.x.readback.get_value(),
                 self.cart.y.readback.get_value(),
@@ -391,20 +388,16 @@ class SuperConductingMagnetController(StandardReadable):
                 self.mode.get_value(),
             )
             current = MagnetPosition(x=x0, y=y0, z=z0)
-            target = MagnetPosition(
-                x=current.x if x is None else x,
-                y=current.y if y is None else y,
-                z=current.z if z is None else z,
-            )
             movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
             if movement_strategy is None:
                 raise ValueError(
                     f"No movement strategy has been configured for device {self.name} for mode {mode}."
                 )
             self.log.debug(
-                f"Attempting move in mode {mode} with parameters {target}. Current position is {current}"
+                f"Attempting move in mode {mode} with parameters {pos}. Current position is {current}"
             )
-            for step in movement_strategy.moves(current, target):
+            movement_strategy.check_within_limits(current, pos)
+            for step in movement_strategy.move_steps(current, pos):
                 await self._apply_step(step)
         finally:
             self._moving = False
