@@ -40,5 +40,5 @@ def dd() -> DiffractionDichroism:
 
 
 @devices.factory()
-def scm_temperature_controller() -> SCMTemperatureController:
+def scm_temp_controller() -> SCMTemperatureController:
     return SCMTemperatureController(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
