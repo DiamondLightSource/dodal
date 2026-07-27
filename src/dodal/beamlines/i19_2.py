@@ -5,7 +5,7 @@ from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
-
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
@@ -75,10 +75,13 @@ def config_client() -> ConfigClient:
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return StaticVisitPathProvider(
-        BL,
-        Path("/dls/i19-2/data/2026/cm44169-1/"),
+    return StaticPathProvider(
+        UUIDFilenameProvider(), Path("/dls/i19-2/data/2026/cm44169-3/20260727_serial")
     )
+    # return StaticVisitPathProvider(
+    #     BL,
+    #     Path("/dls/i19-2/data/2026/cm44169-3/"),
+    # )
 
 
 @devices.factory()
