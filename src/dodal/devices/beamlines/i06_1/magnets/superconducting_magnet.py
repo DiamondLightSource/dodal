@@ -62,11 +62,11 @@ class FlyMagnetInfo(BaseModel):
 
 @dataclass
 class MagnetAxisMovableLogic(MovableLogic[float]):
-    axis: str
+    axis_mode: MagnetMode
     magnet_set_within_boundary: MagnetMoveWithinBoundary
 
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
-        values = {self.axis: new_position}
+        values = {self.axis_mode.axis_alias: new_position}
         await self.magnet_set_within_boundary(MagnetPositionRequest(**values))
 
 
@@ -87,7 +87,7 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
     def __init__(
         self,
         prefix: str,
-        axis: str,
+        axis_mode: MagnetMode,
         ramp_rate: MagnetAxisRampRateController,
         magnet_set_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
@@ -101,7 +101,7 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         self._movable_logic = MagnetAxisMovableLogic(
             readback=self.readback,
             setpoint=self.demand,
-            axis=axis,
+            axis_mode=axis_mode,
             magnet_set_within_boundary=magnet_set_within_boundary,
         )
         self._fly_info: FlyMagnetInfo | None = None
@@ -149,20 +149,20 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
         self,
         prefix: str,
         ramp_rate: MagnetThreeAxesRampRateController,
-        set_mag_within_boundary: MagnetMoveWithinBoundary,
+        mag_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
     ) -> None:
-        self._set_mag_within_boundary = set_mag_within_boundary
         with self.add_children_as_readables():
             self.x = MagnetAxis(
-                prefix + "X:", "x", ramp_rate.x, set_mag_within_boundary
+                prefix + "X:", MagnetMode.UNIAXIAL_X, ramp_rate.x, mag_within_boundary
             )
             self.y = MagnetAxis(
-                prefix + "Y:", "y", ramp_rate.y, set_mag_within_boundary
+                prefix + "Y:", MagnetMode.UNIAXIAL_Y, ramp_rate.y, mag_within_boundary
             )
             self.z = MagnetAxis(
-                prefix + "Z:", "z", ramp_rate.z, set_mag_within_boundary
+                prefix + "Z:", MagnetMode.UNIAXIAL_Z, ramp_rate.z, mag_within_boundary
             )
+        self._set_mag_within_boundary = mag_within_boundary
         super().__init__(name)
 
     @AsyncStatus.wrap
