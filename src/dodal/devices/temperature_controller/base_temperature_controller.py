@@ -77,7 +77,7 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable, Movable):
+class BaseTemperatureSensor(StandardReadable, Movable[float]):
     """Base interface for temperature sensors supporting dynamic readback targeting.
 
     Attributes:
