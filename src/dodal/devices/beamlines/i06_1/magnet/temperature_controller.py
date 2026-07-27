@@ -71,7 +71,7 @@ class CryoconM32Sensor(StandardReadable):
         self.sensor.set_name(name)
 
 
-class SCMSensor(BaseTemperatureSensor):
+class SuperConductingMagnetTemperatureSensor(BaseTemperatureSensor):
     """Cryocon M32 dual-channel temperature sensor.
 
     Provides two primary temperature readback sensors(`channel1 ` and `channel2`)
@@ -147,7 +147,7 @@ class SCMTemperatureController(TemperatureController):
         name: str = "",
     ):
 
-        sensor = SCMSensor(prefix=prefix)
+        sensor = SuperConductingMagnetTemperatureSensor(prefix=prefix)
         heater = CryoconM32Heater(prefix=prefix, infix=infix)
         setpoint = epics_signal_dmd_sts(float, prefix, infix, "SETPOINT")
 
