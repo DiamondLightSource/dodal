@@ -7,7 +7,7 @@ from .superconducting_magnet import (
     FlyMagnetInfo,
     MagnetAxis,
     MagnetLimitStatus,
-    MagnetModes,
+    MagnetMode,
     MagnetRampStatus,
     SuperConductingMagnetController,
 )
@@ -21,7 +21,7 @@ __all__ = [
     "FlyMagnetInfo",
     "MagnetAxis",
     "MagnetLimitStatus",
-    "MagnetModes",
+    "MagnetMode",
     "MagnetRampStatus",
     "SuperConductingMagnetController",
 ]

@@ -2,7 +2,7 @@ import math
 from abc import abstractmethod
 from dataclasses import dataclass
 
-from dodal.devices.beamlines.i06_1.magnets.enums import MagnetModes
+from dodal.devices.beamlines.i06_1.magnets.enums import MagnetMode
 
 
 def read_theta(x: float, z: float) -> float:
@@ -79,7 +79,7 @@ class MagnetPositionError(Exception):
 
     @classmethod
     def total_field_mag_outside_limit(
-        cls, mode: MagnetModes, limit: float, pos: MagnetPosition
+        cls, mode: MagnetMode, limit: float, pos: MagnetPosition
     ):
         return cls(
             f"Target field magnitude of {pos.field_magnitude} T exceeds "
@@ -88,7 +88,7 @@ class MagnetPositionError(Exception):
         )
 
     @classmethod
-    def axis_outside_limit(cls, mode: MagnetModes, limit: float, pos: float, axis: str):
+    def axis_outside_limit(cls, mode: MagnetMode, limit: float, pos: float, axis: str):
         return cls(
             f"Axis {axis} with value {pos} exceeds limit {limit} T for mode {mode}. "
         )
@@ -109,7 +109,7 @@ class MovementStrategy:
 
 class SphericalMovement(MovementStrategy):
     LIMIT = 1.75
-    MODE = MagnetModes.SPHERICAL
+    MODE = MagnetMode.SPHERICAL
 
     def check_within_limit(
         self, current: MagnetPosition, target: MagnetPositionRequest
@@ -155,7 +155,7 @@ class SphericalMovement(MovementStrategy):
 
 class CubicMovement(MovementStrategy):
     LIMIT = 1.5
-    MODE = MagnetModes.CUBIC
+    MODE = MagnetMode.CUBIC
 
     def check_within_limits(
         self, current: MagnetPosition, target: MagnetPositionRequest
@@ -178,7 +178,7 @@ class CubicMovement(MovementStrategy):
 
 class PlanarXZMovement(MovementStrategy):
     LIMIT = 2.0
-    MODE = MagnetModes.PLANAR_XZ
+    MODE = MagnetMode.PLANAR_XZ
 
     def check_within_limits(
         self, current: MagnetPosition, target: MagnetPositionRequest
@@ -201,7 +201,7 @@ class PlanarXZMovement(MovementStrategy):
 
 @dataclass
 class UniaxialMovement(MovementStrategy):
-    mode: MagnetModes
+    mode: MagnetMode
     limit: float
 
     def _target_axes_map(
@@ -246,7 +246,7 @@ class QuadrantXYMovement(MovementStrategy):
     """
 
     LIMIT = 2.0
-    MODE = MagnetModes.QUADRANT_XY
+    MODE = MagnetMode.QUADRANT_XY
 
     def check_within_limits(
         self, current: MagnetPosition, target: MagnetPositionRequest

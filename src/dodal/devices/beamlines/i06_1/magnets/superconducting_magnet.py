@@ -26,7 +26,7 @@ from pydantic import BaseModel, Field
 
 from dodal.devices.beamlines.i06_1.magnets.enums import (
     MagnetLimitStatus,
-    MagnetModes,
+    MagnetMode,
     MagnetRampStatus,
 )
 from dodal.devices.beamlines.i06_1.magnets.movement import (
@@ -298,14 +298,14 @@ class SuperConductingMagnetController(StandardReadable):
     safe sequence of cartesian magnet moves before ramping the field.
     """
 
-    _MODE_MOVEMENT_STRATEGY: dict[MagnetModes, MovementStrategy] = {
-        MagnetModes.SPHERICAL: SphericalMovement(),
-        MagnetModes.CUBIC: CubicMovement(),
-        MagnetModes.PLANAR_XZ: PlanarXZMovement(),
-        MagnetModes.QUADRANT_XY: QuadrantXYMovement(),
-        MagnetModes.UNIAXIAL_X: UniaxialMovement(MagnetModes.UNIAXIAL_X, 2.0),
-        MagnetModes.UNIAXIAL_Y: UniaxialMovement(MagnetModes.UNIAXIAL_Y, 2.0),
-        MagnetModes.UNIAXIAL_Z: UniaxialMovement(MagnetModes.UNIAXIAL_Z, 6.0),
+    _MODE_MOVEMENT_STRATEGY: dict[MagnetMode, MovementStrategy] = {
+        MagnetMode.SPHERICAL: SphericalMovement(),
+        MagnetMode.CUBIC: CubicMovement(),
+        MagnetMode.PLANAR_XZ: PlanarXZMovement(),
+        MagnetMode.QUADRANT_XY: QuadrantXYMovement(),
+        MagnetMode.UNIAXIAL_X: UniaxialMovement(MagnetMode.UNIAXIAL_X, 2.0),
+        MagnetMode.UNIAXIAL_Y: UniaxialMovement(MagnetMode.UNIAXIAL_Y, 2.0),
+        MagnetMode.UNIAXIAL_Z: UniaxialMovement(MagnetMode.UNIAXIAL_Z, 6.0),
     }
 
     def __init__(
@@ -315,7 +315,7 @@ class SuperConductingMagnetController(StandardReadable):
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.mode = epics_signal_rw(MagnetModes, prefix + "MODE")
+            self.mode = epics_signal_rw(MagnetMode, prefix + "MODE")
 
         with self.add_children_as_readables():
             self.cart = MagnetCartesianCoordinates(

@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.beamlines.i06_1.magnets.enums import MagnetModes
+from dodal.devices.beamlines.i06_1.magnets.enums import MagnetMode
 from dodal.devices.beamlines.i06_1.magnets.movement import (
     CubicMovement,
     MagnetPosition,
@@ -158,13 +158,13 @@ def test_planar_xz_rejects_outside_radius() -> None:
 @pytest.mark.parametrize(
     "mode, limit, target",
     [
-        (MagnetModes.UNIAXIAL_X, 2, MagnetPositionRequest(x=1, y=0, z=0)),
-        (MagnetModes.UNIAXIAL_Y, 2, MagnetPositionRequest(x=0, y=-1, z=0)),
-        (MagnetModes.UNIAXIAL_Z, 5, MagnetPositionRequest(x=0, y=0, z=3)),
+        (MagnetMode.UNIAXIAL_X, 2, MagnetPositionRequest(x=1, y=0, z=0)),
+        (MagnetMode.UNIAXIAL_Y, 2, MagnetPositionRequest(x=0, y=-1, z=0)),
+        (MagnetMode.UNIAXIAL_Z, 5, MagnetPositionRequest(x=0, y=0, z=3)),
     ],
 )
 def test_uniaxial_returns_single_step(
-    mode: MagnetModes, limit: float, target: MagnetPositionRequest
+    mode: MagnetMode, limit: float, target: MagnetPositionRequest
 ) -> None:
     assert UniaxialMovement(mode, limit).move_steps(
         MagnetPosition(x=0, y=0, z=0), target
@@ -174,16 +174,16 @@ def test_uniaxial_returns_single_step(
 @pytest.mark.parametrize(
     "mode, target",
     [
-        (MagnetModes.UNIAXIAL_X, MagnetPositionRequest(x=1, y=1, z=0)),
-        (MagnetModes.UNIAXIAL_X, MagnetPositionRequest(x=1, y=0, z=1)),
-        (MagnetModes.UNIAXIAL_Y, MagnetPositionRequest(x=1, y=1, z=0)),
-        (MagnetModes.UNIAXIAL_Y, MagnetPositionRequest(x=0, y=1, z=1)),
-        (MagnetModes.UNIAXIAL_Z, MagnetPositionRequest(x=1, y=0, z=1)),
-        (MagnetModes.UNIAXIAL_Z, MagnetPositionRequest(x=0, y=1, z=1)),
+        (MagnetMode.UNIAXIAL_X, MagnetPositionRequest(x=1, y=1, z=0)),
+        (MagnetMode.UNIAXIAL_X, MagnetPositionRequest(x=1, y=0, z=1)),
+        (MagnetMode.UNIAXIAL_Y, MagnetPositionRequest(x=1, y=1, z=0)),
+        (MagnetMode.UNIAXIAL_Y, MagnetPositionRequest(x=0, y=1, z=1)),
+        (MagnetMode.UNIAXIAL_Z, MagnetPositionRequest(x=1, y=0, z=1)),
+        (MagnetMode.UNIAXIAL_Z, MagnetPositionRequest(x=0, y=1, z=1)),
     ],
 )
 def test_uniaxial_rejects_other_axes(
-    mode: MagnetModes, target: MagnetPositionRequest
+    mode: MagnetMode, target: MagnetPositionRequest
 ) -> None:
     with pytest.raises(MagnetPositionError):
         UniaxialMovement(mode, limit=5).check_within_limits(
@@ -195,7 +195,7 @@ def test_uniaxial_raise_error_when_above_limit() -> None:
     current = MagnetPosition(x=0, y=0, z=0)
     target = MagnetPositionRequest(x=10, y=0, z=0)
     with pytest.raises(MagnetPositionError):
-        UniaxialMovement(MagnetModes.UNIAXIAL_X, limit=5).check_within_limits(
+        UniaxialMovement(MagnetMode.UNIAXIAL_X, limit=5).check_within_limits(
             current, target
         )
 
