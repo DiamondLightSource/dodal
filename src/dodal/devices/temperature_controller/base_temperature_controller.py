@@ -150,7 +150,7 @@ HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
 class TemperatureController(
-    StandardReadable, StandardMovable, Generic[SensorT, HeaterT]
+    StandardReadable, StandardMovable[float], Generic[SensorT, HeaterT]
 ):
     """Temperature controller tying together sensor, heater, and PID units.
 
