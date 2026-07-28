@@ -1,17 +1,16 @@
 from collections.abc import Callable
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, Protocol, Self, runtime_checkable
 
 from pydantic import (
     BaseModel,
     Field,
     PrivateAttr,
     StrictFloat,
-    StrictInt,
     field_validator,
     model_validator,
 )
 
-from .arithmetic_conversions import (
+from dodal.common.general_maths.arithmetic_conversions import (
     convert_cm_to_mm,
     convert_microns_to_cm,
     convert_mm_to_cm,
@@ -21,6 +20,28 @@ from .arithmetic_conversions import (
 SupportedThicknessUnits = Annotated[
     Literal["cm", "mm", "um", "micron"], "Supported thickness units"
 ]
+
+
+@runtime_checkable
+class ThicknessProvider(Protocol):
+    """Provider API which the standard FoilGeometry implements.
+
+    Used here to make FoilAbsorber easier to test.
+    """
+
+    def get_thickness_cm(self) -> float: ...
+
+
+@runtime_checkable
+class TaperedGeometryProvider(Protocol):
+    """Provider API which the standard WedgeGeometry implements.
+
+    Used here to make WedgeAbsorber easier to test.
+    """
+
+    def thickness_cm_at_motor_position_mm(
+        self, *, motor_position_mm: StrictFloat
+    ) -> float: ...
 
 
 class FoilGeometry(BaseModel):
@@ -45,11 +66,11 @@ class FoilGeometry(BaseModel):
     }
 
     unit: str
-    numerical_value: Annotated[float, Field(gt=0.0)]
+    numerical_value: Annotated[StrictFloat, Field(gt=0.0)]
     _foil_thickness: float = PrivateAttr(default=0.0)
 
     @model_validator(mode="after")
-    def _calculate_thickness(self) -> "FoilGeometry":
+    def _pre_calculate_thickness(self) -> "FoilGeometry":
         # Look up directly from the conversion dictionary
         self._foil_thickness = self._convertors[self.unit](self.numerical_value)
         return self
@@ -65,12 +86,12 @@ class WedgeGeometry(BaseModel):
     Values used for inputs come from beamline scientist calibrations on real absorber.
 
     Args:
-        tip_mm (float): unrestricted value, point on motor axis scale where modelled taper reaches zero thickness.
-        taper_cotangent (float): taper angle cotangent, sign depends on motor direction convention, bounded to keep wedge angle thin.
+        tip_mm (StrictFloat): unrestricted value, point on motor axis scale where modelled taper reaches zero thickness.
+        taper_cotangent (StrictFloat): taper angle cotangent, sign depends on motor direction convention, bounded to keep wedge angle thin.
     """
 
-    tip_mm: StrictFloat | StrictInt
-    taper_cotangent: StrictFloat | StrictInt
+    tip_mm: StrictFloat
+    taper_cotangent: StrictFloat
     _taper_gradient: float = PrivateAttr(default=0.0)
 
     @field_validator("taper_cotangent")
@@ -88,13 +109,13 @@ class WedgeGeometry(BaseModel):
         return self
 
     def motor_position_mm_for_thickness_cm(
-        self, thickness_cm: Annotated[float, Field(ge=0.0)]
+        self, *, thickness_cm: Annotated[StrictFloat, Field(ge=0.0)]
     ) -> float:
         """Hypothetical motor position at which the wedge thickness would take on the requested value.
         N.B. absorber thickness are best worked out in cm (science), motor positions prefer mm (controls).
 
         Args:
-            thickness_cm: (float) non-negative float, zero permitted - the required target thickness in cm
+            thickness_cm: (StrictFloat) non-negative float, zero permitted - the required target thickness in cm
 
         Returns:
             motor position in mm where a mathematical model wedge puts the target thickness in the x-ray beam
@@ -108,14 +129,16 @@ class WedgeGeometry(BaseModel):
         _x = convert_cm_to_mm(thickness_cm)  # do the line calculations in mm
         return get_straight_line_y(_line_offset, _line_gradient, _x)
 
-    def thickness_cm_at_motor_position_mm(self, motor_position_mm: float) -> float:
+    def thickness_cm_at_motor_position_mm(
+        self, *, motor_position_mm: StrictFloat
+    ) -> float:
         """Thickness of modelled wedge a given motor position in most useful units.
         N.B. The wedge geometry is not bounded by lateral position limits, but does reject,
         negative thickness,
         unlikely large taper angles (beyond about 11.31 degrees).
 
         Args:
-            motor_position_mm: (float) unrestricted float, zero permitted - the required target thickness
+            motor_position_mm: (StrictFloat) unrestricted float, zero permitted - the required target thickness
 
         Returns:
             position in mm on the motor axis scale where a mathematical wedge would have the target thickness
