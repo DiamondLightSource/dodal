@@ -77,7 +77,7 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable, Movable[float]):
+class BaseTemperatureSensor(StandardReadable, Movable):
     """Base interface for temperature sensors supporting dynamic readback targeting.
 
     Attributes:
@@ -150,7 +150,7 @@ HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
 class TemperatureController(
-    StandardReadable, StandardMovable[float], Generic[SensorT, HeaterT]
+    StandardReadable, StandardMovable, Generic[SensorT, HeaterT]
 ):
     """Temperature controller tying together sensor, heater, and PID units.
 

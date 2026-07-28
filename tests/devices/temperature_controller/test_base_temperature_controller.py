@@ -2,7 +2,9 @@ import asyncio
 
 import pytest
 from ophyd_async.core import (
+    DeviceMock,
     StandardReadableFormat,
+    default_mock_class,
     init_devices,
     set_mock_value,
 )
@@ -33,6 +35,7 @@ class MockHeater(BaseHeater):
         super().__init__(name=name)
 
 
+@default_mock_class(DeviceMock)
 class MockTemperatureController(TemperatureController):
     def __init__(self, name: str = ""):
         sensor = MinimalMockSensor()
@@ -80,12 +83,33 @@ async def test_temperature_movable_with_different_sensor(
 
     status = mock_controller.set(20.0)
     assert not status.done
+    await assert_reading(
+        mock_controller,
+        {
+            "mock_controller": partial_reading(10.0),
+            "mock_controller-sensor-sensor2": partial_reading(0.0),
+        },
+    )
     set_mock_value(mock_controller.sensor.sensor, 19.4)
-
+    await assert_reading(
+        mock_controller,
+        {
+            "mock_controller": partial_reading(19.4),
+            "mock_controller-sensor-sensor2": partial_reading(0.0),
+        },
+    )
     assert not status.done
     set_mock_value(mock_controller.sensor.sensor, 19.8)
     await status
     assert status.done
+    await assert_reading(
+        mock_controller,
+        {
+            "mock_controller": partial_reading(19.8),
+            "mock_controller-sensor-sensor2": partial_reading(0.0),
+        },
+    )
+
     assert status.success
     await mock_controller.sensor.set("sensor2")
     status = mock_controller.set(18.8)
