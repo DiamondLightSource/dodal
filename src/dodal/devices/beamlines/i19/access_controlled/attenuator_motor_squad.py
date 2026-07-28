@@ -1,8 +1,15 @@
-from typing import Annotated, Any, Self
+from typing import Annotated, Self
 
 from ophyd_async.core import AsyncStatus
-from pydantic import BaseModel, model_validator
-from pydantic.types import PositiveInt, StringConstraints
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictFloat,
+    StrictInt,
+    model_validator,
+)
+from pydantic.types import StringConstraints
 
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import (
     OpticsBlueAPIDevice,
@@ -11,12 +18,18 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
 )
 
-PermittedKeyStr = Annotated[str, StringConstraints(pattern="^[A-Za-z0-9-_]*$")]
+PermittedKeyStr = Annotated[str, StringConstraints(pattern="^[A-Za-z0-9-_]+$")]
 
 
-class AttenuatorMotorPositionDemands(BaseModel):
-    continuous_demands: dict[PermittedKeyStr, float] = {}
-    indexed_demands: dict[PermittedKeyStr, PositiveInt] = {}
+class AttenuatorMotorPositions(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    continuous_demands: dict[PermittedKeyStr, StrictFloat | StrictInt] = Field(
+        default_factory=dict, kw_only=True
+    )
+    indexed_demands: dict[PermittedKeyStr, Annotated[StrictInt, Field(gt=0)]] = Field(
+        default_factory=dict, kw_only=True
+    )
 
     @model_validator(mode="after")
     def no_keys_clash(self) -> Self:
@@ -29,7 +42,9 @@ class AttenuatorMotorPositionDemands(BaseModel):
             error_msg = f"Common {ks} found in distinct motor demands: {common_keys}"
             raise ValueError(error_msg)
 
-    def validated_complete_demand(self) -> dict[PermittedKeyStr, Any]:
+    def validated_complete_demand(
+        self,
+    ) -> dict[PermittedKeyStr, StrictInt | StrictFloat]:
         return self.continuous_demands | self.indexed_demands
 
 
@@ -52,7 +67,7 @@ class AttenuatorMotorSquad(OpticsBlueAPIDevice):
     """
 
     @AsyncStatus.wrap
-    async def set(self, value: AttenuatorMotorPositionDemands):
+    async def set(self, value: AttenuatorMotorPositions):
         request_params = {
             "name": "operate_motor_squad_plan",
             "params": {
