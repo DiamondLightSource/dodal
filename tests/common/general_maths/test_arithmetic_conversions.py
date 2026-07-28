@@ -15,8 +15,9 @@ from dodal.common.general_maths.arithmetic_conversions import (
     convert_percentage_to_factor,
     get_straight_line_y,
 )
-
-from .operator_inversion_pairing import OperatorInversionPairing
+from tests.common.general_maths.operator_inversion_pairing import (
+    OperatorInversionPairing,
+)
 
 
 # expected success tests (the 'Happy Path'): All numbers here are arbitrary
