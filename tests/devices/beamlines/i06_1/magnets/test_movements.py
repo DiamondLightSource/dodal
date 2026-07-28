@@ -17,6 +17,35 @@ from tests.devices.beamlines.i06_1.magnets.utils import (
 )
 
 
+def test_magnet_position_error_total_field_mag_outside_limit():
+    position = MagnetPosition(x=1.0, y=2.0, z=3.0)
+    error = MagnetPositionError.total_field_mag_outside_limit(
+        MagnetMode.SPHERICAL, 1.75, position
+    )
+    assert isinstance(error, MagnetPositionError)
+    assert str(error) == (
+        f"Target field magnitude of {position.field_magnitude} T exceeds "
+        f"limit of 1.75 for mode {MagnetMode.SPHERICAL}. Requested position: {position}."
+    )
+
+
+def test_magnet_position_error_axis_outside_limit():
+    error = MagnetPositionError.axis_outside_limit(MagnetMode.CUBIC, 1.5, 2.0, "x")
+    assert isinstance(error, MagnetPositionError)
+    assert str(error) == (
+        f"Axis x with value 2.0 exceeds limit 1.5 T for mode {MagnetMode.CUBIC}."
+    )
+
+
+def test_magnet_position_error_axis_must_be_zero():
+    error = MagnetPositionError.axis_must_be_zero(MagnetMode.PLANAR_XZ, "y", 1.0)
+    assert isinstance(error, MagnetPositionError)
+    assert str(error) == (
+        f"Axis y must remain zero for mode {MagnetMode.PLANAR_XZ}. "
+        "Requested value was 1.0."
+    )
+
+
 def test_cartesian_and_spherical_are_inverse() -> None:
     cartesian = MagnetPosition(x=10, y=20, z=30)
     result = cartesian.to_spherical().to_cartesian()
@@ -53,20 +82,6 @@ def test_cartesian_and_spherical_conversion_is_correct(
 def test_all_none_values_for_magnet_position_request_raises_error():
     with pytest.raises(ValueError):
         MagnetPositionRequest()
-
-
-# Doesn't matter order we decrease?
-# def test_spherical_movement_decreases_z_then_x_then_y() -> None:
-#     move_stragegy = SphericalMovement()
-#     steps = move_stragegy.moves(
-#         current=MagnetPosition(x=10, y=10, z=10),
-#         target=MagnetPositionRequest(x=5, y=5, z=2),
-#     )
-#     assert steps == [
-#         MagnetPositionRequest(z=2),
-#         MagnetPositionRequest(x=5),
-#         MagnetPositionRequest(y=5),
-#     ]
 
 
 @pytest.mark.parametrize(
@@ -111,6 +126,25 @@ def test_spherical_movement(
     assert SphericalMovement().move_steps(current, target) == expected
 
 
+def test_spherical_movement_within_limit():
+    current = MagnetPosition(x=0.0, y=0.0, z=0.0)
+    target = MagnetPositionRequest(x=1.0, y=0.0, z=0.0)
+    SphericalMovement().check_within_limit(current, target)
+
+
+def test_spherical_movement_outside_limit_raises_error():
+    current = MagnetPosition(x=0.0, y=0.0, z=0.0)
+    target = MagnetPositionRequest(x=2.0, y=0.0, z=0.0)
+    with pytest.raises(MagnetPositionError):
+        SphericalMovement().check_within_limit(current, target)
+
+
+def test_spherical_movement_at_limit_is_allowed():
+    current = MagnetPosition(x=0.0, y=0.0, z=0.0)
+    target = MagnetPositionRequest(x=1.75, y=0.0, z=0.0)
+    SphericalMovement().check_within_limit(current, target)
+
+
 @pytest.mark.parametrize(
     "target",
     [
@@ -127,7 +161,6 @@ def test_cubic_rejects_outside_limits(target: MagnetPositionRequest) -> None:
 def test_cubic_returns_single_step() -> None:
     current = MagnetPosition(x=0, y=0, z=0)
     target = MagnetPositionRequest(x=1, y=1.2, z=-0.5)
-
     assert CubicMovement().move_steps(current, target) == [
         MagnetPositionRequest(x=1, y=1.2, z=-0.5)
     ]
@@ -135,7 +168,6 @@ def test_cubic_returns_single_step() -> None:
 
 def test_planar_xz_returns_single_step() -> None:
     target = MagnetPositionRequest(x=1.2, y=0, z=-0.4)
-
     assert PlanarXZMovement().move_steps(MagnetPosition(x=0, y=0, z=0), target) == [
         MagnetPositionRequest(x=1.2, z=-0.4),
     ]
@@ -203,8 +235,7 @@ def test_uniaxial_raise_error_when_above_limit() -> None:
 def test_quadrant_xy_sequence() -> None:
     current = MagnetPosition(x=1, y=0.5, z=0)
     target = MagnetPositionRequest(x=1.5, y=1, z=0)
-    strategy = QuadrantXYMovement()
-    assert strategy.move_steps(current, target) == [
+    assert QuadrantXYMovement().move_steps(current, target) == [
         MagnetPositionRequest(x=0),
         MagnetPositionRequest(y=1),
         MagnetPositionRequest(x=1.5),
@@ -214,8 +245,7 @@ def test_quadrant_xy_sequence() -> None:
 def test_quadrant_xy_skips_initial_x_zero() -> None:
     current = MagnetPosition(x=0, y=0, z=0)
     target = MagnetPositionRequest(x=1, y=1, z=0)
-    strategy = QuadrantXYMovement()
-    assert strategy.move_steps(current, target) == [
+    assert QuadrantXYMovement().move_steps(current, target) == [
         MagnetPositionRequest(y=1),
         MagnetPositionRequest(x=1),
     ]
@@ -224,8 +254,7 @@ def test_quadrant_xy_skips_initial_x_zero() -> None:
 def test_quadrant_xy_skips_y_move() -> None:
     target = MagnetPosition(x=1, y=1.5, z=0)
     current = MagnetPositionRequest(x=0.5, y=1.5, z=0)
-    strategy = QuadrantXYMovement()
-    assert strategy.move_steps(target, current) == [
+    assert QuadrantXYMovement().move_steps(target, current) == [
         MagnetPositionRequest(x=0),
         MagnetPositionRequest(x=0.5),
     ]

@@ -75,22 +75,25 @@ class MagnetPositionRequest:
 
 
 class MagnetPositionError(Exception):
-    pass
-
     @classmethod
     def total_field_mag_outside_limit(
         cls, mode: MagnetMode, limit: float, pos: MagnetPosition
     ):
         return cls(
             f"Target field magnitude of {pos.field_magnitude} T exceeds "
-            f"limit of {limit} for mode {mode}. "
-            f"math.hypot(x={pos.x}, z={pos.z}, y={pos.y}) = {pos.field_magnitude}."
+            f"limit of {limit} for mode {mode}. Requested position: {pos}."
         )
 
     @classmethod
     def axis_outside_limit(cls, mode: MagnetMode, limit: float, pos: float, axis: str):
         return cls(
-            f"Axis {axis} with value {pos} exceeds limit {limit} T for mode {mode}. "
+            f"Axis {axis} with value {pos} exceeds limit {limit} T for mode {mode}."
+        )
+
+    @classmethod
+    def axis_must_be_zero(cls, mode: MagnetMode, axis: str, value: float):
+        return cls(
+            f"Axis {axis} must remain zero for mode {mode}. Requested value was {value}."
         )
 
 
@@ -125,13 +128,11 @@ class SphericalMovement(MovementStrategy):
     ) -> list[MagnetPositionRequest]:
 
         steps: list[MagnetPositionRequest] = []
-
         decreases = [
             ("z", current.z, target.z),
             ("x", current.x, target.x),
             ("y", current.y, target.y),
         ]
-
         # Do all decreasing of axes first as one step. This ensures we don't
         # quench the magnet.
         decrease_kwargs = {}
@@ -160,14 +161,14 @@ class CubicMovement(MovementStrategy):
     def check_within_limits(
         self, current: MagnetPosition, target: MagnetPositionRequest
     ) -> None:
-        for _, value in (
+        for axis, value in (
             ("x", target.x),
             ("y", target.y),
             ("z", target.z),
         ):
             if value is not None and abs(value) > self.LIMIT:
-                raise MagnetPositionError(
-                    f"Target {target} outside region limit of {self.LIMIT} for mode {self.MODE}"
+                raise MagnetPositionError.axis_outside_limit(
+                    self.MODE, self.LIMIT, value, axis
                 )
 
     def move_steps(
@@ -184,9 +185,7 @@ class PlanarXZMovement(MovementStrategy):
         self, current: MagnetPosition, target: MagnetPositionRequest
     ) -> None:
         if target.y is not None and target.y != 0:
-            raise MagnetPositionError(
-                f"Y must remain zero in XZ mode. Requested value was {target.y}"
-            )
+            raise MagnetPositionError.axis_must_be_zero(self.MODE, "y", target.y)
         new_total_pos = target.total_position(current)
         if new_total_pos.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
@@ -227,10 +226,7 @@ class UniaxialMovement(MovementStrategy):
                         self.mode, self.limit, abs_value, axis
                     )
             elif value != 0:
-                raise MagnetPositionError(
-                    f"{axis} must remain zero in {self.mode} mode. "
-                    f"Requested value was {value}"
-                )
+                raise MagnetPositionError.axis_must_be_zero(self.mode, axis, value)
 
     def move_steps(
         self, current: MagnetPosition, target: MagnetPositionRequest
@@ -252,9 +248,7 @@ class QuadrantXYMovement(MovementStrategy):
         self, current: MagnetPosition, target: MagnetPositionRequest
     ) -> None:
         if target.z is not None and target.z != 0:
-            raise MagnetPositionError(
-                f"Z must remain zero in QUADRANT_XY mode. You provided {target.z}"
-            )
+            raise MagnetPositionError.axis_must_be_zero(self.MODE, "z", target.z)
         new_total_pos = target.total_position(current)
         if new_total_pos.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
