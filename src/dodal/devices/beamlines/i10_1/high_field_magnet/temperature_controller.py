@@ -87,7 +87,7 @@ class HighFieldMagnetHeater(BaseHeater):
         super().__init__(name=name)
 
 
-class HFMTemperatureController(TemperatureController):
+class HighFieldMagnetTemperatureController(TemperatureController):
     """Temperature controller for the High-Field Magnet.
 
     Args:

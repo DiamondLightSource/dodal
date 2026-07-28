@@ -6,10 +6,8 @@ from dodal.devices.beamlines.i10_1 import (
     ElectromagnetMagnetField,
     ElectromagnetStage,
     HighFieldMagnet,
-    I10JScalerCard,
-)
-from dodal.devices.beamlines.i10_1.high_field_magnet.temperature_controller import (
     HighFieldMagnetTemperatureController,
+    I10JScalerCard,
 )
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import (
