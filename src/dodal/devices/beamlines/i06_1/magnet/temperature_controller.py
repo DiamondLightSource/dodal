@@ -142,7 +142,7 @@ class CryoconM32Heater(BaseHeater):
         super().__init__(name=name)
 
 
-class SCMTemperatureController(TemperatureController):
+class SuperConductingMagnetTemperatureController(TemperatureController):
     """Super Conducting Magnet (SCM) Cryocon M32 temperature controller.
 
     Args:

@@ -3,7 +3,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
 from dodal.devices.beamlines.i06_1.magnet.temperature_controller import (
-    SCMTemperatureController,
+    SuperConductingMagnetTemperatureController,
 )
 from dodal.devices.motors import XYThetaStage
 from dodal.devices.temperature_controller import Lakeshore336
@@ -40,5 +40,7 @@ def dd() -> DiffractionDichroism:
 
 
 @devices.factory()
-def scm_temp_controller() -> SCMTemperatureController:
-    return SCMTemperatureController(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
+def scm_temp_controller() -> SuperConductingMagnetTemperatureController:
+    return SuperConductingMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:"
+    )

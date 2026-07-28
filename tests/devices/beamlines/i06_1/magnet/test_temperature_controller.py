@@ -9,14 +9,14 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.beamlines.i06_1.magnet.temperature_controller import (
-    SCMTemperatureController,
+    SuperConductingMagnetTemperatureController,
 )
 
 
 @pytest.fixture
-def scm_temp_controller() -> SCMTemperatureController:
+def scm_temp_controller() -> SuperConductingMagnetTemperatureController:
     with init_devices(mock=True):
-        scm_temp_controller = SCMTemperatureController(
+        scm_temp_controller = SuperConductingMagnetTemperatureController(
             prefix="I06J-MAGNET-01::",
             infix="LOOP1",
         )
@@ -24,7 +24,7 @@ def scm_temp_controller() -> SCMTemperatureController:
 
 
 async def test_temperature_controller_readback(
-    scm_temp_controller: SCMTemperatureController,
+    scm_temp_controller: SuperConductingMagnetTemperatureController,
 ):
 
     await assert_reading(
