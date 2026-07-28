@@ -27,6 +27,12 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
 
+PATH_PROVIDER_DEFAULT = ""
+PATH_PROVIDER_PANDA = "panda"
+PATH_PROVIDER_EIGER = "eiger"
+
+_path_providers: dict[str, PathProvider] = {}
+
 
 def set_beamline(beamline: str):
     global BL
@@ -161,27 +167,45 @@ def device_factory(
     return decorator
 
 
-def set_path_provider(provider: PathProvider):
-    global PATH_PROVIDER
+def set_path_provider(provider: PathProvider, key: str = PATH_PROVIDER_DEFAULT):
+    """Register a path provider for the specified key.
+
+    Args:
+        provider: The path provider to register
+        key: A key identifying the path provider if unspecified the default provider is set.
+    """
+    global _path_providers
 
     LOGGER.info(
         "Setting global path provider to %s (previously %s)",
         provider,
-        globals().get("PATH_PROVIDER"),
+        _path_providers.get(key),
     )
-    PATH_PROVIDER = provider
+    _path_providers[key] = provider
 
 
-def get_path_provider() -> PathProvider:
-    return PATH_PROVIDER
+def get_path_provider(key: str = PATH_PROVIDER_DEFAULT) -> PathProvider:
+    """Fetch the specified path provider.
+
+    Args:
+        key: A key identifying the path provider to fetch, or if unspecified return the default provider.
+
+    Raises:
+        KeyError: if the specified provider cannot be found
+    """
+    return _path_providers[key]
 
 
-def clear_path_provider() -> None:
-    global PATH_PROVIDER
-    LOGGER.info("Clearing global path provider: %s", globals().get("PATH_PROVIDER"))
+def clear_path_provider(key: str = PATH_PROVIDER_DEFAULT) -> None:
+    """Unregister the specified path provider
+    Args:
+        key: The key identifying the path provider, or the default provider if unspecified.
+    """
+    global _path_providers
+    LOGGER.info("Clearing global path provider: %s", _path_providers.get(key))
     try:
-        del PATH_PROVIDER
-    except NameError:
+        del _path_providers[key]
+    except KeyError:
         # In this case the path provider was never set so we can do nothing
         pass
 

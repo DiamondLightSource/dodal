@@ -3,13 +3,18 @@ from os import getenv
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, Reference
-from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
+from ophyd_async.fastcs.eiger import EigerDetector as FastCSEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
 from dodal.common.beamlines.beamline_parameters import CONFIG_SERVER_URL_ENV_VAR
+from dodal.common.beamlines.beamline_utils import (
+    PATH_PROVIDER_EIGER,
+    PATH_PROVIDER_PANDA,
+    set_config_client,
+    set_path_provider,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
@@ -93,9 +98,17 @@ devices = DeviceManager()
 
 @devices.fixture
 @cache
-def path_provider() -> PathProvider:
+def panda_path_provider() -> PathProvider:
     provider = PandASubpathProvider()
-    set_path_provider(provider)
+    set_path_provider(provider, PATH_PROVIDER_PANDA)
+    return provider
+
+
+@devices.fixture
+@cache
+def eiger_path_provider() -> PathProvider:
+    provider = PandASubpathProvider()
+    set_path_provider(provider, PATH_PROVIDER_EIGER)
     return provider
 
 
@@ -190,13 +203,13 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
     return eiger
 
 
-# ophyd-async no longer works with a mixed ADOdin and fastCS Eiger. Need to update the
-# beamline to use a fastCS Odin and Eiger
+# ophyd-async no longer works with a mixed ADOdin and fastCS Eiger.
+# TODO I03-1103 Need to update the beamline to use a fastCS Odin and Eiger
 @devices.factory(skip=True)
-def fastcs_eiger(path_provider: PathProvider) -> FastEiger:
-    return FastEiger(
+def fastcs_eiger(eiger_path_provider: PathProvider) -> FastCSEiger:
+    return FastCSEiger(
         prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
-        path_provider=path_provider,
+        path_provider=eiger_path_provider,
     )
 
 
@@ -286,10 +299,10 @@ def xspress3mini() -> Xspress3:
 
 
 @devices.factory()
-def panda(path_provider: PathProvider) -> HDFPanda:
+def panda(panda_path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
-        path_provider=path_provider,
+        path_provider=panda_path_provider,
     )
 
 
