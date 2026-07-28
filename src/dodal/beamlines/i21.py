@@ -38,7 +38,6 @@ set_utils_beamline(BL)
 I21_PHASE_POLY_DEG_COLUMNS = ["b"]
 I21_GRATING_COLUMNS = "Grating"
 
-I21_CONF_CLIENT = ConfigClient.from_url()
 LOOK_UPTABLE_DIR = "/dls_sw/i21/software/gda/workspace_git/gda-diamond.git/configurations/i21-config/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "IDEnergy2GapCalibrations.csv"
 PHASE_LOOKUP_FILE_NAME = "IDEnergy2PhaseCalibrations.csv"
@@ -48,6 +47,11 @@ devices = DeviceManager()
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
+
+
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
 
 
 @devices.factory()
@@ -88,20 +92,21 @@ def id(
 @devices.factory()
 def id_controller(
     id: Apple2[UndulatorPhaseAxes],
+    config_client: ConfigClient,
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """I21 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=id,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(grating=I21_GRATING_COLUMNS),
-            config_client=I21_CONF_CLIENT,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(
                 grating=I21_GRATING_COLUMNS, poly_deg=I21_PHASE_POLY_DEG_COLUMNS
             ),
-            config_client=I21_CONF_CLIENT,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         units="eV",
