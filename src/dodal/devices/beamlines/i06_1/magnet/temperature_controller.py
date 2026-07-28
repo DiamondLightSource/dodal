@@ -91,7 +91,7 @@ class SuperConductingMagnetTemperatureSensor(BaseTemperatureSensor):
         super().__init__(name=name)
 
         self.active_sensor = derived_signal_r(
-            raw_to_derived=self.select_sensor,
+            raw_to_derived=self._select_sensor,
             active_sensor_name=self._active_sensor_name,
             sensor=self.sensor,
             sensor2=self.sensor2,
@@ -105,7 +105,7 @@ class SuperConductingMagnetTemperatureSensor(BaseTemperatureSensor):
     def sensor2(self) -> SignalR[float]:
         return self.channel2.sensor
 
-    def select_sensor(
+    def _select_sensor(
         self, active_sensor_name: str, sensor: float, sensor2: float
     ) -> float:
         if active_sensor_name == "sensor2":
