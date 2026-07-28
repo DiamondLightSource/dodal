@@ -165,7 +165,7 @@ def path_to_mock_data() -> PathToMockDataDict:
     }
 ```
 
-The mock `ConfigClient` is then configured with this data:
+The mock `ConfigClient` defined in `tests/conftest.py` (which is an avaliable fixture for every test) is then configured with this data:
 
 ```python
 from daq_config_server.client import ConfigClient
@@ -180,6 +180,8 @@ def mock_config_client(path_to_mock_data: PathToMockDataDict) -> ConfigClient:
 When `get_file_contents()` is called for `TEST_HARD_UNDULATOR_LUT`, the mock client returns the configured model without accessing the file or configuration service.
 
 This approach can be used for any configuration format that requires custom parsing.
+
+So a user who needs custom data to be return from the `ConfigClient` only needs to override the `path_to_mock_data` fixture and then the test needs a dependency on the `mock_config_client` fixture.
 
 
 ## Testing beamline module imports and device creation
