@@ -1,6 +1,6 @@
 """High-Field Magnet (HFM) temperature controller sub-devices and signals."""
 
-from ophyd_async.core import StandardReadableFormat, StrictEnum
+from ophyd_async.core import StandardReadableFormat, StrictEnum, derived_signal_r
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.temperature_controller import (
@@ -36,10 +36,28 @@ class HighFieldMagnetTemperatureSensor(BaseTemperatureSensor):
     ):
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.sensor = epics_signal_r(float, prefix + suffix)
-            self.sensor2 = epics_signal_r(float, prefix + suffix + "2")
-            self.sensor3 = epics_signal_r(float, prefix + suffix + "3")
+            self.sensor = epics_signal_r(float, f"{prefix}{suffix}")
+            self.sensor2 = epics_signal_r(float, f"{prefix}{suffix}2")
+            self.sensor3 = epics_signal_r(float, f"{prefix}{suffix}3")
         super().__init__(name=name)
+        self.active_sensor = derived_signal_r(
+            raw_to_derived=self._select_sensor,
+            active_sensor_name=self._active_sensor_name,
+            sensor=self.sensor,
+            sensor2=self.sensor2,
+            sensor3=self.sensor3,
+        )
+
+    def _select_sensor(
+        self, active_sensor_name: str, sensor: float, sensor2: float, sensor3: float
+    ) -> float:
+        match active_sensor_name:
+            case "sensor2":
+                return sensor2
+            case "sensor3":
+                return sensor3
+            case _:
+                return sensor
 
 
 class HighFieldMagnetHeater(BaseHeater):
@@ -59,12 +77,12 @@ class HighFieldMagnetHeater(BaseHeater):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.mode = epics_signal_rw(
                 HeaterMode,
-                read_pv=prefix + "ACTIVITY",
-                write_pv=prefix + "ACTIVITY:SET",
+                read_pv=f"{prefix}ACTIVITY",
+                write_pv=f"{prefix}ACTIVITY:SET",
             )
-            self.setpoint = epics_signal_rw(float, prefix + "MANV:SET")
+            self.setpoint = epics_signal_rw(float, f"{prefix}MANV:SET")
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.output = epics_signal_r(float, prefix + "HEATERP")
+            self.output = epics_signal_r(float, f"{prefix}HEATERP")
 
         super().__init__(name=name)
 
@@ -86,7 +104,7 @@ class HFMTemperatureController(TemperatureController):
     ):
         sensor = HighFieldMagnetTemperatureSensor(prefix=prefix)
         heater = HighFieldMagnetHeater(prefix=prefix)
-        setpoint = epics_signal_rw(float, prefix + suffix)
+        setpoint = epics_signal_rw(float, f"{prefix}{suffix}")
         pid = PID(prefix=prefix)
         super().__init__(
             setpoint=setpoint,

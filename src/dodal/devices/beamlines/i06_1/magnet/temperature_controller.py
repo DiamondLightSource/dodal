@@ -6,6 +6,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -82,16 +83,19 @@ class SuperConductingMagnetTemperatureSensor(BaseTemperatureSensor):
         name: Name of the sensor device instance. Defaults to "".
     """
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.channel1 = CryoconM32Sensor(prefix=prefix + "STS:T1")
             self.channel2 = CryoconM32Sensor(prefix=prefix + "STS:T2")
 
         super().__init__(name=name)
+
+        self.active_sensor = derived_signal_r(
+            raw_to_derived=self.select_sensor,
+            active_sensor_name=self._active_sensor_name,
+            sensor=self.sensor,
+            sensor2=self.sensor2,
+        )
 
     @property
     def sensor(self) -> SignalR[float]:  # type: ignore[override]
@@ -100,6 +104,13 @@ class SuperConductingMagnetTemperatureSensor(BaseTemperatureSensor):
     @property
     def sensor2(self) -> SignalR[float]:
         return self.channel2.sensor
+
+    def select_sensor(
+        self, active_sensor_name: str, sensor: float, sensor2: float
+    ) -> float:
+        if active_sensor_name == "sensor2":
+            return sensor2
+        return sensor
 
 
 class CryoconM32Heater(BaseHeater):

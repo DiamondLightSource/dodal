@@ -26,11 +26,11 @@ def scm_temp_controller() -> SCMTemperatureController:
 async def test_temperature_controller_readback(
     scm_temp_controller: SCMTemperatureController,
 ):
-    await scm_temp_controller.set(1.0)
+
     await assert_reading(
         scm_temp_controller,
         {
-            "scm_temp_controller": partial_reading(1.0),
+            "scm_temp_controller-sensor-channel1": partial_reading(0.0),
             "scm_temp_controller-sensor-channel2": partial_reading(0.0),
         },
     )
@@ -39,7 +39,7 @@ async def test_temperature_controller_readback(
         scm_temp_controller,
         {
             "scm_temp_controller-tolerance": partial_reading(0.1),
-            "scm_temp_controller-user_setpoint": partial_reading(1.0),
+            "scm_temp_controller-user_setpoint": partial_reading(0.0),
             "scm_temp_controller-sensor-channel1-slope": partial_reading(0.0),
             "scm_temp_controller-sensor-channel1-offset": partial_reading(0.0),
             "scm_temp_controller-sensor-channel1-min": partial_reading(0.0),

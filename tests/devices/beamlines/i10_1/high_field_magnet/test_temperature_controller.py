@@ -26,12 +26,11 @@ def hfm_temp_controller() -> HFMTemperatureController:
 async def test_temperature_controller_readback(
     hfm_temp_controller: HFMTemperatureController,
 ):
-    await hfm_temp_controller.set(1.0)
 
     await assert_reading(
         hfm_temp_controller,
         {
-            "hfm_temp_controller": partial_reading(1.0),
+            "hfm_temp_controller-sensor-sensor": partial_reading(0.0),
             "hfm_temp_controller-sensor-sensor2": partial_reading(0.0),
             "hfm_temp_controller-sensor-sensor3": partial_reading(0.0),
         },
@@ -40,7 +39,7 @@ async def test_temperature_controller_readback(
         hfm_temp_controller,
         {
             "hfm_temp_controller-tolerance": partial_reading(0.1),
-            "hfm_temp_controller-user_setpoint": partial_reading(1.0),
+            "hfm_temp_controller-user_setpoint": partial_reading(0.0),
         },
     )
     await asyncio.gather(

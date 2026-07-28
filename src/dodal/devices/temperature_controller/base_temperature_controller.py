@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Generic, TypeVar
 
 from bluesky.protocols import Movable
@@ -77,33 +78,42 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable, Movable):
-    """Base interface for temperature sensors supporting dynamic readback targeting.
-
-    Attributes:
-        sensor: Default readback signal for the primary temperature sensor channel.
-    """
+class BaseTemperatureSensor(StandardReadable, Movable[str]):
+    """Base interface for temperature sensors supporting dynamic readback targeting."""
 
     sensor: SignalR[float]
+    active_sensor: SignalR[float]
 
     def __init__(self, name: str = ""):
-        self._active_sensor_name: str | None = None
-        super().__init__(name=name)
 
-    @property
-    def active_sensor(self) -> SignalR[float]:
-        if self._active_sensor_name is not None:
-            return getattr(self, self._active_sensor_name)
-        return self.sensor
+        self._active_sensor_name = soft_signal_rw(str, initial_value="sensor")
+
+        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
-        """Select the active sensor channel.
+        """Select the active sensor channel by name."""
+        await self.set_active_readback(value)
 
-        Args:
-            value: Attribute name of the target sensor (e.g., 'sensor', 'sensor2').
-        """
-        self.set_active_readback(value)
+    async def set_active_readback(self, sensor_name: str | None) -> None:
+        if sensor_name is not None:
+            available = self._get_available_sensors()
+            if sensor_name not in available:
+                available_sensors = (
+                    ", ".join(f"'{s}'" for s in available) if available else "none"
+                )
+                raise ValueError(
+                    f"Invalid readback target '{sensor_name}'. "
+                    f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2'). "
+                    f"Available sensors on {self.name}: [{available_sensors}]"
+                )
+            LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
+            await self._active_sensor_name.set(sensor_name)
+        else:
+            LOGGER.info(
+                f"Setting active sensor on {self.name} to default: '{sensor_name}'"
+            )
+            await self._active_sensor_name.set("sensor")
 
     def _get_available_sensors(self) -> list[str]:
         """Inspect instance attributes for valid sensor signal names.
@@ -119,30 +129,6 @@ class BaseTemperatureSensor(StandardReadable, Movable):
                 and isinstance(getattr(self, attr, None), SignalR)
             ]
         )
-
-    def set_active_readback(self, sensor_name: str | None) -> None:
-        """Set the active sensor for set temperature readback.
-
-        Args:
-            sensor_name: Target sensor attribute name (e.g., 'sensor', 'sensor2') or `None` to reset to default.
-
-        Raises:
-            ValueError: If `sensor_name` is provided but is not present in available sensor signals.
-        """
-        if sensor_name is not None:
-            available = self._get_available_sensors()
-            if sensor_name not in available:
-                available_sensors = (
-                    ", ".join(f"'{s}'" for s in available) if available else "none"
-                )
-                raise ValueError(
-                    f"Invalid readback target '{sensor_name}'. "
-                    f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2'). "
-                    f"Available sensors on {self.name}: [{available_sensors}]"
-                )
-            LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
-
-        self._active_sensor_name = sensor_name
 
 
 SensorT = TypeVar("SensorT", bound=BaseTemperatureSensor)
@@ -182,8 +168,8 @@ class TemperatureController(
 
         super().__init__(name=name)
 
-    @property
-    def movable_logic(self) -> TemperatureMovableLogic:  # type: ignore[override]
+    @cached_property
+    def movable_logic(self) -> TemperatureMovableLogic:
         """Readback needed to be the active sensor, hence not cached_property."""
         return TemperatureMovableLogic(
             setpoint=self.user_setpoint,
