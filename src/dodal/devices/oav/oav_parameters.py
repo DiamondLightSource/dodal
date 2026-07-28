@@ -99,6 +99,8 @@ class OAVParameters:
         self.open_ksize: int = update("open_ksize", int, default=0)
         self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
+        # NOTE Keeping the direction as int as different beamlines may have different
+        # orientation, and we currently don't have the full picture
         self.direction: int = update("direction", int)
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
