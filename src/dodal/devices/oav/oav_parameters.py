@@ -101,9 +101,15 @@ class OAVParameters:
         self.open_ksize: int = update("open_ksize", int, default=0)
         self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
-        self.direction: ScanDirections = [*ScanDirections][
-            self.active_params["direction"]
-        ]
+        self.direction: int = update("direction", int)
+        # GETTING ERROR so going back a bit
+        #   File "/dls_sw/i19-1/software/bluesky/dodal/src/dodal/devices/oav/oav_parameters.py", line 104, in update_self_from_current_context
+        #     self.direction: ScanDirections = [*ScanDirections][
+        #                                      ^^^^^^^^^^^^^^^^^^
+        # IndexError: list index out of range
+        # self.direction: ScanDirections = [*ScanDirections][
+        #     self.active_params["direction"]
+        # ]
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
     def get_max_tip_distance_in_pixels(self, microns_per_pixel: float) -> float:
