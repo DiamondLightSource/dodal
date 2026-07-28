@@ -14,6 +14,7 @@ from ophyd_async.core import (
     StandardReadableFormat,
     TimeoutCalculator,
     WatchableAsyncStatus,
+    callback_on_mock_execute,
     callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
@@ -21,7 +22,11 @@ from ophyd_async.core import (
     set_mock_value,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
+from ophyd_async.epics.core import (
+    epics_signal_r,
+    epics_signal_rw,
+    epics_triggerable_command,
+)
 from pydantic import BaseModel, Field
 
 from dodal.devices.beamlines.i06_1.magnets.coordinates import (
@@ -240,7 +245,7 @@ class MockSuperConductingMagnetController(
 
     async def connect(self, device: "SuperConductingMagnetController"):
 
-        async def _trigger_start_ramp(value):
+        async def _trigger_start_ramp():
             # Whenever ramp is triggered for the ioc, readback values move to the
             # demand values. Simulate this behaviour here.
             x_d, y_d, z_d = await asyncio.gather(
@@ -254,7 +259,7 @@ class MockSuperConductingMagnetController(
             set_mock_value(device.cart.z.readback, z_d)
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
-        callback_on_mock_put(device.start_ramp, _trigger_start_ramp)
+        callback_on_mock_execute(device.start_ramp, _trigger_start_ramp)
 
         async def _set_mode(value):
             # Whenever mode is set, ioc automatically sets everything to zero and
@@ -262,7 +267,7 @@ class MockSuperConductingMagnetController(
             set_mock_value(device.cart.x.demand, 0.0)
             set_mock_value(device.cart.y.demand, 0.0)
             set_mock_value(device.cart.z.demand, 0.0)
-            await _trigger_start_ramp(value)
+            await _trigger_start_ramp()
 
         callback_on_mock_put(device.mode, _set_mode)
         set_mock_value(device.limit_status, MagnetLimitStatus.OK)
@@ -311,8 +316,7 @@ class SuperConductingMagnetController(StandardReadable):
 
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
-        self.start_ramp = epics_signal_x(prefix + "STARTRAMP.PROC")
-        self.timeout = 600
+        self.start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
 
         # Used to block parallel moves that are not submitted together. Allows us to
         # always be sure we safely move the magnet using coordinated logic.
@@ -327,8 +331,8 @@ class SuperConductingMagnetController(StandardReadable):
         if limit_status == MagnetLimitStatus.VIOLATION:
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
-        await self.start_ramp.trigger(timeout=self.timeout)
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, self.timeout)
+        await self.start_ramp.trigger()
+        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=None)
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
