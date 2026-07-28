@@ -101,7 +101,7 @@ async def test_scmc_sph_set_using_spherical(
     spherical: MagnetSphericalPosition,
 ) -> None:
     await scmc.mode.set(MagnetMode.SPHERICAL)
-    await scmc.sph.set(spherical)
+    await scmc.sph.set(spherical.to_request_pos())
     rho, theta, phi = await asyncio.gather(
         scmc.sph.rho.get_value(),
         scmc.sph.theta.get_value(),
@@ -130,7 +130,7 @@ async def test_scmc_cart_set_using_cartesian(
     spherical: MagnetSphericalPosition,
 ) -> None:
     await scmc.mode.set(MagnetMode.CUBIC)
-    await scmc.cart.set(cartesian)
+    await scmc.cart.set(cartesian.to_request_pos())
     x, y, z = await asyncio.gather(
         scmc.cart.x.readback.get_value(),
         scmc.cart.y.readback.get_value(),

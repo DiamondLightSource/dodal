@@ -35,6 +35,7 @@ from dodal.devices.beamlines.i06_1.magnets.movement import (
     MagnetPositionError,
     MagnetPositionRequest,
     MagnetSphericalPosition,
+    MagnetSphericalPositionRequest,
     MovementStrategy,
     PlanarXZMovement,
     QuadrantXYMovement,
@@ -51,7 +52,7 @@ from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
 
 
 class MagnetMoveWithinBoundary(Protocol):
-    async def __call__(self, pos: MagnetPositionRequest): ...
+    async def __call__(self, value: MagnetPositionRequest): ...
 
 
 class FlyMagnetInfo(BaseModel):
@@ -166,10 +167,8 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: MagnetPosition):
-        await self._set_mag_within_boundary(
-            MagnetPositionRequest(x=value.x, y=value.y, z=value.z)
-        )
+    async def set(self, value: MagnetPositionRequest):
+        await self._set_mag_within_boundary(value)
 
 
 class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
@@ -178,7 +177,7 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
     Exposes the magnet field in spherical coordinates using the derived signals
     ``rho``, ``theta`` and ``phi``. These signals are calculated from the
     underlying cartesian magnet axes and may also be written individually or as a
-    complete ``MagnetSphericalPosition``.
+    complete ``MagnetSphericalPositionRequest``.
 
     Writes are converted to cartesian coordinates before being delegated to the
     parent ``SuperConductingMagnetController``, allowing the active movement strategy to
@@ -199,50 +198,38 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
                 read_rho, self._set_rho, x=cart.x, y=cart.y, z=cart.z
             )
             self.phi = derived_signal_rw(
-                read_phi,
-                self._set_phi,
-                x=cart.x,
-                y=cart.y,
-                z=cart.z,
+                read_phi, self._set_phi, x=cart.x, y=cart.y, z=cart.z
             )
         self._set_mag_within_boundary = set_mag_within_boundary
         self._cart_ref = Reference(cart)
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: MagnetSphericalPosition):
-        cart = value.to_cartesian()
-        await self._set_mag_within_boundary(
-            MagnetPositionRequest(x=cart.x, y=cart.y, z=cart.z)
-        )
+    async def set(self, value: MagnetSphericalPositionRequest):
+        """Set the requested spherical coordinates.
 
-    async def _set_spherical(
-        self,
-        rho: float | None = None,
-        theta: float | None = None,
-        phi: float | None = None,
-    ):
-        x, y, z = await asyncio.gather(
+        Any unspecified spherical coordinates are taken from the current magnet
+        readback position. The resulting complete spherical position is converted
+        to Cartesian coordinates and passed to the movement controller, which
+        determines a safe sequence of Cartesian moves for the active magnet mode.
+        """
+        x0, y0, z0 = await asyncio.gather(
             self._cart_ref().x.readback.get_value(),
             self._cart_ref().y.readback.get_value(),
             self._cart_ref().z.readback.get_value(),
         )
-        current = MagnetPosition(x=x, y=y, z=z).to_spherical()
-        spherical_pos = MagnetSphericalPosition(
-            rho=current.rho if rho is None else rho,
-            theta=current.theta if theta is None else theta,
-            phi=current.phi if phi is None else phi,
-        )
-        await self.set(spherical_pos)
+        current_readback = MagnetPosition(x=x0, y=y0, z=z0)
+        target = value.resolve_pos(current_readback)
+        await self._set_mag_within_boundary(target.to_request_pos())
 
     async def _set_rho(self, rho: float):
-        await self._set_spherical(rho=rho)
+        await self.set(MagnetSphericalPositionRequest(rho=rho))
 
     async def _set_theta(self, theta: float):
-        await self._set_spherical(theta=theta)
+        await self.set(MagnetSphericalPositionRequest(theta=theta))
 
     async def _set_phi(self, phi: float):
-        await self._set_spherical(phi=phi)
+        await self.set(MagnetSphericalPositionRequest(phi=phi))
 
 
 class MockSuperConductingMagnetController(
@@ -365,7 +352,7 @@ class SuperConductingMagnetController(StandardReadable):
         await asyncio.gather(*tasks)
         await self._ramp()
 
-    async def set_within_boundary(self, pos: MagnetPositionRequest):
+    async def set_within_boundary(self, value: MagnetPositionRequest):
         """Move the magnet to a new cartesian position.
 
         Any coordinates left as ``None`` retain their current values. The requested
@@ -387,17 +374,18 @@ class SuperConductingMagnetController(StandardReadable):
                 self.cart.z.readback.get_value(),
                 self.mode.get_value(),
             )
-            current = MagnetPosition(x=x0, y=y0, z=z0)
+            current_readback = MagnetPosition(x=x0, y=y0, z=z0)
             movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
             if movement_strategy is None:
                 raise ValueError(
                     f"No movement strategy has been configured for device {self.name} for mode {mode}."
                 )
             self.log.debug(
-                f"Attempting move in mode {mode} with parameters {pos}. Current position is {current}"
+                f"Attempting move in mode {mode} with parameters {value}. "
+                f"Current readback position is {current_readback}."
             )
-            movement_strategy.check_within_limits(current, pos)
-            for step in movement_strategy.move_steps(current, pos):
+            movement_strategy.check_within_limits(current_readback, value)
+            for step in movement_strategy.move_steps(current_readback, value):
                 await self._apply_step(step)
         finally:
             self._moving = False
