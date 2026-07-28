@@ -7,6 +7,7 @@ from dodal.devices.beamlines.i06_1.magnets.movement import (
     MagnetPositionError,
     MagnetPositionRequest,
     MagnetSphericalPosition,
+    MagnetSphericalPositionRequest,
     PlanarXZMovement,
     QuadrantXYMovement,
     SphericalMovement,
@@ -82,6 +83,8 @@ def test_cartesian_and_spherical_conversion_is_correct(
 def test_all_none_values_for_magnet_position_request_raises_error():
     with pytest.raises(ValueError):
         MagnetPositionRequest()
+    with pytest.raises(ValueError):
+        MagnetSphericalPositionRequest()
 
 
 @pytest.mark.parametrize(
