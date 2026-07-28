@@ -37,7 +37,7 @@ devices = DeviceManager()
 
 
 @devices.fixture
-def jconfig_client() -> ConfigClient:
+def config_client() -> ConfigClient:
     return ConfigClient.from_url()
 
 
@@ -79,19 +79,19 @@ def jid(jgap: UndulatorGap, jphase: UndulatorPhaseAxes) -> Apple2[UndulatorPhase
 @devices.factory()
 def jidcontroller(
     jid: Apple2[UndulatorPhaseAxes],
-    jconfig_client: ConfigClient,
+    config_client: ConfigClient,
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """J09 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=jid,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
-            config_client=jconfig_client,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
-            config_client=jconfig_client,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
         ),
         units="keV",
