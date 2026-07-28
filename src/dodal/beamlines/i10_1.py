@@ -9,7 +9,7 @@ from dodal.devices.beamlines.i10_1 import (
     I10JScalerCard,
 )
 from dodal.devices.beamlines.i10_1.high_field_magnet.temperature_controller import (
-    HFMTemperatureController,
+    HighFieldMagnetTemperatureController,
 )
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import (
@@ -260,15 +260,21 @@ def high_field_magnet() -> HighFieldMagnet:
 
 
 @devices.factory()
-def hfm_temp() -> HFMTemperatureController:
-    return HFMTemperatureController(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
+def hfm_temp() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:"
+    )
 
 
 @devices.factory()
-def hfm_vti() -> HFMTemperatureController:
-    return HFMTemperatureController(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")
+def hfm_vti() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:"
+    )
 
 
 @devices.factory()
-def hfm_he3() -> HFMTemperatureController:
-    return HFMTemperatureController(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:")
+def hfm_he3() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:"
+    )

@@ -9,14 +9,14 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.beamlines.i10_1.high_field_magnet.temperature_controller import (
-    HFMTemperatureController,
+    HighFieldMagnetTemperatureController,
 )
 
 
 @pytest.fixture
-def hfm_temp_controller() -> HFMTemperatureController:
+def hfm_temp_controller() -> HighFieldMagnetTemperatureController:
     with init_devices(mock=True):
-        hfm_temp_controller = HFMTemperatureController(
+        hfm_temp_controller = HighFieldMagnetTemperatureController(
             prefix="I10J-MAGNET-01:TEMP:",
             suffix="TTEMP:SET",
         )
@@ -24,7 +24,7 @@ def hfm_temp_controller() -> HFMTemperatureController:
 
 
 async def test_temperature_controller_readback(
-    hfm_temp_controller: HFMTemperatureController,
+    hfm_temp_controller: HighFieldMagnetTemperatureController,
 ):
 
     await assert_reading(

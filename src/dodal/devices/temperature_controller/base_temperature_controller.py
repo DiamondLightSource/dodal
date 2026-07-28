@@ -92,7 +92,11 @@ class BaseTemperatureSensor(StandardReadable, Movable[str]):
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
-        """Select the active sensor channel by name."""
+        """Select the active sensor channel by name.
+
+        Args:
+            value: Attribute name of the target sensor (e.g., 'sensor', 'sensor2').
+        """
         await self.set_active_readback(value)
 
     async def set_active_readback(self, sensor_name: str | None) -> None:
@@ -136,7 +140,7 @@ HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
 class TemperatureController(
-    StandardReadable, StandardMovable, Generic[SensorT, HeaterT]
+    StandardReadable, StandardMovable[float], Generic[SensorT, HeaterT]
 ):
     """Temperature controller tying together sensor, heater, and PID units.
 
