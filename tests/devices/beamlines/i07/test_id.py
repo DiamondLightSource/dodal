@@ -15,12 +15,14 @@ def harmonic() -> UndulatorOrder:
 
 
 @pytest.fixture
-async def id(harmonic: UndulatorOrder) -> InsertionDevice:
+async def id(
+    harmonic: UndulatorOrder, mock_config_client: ConfigClient
+) -> InsertionDevice:
     async with init_devices(mock=True):
         id = InsertionDevice(
             "ID-01",
             harmonic,
-            ConfigClient(""),
+            mock_config_client,
             TEST_LOOKUP_TABLE_PATH,
         )
     return id

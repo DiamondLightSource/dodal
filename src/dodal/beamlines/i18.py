@@ -51,7 +51,7 @@ def path_provider() -> PathProvider:
 
 @devices.fixture
 def config_client() -> ConfigClient:
-    return ConfigClient()
+    return ConfigClient.from_url()
 
 
 @devices.factory()

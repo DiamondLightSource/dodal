@@ -81,7 +81,7 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient(I04_CONFIG_SERVER_ENDPOINT)
+    client = ConfigClient.from_url(I04_CONFIG_SERVER_ENDPOINT)
     set_config_client(client)
     return client
 

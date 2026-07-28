@@ -21,7 +21,7 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    return ConfigClient()
+    return ConfigClient.from_url()
 
 
 @devices.factory()

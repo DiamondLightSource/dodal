@@ -36,7 +36,7 @@ set_utils_beamline(BL)
 
 @devices.fixture
 def config_client() -> ConfigClient:
-    return ConfigClient()
+    return ConfigClient.from_url()
 
 
 @devices.factory()

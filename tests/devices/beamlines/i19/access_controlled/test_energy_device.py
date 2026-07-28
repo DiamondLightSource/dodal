@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from daq_config_server.client import ConfigClient
+from daq_config_server.testing import PathToMockDataDict
 from ophyd_async.core import SignalR, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -27,7 +28,7 @@ MIRROR_ENERGIES: dict[str, Any] = {
 
 
 @pytest.fixture
-def path_to_mock_data() -> dict:
+def path_to_mock_data() -> PathToMockDataDict:
     return {"/path/to/config": MIRROR_ENERGIES}
 
 

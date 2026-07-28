@@ -105,7 +105,7 @@ def config_client() -> ConfigClient:
     config_server_url = getenv(
         CONFIG_SERVER_URL_ENV_VAR, DEFAULT_CONFIG_SERVER_ENDPOINT
     )
-    client = ConfigClient(config_server_url)
+    client = ConfigClient.from_url(config_server_url)
     set_config_client(client)
     return client
 

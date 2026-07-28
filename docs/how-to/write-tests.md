@@ -74,7 +74,7 @@ from bluesky import RunEngine
 from bluesky import plan_stubs as bps
 from ophyd_async.core import OnOff, init_devices
 from ophyd_async.testing import assert_reading, get_mock_put, partial_reading
-from dodal.device.my_device import  MyDevice
+from dodal.device.my_device import MyDevice
 
 
 @pytest.fixture
@@ -111,14 +111,14 @@ async def test_my_device_read(sim_my_device: MyDevice, run_engine: RunEngine) ->
 `partial_reading` wraps the value given in a mapping like `{"value": ANY}`, so we are actually checking that the reading matches the expected structure.
 
 ```Python
-    prefix = sim_my_device.name
-    await assert_reading(
-        sim_my_device,
-        {
-            f"{prefix}-signal_a" : {"value": OnOff.ON},
-            f"{prefix}-signal_b" : {"value": 0},
-        }
-    )
+prefix = sim_my_device.name
+await assert_reading(
+    sim_my_device,
+    {
+        f"{prefix}-signal_a": {"value": OnOff.ON},
+        f"{prefix}-signal_b": {"value": 0},
+    },
+)
 ```
 
 ## Using the mock_config_client fixture to read files
@@ -153,8 +153,11 @@ Some configuration files are not JSON-based and require custom parsing logic. Th
 For example:
 
 ```python
+from daq_config_server.testing import PathToMockDataDict
+
+
 @pytest.fixture
-def path_to_mock_data() -> dict:
+def path_to_mock_data() -> PathToMockDataDict:
     return {
         TEST_HARD_UNDULATOR_LUT: parse_i09_hu_undulator_energy_gap_lut(
             Path(TEST_HARD_UNDULATOR_LUT).read_text()
@@ -165,11 +168,13 @@ def path_to_mock_data() -> dict:
 The mock `ConfigClient` is then configured with this data:
 
 ```python
+from daq_config_server.client import ConfigClient
+from daq_config_server.testing import MockServerResponse, PathToMockDataDict
+
+
 @pytest.fixture
-def mock_config_client(path_to_mock_data) -> ConfigClient:
-    config_client = ConfigClient()
-    config_client.configure_mock(path_to_mock_data)
-    return config_client
+def mock_config_client(path_to_mock_data: PathToMockDataDict) -> ConfigClient:
+    return ConfigClient(server_response=MockServerResponse(path_to_mock_data))
 ```
 
 When `get_file_contents()` is called for `TEST_HARD_UNDULATOR_LUT`, the mock client returns the configured model without accessing the file or configuration service.

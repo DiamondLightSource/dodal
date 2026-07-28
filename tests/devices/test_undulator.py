@@ -8,6 +8,7 @@ from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables.insertion_device import (
     UndulatorEnergyGapLookupTable,
 )
+from daq_config_server.testing import PathToMockDataDict
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
@@ -32,7 +33,7 @@ LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
 
 
 @pytest.fixture
-def path_to_mock_data() -> dict:
+def path_to_mock_data() -> PathToMockDataDict:
     return {
         TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT: UndulatorEnergyGapLookupTable(
             rows=[[0, 10], [10000, 20]]

@@ -13,7 +13,7 @@ SAFE_POSITION = 2.0
 
 
 @pytest.fixture
-async def positioner() -> SafeOrBeamPositioner:
+async def positioner(mock_config_client: ConfigClient) -> SafeOrBeamPositioner:
     class MockSafeOrBeamPositioner(SafeOrBeamPositioner):
         def get_config(self) -> TemperatureControllerParams:
             return TemperatureControllerParams(
@@ -29,7 +29,7 @@ async def positioner() -> SafeOrBeamPositioner:
             )
 
     async with init_devices(mock=True):
-        mock_positioner = MockSafeOrBeamPositioner("", ConfigClient(""), "")
+        mock_positioner = MockSafeOrBeamPositioner("", mock_config_client, "")
 
     set_mock_value(mock_positioner.motor.user_readback, 50.0)
     return mock_positioner

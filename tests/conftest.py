@@ -2,6 +2,7 @@ import importlib
 import logging
 import os
 import sys
+from contextlib import contextmanager
 from os import environ
 from pathlib import Path
 from types import ModuleType
@@ -9,6 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from daq_config_server.client import ConfigClient
+from daq_config_server.testing import MockServerResponse, PathToMockDataDict
 from ophyd_async.core import PathProvider
 
 from dodal.common.beamlines import beamline_utils
@@ -86,15 +88,13 @@ pytest_plugins = [
 
 
 @pytest.fixture
-def path_to_mock_data() -> dict:
+def path_to_mock_data() -> PathToMockDataDict:
     return {}
 
 
 @pytest.fixture
-def mock_config_client(path_to_mock_data) -> ConfigClient:
-    config_client = ConfigClient()
-    config_client.configure_mock(path_to_mock_data)
-    return config_client
+def mock_config_client(path_to_mock_data: PathToMockDataDict) -> ConfigClient:
+    return ConfigClient(server_response=MockServerResponse(path_to_mock_data))
 
 
 def is_path_banned(path: Path, banned_paths: list[Path]) -> bool:
@@ -170,6 +170,16 @@ async def static_path_provider(
     return svpp
 
 
+@contextmanager
+def patch_all_config_clients(mock_config_client: ConfigClient):
+    with patch.object(
+        ConfigClient,
+        "from_url",
+        return_value=mock_config_client,
+    ):
+        yield
+
+
 @pytest.fixture(scope="function")
 def module_and_devices_for_beamline(
     mock_config_client: ConfigClient, request: pytest.FixtureRequest
@@ -181,32 +191,35 @@ def module_and_devices_for_beamline(
 
     beamline = request.param
 
-    with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):
-        bl_mod = importlib.import_module("dodal.beamlines." + beamline)
-        mock_beamline_module_filepaths(beamline, bl_mod)
-        if isinstance(
-            device_manager := getattr(bl_mod, "devices", None), DeviceManager
-        ):
-            result = device_manager.build_all(include_skipped=True, mock=True).connect()
-            devices, exceptions = (
-                result.devices,
-                result.connection_errors | result.build_errors,
-            )
-        else:
-            devices, exceptions = make_all_devices(
-                bl_mod,
-                include_skipped=True,
-                fake_with_ophyd_sim=True,
-            )
-        yield (bl_mod, devices, exceptions)
-        beamline_utils.clear_devices()
-        for factory in collect_factories(bl_mod).values():
-            if isinstance(factory, DeviceInitializationController):
-                factory.cache_clear()
-        del bl_mod
+    with patch_all_config_clients(mock_config_client):
+        with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):
+            bl_mod = importlib.import_module("dodal.beamlines." + beamline)
+            mock_beamline_module_filepaths(beamline, bl_mod)
+            if isinstance(
+                device_manager := getattr(bl_mod, "devices", None), DeviceManager
+            ):
+                result = device_manager.build_all(
+                    include_skipped=True, mock=True
+                ).connect()
+                devices, exceptions = (
+                    result.devices,
+                    result.connection_errors | result.build_errors,
+                )
+            else:
+                devices, exceptions = make_all_devices(
+                    bl_mod,
+                    include_skipped=True,
+                    fake_with_ophyd_sim=True,
+                )
+            yield (bl_mod, devices, exceptions)
+            beamline_utils.clear_devices()
+            for factory in collect_factories(bl_mod).values():
+                if isinstance(factory, DeviceInitializationController):
+                    factory.cache_clear()
+            del bl_mod
 
-        # Set back the ConfigClient instance with the original one.
-        ConfigClient.get_file_contents = original_config_client
+            # Set back the ConfigClient instance with the original one.
+            ConfigClient.get_file_contents = original_config_client
 
 
 def mock_beamline_module_filepaths(bl_name: str, bl_module: ModuleType):

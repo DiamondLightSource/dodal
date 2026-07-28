@@ -34,7 +34,7 @@ LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/co
 
 @devices.fixture
 def iconfig_client() -> ConfigClient:
-    return ConfigClient()
+    return ConfigClient.from_url()
 
 
 @devices.factory()

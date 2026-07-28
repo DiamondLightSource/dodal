@@ -63,7 +63,7 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient()
+    client = ConfigClient.from_url()
     set_config_client(client)
     return client
 
