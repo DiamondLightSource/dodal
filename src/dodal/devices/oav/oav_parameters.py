@@ -7,8 +7,6 @@ from xml.etree.ElementTree import Element
 from daq_config_server import ConfigClient
 from daq_config_server.models import DisplayConfig
 
-from dodal.devices.oav.pin_image_recognition import ScanDirections
-
 # GDA currently assumes this aspect ratio for the OAV window size.
 # For some beamline this doesn't affect anything as the actual OAV aspect ratio
 # matches. Others need to take it into account to rescale the values stored in
@@ -101,9 +99,7 @@ class OAVParameters:
         self.open_ksize: int = update("open_ksize", int, default=0)
         self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
-        self.direction: ScanDirections = [*ScanDirections][
-            self.active_params["direction"]
-        ]
+        self.direction: int = update("direction", int)
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
     def get_max_tip_distance_in_pixels(self, microns_per_pixel: float) -> float:
