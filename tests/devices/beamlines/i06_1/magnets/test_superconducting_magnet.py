@@ -339,12 +339,12 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
     movement_strategy = MagicMock()
 
     mov_str_return_values = [
-        movement.MagnetPositionRequest(z=2),
-        movement.MagnetPositionRequest(x=1, y=2, z=3),
+        movement.MagnetRequest(z=2),
+        movement.MagnetRequest(x=1, y=2, z=3),
     ]
     expected_apply_step_calls = [
-        call(movement.MagnetPositionRequest(z=2)),
-        call(movement.MagnetPositionRequest(x=1, y=2, z=3)),
+        call(movement.MagnetRequest(z=2)),
+        call(movement.MagnetRequest(x=1, y=2, z=3)),
     ]
     movement_strategy.move_steps.return_value = mov_str_return_values
 

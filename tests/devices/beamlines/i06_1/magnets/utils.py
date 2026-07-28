@@ -1,6 +1,6 @@
 import math
 
-from dodal.devices.beamlines.i06_1.magnets.movement import (
+from dodal.devices.beamlines.i06_1.magnets.coordinates import (
     MagnetPosition,
     MagnetSphericalPosition,
 )

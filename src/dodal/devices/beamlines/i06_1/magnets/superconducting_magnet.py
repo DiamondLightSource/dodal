@@ -24,6 +24,12 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 from pydantic import BaseModel, Field
 
+from dodal.devices.beamlines.i06_1.magnets.coordinates import (
+    MagnetPosition,
+    MagnetRequest,
+    MagnetSphericalPosition,
+    MagnetSphericalRequest,
+)
 from dodal.devices.beamlines.i06_1.magnets.enums import (
     MagnetLimitStatus,
     MagnetMode,
@@ -31,19 +37,12 @@ from dodal.devices.beamlines.i06_1.magnets.enums import (
 )
 from dodal.devices.beamlines.i06_1.magnets.movement import (
     CubicMovement,
-    MagnetPosition,
     MagnetPositionError,
-    MagnetPositionRequest,
-    MagnetSphericalPosition,
-    MagnetSphericalPositionRequest,
     MovementStrategy,
     PlanarXZMovement,
     QuadrantXYMovement,
     SphericalMovement,
     UniaxialMovement,
-    read_phi,
-    read_rho,
-    read_theta,
 )
 from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
     MagnetAxisRampRateController,
@@ -52,7 +51,7 @@ from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
 
 
 class MagnetMoveWithinBoundary(Protocol):
-    async def __call__(self, value: MagnetPositionRequest): ...
+    async def __call__(self, value: MagnetRequest): ...
 
 
 class FlyMagnetInfo(BaseModel):
@@ -68,7 +67,7 @@ class MagnetAxisMovableLogic(MovableLogic[float]):
 
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         values = {self.axis_mode.axis_alias: new_position}
-        await self.magnet_set_within_boundary(MagnetPositionRequest(**values))
+        await self.magnet_set_within_boundary(MagnetRequest(**values))
 
 
 @default_mock_class(DeviceMock)
@@ -167,7 +166,7 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: MagnetPositionRequest):
+    async def set(self, value: MagnetRequest):
         await self._set_mag_within_boundary(value)
 
 
@@ -177,7 +176,7 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
     Exposes the magnet field in spherical coordinates using the derived signals
     ``rho``, ``theta`` and ``phi``. These signals are calculated from the
     underlying cartesian magnet axes and may also be written individually or as a
-    complete ``MagnetSphericalPositionRequest``.
+    complete ``MagnetSphericalRequest``.
 
     Writes are converted to cartesian coordinates before being delegated to the
     parent ``SuperConductingMagnetController``, allowing the active movement strategy to
@@ -192,20 +191,20 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
     ):
         with self.add_children_as_readables():
             self.theta = derived_signal_rw(
-                read_theta, self._set_theta, x=cart.x, z=cart.z
+                MagnetPosition.calc_theta, self._set_theta, x=cart.x, z=cart.z
             )
             self.rho = derived_signal_rw(
-                read_rho, self._set_rho, x=cart.x, y=cart.y, z=cart.z
+                MagnetPosition.calc_rho, self._set_rho, x=cart.x, y=cart.y, z=cart.z
             )
             self.phi = derived_signal_rw(
-                read_phi, self._set_phi, x=cart.x, y=cart.y, z=cart.z
+                MagnetPosition.calc_phi, self._set_phi, x=cart.x, y=cart.y, z=cart.z
             )
         self._set_mag_within_boundary = set_mag_within_boundary
         self._cart_ref = Reference(cart)
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: MagnetSphericalPositionRequest):
+    async def set(self, value: MagnetSphericalRequest):
         """Set the requested spherical coordinates.
 
         Any unspecified spherical coordinates are taken from the current magnet
@@ -219,17 +218,17 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
             self._cart_ref().z.readback.get_value(),
         )
         current_readback = MagnetPosition(x=x0, y=y0, z=z0)
-        target = value.resolve_pos(current_readback)
-        await self._set_mag_within_boundary(target.to_request_pos())
+        target = value.resolve_pos(current_readback.to_spherical())
+        await self._set_mag_within_boundary(target.to_cartesian().to_request_pos())
 
     async def _set_rho(self, rho: float):
-        await self.set(MagnetSphericalPositionRequest(rho=rho))
+        await self.set(MagnetSphericalRequest(rho=rho))
 
     async def _set_theta(self, theta: float):
-        await self.set(MagnetSphericalPositionRequest(theta=theta))
+        await self.set(MagnetSphericalRequest(theta=theta))
 
     async def _set_phi(self, phi: float):
-        await self.set(MagnetSphericalPositionRequest(phi=phi))
+        await self.set(MagnetSphericalRequest(phi=phi))
 
 
 class MockSuperConductingMagnetController(
@@ -334,7 +333,7 @@ class SuperConductingMagnetController(StandardReadable):
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
 
-    async def _apply_step(self, step: MagnetPositionRequest) -> None:
+    async def _apply_step(self, step: MagnetRequest) -> None:
         """Apply a single movement step and wait for the magnet ramp to complete.
 
         A movement step may update one or more cartesian axes simultaneously. Once
@@ -352,7 +351,7 @@ class SuperConductingMagnetController(StandardReadable):
         await asyncio.gather(*tasks)
         await self._ramp()
 
-    async def set_within_boundary(self, value: MagnetPositionRequest):
+    async def set_within_boundary(self, value: MagnetRequest):
         """Move the magnet to a new cartesian position.
 
         Any coordinates left as ``None`` retain their current values. The requested
