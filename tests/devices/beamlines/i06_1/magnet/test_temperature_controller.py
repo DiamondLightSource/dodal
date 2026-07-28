@@ -72,3 +72,12 @@ async def test_temperature_controller_readback(
             "scm_temp_controller-sensor-channel2": partial_reading(0.0),
         },
     )
+
+
+async def test_temperature_controller_sensor_switch(
+    scm_temp_controller: SuperConductingMagnetTemperatureController,
+):
+    await scm_temp_controller.sensor.set("sensor2")
+    assert await scm_temp_controller.sensor._active_sensor_name.get_value() == "sensor2"
+    await scm_temp_controller.sensor.set("sensor")
+    assert await scm_temp_controller.sensor._active_sensor_name.get_value() == "sensor"

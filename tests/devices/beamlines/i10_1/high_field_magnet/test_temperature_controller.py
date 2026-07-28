@@ -55,3 +55,14 @@ async def test_temperature_controller_readback(
             "hfm_temp_controller-pid-d": partial_reading(3.0),
         },
     )
+
+
+async def test_temperature_controller_sensor_switch(
+    hfm_temp_controller: HighFieldMagnetTemperatureController,
+):
+    await hfm_temp_controller.sensor.set("sensor2")
+    assert await hfm_temp_controller.sensor._active_sensor_name.get_value() == "sensor2"
+    await hfm_temp_controller.sensor.set("sensor3")
+    assert await hfm_temp_controller.sensor._active_sensor_name.get_value() == "sensor3"
+    await hfm_temp_controller.sensor.set("sensor")
+    assert await hfm_temp_controller.sensor._active_sensor_name.get_value() == "sensor"
