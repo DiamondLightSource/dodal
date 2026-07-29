@@ -37,10 +37,17 @@ async def test_locate(high_field_magnet: HighFieldMagnet):
 
 
 async def test_stop_success(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.user_setpoint, 7.5)
-    set_mock_value(high_field_magnet.user_readback, 1.5)
+    readback = 7.5
+    setpoint = 1.5
+    set_mock_value(high_field_magnet.user_setpoint, setpoint)
+    set_mock_value(high_field_magnet.user_readback, readback)
     await high_field_magnet.stop()
-    get_mock_put(high_field_magnet.user_setpoint).assert_awaited_once_with(1.5)
+    get_mock_put(high_field_magnet.user_setpoint).assert_awaited_once_with(readback)
+    setpoint_val, readback_val = await asyncio.gather(
+        high_field_magnet.user_setpoint.get_value(),
+        high_field_magnet.user_readback.get_value(),
+    )
+    assert setpoint_val == readback_val == readback
 
 
 async def test_set_raises_runtime_error_when_stopped(
