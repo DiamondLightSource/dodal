@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import (
     PathProvider,
     StaticPathProvider,
@@ -57,7 +57,7 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient()
+    client = ConfigClient.from_url()
     set_config_client(client)
     return client
 

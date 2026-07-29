@@ -1,5 +1,5 @@
 import numpy as np
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.devices.undulator import UndulatorInKeV, UndulatorOrder
 from dodal.devices.util.lookup_tables import energy_distance_table

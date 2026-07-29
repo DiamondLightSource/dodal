@@ -100,7 +100,7 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
         (10, 20, 30, 15, -2000),  # phi goes beyond lower limit
     ],
 )
-async def test_given_set_with_value_outside_motor_limit(
+async def test_given_set_with_value_outside_motor_limit_then_error_raised(
     smargon: Smargon, test_x, test_y, test_z, test_chi, test_phi
 ):
     for motor in [
