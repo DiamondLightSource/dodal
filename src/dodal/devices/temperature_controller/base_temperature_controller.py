@@ -2,19 +2,21 @@
 
 from __future__ import annotations
 
-import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    Device,
+    DeviceVector,
     SignalR,
     SignalRW,
     StandardMovable,
     StandardReadable,
     StandardReadableFormat,
+    derived_signal_r,
     soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_rw
@@ -78,17 +80,32 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable, Movable[str]):
-    """Base interface for temperature sensors supporting dynamic readback targeting."""
+DeviceT = TypeVar("DeviceT", bound=Device)
 
-    sensor: SignalR[float]
-    active_sensor: SignalR[float]
 
-    def __init__(self, name: str = ""):
+class TemperatureSensor(StandardReadable, Generic[DeviceT]):
+    """Interface for temperature sensors supporting dynamic readback targeting."""
 
-        self._active_sensor_name = soft_signal_rw(str, initial_value="sensor")
+    def __init__(self, channel: DeviceVector, name: str = ""):
+        with self.add_children_as_readables():
+            self.active_sensor_name = soft_signal_rw(str, initial_value="sensor1")
+            self.channel = channel
 
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.active_sensor = derived_signal_r(
+                raw_to_derived=self._select_sensor,
+                derived_units=None,
+                derived_precision=None,
+                active_sensor_name=self.active_sensor_name,
+                **self._sensor_name_to_device(),
+            )
         super().__init__(name=name)
+
+    def _sensor_name_to_device(self) -> Mapping[str, DeviceT]:
+        return {f"sensor{i}": child for i, child in self.channel.items()}
+
+    def _select_sensor(self, active_sensor_name: str, **kwargs: float) -> float:
+        return kwargs[active_sensor_name]
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
@@ -97,50 +114,15 @@ class BaseTemperatureSensor(StandardReadable, Movable[str]):
         Args:
             value: Attribute name of the target sensor (e.g., 'sensor', 'sensor2').
         """
-        await self.set_active_readback(value)
-
-    async def set_active_readback(self, sensor_name: str | None) -> None:
-        if sensor_name is not None:
-            available = self._get_available_sensors()
-            if sensor_name not in available:
-                available_sensors = (
-                    ", ".join(f"'{s}'" for s in available) if available else "none"
-                )
-                raise ValueError(
-                    f"Invalid readback target '{sensor_name}'. "
-                    f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2'). "
-                    f"Available sensors on {self.name}: [{available_sensors}]"
-                )
-            LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
-            await self._active_sensor_name.set(sensor_name)
-        else:
-            LOGGER.info(
-                f"Setting active sensor on {self.name} to default: '{sensor_name}'"
-            )
-            await self._active_sensor_name.set("sensor")
-
-    def _get_available_sensors(self) -> list[str]:
-        """Inspect instance attributes for valid sensor signal names.
-
-        Returns:
-            Sorted list of attribute names matching the pattern `sensor<int>` that are SignalR instances.
-        """
-        return sorted(
-            [
-                attr
-                for attr in dir(self)
-                if re.match(r"^sensor\d*$", attr)
-                and isinstance(getattr(self, attr, None), SignalR)
-            ]
-        )
+        await self.active_sensor_name.set(value)
 
 
-SensorT = TypeVar("SensorT", bound=BaseTemperatureSensor)
+SensorT = TypeVar("SensorT", bound=TemperatureSensor)
 HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
 class TemperatureController(
-    StandardReadable, StandardMovable[float], Generic[SensorT, HeaterT]
+    StandardReadable, StandardMovable[float], Generic[DeviceT, HeaterT]
 ):
     """Temperature controller tying together sensor, heater, and PID units.
 
@@ -155,7 +137,7 @@ class TemperatureController(
     def __init__(
         self,
         setpoint: SignalRW[float],
-        sensor: SensorT,
+        sensor: TemperatureSensor[DeviceT],
         heater: HeaterT,
         pid: PID,
         name: str = "",
