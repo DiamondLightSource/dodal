@@ -1,5 +1,5 @@
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllerParams,
 )
@@ -12,9 +12,9 @@ from tests.test_data import TEST_XPDF_LOCAL_PARAMETERS
 
 
 @pytest.fixture
-async def blower():
+async def blower(mock_config_client: ConfigClient):
     async with init_devices(mock=True):
-        blower = Blower("", "", "", ConfigClient(""), TEST_XPDF_LOCAL_PARAMETERS)
+        blower = Blower("", "", "", mock_config_client, TEST_XPDF_LOCAL_PARAMETERS)
     return blower
 
 
