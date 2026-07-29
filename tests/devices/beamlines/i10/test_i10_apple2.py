@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from numpy import linspace, poly1d
 from ophyd_async.core import (
     callback_on_mock_put,
@@ -57,7 +57,7 @@ from tests.devices.insertion_device.util import (
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 
-# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+# mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 

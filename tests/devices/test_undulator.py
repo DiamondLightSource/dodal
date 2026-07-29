@@ -1,14 +1,14 @@
 from collections.abc import Generator
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables.insertion_device import (
     UndulatorEnergyGapLookupTable,
 )
+from daq_config_server.testing import PathToMockDataDict
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
@@ -33,12 +33,21 @@ LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
 
 
 @pytest.fixture
-async def undulator() -> UndulatorInKeV:
+def path_to_mock_data() -> PathToMockDataDict:
+    return {
+        TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT: UndulatorEnergyGapLookupTable(
+            rows=[[0, 10], [10000, 20]]
+        )
+    }
+
+
+@pytest.fixture
+async def undulator(mock_config_client: ConfigClient) -> UndulatorInKeV:
     async with init_devices(mock=True):
         baton = Baton("BATON-01")
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             poles=80,
             length=2.0,
@@ -121,11 +130,11 @@ async def test_configuration_includes_configuration_fields(undulator: UndulatorI
     )
 
 
-async def test_poles_not_propagated_if_not_supplied():
+async def test_poles_not_propagated_if_not_supplied(mock_config_client: ConfigClient):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             length=2.0,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -134,11 +143,11 @@ async def test_poles_not_propagated_if_not_supplied():
     assert "undulator-poles" not in (await undulator.read_configuration())
 
 
-async def test_length_not_propagated_if_not_supplied():
+async def test_length_not_propagated_if_not_supplied(mock_config_client: ConfigClient):
     async with init_devices(mock=True):
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             poles=80,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -159,7 +168,7 @@ def test_correct_closest_distance_to_energy_from_table(energy, expected_output):
 
 
 async def test_when_gap_access_is_disabled_set_then_error_is_raised(
-    undulator,
+    undulator: UndulatorInKeV,
 ):
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.DISABLED)
     with pytest.raises(AccessError):
@@ -169,9 +178,6 @@ async def test_when_gap_access_is_disabled_set_then_error_is_raised(
 async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_mode_enabled(
     undulator_in_commissioning_mode: UndulatorInKeV,
 ):
-    undulator_in_commissioning_mode.config_server.get_file_contents = MagicMock(
-        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10, 20]])
-    )
     set_mock_value(
         undulator_in_commissioning_mode.gap_access, EnabledDisabledUpper.DISABLED
     )
@@ -185,9 +191,6 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
     undulator: UndulatorInKeV,
 ):
-    undulator.config_server.get_file_contents = MagicMock(
-        return_value=UndulatorEnergyGapLookupTable(rows=[[0, 10], [10000, 20]])
-    )
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)
 
