@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 2.5.4.dev5+g50b6b22ac documentation</title>
+    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 2.5.4.dev6+gc5a4fc349 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=afa4dbf5"></script>
+    <script src="../../../../_static/documentation_options.js?v=217a97ed"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1018,17 +1018,18 @@ window.runMermaid = runMermaid;</script>
             <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">Pol</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span>
-        <span class="c1"># check if undulator phase is unlocked.</span>
+        <span class="c1"># For unlocked phase axes, use top_inner and btm_outer readbacks to calculate</span>
+        <span class="c1"># derived signal polarisation.</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">UndulatorPhaseAxes</span><span class="p">):</span>
             <span class="n">top_inner</span> <span class="o">=</span> <span class="n">phase</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_readback</span>
             <span class="n">btm_outer</span> <span class="o">=</span> <span class="n">phase</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># If locked phase axes make the locked phase 0.</span>
-            <span class="n">top_inner</span> <span class="o">=</span> <span class="n">btm_outer</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="c1"># Locked phase axes do not have top_inner or btm_outer signals. Use zero</span>
+            <span class="c1"># value constants for these phases when calculating derived polarisation.</span>
+            <span class="n">top_inner</span> <span class="o">=</span> <span class="n">btm_outer</span> <span class="o">=</span> <span class="mf">0.0</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
             <span class="c1"># Hardware backed read/write for polarisation.</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
                 <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_pol</span><span class="p">,</span>
                 <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_pol</span><span class="p">,</span>
