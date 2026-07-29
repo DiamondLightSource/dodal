@@ -185,7 +185,7 @@ class ProgramAbort(Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self._signal_ref().set("&2A")
+        await self._signal_ref().set("&2A", wait=True)
         await sleep(1.0)  # TODO Check with scientist what this sleep is really for.
         await self._signal_ref().set("P2401=0")
         await wait_for_value(
