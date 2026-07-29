@@ -1,7 +1,7 @@
 from functools import cache
 from os import getenv
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
@@ -105,7 +105,7 @@ def config_client() -> ConfigClient:
     config_server_url = getenv(
         CONFIG_SERVER_URL_ENV_VAR, DEFAULT_CONFIG_SERVER_ENDPOINT
     )
-    client = ConfigClient(config_server_url)
+    client = ConfigClient.from_url(config_server_url)
     set_config_client(client)
     return client
 

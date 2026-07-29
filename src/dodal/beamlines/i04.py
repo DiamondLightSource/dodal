@@ -1,6 +1,6 @@
 from functools import cache
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import Reference
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -81,7 +81,7 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient(I04_CONFIG_SERVER_ENDPOINT)
+    client = ConfigClient.from_url(I04_CONFIG_SERVER_ENDPOINT)
     set_config_client(client)
     return client
 

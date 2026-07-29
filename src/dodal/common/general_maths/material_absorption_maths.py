@@ -1,5 +1,7 @@
+from collections.abc import Callable
 from typing import Annotated
 
+from numpy.polynomial import polynomial
 from pydantic import (
     Field,
     StrictFloat,
@@ -12,6 +14,93 @@ from dodal.common.general_maths.transmission_interconversion import (
 )
 
 
+class AbsorptionCalculator:
+    """Interface for calculating absorption (due to mass attenuation) per cm as a function of x-ray energy in keV.
+    Reports back a natural log based absorption factor as function of x-ray energy.
+    """
+
+    def __init__(self, _calculation: Callable[[float], float]):
+        self._calculate = _calculation
+
+    def absorption_coefficient_per_cm(
+        self, energy_kev: Annotated[StrictFloat, Field(gt=0)]
+    ) -> float:
+        """Logarithmic contribution to x-ray absorption per cm (depth into absorber) at a particular photon energy.
+
+        Notes:
+        1) The cm as a typical unit length scale is a de facto standard in the field.
+        2a) The absorption coefficient is in factors of e.
+        2b) Barnett absorption units are only used once this coefficient is combined with depth in cm.
+        3a) Negative contributions to a sum have to be permitted so the output,
+            of a specific calculator instance, can be a float of either sign.
+        3b) Sub-classes may implicitly restrict this expectation.
+            Real materials the final absorption will be positive.
+
+        Args:
+            energy_kev (StrictFloat): The individual energy per photon in kilo-electronvolts
+
+        Returns:
+            (float): Model adjustment of attenuation per cm of absorber material depth.
+        """
+        return self._calculate(energy_kev)
+
+
+class CompoundAbsorptionCalculator(AbsorptionCalculator):
+    """Advanced physics model for mass attenuation per cm as a function of x-ray energy in keV.
+    Applies effects from several absorption term calculations.
+
+    Attributes:
+        contributers (list[AbsorptionCalculator])
+    """
+
+    def __init__(self, contributions: list[AbsorptionCalculator]):
+        super().__init__(
+            # lambda k is energy in keV
+            lambda k: sum(c.absorption_coefficient_per_cm(k) for c in contributions)
+        )
+
+
+class PolynomialAbsorptionCorrection(AbsorptionCalculator):
+    """Corrective model for mass attenuation per cm as a function of x-ray energy in keV.
+    Provides terms for correcting a baseline mass attenuation.
+
+    Attributes:
+        corrective_terms (float): Polynomial coefficients to correct the baseline modelled absorption per cm
+    """
+
+    def __init__(self, coefficients_per_cm: list[float]):
+
+        def _calculate_correction(energy_kev: float) -> float:
+            correction = polynomial.polyval(energy_kev, coefficients_per_cm)
+            return float(correction)  # numpy did not specify float as the return type
+
+        super().__init__(_calculate_correction)
+
+
+class SingleRollOffAbsorptionCalculator(AbsorptionCalculator):
+    """Simplest physics model for mass attenuation per cm as a function of x-ray energy in keV.
+    Typically appropriate where one element dominates the absorption,
+    and energies passed in as calculation arguments are above the elements absorption resonance edge.
+
+    Attributes:
+        material_factor_per_cm (StrictFloat): Positive non-zero material constant
+        (hypothetical trend offset equivalent to an absorption per cm at 1 keV)
+        roll_off: negative exponent of energy dependence above the resonant edge.
+    """
+
+    def __init__(
+        self,
+        material_factor_per_cm: Annotated[StrictFloat, Field(gt=0)],
+        roll_off: Annotated[StrictFloat, Field(lt=0)],
+    ):
+        # lambda k is energy in keV
+        super().__init__(
+            lambda k: photon_mass_attenuation_per_unit_length(
+                k, material_factor_per_cm, roll_off
+            )
+        )
+
+
 @validate_call
 def photon_mass_attenuation_per_unit_length(
     energy_kev: Annotated[StrictFloat, Field(gt=0)],
@@ -20,10 +109,11 @@ def photon_mass_attenuation_per_unit_length(
 ) -> float:
     """Calculates mass attenuation per unit length.
 
+    See for example: https://en.wikipedia.org/wiki/Mass_attenuation_coefficient.
+
     Args:
         energy_kev (StrictFloat): X-ray energy in keV (positive values only).
-        photon_absorption_factor_per_unit_length (StrictFloat): Factors of e,
-            in X-ray flux reduction, per unit depth of absorber (positive values only).
+        photon_absorption_factor_per_unit_length (StrictFloat): Logarithmic constant, scaled in factors of e.
         energy_dependence_exponent (StrictFloat): Roll off of absorption factor (negative values only).
 
     Returns:
@@ -37,7 +127,7 @@ def photon_mass_attenuation_per_unit_length(
 @validate_call
 def attenuation_at_depth_cm(
     depth_cm: Annotated[StrictFloat, Field(ge=0)],
-    absorption_coefficient_per_cm: Annotated[StrictFloat, Field(ge=0)],
+    absorption_coefficient_per_cm: Annotated[StrictFloat, Field(gt=0)],
 ) -> float:
     """Calculates attenuation in Barnett units, where 1000 Bn equivalent to 1/e,
     0Bn to 1 and 2000 Bn to 1/(e^2).
@@ -71,7 +161,6 @@ def thickness_cm_required_to_attenuate(
             in logarithmic Barnett attenuation units.
         absorption_coefficient_per_cm (StrictFloat): Factors of e per cm, reduction in flux.
             N.B. This coefficient is positive (and greater than a lower bound for realism).
-
 
     Raises:
         ValueError: if attenuation is below zero,

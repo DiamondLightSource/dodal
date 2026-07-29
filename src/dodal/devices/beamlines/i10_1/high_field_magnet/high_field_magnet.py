@@ -107,7 +107,6 @@ class HighFieldMagnet(StandardMovable[float], StandardReadable, Flyable, Prepara
             read_pv=prefix + "RBV:SETPOINTFIELD",
             write_pv=prefix + "SET:SETPOINTFIELD",
         )
-        self._set_success = True
         self._fly_info: FlyMagInfo | None = None
         self._fly_status: WatchableAsyncStatus | None = None
 

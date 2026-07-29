@@ -13,9 +13,11 @@ from dodal.common.general_maths.arithmetic_conversions import (
     convert_mm_to_cm,
     convert_mm_to_microns,
     convert_percentage_to_factor,
+    get_straight_line_y,
 )
-
-from .operator_inversion_pairing import OperatorInversionPairing
+from tests.common.general_maths.operator_inversion_pairing import (
+    OperatorInversionPairing,
+)
 
 
 # expected success tests (the 'Happy Path'): All numbers here are arbitrary
@@ -57,6 +59,29 @@ def test_conversion_from_electronvolts_to_kiloelectronvolts(input, result):
 @pytest.mark.parametrize("input,result", [(10000.0, 1.0), (1000, 0.1)])
 def test_conversion_from_microns_to_centimetres(input, result):
     assert convert_microns_to_cm(input) == pytest.approx(result)
+
+
+@pytest.mark.parametrize(
+    "c,m,x,expected_y",
+    [
+        (1.5, 1.0, 2.0, 3.5),
+        (-1.5, 1.0, 10.0, 8.5),
+        (3.5, -4.2, 7.2, -26.74),
+        (-0.8, -0.14, -9.1, 0.474),
+        (-2.4, 1.7, 2.8, 2.36),
+        (0.0, 15.8, 0.0, 0.0),
+        (0.0, -9.14, 0.0, 0.0),
+        (0.0, 3.2, 11.6, 37.12),
+        (0.0, -3.2, 11.6, -37.12),
+        (0.0, 3.2, -11.6, -37.12),
+        (0.1, -3.2, -11.6, 37.22),
+        (5.2, 0.0, -8.64, 5.2),
+    ],
+)
+def test_straight_line_conversion(c, m, x, expected_y):
+    assert get_straight_line_y(line_offset=c, line_gradient=m, x=x) == pytest.approx(
+        expected_y
+    )
 
 
 # Circular "sanity check" tests, exercise pairs of reciprocating functions
@@ -107,9 +132,11 @@ def test_reciprocal_function_pairs_nest_consistent_with_identity(
 
 
 # The inauspicuous path
+
+
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), False],
 )
 def test_convert_microns_to_cm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -118,7 +145,7 @@ def test_convert_microns_to_cm_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), False],
 )
 def test_convert_ev_to_kev_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -127,7 +154,7 @@ def test_convert_ev_to_kev_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), False],
 )
 def test_convert_microns_to_mm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -136,7 +163,7 @@ def test_convert_microns_to_mm_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), False],
 )
 def test_convert_mm_to_microns_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -145,7 +172,7 @@ def test_convert_mm_to_microns_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), True],
 )
 def test_convert_factor_to_percentage_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -154,7 +181,7 @@ def test_convert_factor_to_percentage_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), False],
 )
 def test_convert_percentage_to_factor_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -163,7 +190,7 @@ def test_convert_percentage_to_factor_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), False],
 )
 def test_convert_mm_to_cm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
@@ -172,8 +199,41 @@ def test_convert_mm_to_cm_raises_error_with_bad_input(bad_input):
 
 @pytest.mark.parametrize(
     "bad_input",
-    ["a", [], None, math.sin, object(), False],
+    ["", "a", [], None, math.sin, object(), True],
 )
 def test_convert_cm_to_mm_raises_error_with_bad_input(bad_input):
     with pytest.raises(pydantic.ValidationError):
         convert_cm_to_mm(bad_input)
+
+
+@pytest.mark.parametrize(
+    "bad_input",
+    ["", "a", [], None, math.log, object(), False],
+)
+def test_straight_line_calculator_raises_error_with_bad_offset(bad_input):
+    _probe_x = 11.1
+    _line_gradient = -2.07
+    with pytest.raises(pydantic.ValidationError):
+        get_straight_line_y(bad_input, _line_gradient, _probe_x)
+
+
+@pytest.mark.parametrize(
+    "bad_input",
+    ["", "a", [], None, math.sin, object(), True],
+)
+def test_straight_line_calculator_raises_error_with_bad_gradient(bad_input):
+    _probe_x = -11.1
+    _line_offset = 14.2
+    with pytest.raises(pydantic.ValidationError):
+        get_straight_line_y(_line_offset, bad_input, _probe_x)
+
+
+@pytest.mark.parametrize(
+    "bad_input",
+    ["", "a", [], None, math.tan, object(), False],
+)
+def test_straight_line_calculator_raises_error_with_bad_x_value(bad_input):
+    _line_offset = 0.1
+    _line_gradient = 5.4
+    with pytest.raises(pydantic.ValidationError):
+        get_straight_line_y(_line_offset, _line_gradient, bad_input)

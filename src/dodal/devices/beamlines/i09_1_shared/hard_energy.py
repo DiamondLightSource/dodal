@@ -2,7 +2,7 @@ from asyncio import gather
 from typing import Protocol
 
 from bluesky.protocols import Locatable, Location, Movable
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables import GenericLookupTable
 from ophyd_async.core import (
     AsyncStatus,

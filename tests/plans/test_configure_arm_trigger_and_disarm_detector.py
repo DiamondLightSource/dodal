@@ -2,12 +2,13 @@ from unittest.mock import MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import (
     DetectorTrigger,
     TriggerInfo,
     callback_on_mock_execute,
     get_mock,
+    init_devices,
     set_mock_value,
 )
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
@@ -21,16 +22,19 @@ from dodal.plans.configure_arm_trigger_and_disarm_detector import (
 
 @pytest.fixture
 async def fake_eiger() -> FastEiger:
-    fake_eiger = FastEiger("", MagicMock())
-    await fake_eiger.connect(mock=True)
+    with init_devices(mock=True):
+        fake_eiger = FastEiger("", MagicMock())
     set_mock_value(fake_eiger.detector.bit_depth_image, 32)
     return fake_eiger
 
 
 async def test_configure_arm_trigger_and_disarm_detector(
-    fake_eiger: FastEiger, eiger_params: DetectorParams, run_engine: RunEngine
+    fake_eiger: FastEiger,
+    eiger_params: DetectorParams,
+    run_engine: RunEngine,
+    mock_config_client: ConfigClient,
 ):
-    set_config_client(ConfigClient("test"))
+    set_config_client(mock_config_client)
     trigger_info = TriggerInfo(
         # Manual trigger, so setting number of triggers to 1.
         number_of_events=1,
@@ -55,7 +59,7 @@ async def test_configure_arm_trigger_and_disarm_detector(
     def set_frames_written(*args, **kwargs) -> None:
         set_mock_value(fake_eiger.od.fp.frames_written, 1)
 
-    callback_on_mock_execute(fake_eiger.detector.trigger, set_frames_written)
+    callback_on_mock_execute(fake_eiger.arm_when_ready, set_frames_written)
 
     run_engine(
         configure_arm_trigger_and_disarm_detector(

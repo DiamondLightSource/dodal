@@ -3,7 +3,7 @@ from collections.abc import Callable
 from typing import Annotated, Final, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
 from ophyd_async.core import (
