@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i15_1.robot.Robot &#8212; dodal 2.5.4.dev4+g3b77d8109 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot.Robot &#8212; dodal 2.5.4.dev5+g50b6b22ac documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=fc698186"></script>
+    <script src="../../_static/documentation_options.js?v=afa4dbf5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1105,6 +1105,8 @@
 <span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.beamlines.i15_1.robot.SampleLocation.html#dodal.devices.beamlines.i15_1.robot.SampleLocation" title="dodal.devices.beamlines.i15_1.robot.SampleLocation"><span class="pre">SampleLocation</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i15_1/robot.html#Robot.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i15_1.robot.Robot.set" title="Link to this definition">#</a></dt>
 <dd><p>Perform a sample load from the specified sample location or a sample unload
 if SAMPLE_LOCATION_EMPTY is specified.</p>
+<p>If the a sample load is requested and there is already a sample loaded then
+perform an unload first.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference internal" href="dodal.devices.beamlines.i15_1.robot.SampleLocation.html#dodal.devices.beamlines.i15_1.robot.SampleLocation" title="dodal.devices.beamlines.i15_1.robot.SampleLocation"><em>SampleLocation</em></a>) – the sample location to load to or

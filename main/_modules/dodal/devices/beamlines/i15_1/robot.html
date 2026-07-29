@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.5.4.dev4+g3b77d8109 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 2.5.4.dev5+g50b6b22ac documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=fc698186"></script>
+    <script src="../../../../../_static/documentation_options.js?v=afa4dbf5"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1200,6 +1200,9 @@ window.runMermaid = runMermaid;</script>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a sample load from the specified sample location or a sample unload</span>
 <span class="sd">        if SAMPLE_LOCATION_EMPTY is specified.</span>
 
+<span class="sd">        If the a sample load is requested and there is already a sample loaded then</span>
+<span class="sd">        perform an unload first.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            value (SampleLocation): the sample location to load to or</span>
 <span class="sd">                                    SAMPLE_LOCATION_EMPTY to unload</span>
@@ -1207,6 +1210,17 @@ window.runMermaid = runMermaid;</script>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">SAMPLE_LOCATION_EMPTY</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unload</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">current_puck</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">puck</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+            <span class="n">current_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">current_position</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">current_puck</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Position </span><span class="si">{</span><span class="n">current_position</span><span class="si">}</span><span class="s2"> from puck </span><span class="si">{</span><span class="n">current_puck</span><span class="si">}</span><span class="s2"> already loaded, unloading first.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unload</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">current_position</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">current_puck</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Robot state is invalid with a current puck/position of </span><span class="si">{</span><span class="n">current_puck</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">current_position</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 
