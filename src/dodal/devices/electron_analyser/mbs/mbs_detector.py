@@ -47,8 +47,6 @@ class MbsDetector(
             driver.slices,
             driver.iterations,
             driver.total_steps,
-            driver.acquire_time,
-            driver.acquire_period,
             driver.total_time,
             driver.energy_axis,
             driver.angle_axis,

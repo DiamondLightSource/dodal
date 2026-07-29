@@ -12,7 +12,13 @@ from daq_config_server.models.lookup_tables.mx_lut_models import (
     BeamlineRollLookupTable,
 )
 from daq_config_server.testing import PathToMockDataDict
-from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
+from ophyd_async.core import (
+    AsyncStatus,
+    get_mock_put,
+    init_devices,
+    set_mock_attr,
+    set_mock_value,
+)
 
 from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.enums import EnabledDisabledUpper
@@ -186,11 +192,15 @@ async def test_dcm_offset_only_set_when_energy_set_completes(
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
 
-    fake_undulator_dcm.dcm_ref().energy_in_keV.set = MagicMock(
-        return_value=AsyncStatus(release_dcm.wait())
+    set_mock_attr(
+        fake_undulator_dcm.dcm_ref().energy_in_keV,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_dcm.wait())),
     )
-    fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
-        return_value=AsyncStatus(release_undulator.wait())
+    set_mock_attr(
+        fake_undulator_dcm.undulator_ref().gap_motor,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_undulator.wait())),
     )
 
     offset_put = get_mock_put(fake_undulator_dcm.dcm_ref().offset_in_mm.user_setpoint)
@@ -214,11 +224,15 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
 
-    fake_undulator_dcm.dcm_ref().energy_in_keV.set = MagicMock(
-        return_value=AsyncStatus(release_dcm.wait())
+    set_mock_attr(
+        fake_undulator_dcm.dcm_ref().energy_in_keV,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_dcm.wait())),
     )
-    fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
-        return_value=AsyncStatus(release_undulator.wait())
+    set_mock_attr(
+        fake_undulator_dcm.undulator_ref().gap_motor,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_undulator.wait())),
     )
 
     status = fake_undulator_dcm.set(5.0)

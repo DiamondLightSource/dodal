@@ -11,6 +11,7 @@ from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_value,
 )
 
@@ -181,7 +182,7 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
     def failed(*args, **kwargs):
         raise AssertionError("Test Failure")
 
-    mirror_voltage_with_set._setpoint_v.set = failed
+    set_mock_attr(mirror_voltage_with_set._setpoint_v, "set", failed)
 
     def plan():
         with pytest.raises(FailedStatus) as e:
