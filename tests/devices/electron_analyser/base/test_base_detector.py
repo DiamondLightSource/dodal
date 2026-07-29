@@ -16,6 +16,7 @@ from dodal.devices.electron_analyser.base import (
 from tests.devices.electron_analyser.helper_util import (
     generate_fixture_regions_pair,
     load_b07_specs_test_seq,
+    load_i05_mbs_test_xml_seq,
     load_i09_vgscienta_test_seq,
 )
 
@@ -81,6 +82,7 @@ def test_analyser_detector_set_called_region_logic_setup_with_region(
     [
         pytest.param("ew4000", load_i09_vgscienta_test_seq()),
         pytest.param("b07b_specs150", load_b07_specs_test_seq()),
+        pytest.param("i05_mbs_analyser", load_i05_mbs_test_xml_seq()),
     ],
     indirect=["sim_detector"],
 )
