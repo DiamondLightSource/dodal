@@ -221,11 +221,7 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
 ):
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
-    set_mock_attr(
-        fake_undulator_dcm.dcm_ref().offset_in_mm,
-        "set",
-        MagicMock(return_value=AsyncStatus(asyncio.sleep(0))),
-    )
+
     set_mock_attr(
         fake_undulator_dcm.dcm_ref().energy_in_keV,
         "set",

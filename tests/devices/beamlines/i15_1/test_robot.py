@@ -1,4 +1,4 @@
-from unittest.mock import ANY, call
+from unittest.mock import ANY, AsyncMock, call
 
 import pytest
 from ophyd_async.core import (
@@ -286,3 +286,45 @@ async def test_when_puck_or_position_out_of_bounds_then_error_raised(
 ) -> None:
     with pytest.raises(ValueError):
         SampleLocation(puck, position)
+
+
+async def test_given_something_already_loaded_then_robot_will_unload(robot: Robot):
+    robot._unload = AsyncMock()
+    set_mock_value(robot.current_sample.puck, 8)
+    set_mock_value(robot.current_sample.position, 1)
+
+    set_location = SampleLocation(puck=1, position=2)
+    await robot.set(set_location)
+
+    robot._unload.assert_awaited_once()
+
+
+@pytest.mark.parametrize(
+    "puck, position",
+    ([0, 1], [1, 0]),
+)
+async def test_given_current_robot_state_is_invalid_then_raise_and_do_nothing(
+    robot: Robot, puck: int, position: int
+):
+    robot._unload = AsyncMock()
+    set_mock_value(robot.current_sample.puck, puck)
+    set_mock_value(robot.current_sample.position, position)
+
+    with pytest.raises(ValueError, match="Robot state is invalid"):
+        set_location = SampleLocation(puck=1, position=2)
+        await robot.set(set_location)
+
+    robot._unload.assert_not_called()
+
+
+async def test_given_unload_fails_then_load_does_not_happen(robot: Robot):
+    robot._unload = AsyncMock(side_effect=ValueError())
+    set_mock_value(robot.current_sample.puck, 8)
+    set_mock_value(robot.current_sample.position, 1)
+
+    with pytest.raises(ValueError):
+        set_location = SampleLocation(puck=1, position=2)
+        await robot.set(set_location)
+
+    get_mock_put(robot.puck_sel).assert_not_called()
+    get_mock_put(robot.pos_sel).assert_not_called()
