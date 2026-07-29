@@ -69,7 +69,7 @@ def scaler2_controller() -> ScalerCardController:
 
 
 @devices.factory()
-def mag_scaler2(scaler2_controller: ScalerCardController):
+def scaler2_mag(scaler2_controller: ScalerCardController):
     """Magnet scaler card channels for scaler2_controller."""
     mag_prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
     current_amp_pv = f"{I_PREFIX.beamline_prefix}-DI-IAMP-04:I1C-RAW"
@@ -89,7 +89,7 @@ def mag_scaler2(scaler2_controller: ScalerCardController):
 
 
 @devices.factory()
-def ppj_scaler2(scaler2_controller: ScalerCardController):
+def scaler2_ppj(scaler2_controller: ScalerCardController):
     """Patch Panel J channels for scaler2_controller."""
     prefix = f"{J_PREFIX.beamline_prefix}-EA-USER-01:"
     return ScalerCardChannels(
