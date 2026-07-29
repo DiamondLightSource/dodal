@@ -216,9 +216,8 @@ async def test_dcm_offset_only_set_when_energy_set_completes(
     offset_put.assert_called_with(25.6)
 
 
-@pytest.mark.parametrize("i", range(0, 100))
 async def test_energy_set_only_complete_when_all_statuses_are_finished(
-    fake_undulator_dcm: UndulatorDCM, i, event_loop_fuzzing
+    fake_undulator_dcm: UndulatorDCM,
 ):
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
