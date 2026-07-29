@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_attr
 
 from dodal.devices.beamlines.i06_shared import I06Apple2Controller
 from dodal.devices.insertion_device import (
@@ -56,7 +56,7 @@ async def test_set_motors_from_energy_and_polarisation_sets_correct_values(
     mock_i06_controller: I06Apple2Controller,
     mock_apple2: Apple2[UndulatorPhaseAxes],
 ):
-    mock_apple2.set = AsyncMock()
+    mock_set = set_mock_attr(mock_apple2, "set", AsyncMock())
     # Mock polarisation setpoint check
     mock_i06_controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
     await mock_i06_controller.energy.set(100.0)
@@ -75,7 +75,7 @@ async def test_set_motors_from_energy_and_polarisation_sets_correct_values(
             btm_outer=0.0,
         ),
     )
-    mock_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
+    mock_set.assert_awaited_once_with(id_motor_values=expected_val)
 
 
 async def test_energy_readback_with_inverse_lut(

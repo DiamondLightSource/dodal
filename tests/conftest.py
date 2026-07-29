@@ -105,11 +105,6 @@ def is_path_banned(path: Path, banned_paths: list[Path]) -> bool:
 
 
 @pytest.fixture(autouse=True)
-def _allowed_bluesky_attr():
-    os.environ["OPHYD_ASYNC_ALLOW_RESERVED_ATTRS"] = "YES"
-
-
-@pytest.fixture(autouse=True)
 def reset_path_provider():
     yield
     clear_path_provider()

@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_attr
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i09_2 import I092SampleManipulator, PiezoElectricMotor
@@ -38,9 +38,9 @@ async def piezo_motor() -> PiezoElectricMotor:
 
 
 async def test_piezo_motor_stop(piezo_motor: PiezoElectricMotor) -> None:
-    piezo_motor.motor_stop.set = AsyncMock()
+    mock_set = set_mock_attr(piezo_motor.motor_stop, "set", AsyncMock())
     await piezo_motor.stop()
-    piezo_motor.motor_stop.set.assert_awaited_once_with(1)
+    mock_set.assert_awaited_once_with(1)
 
 
 async def test_piezo_motor_set(piezo_motor: PiezoElectricMotor) -> None:
