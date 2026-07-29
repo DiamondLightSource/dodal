@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.k07 &#8212; dodal 2.5.4.dev3+gfa1d92ae4 documentation</title>
+    <title>dodal.beamlines.k07 &#8212; dodal 2.5.4.dev4+g3b77d8109 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=f79301ca"></script>
+    <script src="../../../_static/documentation_options.js?v=fc698186"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -890,7 +890,7 @@ window.runMermaid = runMermaid;</script>
   <h1>Source code for dodal.beamlines.k07</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrictEnum</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
@@ -912,9 +912,6 @@ window.runMermaid = runMermaid;</script>
 
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
 
-
-<span class="n">K07_CONF_CLIENT</span> <span class="o">=</span> <span class="n">ConfigClient</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://daq-config.diamond.ac.uk&quot;</span><span class="p">)</span>
-
 <span class="n">LOOK_UPTABLE_DIR</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/k07/software/gda/workspace_git/gda-diamond.git/configurations/k07/lookupTables/&quot;</span>
 <span class="n">GAP_LOOKUP_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;JIDEnergy2GapCalibrations.csv&quot;</span>
 <span class="n">PHASE_LOOKUP_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;JIDEnergy2PhaseCalibrations.csv&quot;</span>
@@ -925,6 +922,14 @@ window.runMermaid = runMermaid;</script>
 <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 <span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="config_client">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.k07.html#dodal.beamlines.k07.config_client">[docs]</a>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">config_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ConfigClient</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ConfigClient</span><span class="o">.</span><span class="n">from_url</span><span class="p">()</span></div>
+
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
@@ -985,20 +990,21 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">id_controller</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="n">Apple2</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">],</span>
+    <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Apple2EnforceLHMoveController</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;I21 insertion device controller.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Apple2EnforceLHMoveController</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">](</span>
         <span class="n">apple2</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
         <span class="n">gap_energy_motor_lut</span><span class="o">=</span><span class="n">ConfigServerEnergyMotorLookup</span><span class="p">(</span>
             <span class="n">lut_config</span><span class="o">=</span><span class="n">LookupTableColumnConfig</span><span class="p">(</span><span class="n">grating</span><span class="o">=</span><span class="n">K07_GRATING_COLUMNS</span><span class="p">),</span>
-            <span class="n">config_client</span><span class="o">=</span><span class="n">K07_CONF_CLIENT</span><span class="p">,</span>
+            <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
             <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">LOOK_UPTABLE_DIR</span><span class="p">,</span> <span class="n">GAP_LOOKUP_FILE_NAME</span><span class="p">),</span>
         <span class="p">),</span>
         <span class="n">phase_energy_motor_lut</span><span class="o">=</span><span class="n">ConfigServerEnergyMotorLookup</span><span class="p">(</span>
             <span class="n">lut_config</span><span class="o">=</span><span class="n">LookupTableColumnConfig</span><span class="p">(</span>
                 <span class="n">grating</span><span class="o">=</span><span class="n">K07_GRATING_COLUMNS</span><span class="p">,</span> <span class="n">poly_deg</span><span class="o">=</span><span class="n">K07_PHASE_POLY_DEG_COLUMNS</span>
             <span class="p">),</span>
-            <span class="n">config_client</span><span class="o">=</span><span class="n">K07_CONF_CLIENT</span><span class="p">,</span>
+            <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
             <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">LOOK_UPTABLE_DIR</span><span class="p">,</span> <span class="n">GAP_LOOKUP_FILE_NAME</span><span class="p">),</span>
         <span class="p">),</span>
         <span class="n">units</span><span class="o">=</span><span class="s2">&quot;eV&quot;</span><span class="p">,</span>

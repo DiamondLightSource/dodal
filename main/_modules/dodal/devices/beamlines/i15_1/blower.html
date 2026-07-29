@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.blower &#8212; dodal 2.5.4.dev3+gfa1d92ae4 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.blower &#8212; dodal 2.5.4.dev4+g3b77d8109 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=f79301ca"></script>
+    <script src="../../../../../_static/documentation_options.js?v=fc698186"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,7 +885,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamlines.i15_1.blower</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models.i15_1.xpdf_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TemperatureControllerParams</span><span class="p">,</span>
 <span class="p">)</span>
@@ -913,6 +913,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">pneumatic_pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
         <span class="n">xpdf_parameters_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_temperature_sp</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SP&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_temperature_rbv</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PV:RBV&quot;</span><span class="p">)</span>
@@ -929,7 +930,7 @@ window.runMermaid = runMermaid;</script>
             <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RR&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RR:RBV&quot;</span>
         <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">motion_pv</span><span class="p">,</span> <span class="n">config_client</span><span class="p">,</span> <span class="n">xpdf_parameters_path</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">motion_pv</span><span class="p">,</span> <span class="n">config_client</span><span class="p">,</span> <span class="n">xpdf_parameters_path</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature_rbv</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">temperature_rbv</span>

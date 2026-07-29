@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Writing Tests in This Python Project &#8212; dodal 2.5.4.dev3+gfa1d92ae4 documentation</title>
+    <title>Writing Tests in This Python Project &#8212; dodal 2.5.4.dev4+g3b77d8109 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=f79301ca"></script>
+    <script src="../_static/documentation_options.js?v=fc698186"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -421,6 +421,7 @@
 
 
 
+
 <li class="toctree-l1"><a class="reference internal" href="dev-install.html">Setup Developer Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="excalidraw.html">How to embed Excalidraw diagrams</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external-io-devices.html">How to Write External IO Devices</a></li>
@@ -563,7 +564,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">OnOff</span><span class="p">,</span> <span class="n">init_devices</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">assert_reading</span><span class="p">,</span> <span class="n">get_mock_put</span><span class="p">,</span> <span class="n">partial_reading</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device.my_device</span><span class="w"> </span><span class="kn">import</span>  <span class="n">MyDevice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device.my_device</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyDevice</span>
 
 
 <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
@@ -596,16 +597,131 @@
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">partial_reading</span></code> wraps the value given in a mapping like <code class="docutils literal notranslate"><span class="pre">{&quot;value&quot;:</span> <span class="pre">ANY}</span></code>, so we are actually checking that the reading matches the expected structure.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span>    <span class="n">prefix</span> <span class="o">=</span> <span class="n">sim_my_device</span><span class="o">.</span><span class="n">name</span>
-    <span class="k">await</span> <span class="n">assert_reading</span><span class="p">(</span>
-        <span class="n">sim_my_device</span><span class="p">,</span>
-        <span class="p">{</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">},</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">prefix</span> <span class="o">=</span> <span class="n">sim_my_device</span><span class="o">.</span><span class="n">name</span>
+<span class="k">await</span> <span class="n">assert_reading</span><span class="p">(</span>
+    <span class="n">sim_my_device</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">},</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="using-the-mock-config-client-fixture-to-read-files">
+<h2>Using the mock_config_client fixture to read files<a class="headerlink" href="#using-the-mock-config-client-fixture-to-read-files" title="Link to this heading">#</a></h2>
+<p>Unit tests should not communicate with the real daq-config-server or read files from the DLS filesystem.</p>
+<p>Dodal provides a <code class="docutils literal notranslate"><span class="pre">mock_config_client</span></code> fixture in <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code>. This fixture creates the ConfigClient and puts it into a mock mode. This reads test files directly from the local filesystem.</p>
+<p>Most tests only need to depend on this fixture:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.my_device</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyDevice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_devices</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_device</span><span class="p">(</span><span class="n">mock_config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">init_devices</span><span class="p">(</span><span class="n">mock</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MyDevice</span><span class="p">(</span>
+            <span class="n">config_client</span><span class="o">=</span><span class="n">mock_config_client</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;tests/test_data/example_lookup_table.json&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<section id="mocking-configuration-files">
+<h3>Mocking configuration files<a class="headerlink" href="#mocking-configuration-files" title="Link to this heading">#</a></h3>
+<p>Some configuration files are not JSON-based and require custom parsing logic. These can be provided to the <code class="docutils literal notranslate"><span class="pre">ConfigClient</span></code> mock by adding the configuration path and its parsed model to the <code class="docutils literal notranslate"><span class="pre">path_to_mock_data</span></code> fixture.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathToMockDataDict</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">path_to_mock_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PathToMockDataDict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">TEST_HARD_UNDULATOR_LUT</span><span class="p">:</span> <span class="n">parse_i09_hu_undulator_energy_gap_lut</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">TEST_HARD_UNDULATOR_LUT</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>The mock <code class="docutils literal notranslate"><span class="pre">ConfigClient</span></code> defined in <code class="docutils literal notranslate"><span class="pre">tests/conftest.py</span></code> (which is an avaliable fixture for every test) is then configured with this data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MockServerResponse</span><span class="p">,</span> <span class="n">PathToMockDataDict</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_config_client</span><span class="p">(</span><span class="n">path_to_mock_data</span><span class="p">:</span> <span class="n">PathToMockDataDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigClient</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ConfigClient</span><span class="p">(</span><span class="n">server_response</span><span class="o">=</span><span class="n">MockServerResponse</span><span class="p">(</span><span class="n">path_to_mock_data</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">get_file_contents()</span></code> is called for <code class="docutils literal notranslate"><span class="pre">TEST_HARD_UNDULATOR_LUT</span></code>, the mock client returns the configured model without accessing the file or configuration service.</p>
+<p>This approach can be used for any configuration format that requires custom parsing.</p>
+<p>So a user who needs custom data to be return from the <code class="docutils literal notranslate"><span class="pre">ConfigClient</span></code> only needs to override the <code class="docutils literal notranslate"><span class="pre">path_to_mock_data</span></code> fixture and then the test needs a dependency on the <code class="docutils literal notranslate"><span class="pre">mock_config_client</span></code> fixture.</p>
+</section>
+</section>
+<section id="testing-beamline-module-imports-and-device-creation">
+<h2>Testing beamline module imports and device creation<a class="headerlink" href="#testing-beamline-module-imports-and-device-creation" title="Link to this heading">#</a></h2>
+<p>The tests in <code class="docutils literal notranslate"><span class="pre">tests/common/beamlines/test_device_instantiation.py</span></code> validate that every beamline module can be imported and that all device factories successfully construct devices in a test environment.</p>
+<p>During import and device creation, many beamlines load configuration files using either:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ConfigClient.get_file_contents()</span></code></p></li>
+<li><p>Module-level path constants that point to files on the DLS filesystem</p></li>
+</ul>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">BEAMLINE_PARAMETERS_PATH</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;/dls_sw/i03/software/daq_configuration/json/beamlineParameters.json&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>These files are not available in unit test environments and must not be accessed during tests.</p>
+<p>To allow beamline import and device creation tests to run without access to the DLS filesystem, the <code class="docutils literal notranslate"><span class="pre">module_and_devices_for_beamline</span></code> fixture performs two forms of mocking:</p>
+<ol class="arabic simple">
+<li><p>Configures <code class="docutils literal notranslate"><span class="pre">ConfigClient</span></code> with mock configuration data using <code class="docutils literal notranslate"><span class="pre">configure_mock()</span></code>.</p></li>
+<li><p>Replaces known module-level file path constants with paths to test data files.</p></li>
+</ol>
+<section id="mocking-beamline-file-paths">
+<h3>Mocking beamline file paths<a class="headerlink" href="#mocking-beamline-file-paths" title="Link to this heading">#</a></h3>
+<p>Some beamlines contain module-level constants that directly reference files on the DLS filesystem. These constants are replaced after module import using the <code class="docutils literal notranslate"><span class="pre">MOCK_ATTRIBUTES_TABLE</span></code>.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MOCK_ATTRIBUTES_TABLE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;i03&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;BEAMLINE_PARAMETERS_PATH&quot;</span><span class="p">:</span> <span class="n">TEST_BEAMLINE_PARAMETERS_TXT</span><span class="p">,</span>
+        <span class="s2">&quot;DAQ_CONFIGURATION_PATH&quot;</span><span class="p">:</span> <span class="n">MOCK_DAQ_CONFIG_PATH</span><span class="p">,</span>
+        <span class="s2">&quot;ZOOM_PARAMS_FILE&quot;</span><span class="p">:</span> <span class="n">TEST_OAV_ZOOM_LEVELS</span><span class="p">,</span>
+        <span class="s2">&quot;DISPLAY_CONFIG&quot;</span><span class="p">:</span> <span class="n">TEST_DISPLAY_CONFIG</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When the <code class="docutils literal notranslate"><span class="pre">i03</span></code> beamline is tested, these attributes are overwritten with paths to local test files:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mock_beamline_module_filepaths</span><span class="p">(</span><span class="s2">&quot;i03&quot;</span><span class="p">,</span> <span class="n">beamline_module</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This allows device factories to load representative configuration data without accessing the real DLS filesystem.</p>
+</section>
+<section id="adding-support-for-a-new-beamline">
+<h3>Adding support for a new beamline<a class="headerlink" href="#adding-support-for-a-new-beamline" title="Link to this heading">#</a></h3>
+<p>If the device creation tests fail because a beamline attempts to access a file under <code class="docutils literal notranslate"><span class="pre">/dls</span></code> or <code class="docutils literal notranslate"><span class="pre">/dls_sw</span></code>, identify the module attribute containing the path and add an entry to <code class="docutils literal notranslate"><span class="pre">MOCK_ATTRIBUTES_TABLE</span></code>.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MOCK_ATTRIBUTES_TABLE</span> <span class="o">=</span> <span class="p">{</span> 
+    <span class="o">...</span>
+    <span class="s2">&quot;iXX: {</span>
+        <span class="s2">&quot;MY_CONFIGURATION_FILE&quot;</span><span class="p">:</span> <span class="n">TEST_MY_CONFIGURATION_FILE</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The replacement file should be committed to the test suite and contain the minimum configuration required for the beamline to initialise successfully.</p>
+<p>As a rule of thumb:</p>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">mock_config_client</span></code> when configuration is loaded through <code class="docutils literal notranslate"><span class="pre">ConfigClient</span></code>.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">MOCK_ATTRIBUTES_TABLE</span></code> when a beamline module contains hard-coded filesystem paths.</p></li>
+<li><p>If both mechanisms are used by a beamline, both may need to be configured for the tests to pass.</p></li>
+</ul>
+</section>
 </section>
 <section id="test-performance-and-reliability">
 <h2>Test performance and reliability<a class="headerlink" href="#test-performance-and-reliability" title="Link to this heading">#</a></h2>
@@ -685,6 +801,15 @@ remove the parametrization afterwards.</p>
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-organization">Test Organization</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-test-for-a-device">Writing a test for a device</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-mock-config-client-fixture-to-read-files">Using the mock_config_client fixture to read files</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mocking-configuration-files">Mocking configuration files</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-beamline-module-imports-and-device-creation">Testing beamline module imports and device creation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mocking-beamline-file-paths">Mocking beamline file paths</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-support-for-a-new-beamline">Adding support for a new beamline</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-performance-and-reliability">Test performance and reliability</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#event-loop-fuzzer">Event loop fuzzer</a></li>
 </ul>

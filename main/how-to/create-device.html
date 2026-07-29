@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new device &#8212; dodal 2.5.4.dev3+gfa1d92ae4 documentation</title>
+    <title>Creating a new device &#8212; dodal 2.5.4.dev4+g3b77d8109 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=f79301ca"></script>
+    <script src="../_static/documentation_options.js?v=fc698186"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -421,6 +421,7 @@
 
 
 
+
 <li class="toctree-l1"><a class="reference internal" href="dev-install.html">Setup Developer Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="excalidraw.html">How to embed Excalidraw diagrams</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external-io-devices.html">How to Write External IO Devices</a></li>
@@ -542,6 +543,41 @@
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">dodal</span> <span class="pre">connect</span> <span class="pre">&lt;beamline&gt;</span></code> to check device connectivity and <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> to confirm PVs and datatypes. You can check a PV’s datatype by using the <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> command. If the datatype is an enum, <code class="docutils literal notranslate"><span class="pre">caget</span> <span class="pre">-d</span> <span class="pre">31</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> will also display the available enums that the PV takes. Common enums are defined in <code class="docutils literal notranslate"><span class="pre">ophyd-async.core</span></code> for devices to use, but you can define custom ones when suitable (inheriting from <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code> <code class="docutils literal notranslate"><span class="pre">StrictEnum</span></code>, <code class="docutils literal notranslate"><span class="pre">SupersetEnum</span></code> or <code class="docutils literal notranslate"><span class="pre">SubsetEnum</span></code>). The values should be capitalised e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;On&quot;</span></code>. If the PV expects upper case for the enum (e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;ON&quot;</span></code>), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html">here</a>.</p></li>
 </ul>
 </section>
+<section id="using-the-daq-config-server-service-for-configuration">
+<h1>Using the daq-config-server service for configuration<a class="headerlink" href="#using-the-daq-config-server-service-for-configuration" title="Link to this heading">#</a></h1>
+<p>Beamlines and devices may depend on the daq-config-server <code class="docutils literal notranslate"><span class="pre">ConfigClient</span></code> to retrieve configuration files. These files are often stored on the DLS filesystem and contain configuration data that determines device behaviour.</p>
+<p>For example, an insertion device may use a calibration file containing polynomial coefficients that convert photon energy into insertion device gap for different polarisation modes. A device may retrieve this information using a <code class="docutils literal notranslate"><span class="pre">ConfigClient</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.my_device</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyDevice</span>
+
+<span class="n">LOOKUPTABLE_DIR</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;/dls_sw/iXX/software/gda/workspace_git/&quot;</span>
+    <span class="s2">&quot;gda-diamond.git/configurations/iXX/lookupTables&quot;</span>
+<span class="p">)</span>
+<span class="n">LOOKUP_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;JIDEnergy2GapCalibrations.csv&quot;</span>
+
+<span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
+
+
+<span class="nd">@devices</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">config_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ConfigClient</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ConfigClient</span><span class="o">.</span><span class="n">from_url</span><span class="p">()</span>
+
+
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_device</span><span class="p">(</span><span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">MyDevice</span><span class="p">(</span>
+        <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">LOOKUPTABLE_DIR</span><span class="p">,</span> <span class="n">LOOKUP_FILE_NAME</span><span class="p">),</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Please checkout the daq-config-server documentation for more information: https://diamondlightsource.github.io/daq-config-server/main/index.html.</p>
+</section>
 <section id="device-best-practices-for-bluesky-plans">
 <h1>Device best practices for Bluesky plans<a class="headerlink" href="#device-best-practices-for-bluesky-plans" title="Link to this heading">#</a></h1>
 <ul class="simple">
@@ -617,6 +653,7 @@
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Creating a new device</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#reusing-an-existing-class">Reusing an existing class</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-device-class">Writing a device class</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-daq-config-server-service-for-configuration">Using the daq-config-server service for configuration</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#device-best-practices-for-bluesky-plans">Device best practices for Bluesky plans</a></li>
 </ul>
 

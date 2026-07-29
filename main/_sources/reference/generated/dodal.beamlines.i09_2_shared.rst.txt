@@ -20,6 +20,12 @@ dodal.beamlines.i09\_2\_shared
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+   
    
 
    

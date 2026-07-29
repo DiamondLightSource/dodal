@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.safe_or_beam_positioner &#8212; dodal 2.5.4.dev3+gfa1d92ae4 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.safe_or_beam_positioner &#8212; dodal 2.5.4.dev4+g3b77d8109 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=f79301ca"></script>
+    <script src="../../../../../_static/documentation_options.js?v=fc698186"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -888,7 +888,7 @@ window.runMermaid = runMermaid;</script>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">abstractmethod</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models.i15_1.xpdf_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TemperatureControllerParams</span><span class="p">,</span>
     <span class="n">TemperatureControllersConfig</span><span class="p">,</span>
@@ -913,13 +913,17 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i15_1.safe_or_beam_positioner.SafeOrBeamPositioner.html#dodal.devices.beamlines.i15_1.safe_or_beam_positioner.SafeOrBeamPositioner">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SafeOrBeamPositioner</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">SafeOrBeamPosition</span><span class="p">]):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span> <span class="n">xpdf_parameters_path</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
+        <span class="n">xpdf_parameters_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span> <span class="o">=</span> <span class="n">config_client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xpdf_parameters_path</span> <span class="o">=</span> <span class="n">xpdf_parameters_path</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SafeOrBeamPosition</span><span class="p">):</span>
