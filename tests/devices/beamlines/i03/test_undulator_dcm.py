@@ -216,14 +216,17 @@ async def test_dcm_offset_only_set_when_energy_set_completes(
     offset_put.assert_called_with(25.6)
 
 
+@pytest.mark.parametrize("i", range(0, 100))
 async def test_energy_set_only_complete_when_all_statuses_are_finished(
-    fake_undulator_dcm: UndulatorDCM,
+    fake_undulator_dcm: UndulatorDCM, i, event_loop_fuzzing
 ):
-    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.0)
-
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
-
+    set_mock_attr(
+        fake_undulator_dcm.dcm_ref().offset_in_mm,
+        "set",
+        MagicMock(return_value=AsyncStatus(asyncio.sleep(0))),
+    )
     set_mock_attr(
         fake_undulator_dcm.dcm_ref().energy_in_keV,
         "set",
@@ -234,16 +237,17 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
         "set",
         MagicMock(return_value=AsyncStatus(release_undulator.wait())),
     )
-
     status = fake_undulator_dcm.set(5.0)
+    done, _ = await asyncio.wait([status.task], timeout=0.1)
+    assert not done
 
-    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
-    assert not status.done
     release_dcm.set()
-    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
-    assert not status.done
+    done, _ = await asyncio.wait([status.task], timeout=0.1)
+    assert not done
+
     release_undulator.set()
-    await asyncio.wait_for(status, timeout=0.02)
+    done, _ = await asyncio.wait([status.task], timeout=0.1)
+    assert status.task in done
 
 
 async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_energy_is_not_set(
