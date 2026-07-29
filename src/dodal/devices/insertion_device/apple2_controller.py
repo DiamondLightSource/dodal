@@ -126,17 +126,18 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             soft_signal_r_and_setter(Pol)
         )
         phase = self.apple2().phase()
-        # check if undulator phase is unlocked.
+        # For unlocked phase axes, use top_inner and btm_outer readbacks to calculate
+        # derived signal polarisation.
         if isinstance(phase, UndulatorPhaseAxes):
             top_inner = phase.top_inner.user_readback
             btm_outer = phase.btm_outer.user_readback
         else:
-            # If locked phase axes make the locked phase 0.
-            top_inner = btm_outer = soft_signal_rw(float, initial_value=0.0)
+            # Locked phase axes do not have top_inner or btm_outer signals. Use zero
+            # value constants for these phases when calculating derived polarisation.
+            top_inner = btm_outer = 0.0
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Hardware backed read/write for polarisation.
-
             self.polarisation = derived_signal_rw(
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,

@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import InOut, PathProvider, StrictEnum
 from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.epics.adpilatus import PilatusDetector
@@ -37,7 +37,7 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    return ConfigClient()
+    return ConfigClient.from_url()
 
 
 @devices.fixture

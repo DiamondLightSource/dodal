@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.common.beamlines.beamline_parameters import (
     get_beamline_parameters,
@@ -27,8 +27,8 @@ def patch_beamline_parameter_paths():
 
 
 @pytest.fixture(autouse=True)
-def always_set_config_client():
-    set_config_client(ConfigClient("test"))
+def always_set_config_client(mock_config_client: ConfigClient):
+    set_config_client(mock_config_client)
 
 
 def test_beamline_parameters():

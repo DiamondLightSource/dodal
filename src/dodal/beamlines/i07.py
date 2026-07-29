@@ -1,6 +1,6 @@
 from functools import cache
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.beamline_utils import set_config_client
@@ -22,7 +22,7 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient()
+    client = ConfigClient.from_url()
     set_config_client(client)
     return client
 
