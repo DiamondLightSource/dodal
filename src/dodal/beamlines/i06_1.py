@@ -1,4 +1,4 @@
-from ophyd_async.core import DeviceVector
+from ophyd_async.core import DeviceMap, DeviceVector
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.beamlines.i06_shared import devices as i06_shared_devices
@@ -74,15 +74,14 @@ def mag_scaler2(scaler2_controller: ScalerCardController):
     mag_prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
     current_amp_pv = f"{I_PREFIX.beamline_prefix}-DI-IAMP-04:I1C-RAW"
     return ScalerCardChannels(
-        channels=DeviceVector(
+        channels=DeviceMap(
             {
-                # Change to DeviceMap when on ophyd-async 0.20
-                0: epics_signal_r(float, mag_prefix + "TEYC-RAW"),  # tey
-                1: epics_signal_r(float, current_amp_pv),  # i0
-                2: epics_signal_r(float, mag_prefix + "FDUC-RAW"),  # FDU
-                3: epics_signal_r(float, mag_prefix + "FDDC-RAW"),  # FDD
-                4: epics_signal_r(float, mag_prefix + "90DC-RAW"),  # D90
-                5: epics_signal_r(float, mag_prefix + "FIELDC-RAW"),  # FFZ
+                "tey": epics_signal_r(float, mag_prefix + "TEYC-RAW"),
+                "i0": epics_signal_r(float, current_amp_pv),
+                "fdu": epics_signal_r(float, mag_prefix + "FDUC-RAW"),
+                "fdd": epics_signal_r(float, mag_prefix + "FDDC-RAW"),
+                "d90": epics_signal_r(float, mag_prefix + "90DC-RAW"),
+                "ffz": epics_signal_r(float, mag_prefix + "FIELDC-RAW"),
             }
         ),
         controller=scaler2_controller,

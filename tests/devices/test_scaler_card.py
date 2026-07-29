@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky.protocols import Reading
 from ophyd_async.core import (
+    DeviceMap,
     DeviceVector,
     StandardReadable,
     get_mock_put,
@@ -51,6 +52,23 @@ def scaler2(scaler_controller: ScalerCardController):
     return scaler2
 
 
+@pytest.fixture
+def scaler3(scaler_controller: ScalerCardController):
+    """Multi channel example with device map."""
+    with init_devices(mock=True):
+        scaler3 = ScalerCardChannels(
+            channels=DeviceMap(
+                {
+                    "dev1": epics_signal_r(float, "TEST1:"),
+                    "dev2": epics_signal_r(float, "TEST2:"),
+                    "dev3": epics_signal_r(float, "TEST3:"),
+                }
+            ),
+            controller=scaler_controller,
+        )
+    return scaler3
+
+
 class MultiChannelExample(StandardReadable):
     def __init__(self, name: str = ""):
         with self.add_children_as_readables():
@@ -60,14 +78,14 @@ class MultiChannelExample(StandardReadable):
 
 
 @pytest.fixture
-def scaler3(scaler_controller: ScalerCardController):
+def scaler4(scaler_controller: ScalerCardController):
     """Multi channel example with sub device."""
     with init_devices(mock=True):
-        scaler3 = ScalerCardChannels(
+        scaler4 = ScalerCardChannels(
             channels=MultiChannelExample(),
             controller=scaler_controller,
         )
-    return scaler3
+    return scaler4
 
 
 async def test_scaler1_single_channel_read_and_configuration(
@@ -81,7 +99,7 @@ async def test_scaler1_single_channel_read_and_configuration(
     )
 
 
-async def test_scaler2_multi_channel_read_and_configuration(
+async def test_scaler2_multi_channel_device_vector_read_and_configuration(
     scaler2: ScalerCardChannels,
 ) -> None:
     await asyncio.gather(
@@ -99,19 +117,37 @@ async def test_scaler2_multi_channel_read_and_configuration(
     )
 
 
-async def test_scaler3_multi_channel_read_and_configuration(
+async def test_scaler3_multi_channel_device_map_read_and_configuration(
     scaler3: ScalerCardChannels,
 ) -> None:
     await asyncio.gather(
         assert_reading(
             scaler3,
             {
-                "scaler3-channel-hm3amp20": partial_reading(0),
-                "scaler3-channel-sm5amp8": partial_reading(0),
+                "scaler3-channel-dev1": partial_reading(0),
+                "scaler3-channel-dev2": partial_reading(0),
+                "scaler3-channel-dev3": partial_reading(0),
             },
         ),
         assert_configuration(
             scaler3, {"scaler_controller-integration_time": partial_reading(0)}
+        ),
+    )
+
+
+async def test_scaler4_multi_channel_sub_device_read_and_configuration(
+    scaler4: ScalerCardChannels,
+) -> None:
+    await asyncio.gather(
+        assert_reading(
+            scaler4,
+            {
+                "scaler4-channel-hm3amp20": partial_reading(0),
+                "scaler4-channel-sm5amp8": partial_reading(0),
+            },
+        ),
+        assert_configuration(
+            scaler4, {"scaler_controller-integration_time": partial_reading(0)}
         ),
     )
 
@@ -133,9 +169,11 @@ async def test_scaler_controller_read_when_used_with_channel(
 async def test_scaler_controller_read_when_used_with_multiple_channels(
     scaler_controller: ScalerCardController,
     scaler1: ScalerCardChannels,
-    scaler2: ScalerCardController,
-    scaler3: ScalerCardController,
+    scaler2: ScalerCardChannels,
+    scaler3: ScalerCardChannels,
+    scaler4: ScalerCardChannels,
 ) -> None:
+    """Using multiple channels should add their readables to the master controller."""
     await assert_reading(
         scaler_controller,
         {
@@ -143,8 +181,11 @@ async def test_scaler_controller_read_when_used_with_multiple_channels(
             "scaler2-channel-0": partial_reading(0),
             "scaler2-channel-1": partial_reading(0),
             "scaler2-channel-2": partial_reading(0),
-            "scaler3-channel-hm3amp20": partial_reading(0),
-            "scaler3-channel-sm5amp8": partial_reading(0),
+            "scaler3-channel-dev1": partial_reading(0),
+            "scaler3-channel-dev2": partial_reading(0),
+            "scaler3-channel-dev3": partial_reading(0),
+            "scaler4-channel-hm3amp20": partial_reading(0),
+            "scaler4-channel-sm5amp8": partial_reading(0),
         },
     )
 
