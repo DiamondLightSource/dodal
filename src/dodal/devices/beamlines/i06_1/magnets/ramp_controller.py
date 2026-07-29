@@ -12,7 +12,7 @@ from ophyd_async.core import (
     default_mock_class,
     set_mock_value,
 )
-from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 @dataclass
@@ -33,8 +33,8 @@ class RampRateMovableLogic(MovableLogic[float]):
 class MockMagnetAxisRampRateController(InstantMovableMock):
     async def connect(self, device: StandardMovable):
         await super().connect(device)
-        # Extend to set a sensible default value for the limit.
-        set_mock_value(device.limit, 2)  # type: ignore
+        # Extend to set a sensible default value for the ramp limit.
+        set_mock_value(device.ramp_limit, 2)  # type: ignore
 
 
 @default_mock_class(MockMagnetAxisRampRateController)
@@ -47,15 +47,16 @@ class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.readback = epics_signal_rw(float, prefix + "STS:RAMPRATE:TPM")
+            self.readback = epics_signal_r(float, prefix + "STS:RAMPRATE:TPM")
         self.demand = epics_signal_rw(float, prefix + "SET:DMD:RAMPRATE:TPM")
-        self.limit = epics_signal_rw(float, prefix + "LIM:RAMPRATE:TPM")
+        self.ramp_limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
+        self.axis_limit = epics_signal_r(float, prefix + "LIM:FIELD:NOW")
         super().__init__(name)
 
     @cached_property
     def movable_logic(self) -> RampRateMovableLogic:
         return RampRateMovableLogic(
-            readback=self.readback, setpoint=self.demand, limit=self.limit
+            readback=self.readback, setpoint=self.demand, limit=self.ramp_limit
         )
 
 

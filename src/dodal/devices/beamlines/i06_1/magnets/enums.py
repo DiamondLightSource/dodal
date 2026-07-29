@@ -1,7 +1,7 @@
 from ophyd_async.core import StrictEnum
 
 
-class MagnetModes(StrictEnum):
+class MagnetMode(StrictEnum):
     UNIAXIAL_X = "UNIAXIAL_X"
     UNIAXIAL_Y = "UNIAXIAL_Y"
     UNIAXIAL_Z = "UNIAXIAL_Z"
@@ -11,6 +11,18 @@ class MagnetModes(StrictEnum):
     CUBIC = "CUBIC"
     UNDEFINED = "UNDEFINED"
 
+    @property
+    def axis_alias(self) -> str:
+        match self:
+            case MagnetMode.UNIAXIAL_X:
+                return "x"
+            case MagnetMode.UNIAXIAL_Y:
+                return "y"
+            case MagnetMode.UNIAXIAL_Z:
+                return "z"
+            case _:
+                raise ValueError(f"{self} is not a valid uniaxial.")
+
 
 class MagnetRampStatus(StrictEnum):
     RAMP_MADE = "RAMP MADE"
@@ -19,4 +31,4 @@ class MagnetRampStatus(StrictEnum):
 
 class MagnetLimitStatus(StrictEnum):
     OK = "OK"
-    VIOLTATION = "VIOLATION"
+    VIOLATION = "VIOLATION"

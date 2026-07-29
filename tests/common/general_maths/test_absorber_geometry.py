@@ -29,8 +29,8 @@ def test_foil_absorber_reports_thickness_in_cm_when_validly_specified(
 @pytest.mark.parametrize(
     "tip, taper_cotangent, probed_position_mm, expected_thickness_cm",
     [
-        (-5.0, 10.0, -5.0, 0.0),
-        (2.0, -10.0, -15.2, 0.172),
+        (-5, 5.0, -5.0, 0.0),
+        (2, -10.0, -15.2, 0.172),
         (-12.8, 9.7, 80.6, 0.9628866),
         (12.8, 11.1, 22.4, 0.08648649),
     ],
@@ -40,7 +40,7 @@ def test_wedge_geometry_reports_correct_thickness_in_cm(
 ):
     wedge_absorber = WedgeGeometry(tip_mm=tip, taper_cotangent=taper_cotangent)
     assert wedge_absorber.thickness_cm_at_motor_position_mm(
-        probed_position_mm
+        motor_position_mm=probed_position_mm
     ) == pytest.approx(expected_thickness_cm)
 
 
@@ -48,7 +48,7 @@ def test_wedge_geometry_reports_correct_thickness_in_cm(
     "tip, taper_cotangent, required_thickness_cm, expected_motor_position_mm",
     [
         (-5.0, 10.0, 0.04, -1.0),
-        (2.0, -10.0, 0.172, -15.2),
+        (3, -10.0, 0.172, -14.2),
         (-12.8, 9.7, 0.9628866, 80.6),
         (12.8, 11.1, 0.08648649, 22.4),
     ],
@@ -58,7 +58,7 @@ def test_wedge_geometry_reports_correct_motor_position_mm_to_achieve_requested_t
 ):
     wedge_absorber = WedgeGeometry(tip_mm=tip, taper_cotangent=taper_cotangent)
     assert wedge_absorber.motor_position_mm_for_thickness_cm(
-        required_thickness_cm
+        thickness_cm=required_thickness_cm
     ) == pytest.approx(expected_motor_position_mm)
 
 
@@ -75,7 +75,9 @@ def test_wedge_geometry_reports_correct_motor_position_mm_to_achieve_requested_t
         [],
         {},
         object(),
+        AttributeError(),
         False,
+        True,
     ],
 )
 def test_foil_absorber_raises_error_when_given_invalid_input_for_numerical_thickness(
@@ -89,6 +91,7 @@ def test_foil_absorber_raises_error_when_given_invalid_input_for_numerical_thick
     "unsupported_unit",
     [
         "",
+        "12",
         "mile",
         "km",
         "furlong",
@@ -112,13 +115,16 @@ def test_foil_absorber_raises_error_when_asked_to_use_unsupported_distance_units
     "bad_input",
     [
         -9,
+        0,
         4.7,
         math.sin,
         None,
         [],
         {},
         object(),
+        KeyError(),
         True,
+        False,
     ],
 )
 def test_foil_absorber_raises_error_when_given_invalid_distance_units(bad_input):
@@ -129,6 +135,11 @@ def test_foil_absorber_raises_error_when_given_invalid_distance_units(bad_input)
 @pytest.mark.parametrize(
     "taper_cotangent",
     [
+        0,
+        1,
+        -2,
+        4,
+        -3,
         0.0,
         1.0,
         -2.1,

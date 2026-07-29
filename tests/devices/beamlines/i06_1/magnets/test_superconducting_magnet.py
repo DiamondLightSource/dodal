@@ -3,6 +3,8 @@ import math
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
+from bluesky import FailedStatus, RunEngine
+from bluesky.plan_stubs import mv
 from bluesky.protocols import Reading
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
@@ -12,7 +14,7 @@ from dodal.devices.beamlines.i06_1.magnets import (
     MagnetAxis,
     MagnetAxisRampRateController,
     MagnetLimitStatus,
-    MagnetModes,
+    MagnetMode,
     MagnetPosition,
     MagnetPositionError,
     MagnetRampStatus,
@@ -58,7 +60,7 @@ async def test_scmc_read(scmc: SuperConductingMagnetController) -> None:
 
 async def test_scmc_configuration(scmc: SuperConductingMagnetController) -> None:
     await assert_configuration(
-        scmc, {"scmc-mode": partial_reading(MagnetModes.UNIAXIAL_X)}
+        scmc, {"scmc-mode": partial_reading(MagnetMode.UNIAXIAL_X)}
     )
 
 
@@ -78,7 +80,7 @@ async def test_scmc_axis_set_uses_correct_axis(
     expected_y: float,
     expected_z: float,
 ) -> None:
-    await scmc.mode.set(getattr(MagnetModes, "UNIAXIAL_" + axis.capitalize()))
+    await scmc.mode.set(getattr(MagnetMode, "UNIAXIAL_" + axis.capitalize()))
     await getattr(scmc.cart, axis).set(value)
     x, y, z = await asyncio.gather(
         scmc.cart.x.readback.get_value(),
@@ -98,8 +100,8 @@ async def test_scmc_sph_set_using_spherical(
     cartesian: MagnetPosition,
     spherical: MagnetSphericalPosition,
 ) -> None:
-    await scmc.mode.set(MagnetModes.SPHERICAL)
-    await scmc.sph.set(spherical)
+    await scmc.mode.set(MagnetMode.SPHERICAL)
+    await scmc.sph.set(spherical.to_request_pos())
     rho, theta, phi = await asyncio.gather(
         scmc.sph.rho.get_value(),
         scmc.sph.theta.get_value(),
@@ -127,8 +129,8 @@ async def test_scmc_cart_set_using_cartesian(
     cartesian: MagnetPosition,
     spherical: MagnetSphericalPosition,
 ) -> None:
-    await scmc.mode.set(MagnetModes.CUBIC)
-    await scmc.cart.set(cartesian)
+    await scmc.mode.set(MagnetMode.CUBIC)
+    await scmc.cart.set(cartesian.to_request_pos())
     x, y, z = await asyncio.gather(
         scmc.cart.x.readback.get_value(),
         scmc.cart.y.readback.get_value(),
@@ -167,7 +169,7 @@ async def test_scmc_spherical_individual_axis_set(
     expected_y: float,
     expected_z: float,
 ) -> None:
-    await scmc.mode.set(MagnetModes.SPHERICAL)
+    await scmc.mode.set(MagnetMode.SPHERICAL)
     for axis, value in zip(axes, values, strict=True):
         await getattr(scmc.sph, axis).set(value)
 
@@ -187,36 +189,23 @@ async def test_scmc_spherical_individual_axis_set(
 async def test_scmc_raises_error_if_limit_status_is_violation(
     scmc: SuperConductingMagnetController,
 ) -> None:
-    await scmc.mode.set(MagnetModes.UNIAXIAL_X)
-    set_mock_value(scmc.limit_status, MagnetLimitStatus.VIOLTATION)
+    await scmc.mode.set(MagnetMode.UNIAXIAL_X)
+    set_mock_value(scmc.limit_status, MagnetLimitStatus.VIOLATION)
     with pytest.raises(MagnetPositionError):
         await scmc.cart.x.set(1)
 
 
-async def test_scmc_set_within_boundary_raises_error_if_all_values_none(
-    scmc: SuperConductingMagnetController,
-) -> None:
-    with pytest.raises(MagnetPositionError):
-        await scmc.set_within_boundary()
-
-
 @pytest.mark.parametrize(
-    "axis, mode",
-    [
-        ("x", MagnetModes.UNIAXIAL_X),
-        ("y", MagnetModes.UNIAXIAL_Y),
-        ("z", MagnetModes.UNIAXIAL_Z),
-    ],
+    "mode", [MagnetMode.UNIAXIAL_X, MagnetMode.UNIAXIAL_Y, MagnetMode.UNIAXIAL_Z]
 )
 async def test_scmc_axis_with_ramp_rate_wired_correctly_with_prepare(
     scmc: SuperConductingMagnetController,
     ramp_rate: MagnetThreeAxesRampRateController,
-    axis: str,
-    mode: MagnetModes,
+    mode: MagnetMode,
 ) -> None:
     await scmc.mode.set(mode)
-    magnet_axis: MagnetAxis = getattr(scmc.cart, axis)
-    ramp_axis: MagnetAxisRampRateController = getattr(ramp_rate, axis)
+    magnet_axis: MagnetAxis = getattr(scmc.cart, mode.axis_alias)
+    ramp_axis: MagnetAxisRampRateController = getattr(ramp_rate, mode.axis_alias)
 
     fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=1.5)
     await magnet_axis.prepare(fly_info)
@@ -227,7 +216,7 @@ async def test_scmc_axis_with_ramp_rate_wired_correctly_with_prepare(
 async def test_scmc_axis_kickoff_and_complete(
     scmc: SuperConductingMagnetController,
 ) -> None:
-    await scmc.mode.set(MagnetModes.UNIAXIAL_X)
+    await scmc.mode.set(MagnetMode.UNIAXIAL_X)
     fly_info = FlyMagnetInfo(start_position=1, end_position=2, ramp_rate=2)
     assert scmc.cart.x._fly_info is None
     await scmc.cart.x.prepare(fly_info)
@@ -242,7 +231,7 @@ async def test_scmc_axis_kickoff_and_complete(
 async def test_scmc_axis_kickoff_and_complete_raises_error_without_prepare(
     scmc: SuperConductingMagnetController,
 ):
-    await scmc.mode.set(MagnetModes.UNIAXIAL_X)
+    await scmc.mode.set(MagnetMode.UNIAXIAL_X)
     # Do multiple times to make sure you cannot kickoff or complete without preparing
     # each time
     for _ in range(3):
@@ -276,7 +265,7 @@ async def test_scmc_mock_device_behaviour(
 
     # Set a mode value and check to see if all values are set back to zero and ramp
     # status change happened
-    await scmc.mode.set(MagnetModes.UNIAXIAL_X)
+    await scmc.mode.set(MagnetMode.UNIAXIAL_X)
 
     x_d, y_d, z_d, x_rbv, y_rbv, z_rbv = await asyncio.gather(
         scmc.cart.x.demand.get_value(),
@@ -307,20 +296,20 @@ async def test_scmc_no_movement_strategy_for_mode(
 
 
 @pytest.mark.parametrize(
-    "mode,expected",
+    "mode, expected",
     [
-        (MagnetModes.SPHERICAL, movement.SphericalMovement),
-        (MagnetModes.CUBIC, movement.CubicMovement),
-        (MagnetModes.PLANAR_XZ, movement.PlanarXZMovement),
-        (MagnetModes.QUADRANT_XY, movement.QuadrantXYMovement),
-        (MagnetModes.UNIAXIAL_X, movement.UniaxialMovement),
-        (MagnetModes.UNIAXIAL_Y, movement.UniaxialMovement),
-        (MagnetModes.UNIAXIAL_Z, movement.UniaxialMovement),
+        (MagnetMode.SPHERICAL, movement.SphericalMovement),
+        (MagnetMode.CUBIC, movement.CubicMovement),
+        (MagnetMode.PLANAR_XZ, movement.PlanarXZMovement),
+        (MagnetMode.QUADRANT_XY, movement.QuadrantXYMovement),
+        (MagnetMode.UNIAXIAL_X, movement.UniaxialMovement),
+        (MagnetMode.UNIAXIAL_Y, movement.UniaxialMovement),
+        (MagnetMode.UNIAXIAL_Z, movement.UniaxialMovement),
     ],
 )
 async def test_scmc_magnet_mode_to_movement_strategy_configuration(
     scmc: SuperConductingMagnetController,
-    mode: MagnetModes,
+    mode: MagnetMode,
     expected: type[movement.MovementStrategy],
 ) -> None:
     assert isinstance(scmc._MODE_MOVEMENT_STRATEGY[mode], expected)
@@ -329,9 +318,18 @@ async def test_scmc_magnet_mode_to_movement_strategy_configuration(
 async def test_scmc_magnet_mode_to_uniaxial_movement_strategy_configuration(
     scmc: SuperConductingMagnetController,
 ) -> None:
-    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X].axis == "x"  # type:ignore
-    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Y].axis == "y"  # type:ignore
-    assert scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_Z].axis == "z"  # type:ignore
+    assert (
+        scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_X].mode  # type:ignore
+        == MagnetMode.UNIAXIAL_X
+    )
+    assert (
+        scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_Y].mode  # type:ignore
+        == MagnetMode.UNIAXIAL_Y
+    )
+    assert (
+        scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_Z].mode  # type:ignore
+        == MagnetMode.UNIAXIAL_Z
+    )
 
 
 async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
@@ -341,16 +339,16 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
     movement_strategy = MagicMock()
 
     mov_str_return_values = [
-        movement.MagnetStep(z=2),
-        movement.MagnetStep(x=1, y=2, z=3),
+        movement.MagnetRequest(z=2),
+        movement.MagnetRequest(x=1, y=2, z=3),
     ]
     expected_apply_step_calls = [
-        call(movement.MagnetStep(z=2)),
-        call(movement.MagnetStep(x=1, y=2, z=3)),
+        call(movement.MagnetRequest(z=2)),
+        call(movement.MagnetRequest(x=1, y=2, z=3)),
     ]
-    movement_strategy.moves.return_value = mov_str_return_values
+    movement_strategy.move_steps.return_value = mov_str_return_values
 
-    scmc._MODE_MOVEMENT_STRATEGY[MagnetModes.UNIAXIAL_X] = movement_strategy
+    scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_X] = movement_strategy
 
     scmc._ramp = AsyncMock()
 
@@ -358,8 +356,23 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
         "dodal.devices.beamlines.i06_1.magnets.superconducting_magnet.SuperConductingMagnetController._apply_step",
         wraps=scmc._apply_step,
     ) as mock_apply_step:
-        await scmc.mode.set(MagnetModes.UNIAXIAL_X)
+        await scmc.mode.set(MagnetMode.UNIAXIAL_X)
         await scmc.cart.x.set(4)
 
         assert mock_apply_step.call_args_list == expected_apply_step_calls
         assert scmc._ramp.call_count == len(mov_str_return_values)
+
+
+async def test_external_parallel_moves_for_scmc_raise_error(
+    scmc: SuperConductingMagnetController, run_engine: RunEngine
+) -> None:
+    run_engine(mv(scmc.mode, MagnetMode.CUBIC))
+    # Coordinated parallel move of axes submitted together is okay.
+    run_engine(mv(scmc.cart, MagnetPosition(x=1, y=1, z=1)))
+
+    # Coordinated parallel move on axes done separately fails.
+    with pytest.raises(FailedStatus):
+        run_engine(mv(scmc.cart.x, 0.5, scmc.cart.y, 0.5))
+
+    # Check after a blocked move and the first move finished, we can still do another move.
+    run_engine(mv(scmc.cart, MagnetPosition(x=0.1, y=0.2, z=0.3)))

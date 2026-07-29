@@ -1,11 +1,15 @@
 import pytest
 
+from dodal.devices.beamlines.i06_1.magnets.coordinates import (
+    MagnetPosition,
+    MagnetRequest,
+    MagnetSphericalPosition,
+    MagnetSphericalRequest,
+)
+from dodal.devices.beamlines.i06_1.magnets.enums import MagnetMode
 from dodal.devices.beamlines.i06_1.magnets.movement import (
     CubicMovement,
-    MagnetPosition,
     MagnetPositionError,
-    MagnetSphericalPosition,
-    MagnetStep,
     PlanarXZMovement,
     QuadrantXYMovement,
     SphericalMovement,
@@ -14,6 +18,35 @@ from dodal.devices.beamlines.i06_1.magnets.movement import (
 from tests.devices.beamlines.i06_1.magnets.utils import (
     EXPECTED_CARTESIAN_SPHERICAL_CONVERSION,
 )
+
+
+def test_magnet_position_error_total_field_mag_outside_limit():
+    position = MagnetPosition(x=1.0, y=2.0, z=3.0)
+    error = MagnetPositionError.total_field_mag_outside_limit(
+        MagnetMode.SPHERICAL, 1.75, position
+    )
+    assert isinstance(error, MagnetPositionError)
+    assert str(error) == (
+        f"Target field magnitude of {position.field_magnitude} T exceeds "
+        f"limit of 1.75 for mode {MagnetMode.SPHERICAL}. Requested position: {position}."
+    )
+
+
+def test_magnet_position_error_axis_outside_limit():
+    error = MagnetPositionError.axis_outside_limit(MagnetMode.CUBIC, 1.5, 2.0, "x")
+    assert isinstance(error, MagnetPositionError)
+    assert str(error) == (
+        f"Axis x with value 2.0 exceeds limit 1.5 T for mode {MagnetMode.CUBIC}."
+    )
+
+
+def test_magnet_position_error_axis_must_be_zero():
+    error = MagnetPositionError.axis_must_be_zero(MagnetMode.PLANAR_XZ, "y", 1.0)
+    assert isinstance(error, MagnetPositionError)
+    assert str(error) == (
+        f"Axis y must remain zero for mode {MagnetMode.PLANAR_XZ}. "
+        "Requested value was 1.0."
+    )
 
 
 def test_cartesian_and_spherical_are_inverse() -> None:
@@ -49,180 +82,196 @@ def test_cartesian_and_spherical_conversion_is_correct(
     assert result.z == pytest.approx(cartesian.z)
 
 
-def test_spherical_movement_decreases_z_then_x_then_y() -> None:
-    move_stragegy = SphericalMovement()
-    steps = move_stragegy.moves(
-        current=MagnetPosition(x=10, y=10, z=10),
-        target=MagnetPosition(x=5, y=5, z=2),
-    )
-    assert steps == [MagnetStep(z=2), MagnetStep(x=5), MagnetStep(y=5)]
-
-
-def test_spherical_movement_adds_final_combined_increase() -> None:
-    move_stragegy = SphericalMovement()
-    steps = move_stragegy.moves(
-        current=MagnetPosition(x=10, y=10, z=10),
-        target=MagnetPosition(x=20, y=5, z=2),
-    )
-    assert steps == [MagnetStep(z=2), MagnetStep(y=5), MagnetStep(x=20, y=5, z=2)]
+def test_all_none_values_for_magnet_position_request_raises_error():
+    with pytest.raises(ValueError):
+        MagnetRequest()
+    with pytest.raises(ValueError):
+        MagnetSphericalRequest()
 
 
 @pytest.mark.parametrize(
     "current, target, expected",
     [
+        # All decreases done as one move.
         (
             MagnetPosition(x=3, y=3, z=3),
-            MagnetPosition(x=1, y=1, z=1),
-            [
-                MagnetStep(z=1),
-                MagnetStep(x=1),
-                MagnetStep(y=1),
-            ],
+            MagnetRequest(x=1, y=1, z=1),
+            [MagnetRequest(x=1, y=1, z=1)],
         ),
+        # Check decreases done as one move and done before the increase
         (
             MagnetPosition(x=3, y=3, z=3),
-            MagnetPosition(x=4, y=2, z=1),
+            MagnetRequest(x=4, y=2, z=1),
             [
-                MagnetStep(z=1),
-                MagnetStep(y=2),
-                MagnetStep(x=4, y=2, z=1),
+                MagnetRequest(y=2, z=1),
+                MagnetRequest(x=4),
             ],
         ),
+        # Check if all an increase, all done together
         (
             MagnetPosition(x=1, y=1, z=1),
-            MagnetPosition(x=2, y=2, z=2),
+            MagnetRequest(x=2, y=2, z=2),
             [
-                MagnetStep(x=2, y=2, z=2),
+                MagnetRequest(x=2, y=2, z=2),
             ],
         ),
+        # Check requesting same position will do no movement
         (
             MagnetPosition(x=1, y=2, z=3),
-            MagnetPosition(x=1, y=2, z=3),
+            MagnetRequest(x=1, y=2, z=3),
             [],
         ),
     ],
 )
 def test_spherical_movement(
-    current: MagnetPosition, target: MagnetPosition, expected: list[MagnetStep]
+    current: MagnetPosition,
+    target: MagnetRequest,
+    expected: list[MagnetRequest],
 ) -> None:
-    assert SphericalMovement().moves(current, target) == expected
+    assert SphericalMovement().move_steps(current, target) == expected
+
+
+def test_spherical_movement_within_limit():
+    current = MagnetPosition(x=0.0, y=0.0, z=0.0)
+    target = MagnetRequest(x=1.0, y=0.0, z=0.0)
+    SphericalMovement().check_within_limit(current, target)
+
+
+def test_spherical_movement_outside_limit_raises_error():
+    current = MagnetPosition(x=0.0, y=0.0, z=0.0)
+    target = MagnetRequest(x=2.0, y=0.0, z=0.0)
+    with pytest.raises(MagnetPositionError):
+        SphericalMovement().check_within_limit(current, target)
+
+
+def test_spherical_movement_at_limit_is_allowed():
+    current = MagnetPosition(x=0.0, y=0.0, z=0.0)
+    target = MagnetRequest(x=1.75, y=0.0, z=0.0)
+    SphericalMovement().check_within_limit(current, target)
 
 
 @pytest.mark.parametrize(
     "target",
     [
-        MagnetPosition(x=1.6, y=0, z=0),
-        MagnetPosition(x=0, y=-1.6, z=0),
-        MagnetPosition(x=0, y=0, z=2),
+        MagnetRequest(x=1.6, y=0, z=0),
+        MagnetRequest(x=0, y=-1.6, z=0),
+        MagnetRequest(x=0, y=0, z=2),
     ],
 )
-def test_cubic_rejects_outside_limits(target: MagnetPosition) -> None:
+def test_cubic_rejects_outside_limits(target: MagnetRequest) -> None:
     with pytest.raises(MagnetPositionError):
-        CubicMovement().moves(MagnetPosition(x=0, y=0, z=0), target)
+        CubicMovement().check_within_limits(MagnetPosition(x=0, y=0, z=0), target)
 
 
 def test_cubic_returns_single_step() -> None:
     current = MagnetPosition(x=0, y=0, z=0)
-    target = MagnetPosition(x=1, y=1.2, z=-0.5)
-
-    assert CubicMovement().moves(current, target) == [MagnetStep(x=1, y=1.2, z=-0.5)]
+    target = MagnetRequest(x=1, y=1.2, z=-0.5)
+    assert CubicMovement().move_steps(current, target) == [
+        MagnetRequest(x=1, y=1.2, z=-0.5)
+    ]
 
 
 def test_planar_xz_returns_single_step() -> None:
-    target = MagnetPosition(x=1.2, y=0, z=-0.4)
-
-    assert PlanarXZMovement().moves(MagnetPosition(x=0, y=0, z=0), target) == [
-        MagnetStep(x=1.2, z=-0.4),
+    target = MagnetRequest(x=1.2, y=0, z=-0.4)
+    assert PlanarXZMovement().move_steps(MagnetPosition(x=0, y=0, z=0), target) == [
+        MagnetRequest(x=1.2, z=-0.4),
     ]
 
 
 def test_planar_xz_rejects_nonzero_y() -> None:
     with pytest.raises(MagnetPositionError):
-        PlanarXZMovement().moves(
-            MagnetPosition(x=0, y=0, z=0), MagnetPosition(x=1, y=1, z=0)
+        PlanarXZMovement().check_within_limits(
+            MagnetPosition(x=0, y=0, z=0), MagnetRequest(x=1, y=1, z=0)
         )
 
 
 def test_planar_xz_rejects_outside_radius() -> None:
     with pytest.raises(MagnetPositionError):
-        PlanarXZMovement().moves(
-            MagnetPosition(x=0, y=0, z=0), MagnetPosition(x=2, y=0, z=2)
+        PlanarXZMovement().check_within_limits(
+            MagnetPosition(x=0, y=0, z=0), MagnetRequest(x=2, y=0, z=2)
         )
 
 
 @pytest.mark.parametrize(
-    "axis, limit, target",
+    "mode, limit, target",
     [
-        ("x", 2, MagnetPosition(x=1, y=0, z=0)),
-        ("y", 2, MagnetPosition(x=0, y=-1, z=0)),
-        ("z", 5, MagnetPosition(x=0, y=0, z=3)),
+        (MagnetMode.UNIAXIAL_X, 2, MagnetRequest(x=1, y=0, z=0)),
+        (MagnetMode.UNIAXIAL_Y, 2, MagnetRequest(x=0, y=-1, z=0)),
+        (MagnetMode.UNIAXIAL_Z, 5, MagnetRequest(x=0, y=0, z=3)),
     ],
 )
 def test_uniaxial_returns_single_step(
-    axis: str, limit: float, target: MagnetPosition
+    mode: MagnetMode, limit: float, target: MagnetRequest
 ) -> None:
-    assert UniaxialMovement(axis, limit).moves(
+    assert UniaxialMovement(mode, limit).move_steps(
         MagnetPosition(x=0, y=0, z=0), target
-    ) == [MagnetStep(**{axis: getattr(target, axis)})]
+    ) == [MagnetRequest(**{mode.axis_alias: getattr(target, mode.axis_alias)})]
 
 
 @pytest.mark.parametrize(
-    "axis,target",
+    "mode, target",
     [
-        ("x", MagnetPosition(x=1, y=1, z=0)),
-        ("x", MagnetPosition(x=1, y=0, z=1)),
-        ("y", MagnetPosition(x=1, y=1, z=0)),
-        ("y", MagnetPosition(x=0, y=1, z=1)),
-        ("z", MagnetPosition(x=1, y=0, z=1)),
-        ("z", MagnetPosition(x=0, y=1, z=1)),
+        (MagnetMode.UNIAXIAL_X, MagnetRequest(x=1, y=1, z=0)),
+        (MagnetMode.UNIAXIAL_X, MagnetRequest(x=1, y=0, z=1)),
+        (MagnetMode.UNIAXIAL_Y, MagnetRequest(x=1, y=1, z=0)),
+        (MagnetMode.UNIAXIAL_Y, MagnetRequest(x=0, y=1, z=1)),
+        (MagnetMode.UNIAXIAL_Z, MagnetRequest(x=1, y=0, z=1)),
+        (MagnetMode.UNIAXIAL_Z, MagnetRequest(x=0, y=1, z=1)),
     ],
 )
-def test_uniaxial_rejects_other_axes(axis: str, target: MagnetPosition) -> None:
+def test_uniaxial_rejects_other_axes(mode: MagnetMode, target: MagnetRequest) -> None:
     with pytest.raises(MagnetPositionError):
-        UniaxialMovement(axis, limit=5).moves(MagnetPosition(x=0, y=0, z=0), target)
+        UniaxialMovement(mode, limit=5).check_within_limits(
+            MagnetPosition(x=0, y=0, z=0), target
+        )
 
 
 def test_uniaxial_raise_error_when_above_limit() -> None:
     current = MagnetPosition(x=0, y=0, z=0)
-    target = MagnetPosition(x=10, y=0, z=0)
+    target = MagnetRequest(x=10, y=0, z=0)
     with pytest.raises(MagnetPositionError):
-        UniaxialMovement("x", limit=5).moves(current, target)
+        UniaxialMovement(MagnetMode.UNIAXIAL_X, limit=5).check_within_limits(
+            current, target
+        )
 
 
 def test_quadrant_xy_sequence() -> None:
     current = MagnetPosition(x=1, y=0.5, z=0)
-    target = MagnetPosition(x=1.5, y=1, z=0)
-    strategy = QuadrantXYMovement()
-    assert strategy.moves(current, target) == [
-        MagnetStep(x=0),
-        MagnetStep(y=1),
-        MagnetStep(x=1.5),
+    target = MagnetRequest(x=1.5, y=1, z=0)
+    assert QuadrantXYMovement().move_steps(current, target) == [
+        MagnetRequest(x=0),
+        MagnetRequest(y=1),
+        MagnetRequest(x=1.5),
     ]
 
 
 def test_quadrant_xy_skips_initial_x_zero() -> None:
     current = MagnetPosition(x=0, y=0, z=0)
-    target = MagnetPosition(x=1, y=1, z=0)
-    strategy = QuadrantXYMovement()
-    assert strategy.moves(current, target) == [MagnetStep(y=1), MagnetStep(x=1)]
+    target = MagnetRequest(x=1, y=1, z=0)
+    assert QuadrantXYMovement().move_steps(current, target) == [
+        MagnetRequest(y=1),
+        MagnetRequest(x=1),
+    ]
 
 
 def test_quadrant_xy_skips_y_move() -> None:
     target = MagnetPosition(x=1, y=1.5, z=0)
-    current = MagnetPosition(x=0.5, y=1.5, z=0)
-    strategy = QuadrantXYMovement()
-    assert strategy.moves(target, current) == [MagnetStep(x=0), MagnetStep(x=0.5)]
+    current = MagnetRequest(x=0.5, y=1.5, z=0)
+    assert QuadrantXYMovement().move_steps(target, current) == [
+        MagnetRequest(x=0),
+        MagnetRequest(x=0.5),
+    ]
 
 
 def test_quadrant_xy_rejects_nonzero_z() -> None:
     with pytest.raises(MagnetPositionError):
-        QuadrantXYMovement().moves(
-            MagnetPosition(x=0, y=0, z=0), MagnetPosition(x=1, y=1, z=1)
+        QuadrantXYMovement().check_within_limits(
+            MagnetPosition(x=0, y=0, z=0), MagnetRequest(x=1, y=1, z=1)
         )
 
 
 def test_quadrant_xy_rejects_outside_radius() -> None:
     with pytest.raises(MagnetPositionError):
-        QuadrantXYMovement().moves(
-            MagnetPosition(x=0, y=0, z=0), MagnetPosition(x=2, y=2, z=0)
+        QuadrantXYMovement().check_within_limits(
+            MagnetPosition(x=0, y=0, z=0), MagnetRequest(x=2, y=2, z=0)
         )

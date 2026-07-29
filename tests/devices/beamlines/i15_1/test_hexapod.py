@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator
 from unittest.mock import MagicMock, call
 
 import pytest
-from ophyd_async.core import get_mock_put, init_devices, set_mock_value
+from ophyd_async.core import get_mock_put, init_devices, set_mock_attr, set_mock_value
 from ophyd_async.epics.motor import MotorLimitsError
 
 from dodal.devices.beamlines.i15_1.hexapod import CombinedMove, Hexapod
@@ -126,7 +126,7 @@ async def test_given_set_with_all_values_then_motors_set_in_order(hexapod: Hexap
 async def test_given_set_fails_then_defer_moves_turned_back_off(hexapod: Hexapod):
     class MyError(Exception): ...
 
-    hexapod.x.user_setpoint.set = MagicMock(side_effect=MyError())
+    set_mock_attr(hexapod.x.user_setpoint, "set", MagicMock(side_effect=MyError()))
     with pytest.raises(MyError):
         await hexapod.set(CombinedMove(x=10))
 
@@ -141,7 +141,7 @@ async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out
     hexapod.DEFERRED_MOVE_SET_TIMEOUT = 0.01  # type: ignore
 
     # Override the callback so it doesn't change the `user_setpoint`
-    hexapod.x.user_setpoint.set = MagicMock()
+    set_mock_attr(hexapod.x.user_setpoint, "set", MagicMock())
 
     with pytest.raises(TimeoutError):
         await hexapod.set(CombinedMove(x=10))

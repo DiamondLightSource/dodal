@@ -5,7 +5,6 @@ from numpy.polynomial import polynomial
 from pydantic import (
     Field,
     StrictFloat,
-    StrictInt,
     validate_call,
 )
 
@@ -24,7 +23,7 @@ class AbsorptionCalculator:
         self._calculate = _calculation
 
     def absorption_coefficient_per_cm(
-        self, energy_kev: Annotated[StrictFloat | StrictInt, Field(gt=0)]
+        self, energy_kev: Annotated[StrictFloat, Field(gt=0)]
     ) -> float:
         """Logarithmic contribution to x-ray absorption per cm (depth into absorber) at a particular photon energy.
 
@@ -38,7 +37,7 @@ class AbsorptionCalculator:
             Real materials the final absorption will be positive.
 
         Args:
-            energy_kev (StrictFloat|StrictInt): The individual energy per photon in kilo-electronvolts
+            energy_kev (StrictFloat): The individual energy per photon in kilo-electronvolts
 
         Returns:
             (float): Model adjustment of attenuation per cm of absorber material depth.
@@ -91,8 +90,8 @@ class SingleRollOffAbsorptionCalculator(AbsorptionCalculator):
 
     def __init__(
         self,
-        material_factor_per_cm: Annotated[StrictFloat | StrictInt, Field(gt=0)],
-        roll_off: Annotated[StrictFloat | StrictInt, Field(lt=0)],
+        material_factor_per_cm: Annotated[StrictFloat, Field(gt=0)],
+        roll_off: Annotated[StrictFloat, Field(lt=0)],
     ):
         # lambda k is energy in keV
         super().__init__(
@@ -104,11 +103,9 @@ class SingleRollOffAbsorptionCalculator(AbsorptionCalculator):
 
 @validate_call
 def photon_mass_attenuation_per_unit_length(
-    energy_kev: Annotated[StrictFloat | StrictInt, Field(gt=0)],
-    photon_absorption_factor_per_unit_length: Annotated[
-        StrictFloat | StrictInt, Field(gt=0)
-    ],
-    energy_dependence_exponent: Annotated[StrictFloat | StrictInt, Field(lt=0)],
+    energy_kev: Annotated[StrictFloat, Field(gt=0)],
+    photon_absorption_factor_per_unit_length: Annotated[StrictFloat, Field(gt=0)],
+    energy_dependence_exponent: Annotated[StrictFloat, Field(lt=0)],
 ) -> float:
     """Calculates mass attenuation per unit length.
 
@@ -129,8 +126,8 @@ def photon_mass_attenuation_per_unit_length(
 
 @validate_call
 def attenuation_at_depth_cm(
-    depth_cm: Annotated[StrictFloat | StrictInt, Field(ge=0)],
-    absorption_coefficient_per_cm: Annotated[StrictFloat | StrictInt, Field(gt=0)],
+    depth_cm: Annotated[StrictFloat, Field(ge=0)],
+    absorption_coefficient_per_cm: Annotated[StrictFloat, Field(gt=0)],
 ) -> float:
     """Calculates attenuation in Barnett units, where 1000 Bn equivalent to 1/e,
     0Bn to 1 and 2000 Bn to 1/(e^2).
@@ -154,8 +151,8 @@ def attenuation_at_depth_cm(
 
 @validate_call
 def thickness_cm_required_to_attenuate(
-    target_attenuation_bn: Annotated[StrictFloat | StrictInt, Field(ge=0)],
-    absorption_coefficient_per_cm: Annotated[StrictFloat | StrictInt, Field(gt=1.0e-8)],
+    target_attenuation_bn: Annotated[StrictFloat, Field(ge=0)],
+    absorption_coefficient_per_cm: Annotated[StrictFloat, Field(gt=1.0e-8)],
 ) -> float:
     """Calculates material depth in cm.
 
