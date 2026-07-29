@@ -8,6 +8,7 @@ from ophyd_async.core import (
     StandardReadable,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r
@@ -157,9 +158,7 @@ async def test_scaler_controller_set(scaler_controller: ScalerCardController) ->
 async def test_scaler_card_channels_set_calls_controller_set(
     scaler1: ScalerCardChannels,
 ):
-    set_mock = AsyncMock()
-    scaler1.controller_ref().set = set_mock
-
+    set_mock = set_mock_attr(scaler1.controller_ref(), "set", AsyncMock())
     await scaler1.set(2)
     set_mock.assert_called_once_with(2)
 
@@ -167,9 +166,7 @@ async def test_scaler_card_channels_set_calls_controller_set(
 async def test_scaler_card_channels_trigger_calls_controller_trigger(
     scaler1: ScalerCardChannels,
 ):
-    trigger_mock = AsyncMock()
-    scaler1.controller_ref().trigger = trigger_mock
-
+    trigger_mock = set_mock_attr(scaler1.controller_ref(), "trigger", AsyncMock())
     await scaler1.trigger()
     trigger_mock.assert_called_once()
 
