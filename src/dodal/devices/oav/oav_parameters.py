@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 from xml.etree.ElementTree import Element
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models import DisplayConfig
 
 # GDA currently assumes this aspect ratio for the OAV window size.

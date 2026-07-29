@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import (
     DetectorTrigger,
     TriggerInfo,
@@ -28,9 +28,12 @@ async def fake_eiger() -> FastEiger:
 
 
 async def test_configure_arm_trigger_and_disarm_detector(
-    fake_eiger: FastEiger, eiger_params: DetectorParams, run_engine: RunEngine
+    fake_eiger: FastEiger,
+    eiger_params: DetectorParams,
+    run_engine: RunEngine,
+    mock_config_client: ConfigClient,
 ):
-    set_config_client(ConfigClient("test"))
+    set_config_client(mock_config_client)
     trigger_info = TriggerInfo(
         # Manual trigger, so setting number of triggers to 1.
         number_of_events=1,
