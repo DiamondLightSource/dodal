@@ -89,7 +89,7 @@ def detector_motion() -> YZStage:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return YZStage(
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:",
+        prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
     )
 
 

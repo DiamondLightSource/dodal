@@ -38,8 +38,8 @@ class LaserSettings(str, Enum):
 
     LASER_1_ON = " M712=1 M711=1"
     LASER_1_OFF = " M712=0 M711=1"
-    LASER_2_ON = " M812=1 M811=1"
-    LASER_2_OFF = " M812=0 M811=1"
+    LASER_2_ON = " M612=1 M611=1"
+    LASER_2_OFF = " M612=0 M611=1"
 
 
 class EncReset(str, Enum):
@@ -183,7 +183,7 @@ class ProgramAbort(Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self._signal_ref().set("A", wait=True)
+        await self._signal_ref().set("&2A", wait=True)
         await sleep(1.0)  # TODO Check with scientist what this sleep is really for.
         await self._signal_ref().set("P2401=0", wait=True)
         await wait_for_value(
