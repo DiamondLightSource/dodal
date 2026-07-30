@@ -90,9 +90,10 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
     """Interface for temperature sensors supporting dynamic readback targeting."""
 
     def __init__(self, channel: DeviceMap[SensorDevice], name: str = ""):
-        self.active_sensor_name = soft_signal_rw(
-            str, initial_value=list(channel.keys())[0]
-        )
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.active_sensor_name = soft_signal_rw(
+                str, initial_value=list(channel.keys())[0]
+            )
         with self.add_children_as_readables():
             self.channel = channel
 
@@ -106,7 +107,7 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
         super().__init__(name=name)
 
     def _sensor_name_to_signal(self) -> Mapping[str, SignalR[float]]:
-        return {f"{i}": child.sensor for i, child in self.channel.items()}
+        return {name: child.sensor for name, child in self.channel.items()}
 
     def _select_sensor(self, active_sensor_name: str, **kwargs: float) -> float:
         return kwargs[active_sensor_name]

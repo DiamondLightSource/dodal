@@ -111,6 +111,7 @@ async def test_temperature_controller_readback(
         {
             "mock_controller-tolerance": partial_reading(0.1),
             "mock_controller-user_setpoint": partial_reading(0.0),
+            "mock_controller-sensor-active_sensor_name": partial_reading("sensor1"),
         },
     )
     await asyncio.gather(
