@@ -135,7 +135,6 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
         await self.active_sensor_name.set(sensor_name)
 
 
-SensorT = TypeVar("SensorT", bound=TemperatureSensor)
 HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
