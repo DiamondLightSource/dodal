@@ -69,6 +69,9 @@ class HighFieldMagnetTemperatureController(
     Args:
         prefix: Base EPICS PV prefix for the HFM controller system.
         suffix: PV suffix for the targeted setpoint. Defaults to "TTEMP:SET".
+        sensor_map: Mapping of sensor names to PV suffix strings for the underlying
+            :class:`~ophyd_async.core.DeviceMap`. If ``None``, defaults to
+            ``{"sensor1": "", "sensor2": "2", "sensor3": "3"}``.
         name: Name of the controller instance. Defaults to "".
     """
 
