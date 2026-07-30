@@ -72,6 +72,7 @@ from dodal.devices.zocalo import ZocaloResults, ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
+SKIP_FASTCS_EIGER = True
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
@@ -205,7 +206,7 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
 
 # ophyd-async no longer works with a mixed ADOdin and fastCS Eiger.
 # TODO I03-1103 Need to update the beamline to use a fastCS Odin and Eiger
-@devices.factory(skip=True)
+@devices.factory(skip=lambda: SKIP_FASTCS_EIGER)
 def fastcs_eiger(eiger_path_provider: PathProvider) -> FastCSEiger:
     return FastCSEiger(
         prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
