@@ -69,3 +69,16 @@ async def test_temperature_controller_sensor_switch(
     assert await hfm_temp_controller.sensor.active_sensor_name.get_value() == "he3_high"
     await hfm_temp_controller.sensor.set("Sorb")
     assert await hfm_temp_controller.sensor.active_sensor_name.get_value() == "Sorb"
+
+
+async def test_temperature_controller_defaults_creation():
+    with init_devices(mock=True):
+        hfm_temp_controller = HighFieldMagnetTemperatureController(
+            prefix="I10J-MAGNET-01:TEMP:",
+            suffix="TTEMP:SET",
+        )
+    assert sorted(hfm_temp_controller.sensor.channel.keys()) == [
+        "sensor1",
+        "sensor2",
+        "sensor3",
+    ]
