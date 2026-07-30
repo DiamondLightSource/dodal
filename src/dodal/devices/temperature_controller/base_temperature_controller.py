@@ -10,7 +10,7 @@ from typing import Generic, TypeVar
 from ophyd_async.core import (
     AsyncStatus,
     Device,
-    DeviceVector,
+    DeviceMap,
     SignalR,
     SignalRW,
     StandardMovable,
@@ -86,23 +86,24 @@ DeviceT = TypeVar("DeviceT", bound=Device)
 class TemperatureSensor(StandardReadable, Generic[DeviceT]):
     """Interface for temperature sensors supporting dynamic readback targeting."""
 
-    def __init__(self, channel: DeviceVector, name: str = ""):
+    def __init__(self, channel: DeviceMap, name: str = ""):
+        self.active_sensor_name = soft_signal_rw(
+            str, initial_value=list(channel.keys())[0]
+        )
         with self.add_children_as_readables():
-            self.active_sensor_name = soft_signal_rw(str, initial_value="sensor1")
             self.channel = channel
 
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.active_sensor = derived_signal_r(
-                raw_to_derived=self._select_sensor,
-                derived_units=None,
-                derived_precision=None,
-                active_sensor_name=self.active_sensor_name,
-                **self._sensor_name_to_device(),
-            )
+        self.active_sensor = derived_signal_r(
+            raw_to_derived=self._select_sensor,
+            derived_units=None,
+            derived_precision=None,
+            active_sensor_name=self.active_sensor_name,
+            **self._sensor_name_to_device(),
+        )
         super().__init__(name=name)
 
     def _sensor_name_to_device(self) -> Mapping[str, DeviceT]:
-        return {f"sensor{i}": child for i, child in self.channel.items()}
+        return {f"{i}": child.sensor for i, child in self.channel.items()}
 
     def _select_sensor(self, active_sensor_name: str, **kwargs: float) -> float:
         return kwargs[active_sensor_name]
@@ -114,7 +115,20 @@ class TemperatureSensor(StandardReadable, Generic[DeviceT]):
         Args:
             value: Attribute name of the target sensor (e.g., 'sensor', 'sensor2').
         """
-        await self.active_sensor_name.set(value)
+        await self.set_active_readback(value)
+
+    async def set_active_readback(self, sensor_name: str) -> None:
+        available = sorted(self.channel.keys())
+        if sensor_name not in available:
+            available_sensors = (
+                ", ".join(f"'{s}'" for s in available) if available else "none"
+            )
+            raise ValueError(
+                f"Invalid readback target '{sensor_name}'. "
+                f"Available sensors on {self.name}: [{available_sensors}]"
+            )
+        LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
+        await self.active_sensor_name.set(sensor_name)
 
 
 SensorT = TypeVar("SensorT", bound=TemperatureSensor)
