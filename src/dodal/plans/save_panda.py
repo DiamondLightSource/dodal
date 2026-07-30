@@ -70,6 +70,18 @@ def main(argv: list[str] | None = None):
     return 0
 
 
+# def build_device(module: str | ModuleType, device_name: str):
+#     if isinstance(module, str):
+#         module = import_module(module)
+
+#     Need to create device manager, look for it in the module
+#     Then use it to get the factories
+#     device_factories = manager.get_all_factories()
+#     From those extract the panda
+#     panda = device_factories[device_name]
+#     and build it
+
+
 def _save_panda(beamline, device_name, output_directory, file_name):
     run_engine = RunEngine()
     print("Creating devices...")
