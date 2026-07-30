@@ -32,7 +32,7 @@ class TemperatureMovableLogic(MovableWithToleranceLogic):
     setting the target setpoint to the current readback value.
     """
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop any active temperature move by setting the setpoint to the current readback value."""
         current_val = await self.readback.get_value()
         LOGGER.info(
@@ -90,6 +90,10 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
     """Interface for temperature sensors supporting dynamic readback targeting."""
 
     def __init__(self, channel: DeviceMap[SensorDevice], name: str = ""):
+        if not channel:
+            raise ValueError(
+                f"Cannot initialize {self.__class__.__name__} with an empty DeviceMap."
+            )
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.active_sensor_name = soft_signal_rw(
                 str, initial_value=list(channel.keys())[0]

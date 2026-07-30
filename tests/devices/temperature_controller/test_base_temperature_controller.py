@@ -25,7 +25,7 @@ class MinimalMockSensor(BaseTemperatureSensor):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.sensor = epics_signal_r(float, prefix + "suffix")
-
+        self.something_else = epics_signal_r(float, prefix + "suffix")
         super().__init__(name=name)
 
 
@@ -148,7 +148,7 @@ async def test_temperature_controller_stop_with_different_sensor(
 async def test_temperature_controller_set_active_readback_with_invalid_sensor(
     mock_controller: MockTemperatureController,
 ):
-    with pytest.raises(ValueError, match="['sensor', 'sensor2']"):
+    with pytest.raises(ValueError, match=r"\['sensor1', 'sensor2'\]"):
         await mock_controller.sensor.set_active_readback("sensor888")
 
 
@@ -165,3 +165,28 @@ async def test_temperature_controller_sensor_switch(
     await mock_controller.sensor.set("sensor1")
     assert await mock_controller.sensor.active_sensor_name.get_value() == "sensor1"
     assert await mock_controller.sensor.active_sensor.get_value() == 0.0
+
+
+async def test_sensor_switch_during_active_move(
+    mock_controller: MockTemperatureController,
+):
+    set_mock_value(mock_controller.tolerance, 0.2)
+    set_mock_value(mock_controller.sensor.channel["sensor1"].sensor, 10.0)
+    set_mock_value(mock_controller.sensor.channel["sensor2"].sensor, 19.9)
+
+    status = mock_controller.set(20.0)
+    assert not status.done
+
+    await mock_controller.sensor.set("sensor2")
+    await status
+    assert status.done
+    assert status.success
+    assert await mock_controller.sensor.active_sensor.get_value() == 19.9
+
+
+async def test_temperature_sensor_fail_initiation_with_empty_map():
+    with pytest.raises(
+        ValueError,
+        match=r"Cannot initialize TemperatureSensor with an empty DeviceMap.",
+    ):
+        TemperatureSensor(DeviceMap())
