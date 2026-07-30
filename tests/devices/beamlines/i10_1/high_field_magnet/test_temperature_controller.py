@@ -19,6 +19,7 @@ def hfm_temp_controller() -> HighFieldMagnetTemperatureController:
         hfm_temp_controller = HighFieldMagnetTemperatureController(
             prefix="I10J-MAGNET-01:TEMP:",
             suffix="TTEMP:SET",
+            sensor_map={"Sorb": "", "he3_low": "2", "he3_high": "3"},
         )
     return hfm_temp_controller
 
@@ -28,11 +29,11 @@ async def test_temperature_controller_readback(
 ):
 
     await assert_reading(
-        hfm_temp_controller,
+        hfm_temp_controller.sensor.channel["Sorb"],
         {
-            "hfm_temp_controller-sensor-sensor": partial_reading(0.0),
-            "hfm_temp_controller-sensor-sensor2": partial_reading(0.0),
-            "hfm_temp_controller-sensor-sensor3": partial_reading(0.0),
+            "hfm_temp_controller-sensor-Sorb": partial_reading(0.0),
+            "hfm_temp_controller-sensor-he3_low": partial_reading(0.0),
+            "hfm_temp_controller-sensor-he3_high": partial_reading(0.0),
         },
     )
     await assert_configuration(
@@ -60,9 +61,10 @@ async def test_temperature_controller_readback(
 async def test_temperature_controller_sensor_switch(
     hfm_temp_controller: HighFieldMagnetTemperatureController,
 ):
+    assert await hfm_temp_controller.sensor.active_sensor_name.get_value() == "sensor1"
     await hfm_temp_controller.sensor.set("sensor2")
-    assert await hfm_temp_controller.sensor._active_sensor_name.get_value() == "sensor2"
+    assert await hfm_temp_controller.sensor.active_sensor_name.get_value() == "sensor2"
     await hfm_temp_controller.sensor.set("sensor3")
-    assert await hfm_temp_controller.sensor._active_sensor_name.get_value() == "sensor3"
-    await hfm_temp_controller.sensor.set("sensor")
-    assert await hfm_temp_controller.sensor._active_sensor_name.get_value() == "sensor"
+    assert await hfm_temp_controller.sensor.active_sensor_name.get_value() == "sensor3"
+    await hfm_temp_controller.sensor.set("sensor1")
+    assert await hfm_temp_controller.sensor.active_sensor_name.get_value() == "sensor1"

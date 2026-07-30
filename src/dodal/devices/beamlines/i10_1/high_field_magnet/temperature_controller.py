@@ -29,6 +29,10 @@ class HighFieldMagnetSensor(BaseTemperatureSensor):
             self.sensor = epics_signal_r(float, pv)
         super().__init__(name=name)
 
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        super().set_name(name, child_name_separator=child_name_separator)
+        self.sensor.set_name(name=name)
+
 
 class HighFieldMagnetHeater(BaseHeater):
     """Heater unit for the High-Field Magnet.
@@ -76,11 +80,12 @@ class HighFieldMagnetTemperatureController(
         name: str = "",
     ):
         if sensor_map is None:
-            sensor_map = {f"sensor{i}": str(i) for i in range(1, 4)}
+            sensor_map = {"sensor1": ""}
+            sensor_map.update({f"sensor{i}": str(i) for i in range(2, 4)})
         sensor = TemperatureSensor[HighFieldMagnetSensor](
             DeviceMap(
                 {
-                    name_key: HighFieldMagnetSensor(f"{prefix}TTEMP:{pv_suffix}")
+                    name_key: HighFieldMagnetSensor(f"{prefix}STEMP{pv_suffix}")
                     for name_key, pv_suffix in sensor_map.items()
                 }
             )

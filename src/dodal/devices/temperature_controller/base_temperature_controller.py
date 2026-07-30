@@ -138,6 +138,10 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
         LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
         await self.active_sensor_name.set(sensor_name)
 
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        super().set_name(name, child_name_separator=child_name_separator)
+        self.channel.set_name(name)
+
 
 HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 

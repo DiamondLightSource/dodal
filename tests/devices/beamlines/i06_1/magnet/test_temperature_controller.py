@@ -30,8 +30,8 @@ async def test_temperature_controller_readback(
     await assert_reading(
         scm_temp_controller,
         {
-            "scm_temp_controller-sensor-channel1": partial_reading(0.0),
-            "scm_temp_controller-sensor-channel2": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor1": partial_reading(0.0),
+            "scm_temp_controller-sensor-sensor2": partial_reading(0.0),
         },
     )
 
