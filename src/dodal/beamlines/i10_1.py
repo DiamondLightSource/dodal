@@ -260,19 +260,22 @@ def high_field_magnet() -> HighFieldMagnet:
 @devices.factory()
 def hfm_temp() -> HighFieldMagnetTemperatureController:
     return HighFieldMagnetTemperatureController(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:"
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
+        sensor_map={"magnet_top": "", "magnet_bottom": "2", "bath_pressure": "3"},
     )
 
 
 @devices.factory()
 def hfm_vti() -> HighFieldMagnetTemperatureController:
     return HighFieldMagnetTemperatureController(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:"
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:",
+        sensor_map={"vti": "", "pot_1k": "3"},
     )
 
 
 @devices.factory()
 def hfm_he3() -> HighFieldMagnetTemperatureController:
     return HighFieldMagnetTemperatureController(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:"
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:",
+        sensor_map={"sorb": "", "he3_low": "2", "he3_high": "3"},
     )

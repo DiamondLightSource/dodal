@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
-import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceMap,
     SignalR,
     SignalRW,
     StandardMovable,
     StandardReadable,
     StandardReadableFormat,
+    derived_signal_r,
     soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_rw
@@ -31,7 +32,7 @@ class TemperatureMovableLogic(MovableWithToleranceLogic):
     setting the target setpoint to the current readback value.
     """
 
-    async def stop(self):
+    async def stop(self) -> None:
         """Stop any active temperature move by setting the setpoint to the current readback value."""
         current_val = await self.readback.get_value()
         LOGGER.info(
@@ -78,17 +79,42 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-class BaseTemperatureSensor(StandardReadable, Movable[str]):
-    """Base interface for temperature sensors supporting dynamic readback targeting."""
-
+class BaseTemperatureSensor(StandardReadable):
     sensor: SignalR[float]
-    active_sensor: SignalR[float]
 
-    def __init__(self, name: str = ""):
 
-        self._active_sensor_name = soft_signal_rw(str, initial_value="sensor")
+SensorDevice = TypeVar("SensorDevice", bound=BaseTemperatureSensor)
 
+
+class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
+    """Interface for temperature sensors supporting dynamic readback targeting."""
+
+    def __init__(self, channel: DeviceMap[SensorDevice], name: str = ""):
+        if not channel:
+            raise ValueError(
+                f"Cannot initialize {self.__class__.__name__} with an empty DeviceMap."
+            )
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.active_sensor_name = soft_signal_rw(
+                str, initial_value=list(channel.keys())[0]
+            )
+        with self.add_children_as_readables():
+            self.channel = channel
+
+        self.active_sensor = derived_signal_r(
+            raw_to_derived=self._select_sensor,
+            derived_units=None,
+            derived_precision=None,
+            active_sensor_name=self.active_sensor_name,
+            **self._sensor_name_to_signal(),
+        )
         super().__init__(name=name)
+
+    def _sensor_name_to_signal(self) -> Mapping[str, SignalR[float]]:
+        return {name: child.sensor for name, child in self.channel.items()}
+
+    def _select_sensor(self, active_sensor_name: str, **kwargs: float) -> float:
+        return kwargs[active_sensor_name]
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
@@ -99,48 +125,29 @@ class BaseTemperatureSensor(StandardReadable, Movable[str]):
         """
         await self.set_active_readback(value)
 
-    async def set_active_readback(self, sensor_name: str | None) -> None:
-        if sensor_name is not None:
-            available = self._get_available_sensors()
-            if sensor_name not in available:
-                available_sensors = (
-                    ", ".join(f"'{s}'" for s in available) if available else "none"
-                )
-                raise ValueError(
-                    f"Invalid readback target '{sensor_name}'. "
-                    f"Target must be exactly 'sensor' or 'sensor' followed by an integer (e.g., 'sensor2'). "
-                    f"Available sensors on {self.name}: [{available_sensors}]"
-                )
-            LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
-            await self._active_sensor_name.set(sensor_name)
-        else:
-            LOGGER.info(
-                f"Setting active sensor on {self.name} to default: '{sensor_name}'"
+    async def set_active_readback(self, sensor_name: str) -> None:
+        available = sorted(self.channel.keys())
+        if sensor_name not in available:
+            available_sensors = (
+                ", ".join(f"'{s}'" for s in available) if available else "none"
             )
-            await self._active_sensor_name.set("sensor")
+            raise ValueError(
+                f"Invalid readback target '{sensor_name}'. "
+                f"Available sensors on {self.name}: [{available_sensors}]"
+            )
+        LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
+        await self.active_sensor_name.set(sensor_name)
 
-    def _get_available_sensors(self) -> list[str]:
-        """Inspect instance attributes for valid sensor signal names.
-
-        Returns:
-            Sorted list of attribute names matching the pattern `sensor<int>` that are SignalR instances.
-        """
-        return sorted(
-            [
-                attr
-                for attr in dir(self)
-                if re.match(r"^sensor\d*$", attr)
-                and isinstance(getattr(self, attr, None), SignalR)
-            ]
-        )
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        super().set_name(name, child_name_separator=child_name_separator)
+        self.channel.set_name(name)
 
 
-SensorT = TypeVar("SensorT", bound=BaseTemperatureSensor)
 HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
 class TemperatureController(
-    StandardReadable, StandardMovable[float], Generic[SensorT, HeaterT]
+    StandardReadable, StandardMovable[float], Generic[SensorDevice, HeaterT]
 ):
     """Temperature controller tying together sensor, heater, and PID units.
 
@@ -155,7 +162,7 @@ class TemperatureController(
     def __init__(
         self,
         setpoint: SignalRW[float],
-        sensor: SensorT,
+        sensor: TemperatureSensor[SensorDevice],
         heater: HeaterT,
         pid: PID,
         name: str = "",
