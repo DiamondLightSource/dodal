@@ -277,5 +277,5 @@ def hfm_vti() -> HighFieldMagnetTemperatureController:
 def hfm_he3() -> HighFieldMagnetTemperatureController:
     return HighFieldMagnetTemperatureController(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:",
-        sensor_map={"Sorb": "", "he3_low": "2", "he3_high": "3"},
+        sensor_map={"sorb": "", "he3_low": "2", "he3_high": "3"},
     )
