@@ -9,7 +9,6 @@ from typing import Generic, TypeVar
 
 from ophyd_async.core import (
     AsyncStatus,
-    Device,
     DeviceMap,
     SignalR,
     SignalRW,
@@ -80,13 +79,17 @@ class BaseHeater(StandardReadable):
     output: SignalR[float]
 
 
-DeviceT = TypeVar("DeviceT", bound=Device)
+class BaseTemperatureSensor(StandardReadable):
+    sensor: SignalR[float]
 
 
-class TemperatureSensor(StandardReadable, Generic[DeviceT]):
+SensorDevice = TypeVar("SensorDevice", bound=BaseTemperatureSensor)
+
+
+class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
     """Interface for temperature sensors supporting dynamic readback targeting."""
 
-    def __init__(self, channel: DeviceMap, name: str = ""):
+    def __init__(self, channel: DeviceMap[SensorDevice], name: str = ""):
         self.active_sensor_name = soft_signal_rw(
             str, initial_value=list(channel.keys())[0]
         )
@@ -98,11 +101,11 @@ class TemperatureSensor(StandardReadable, Generic[DeviceT]):
             derived_units=None,
             derived_precision=None,
             active_sensor_name=self.active_sensor_name,
-            **self._sensor_name_to_device(),
+            **self._sensor_name_to_signal(),
         )
         super().__init__(name=name)
 
-    def _sensor_name_to_device(self) -> Mapping[str, DeviceT]:
+    def _sensor_name_to_signal(self) -> Mapping[str, SignalR[float]]:
         return {f"{i}": child.sensor for i, child in self.channel.items()}
 
     def _select_sensor(self, active_sensor_name: str, **kwargs: float) -> float:
@@ -136,7 +139,7 @@ HeaterT = TypeVar("HeaterT", bound=BaseHeater)
 
 
 class TemperatureController(
-    StandardReadable, StandardMovable[float], Generic[DeviceT, HeaterT]
+    StandardReadable, StandardMovable[float], Generic[SensorDevice, HeaterT]
 ):
     """Temperature controller tying together sensor, heater, and PID units.
 
@@ -151,7 +154,7 @@ class TemperatureController(
     def __init__(
         self,
         setpoint: SignalRW[float],
-        sensor: TemperatureSensor[DeviceT],
+        sensor: TemperatureSensor[SensorDevice],
         heater: HeaterT,
         pid: PID,
         name: str = "",

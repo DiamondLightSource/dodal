@@ -1,6 +1,7 @@
 from .base_temperature_controller import (
     PID,
     BaseHeater,
+    BaseTemperatureSensor,
     TemperatureController,
     TemperatureSensor,
 )
@@ -14,4 +15,5 @@ __all__ = [
     "TemperatureSensor",
     "PID",
     "TemperatureController",
+    "BaseTemperatureSensor",
 ]

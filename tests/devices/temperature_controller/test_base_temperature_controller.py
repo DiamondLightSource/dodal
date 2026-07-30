@@ -4,7 +4,6 @@ import pytest
 from ophyd_async.core import (
     DeviceMap,
     DeviceMock,
-    StandardReadable,
     StandardReadableFormat,
     default_mock_class,
     init_devices,
@@ -16,12 +15,13 @@ from ophyd_async.testing import assert_configuration, assert_reading, partial_re
 from dodal.devices.temperature_controller import (
     PID,
     BaseHeater,
+    BaseTemperatureSensor,
     TemperatureController,
     TemperatureSensor,
 )
 
 
-class MinimalMockSensor(StandardReadable):
+class MinimalMockSensor(BaseTemperatureSensor):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.sensor = epics_signal_r(float, prefix + "suffix")
