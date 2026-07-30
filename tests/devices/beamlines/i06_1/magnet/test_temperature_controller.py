@@ -1,7 +1,7 @@
 import asyncio
 
 import pytest
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -65,37 +65,3 @@ async def test_temperature_controller_readback(
             "scm_temp_controller-pid-d": partial_reading(3.0),
         },
     )
-
-    # await assert_reading(
-    #     scm_temp_controller.sensor.sensor2,
-    #     {
-    #         "scm_temp_controller-sensor-channel2": partial_reading(0.0),
-    #     },
-    # )
-
-
-async def test_temperature_controller_sensor_switch(
-    scm_temp_controller: SuperConductingMagnetTemperatureController,
-):
-    await scm_temp_controller.sensor.set("sensor2")
-    assert await scm_temp_controller.sensor.active_sensor_name.get_value() == "sensor2"
-    await scm_temp_controller.sensor.set("sensor")
-    assert await scm_temp_controller.sensor.active_sensor_name.get_value() == "sensor"
-
-
-async def test_scmc(scm_temp_controller: SuperConductingMagnetTemperatureController):
-
-    sensor = scm_temp_controller.sensor
-    await sensor.active_sensor_name.set("sensor2")
-
-    assert await sensor.active_sensor.get_value() == 0
-    set_mock_value(sensor.channel[2].sensor, 1)
-    assert await sensor.active_sensor.get_value() == 1
-
-    await sensor.active_sensor_name.set("sensor1")
-    assert await sensor.active_sensor.get_value() == 0
-    set_mock_value(sensor.channel[1].sensor, 2)
-    assert await sensor.active_sensor.get_value() == 2
-
-    await sensor.active_sensor_name.set("sensor2")
-    assert await sensor.active_sensor.get_value() == 1

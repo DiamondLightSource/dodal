@@ -1,9 +1,8 @@
 """Cryocon M32 temperature sensor, heater, and controller devices."""
 
 from ophyd_async.core import (
-    DeviceVector,
+    DeviceMap,
     SignalRW,
-    StandardReadable,
     StandardReadableFormat,
     StrictEnum,
 )
@@ -12,6 +11,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from dodal.devices.temperature_controller import (
     PID,
     BaseHeater,
+    BaseTemperatureSensor,
     TemperatureController,
     TemperatureSensor,
 )
@@ -42,7 +42,7 @@ class HeaterMode(StrictEnum):
     RAMP = "RampP"
 
 
-class CryoconM32Sensor(StandardReadable):
+class CryoconM32Sensor(BaseTemperatureSensor):
     """Configuration signal group for a Cryocon M32 sensor channel.
 
     Attributes:
@@ -118,10 +118,10 @@ class SuperConductingMagnetTemperatureController(
         name: str = "",
     ):
         sensor = TemperatureSensor[CryoconM32Sensor](
-            DeviceVector(
+            DeviceMap(
                 {
-                    1: CryoconM32Sensor(prefix + "STS:T1"),
-                    2: CryoconM32Sensor(prefix + "STS:T2"),
+                    "sensor1": CryoconM32Sensor(prefix + "STS:T1"),
+                    "sensor2": CryoconM32Sensor(prefix + "STS:T2"),
                 }
             )
         )
