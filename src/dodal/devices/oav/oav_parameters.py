@@ -178,8 +178,12 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
         config = {}
         um_xy = self._read_zoom_params()
         bc_xy = self._read_display_config()
+
         for zoom_key in list(bc_xy.keys()):
+            um_zoom_key = zoom_key
+            if zoom_key not in um_xy and str(int(float(zoom_key))) in um_xy:
+                um_zoom_key = str(int(float(zoom_key)))
             config[zoom_key] = ZoomParamsCrosshair(
-                microns_per_pixel=um_xy[zoom_key], crosshair=bc_xy[zoom_key]
+                microns_per_pixel=um_xy[um_zoom_key], crosshair=bc_xy[zoom_key]
             )
         return config
