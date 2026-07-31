@@ -2,7 +2,9 @@ import argparse
 import os
 import sys
 from argparse import ArgumentParser
+from importlib import import_module
 from pathlib import Path
+from types import ModuleType
 from typing import cast
 
 from bluesky.run_engine import RunEngine
@@ -12,7 +14,9 @@ from ophyd_async.plan_stubs import (
 )
 
 from dodal.beamlines import module_name_for_beamline
-from dodal.utils import make_device
+from dodal.device_manager import DeviceManager
+
+# from dodal.utils import make_device
 
 
 def main(argv: list[str] | None = None):
@@ -70,16 +74,18 @@ def main(argv: list[str] | None = None):
     return 0
 
 
-# def build_device(module: str | ModuleType, device_name: str):
-#     if isinstance(module, str):
-#         module = import_module(module)
+def build_device(module: str | ModuleType, device_name: str):
+    if isinstance(module, str):
+        module = import_module(module)
 
-#     Need to create device manager, look for it in the module
-#     Then use it to get the factories
-#     device_factories = manager.get_all_factories()
-#     From those extract the panda
-#     panda = device_factories[device_name]
-#     and build it
+    if (manager := getattr(module, "DeviceManager", None)) and isinstance(
+        manager, DeviceManager
+    ):
+        factories = manager.get_all_factories()
+        device = manager.build_devices(factories[device_name])
+    else:
+        raise ValueError("No device manager found in {module}")
+    return device
 
 
 def _save_panda(beamline, device_name, output_directory, file_name):
@@ -87,14 +93,16 @@ def _save_panda(beamline, device_name, output_directory, file_name):
     print("Creating devices...")
     module_name = module_name_for_beamline(beamline)
     try:
-        devices = make_device(
-            f"dodal.beamlines.{module_name}", device_name, connect_immediately=True
-        )
+        device = build_device(f"dodal.beamlines.{module_name}", device_name)
+        # devices = make_device(
+        #     f"dodal.beamlines.{module_name}", device_name, connect_immediately=True
+        # )
     except Exception as error:
         sys.stderr.write(f"Couldn't create device {device_name}: {error}\n")
         sys.exit(1)
 
-    panda = devices[device_name]
+    # panda = devices[device_name]
+    panda = device[device_name]
     print(
         f"Saving to {output_directory}/{file_name} from {device_name} on {beamline}..."
     )
