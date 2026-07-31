@@ -72,11 +72,6 @@ async def dual_energy_source(
 
 
 @pytest.fixture
-async def dual_source_energy(dual_energy_source: DualEnergySource) -> SignalR[float]:
-    return dual_energy_source.energy
-
-
-@pytest.fixture
 async def b07b_specs150(
     source_energy: SignalR[float],
 ) -> SpecsDetector[b07.LensMode, b07_shared.PsuMode]:
