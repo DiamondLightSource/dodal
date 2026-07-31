@@ -27,7 +27,7 @@ class MagnetPositionError(Exception):
     @classmethod
     def axis_must_be_zero(cls, mode: MagnetMode, axis: str, value: float):
         return cls(
-            f"Axis {axis} must remain zero for mode {mode}. Requested value was {value}."
+            f"Axis {axis} must remain zero for mode {mode}. Requested value was {value}T."
         )
 
 

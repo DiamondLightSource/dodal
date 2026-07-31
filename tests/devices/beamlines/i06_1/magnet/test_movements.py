@@ -45,7 +45,7 @@ def test_magnet_position_error_axis_must_be_zero():
     assert isinstance(error, MagnetPositionError)
     assert str(error) == (
         f"Axis y must remain zero for mode {MagnetMode.PLANAR_XZ}. "
-        "Requested value was 1.0."
+        "Requested value was 1.0T."
     )
 
 
