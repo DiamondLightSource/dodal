@@ -115,7 +115,7 @@ def test_dual_energy_source_validate_config_signal(
         pgm = PlaneGratingMonochromator("PGM:", Grating)
         with pytest.raises(
             NotConnectedError,
-            match='Signal cannot have name "" . Make sure the signal has been '
+            match='Signal cannot have name "". Make sure the signal has been '
             "connected and named before passing to class DualEnergySource",
         ):
             DualEnergySource(

@@ -83,6 +83,6 @@ class DualEnergySource(StandardReadable):
         for signal in signals:
             if signal.name == "":
                 raise NotConnectedError(
-                    'Signal cannot have name "" . Make sure the signal has been '
+                    'Signal cannot have name "". Make sure the signal has been '
                     f"connected and named before passing to class {self.__class__.__name__}"
                 )
