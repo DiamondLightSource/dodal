@@ -2,7 +2,7 @@ from dodal.beamlines.i06_shared import devices as i06_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
-from dodal.devices.beamlines.i06_1.magnets import (
+from dodal.devices.beamlines.i06_1.magnet import (
     MagnetThreeAxesRampRateController,
     SuperConductingMagnetController,
 )

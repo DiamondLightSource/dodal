@@ -9,7 +9,7 @@ from bluesky.protocols import Reading
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.beamlines.i06_1.magnets import (
+from dodal.devices.beamlines.i06_1.magnet import (
     FlyMagnetInfo,
     MagnetAxis,
     MagnetAxisRampRateController,
@@ -23,7 +23,7 @@ from dodal.devices.beamlines.i06_1.magnets import (
     SuperConductingMagnetController,
     movement,
 )
-from tests.devices.beamlines.i06_1.magnets.utils import (
+from tests.devices.beamlines.i06_1.magnet.utils import (
     EXPECTED_CARTESIAN_SPHERICAL_CONVERSION,
 )
 

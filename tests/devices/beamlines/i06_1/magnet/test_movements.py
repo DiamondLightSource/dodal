@@ -1,13 +1,13 @@
 import pytest
 
-from dodal.devices.beamlines.i06_1.magnets.coordinates import (
+from dodal.devices.beamlines.i06_1.magnet.coordinates import (
     MagnetPosition,
     MagnetRequest,
     MagnetSphericalPosition,
     MagnetSphericalRequest,
 )
-from dodal.devices.beamlines.i06_1.magnets.enums import MagnetMode
-from dodal.devices.beamlines.i06_1.magnets.movement import (
+from dodal.devices.beamlines.i06_1.magnet.enums import MagnetMode
+from dodal.devices.beamlines.i06_1.magnet.movement import (
     CubicMovement,
     MagnetPositionError,
     PlanarXZMovement,
@@ -15,7 +15,7 @@ from dodal.devices.beamlines.i06_1.magnets.movement import (
     SphericalMovement,
     UniaxialMovement,
 )
-from tests.devices.beamlines.i06_1.magnets.utils import (
+from tests.devices.beamlines.i06_1.magnet.utils import (
     EXPECTED_CARTESIAN_SPHERICAL_CONVERSION,
 )
 

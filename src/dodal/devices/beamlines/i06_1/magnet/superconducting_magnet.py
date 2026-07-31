@@ -29,18 +29,18 @@ from ophyd_async.epics.core import (
 )
 from pydantic import BaseModel, Field
 
-from dodal.devices.beamlines.i06_1.magnets.coordinates import (
+from dodal.devices.beamlines.i06_1.magnet.coordinates import (
     MagnetPosition,
     MagnetRequest,
     MagnetSphericalPosition,
     MagnetSphericalRequest,
 )
-from dodal.devices.beamlines.i06_1.magnets.enums import (
+from dodal.devices.beamlines.i06_1.magnet.enums import (
     MagnetLimitStatus,
     MagnetMode,
     MagnetRampStatus,
 )
-from dodal.devices.beamlines.i06_1.magnets.movement import (
+from dodal.devices.beamlines.i06_1.magnet.movement import (
     CubicMovement,
     MagnetPositionError,
     MovementStrategy,
@@ -49,7 +49,7 @@ from dodal.devices.beamlines.i06_1.magnets.movement import (
     SphericalMovement,
     UniaxialMovement,
 )
-from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
+from dodal.devices.beamlines.i06_1.magnet.ramp_controller import (
     MagnetAxisRampRateController,
     MagnetThreeAxesRampRateController,
 )

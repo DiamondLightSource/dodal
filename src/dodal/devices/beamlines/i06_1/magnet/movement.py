@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
-from dodal.devices.beamlines.i06_1.magnets.coordinates import (
+from dodal.devices.beamlines.i06_1.magnet.coordinates import (
     MagnetPosition,
     MagnetRequest,
 )
-from dodal.devices.beamlines.i06_1.magnets.enums import MagnetMode
+from dodal.devices.beamlines.i06_1.magnet.enums import MagnetMode
 
 
 class MagnetPositionError(Exception):
