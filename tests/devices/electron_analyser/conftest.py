@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 
 import numpy as np
@@ -19,7 +20,6 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import (
-    DualEnergySource,
     ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
@@ -30,7 +30,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.selectable_source import SelectedSource
+from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 
 
 @pytest.fixture
@@ -54,18 +54,20 @@ async def source_energy() -> SignalR[float]:
 async def dual_energy_source(
     source_selector: SignalRW[SelectedSource],
 ) -> DualEnergySource:
-    async with init_devices(mock=True):
+    with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
         pgm = PlaneGratingMonochromator("PGM:", Grating)
-        await dcm.energy_in_keV.set(2.2)
-        await pgm.energy.set(500)
+    # Do in new context so that dcm and pgm are connected and named before giving to
+    # dual_energy_source.
+    with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
             source1=dcm.energy_in_eV,
             source2=pgm.energy.user_readback,
             selected_source=source_selector,
         )
+    await asyncio.gather(dcm.energy_in_keV.set(2.2), pgm.energy.set(500))
     return dual_energy_source
 
 

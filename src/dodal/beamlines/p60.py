@@ -12,7 +12,6 @@ from dodal.devices.beamlines.p60 import (
     PsuMode,
 )
 from dodal.devices.electron_analyser.base import (
-    DualEnergySource,
     ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
@@ -20,7 +19,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaDetector,
 )
-from dodal.devices.selectable_source import SelectedSource
+from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

@@ -17,7 +17,6 @@ from .base_region import (
 )
 from .base_util import to_binding_energy, to_kinetic_energy
 from .detector_logic import ElectronAnalyserTriggerLogic, RegionLogic
-from .energy_sources import DualEnergySource
 
 __all__ = [
     "ElectronAnalyserDetector",
@@ -38,5 +37,4 @@ __all__ = [
     "to_kinetic_energy",
     "ElectronAnalyserTriggerLogic",
     "RegionLogic",
-    "DualEnergySource",
 ]

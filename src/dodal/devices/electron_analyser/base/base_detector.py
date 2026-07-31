@@ -1,9 +1,7 @@
-import asyncio
 from collections.abc import Mapping, Sequence
 from typing import Generic
 
 import numpy as np
-from bluesky.protocols import Preparable, Stageable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -18,40 +16,12 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
-from dodal.devices.electron_analyser.base.base_region import (
-    BaseRegion,
-    BaseSequence,
-    GenericRegion,
-    TBaseRegion,
-)
+from dodal.devices.electron_analyser.base.base_region import GenericRegion, TBaseRegion
 from dodal.devices.electron_analyser.base.base_util import to_binding_energy
 from dodal.devices.electron_analyser.base.detector_logic import (
     ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
-
-
-class SequenceHolder(Stageable, Preparable):
-    """Wrapper to hold the sequence data for an electron analyser.
-
-    Used in scans when we need to hold the state of the configured sequence of regions
-    to give to the electron analyser for each step of a scan.
-    """
-
-    def __init__(self):
-        self.data: BaseSequence[BaseRegion] | None = None
-
-    @AsyncStatus.wrap
-    async def prepare(self, value: BaseSequence[BaseRegion] | None):
-        self.data = value
-
-    @AsyncStatus.wrap
-    async def stage(self):
-        pass
-
-    @AsyncStatus.wrap
-    async def unstage(self):
-        self.data = None
 
 
 class ElectronAnalyserDetector(
@@ -74,15 +44,17 @@ class ElectronAnalyserDetector(
         config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
-        self.sequence = SequenceHolder()
-        self._region_logic = region_logic
+        print(region_logic.energy_source)
+        print(type(region_logic.energy_source))
+        print(region_logic.energy_source.datatype)
         self.binding_energy_axis = derived_signal_r(
             self._calculate_binding_energy_axis,
             "eV",
-            energy_axis=region_logic.driver.energy_axis,
+            energy_axis=driver.energy_axis,
             excitation_energy=region_logic.energy_source,
-            energy_mode=region_logic.driver.energy_mode,
+            energy_mode=driver.energy_mode,
         )
+        self._region_logic = region_logic
         config_sigs = (self.binding_energy_axis, *config_sigs)
         super().__init__(
             driver,
@@ -129,23 +101,6 @@ class ElectronAnalyserDetector(
     async def set(self, region: TBaseRegion) -> None:
         """Configure detector with regions from plans."""
         await self._region_logic.setup_with_region(region)
-
-    @AsyncStatus.wrap
-    async def stage(self) -> None:
-        """Prepare the detector for use by ensuring it is idle and ready.
-
-        This method asynchronously stages the detector by disarming the controller to
-        ensure the detector is not actively acquiring data.
-
-        Raises:
-            Any exceptions raised by the driver's stage or controller's disarm methods.
-        """
-        await asyncio.gather(super().stage(), self.sequence.stage())
-
-    @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        """Disarm the detector."""
-        await asyncio.gather(super().unstage(), self.sequence.unstage())
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[

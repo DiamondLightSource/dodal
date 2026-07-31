@@ -15,7 +15,6 @@ from dodal.devices.beamlines.i09 import (
 from dodal.devices.beamlines.i09.scaler import ScalerController
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import (
-    DualEnergySource,
     ElectronAnalyserTriggerLogic,
     RegionLogic,
 )
@@ -27,7 +26,7 @@ from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.selectable_source import SelectedSource
+from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
