@@ -44,9 +44,6 @@ class ElectronAnalyserDetector(
         config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
-        print(region_logic.energy_source)
-        print(type(region_logic.energy_source))
-        print(region_logic.energy_source.datatype)
         self.binding_energy_axis = derived_signal_r(
             self._calculate_binding_energy_axis,
             "eV",
