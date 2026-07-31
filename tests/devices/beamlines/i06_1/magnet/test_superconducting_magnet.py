@@ -353,7 +353,7 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
     scmc._ramp = AsyncMock()
 
     with patch(
-        "dodal.devices.beamlines.i06_1.magnets.superconducting_magnet.SuperConductingMagnetController._apply_step",
+        "dodal.devices.beamlines.i06_1.magnet.superconducting_magnet.SuperConductingMagnetController._apply_step",
         wraps=scmc._apply_step,
     ) as mock_apply_step:
         await scmc.mode.set(MagnetMode.UNIAXIAL_X)

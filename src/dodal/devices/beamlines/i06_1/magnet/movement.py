@@ -14,14 +14,14 @@ class MagnetPositionError(Exception):
         cls, mode: MagnetMode, limit: float, pos: MagnetPosition
     ):
         return cls(
-            f"Target field magnitude of {pos.field_magnitude} T exceeds "
+            f"Target field magnitude of {pos.field_magnitude}T exceeds "
             f"limit of {limit} for mode {mode}. Requested position: {pos}."
         )
 
     @classmethod
     def axis_outside_limit(cls, mode: MagnetMode, limit: float, pos: float, axis: str):
         return cls(
-            f"Axis {axis} with value {pos} exceeds limit {limit} T for mode {mode}."
+            f"Axis {axis} with value {pos} exceeds limit {limit}T for mode {mode}."
         )
 
     @classmethod
@@ -48,10 +48,10 @@ class SphericalMovement(MovementStrategy):
     LIMIT = 1.75
     MODE = MagnetMode.SPHERICAL
 
-    def check_within_limit(
-        self, current: MagnetPosition, target: MagnetRequest
+    def check_within_limits(
+        self, current_readback: MagnetPosition, target: MagnetRequest
     ) -> None:
-        mag_pos_after_move = target.resolve_pos(current)
+        mag_pos_after_move = target.resolve_pos(current_readback)
         if mag_pos_after_move.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
                 self.MODE, self.LIMIT, mag_pos_after_move

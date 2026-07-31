@@ -27,7 +27,7 @@ def test_magnet_position_error_total_field_mag_outside_limit():
     )
     assert isinstance(error, MagnetPositionError)
     assert str(error) == (
-        f"Target field magnitude of {position.field_magnitude} T exceeds "
+        f"Target field magnitude of {position.field_magnitude}T exceeds "
         f"limit of 1.75 for mode {MagnetMode.SPHERICAL}. Requested position: {position}."
     )
 
@@ -36,7 +36,7 @@ def test_magnet_position_error_axis_outside_limit():
     error = MagnetPositionError.axis_outside_limit(MagnetMode.CUBIC, 1.5, 2.0, "x")
     assert isinstance(error, MagnetPositionError)
     assert str(error) == (
-        f"Axis x with value 2.0 exceeds limit 1.5 T for mode {MagnetMode.CUBIC}."
+        f"Axis x with value 2.0 exceeds limit 1.5T for mode {MagnetMode.CUBIC}."
     )
 
 
@@ -134,20 +134,20 @@ def test_spherical_movement(
 def test_spherical_movement_within_limit():
     current = MagnetPosition(x=0.0, y=0.0, z=0.0)
     target = MagnetRequest(x=1.0, y=0.0, z=0.0)
-    SphericalMovement().check_within_limit(current, target)
+    SphericalMovement().check_within_limits(current, target)
 
 
 def test_spherical_movement_outside_limit_raises_error():
     current = MagnetPosition(x=0.0, y=0.0, z=0.0)
     target = MagnetRequest(x=2.0, y=0.0, z=0.0)
     with pytest.raises(MagnetPositionError):
-        SphericalMovement().check_within_limit(current, target)
+        SphericalMovement().check_within_limits(current, target)
 
 
 def test_spherical_movement_at_limit_is_allowed():
     current = MagnetPosition(x=0.0, y=0.0, z=0.0)
     target = MagnetRequest(x=1.75, y=0.0, z=0.0)
-    SphericalMovement().check_within_limit(current, target)
+    SphericalMovement().check_within_limits(current, target)
 
 
 @pytest.mark.parametrize(
