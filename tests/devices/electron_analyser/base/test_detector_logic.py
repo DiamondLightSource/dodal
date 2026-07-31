@@ -23,7 +23,7 @@ from dodal.devices.electron_analyser.base import (
 from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
-from dodal.devices.selectable_source import SelectedSource
+from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     generate_fixture_regions_pair,
     load_b07_specs_test_seq,
@@ -62,6 +62,11 @@ def mbs_driver() -> MbsAnalyserDriverIO[i05_shared.LensMode, i05_shared.PassEner
 @pytest.fixture(params=["specs_driver", "vgscienta_driver", "mbs_driver"])
 def driver(request: pytest.FixtureRequest) -> AbstractAnalyserDriverIO:
     return request.getfixturevalue(request.param)
+
+
+@pytest.fixture
+async def dual_source_energy(dual_energy_source: DualEnergySource) -> SignalR[float]:
+    return dual_energy_source.energy
 
 
 @pytest.fixture(params=["source_energy", "dual_source_energy"])
