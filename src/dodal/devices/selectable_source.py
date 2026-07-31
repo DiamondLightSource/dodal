@@ -18,7 +18,6 @@ class SelectedSource(StrictEnum):
     SOURCE2 = "source2"
 
 
-#
 T = TypeVar("T")
 
 
