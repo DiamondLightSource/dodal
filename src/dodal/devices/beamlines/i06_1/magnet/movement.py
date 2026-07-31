@@ -70,21 +70,18 @@ class SphericalMovement(MovementStrategy):
         # Do all decreasing of axes first as one step. This ensures we don't
         # quench the magnet.
         decrease_kwargs = {}
+        increase_kwargs = {}
         for axis, old, new in decreases:
-            if new is not None and abs(new) < abs(old):
-                decrease_kwargs[axis] = new
+            if new is not None:
+                if abs(new) < abs(old):
+                    decrease_kwargs[axis] = new
+                if abs(new) > abs(old):
+                    increase_kwargs[axis] = new
 
         if decrease_kwargs:
             steps.append(MagnetRequest(**decrease_kwargs))
-
-        increase_kwargs = {}
-        for axis, old, new in decreases:
-            if new is not None and abs(new) > abs(old):
-                increase_kwargs[axis] = new
-
         if increase_kwargs:
             steps.append(MagnetRequest(**increase_kwargs))
-
         return steps
 
 
