@@ -4,7 +4,6 @@ import pytest
 from ophyd_async.core import (
     DeviceMap,
     DeviceMock,
-    StandardReadableFormat,
     default_mock_class,
     init_devices,
     set_mock_value,
@@ -23,10 +22,8 @@ from dodal.devices.temperature_controller import (
 
 class MinimalMockSensor(BaseTemperatureSensor):
     def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.sensor = epics_signal_r(float, prefix + "suffix")
         self.something_else = epics_signal_r(float, prefix + "suffix")
-        super().__init__(name=name)
+        super().__init__(name=name, pv=prefix + "suffix")
 
 
 class MockHeater(BaseHeater):

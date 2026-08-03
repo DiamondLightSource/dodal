@@ -21,19 +21,6 @@ class HeaterMode(StrictEnum):
     AUTO = "Auto"
 
 
-class HighFieldMagnetSensor(BaseTemperatureSensor):
-    """Single channel temperature sensor sub-device for High-Field Magnet."""
-
-    def __init__(self, pv: str, name: str = ""):
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.sensor = epics_signal_r(float, pv)
-        super().__init__(name=name)
-
-    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
-        super().set_name(name, child_name_separator=child_name_separator)
-        self.sensor.set_name(name=name)
-
-
 class HighFieldMagnetHeater(BaseHeater):
     """Heater unit for the High-Field Magnet.
 
@@ -62,7 +49,7 @@ class HighFieldMagnetHeater(BaseHeater):
 
 
 class HighFieldMagnetTemperatureController(
-    TemperatureController[HighFieldMagnetSensor, HighFieldMagnetHeater]
+    TemperatureController[BaseTemperatureSensor, HighFieldMagnetHeater]
 ):
     """Temperature controller for the High-Field Magnet.
 
@@ -85,10 +72,10 @@ class HighFieldMagnetTemperatureController(
         if sensor_map is None:
             sensor_map = {"sensor1": ""}
             sensor_map.update({f"sensor{i}": str(i) for i in range(2, 4)})
-        sensor = TemperatureSensor[HighFieldMagnetSensor](
+        sensor = TemperatureSensor[BaseTemperatureSensor](
             DeviceMap(
                 {
-                    name_key: HighFieldMagnetSensor(f"{prefix}STEMP{pv_suffix}")
+                    name_key: BaseTemperatureSensor(f"{prefix}STEMP{pv_suffix}")
                     for name_key, pv_suffix in sensor_map.items()
                 }
             )

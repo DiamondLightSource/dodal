@@ -57,18 +57,12 @@ class CryoconM32Sensor(BaseTemperatureSensor):
     """
 
     def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.sensor = epics_signal_r(float, prefix)
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.min = epics_signal_r(float, prefix + ":MIN")
             self.max = epics_signal_r(float, prefix + ":MAX")
             self.slope = epics_signal_r(float, prefix + ":SLOPE")
             self.offset = epics_signal_r(float, prefix + ":OFFSET")
-        super().__init__(name)
-
-    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
-        super().set_name(name, child_name_separator=child_name_separator)
-        self.sensor.set_name(name)
+        super().__init__(pv=prefix, name=name)
 
 
 class CryoconM32Heater(BaseHeater):

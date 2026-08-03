@@ -18,7 +18,7 @@ from ophyd_async.core import (
     derived_signal_r,
     soft_signal_rw,
 )
-from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.movable import MovableWithToleranceLogic
 from dodal.log import LOGGER
@@ -80,7 +80,18 @@ class BaseHeater(StandardReadable):
 
 
 class BaseTemperatureSensor(StandardReadable):
-    sensor: SignalR[float]
+    def __init__(
+        self,
+        pv: str = "",
+        name: str = "",
+    ):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.sensor = epics_signal_r(float, pv)
+        super().__init__(name=name)
+
+    def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
+        super().set_name(name, child_name_separator=child_name_separator)
+        self.sensor.set_name(name=name)
 
 
 SensorDevice = TypeVar("SensorDevice", bound=BaseTemperatureSensor)
