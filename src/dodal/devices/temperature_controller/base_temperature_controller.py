@@ -96,7 +96,9 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
             )
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.active_sensor_name = soft_signal_rw(
-                str, initial_value=list(channel.keys())[0]
+                str,
+                initial_value=list(channel.keys())[0],
+                setter=self.set_active_readback,
             )
         with self.add_children_as_readables():
             self.channel = channel
@@ -123,9 +125,9 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
         Args:
             value: Attribute name of the target sensor (e.g., 'sensor', 'sensor2').
         """
-        await self.set_active_readback(value)
+        await self.active_sensor_name.set(value)
 
-    async def set_active_readback(self, sensor_name: str) -> None:
+    async def set_active_readback(self, sensor_name: str | None) -> str:
         available = sorted(self.channel.keys())
         if sensor_name not in available:
             available_sensors = (
@@ -136,7 +138,7 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
                 f"Available sensors on {self.name}: [{available_sensors}]"
             )
         LOGGER.info(f"Setting active sensor on {self.name} to: '{sensor_name}'")
-        await self.active_sensor_name.set(sensor_name)
+        return sensor_name
 
     def set_name(self, name: str, *, child_name_separator: str | None = None) -> None:
         super().set_name(name, child_name_separator=child_name_separator)

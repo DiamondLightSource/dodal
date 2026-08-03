@@ -149,7 +149,7 @@ async def test_temperature_controller_set_active_readback_with_invalid_sensor(
     mock_controller: MockTemperatureController,
 ):
     with pytest.raises(ValueError, match=r"\['sensor1', 'sensor2'\]"):
-        await mock_controller.sensor.set_active_readback("sensor888")
+        await mock_controller.sensor.set("sensor888")
 
 
 async def test_temperature_controller_sensor_switch(
