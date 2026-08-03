@@ -91,7 +91,7 @@ def test_wedge_geometry_reports_correct_motor_position_mm_to_achieve_requested_t
 )
 def test_foil_absorber_raises_error_when_given_invalid_input_for_numerical_thickness(
     _bad_number: Any,
-):
+) -> None:
     with pytest.raises(pydantic.ValidationError):
         FoilGeometry(unit="cm", numerical_value=_bad_number)
 
@@ -115,7 +115,7 @@ def test_foil_absorber_raises_error_when_given_invalid_input_for_numerical_thick
 )
 def test_foil_absorber_raises_error_when_asked_to_use_unsupported_distance_units(
     _unsupported_unit: Any,
-):
+) -> None:
     with pytest.raises(KeyError):
         FoilGeometry(unit=_unsupported_unit, numerical_value=1.1)
 
@@ -201,6 +201,6 @@ def test_wedge_absorber_raises_error_when_given_invalid_input_for_taper(
 )
 def test_wedge_absorber_raises_error_when_given_invalid_input_for_tip_position(
     _bad_input: Any,
-):
+) -> None:
     with pytest.raises(pydantic.ValidationError):
         WedgeGeometry(tip_mm=_bad_input, taper_cotangent=-7.6)
