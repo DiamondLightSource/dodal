@@ -359,13 +359,16 @@ class SuperConductingMagnetController(StandardReadable):
         await self._trigger_ramp()
 
     async def set_within_boundary(self, value: MagnetRequest):
-        """Move the magnet to a new cartesian position.
+        """Move the magnet to a new cartesian position while respecting mode limits.
 
         Any coordinates left as ``None`` retain their current values. The requested
-        target position is validated against the current magnet operating mode and
-        converted into a sequence of movement steps by the corresponding movement
-        strategy. Each step is then applied sequentially until the requested target
-        position is reached.
+        target position is first validated against the limits of the current magnet
+        operating mode. The corresponding movement strategy then generates a sequence
+        of intermediate movement steps.
+
+        Each movement step is validated against the latest magnet readback before it
+        is applied. The readback position is updated after each step, ensuring that
+        subsequent steps are validated against the magnet's actual current position.
         """
         if self._moving:
             raise RuntimeError(
