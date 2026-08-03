@@ -180,7 +180,6 @@ class TemperatureController(
         pid: PID,
         name: str = "",
     ):
-
         self.pid = pid
         self.heater = heater
         with self.add_children_as_readables():
