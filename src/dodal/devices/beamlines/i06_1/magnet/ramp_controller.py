@@ -50,7 +50,6 @@ class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
             self.readback = epics_signal_r(float, prefix + "STS:RAMPRATE:TPM")
         self.demand = epics_signal_rw(float, prefix + "SET:DMD:RAMPRATE:TPM")
         self.ramp_limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
-        self.axis_limit = epics_signal_r(float, prefix + "LIM:FIELD:NOW")
         super().__init__(name)
 
     @cached_property
