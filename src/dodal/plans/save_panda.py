@@ -16,8 +16,6 @@ from ophyd_async.plan_stubs import (
 from dodal.beamlines import module_name_for_beamline
 from dodal.device_manager import DeviceManager
 
-# from dodal.utils import make_device
-
 
 def main(argv: list[str] | None = None):
     """CLI Utility to save the panda configuration."""
@@ -78,13 +76,13 @@ def build_device(module: str | ModuleType, device_name: str):
     if isinstance(module, str):
         module = import_module(module)
 
-    if (manager := getattr(module, "DeviceManager", None)) and isinstance(
+    if (manager := getattr(module, "devices", None)) and isinstance(
         manager, DeviceManager
     ):
         factories = manager.get_all_factories()
-        device = manager.build_devices(factories[device_name])
     else:
-        raise ValueError("No device manager found in {module}")
+        raise ValueError(f"No device manager found in {module}")
+    device = manager.build_devices(factories[device_name])
     return device
 
 
@@ -93,16 +91,15 @@ def _save_panda(beamline, device_name, output_directory, file_name):
     print("Creating devices...")
     module_name = module_name_for_beamline(beamline)
     try:
+        # Build and connect device
         device = build_device(f"dodal.beamlines.{module_name}", device_name)
-        # devices = make_device(
-        #     f"dodal.beamlines.{module_name}", device_name, connect_immediately=True
-        # )
+        device.connect()
+        print("Panda device built and connected")
     except Exception as error:
         sys.stderr.write(f"Couldn't create device {device_name}: {error}\n")
         sys.exit(1)
 
-    # panda = devices[device_name]
-    panda = device[device_name]
+    panda = device.devices[device_name]
     print(
         f"Saving to {output_directory}/{file_name} from {device_name} on {beamline}..."
     )
