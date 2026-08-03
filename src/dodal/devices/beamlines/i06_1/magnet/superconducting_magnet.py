@@ -174,6 +174,14 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
     async def set(self, value: MagnetRequest):
         await self._set_mag_within_boundary(value)
 
+    async def get_readback_position(self) -> MagnetPosition:
+        x0, y0, z0 = await asyncio.gather(
+            self.x.readback.get_value(),
+            self.y.readback.get_value(),
+            self.z.readback.get_value(),
+        )
+        return MagnetPosition(x=x0, y=y0, z=z0)
+
 
 class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
     """Spherical coordinate interface to the superconducting magnet.
@@ -217,12 +225,7 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
         to Cartesian coordinates and passed to the movement controller, which
         determines a safe sequence of Cartesian moves for the active magnet mode.
         """
-        x0, y0, z0 = await asyncio.gather(
-            self._cart_ref().x.readback.get_value(),
-            self._cart_ref().y.readback.get_value(),
-            self._cart_ref().z.readback.get_value(),
-        )
-        current_readback = MagnetPosition(x=x0, y=y0, z=z0)
+        current_readback = await self._cart_ref().get_readback_position()
         target = value.resolve_pos(current_readback.to_spherical())
         await self._set_mag_within_boundary(target.to_cartesian().to_request_pos())
 
@@ -371,13 +374,9 @@ class SuperConductingMagnetController(StandardReadable):
             )
         try:
             self._moving = True
-            x0, y0, z0, mode = await asyncio.gather(
-                self.cart.x.readback.get_value(),
-                self.cart.y.readback.get_value(),
-                self.cart.z.readback.get_value(),
-                self.mode.get_value(),
+            current_readback, mode = await asyncio.gather(
+                self.cart.get_readback_position(), self.mode.get_value()
             )
-            current_readback = MagnetPosition(x=x0, y=y0, z=z0)
             movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
             if movement_strategy is None:
                 raise ValueError(
@@ -385,10 +384,17 @@ class SuperConductingMagnetController(StandardReadable):
                 )
             self.log.debug(
                 f"Attempting move in mode {mode} with parameters {value}. "
-                f"Current readback position is {current_readback}."
+                f"Current readback is {current_readback}."
             )
+            # Check final requested position is within limits.
             movement_strategy.check_within_limits(current_readback, value)
             for step in movement_strategy.move_steps(current_readback, value):
+                self.log.debug(
+                    f"Applying movement step {step}. Current readback is {current_readback}."
+                )
+                # Check each generated step with the current readback is within limits.
+                movement_strategy.check_within_limits(current_readback, step)
                 await self._apply_step(step)
+                current_readback = await self.cart.get_readback_position()
         finally:
             self._moving = False

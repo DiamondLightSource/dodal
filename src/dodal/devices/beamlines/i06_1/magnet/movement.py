@@ -30,6 +30,12 @@ class MagnetPositionError(Exception):
             f"Axis {axis} must remain zero for mode {mode}. Requested value was {value}T."
         )
 
+    @classmethod
+    def axis_below_limit(cls, mode: MagnetMode, limit: float, pos: float, axis: str):
+        return cls(
+            f"Axis {axis} with value {pos}T is below minimum {limit}T for mode {mode}."
+        )
+
 
 class MovementStrategy:
     def check_within_limits(
@@ -174,14 +180,28 @@ class QuadrantXYMovement(MovementStrategy):
     MODE = MagnetMode.QUADRANT_XY
 
     def check_within_limits(
-        self, current_readback: MagnetPosition, target: MagnetRequest
+        self,
+        current_readback: MagnetPosition,
+        target: MagnetRequest,
     ) -> None:
-        if target.z is not None and target.z != 0:
-            raise MagnetPositionError.axis_must_be_zero(self.MODE, "z", target.z)
-        total_pos = target.resolve_pos(current_readback)
-        if total_pos.field_magnitude > self.LIMIT:
+        target_pos = target.resolve_pos(current_readback)
+
+        if target_pos.z != 0:
+            raise MagnetPositionError.axis_must_be_zero(self.MODE, "z", target_pos.z)
+
+        if target_pos.x < 0:
+            raise MagnetPositionError.axis_below_limit(
+                self.MODE, 0.0, target_pos.x, "x"
+            )
+
+        if target_pos.y < 0:
+            raise MagnetPositionError.axis_below_limit(
+                self.MODE, 0.0, target_pos.y, "y"
+            )
+
+        if target_pos.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
-                self.MODE, self.LIMIT, total_pos
+                self.MODE, self.LIMIT, target.resolve_pos(current_readback)
             )
 
     def move_steps(
@@ -189,16 +209,16 @@ class QuadrantXYMovement(MovementStrategy):
     ) -> list[MagnetRequest]:
         steps: list[MagnetRequest] = []
 
-        # Step 1: remove X component first
-        if target.x is not None and current_readback.x != 0:
+        # If increasing Y while X is non-zero could exceed the field limit,
+        # reduce X before increasing Y.
+        if (
+            target.y is not None
+            and target.y > current_readback.y
+            and current_readback.x > 0
+            and MagnetPosition(x=current_readback.x, y=target.y, z=0).field_magnitude
+            >= self.LIMIT
+        ):
             steps.append(MagnetRequest(x=0))
 
-        # Step 2: move Y
-        if target.y is not None and current_readback.y != target.y:
-            steps.append(MagnetRequest(y=target.y))
-
-        # Step 3: move X to its final value
-        if target.x is not None and target.x != 0:
-            steps.append(MagnetRequest(x=target.x))
-
+        steps.append(MagnetRequest(x=target.x, y=target.y, z=target.z))
         return steps
