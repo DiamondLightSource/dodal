@@ -352,7 +352,7 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
 
     scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_X] = movement_strategy
 
-    scmc._ramp = AsyncMock()
+    scmc._trigger_ramp = AsyncMock()
 
     with patch(
         "dodal.devices.beamlines.i06_1.magnet.superconducting_magnet.SuperConductingMagnetController._apply_step",
@@ -362,7 +362,7 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
         await scmc.cart.x.set(4)
 
         assert mock_apply_step.call_args_list == expected_apply_step_calls
-        assert scmc._ramp.call_count == len(mov_str_return_values)
+        assert scmc._trigger_ramp.call_count == len(mov_str_return_values)
 
 
 async def test_external_parallel_moves_for_scmc_raise_error(

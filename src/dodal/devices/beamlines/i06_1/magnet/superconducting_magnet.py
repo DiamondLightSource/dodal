@@ -327,7 +327,7 @@ class SuperConductingMagnetController(StandardReadable):
 
         super().__init__(name)
 
-    async def _ramp(self):
+    async def _trigger_ramp(self):
         # Setting invalid demand values should put the limit status in violation state.
         # Block ramp if in violation state.
         limit_status = await self.limit_status.get_value()
@@ -356,7 +356,7 @@ class SuperConductingMagnetController(StandardReadable):
             tasks.append(self.cart.z.demand.set(step.z))
         self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
-        await self._ramp()
+        await self._trigger_ramp()
 
     async def set_within_boundary(self, value: MagnetRequest):
         """Move the magnet to a new cartesian position.
