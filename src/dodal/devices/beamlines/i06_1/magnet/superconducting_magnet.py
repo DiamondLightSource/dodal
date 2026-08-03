@@ -1,25 +1,15 @@
 import asyncio
-from dataclasses import dataclass
-from functools import cached_property
 from typing import Protocol
 
-from bluesky.protocols import Flyable, Movable, Preparable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceMock,
-    MovableLogic,
     Reference,
-    StandardMovable,
     StandardReadable,
     StandardReadableFormat,
-    TimeoutCalculator,
-    WatchableAsyncStatus,
-    callback_on_mock_execute,
-    callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
-    error_if_none,
-    set_mock_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import (
@@ -49,10 +39,6 @@ from dodal.devices.beamlines.i06_1.magnet.movement import (
     SphericalMovement,
     UniaxialMovement,
 )
-from dodal.devices.beamlines.i06_1.magnet.ramp_controller import (
-    MagnetAxisRampRateController,
-    MagnetThreeAxesRampRateController,
-)
 
 
 class MagnetMoveWithinBoundary(Protocol):
@@ -65,20 +51,10 @@ class FlyMagnetInfo(BaseModel):
     ramp_rate: float = Field(frozen=True, gt=0)
 
 
-@dataclass
-class MagnetAxisMovableLogic(MovableLogic[float]):
-    axis_mode: MagnetMode
-    magnet_set_within_boundary: MagnetMoveWithinBoundary
-
-    async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
-        values = {self.axis_mode.axis_alias: new_position}
-        await self.magnet_set_within_boundary(MagnetRequest(**values))
-
-
 @default_mock_class(DeviceMock)
 # Don't want to sync readback and setpoint. IOC behaviour will move readback to demand
 # once start_ramp is triggered. This logic lives in the SuperConductingMagnetController.
-class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
+class MagnetAxis(StandardReadable):
     """Represents one cartesian axis of a superconducting vector magnet.
 
     Although each axis can be moved independently, all moves are delegated to
@@ -92,192 +68,62 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
     def __init__(
         self,
         prefix: str,
-        axis_mode: MagnetMode,
-        ramp_rate: MagnetAxisRampRateController,
-        magnet_set_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
     ):
-        self.ramp_rate_ref = Reference(ramp_rate)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, prefix + "RBV")
         self.demand = epics_signal_rw(float, prefix + "DMD")
-
-        self._movable_logic = MagnetAxisMovableLogic(
-            readback=self.readback,
-            setpoint=self.demand,
-            axis_mode=axis_mode,
-            magnet_set_within_boundary=magnet_set_within_boundary,
-        )
-        self._fly_info: FlyMagnetInfo | None = None
-        self._fly_status: WatchableAsyncStatus | None = None
+        self.limit = epics_signal_r(float, prefix + ":LIM:FIELD:NOW")
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.ramp_speed = epics_signal_rw(
+                float,
+                read_pv=prefix + "STS:RAMPRATE:TPM",
+                write_pv=prefix + "SET:DMD:RAMPRATE:TPM",
+            )
+            self.ramp_limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
         super().__init__(name)
 
-    @cached_property
-    def movable_logic(self) -> MagnetAxisMovableLogic:
-        return self._movable_logic
 
-    @AsyncStatus.wrap
-    async def prepare(self, value: FlyMagnetInfo):
-        self._fly_info = value
-        await self.ramp_rate_ref().set(value.ramp_rate)
-        await self.set(value.start_position)
+# class MockSuperConductingMagnetController(
+#     DeviceMock["SuperConductingMagnetController"]
+# ):
+#     """Add additional callback logic to our device to get the mock behaviour to simulate
+#     the hardware as best we can.
+#     """
 
-    @AsyncStatus.wrap
-    async def kickoff(self):
-        fly_info = error_if_none(
-            self._fly_info,
-            f"{self.name} must be prepared before attempting to kickoff.",
-        )
-        self._fly_status = self.set(fly_info.end_position)
-        self._fly_info = None
+#     async def connect(self, device: "SuperConductingMagnetController"):
 
-    def complete(self) -> WatchableAsyncStatus:
-        fly_status = error_if_none(self._fly_status, f"{self.name} kickoff not called.")
-        self._fly_status = None
-        return fly_status
+#         async def _trigger_start_ramp():
+#             # Whenever ramp is triggered for the ioc, readback values move to the
+#             # demand values. Simulate this behaviour here.
+#             x_d, y_d, z_d = await asyncio.gather(
+#                 device.cart.x.demand.get_value(),
+#                 device.cart.y.demand.get_value(),
+#                 device.cart.z.demand.get_value(),
+#             )
+#             set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
+#             set_mock_value(device.cart.x.readback, x_d)
+#             set_mock_value(device.cart.y.readback, y_d)
+#             set_mock_value(device.cart.z.readback, z_d)
+#             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
+#         callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
 
-class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
-    """Cartesian interface to the superconducting magnet.
+#         async def _set_mode(value):
+#             # Whenever mode is set, ioc automatically sets everything to zero and
+#             # triggers a ramp.
+#             set_mock_value(device.cart.x.demand, 0.0)
+#             set_mock_value(device.cart.y.demand, 0.0)
+#             set_mock_value(device.cart.z.demand, 0.0)
+#             await _trigger_start_ramp()
 
-    Exposes the physical X, Y and Z magnet axes as individual movable signals,
-    together with a grouped ``MagnetPosition`` interface for moving all three axes
-    simultaneously.
-
-    Individual axis moves and grouped cartesian moves are delegated to the parent
-    ``SuperConductingMagnetController``, which applies the active movement strategy for the
-    current operating mode before commanding the hardware.
-    """
-
-    def __init__(
-        self,
-        prefix: str,
-        ramp_rate: MagnetThreeAxesRampRateController,
-        mag_within_boundary: MagnetMoveWithinBoundary,
-        name: str = "",
-    ) -> None:
-        with self.add_children_as_readables():
-            self.x = MagnetAxis(
-                prefix + "X:", MagnetMode.UNIAXIAL_X, ramp_rate.x, mag_within_boundary
-            )
-            self.y = MagnetAxis(
-                prefix + "Y:", MagnetMode.UNIAXIAL_Y, ramp_rate.y, mag_within_boundary
-            )
-            self.z = MagnetAxis(
-                prefix + "Z:", MagnetMode.UNIAXIAL_Z, ramp_rate.z, mag_within_boundary
-            )
-        self._set_mag_within_boundary = mag_within_boundary
-        super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: MagnetRequest):
-        await self._set_mag_within_boundary(value)
-
-    async def get_readback_position(self) -> MagnetPosition:
-        x0, y0, z0 = await asyncio.gather(
-            self.x.readback.get_value(),
-            self.y.readback.get_value(),
-            self.z.readback.get_value(),
-        )
-        return MagnetPosition(x=x0, y=y0, z=z0)
+#         callback_on_mock_put(device.mode, _set_mode)
+#         set_mock_value(device.limit_status, MagnetLimitStatus.OK)
+#         set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
 
-class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
-    """Spherical coordinate interface to the superconducting magnet.
-
-    Exposes the magnet field in spherical coordinates using the derived signals
-    ``rho``, ``theta`` and ``phi``. These signals are calculated from the
-    underlying cartesian magnet axes and may also be written individually or as a
-    complete ``MagnetSphericalRequest``.
-
-    Writes are converted to cartesian coordinates before being delegated to the
-    parent ``SuperConductingMagnetController``, allowing the active movement strategy to
-    determine a safe sequence of cartesian moves.
-    """
-
-    def __init__(
-        self,
-        cart: MagnetCartesianCoordinates,
-        set_mag_within_boundary: MagnetMoveWithinBoundary,
-        name: str = "",
-    ):
-        with self.add_children_as_readables():
-            self.theta = derived_signal_rw(
-                MagnetPosition.calc_theta, self._set_theta, x=cart.x, z=cart.z
-            )
-            self.rho = derived_signal_rw(
-                MagnetPosition.calc_rho, self._set_rho, x=cart.x, y=cart.y, z=cart.z
-            )
-            self.phi = derived_signal_rw(
-                MagnetPosition.calc_phi, self._set_phi, x=cart.x, y=cart.y, z=cart.z
-            )
-        self._set_mag_within_boundary = set_mag_within_boundary
-        self._cart_ref = Reference(cart)
-        super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: MagnetSphericalRequest):
-        """Set the requested spherical coordinates.
-
-        Any unspecified spherical coordinates are taken from the current magnet
-        readback position. The resulting complete spherical position is converted
-        to Cartesian coordinates and passed to the movement controller, which
-        determines a safe sequence of Cartesian moves for the active magnet mode.
-        """
-        current_readback = await self._cart_ref().get_readback_position()
-        target = value.resolve_pos(current_readback.to_spherical())
-        await self._set_mag_within_boundary(target.to_cartesian().to_request_pos())
-
-    async def _set_rho(self, rho: float):
-        await self.set(MagnetSphericalRequest(rho=rho))
-
-    async def _set_theta(self, theta: float):
-        await self.set(MagnetSphericalRequest(theta=theta))
-
-    async def _set_phi(self, phi: float):
-        await self.set(MagnetSphericalRequest(phi=phi))
-
-
-class MockSuperConductingMagnetController(
-    DeviceMock["SuperConductingMagnetController"]
-):
-    """Add additional callback logic to our device to get the mock behaviour to simulate
-    the hardware as best we can.
-    """
-
-    async def connect(self, device: "SuperConductingMagnetController"):
-
-        async def _trigger_start_ramp():
-            # Whenever ramp is triggered for the ioc, readback values move to the
-            # demand values. Simulate this behaviour here.
-            x_d, y_d, z_d = await asyncio.gather(
-                device.cart.x.demand.get_value(),
-                device.cart.y.demand.get_value(),
-                device.cart.z.demand.get_value(),
-            )
-            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
-            set_mock_value(device.cart.x.readback, x_d)
-            set_mock_value(device.cart.y.readback, y_d)
-            set_mock_value(device.cart.z.readback, z_d)
-            set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
-
-        callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
-
-        async def _set_mode(value):
-            # Whenever mode is set, ioc automatically sets everything to zero and
-            # triggers a ramp.
-            set_mock_value(device.cart.x.demand, 0.0)
-            set_mock_value(device.cart.y.demand, 0.0)
-            set_mock_value(device.cart.z.demand, 0.0)
-            await _trigger_start_ramp()
-
-        callback_on_mock_put(device.mode, _set_mode)
-        set_mock_value(device.limit_status, MagnetLimitStatus.OK)
-        set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
-
-
-@default_mock_class(MockSuperConductingMagnetController)
+# @default_mock_class(MockSuperConductingMagnetController)
 class SuperConductingMagnetController(StandardReadable):
     """A three-axis superconducting vector magnet.
 
@@ -297,25 +143,21 @@ class SuperConductingMagnetController(StandardReadable):
         MagnetMode.CUBIC: CubicMovement(),
         MagnetMode.PLANAR_XZ: PlanarXZMovement(),
         MagnetMode.QUADRANT_XY: QuadrantXYMovement(),
-        MagnetMode.UNIAXIAL_X: UniaxialMovement(MagnetMode.UNIAXIAL_X, 2.0),
-        MagnetMode.UNIAXIAL_Y: UniaxialMovement(MagnetMode.UNIAXIAL_Y, 2.0),
-        MagnetMode.UNIAXIAL_Z: UniaxialMovement(MagnetMode.UNIAXIAL_Z, 6.0),
+        MagnetMode.UNIAXIAL_X: UniaxialMovement(MagnetMode.UNIAXIAL_X),
+        MagnetMode.UNIAXIAL_Y: UniaxialMovement(MagnetMode.UNIAXIAL_Y),
+        MagnetMode.UNIAXIAL_Z: UniaxialMovement(MagnetMode.UNIAXIAL_Z),
     }
 
     def __init__(
         self,
         prefix: str,
-        ramp_controllers: MagnetThreeAxesRampRateController,
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.mode = epics_signal_rw(MagnetMode, prefix + "MODE")
-
-        with self.add_children_as_readables():
-            self.cart = MagnetCartesianCoordinates(
-                prefix, ramp_controllers, self.set_within_boundary
-            )
-            self.sph = MagnetSphericalCoordinates(self.cart, self.set_within_boundary)
+        self.x = MagnetAxis(prefix + "X:")
+        self.y = MagnetAxis(prefix + "Y:")
+        self.z = MagnetAxis(prefix + "Z:")
 
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
@@ -349,11 +191,11 @@ class SuperConductingMagnetController(StandardReadable):
         """
         tasks = []
         if step.x is not None:
-            tasks.append(self.cart.x.demand.set(step.x))
+            tasks.append(self.x.demand.set(step.x))
         if step.y is not None:
-            tasks.append(self.cart.y.demand.set(step.y))
+            tasks.append(self.y.demand.set(step.y))
         if step.z is not None:
-            tasks.append(self.cart.z.demand.set(step.z))
+            tasks.append(self.z.demand.set(step.z))
         self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
         await self._trigger_ramp()
@@ -371,14 +213,13 @@ class SuperConductingMagnetController(StandardReadable):
         subsequent steps are validated against the magnet's actual current position.
         """
         if self._moving:
-            raise RuntimeError(
-                f"Cannot do move for {self.name}. It is already moving. For simultaneous "
-                f"moving of axes, please use {self.cart.name} or {self.sph.name}."
-            )
+            raise RuntimeError(f"Cannot do move for {self.name}. It is already moving.")
         try:
             self._moving = True
-            current_readback, mode = await asyncio.gather(
-                self.cart.get_readback_position(), self.mode.get_value()
+            current_readback, mode, field_limit = await asyncio.gather(
+                self.get_readback_position(),
+                self.mode.get_value(),
+                self.get_field_limit(),
             )
             movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
             if movement_strategy is None:
@@ -390,14 +231,135 @@ class SuperConductingMagnetController(StandardReadable):
                 f"Current readback is {current_readback}."
             )
             # Check final requested position is within limits.
-            movement_strategy.check_within_limits(current_readback, value)
+            movement_strategy.check_within_limits(current_readback, value, field_limit)
             for step in movement_strategy.move_steps(current_readback, value):
                 self.log.debug(
                     f"Applying movement step {step}. Current readback is {current_readback}."
                 )
                 # Check each generated step with the current readback is within limits.
-                movement_strategy.check_within_limits(current_readback, step)
+                movement_strategy.check_within_limits(
+                    current_readback, step, field_limit
+                )
                 await self._apply_step(step)
-                current_readback = await self.cart.get_readback_position()
+                current_readback = await self.get_readback_position()
         finally:
             self._moving = False
+
+    async def get_readback_position(self) -> MagnetPosition:
+        """Get the current magnet readback position as a :class:`MagnetPosition`."""
+        x, y, z = await asyncio.gather(
+            self.x.readback.get_value(),
+            self.y.readback.get_value(),
+            self.z.readback.get_value(),
+        )
+        return MagnetPosition(x=x, y=y, z=z)
+
+    async def get_field_limit(self) -> MagnetPosition:
+        """Get the current field limit of the magnet.
+
+        The field limit is a live readback from the IOC and may change depending on
+        the current magnet operating mode and the current demand values.
+        """
+        x, y, z = await asyncio.gather(
+            self.x.limit.get_value(),
+            self.y.limit.get_value(),
+            self.z.limit.get_value(),
+        )
+        return MagnetPosition(x=x, y=y, z=z)
+
+
+class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
+    """Cartesian interface to the superconducting magnet.
+
+    Exposes the physical X, Y and Z magnet axes as individual movable signals,
+    together with a grouped ``MagnetPosition`` interface for moving all three axes
+    simultaneously.
+
+    Individual axis moves and grouped cartesian moves are delegated to the parent
+    ``SuperConductingMagnetController``, which applies the active movement strategy for the
+    current operating mode before commanding the hardware.
+    """
+
+    def __init__(
+        self,
+        controller: SuperConductingMagnetController,
+        name: str = "",
+    ) -> None:
+        self._controller_ref = Reference(controller)
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.x = derived_signal_rw(
+                raw_to_derived=lambda val: val,
+                set_derived=self._set_x,
+                val=self._controller_ref().x.readback,
+            )
+            self.y = derived_signal_rw(
+                raw_to_derived=lambda val: val,
+                set_derived=self._set_y,
+                val=self._controller_ref().y.readback,
+            )
+            self.z = derived_signal_rw(
+                raw_to_derived=lambda val: val,
+                set_derived=self._set_z,
+                val=self._controller_ref().z.readback,
+            )
+
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: MagnetRequest):
+        await self._controller_ref().set_within_boundary(value)
+
+    async def _set_x(self, x: float):
+        await self.set(MagnetRequest(x=x))
+
+    async def _set_y(self, y: float):
+        await self.set(MagnetRequest(y=y))
+
+    async def _set_z(self, z: float):
+        await self.set(MagnetRequest(z=z))
+
+
+# class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
+#     """Spherical coordinate interface to the superconducting magnet.
+
+#     Exposes the magnet field in spherical coordinates using the derived signals
+#     ``rho``, ``theta`` and ``phi``. These signals are calculated from the
+#     underlying cartesian magnet axes and may also be written individually or as a
+#     complete ``MagnetSphericalRequest``.
+
+#     Writes are converted to cartesian coordinates before being delegated to the
+#     parent ``SuperConductingMagnetController``, allowing the active movement strategy to
+#     determine a safe sequence of cartesian moves.
+#     """
+
+#     def __init__(
+#         self,
+#         controller: SuperConductingMagnetController,
+#         name: str = "",
+#     ):
+#         self._controller_ref = Reference(controller)
+#         super().__init__(name)
+
+#     @AsyncStatus.wrap
+#     async def set(self, value: MagnetSphericalRequest):
+#         """Set the requested spherical coordinates.
+
+#         Any unspecified spherical coordinates are taken from the current magnet
+#         readback position. The resulting complete spherical position is converted
+#         to Cartesian coordinates and passed to the movement controller, which
+#         determines a safe sequence of Cartesian moves for the active magnet mode.
+#         """
+#         current_readback = await self._controller_ref().get_readback_position()
+#         target = value.resolve_pos(current_readback.to_spherical())
+#         await self._controller_ref().set_within_boundary(
+#             target.to_cartesian().to_request_pos()
+#         )
+
+#     async def _set_rho(self, rho: float):
+#         await self.set(MagnetSphericalRequest(rho=rho))
+
+#     async def _set_theta(self, theta: float):
+#         await self.set(MagnetSphericalRequest(theta=theta))
+
+#     async def _set_phi(self, phi: float):
+#         await self.set(MagnetSphericalRequest(phi=phi))
