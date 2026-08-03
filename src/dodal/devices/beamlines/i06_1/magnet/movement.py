@@ -19,18 +19,6 @@ class MagnetPositionError(Exception):
         )
 
     @classmethod
-    def axis_outside_limit(cls, mode: MagnetMode, limit: float, pos: float, axis: str):
-        return cls(
-            f"Axis {axis} with value {pos} exceeds limit {limit}T for mode {mode}."
-        )
-
-    @classmethod
-    def axis_must_be_zero(cls, mode: MagnetMode, axis: str, value: float):
-        return cls(
-            f"Axis {axis} must remain zero for mode {mode}. Requested value was {value}T."
-        )
-
-    @classmethod
     def axis_below_limit(cls, mode: MagnetMode, limit: float, pos: float, axis: str):
         return cls(
             f"Axis {axis} with value {pos}T is below minimum {limit}T for mode {mode}."
@@ -130,17 +118,17 @@ class SphericalMovement(MovementStrategy):
         decrease_kwargs = {}
         increase_kwargs = {}
         for axis, old, new in decreases:
-            if new is not None:
+            if new is not None and old != new:
                 if abs(new) < abs(old):
                     decrease_kwargs[axis] = new
-                if abs(new) > abs(old):
+                else:
                     increase_kwargs[axis] = new
 
         if decrease_kwargs:
             steps.append(MagnetRequest(**decrease_kwargs))
         if increase_kwargs:
             steps.append(MagnetRequest(**increase_kwargs))
-        return steps
+        return steps if steps else [target]
 
 
 class CubicMovement(MovementStrategy):
@@ -229,10 +217,20 @@ class QuadrantXYMovement(MovementStrategy):
     ) -> None:
         target_pos = target.resolve_pos(current_readback)
         self._check_epics_hardware_limits(target_pos, limits)
+        # Positive quadrant only as manual state`Move field direction through positive quadrant.`
+        if target_pos.x < 0:
+            raise MagnetPositionError.axis_below_limit(
+                self.MODE, 0.0, target_pos.x, "x"
+            )
+
+        if target_pos.y < 0:
+            raise MagnetPositionError.axis_below_limit(
+                self.MODE, 0.0, target_pos.y, "y"
+            )
 
         if target_pos.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
-                self.MODE, self.LIMIT, target.resolve_pos(current_readback)
+                self.MODE, self.LIMIT, target_pos
             )
 
     def move_steps(
@@ -250,6 +248,7 @@ class QuadrantXYMovement(MovementStrategy):
             >= self.LIMIT
         ):
             steps.append(MagnetRequest(x=0))
+            steps.append(MagnetRequest(x=0, y=target.y, z=target.z))
 
         steps.append(MagnetRequest(x=target.x, y=target.y, z=target.z))
         return steps
