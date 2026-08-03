@@ -319,47 +319,84 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
         await self.set(MagnetRequest(z=z))
 
 
-# class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
-#     """Spherical coordinate interface to the superconducting magnet.
+class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
+    """Spherical coordinate interface to the superconducting magnet.
 
-#     Exposes the magnet field in spherical coordinates using the derived signals
-#     ``rho``, ``theta`` and ``phi``. These signals are calculated from the
-#     underlying cartesian magnet axes and may also be written individually or as a
-#     complete ``MagnetSphericalRequest``.
+    Exposes the magnet field in spherical coordinates using the derived signals
+    ``rho``, ``theta`` and ``phi``. These signals are calculated from the
+    underlying cartesian magnet axes and may also be written individually or as a
+    complete ``MagnetSphericalRequest``.
 
-#     Writes are converted to cartesian coordinates before being delegated to the
-#     parent ``SuperConductingMagnetController``, allowing the active movement strategy to
-#     determine a safe sequence of cartesian moves.
-#     """
+    Writes are converted to cartesian coordinates before being delegated to the
+    parent ``SuperConductingMagnetController``, allowing the active movement strategy to
+    determine a safe sequence of cartesian moves.
+    """
 
-#     def __init__(
-#         self,
-#         controller: SuperConductingMagnetController,
-#         name: str = "",
-#     ):
-#         self._controller_ref = Reference(controller)
-#         super().__init__(name)
+    def __init__(
+        self,
+        controller: SuperConductingMagnetController,
+        name: str = "",
+    ):
+        self._controller_ref = Reference(controller)
 
-#     @AsyncStatus.wrap
-#     async def set(self, value: MagnetSphericalRequest):
-#         """Set the requested spherical coordinates.
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.rho = derived_signal_rw(
+                raw_to_derived=lambda x, y, z: self._get_spherical_component(
+                    "rho", x, y, z
+                ),
+                set_derived=self._set_rho,
+                x=self._controller_ref().x.readback,
+                y=self._controller_ref().y.readback,
+                z=self._controller_ref().z.readback,
+            )
+            self.theta = derived_signal_rw(
+                raw_to_derived=lambda x, y, z: self._get_spherical_component(
+                    "theta", x, y, z
+                ),
+                set_derived=self._set_theta,
+                x=self._controller_ref().x.readback,
+                y=self._controller_ref().y.readback,
+                z=self._controller_ref().z.readback,
+            )
+            self.phi = derived_signal_rw(
+                raw_to_derived=lambda x, y, z: self._get_spherical_component(
+                    "phi", x, y, z
+                ),
+                set_derived=self._set_phi,
+                x=self._controller_ref().x.readback,
+                y=self._controller_ref().y.readback,
+                z=self._controller_ref().z.readback,
+            )
+        super().__init__(name)
 
-#         Any unspecified spherical coordinates are taken from the current magnet
-#         readback position. The resulting complete spherical position is converted
-#         to Cartesian coordinates and passed to the movement controller, which
-#         determines a safe sequence of Cartesian moves for the active magnet mode.
-#         """
-#         current_readback = await self._controller_ref().get_readback_position()
-#         target = value.resolve_pos(current_readback.to_spherical())
-#         await self._controller_ref().set_within_boundary(
-#             target.to_cartesian().to_request_pos()
-#         )
+    def _get_spherical_component(self, component: str, x, y, z) -> float:
+        cart_pos = MagnetPosition(
+            x=x,
+            y=y,
+            z=z,
+        )
+        return getattr(cart_pos.to_spherical(), component)
 
-#     async def _set_rho(self, rho: float):
-#         await self.set(MagnetSphericalRequest(rho=rho))
+    @AsyncStatus.wrap
+    async def set(self, value: MagnetSphericalRequest):
+        """Set the requested spherical coordinates.
 
-#     async def _set_theta(self, theta: float):
-#         await self.set(MagnetSphericalRequest(theta=theta))
+        Any unspecified spherical coordinates are taken from the current magnet
+        readback position. The resulting complete spherical position is converted
+        to Cartesian coordinates and passed to the movement controller, which
+        determines a safe sequence of Cartesian moves for the active magnet mode.
+        """
+        current_readback = await self._controller_ref().get_readback_position()
+        target = value.resolve_pos(current_readback.to_spherical())
+        await self._controller_ref().set_within_boundary(
+            target.to_cartesian().to_request_pos()
+        )
 
-#     async def _set_phi(self, phi: float):
-#         await self.set(MagnetSphericalRequest(phi=phi))
+    async def _set_rho(self, rho: float):
+        await self.set(MagnetSphericalRequest(rho=rho))
+
+    async def _set_theta(self, theta: float):
+        await self.set(MagnetSphericalRequest(theta=theta))
+
+    async def _set_phi(self, phi: float):
+        await self.set(MagnetSphericalRequest(phi=phi))
