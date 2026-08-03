@@ -29,18 +29,18 @@ from ophyd_async.epics.core import (
 )
 from pydantic import BaseModel, Field
 
-from dodal.devices.beamlines.i06_1.magnets.coordinates import (
+from dodal.devices.beamlines.i06_1.magnet.coordinates import (
     MagnetPosition,
     MagnetRequest,
     MagnetSphericalPosition,
     MagnetSphericalRequest,
 )
-from dodal.devices.beamlines.i06_1.magnets.enums import (
+from dodal.devices.beamlines.i06_1.magnet.enums import (
     MagnetLimitStatus,
     MagnetMode,
     MagnetRampStatus,
 )
-from dodal.devices.beamlines.i06_1.magnets.movement import (
+from dodal.devices.beamlines.i06_1.magnet.movement import (
     CubicMovement,
     MagnetPositionError,
     MovementStrategy,
@@ -49,7 +49,7 @@ from dodal.devices.beamlines.i06_1.magnets.movement import (
     SphericalMovement,
     UniaxialMovement,
 )
-from dodal.devices.beamlines.i06_1.magnets.ramp_controller import (
+from dodal.devices.beamlines.i06_1.magnet.ramp_controller import (
     MagnetAxisRampRateController,
     MagnetThreeAxesRampRateController,
 )
@@ -174,6 +174,14 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
     async def set(self, value: MagnetRequest):
         await self._set_mag_within_boundary(value)
 
+    async def get_readback_position(self) -> MagnetPosition:
+        x0, y0, z0 = await asyncio.gather(
+            self.x.readback.get_value(),
+            self.y.readback.get_value(),
+            self.z.readback.get_value(),
+        )
+        return MagnetPosition(x=x0, y=y0, z=z0)
+
 
 class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
     """Spherical coordinate interface to the superconducting magnet.
@@ -217,12 +225,7 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
         to Cartesian coordinates and passed to the movement controller, which
         determines a safe sequence of Cartesian moves for the active magnet mode.
         """
-        x0, y0, z0 = await asyncio.gather(
-            self._cart_ref().x.readback.get_value(),
-            self._cart_ref().y.readback.get_value(),
-            self._cart_ref().z.readback.get_value(),
-        )
-        current_readback = MagnetPosition(x=x0, y=y0, z=z0)
+        current_readback = await self._cart_ref().get_readback_position()
         target = value.resolve_pos(current_readback.to_spherical())
         await self._set_mag_within_boundary(target.to_cartesian().to_request_pos())
 
@@ -259,7 +262,7 @@ class MockSuperConductingMagnetController(
             set_mock_value(device.cart.z.readback, z_d)
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
-        callback_on_mock_execute(device.start_ramp, _trigger_start_ramp)
+        callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
 
         async def _set_mode(value):
             # Whenever mode is set, ioc automatically sets everything to zero and
@@ -316,22 +319,22 @@ class SuperConductingMagnetController(StandardReadable):
 
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
-        self.start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
-
+        # Make private so cannot trigger without going through magnet API.
+        self._start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
         # Used to block parallel moves that are not submitted together. Allows us to
         # always be sure we safely move the magnet using coordinated logic.
         self._moving = False
 
         super().__init__(name)
 
-    async def _ramp(self):
+    async def _trigger_ramp(self):
         # Setting invalid demand values should put the limit status in violation state.
         # Block ramp if in violation state.
         limit_status = await self.limit_status.get_value()
         if limit_status == MagnetLimitStatus.VIOLATION:
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
-        await self.start_ramp.trigger()
+        await self._start_ramp.trigger()
         await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=None)
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
@@ -353,16 +356,19 @@ class SuperConductingMagnetController(StandardReadable):
             tasks.append(self.cart.z.demand.set(step.z))
         self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
-        await self._ramp()
+        await self._trigger_ramp()
 
     async def set_within_boundary(self, value: MagnetRequest):
-        """Move the magnet to a new cartesian position.
+        """Move the magnet to a new cartesian position while respecting mode limits.
 
         Any coordinates left as ``None`` retain their current values. The requested
-        target position is validated against the current magnet operating mode and
-        converted into a sequence of movement steps by the corresponding movement
-        strategy. Each step is then applied sequentially until the requested target
-        position is reached.
+        target position is first validated against the limits of the current magnet
+        operating mode. The corresponding movement strategy then generates a sequence
+        of intermediate movement steps.
+
+        Each movement step is validated against the latest magnet readback before it
+        is applied. The readback position is updated after each step, ensuring that
+        subsequent steps are validated against the magnet's actual current position.
         """
         if self._moving:
             raise RuntimeError(
@@ -371,13 +377,9 @@ class SuperConductingMagnetController(StandardReadable):
             )
         try:
             self._moving = True
-            x0, y0, z0, mode = await asyncio.gather(
-                self.cart.x.readback.get_value(),
-                self.cart.y.readback.get_value(),
-                self.cart.z.readback.get_value(),
-                self.mode.get_value(),
+            current_readback, mode = await asyncio.gather(
+                self.cart.get_readback_position(), self.mode.get_value()
             )
-            current_readback = MagnetPosition(x=x0, y=y0, z=z0)
             movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
             if movement_strategy is None:
                 raise ValueError(
@@ -385,10 +387,17 @@ class SuperConductingMagnetController(StandardReadable):
                 )
             self.log.debug(
                 f"Attempting move in mode {mode} with parameters {value}. "
-                f"Current readback position is {current_readback}."
+                f"Current readback is {current_readback}."
             )
+            # Check final requested position is within limits.
             movement_strategy.check_within_limits(current_readback, value)
             for step in movement_strategy.move_steps(current_readback, value):
+                self.log.debug(
+                    f"Applying movement step {step}. Current readback is {current_readback}."
+                )
+                # Check each generated step with the current readback is within limits.
+                movement_strategy.check_within_limits(current_readback, step)
                 await self._apply_step(step)
+                current_readback = await self.cart.get_readback_position()
         finally:
             self._moving = False

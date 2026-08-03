@@ -1,12 +1,12 @@
 import pytest
 
-from dodal.devices.beamlines.i06_1.magnets.coordinates import (
+from dodal.devices.beamlines.i06_1.magnet.coordinates import (
     MagnetPosition,
     MagnetRequest,
     MagnetSphericalPosition,
     MagnetSphericalRequest,
 )
-from tests.devices.beamlines.i06_1.magnets.utils import (
+from tests.devices.beamlines.i06_1.magnet.utils import (
     EXPECTED_CARTESIAN_SPHERICAL_CONVERSION,
 )
 

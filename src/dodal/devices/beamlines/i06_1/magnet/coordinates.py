@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 from dataclasses import dataclass
 
@@ -21,7 +23,7 @@ class MagnetPosition:
     def calc_phi(x: float, y: float, z: float) -> float:
         return math.degrees(math.atan2(math.hypot(x, z), y))
 
-    def to_spherical(self) -> "MagnetSphericalPosition":
+    def to_spherical(self) -> MagnetSphericalPosition:
         return MagnetSphericalPosition(
             rho=self.calc_rho(self.x, self.y, self.z),
             theta=self.calc_theta(self.x, self.z),
@@ -32,7 +34,7 @@ class MagnetPosition:
     def field_magnitude(self) -> float:
         return math.hypot(self.x, self.y, self.z)
 
-    def to_request_pos(self) -> "MagnetRequest":
+    def to_request_pos(self) -> MagnetRequest:
         return MagnetRequest(x=self.x, y=self.y, z=self.z)
 
 
@@ -51,7 +53,7 @@ class MagnetSphericalPosition:
             z=self.rho * math.sin(phi) * math.cos(theta),
         )
 
-    def to_request_pos(self) -> "MagnetSphericalRequest":
+    def to_request_pos(self) -> MagnetSphericalRequest:
         return MagnetSphericalRequest(rho=self.rho, theta=self.theta, phi=self.phi)
 
 

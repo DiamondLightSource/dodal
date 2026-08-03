@@ -9,7 +9,7 @@ from bluesky.protocols import Reading
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.beamlines.i06_1.magnets import (
+from dodal.devices.beamlines.i06_1.magnet import (
     FlyMagnetInfo,
     MagnetAxis,
     MagnetAxisRampRateController,
@@ -18,12 +18,14 @@ from dodal.devices.beamlines.i06_1.magnets import (
     MagnetPosition,
     MagnetPositionError,
     MagnetRampStatus,
+    MagnetRequest,
     MagnetSphericalPosition,
     MagnetThreeAxesRampRateController,
     SuperConductingMagnetController,
     movement,
 )
-from tests.devices.beamlines.i06_1.magnets.utils import (
+from dodal.devices.beamlines.i06_1.magnet.movement import MovementStrategy
+from tests.devices.beamlines.i06_1.magnet.utils import (
     EXPECTED_CARTESIAN_SPHERICAL_CONVERSION,
 )
 
@@ -350,17 +352,17 @@ async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
 
     scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_X] = movement_strategy
 
-    scmc._ramp = AsyncMock()
+    scmc._trigger_ramp = AsyncMock()
 
     with patch(
-        "dodal.devices.beamlines.i06_1.magnets.superconducting_magnet.SuperConductingMagnetController._apply_step",
+        "dodal.devices.beamlines.i06_1.magnet.superconducting_magnet.SuperConductingMagnetController._apply_step",
         wraps=scmc._apply_step,
     ) as mock_apply_step:
         await scmc.mode.set(MagnetMode.UNIAXIAL_X)
         await scmc.cart.x.set(4)
 
         assert mock_apply_step.call_args_list == expected_apply_step_calls
-        assert scmc._ramp.call_count == len(mov_str_return_values)
+        assert scmc._trigger_ramp.call_count == len(mov_str_return_values)
 
 
 async def test_external_parallel_moves_for_scmc_raise_error(
@@ -376,3 +378,67 @@ async def test_external_parallel_moves_for_scmc_raise_error(
 
     # Check after a blocked move and the first move finished, we can still do another move.
     run_engine(mv(scmc.cart, MagnetPosition(x=0.1, y=0.2, z=0.3)))
+
+
+async def test_scmc_set_within_boundary_checks_each_movement_step(
+    scmc: SuperConductingMagnetController,
+) -> None:
+    movement_strategy = MagicMock(spec=MovementStrategy)
+    initial_position = MagnetPosition(x=0, y=0, z=0)
+    position_after_step_1 = MagnetPosition(x=0, y=1, z=0)
+    position_after_step_2 = MagnetPosition(x=1, y=1, z=0)
+
+    target = MagnetRequest(x=1, y=1)
+
+    steps = [MagnetRequest(y=1), MagnetRequest(x=1)]
+    movement_strategy.move_steps.return_value = steps
+
+    scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.QUADRANT_XY] = movement_strategy
+
+    scmc.cart.get_readback_position = AsyncMock(
+        side_effect=[
+            initial_position,
+            position_after_step_1,
+            position_after_step_2,
+        ]
+    )
+    scmc.mode.get_value = AsyncMock(return_value=MagnetMode.QUADRANT_XY)
+    scmc._apply_step = AsyncMock()
+
+    await scmc.set_within_boundary(target)
+
+    assert movement_strategy.check_within_limits.call_args_list == [
+        call(initial_position, target),
+        call(initial_position, steps[0]),
+        call(position_after_step_1, steps[1]),
+    ]
+    assert scmc._apply_step.call_args_list == [call(steps[0]), call(steps[1])]
+    assert scmc.cart.get_readback_position.call_count == 3
+
+
+@pytest.mark.asyncio
+async def test_scmc_set_within_boundary_stops_when_step_is_outside_limits(
+    scmc: SuperConductingMagnetController,
+) -> None:
+    movement_strategy = MagicMock(spec=MovementStrategy)
+    initial_position = MagnetPosition(x=0, y=0, z=0)
+    target = MagnetRequest(x=1, y=1)
+    steps = [MagnetRequest(y=1), MagnetRequest(x=1)]
+
+    movement_strategy.move_steps.return_value = steps
+    movement_strategy.check_within_limits.side_effect = [
+        None,  # Final target is valid.
+        None,  # First step is valid.
+        MagnetPositionError.axis_below_limit(MagnetMode.QUADRANT_XY, 0, -1, "x"),
+    ]
+    scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.QUADRANT_XY] = movement_strategy
+    scmc.cart.get_readback_position = AsyncMock(
+        side_effect=[initial_position, MagnetPosition(x=0, y=1, z=0)]
+    )
+    scmc.mode.get_value = AsyncMock(return_value=MagnetMode.QUADRANT_XY)
+    scmc._apply_step = AsyncMock()
+
+    with pytest.raises(MagnetPositionError):
+        await scmc.set_within_boundary(target)
+    # The invalid second step must never be applied.
+    scmc._apply_step.assert_awaited_once_with(steps[0])

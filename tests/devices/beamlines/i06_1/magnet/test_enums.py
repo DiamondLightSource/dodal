@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.beamlines.i06_1.magnets import MagnetMode
+from dodal.devices.beamlines.i06_1.magnet import MagnetMode
 
 
 @pytest.mark.parametrize(
