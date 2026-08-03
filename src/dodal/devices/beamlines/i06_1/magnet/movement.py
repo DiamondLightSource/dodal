@@ -38,16 +38,34 @@ class MagnetPositionError(Exception):
 
 
 class MovementStrategy:
+    """Define the movement and safety constraints for a magnet operating mode.
+
+    A movement strategy validates requested positions against the constraints of a
+    particular magnet mode and generates a sequence of safe movement steps to reach
+    the requested position. Each generated requested step is validated against the current
+    readback before it is applied.
+    """
+
+    @abstractmethod
     def check_within_limits(
         self, current_readback: MagnetPosition, target: MagnetRequest
     ) -> None:
-        pass
+        """Validate that a requested position is within the mode's limits.
+
+        Raises:
+            MagnetPositionError: If the requested position is invalid or outside
+                the limits of this movement strategy.
+        """
 
     @abstractmethod
     def move_steps(
         self, current_readback: MagnetPosition, target: MagnetRequest
     ) -> list[MagnetRequest]:
-        """Return a sequence of safe moves."""
+        """Generate a sequence of safe movement steps to reach the target.
+
+        The returned steps may be used to move through intermediate positions
+        required to safely reach the target from the current readback position.
+        """
 
 
 class SphericalMovement(MovementStrategy):
