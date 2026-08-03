@@ -124,6 +124,9 @@ class MockSuperConductingMagnetController(
         callback_on_mock_put(device.mode, _set_mode)
         set_mock_value(device.limit_status, MagnetLimitStatus.OK)
         set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+        set_mock_value(device.x.limit, 2.0)
+        set_mock_value(device.y.limit, 2.0)
+        set_mock_value(device.z.limit, 6.0)
 
 
 @default_mock_class(MockSuperConductingMagnetController)

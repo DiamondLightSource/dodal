@@ -75,19 +75,19 @@ async def test_scmc_configuration(scm: SuperConductingMagnet) -> None:
     ],
 )
 async def test_scmc_axis_set_uses_correct_axis(
-    scmc: SuperConductingMagnetController,
+    scm: SuperConductingMagnet,
     axis: str,
     value: float,
     expected_x: float,
     expected_y: float,
     expected_z: float,
 ) -> None:
-    await scmc.mode.set(getattr(MagnetMode, "UNIAXIAL_" + axis.capitalize()))
-    await getattr(scmc.cart, axis).set(value)
+    await scm.controller.mode.set(getattr(MagnetMode, "UNIAXIAL_" + axis.capitalize()))
+    await getattr(scm.cart, axis).set(value)
     x, y, z = await asyncio.gather(
-        scmc.cart.x.readback.get_value(),
-        scmc.cart.y.readback.get_value(),
-        scmc.cart.z.readback.get_value(),
+        scm.cart.x.get_value(),
+        scm.cart.y.get_value(),
+        scm.cart.z.get_value(),
     )
     assert x == expected_x
     assert y == expected_y
