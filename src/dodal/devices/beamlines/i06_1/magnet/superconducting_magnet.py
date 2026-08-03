@@ -262,7 +262,7 @@ class MockSuperConductingMagnetController(
             set_mock_value(device.cart.z.readback, z_d)
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
-        callback_on_mock_execute(device.start_ramp, _trigger_start_ramp)
+        callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
 
         async def _set_mode(value):
             # Whenever mode is set, ioc automatically sets everything to zero and
@@ -319,8 +319,8 @@ class SuperConductingMagnetController(StandardReadable):
 
         self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
-        self.start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
-
+        # Make private so cannot trigger without going through magnet API.
+        self._start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
         # Used to block parallel moves that are not submitted together. Allows us to
         # always be sure we safely move the magnet using coordinated logic.
         self._moving = False
@@ -334,7 +334,7 @@ class SuperConductingMagnetController(StandardReadable):
         if limit_status == MagnetLimitStatus.VIOLATION:
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
-        await self.start_ramp.trigger()
+        await self._start_ramp.trigger()
         await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=None)
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
