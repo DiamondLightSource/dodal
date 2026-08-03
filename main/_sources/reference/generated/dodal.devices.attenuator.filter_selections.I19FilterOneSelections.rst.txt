@@ -69,22 +69,22 @@ dodal.devices.attenuator.filter\_selections.I19FilterOneSelections
    .. autosummary::
    
       
-      ~I19FilterOneSelections.AIR1
+      ~I19FilterOneSelections.W1S1
       
       
-      ~I19FilterOneSelections.AL
+      ~I19FilterOneSelections.W1S2
       
       
-      ~I19FilterOneSelections.AIR3
+      ~I19FilterOneSelections.W1S3
       
       
-      ~I19FilterOneSelections.AU
+      ~I19FilterOneSelections.W1S4
       
       
-      ~I19FilterOneSelections.AIR5
+      ~I19FilterOneSelections.W1S5
       
       
-      ~I19FilterOneSelections.FE
+      ~I19FilterOneSelections.W1S6
       
    
    
