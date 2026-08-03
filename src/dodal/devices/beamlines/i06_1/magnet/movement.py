@@ -128,7 +128,7 @@ class SphericalMovement(MovementStrategy):
             steps.append(MagnetRequest(**decrease_kwargs))
         if increase_kwargs:
             steps.append(MagnetRequest(**increase_kwargs))
-        return steps if steps else [target]
+        return steps
 
 
 class CubicMovement(MovementStrategy):
@@ -248,7 +248,6 @@ class QuadrantXYMovement(MovementStrategy):
             >= self.LIMIT
         ):
             steps.append(MagnetRequest(x=0))
-            steps.append(MagnetRequest(x=0, y=target.y, z=target.z))
 
         steps.append(MagnetRequest(x=target.x, y=target.y, z=target.z))
         return steps
