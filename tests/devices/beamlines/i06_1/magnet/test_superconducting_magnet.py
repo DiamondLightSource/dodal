@@ -21,6 +21,7 @@ from dodal.devices.beamlines.i06_1.magnet import (
     MagnetRequest,
     MagnetSphericalPosition,
     MagnetThreeAxesRampRateController,
+    SuperConductingMagnet,
     SuperConductingMagnetController,
     movement,
 )
@@ -31,38 +32,37 @@ from tests.devices.beamlines.i06_1.magnet.utils import (
 
 
 @pytest.fixture
-def ramp_rate() -> MagnetThreeAxesRampRateController:
+def scmc() -> SuperConductingMagnetController:
     with init_devices(mock=True):
-        ramp_rate = MagnetThreeAxesRampRateController("TEST:")
-    return ramp_rate
-
-
-@pytest.fixture
-def scmc(
-    ramp_rate: MagnetThreeAxesRampRateController,
-) -> SuperConductingMagnetController:
-    with init_devices(mock=True):
-        scmc = SuperConductingMagnetController("TEST:", ramp_rate)
+        scmc = SuperConductingMagnetController("TEST:")
     return scmc
 
 
-async def test_scmc_read(scmc: SuperConductingMagnetController) -> None:
+@pytest.fixture
+def scm(scmc: SuperConductingMagnetController) -> SuperConductingMagnet:
+    with init_devices(mock=True):
+        scm = SuperConductingMagnet(scmc)
+    return scm
+
+
+async def test_scm_read(scm: SuperConductingMagnet) -> None:
+
     await assert_reading(
-        scmc,
+        scm,
         {
-            "scmc-cart-x": partial_reading(0),
-            "scmc-cart-y": partial_reading(0),
-            "scmc-cart-z": partial_reading(0),
-            "scmc-sph-theta": partial_reading(0),
-            "scmc-sph-rho": partial_reading(0),
-            "scmc-sph-phi": partial_reading(0),
+            "scm-cart-x": partial_reading(0),
+            "scm-cart-y": partial_reading(0),
+            "scm-cart-z": partial_reading(0),
+            "scm-sph-theta": partial_reading(0),
+            "scm-sph-rho": partial_reading(0),
+            "scm-sph-phi": partial_reading(0),
         },
     )
 
 
-async def test_scmc_configuration(scmc: SuperConductingMagnetController) -> None:
+async def test_scmc_configuration(scm: SuperConductingMagnet) -> None:
     await assert_configuration(
-        scmc, {"scmc-mode": partial_reading(MagnetMode.UNIAXIAL_X)}
+        scm, {"scm-controller-mode": partial_reading(MagnetMode.UNIAXIAL_X)}
     )
 
 

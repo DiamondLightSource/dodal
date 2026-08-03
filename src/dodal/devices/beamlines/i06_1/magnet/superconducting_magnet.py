@@ -8,8 +8,11 @@ from ophyd_async.core import (
     Reference,
     StandardReadable,
     StandardReadableFormat,
+    callback_on_mock_execute,
+    callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
+    set_mock_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import (
@@ -85,45 +88,45 @@ class MagnetAxis(StandardReadable):
         super().__init__(name)
 
 
-# class MockSuperConductingMagnetController(
-#     DeviceMock["SuperConductingMagnetController"]
-# ):
-#     """Add additional callback logic to our device to get the mock behaviour to simulate
-#     the hardware as best we can.
-#     """
+class MockSuperConductingMagnetController(
+    DeviceMock["SuperConductingMagnetController"]
+):
+    """Add additional callback logic to our device to get the mock behaviour to simulate
+    the hardware as best we can.
+    """
 
-#     async def connect(self, device: "SuperConductingMagnetController"):
+    async def connect(self, device: "SuperConductingMagnetController"):
 
-#         async def _trigger_start_ramp():
-#             # Whenever ramp is triggered for the ioc, readback values move to the
-#             # demand values. Simulate this behaviour here.
-#             x_d, y_d, z_d = await asyncio.gather(
-#                 device.cart.x.demand.get_value(),
-#                 device.cart.y.demand.get_value(),
-#                 device.cart.z.demand.get_value(),
-#             )
-#             set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
-#             set_mock_value(device.cart.x.readback, x_d)
-#             set_mock_value(device.cart.y.readback, y_d)
-#             set_mock_value(device.cart.z.readback, z_d)
-#             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+        async def _trigger_start_ramp():
+            # Whenever ramp is triggered for the ioc, readback values move to the
+            # demand values. Simulate this behaviour here.
+            x_d, y_d, z_d = await asyncio.gather(
+                device.x.demand.get_value(),
+                device.y.demand.get_value(),
+                device.z.demand.get_value(),
+            )
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
+            set_mock_value(device.x.readback, x_d)
+            set_mock_value(device.y.readback, y_d)
+            set_mock_value(device.z.readback, z_d)
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
-#         callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
+        callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
 
-#         async def _set_mode(value):
-#             # Whenever mode is set, ioc automatically sets everything to zero and
-#             # triggers a ramp.
-#             set_mock_value(device.cart.x.demand, 0.0)
-#             set_mock_value(device.cart.y.demand, 0.0)
-#             set_mock_value(device.cart.z.demand, 0.0)
-#             await _trigger_start_ramp()
+        async def _set_mode(value):
+            # Whenever mode is set, ioc automatically sets everything to zero and
+            # triggers a ramp.
+            set_mock_value(device.x.demand, 0.0)
+            set_mock_value(device.y.demand, 0.0)
+            set_mock_value(device.z.demand, 0.0)
+            await _trigger_start_ramp()
 
-#         callback_on_mock_put(device.mode, _set_mode)
-#         set_mock_value(device.limit_status, MagnetLimitStatus.OK)
-#         set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
+        callback_on_mock_put(device.mode, _set_mode)
+        set_mock_value(device.limit_status, MagnetLimitStatus.OK)
+        set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
 
-# @default_mock_class(MockSuperConductingMagnetController)
+@default_mock_class(MockSuperConductingMagnetController)
 class SuperConductingMagnetController(StandardReadable):
     """A three-axis superconducting vector magnet.
 
@@ -288,22 +291,26 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
         self._controller_ref = Reference(controller)
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.x = derived_signal_rw(
-                raw_to_derived=lambda val: val,
+                raw_to_derived=self._read_position,
                 set_derived=self._set_x,
                 val=self._controller_ref().x.readback,
             )
             self.y = derived_signal_rw(
-                raw_to_derived=lambda val: val,
+                raw_to_derived=self._read_position,
                 set_derived=self._set_y,
                 val=self._controller_ref().y.readback,
             )
             self.z = derived_signal_rw(
-                raw_to_derived=lambda val: val,
+                raw_to_derived=self._read_position,
                 set_derived=self._set_z,
                 val=self._controller_ref().z.readback,
             )
 
         super().__init__(name)
+
+    def _read_position(self, val: float) -> float:
+        """Read the current magnet position as a :class:`MagnetPosition`."""
+        return val
 
     @AsyncStatus.wrap
     async def set(self, value: MagnetRequest):
@@ -341,35 +348,34 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.rho = derived_signal_rw(
-                raw_to_derived=lambda x, y, z: self._get_spherical_component(
-                    "rho", x, y, z
-                ),
+                raw_to_derived=self._get_spherical_component,
                 set_derived=self._set_rho,
+                component="rho",
                 x=self._controller_ref().x.readback,
                 y=self._controller_ref().y.readback,
                 z=self._controller_ref().z.readback,
             )
             self.theta = derived_signal_rw(
-                raw_to_derived=lambda x, y, z: self._get_spherical_component(
-                    "theta", x, y, z
-                ),
+                raw_to_derived=self._get_spherical_component,
                 set_derived=self._set_theta,
+                component="theta",
                 x=self._controller_ref().x.readback,
                 y=self._controller_ref().y.readback,
                 z=self._controller_ref().z.readback,
             )
             self.phi = derived_signal_rw(
-                raw_to_derived=lambda x, y, z: self._get_spherical_component(
-                    "phi", x, y, z
-                ),
+                raw_to_derived=self._get_spherical_component,
                 set_derived=self._set_phi,
+                component="phi",
                 x=self._controller_ref().x.readback,
                 y=self._controller_ref().y.readback,
                 z=self._controller_ref().z.readback,
             )
         super().__init__(name)
 
-    def _get_spherical_component(self, component: str, x, y, z) -> float:
+    def _get_spherical_component(
+        self, component: str, x: float, y: float, z: float
+    ) -> float:
         cart_pos = MagnetPosition(
             x=x,
             y=y,
@@ -400,3 +406,18 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
 
     async def _set_phi(self, phi: float):
         await self.set(MagnetSphericalRequest(phi=phi))
+
+
+class SuperConductingMagnet(StandardReadable):
+    """Factory function to create a superconducting magnet device with both cartesian and
+    spherical coordinate interfaces.
+    """
+
+    def __init__(self, controller: SuperConductingMagnetController, name: str = ""):
+
+        with self.add_children_as_readables():
+            self.cart = MagnetCartesianCoordinates(controller)
+            self.sph = MagnetSphericalCoordinates(controller)
+            self.controller = controller
+
+        super().__init__(name)
