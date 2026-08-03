@@ -36,6 +36,13 @@ class MagnetPositionError(Exception):
             f"Axis {axis} with value {pos}T is below minimum {limit}T for mode {mode}."
         )
 
+    @classmethod
+    def epics_hardware_limit_exceeded(cls, axis: str, pos: float, limit: float):
+        return cls(
+            f"Requested {axis} axis position {pos}T exceeds EPICS hardware limit "
+            f"({limit}T)."
+        )
+
 
 class MovementStrategy:
     """Define the movement and safety constraints for a magnet operating mode.
@@ -46,9 +53,29 @@ class MovementStrategy:
     readback before it is applied.
     """
 
+    def _check_epics_hardware_limits(
+        self, target_pos: MagnetPosition, limits: MagnetPosition
+    ) -> None:
+        """Utility method to validate target position against live EPICS PV limits."""
+        if abs(target_pos.x) > limits.x:
+            raise MagnetPositionError.epics_hardware_limit_exceeded(
+                "x", target_pos.x, limits.x
+            )
+        if abs(target_pos.y) > limits.y:
+            raise MagnetPositionError.epics_hardware_limit_exceeded(
+                "y", target_pos.y, limits.y
+            )
+        if abs(target_pos.z) > limits.z:
+            raise MagnetPositionError.epics_hardware_limit_exceeded(
+                "z", target_pos.z, limits.z
+            )
+
     @abstractmethod
     def check_within_limits(
-        self, current_readback: MagnetPosition, target: MagnetRequest
+        self,
+        current_readback: MagnetPosition,
+        target: MagnetRequest,
+        limits: MagnetPosition,
     ) -> None:
         """Validate that a requested position is within the mode's limits.
 
@@ -73,16 +100,23 @@ class SphericalMovement(MovementStrategy):
     MODE = MagnetMode.SPHERICAL
 
     def check_within_limits(
-        self, current_readback: MagnetPosition, target: MagnetRequest
+        self,
+        current_readback: MagnetPosition,
+        target: MagnetRequest,
+        limits: MagnetPosition,
     ) -> None:
+
         mag_pos_after_move = target.resolve_pos(current_readback)
+        self._check_epics_hardware_limits(mag_pos_after_move, limits)
         if mag_pos_after_move.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
                 self.MODE, self.LIMIT, mag_pos_after_move
             )
 
     def move_steps(
-        self, current_readback: MagnetPosition, target: MagnetRequest
+        self,
+        current_readback: MagnetPosition,
+        target: MagnetRequest,
     ) -> list[MagnetRequest]:
 
         steps: list[MagnetRequest] = []
@@ -110,21 +144,16 @@ class SphericalMovement(MovementStrategy):
 
 
 class CubicMovement(MovementStrategy):
-    LIMIT = 1.5
     MODE = MagnetMode.CUBIC
 
     def check_within_limits(
-        self, current_readback: MagnetPosition, target: MagnetRequest
+        self,
+        current_readback: MagnetPosition,
+        target: MagnetRequest,
+        limits: MagnetPosition,
     ) -> None:
-        for axis, value in (
-            ("x", target.x),
-            ("y", target.y),
-            ("z", target.z),
-        ):
-            if value is not None and abs(value) > self.LIMIT:
-                raise MagnetPositionError.axis_outside_limit(
-                    self.MODE, self.LIMIT, value, axis
-                )
+        target_pos = target.resolve_pos(current_readback)
+        self._check_epics_hardware_limits(target_pos, limits)
 
     def move_steps(
         self, current_readback: MagnetPosition, target: MagnetRequest
@@ -137,14 +166,17 @@ class PlanarXZMovement(MovementStrategy):
     MODE = MagnetMode.PLANAR_XZ
 
     def check_within_limits(
-        self, current_readback: MagnetPosition, target: MagnetRequest
+        self,
+        current_readback: MagnetPosition,
+        target: MagnetRequest,
+        limits: MagnetPosition,
     ) -> None:
-        if target.y is not None and target.y != 0:
-            raise MagnetPositionError.axis_must_be_zero(self.MODE, "y", target.y)
-        new_total_pos = target.resolve_pos(current_readback)
-        if new_total_pos.field_magnitude > self.LIMIT:
+        target_pos = target.resolve_pos(current_readback)
+        self._check_epics_hardware_limits(target_pos, limits)
+
+        if target_pos.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
-                self.MODE, self.LIMIT, new_total_pos
+                self.MODE, self.LIMIT, target_pos
             )
 
     def move_steps(
@@ -156,7 +188,6 @@ class PlanarXZMovement(MovementStrategy):
 @dataclass
 class UniaxialMovement(MovementStrategy):
     mode: MagnetMode
-    limit: float
 
     def _target_axes_map(self, target: MagnetRequest) -> dict[str, float | None]:
         return {
@@ -166,20 +197,13 @@ class UniaxialMovement(MovementStrategy):
         }
 
     def check_within_limits(
-        self, current_readback: MagnetPosition, target: MagnetRequest
+        self,
+        current_readback: MagnetPosition,
+        target: MagnetRequest,
+        limits: MagnetPosition,
     ) -> None:
-        for axis, value in self._target_axes_map(target).items():
-            if value is None:
-                continue
-
-            if axis == self.mode.axis_alias:
-                abs_value = abs(value)
-                if abs_value > self.limit:
-                    raise MagnetPositionError.axis_outside_limit(
-                        self.mode, self.limit, abs_value, axis
-                    )
-            elif value != 0:
-                raise MagnetPositionError.axis_must_be_zero(self.mode, axis, value)
+        target_pos = target.resolve_pos(current_readback)
+        self._check_epics_hardware_limits(target_pos, limits)
 
     def move_steps(
         self, current_readback: MagnetPosition, target: MagnetRequest
@@ -201,21 +225,10 @@ class QuadrantXYMovement(MovementStrategy):
         self,
         current_readback: MagnetPosition,
         target: MagnetRequest,
+        limits: MagnetPosition,
     ) -> None:
         target_pos = target.resolve_pos(current_readback)
-
-        if target_pos.z != 0:
-            raise MagnetPositionError.axis_must_be_zero(self.MODE, "z", target_pos.z)
-
-        if target_pos.x < 0:
-            raise MagnetPositionError.axis_below_limit(
-                self.MODE, 0.0, target_pos.x, "x"
-            )
-
-        if target_pos.y < 0:
-            raise MagnetPositionError.axis_below_limit(
-                self.MODE, 0.0, target_pos.y, "y"
-            )
+        self._check_epics_hardware_limits(target_pos, limits)
 
         if target_pos.field_magnitude > self.LIMIT:
             raise MagnetPositionError.total_field_mag_outside_limit(
