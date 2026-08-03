@@ -6,12 +6,13 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from numpy import linspace, poly1d
 from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_value,
 )
 from ophyd_async.testing import assert_emitted
@@ -57,7 +58,7 @@ from tests.devices.insertion_device.util import (
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 
-# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+# mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
@@ -266,11 +267,9 @@ async def test_fail_i10_apple2_controller_set_energy_has_default(
     mock_id_energy: InsertionDeviceEnergy,
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.energy.set = AsyncMock()
+    mock_set = set_mock_attr(mock_id_controller.energy, "set", AsyncMock())
     await mock_id_energy.set(600)
-    mock_id_controller.energy.set.assert_awaited_once_with(
-        600, timeout=MAXIMUM_MOVE_TIME
-    )
+    mock_set.assert_awaited_once_with(600, timeout=MAXIMUM_MOVE_TIME)
 
 
 async def test_beam_energy_re_scan(
@@ -389,11 +388,9 @@ async def test_id_polarisation_set_has_default_timeout(
     mock_id_controller: I10Apple2Controller,
 ):
     set_mock_value(mock_id_controller._energy, 700)
-    mock_id_controller.polarisation.set = AsyncMock()
+    mock_set = set_mock_attr(mock_id_controller.polarisation, "set", AsyncMock())
     await mock_id_pol.set(Pol.LV)
-    mock_id_controller.polarisation.set.assert_awaited_once_with(
-        Pol.LV, timeout=MAXIMUM_MOVE_TIME
-    )
+    mock_set.assert_awaited_once_with(Pol.LV, timeout=MAXIMUM_MOVE_TIME)
 
 
 @pytest.mark.parametrize(
@@ -539,11 +536,11 @@ async def test_linear_arbitrary_pol_set_default_timeout(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.linear_arbitrary_angle.set = AsyncMock()
-    await mock_linear_arbitrary_angle.set(60)
-    mock_id_controller.linear_arbitrary_angle.set.assert_awaited_once_with(
-        60, timeout=MAXIMUM_MOVE_TIME
+    mock_set = set_mock_attr(
+        mock_id_controller.linear_arbitrary_angle, "set", AsyncMock()
     )
+    await mock_linear_arbitrary_angle.set(60)
+    mock_set.assert_awaited_once_with(60, timeout=MAXIMUM_MOVE_TIME)
 
 
 @pytest.mark.parametrize(

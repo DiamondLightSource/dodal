@@ -1,8 +1,5 @@
 import pytest
-from ophyd_async.core import (
-    init_devices,
-    set_mock_value,
-)
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.beamlines.i05_shared import (
     energy_to_gap_converter,

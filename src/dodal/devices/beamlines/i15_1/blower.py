@@ -1,4 +1,4 @@
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllerParams,
 )
@@ -24,6 +24,7 @@ class Blower(SafeOrBeamPositioner):
         pneumatic_pv: str,
         config_client: ConfigClient,
         xpdf_parameters_path: str,
+        name: str = "",
     ):
         self._temperature_sp = epics_signal_w(float, f"{prefix}SP")
         self._temperature_rbv = epics_signal_r(float, f"{prefix}PV:RBV")
@@ -40,7 +41,7 @@ class Blower(SafeOrBeamPositioner):
             float, f"{prefix}RR", f"{prefix}RR:RBV"
         )
 
-        super().__init__(motion_pv, config_client, xpdf_parameters_path)
+        super().__init__(motion_pv, config_client, xpdf_parameters_path, name)
 
     def _get_temperature(self, temperature_rbv: float) -> float:
         return temperature_rbv

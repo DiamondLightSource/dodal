@@ -1,8 +1,8 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from daq_config_server import ConfigClient
-from ophyd_async.core import init_devices, set_mock_value
+from daq_config_server.client import ConfigClient
+from ophyd_async.core import init_devices, set_mock_attr, set_mock_value
 
 from dodal.devices.oav.oav_detector import (
     OAV,
@@ -24,8 +24,12 @@ def null_controller() -> NullZoomController:
 async def test_zoom_controller():
     zoom_controller = ZoomController("", "zoom_controller")
     await zoom_controller.connect(mock=True)
-    zoom_controller.level.describe = AsyncMock(
-        return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}}
+    set_mock_attr(
+        zoom_controller.level,
+        "describe",
+        AsyncMock(
+            return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}}
+        ),
     )
     status = zoom_controller.set("3.0x")
     await status
@@ -164,9 +168,11 @@ async def test_beam_centre_signals_have_same_names(
         assert "oav-beam_centre_j" in reading.keys()
 
 
-async def test_oav_with_null_zoom_controller(null_controller: NullZoomController):
+async def test_oav_with_null_zoom_controller(
+    null_controller: NullZoomController, mock_config_client: ConfigClient
+):
     oav_config = OAVConfigBeamCentre(
-        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, mock_config_client
     )
     oav = OAVBeamCentreFile("", oav_config, "", zoom_controller=null_controller)
 
@@ -192,9 +198,11 @@ async def test_oav_with_null_zoom_controller_set_zoom_level_other_than_1(
     "mjpeg_prefix",
     ["MJPG", "XTAL"],
 )
-async def test_setting_mjpeg_prefix_changes_stream_url(mjpeg_prefix):
+async def test_setting_mjpeg_prefix_changes_stream_url(
+    mjpeg_prefix, mock_config_client: ConfigClient
+):
     oav_config = OAVConfigBeamCentre(
-        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, ConfigClient("")
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG, mock_config_client
     )
     async with init_devices(mock=True, connect=True):
         oav = OAVBeamCentreFile(
