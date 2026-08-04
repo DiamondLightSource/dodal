@@ -1,9 +1,12 @@
 import asyncio
+import dataclasses
+import math
 from typing import Protocol
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
+    ConfinedModel,
     DeviceMock,
     Reference,
     StandardReadable,
@@ -12,6 +15,7 @@ from ophyd_async.core import (
     callback_on_mock_put,
     default_mock_class,
     derived_signal_rw,
+    error_if_none,
     set_mock_value,
     wait_for_value,
 )
@@ -20,7 +24,7 @@ from ophyd_async.epics.core import (
     epics_signal_rw,
     epics_triggerable_command,
 )
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from dodal.devices.beamlines.i06_1.magnet.coordinates import (
     MagnetPosition,
@@ -44,14 +48,21 @@ from dodal.devices.beamlines.i06_1.magnet.movement import (
 )
 
 
+class FlyVectorMagnetInfo(ConfinedModel):
+    fly_axis: str = Field(frozen=True)
+    """Axis to fly along, one of 'x', 'y' or 'z'"""
+    start_position: float = Field(frozen=True)
+    """Start position of the magnet move. in Tesla"""
+
+    end_position: float = Field(frozen=True)
+    """End position of the magnet move, in Tesla."""
+
+    ramp_rate: float = Field(frozen=True, gt=0)
+    """Ramp rate of the magnet move, in Tesla/s."""
+
+
 class MagnetMoveWithinBoundary(Protocol):
     async def __call__(self, value: MagnetRequest): ...
-
-
-class FlyMagnetInfo(BaseModel):
-    start_position: float = Field(frozen=True)
-    end_position: float = Field(frozen=True)
-    ramp_rate: float = Field(frozen=True, gt=0)
 
 
 @default_mock_class(DeviceMock)
@@ -79,7 +90,7 @@ class MagnetAxis(StandardReadable):
         self.demand = epics_signal_rw(float, prefix + "DMD")
         self.limit = epics_signal_r(float, prefix + ":LIM:FIELD:NOW")
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.ramp_speed = epics_signal_rw(
+            self.ramp_rate = epics_signal_rw(
                 float,
                 read_pv=prefix + "STS:RAMPRATE:TPM",
                 write_pv=prefix + "SET:DMD:RAMPRATE:TPM",
@@ -127,10 +138,13 @@ class MockSuperConductingMagnetController(
         set_mock_value(device.x.limit, 2.0)
         set_mock_value(device.y.limit, 2.0)
         set_mock_value(device.z.limit, 6.0)
+        set_mock_value(device.x.ramp_limit, 1.0)
+        set_mock_value(device.y.ramp_limit, 1.0)
+        set_mock_value(device.z.ramp_limit, 1.0)
 
 
 @default_mock_class(MockSuperConductingMagnetController)
-class SuperConductingMagnetController(StandardReadable):
+class SuperConductingMagnetController(StandardReadable, Flyable, Preparable):
     """A three-axis superconducting vector magnet.
 
     The magnet provides both cartesian and spherical coordinate interfaces for
@@ -171,11 +185,13 @@ class SuperConductingMagnetController(StandardReadable):
         self._start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
         # Used to block parallel moves that are not submitted together. Allows us to
         # always be sure we safely move the magnet using coordinated logic.
-        self._moving = False
+        self._move_lock = asyncio.Lock()
+        self._fly_info: FlyVectorMagnetInfo | None = None
+        self._fly_status: AsyncStatus | None = None
 
         super().__init__(name)
 
-    async def _trigger_ramp(self):
+    async def _trigger_ramp(self, timeout: float | None = None):
         # Setting invalid demand values should put the limit status in violation state.
         # Block ramp if in violation state.
         limit_status = await self.limit_status.get_value()
@@ -183,12 +199,16 @@ class SuperConductingMagnetController(StandardReadable):
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
         await self._start_ramp.trigger()
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=None)
+        await wait_for_value(
+            self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=timeout
+        )
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
 
-    async def _apply_step(self, step: MagnetRequest) -> None:
+    async def _apply_step(
+        self, step: MagnetRequest, timeout: float | None = None
+    ) -> None:
         """Apply a single movement step and wait for the magnet ramp to complete.
 
         A movement step may update one or more cartesian axes simultaneously. Once
@@ -204,9 +224,10 @@ class SuperConductingMagnetController(StandardReadable):
             tasks.append(self.z.demand.set(step.z))
         self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
-        await self._trigger_ramp()
+        await self._trigger_ramp(timeout=timeout)
 
-    async def set_within_boundary(self, value: MagnetRequest):
+    @AsyncStatus.wrap
+    async def set_within_boundary(self, value: MagnetRequest) -> None:
         """Move the magnet to a new cartesian position while respecting mode limits.
 
         Any coordinates left as ``None`` retain their current values. The requested
@@ -218,10 +239,10 @@ class SuperConductingMagnetController(StandardReadable):
         is applied. The readback position is updated after each step, ensuring that
         subsequent steps are validated against the magnet's actual current position.
         """
-        if self._moving:
+        if self._move_lock.locked():
             raise RuntimeError(f"Cannot do move for {self.name}. It is already moving.")
-        try:
-            self._moving = True
+
+        async with self._move_lock:
             current_readback, mode, field_limit = await asyncio.gather(
                 self.get_readback_position(),
                 self.mode.get_value(),
@@ -239,17 +260,29 @@ class SuperConductingMagnetController(StandardReadable):
             # Check final requested position is within limits.
             movement_strategy.check_within_limits(current_readback, value, field_limit)
             for step in movement_strategy.move_steps(current_readback, value):
-                self.log.debug(
-                    f"Applying movement step {step}. Current readback is {current_readback}."
-                )
                 # Check each generated step with the current readback is within limits.
                 movement_strategy.check_within_limits(
                     current_readback, step, field_limit
                 )
-                await self._apply_step(step)
+                timeout = await self.calculate_timeout_per_step(current_readback, step)
+                await self._apply_step(step, timeout=timeout)
+                self.log.debug(
+                    f"Applying movement step {step}. Current readback is "
+                    f"{current_readback} with timeout {timeout}."
+                )
                 current_readback = await self.get_readback_position()
-        finally:
-            self._moving = False
+
+    async def calculate_timeout_per_step(
+        self, current_readback: MagnetPosition, value: MagnetRequest
+    ) -> float:
+        """Calculate the timeout for a move based on the distance to move and the ramp rate."""
+        ramp_rate = await self.get_ramp_rate()
+        dx = (value.x - current_readback.x) if value.x is not None else 0.0
+        dy = (value.y - current_readback.y) if value.y is not None else 0.0
+        dz = (value.z - current_readback.z) if value.z is not None else 0.0
+        distance = math.sqrt(dx**2 + dy**2 + dz**2)
+        combined_ramp_rate = max(ramp_rate.x, ramp_rate.y, ramp_rate.z)
+        return distance / combined_ramp_rate + 20.0
 
     async def get_readback_position(self) -> MagnetPosition:
         """Get the current magnet readback position as a :class:`MagnetPosition`."""
@@ -272,6 +305,111 @@ class SuperConductingMagnetController(StandardReadable):
             self.z.limit.get_value(),
         )
         return MagnetPosition(x=x, y=y, z=z)
+
+    async def get_ramp_rate_limit(self) -> MagnetPosition:
+        """Get the current ramp rate limit of the magnet.
+
+        The ramp rate limit is a live readback from the IOC and may change depending on
+        the current magnet operating mode and the current demand values.
+        """
+        x, y, z = await asyncio.gather(
+            self.x.ramp_limit.get_value(),
+            self.y.ramp_limit.get_value(),
+            self.z.ramp_limit.get_value(),
+        )
+        return MagnetPosition(x=x, y=y, z=z)
+
+    async def get_ramp_rate(self) -> MagnetPosition:
+        """Get the current ramp rate of the magnet.
+
+        The ramp rate is a live readback from the IOC and may change depending on
+        the current magnet operating mode and the current demand values.
+        """
+        x, y, z = await asyncio.gather(
+            self.x.ramp_rate.get_value(),
+            self.y.ramp_rate.get_value(),
+            self.z.ramp_rate.get_value(),
+        )
+        return MagnetPosition(x=x, y=y, z=z)
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyVectorMagnetInfo) -> None:
+        """Prepare the magnet for a fly scan.
+        The requested target position is validated against the limits of the current
+        magnet operating mode. The corresponding movement strategy then generates a
+        sequence of intermediate movement steps.
+        Each movement step is validated against the latest magnet readback before it
+        is applied. The readback position is updated after each step, ensuring that
+        subsequent steps are validated against the magnet's actual current position.
+        """
+        self._fly_info = value
+        current_readback, mode, field_limit, ramp_rate_limit = await asyncio.gather(
+            self.get_readback_position(),
+            self.mode.get_value(),
+            self.get_field_limit(),
+            self.get_ramp_rate_limit(),
+        )
+        if mode in {
+            MagnetMode.UNIAXIAL_X,
+            MagnetMode.UNIAXIAL_Y,
+            MagnetMode.UNIAXIAL_Z,
+            MagnetMode.CUBIC,
+        }:
+            movement_strategy = self._MODE_MOVEMENT_STRATEGY.get(mode)
+            max_ramp_rate: float = getattr(ramp_rate_limit, value.fly_axis)
+            if movement_strategy is None:
+                raise ValueError(
+                    f"No movement strategy has been configured for device {self.name} for mode {mode}."
+                )
+            if max_ramp_rate < value.ramp_rate or value.ramp_rate <= 0:
+                raise ValueError(
+                    f"Requested ramp rate {value.ramp_rate} exceeds the ramp rate limit"
+                    f" of {max_ramp_rate} for axis {value.fly_axis}."
+                )
+
+            start_req = MagnetRequest(**{value.fly_axis: value.start_position})
+            end_req = MagnetRequest(**{value.fly_axis: value.end_position})
+
+            movement_strategy.check_within_limits(
+                current_readback, start_req, field_limit
+            )
+
+            start_readback = dataclasses.replace(
+                current_readback, **{value.fly_axis: value.start_position}
+            )
+
+            movement_strategy.check_within_limits(start_readback, end_req, field_limit)
+
+        else:
+            raise ValueError(
+                f"Cannot prepare fly scan in mode {mode}. Only uniaxial and cubic modes are supported for now."
+            )
+        start_position = MagnetRequest(**{value.fly_axis: value.start_position})
+        await self.set_within_boundary(start_position)
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        fly_info = error_if_none(
+            self._fly_info,
+            f"{self.name} must be prepared before attempting to kickoff.",
+        )
+        await getattr(self, fly_info.fly_axis).ramp_rate.set(fly_info.ramp_rate)
+        self.log.info(
+            f"Starting fly scan along axis {fly_info.fly_axis} from "
+            f"{fly_info.start_position} to {fly_info.end_position} "
+            f"at ramp rate {fly_info.ramp_rate}."
+        )
+
+        self._fly_info = None
+        self._fly_status = self.set_within_boundary(
+            MagnetRequest(**{fly_info.fly_axis: fly_info.end_position})
+        )
+
+    def complete(self) -> AsyncStatus:
+        fly_status = error_if_none(
+            self._fly_status, f"kickoff for magnet {self.name} not called."
+        )
+        return fly_status
 
 
 class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
@@ -411,7 +549,7 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
         await self.set(MagnetSphericalRequest(phi=phi))
 
 
-class SuperConductingMagnet(StandardReadable):
+class SuperConductingMagnet(StandardReadable, Preparable, Flyable):
     """Factory function to create a superconducting magnet device with both cartesian and
     spherical coordinate interfaces.
     """
@@ -424,3 +562,14 @@ class SuperConductingMagnet(StandardReadable):
             self.controller = controller
 
         super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyVectorMagnetInfo) -> None:
+        await self.controller.prepare(value=value)
+
+    @AsyncStatus.wrap
+    async def kickoff(self) -> None:
+        self.controller.kickoff()
+
+    def complete(self) -> AsyncStatus:
+        return self.controller.complete()
