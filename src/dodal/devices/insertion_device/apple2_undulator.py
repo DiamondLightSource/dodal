@@ -11,7 +11,6 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     FlyMotorInfo,
-    MovableLogic,
     Reference,
     SignalR,
     SignalW,
@@ -23,7 +22,7 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor, MotorMoveLogic
+from ophyd_async.epics.motor import Motor, MotorFlyableMovableLogic
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device.enum import UndulatorGateStatus
@@ -116,7 +115,7 @@ class SafeUndulatorMover(StandardReadable, UndulatorBase, Generic[T]):
 
 
 @dataclass
-class UnstoppableMotorMoveLogic(MotorMoveLogic):
+class UnstoppableMotorMoveLogic(MotorFlyableMovableLogic):
     async def stop(self):
         """Request to stop moving."""
         LOGGER.warning(f"Stopping {self.readback.name} is not supported.")
@@ -130,7 +129,8 @@ class UnstoppableMotor(Motor):
         del self.motor_stop  # Remove motor_stop from the public interface
 
     @cached_property
-    def movable_logic(self) -> MovableLogic:
+    def _logic(self) -> UnstoppableMotorMoveLogic:
+        """The combined move + fly logic, shared by movable_logic and flyable_logic."""
         return UnstoppableMotorMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
@@ -142,6 +142,9 @@ class UnstoppableMotor(Motor):
             dial_high_limit_travel=self.dial_high_limit_travel,
             velocity=self.velocity,
             acceleration_time=self.acceleration_time,
+            motor_done_move=self.motor_done_move,
+            max_velocity=self.max_velocity,
+            motor_egu=self.motor_egu,
         )
 
 
@@ -225,7 +228,7 @@ class UndulatorGap(GapSafeMotorNoStop):
             self.min_velocity.get_value(),
             self.motor_egu.get_value(),
         )
-        velocity = abs(value.velocity)
+        velocity = abs(value.speed)
         if not (min_velocity <= velocity <= max_velocity):
             raise ValueError(
                 f"Requested velocity {velocity} {egu}/s is out of bounds: "
