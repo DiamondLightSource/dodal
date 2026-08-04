@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from bluesky import RunEngine
 
-from dodal.device_manager import ConnectionSpec, DeviceBuildResult
 from dodal.plans.save_panda import _save_panda, main
 
 
@@ -20,12 +19,8 @@ def test_save_panda(sim_run_engine):
     filename = "file.yml"
     with (
         patch(
-            "dodal.plans.save_panda.build_device",
-            return_value=DeviceBuildResult(
-                devices={"panda": panda},
-                errors={},
-                connection_specs={"panda": ConnectionSpec(mock=False, timeout=30)},
-            ),
+            "dodal.plans.save_panda.build_and_connect_device",
+            return_value=panda,
         ) as mock_make_device,
         patch(
             "dodal.plans.save_panda.RunEngine",
@@ -50,7 +45,7 @@ def test_save_panda(sim_run_engine):
 )
 def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit, tmpdir):
     with patch(
-        "dodal.plans.save_panda.build_device",
+        "dodal.plans.save_panda.build_and_connect_device",
         side_effect=ValueError("No device manager found in dodal.beamlines.i03"),
     ):
         with pytest.raises(AssertionError):
