@@ -3,8 +3,10 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
 from dodal.devices.beamlines.i06_1.magnet import (
-    MagnetThreeAxesRampRateController,
     SuperConductingMagnetController,
+)
+from dodal.devices.beamlines.i06_1.magnet.superconducting_magnet import (
+    SuperConductingMagnet,
 )
 from dodal.devices.motors import XYThetaStage
 from dodal.devices.temperture_controller import Lakeshore336
@@ -41,14 +43,8 @@ def dd() -> DiffractionDichroism:
 
 
 @devices.factory()
-def mag_ramp_rate() -> MagnetThreeAxesRampRateController:
-    return MagnetThreeAxesRampRateController(f"{PREFIX.beamline_prefix}-EA-SMC")
-
-
-@devices.factory()
-def scmc(
-    mag_ramp_rate: MagnetThreeAxesRampRateController,
-) -> SuperConductingMagnetController:
-    return SuperConductingMagnetController(
-        f"{PREFIX.beamline_prefix}-EA-MAG-01:", mag_ramp_rate
+def scmc() -> SuperConductingMagnet:
+    controller = SuperConductingMagnetController(
+        prefix=f"{PREFIX.beamline_prefix}-EA",
     )
+    return SuperConductingMagnet(controller)
