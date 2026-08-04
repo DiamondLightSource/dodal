@@ -453,3 +453,70 @@ async def test_scmc_set_within_boundary_stops_when_step_is_outside_limits(
         await scm.controller.set_within_boundary(target)
     # The invalid second step must never be applied.
     scm.controller._apply_step.assert_awaited_once_with(steps[0], timeout=ANY)
+
+
+@pytest.mark.asyncio
+async def test_prepare_raises_when_no_movement_strategy(
+    scm: SuperConductingMagnet,
+):
+
+    original_strategies = dict(scm.controller._MODE_MOVEMENT_STRATEGY)
+    scm.controller._MODE_MOVEMENT_STRATEGY.clear()
+
+    fly_info = FlyVectorMagnetInfo(
+        fly_axis=MagnetMode.UNIAXIAL_X.axis_alias,
+        start_position=1,
+        end_position=2,
+        ramp_rate=0.5,
+    )
+    with pytest.raises(
+        ValueError,
+        match="No movement strategy has been configured for device",
+    ):
+        await scm.prepare(fly_info)
+    scm.controller._MODE_MOVEMENT_STRATEGY.update(original_strategies)
+
+
+async def test_prepare_raises_on_invalid_ramp_rate(
+    scm: SuperConductingMagnet,
+):
+    invalid_ramp_rate = 15.0
+    await scm.mode.set(MagnetMode.UNIAXIAL_X)
+    fly_info = FlyVectorMagnetInfo(
+        fly_axis="x",
+        start_position=1,
+        end_position=2,
+        ramp_rate=invalid_ramp_rate,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Requested ramp rate",
+    ):
+        await scm.prepare(fly_info)
+
+
+@pytest.mark.parametrize(
+    "mode",
+    [
+        (MagnetMode.SPHERICAL),
+        (MagnetMode.PLANAR_XZ),
+        (MagnetMode.QUADRANT_XY),
+    ],
+)
+async def test_prepare_raises_on_invalid_mode(
+    scm: SuperConductingMagnet, mode: MagnetMode
+):
+    await scm.mode.set(mode)
+    fly_info = FlyVectorMagnetInfo(
+        fly_axis="Y",
+        start_position=1,
+        end_position=2,
+        ramp_rate=0.2,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Only uniaxial and cubic modes are supported",
+    ):
+        await scm.prepare(fly_info)
