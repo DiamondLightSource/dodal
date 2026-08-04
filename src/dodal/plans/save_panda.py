@@ -71,11 +71,11 @@ def main(argv: list[str] | None = None):
     return 0
 
 
-def build_and_connect_device(module: str | ModuleType, device_name: str):
+def build_and_connect_device(module: str | ModuleType, device_name: str = "panda"):
     if isinstance(module, str):
         module = import_module(module)
 
-    if panda := getattr(module, "panda", None):
+    if panda := getattr(module, device_name, None):
         return panda.build(connect_immediately=True)
     else:
         raise ValueError(f"No panda device found in {module}")
