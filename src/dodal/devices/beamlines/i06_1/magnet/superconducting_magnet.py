@@ -51,7 +51,7 @@ from dodal.devices.beamlines.i06_1.magnet.movement import (
 
 class FlyVectorMagnetInfo(ConfinedModel):
     fly_axis: str = Field(frozen=True)
-    """Axis to fly along, one of 'x', 'y' or 'z'"""
+    """Axis to fly along, one of 'x', 'y' or 'z'. Todo theta, phi or rho."""
     start_position: float = Field(frozen=True)
     """Start position of the magnet move. in Tesla"""
 
@@ -139,9 +139,12 @@ class MockSuperConductingMagnetController(
         set_mock_value(device.x.limit, 2.0)
         set_mock_value(device.y.limit, 2.0)
         set_mock_value(device.z.limit, 6.0)
-        set_mock_value(device.x.ramp_limit, 1.0)
-        set_mock_value(device.y.ramp_limit, 1.0)
+        set_mock_value(device.x.ramp_limit, 0.5)
+        set_mock_value(device.y.ramp_limit, 0.25)
         set_mock_value(device.z.ramp_limit, 1.0)
+        set_mock_value(device.x.ramp_rate, 0.5)
+        set_mock_value(device.y.ramp_rate, 0.25)
+        set_mock_value(device.z.ramp_rate, 1.0)
 
 
 @default_mock_class(MockSuperConductingMagnetController)

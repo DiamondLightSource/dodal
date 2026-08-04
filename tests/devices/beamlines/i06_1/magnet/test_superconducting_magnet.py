@@ -10,7 +10,7 @@ from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.beamlines.i06_1.magnet import (
-    FlyMagnetInfo,
+    FlyVectorMagnetInfo,
     MagnetAxis,
     MagnetAxisRampRateController,
     MagnetLimitStatus,
@@ -98,25 +98,25 @@ async def test_scmc_axis_set_uses_correct_axis(
     "cartesian, spherical", EXPECTED_CARTESIAN_SPHERICAL_CONVERSION
 )
 async def test_scmc_sph_set_using_spherical(
-    scmc: SuperConductingMagnetController,
+    scm: SuperConductingMagnet,
     cartesian: MagnetPosition,
     spherical: MagnetSphericalPosition,
 ) -> None:
-    await scmc.mode.set(MagnetMode.SPHERICAL)
-    await scmc.sph.set(spherical.to_request_pos())
+    await scm.controller.mode.set(MagnetMode.SPHERICAL)
+    await scm.sph.set(spherical.to_request_pos())
     rho, theta, phi = await asyncio.gather(
-        scmc.sph.rho.get_value(),
-        scmc.sph.theta.get_value(),
-        scmc.sph.phi.get_value(),
+        scm.sph.rho.get_value(),
+        scm.sph.theta.get_value(),
+        scm.sph.phi.get_value(),
     )
     assert rho == pytest.approx(spherical.rho)
     assert theta == pytest.approx(spherical.theta)
     assert phi == pytest.approx(spherical.phi)
 
     x, y, z = await asyncio.gather(
-        scmc.cart.x.readback.get_value(),
-        scmc.cart.y.readback.get_value(),
-        scmc.cart.z.readback.get_value(),
+        scm.cart.x.get_value(),
+        scm.cart.y.get_value(),
+        scm.cart.z.get_value(),
     )
     assert x == pytest.approx(cartesian.x)
     assert y == pytest.approx(cartesian.y)

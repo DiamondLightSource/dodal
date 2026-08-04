@@ -10,7 +10,7 @@ from .ramp_controller import (
     MagnetThreeAxesRampRateController,
 )
 from .superconducting_magnet import (
-    FlyMagnetInfo,
+    FlyVectorMagnetInfo,
     MagnetAxis,
     MagnetLimitStatus,
     MagnetMode,
@@ -27,7 +27,7 @@ __all__ = [
     "MagnetPositionError",
     "MagnetAxisRampRateController",
     "MagnetThreeAxesRampRateController",
-    "FlyMagnetInfo",
+    "FlyVectorMagnetInfo",
     "MagnetAxis",
     "MagnetLimitStatus",
     "MagnetMode",
