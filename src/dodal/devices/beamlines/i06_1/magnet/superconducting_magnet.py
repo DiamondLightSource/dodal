@@ -84,20 +84,23 @@ class MagnetAxis(StandardReadable):
     def __init__(
         self,
         prefix: str,
+        axis: str,
+        axis_number: str,
         name: str = "",
     ):
-
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.readback = epics_signal_r(float, prefix + "RBV")
-        self.demand = epics_signal_rw(float, prefix + "DMD")
-        self.limit = epics_signal_r(float, prefix + ":LIM:FIELD:NOW")
+            self.readback = epics_signal_r(float, f"{prefix}-MAG-01:{axis}:RBV")
+        self.demand = epics_signal_rw(float, f"{prefix}-MAG-01:{axis}:DMD")
+        self.limit = epics_signal_r(float, f"{prefix}-SMC-0{axis_number}:LIM:FIELD:NOW")
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.ramp_rate = epics_signal_rw(
                 float,
-                read_pv=prefix + "STS:RAMPRATE:TPM",
-                write_pv=prefix + "SET:DMD:RAMPRATE:TPM",
+                read_pv=f"{prefix}-SMC-0{axis_number}:STS:RAMPRATE:TPM",
+                write_pv=f"{prefix}-SMC-0{axis_number}:SET:DMD:RAMPRATE:TPM",
             )
-            self.ramp_limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
+            self.ramp_limit = epics_signal_r(
+                float, f"{prefix}-SMC-0{axis_number}:LIM:RAMPRATE:TPM"
+            )
         super().__init__(name)
 
 
@@ -179,15 +182,19 @@ class SuperConductingMagnetController(StandardReadable, Flyable, Preparable):
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.mode = epics_signal_rw(MagnetMode, prefix + "MODE")
-        self.x = MagnetAxis(prefix + "X:")
-        self.y = MagnetAxis(prefix + "Y:")
-        self.z = MagnetAxis(prefix + "Z:")
+            self.mode = epics_signal_rw(MagnetMode, prefix + "-MAG-01:MODE")
+        self.x = MagnetAxis(prefix, axis="X", axis_number="1")
+        self.y = MagnetAxis(prefix, axis="Y", axis_number="2")
+        self.z = MagnetAxis(prefix, axis="Z", axis_number="3")
 
-        self.ramp_status = epics_signal_rw(MagnetRampStatus, prefix + "RAMPSTATUS")
-        self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
+        self.ramp_status = epics_signal_rw(
+            MagnetRampStatus, prefix + "-MAG-01:RAMPSTATUS"
+        )
+        self.limit_status = epics_signal_rw(
+            MagnetLimitStatus, prefix + "-MAG-01:LIMITSTATUS"
+        )
         # Make private so cannot trigger without going through magnet API.
-        self._start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
+        self._start_ramp = epics_triggerable_command(prefix + "-MAG-01:STARTRAMP.PROC")
         # Used to block parallel moves that are not submitted together. Allows us to
         # always be sure we safely move the magnet using coordinated logic.
         self._move_lock = asyncio.Lock()
