@@ -11,7 +11,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.common.beamlines.device_helpers import DRV_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
@@ -90,7 +90,7 @@ def spectroscopy_detector() -> AravisDetector:
     return AravisDetector(
         pv_prefix,
         path_provider=get_path_provider(),
-        driver_suffix=CAM_SUFFIX,
+        driver_suffix=DRV_SUFFIX,
         writer_suffix=HDF5_SUFFIX,
         plugins={
             "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
@@ -98,21 +98,21 @@ def spectroscopy_detector() -> AravisDetector:
     )
 
 
-@devices.factory()
-def imaging_detector() -> AravisDetector:
-    """The Mako camera for the imaging experiment.
+# @devices.factory()
+# def imaging_detector() -> AravisDetector:
+#     """The Mako camera for the imaging experiment.
 
-    Looks at the on-axis viewing screen.
+#     Looks at the on-axis viewing screen.
 
-    Returns:
-        AravisDetector: The imaging camera device.
-    """
-    return AravisDetector(
-        f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
-        path_provider=get_path_provider(),
-        driver_suffix=CAM_SUFFIX,
-        writer_suffix=HDF5_SUFFIX,
-    )
+#     Returns:
+#         AravisDetector: The imaging camera device.
+#     """
+#     return AravisDetector(
+#         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
+#         path_provider=get_path_provider(),
+#         driver_suffix=CAM_SUFFIX,
+#         writer_suffix=HDF5_SUFFIX,
+#     )
 
 
 @devices.factory()
