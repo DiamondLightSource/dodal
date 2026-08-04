@@ -5,6 +5,7 @@ from typing import Protocol
 
 from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     ConfinedModel,
     DeviceMock,
@@ -282,7 +283,7 @@ class SuperConductingMagnetController(StandardReadable, Flyable, Preparable):
         dz = (value.z - current_readback.z) if value.z is not None else 0.0
         distance = math.sqrt(dx**2 + dy**2 + dz**2)
         combined_ramp_rate = max(ramp_rate.x, ramp_rate.y, ramp_rate.z)
-        return distance / combined_ramp_rate + 20.0
+        return distance / combined_ramp_rate + DEFAULT_TIMEOUT
 
     async def get_readback_position(self) -> MagnetPosition:
         """Get the current magnet readback position as a :class:`MagnetPosition`."""
