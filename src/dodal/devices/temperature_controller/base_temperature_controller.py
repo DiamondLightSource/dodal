@@ -193,7 +193,6 @@ class TemperatureController(
 
     @cached_property
     def movable_logic(self) -> TemperatureMovableLogic:
-        """Readback needed to be the active sensor, hence not cached_property."""
         return TemperatureMovableLogic(
             setpoint=self.user_setpoint,
             readback=self.sensor.active_sensor,
