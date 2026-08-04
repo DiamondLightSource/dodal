@@ -192,9 +192,8 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
     get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
-        str(fly_info.ramp_up_start_pos(0.5))
+        fly_info.ramp_up_start_pos(0.5)
     )
-
     assert await mock_id_gap.velocity.get_value() == 10
 
 

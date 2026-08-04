@@ -17,8 +17,7 @@ from dodal.devices.insertion_device.apple2_undulator import (
 @pytest.fixture
 async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with init_devices(mock=True):
-        mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
-    assert mock_id_gap.name == "mock_id_gap"
+        mock_id_gap = UndulatorGap(prefix)
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
