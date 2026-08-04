@@ -10,6 +10,7 @@ from ophyd_async.core import (
     ConfinedModel,
     DeviceMock,
     Reference,
+    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     callback_on_mock_execute,
@@ -390,6 +391,8 @@ class SuperConductingMagnetController(StandardReadable, Flyable, Preparable):
             )
         start_position = MagnetRequest(**{value.fly_axis: value.start_position})
         await self.set_within_boundary(start_position)
+        fly_axis = getattr(self, value.fly_axis)
+        await fly_axis.ramp_rate.set(value.ramp_rate)
 
     @AsyncStatus.wrap
     async def kickoff(self):
@@ -397,7 +400,7 @@ class SuperConductingMagnetController(StandardReadable, Flyable, Preparable):
             self._fly_info,
             f"{self.name} must be prepared before attempting to kickoff.",
         )
-        await getattr(self, fly_info.fly_axis).ramp_rate.set(fly_info.ramp_rate)
+
         self.log.info(
             f"Starting fly scan along axis {fly_info.fly_axis} from "
             f"{fly_info.start_position} to {fly_info.end_position} "
@@ -413,6 +416,7 @@ class SuperConductingMagnetController(StandardReadable, Flyable, Preparable):
         fly_status = error_if_none(
             self._fly_status, f"kickoff for magnet {self.name} not called."
         )
+        self._fly_status = None
         return fly_status
 
 
@@ -458,7 +462,9 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
         return val
 
     @AsyncStatus.wrap
-    async def set(self, value: MagnetRequest):
+    async def set(self, value: MagnetPosition | MagnetRequest):
+        if isinstance(value, MagnetPosition):
+            value = MagnetRequest(x=value.x, y=value.y, z=value.z)
         await self._controller_ref().set_within_boundary(value)
 
     async def _set_x(self, x: float):
@@ -567,13 +573,17 @@ class SuperConductingMagnet(StandardReadable, Preparable, Flyable):
 
         super().__init__(name)
 
+    @property
+    def mode(self) -> SignalRW[MagnetMode]:
+        return self.controller.mode
+
     @AsyncStatus.wrap
     async def prepare(self, value: FlyVectorMagnetInfo) -> None:
         await self.controller.prepare(value=value)
 
     @AsyncStatus.wrap
     async def kickoff(self) -> None:
-        self.controller.kickoff()
+        await self.controller.kickoff()
 
     def complete(self) -> AsyncStatus:
         return self.controller.complete()
