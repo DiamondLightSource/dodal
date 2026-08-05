@@ -206,7 +206,7 @@ async def test_i10_apple2_controller_determine_pol(
     btm_outer_phase: float,
 ):
     assert await mock_id_controller.polarisation_setpoint.get_value() == Pol.NONE
-    phase = mock_id_controller.apple2().phase_ref()
+    phase = mock_id_controller.apple2_ref().phase_ref()
     set_mock_value(phase.top_inner.user_readback, top_inner_phase)
     set_mock_value(phase.top_outer.user_readback, top_outer_phase)
     set_mock_value(phase.btm_inner.user_readback, btm_inner_phase)
@@ -222,7 +222,7 @@ async def test_i10_apple2_controller_determine_pol(
 async def test_fail_i10_apple2_controller_set_undefined_pol(
     mock_id_controller: I10Apple2Controller,
 ):
-    set_mock_value(mock_id_controller.apple2().gap_ref().motor.user_readback, 101)
+    set_mock_value(mock_id_controller.apple2_ref().gap_ref().motor.user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
     assert (
@@ -235,16 +235,16 @@ async def test_fail_i10_apple2_controller_set_undefined_pol(
 async def test_fail_i10_apple2_controller_set_id_not_ready(
     mock_id_controller: I10Apple2Controller,
 ):
-    gap = mock_id_controller.apple2().gap_ref()
+    gap = mock_id_controller.apple2_ref().gap_ref()
     set_mock_value(gap.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
-    assert e.value == gap.name + " is DISABLED and cannot move."
+    assert str(e.value) == gap.status.name + " is DISABLED and cannot move."
     set_mock_value(gap.status, EnabledDisabledUpper.ENABLED)
     set_mock_value(gap.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
-    assert str(e.value) == gap.name + " is already in motion."
+    assert str(e.value) == gap.gate.name + " is already in motion."
 
 
 async def test_fail_i10_apple2_controller_set_energy_has_default(
@@ -578,7 +578,7 @@ async def test_linear_arbitrary_run_engine_scan(
             if temp_angle > mock_id_controller.angle_threshold_deg
             else temp_angle + 180.0
         )  # convert angle to jawphase.
-        assert jaw_phase.call_args_list[cnt] == mock.call(str(poly(alpha_real)))
+        assert jaw_phase.call_args_list[cnt] == mock.call(poly(alpha_real))
 
 
 def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(

@@ -44,7 +44,7 @@ class InsertionDeviceEnergy(StandardReadable, Movable[float], Preparable, Flyabl
         mid_energy = (value.start_position + value.end_position) / 2.0
         id_controller = self.id_controller()
         LOGGER.info(
-            f"Preparing for fly energy scan, move {id_controller.apple2().phase_ref()} to {mid_energy}"
+            f"Preparing for fly energy scan, move {id_controller.apple2_ref().phase_ref()} to {mid_energy}"
         )
         await self.set(energy=mid_energy)
         current_pol = await id_controller.polarisation_setpoint.get_value()
@@ -65,19 +65,19 @@ class InsertionDeviceEnergy(StandardReadable, Movable[float], Preparable, Flyabl
             + f"Flyscan info in gap: {gap_fly_motor_info}. "
             + f"Speed: {gap_fly_motor_info.velocity}."
         )
-        await id_controller.apple2().gap_ref().prepare(value=gap_fly_motor_info)
+        await id_controller.apple2_ref().gap_ref().prepare(value=gap_fly_motor_info)
 
     @AsyncStatus.wrap
     async def kickoff(self):
-        await self.id_controller().apple2().gap_ref().kickoff()
+        await self.id_controller().apple2_ref().gap_ref().kickoff()
 
     def complete(self) -> WatchableAsyncStatus:
-        return self.id_controller().apple2().gap_ref().complete()
+        return self.id_controller().apple2_ref().gap_ref().complete()
 
     async def get_id_acceleration_time(self) -> float:
         return (
             await self.id_controller()
-            .apple2()
+            .apple2_ref()
             .gap_ref()
             .motor.acceleration_time.get_value()
         )

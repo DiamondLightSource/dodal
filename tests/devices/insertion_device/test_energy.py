@@ -79,7 +79,7 @@ async def test_insertion_device_energy_prepare_success(
     acceleration_time,
     time_for_move,
 ):
-    gap = mock_id_controller.apple2().gap_ref()
+    gap = mock_id_controller.apple2_ref().gap_ref()
     set_mock_value(gap.motor.max_velocity, 30)
     set_mock_value(gap.motor.min_velocity, 1)
     set_mock_value(gap.motor.low_limit_travel, 0)

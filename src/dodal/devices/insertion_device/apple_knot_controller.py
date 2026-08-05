@@ -175,7 +175,7 @@ class AppleKnotController(
         """Check that the top and bottom phase motors are in sync.
         Raise an error if they are not within tolerance.
         """
-        phase = self.apple2().phase_ref()
+        phase = self.apple2_ref().phase_ref()
         current_phase_top, current_phase_bottom = await asyncio.gather(
             phase.top_outer.user_readback.get_value(),
             phase.btm_inner.user_readback.get_value(),
@@ -189,8 +189,8 @@ class AppleKnotController(
     async def _combined_move(self, energy: float, pol: Pol) -> None:
         # get current apple2 value
         current_phase_top, current_gap = await asyncio.gather(
-            self.apple2().phase_ref().top_outer.user_readback.get_value(),
-            self.apple2().gap_ref().motor.user_readback.get_value(),
+            self.apple2_ref().phase_ref().top_outer.user_readback.get_value(),
+            self.apple2_ref().gap_ref().motor.user_readback.get_value(),
         )
         current_apple2_val = self._get_apple2_value(
             current_gap, current_phase_top, Pol.NONE
@@ -208,7 +208,7 @@ class AppleKnotController(
         # execute the moves along the path
         for apple2_val in manhattan_path:
             LOGGER.info(f"Moving to apple2 values: {apple2_val}")
-            await self.apple2().set(id_motor_values=apple2_val)
+            await self.apple2_ref().set(id_motor_values=apple2_val)
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         apple2_val = Apple2Val(
