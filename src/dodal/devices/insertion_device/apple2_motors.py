@@ -133,7 +133,7 @@ class UndulatorGap(SafeUndulatorMoverBase[float]):
         self.motor = UndulatorGapMotor(prefix, self.gate, self.status, self.set_move)
 
     async def set_demand_positions(self, value: float) -> None:
-        await self.motor.set(value)
+        await self.motor.user_setpoint.set(value)
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout_from_signals(

@@ -187,7 +187,6 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         """
         # Only need to check gap as the phase motors share both status and gate with gap.
         await self.gap().raise_if_cannot_move()
-
         await asyncio.gather(
             self.phase().set_demand_positions(
                 value=id_motor_values.extract_phase_val()
@@ -204,7 +203,6 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             self.gap().set_move.set(value=1, timeout=timeout),
             self.phase().set_move.set(value=1, timeout=timeout),
         )
-
         await wait_for_value(
             self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
         )
