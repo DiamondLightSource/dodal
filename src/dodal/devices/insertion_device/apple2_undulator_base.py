@@ -36,8 +36,12 @@ async def estimate_motor_timeout_from_signals(
 async def undulator_check_move(
     status: SignalR[EnabledDisabledUpper], gate: SignalR[UndulatorGateStatus]
 ) -> None:
-    status_val, gate_val = await asyncio.gather(status.get_value(), gate.get_value())
+    """Verify that an undulator is able to accept a move request.
 
+    Raises:
+        RuntimeError: If the undulator is disabled or already moving.
+    """
+    status_val, gate_val = await asyncio.gather(status.get_value(), gate.get_value())
     if status_val is EnabledDisabledUpper.DISABLED:
         raise RuntimeError(f"{status.name} is DISABLED and cannot move.")
     if gate_val is UndulatorGateStatus.OPEN:
@@ -52,6 +56,22 @@ async def set_move_and_wait_for_gate(
 
 
 class SafeUndulatorMoverBase(abc.ABC, StandardReadable, Movable[T], Generic[T]):
+    """Base class for Apple2 undulator devices that use gated motion.
+
+    Subclasses implement writing demand positions and estimating move
+    timeouts, while this class provides the common sequence of:
+
+    * checking that motion is permitted,
+    * writing demand positions,
+    * triggering the controller move,
+    * waiting for motion to complete.
+
+    Attributes:
+        gate: Gate status indicating whether the controller is moving.
+        status: Enable state of the undulator.
+        set_move: Signal used to trigger motion after demands have been written.
+    """
+
     # Nothing move until this is set to 1 and it will return to 0 when done
     set_move: SignalW[int]
 

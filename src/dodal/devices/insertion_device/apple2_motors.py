@@ -6,7 +6,6 @@ from bluesky.protocols import Flyable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
-    MovableLogic,
     SignalR,
     SignalRW,
     SignalW,
@@ -31,6 +30,14 @@ from dodal.log import LOGGER
 
 
 def create_user_setpoint_str(prefix: str) -> tuple[SignalRW[str], SignalRW[float]]:
+    """Create a float interface for an undulator string-valued setpoint PV.
+
+    Undulator motors expose their setpoint PV as a string rather than a numeric
+    value. This helper creates both the underlying string signal and a derived
+    float signal that transparently converts between ``float`` values used by
+    clients and the string representation required by the IOC.
+    """
+
     async def _set_user_setpoint(value: float) -> None:
         await user_setpoint_str.set(str(value))
 
@@ -47,7 +54,22 @@ def create_user_setpoint_str(prefix: str) -> tuple[SignalRW[str], SignalRW[float
 
 
 @dataclass
-class UndulatorGapMoveLogic(MovableLogic[float]):
+class UnstoppableMotorMoveLogic(MotorMoveLogic):
+    """Motor move logic for motors that cannot be stopped."""
+
+    async def stop(self):
+        LOGGER.warning(f"Stopping {self.readback.name} is not supported.")
+
+
+@dataclass
+class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
+    """Move logic for the Apple2 undulator gap motor.
+
+    Extends the standard motor move logic with Apple2-specific behaviour,
+    including gate/status checks, timeout estimation using the dedicated gap
+    velocity PV, and triggering motion via the undulator move PV.
+    """
+
     gate: SignalR[UndulatorGateStatus]
     status: SignalR[EnabledDisabledUpper]
     set_move: SignalW[int]
@@ -59,11 +81,10 @@ class UndulatorGapMoveLogic(MovableLogic[float]):
         velocity = await self.velocity.get_value()
         return estimate_motor_timeout(new_position, old_position, velocity)
 
-    async def stop(self) -> None:
-        LOGGER.warning(f"Stopping {self.readback.name} is not supported.")
-
     async def check_move(self, new_position: float) -> None:
         await undulator_check_move(self.status, self.gate)
+        # Check motor is within limits
+        await super().check_move(new_position)
 
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         await self.setpoint.set(new_position, timeout=timeout())
@@ -71,6 +92,17 @@ class UndulatorGapMoveLogic(MovableLogic[float]):
 
 
 class UndulatorGapMotor(Motor):
+    """Motor record wrapper for the Apple2 undulator gap.
+
+    This class adapts the standard EPICS motor interface to match the Apple2
+    controller by:
+
+    * exposing the string-valued setpoint as a float signal,
+    * using the dedicated gap velocity PV,
+    * disabling stopping,
+    * providing Apple2-specific move logic.
+    """
+
     def __init__(self, prefix: str, gate, status, set_move, name: str = ""):
         super().__init__(prefix=prefix, name=name)
         self.user_setpoint_str, self.user_setpoint = create_user_setpoint_str(prefix)
@@ -89,8 +121,13 @@ class UndulatorGapMotor(Motor):
         self._movable_logic = UndulatorGapMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            # motor_stop=self.motor_stop,  # type: ignore
+            motor_stop=self.motor_stop,  # type: ignore
+            low_limit_travel=self.low_limit_travel,
+            high_limit_travel=self.high_limit_travel,
+            dial_low_limit_travel=self.dial_low_limit_travel,
+            dial_high_limit_travel=self.dial_high_limit_travel,
             velocity=self.velocity,
+            acceleration_time=self.acceleration_time,
             # Specific to this class.
             gate=gate,
             status=status,
@@ -121,16 +158,21 @@ class UndulatorGapMotor(Motor):
 
 
 class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
-    """Apple 2 undulator gap motor device. With PV corrections.
+    """Apple2 undulator gap device.
+
+    Wraps an internal :class:`UndulatorGapMotor` and exposes the Apple2
+    controller interface, where demand positions are written separately from
+    triggering motion via a dedicated move PV.
+
+    Supports standard moves as well as fly scanning.
 
     Args:
-        prefix (str): Beamline specific part of the PV
-        name (str): Name of the Id device
+        prefix: Beamline-specific PV prefix.
+        name: Device name.
     """
 
     def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix=prefix, name=name)
-        # Nothing move until this is set to 1 and it will return to 0 when done.
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         with self.add_children_as_readables():
             self.motor = UndulatorGapMotor(
@@ -160,13 +202,6 @@ class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
         return self.motor.complete()
 
 
-@dataclass
-class UnstoppableMotorMoveLogic(MotorMoveLogic):
-    async def stop(self):
-        """Request to stop moving."""
-        LOGGER.warning(f"Stopping {self.readback.name} is not supported.")
-
-
 class UndulatorPhaseMotor(Motor):
     """Phase motor that will not stop.
 
@@ -178,6 +213,7 @@ class UndulatorPhaseMotor(Motor):
     def __init__(self, prefix: str, name: str = ""):
         motor_pv = f"{prefix}MTR"
         super().__init__(prefix=motor_pv, name=name)
+        del self.motor_stop
         self.user_setpoint_str, self.user_setpoint = create_user_setpoint_str(prefix)
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
@@ -188,7 +224,7 @@ class UndulatorPhaseMotor(Motor):
             readback=self.user_readback,
             setpoint=self.user_setpoint,
             # Safe to do, stop method no longer calls stop signal in movable logic.
-            motor_stop=self.motor_stop,  # type: ignore
+            motor_stop=None,  # type: ignore
             low_limit_travel=self.low_limit_travel,
             high_limit_travel=self.high_limit_travel,
             dial_low_limit_travel=self.dial_low_limit_travel,
