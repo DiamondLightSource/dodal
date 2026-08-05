@@ -73,7 +73,7 @@ class UndulatorGapMotor(MotorStringSetpoint):
     """
 
     def __init__(self, prefix: str, gate, status, set_move, name: str = ""):
-        super().__init__(prefix, prefix + "BLGSET", name=name)
+        super().__init__(prefix + "BLGAPMTR", prefix + "BLGSET", name=name)
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
         """ Clear the motor config_signal as we need new PV for velocity."""
