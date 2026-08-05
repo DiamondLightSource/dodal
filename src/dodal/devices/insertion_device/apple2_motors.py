@@ -89,7 +89,7 @@ class UndulatorGapMotor(Motor):
         self._movable_logic = UndulatorGapMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            motor_stop=self.motor_stop,  # type: ignore
+            # motor_stop=self.motor_stop,  # type: ignore
             velocity=self.velocity,
             # Specific to this class.
             gate=gate,
@@ -132,7 +132,10 @@ class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
         super().__init__(prefix=prefix, name=name)
         # Nothing move until this is set to 1 and it will return to 0 when done.
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
-        self.motor = UndulatorGapMotor(prefix, self.gate, self.status, self.set_move)
+        with self.add_children_as_readables():
+            self.motor = UndulatorGapMotor(
+                prefix, self.gate, self.status, self.set_move
+            )
 
     async def set_demand_positions(self, value: float) -> None:
         await self.motor.user_setpoint.set(value)

@@ -62,7 +62,7 @@ class SafeUndulatorMoverBase(abc.ABC, StandardReadable, Movable[T], Generic[T]):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def move(self, value: T):
+    async def set(self, value: T):
         LOGGER.info(f"Setting {self.name} to {value}")
         await self.raise_if_cannot_move()
         await self.set_demand_positions(value)

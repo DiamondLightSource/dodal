@@ -1,4 +1,3 @@
-import abc
 import asyncio
 
 from bluesky.protocols import Flyable, Movable, Preparable
@@ -6,7 +5,6 @@ from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
     Reference,
-    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     WatchableAsyncStatus,
@@ -23,19 +21,7 @@ from dodal.devices.insertion_device import (
 from dodal.log import LOGGER
 
 
-class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
-    """Base class for ID energy movable device."""
-
-    def __init__(self, name: str = "") -> None:
-        self.energy: Reference[SignalRW[float]]
-        super().__init__(name=name)
-
-    @abc.abstractmethod
-    @AsyncStatus.wrap
-    async def set(self, energy: float) -> None: ...
-
-
-class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
+class InsertionDeviceEnergy(StandardReadable, Movable[float], Preparable, Flyable):
     """Apple2 ID energy movable device."""
 
     def __init__(
