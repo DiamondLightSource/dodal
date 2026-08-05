@@ -50,7 +50,6 @@
    dodal.devices.pressure_jump_cell
    dodal.devices.qbpm
    dodal.devices.robot
-   dodal.devices.s4_slit_gaps
    dodal.devices.scintillator
    dodal.devices.selectable_source
    dodal.devices.single_trigger_detector
