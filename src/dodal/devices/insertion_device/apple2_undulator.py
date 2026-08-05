@@ -176,8 +176,8 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
 
     def __init__(self, id_gap: UndulatorGap, id_phase: PhaseAxesType, name=""):
         with self.add_children_as_readables():
-            self.gap = Reference(id_gap)
-            self.phase = Reference(id_phase)
+            self.gap_ref = Reference(id_gap)
+            self.phase_ref = Reference(id_phase)
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -185,24 +185,20 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         """Check ID is in a movable state and set all the demand value before moving
         them all at the same time.
         """
+        gap = self.gap_ref()
+        phase = self.phase_ref()
         # Only need to check gap as the phase motors share both status and gate with gap.
-        await self.gap().raise_if_cannot_move()
+        await gap.raise_if_cannot_move()
         await asyncio.gather(
-            self.phase().set_demand_positions(
-                value=id_motor_values.extract_phase_val()
-            ),
-            self.gap().set_demand_positions(value=float(id_motor_values.gap)),
+            phase.set_demand_positions(value=id_motor_values.extract_phase_val()),
+            gap.set_demand_positions(value=float(id_motor_values.gap)),
         )
-        timeout = max(
-            await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
-        )
+        timeout = max(await asyncio.gather(gap.get_timeout(), phase.get_timeout()))
         LOGGER.info(
             f"Moving {self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
         await asyncio.gather(
-            self.gap().set_move.set(value=1, timeout=timeout),
-            self.phase().set_move.set(value=1, timeout=timeout),
+            gap.set_move.set(value=1, timeout=timeout),
+            phase.set_move.set(value=1, timeout=timeout),
         )
-        await wait_for_value(
-            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
-        )
+        await wait_for_value(gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)

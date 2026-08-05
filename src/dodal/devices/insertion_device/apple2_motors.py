@@ -2,6 +2,7 @@ import asyncio
 from dataclasses import dataclass
 from functools import cached_property
 
+from bluesky.protocols import Flyable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
@@ -11,6 +12,7 @@ from ophyd_async.core import (
     SignalW,
     StandardReadableFormat,
     TimeoutCalculator,
+    WatchableAsyncStatus,
     derived_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -118,7 +120,7 @@ class UndulatorGapMotor(Motor):
         await super().prepare(value)
 
 
-class UndulatorGap(SafeUndulatorMoverBase[float]):
+class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
     """Apple 2 undulator gap motor device. With PV corrections.
 
     Args:
@@ -146,6 +148,13 @@ class UndulatorGap(SafeUndulatorMoverBase[float]):
         Stores fly info for later use in kickoff.
         """
         await self.motor.prepare(value)
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        await self.motor.kickoff()
+
+    def complete(self) -> WatchableAsyncStatus:
+        return self.motor.complete()
 
 
 @dataclass

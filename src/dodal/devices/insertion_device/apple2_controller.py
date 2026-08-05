@@ -125,7 +125,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        phase = self.apple2().phase()
+        phase = self.apple2().phase_ref()
         # For unlocked phase axes, use top_inner and btm_outer readbacks to calculate
         # derived signal polarisation.
         if isinstance(phase, UndulatorPhaseAxes):
@@ -146,7 +146,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 top_inner=top_inner,
                 btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
-                gap=self.apple2().gap().user_readback,
+                gap=self.apple2().gap_ref().motor.user_readback,
             )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
@@ -154,7 +154,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 set_derived=self._set_energy,
                 energy=self._energy,
                 pol=self.polarisation,
-                gap=self.apple2().gap().user_readback,
+                gap=self.apple2().gap_ref().motor.user_readback,
                 derived_units=units,
             )
 
