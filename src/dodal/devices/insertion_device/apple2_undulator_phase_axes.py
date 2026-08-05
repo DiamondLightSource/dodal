@@ -38,7 +38,7 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
 
     def __init__(self, prefix: str, name: str = ""):
         motor_pv = f"{prefix}MTR"
-        super().__init__(prefix=motor_pv, name=name)
+        super().__init__(motor_pv, prefix + "SET", name=name)
         del self.motor_stop
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 

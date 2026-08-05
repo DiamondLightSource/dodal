@@ -12,12 +12,12 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from dodal.devices.insertion_device.apple2_phase_axes import (
+from dodal.devices.insertion_device.apple2_undulator import Apple2, Apple2Val
+from dodal.devices.insertion_device.apple2_undulator_phase_axes import (
     Apple2PhasesVal,
     PhaseAxesType,
     UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.apple2_undulator import Apple2, Apple2Val
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER

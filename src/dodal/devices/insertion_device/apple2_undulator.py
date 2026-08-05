@@ -5,12 +5,12 @@ from typing import Generic
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, Reference, StandardReadable, wait_for_value
 
-from dodal.devices.insertion_device.apple2_phase_axes import (
+from dodal.devices.insertion_device.apple2_undulator_gap import UndulatorGap
+from dodal.devices.insertion_device.apple2_undulator_phase_axes import (
     Apple2LockedPhasesVal,
     Apple2PhasesVal,
     PhaseAxesType,
 )
-from dodal.devices.insertion_device.apple2_undulator_gap import UndulatorGap
 from dodal.devices.insertion_device.enum import UndulatorGateStatus
 from dodal.log import LOGGER
 

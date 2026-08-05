@@ -7,16 +7,16 @@ from .apple2_controller import (
     Apple2Type,
     EnergyMotorConvertor,
 )
-from .apple2_phase_axes import (
+from .apple2_undulator import Apple2, Apple2Val
+from .apple2_undulator_base import SafeUndulatorMoverBase
+from .apple2_undulator_gap import UndulatorGap
+from .apple2_undulator_phase_axes import (
     Apple2LockedPhasesVal,
     Apple2PhasesVal,
     UndulatorJawPhase,
     UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,
 )
-from .apple2_undulator import Apple2, Apple2Val
-from .apple2_undulator_base import SafeUndulatorMoverBase
-from .apple2_undulator_gap import UndulatorGap
 from .apple_knot_controller import AppleKnotController, AppleKnotPathFinder
 from .energy import BeamEnergy, InsertionDeviceEnergy
 from .energy_motor_lookup import (
