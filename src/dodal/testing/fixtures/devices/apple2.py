@@ -3,14 +3,12 @@ from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device import (
+    Apple2,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
-    UndulatorPhaseAxes,
-)
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2,
     UndulatorLockedPhaseAxes,
+    UndulatorPhaseAxes,
 )
 
 

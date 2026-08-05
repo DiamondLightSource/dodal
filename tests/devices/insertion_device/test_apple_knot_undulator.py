@@ -6,12 +6,10 @@ from dodal.devices.beamlines.i05_shared import (
     energy_to_phase_converter,
 )
 from dodal.devices.insertion_device import (
+    Apple2,
     AppleKnotController,
     AppleKnotPathFinder,
     Pol,
-)
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2,
     UndulatorLockedPhaseAxes,
 )
 
