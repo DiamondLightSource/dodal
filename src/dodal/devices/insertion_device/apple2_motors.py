@@ -219,11 +219,9 @@ class UndulatorPhaseMotor(Motor):
 
     @cached_property
     def movable_logic(self) -> UnstoppableMotorMoveLogic:
-        """The combined move + fly logic, shared by movable_logic and flyable_logic."""
         return UnstoppableMotorMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            # Safe to do, stop method no longer calls stop signal in movable logic.
             motor_stop=None,  # type: ignore
             low_limit_travel=self.low_limit_travel,
             high_limit_travel=self.high_limit_travel,
