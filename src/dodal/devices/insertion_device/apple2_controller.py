@@ -17,10 +17,7 @@ from dodal.devices.insertion_device.apple2_phase_axes import (
     PhaseAxesType,
     UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2,
-    Apple2Val,
-)
+from dodal.devices.insertion_device.apple2_undulator import Apple2, Apple2Val
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
@@ -61,7 +58,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     motor positions via a user-supplied conversion callable.
 
     Attributes:
-        apple2 (Reference[Apple2Type]): Reference to the Apple2 device containing gap
+        apple2_ref (Reference[Apple2Type]): Reference to the Apple2 device containing gap
             and phase motors.
         energy (derived_signal_rw): Derived signal for moving and reading back energy.
         polarisation_setpoint (SignalR): Soft signal for the polarisation setpoint.
@@ -112,7 +109,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         units: str = "eV",
         name: str = "",
     ) -> None:
-        self.apple2 = Reference(apple2)
+        self.apple2_ref = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
         self.inverse_gap_energy_motor_converter = inverse_gap_energy_motor_converter
@@ -127,7 +124,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        phase = self.apple2().phase_ref()
+        phase = self.apple2_ref().phase_ref()
         # For unlocked phase axes, use top_inner and btm_outer readbacks to calculate
         # derived signal polarisation.
         if isinstance(phase, UndulatorPhaseAxes):
@@ -148,7 +145,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 top_inner=top_inner,
                 btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
-                gap=self.apple2().gap_ref().motor.user_readback,
+                gap=self.apple2_ref().gap_ref().motor.user_readback,
             )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
@@ -156,7 +153,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 set_derived=self._set_energy,
                 energy=self._energy,
                 pol=self.polarisation,
-                gap=self.apple2().gap_ref().motor.user_readback,
+                gap=self.apple2_ref().gap_ref().motor.user_readback,
                 derived_units=units,
             )
 
@@ -177,7 +174,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         phase = self.phase_energy_motor_converter(value=energy, pol=pol)
         apple2_val = self._get_apple2_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
-        await self.apple2().set(id_motor_values=apple2_val)
+        await self.apple2_ref().set(id_motor_values=apple2_val)
 
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()

@@ -28,9 +28,9 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
     """Device representing the combined motor controls for an Apple2 undulator.
 
     Attributes:
-        gap (UndulatorGap): The undulator gap motor device.
-        phase (UndulatorPhaseAxes): The undulator phase axes device, consisting of four
-            phase motors.
+        gap_ref (Reference[UndulatorGap]): The undulator gap motor device.
+        phase_ref (Reference[UndulatorPhaseAxes]): The undulator phase axes device,
+            consisting offour phase motors.
 
     Args:
         id_gap (UndulatorGap): An UndulatorGap device.
