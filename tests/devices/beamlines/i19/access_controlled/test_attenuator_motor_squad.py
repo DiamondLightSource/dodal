@@ -13,9 +13,9 @@ from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchSt
 
 
 def given_position_demands() -> AttenuatorMotorPositions:
-    position_demand = MagicMock()
+    position_demand = MagicMock(spec=AttenuatorMotorPositions)
     restful_payload = {"x": 54.3, "y": 72.1, "w": 4}
-    position_demand.validated_complete_demand = MagicMock(return_value=restful_payload)
+    position_demand.validated_and_complete = MagicMock(return_value=restful_payload)
     return position_demand
 
 
