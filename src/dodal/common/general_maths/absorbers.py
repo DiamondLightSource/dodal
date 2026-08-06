@@ -1,26 +1,20 @@
-from typing import Annotated, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
-from pydantic import ConfigDict, Field, StrictFloat, validate_call
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, ConfigDict, StrictFloat, validate_call
 
 from dodal.common.general_maths.absorber_geometry import (
     TaperedGeometryProvider,
     ThicknessProvider,
 )
-from dodal.common.general_maths.material_absorption_maths import AbsorptionCalculator
-from dodal.common.general_maths.transmission_interconversion import (
+from dodal.common.general_maths.material_absorption_maths import (
+    MaterialAbsorptionSpectrum,
     attenuation_from_natural_log_of_transmission,
 )
-
-XrayEnergy = Annotated[
-    StrictFloat,
-    Field(gt=0.1, le=30.0, description="X-rays from 0.1 keV to 30.0"),
-]
 
 
 @runtime_checkable
 class FixedDepth(Protocol):
-    def calculate_absorption_bn(self, xray_energy_kev: XrayEnergy) -> float:
+    def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
         """Calculates absorption for a flat absorber of fixed depth.
 
         Typical use case is a foil absorber in a filter wheel.
@@ -39,8 +33,9 @@ class FixedDepth(Protocol):
 class VariableDepth(Protocol):
     def calculate_absorption_bn(
         self,
-        xray_energy_kev: XrayEnergy,
-        motor_position_mm: StrictFloat,
+        *,
+        xray_energy_kev: float,
+        motor_position_mm: float,
     ) -> float:
         """Calculates absorption for an absorber of variable depth.
 
@@ -57,8 +52,7 @@ class VariableDepth(Protocol):
         ...
 
 
-@dataclass(kw_only=True, frozen=True, config=ConfigDict(arbitrary_types_allowed=True))
-class Absorber:
+class Absorber(BaseModel):
     """Base class for individual attenuating absorber.
 
     This is a system level entity in the business logic of a transmission subsystem,
@@ -69,9 +63,10 @@ class Absorber:
         material_absorption_model: Material specific model for photon mass attenuation calculation.
     """
 
-    material_absorption_model: AbsorptionCalculator
+    spectrum: MaterialAbsorptionSpectrum
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
-    def _attenuation_bn(self, xray_energy_kev, thickness_cm):
+    def _attenuation_bn(self, *, xray_energy_kev, thickness_cm):
         """Common internal conversion calculator.
 
         Extracts material photon mass attenuation from material calculator,
@@ -84,15 +79,12 @@ class Absorber:
         Returns:
             Attenuation in 'system budget friendly' logarithmic units (Barnett units, Bn).
         """
-        _alpha = self.material_absorption_model.absorption_coefficient_per_cm(
-            energy_kev=xray_energy_kev
-        )
+        _alpha = self.spectrum.absorption_coefficient_per_cm(energy_kev=xray_energy_kev)
         _ln_t = -(thickness_cm * _alpha)
         return attenuation_from_natural_log_of_transmission(_ln_t)
 
 
-@dataclass(kw_only=True, frozen=True, config=ConfigDict(arbitrary_types_allowed=True))
-class FoilAbsorber(Absorber, FixedDepth):
+class FoilAbsorber(Absorber):
     """System level representation of an foil absorbing filter, typically wheel mounted.
 
     Attributes:
@@ -105,7 +97,7 @@ class FoilAbsorber(Absorber, FixedDepth):
     geometry_model: ThicknessProvider
 
     @validate_call
-    def calculate_absorption_bn(self, xray_energy_kev: XrayEnergy) -> float:
+    def calculate_absorption_bn(self, *, xray_energy_kev: StrictFloat) -> float:
         # see Protocol API for FixedDepth (absorber)
         _thickness_cm = self.geometry_model.get_thickness_cm()
         return self._attenuation_bn(
@@ -113,8 +105,7 @@ class FoilAbsorber(Absorber, FixedDepth):
         )
 
 
-@dataclass(kw_only=True, frozen=True, config=ConfigDict(arbitrary_types_allowed=True))
-class WedgeAbsorber(Absorber, VariableDepth):
+class WedgeAbsorber(Absorber):
     """System level representation of an foil absorbing filter, typically wheel mounted.
 
     Attributes:
@@ -129,7 +120,8 @@ class WedgeAbsorber(Absorber, VariableDepth):
     @validate_call
     def calculate_absorption_bn(
         self,
-        xray_energy_kev: XrayEnergy,
+        *,
+        xray_energy_kev: StrictFloat,
         motor_position_mm: StrictFloat,
     ) -> float:
         # see Protocol API for VariableDepth (absorber)
