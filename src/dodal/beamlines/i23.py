@@ -11,7 +11,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
-from dodal.devices.motors import SixAxisGonio
+from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -25,6 +25,12 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, get_hostname
+
+ZOOM_PARAMS_FILE = (
+    "/dls_sw/i23/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
+)
+DISPLAY_CONFIG = "/dls_sw/i23/software/daq_configuration/domain/display.configuration"
+I23_CONFIG_SERVER_ENDPOINT = "https://i23-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i23")
 PREFIX = BeamlinePrefix(BL)
@@ -75,6 +81,8 @@ def oav(config_client) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
+        percentage_prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:ZOOM:",
+        level_prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:CAM:",
     )
 
 
@@ -89,8 +97,8 @@ def shutter() -> MXZebraShutter:
 
 
 @devices.factory()
-def gonio() -> SixAxisGonio:
-    return SixAxisGonio(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
+def gonio() -> XYZWrappedOmegaStage:
+    return XYZWrappedOmegaStage(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
 
 
 @devices.factory()

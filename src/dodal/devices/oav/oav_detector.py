@@ -104,11 +104,19 @@ class ZoomController(BaseZoomController):
 
     DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 2
 
-    def __init__(self, prefix: str, name: str = "") -> None:
-        self.percentage = epics_signal_rw(float, f"{prefix}ZOOMPOSCMD")
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        percentage_prefix: str = "",
+        level_prefix: str = "",
+    ) -> None:
+        self.percentage = epics_signal_rw(
+            float, f"{percentage_prefix or prefix}ZOOMPOSCMD"
+        )
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
-        self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
+        self.level = epics_signal_rw(str, f"{level_prefix or prefix}MP:SELECT")
 
         super().__init__(name=name)
 
@@ -166,6 +174,8 @@ class OAV(StandardReadable):
         name: str = "",
         mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
+        percentage_prefix: str = "",
+        level_prefix: str = "",
         x_direction: int = -1,
         y_direction: int = -1,
         z_direction: int = 1,
@@ -178,9 +188,14 @@ class OAV(StandardReadable):
         _bl_prefix = prefix.split("-")[0]
 
         if not zoom_controller:
-            self.zoom_controller = ZoomController(
-                f"{_bl_prefix}-EA-OAV-01:FZOOM:", name
-            )
+            if percentage_prefix:
+                self.zoom_controller = ZoomController(
+                    "", name, percentage_prefix, level_prefix
+                )
+            else:
+                self.zoom_controller = ZoomController(
+                    f"{_bl_prefix}-EA-OAV-01:FZOOM:", name
+                )
         else:
             self.zoom_controller = zoom_controller
 
@@ -258,6 +273,8 @@ class OAVBeamCentreFile(OAV):
         name: str = "",
         mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
+        percentage_prefix: str = "",
+        level_prefix: str = "",
         mjpg_x_size_pv: str = "ArraySize1_RBV",
         mjpg_y_size_pv: str = "ArraySize2_RBV",
         x_direction: int = -1,
@@ -270,6 +287,8 @@ class OAVBeamCentreFile(OAV):
             name=name,
             mjpeg_prefix=mjpeg_prefix,
             zoom_controller=zoom_controller,
+            percentage_prefix=percentage_prefix,
+            level_prefix=level_prefix,
             mjpg_x_size_pv=mjpg_x_size_pv,
             mjpg_y_size_pv=mjpg_y_size_pv,
             x_direction=x_direction,
