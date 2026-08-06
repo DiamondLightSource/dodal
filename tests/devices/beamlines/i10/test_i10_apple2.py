@@ -222,7 +222,7 @@ async def test_i10_apple2_controller_determine_pol(
 async def test_fail_i10_apple2_controller_set_undefined_pol(
     mock_id_controller: I10Apple2Controller,
 ):
-    set_mock_value(mock_id_controller.apple2_ref().gap_ref().motor.user_readback, 101)
+    set_mock_value(mock_id_controller.apple2_ref().gap_ref().user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
     assert (
@@ -355,9 +355,7 @@ async def test_id_polarisation_set(
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(
-            mock_id_controller.apple2_ref().gap_ref().motor.user_setpoint
-        )
+        gap = get_mock_put(mock_id_controller.apple2_ref().gap_ref().user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 

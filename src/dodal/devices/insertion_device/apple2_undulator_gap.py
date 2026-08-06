@@ -2,7 +2,6 @@ import asyncio
 from dataclasses import dataclass
 from functools import cached_property
 
-from bluesky.protocols import Flyable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
@@ -11,7 +10,6 @@ from ophyd_async.core import (
     SignalW,
     StandardReadableFormat,
     TimeoutCalculator,
-    WatchableAsyncStatus,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -21,7 +19,6 @@ from dodal.devices.insertion_device.apple2_motors import (
     UnstoppableMotorMoveLogic,
 )
 from dodal.devices.insertion_device.apple2_undulator_base import (
-    SafeUndulatorMoverBase,
     estimate_motor_timeout,
     estimate_motor_timeout_from_signals,
     set_move_and_wait_for_gate,
@@ -125,7 +122,7 @@ class UndulatorGapMotor(MotorStringSetpoint):
         await super().prepare(value)
 
 
-class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
+class UndulatorGap(UndulatorGapMotor):
     """Apple2 undulator gap device.
 
     Wraps an internal :class:`UndulatorGapMotor` and exposes the Apple2
@@ -140,31 +137,21 @@ class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
     """
 
     def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix=prefix, name=name)
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+        self.status = epics_signal_r(EnabledDisabledUpper, prefix + "BLSTAT")
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
-        with self.add_children_as_readables():
-            self.motor = UndulatorGapMotor(
-                prefix, self.gate, self.status, self.set_move
-            )
+        super().__init__(
+            prefix=prefix,
+            gate=self.gate,
+            status=self.status,
+            set_move=self.set_move,
+            name=name,
+        )
 
     async def set_demand_positions(self, value: float) -> None:
-        await self.motor.user_setpoint.set(value)
+        await self.user_setpoint.set(value)
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout_from_signals(
-            self.motor.user_setpoint, self.motor.user_readback, self.motor.velocity
+            self.user_setpoint, self.user_readback, self.velocity
         )
-
-    @AsyncStatus.wrap
-    async def prepare(self, value: FlyMotorInfo) -> None:
-        """Prepare for a fly scan by moving to the run-up position at max velocity.
-        Stores fly info for later use in kickoff.
-        """
-        await self.motor.prepare(value)
-
-    @AsyncStatus.wrap
-    async def kickoff(self):
-        await self.motor.kickoff()
-
-    def complete(self) -> WatchableAsyncStatus:
-        return self.motor.complete()

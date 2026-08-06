@@ -40,6 +40,7 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
         motor_pv = f"{prefix}MTR"
         super().__init__(motor_pv, prefix + "SET", name=name)
         del self.motor_stop
+        self.motor_stop = None
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
     @cached_property
@@ -47,7 +48,7 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
         return UnstoppableMotorMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            motor_stop=None,  # type: ignore
+            motor_stop=self.motor_stop,  # type: ignore
             low_limit_travel=self.low_limit_travel,
             high_limit_travel=self.high_limit_travel,
             dial_low_limit_travel=self.dial_low_limit_travel,
