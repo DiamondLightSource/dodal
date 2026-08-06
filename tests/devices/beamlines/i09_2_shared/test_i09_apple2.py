@@ -155,19 +155,11 @@ async def test_j09_apple2_controller_determine_pol(
     btm_outer_phase: float,
 ):
     assert await mock_id_controller.polarisation_setpoint.get_value() == Pol.NONE
-
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner_phase
-    )
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer_phase
-    )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner_phase
-    )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer_phase
-    )
+    phase = mock_id_controller.apple2_ref().phase_ref()
+    set_mock_value(phase.top_inner.user_readback, top_inner_phase)
+    set_mock_value(phase.top_outer.user_readback, top_outer_phase)
+    set_mock_value(phase.btm_inner.user_readback, btm_inner_phase)
+    set_mock_value(phase.btm_outer.user_readback, btm_outer_phase)
     if pol == Pol.NONE:
         with pytest.raises(ValueError):
             await mock_id_controller.energy.set(0.800)
@@ -196,21 +188,22 @@ async def test_j09_apple2_controller_set_pol_lh(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    set_mock_value(mock_id_controller.apple2().phase().top_outer.user_readback, 10)
-    set_mock_value(mock_id_controller.apple2().phase().btm_inner.user_readback, 10)
+    phase = mock_id_controller.apple2_ref().phase_ref()
+    set_mock_value(phase.top_outer.user_readback, 10)
+    set_mock_value(phase.btm_inner.user_readback, 10)
     await mock_id_controller.polarisation.set(pol)
-    get_mock_put(
-        mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).assert_called_once_with(f"{top_outer_phase}")
-    get_mock_put(
-        mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).assert_called_once_with(f"{top_inner_phase}")
-    get_mock_put(
-        mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).assert_called_once_with(f"{btm_inner_phase}")
-    get_mock_put(
-        mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).assert_called_once_with(f"{btm_outer_phase}")
+    get_mock_put(phase.top_outer.user_setpoint_str).assert_called_once_with(
+        f"{top_outer_phase}"
+    )
+    get_mock_put(phase.top_inner.user_setpoint_str).assert_called_once_with(
+        f"{top_inner_phase}"
+    )
+    get_mock_put(phase.btm_inner.user_setpoint_str).assert_called_once_with(
+        f"{btm_inner_phase}"
+    )
+    get_mock_put(phase.btm_outer.user_setpoint_str).assert_called_once_with(
+        f"{btm_outer_phase}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -230,31 +223,16 @@ async def test_j09_apple2_controller_set_pol_does_nothing_when_pol_unchanged(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer_phase
-    )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner_phase
-    )
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner_phase
-    )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer_phase
-    )
+    phase = mock_id_controller.apple2_ref().phase_ref()
+    set_mock_value(phase.top_outer.user_readback, top_outer_phase)
+    set_mock_value(phase.btm_inner.user_readback, btm_inner_phase)
+    set_mock_value(phase.top_inner.user_readback, top_inner_phase)
+    set_mock_value(phase.btm_outer.user_readback, btm_outer_phase)
     await mock_id_controller.polarisation.set(pol)
-    get_mock_put(
-        mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).assert_not_called()
-    get_mock_put(
-        mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).assert_not_called()
-    get_mock_put(
-        mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).assert_not_called()
-    get_mock_put(
-        mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).assert_not_called()
+    get_mock_put(phase.top_outer.user_setpoint).assert_not_called()
+    get_mock_put(phase.top_inner.user_setpoint).assert_not_called()
+    get_mock_put(phase.btm_inner.user_setpoint).assert_not_called()
+    get_mock_put(phase.btm_outer.user_setpoint).assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -280,34 +258,27 @@ async def test_j09_apple2_controller_set_pol(
     btm_outer_phase: float,
 ):
     # set pol to unknown first
-    set_mock_value(mock_id_controller.apple2().phase().top_outer.user_readback, 2)
-    set_mock_value(mock_id_controller.apple2().phase().btm_inner.user_readback, 1)
-    set_mock_value(mock_id_controller.apple2().phase().top_inner.user_readback, 3)
-    set_mock_value(mock_id_controller.apple2().phase().btm_outer.user_readback, 4)
+    phase = mock_id_controller.apple2_ref().phase_ref()
+    set_mock_value(phase.top_outer.user_readback, 2)
+    set_mock_value(phase.btm_inner.user_readback, 1)
+    set_mock_value(phase.top_inner.user_readback, 3)
+    set_mock_value(phase.btm_outer.user_readback, 4)
     mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     mock_id_controller.phase_energy_motor_lut.update_lookup_table()
     await mock_id_controller.polarisation.set(pol)
-    assert get_mock_put(
-        mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).call_args_list == [
+    assert get_mock_put(phase.top_outer.user_setpoint_str).call_args_list == [
         call("0.0"),
         call(f"{top_outer_phase}"),
     ]
-    assert get_mock_put(
-        mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).call_args_list == [
+    assert get_mock_put(phase.top_inner.user_setpoint_str).call_args_list == [
         call("0.0"),
         call(f"{top_inner_phase}"),
     ]
-    assert get_mock_put(
-        mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).call_args_list == [
+    assert get_mock_put(phase.btm_inner.user_setpoint_str).call_args_list == [
         call("0.0"),
         call(f"{btm_inner_phase}"),
     ]
-    assert get_mock_put(
-        mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).call_args_list == [
+    assert get_mock_put(phase.btm_outer.user_setpoint_str).call_args_list == [
         call("0.0"),
         call(f"{btm_outer_phase}"),
     ]
@@ -329,23 +300,24 @@ async def test_j09_apple2_controller_set_pol_does_not_go_via_lh_if_already_at_lh
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    set_mock_value(mock_id_controller.apple2().phase().top_outer.user_readback, 0)
-    set_mock_value(mock_id_controller.apple2().phase().btm_inner.user_readback, 0)
-    set_mock_value(mock_id_controller.apple2().phase().top_inner.user_readback, 0)
-    set_mock_value(mock_id_controller.apple2().phase().btm_outer.user_readback, 0)
+    phase = mock_id_controller.apple2_ref().phase_ref()
+    set_mock_value(phase.top_outer.user_readback, 0)
+    set_mock_value(phase.btm_inner.user_readback, 0)
+    set_mock_value(phase.top_inner.user_readback, 0)
+    set_mock_value(phase.btm_outer.user_readback, 0)
     await mock_id_controller.polarisation.set(pol)
-    get_mock_put(
-        mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).assert_called_once_with(f"{top_outer_phase}")
-    get_mock_put(
-        mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).assert_called_once_with(f"{top_inner_phase}")
-    get_mock_put(
-        mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).assert_called_once_with(f"{btm_inner_phase}")
-    get_mock_put(
-        mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).assert_called_once_with(f"{btm_outer_phase}")
+    get_mock_put(phase.top_outer.user_setpoint_str).assert_called_once_with(
+        f"{top_outer_phase}"
+    )
+    get_mock_put(phase.top_inner.user_setpoint_str).assert_called_once_with(
+        f"{top_inner_phase}"
+    )
+    get_mock_put(phase.btm_inner.user_setpoint_str).assert_called_once_with(
+        f"{btm_inner_phase}"
+    )
+    get_mock_put(phase.btm_outer.user_setpoint_str).assert_called_once_with(
+        f"{btm_outer_phase}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -366,7 +338,9 @@ async def test_j09_apple2_controller_set_energy(
 ):
     mock_id_controller._polarisation_setpoint_set(pol)
     await mock_id_controller.energy.set(energy)
-    mock_gap_setpoint = get_mock_put(mock_id_controller.apple2().gap().user_setpoint)
+    mock_gap_setpoint = get_mock_put(
+        mock_id_controller.apple2_ref().gap_ref().motor.user_setpoint
+    )
     assert float(mock_gap_setpoint.call_args_list[0].args[0]) == pytest.approx(
         expected_gap, abs=1
     )
