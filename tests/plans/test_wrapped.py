@@ -1,3 +1,4 @@
+import re
 from collections.abc import Mapping, Sequence
 from typing import cast
 
@@ -20,9 +21,7 @@ from pydantic import ValidationError
 
 from dodal.devices.motors import Motor
 from dodal.plans.wrapped import (
-    _make_list_scan_args,
-    _make_num_scan_args,
-    _make_step_scan_args,
+    _make_step_scan_args_and_shape,
     _make_stepped_list_num,
     _make_stepped_list_step,
     _round_list_elements,
@@ -35,11 +34,19 @@ from dodal.plans.wrapped import (
     num_grid_scan,
     num_rscan,
     num_scan,
+    require,
     step_grid_rscan,
     step_grid_scan,
     step_rscan,
     step_scan,
 )
+
+
+def assert_expected_shape(
+    run_engine_documents: Mapping[str, list[dict]], expected_shape: tuple[int, ...]
+) -> None:
+    start = run_engine_documents["start"][0]
+    assert start["shape"] == expected_shape
 
 
 def test_count_delay_validation(det: StandardDetector, run_engine: RunEngine):
@@ -61,7 +68,6 @@ def test_count_delay_validation(det: StandardDetector, run_engine: RunEngine):
     for delay, reason in args.items():
         with pytest.raises((ValidationError, AssertionError), match=reason):
             run_engine(count([det], num=3, delay=delay))
-        print(delay)
 
 
 def test_count_detectors_validation(run_engine: RunEngine):
@@ -99,10 +105,10 @@ def test_count_plan_produces_expected_start_document(
     start = run_engine_documents.get("start")
     assert start and len(start) == 1
     run_start = cast(RunStart, start[0])
-    assert run_start.get("shape") == shape
     assert (hints := run_start.get("hints")) and (
         hints.get("dimensions") == [(("time",), "primary")]
     )
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize("num, length", ([1, 1], [3, 3]))
@@ -187,28 +193,6 @@ def test_count_with_no_detector_raise_error(run_engine: RunEngine):
         run_engine(count([]))
 
 
-@pytest.mark.parametrize(
-    "x_list, y_list, num, final_shape, final_length",
-    (
-        [[0.0, 1.1], [2.2, 3.3], 3, [3], 6],
-        [[0.0, 1.1, 2], [2.2, 3.3, 3], None, [2, 3], 8],
-    ),
-)
-def test_make_num_scan_args(
-    x_axis: Motor,
-    y_axis: Motor,
-    x_list: list[float | int],
-    y_list: list[float | int],
-    num: int | None,
-    final_shape: list[int],
-    final_length: int,
-):
-    args, shape = _make_num_scan_args([(x_axis, x_list), (y_axis, y_list)], num=num)
-    assert shape == final_shape
-    assert len(args) == final_length
-    assert args[0] == x_axis
-
-
 def _assert_emitted(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
@@ -254,8 +238,9 @@ def test_num_scan_with_one_axis(
     x_list: list[float | int],
     num: int,
 ):
-    run_engine(num_scan(detectors=detectors, params=[(x_axis, x_list)], num=num))
+    run_engine(num_scan(detectors=detectors, params=[x_axis, *x_list], num=num))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
@@ -274,18 +259,19 @@ def test_num_scan_with_two_axes(
     run_engine(
         num_scan(
             detectors=detectors,
-            params=[(x_axis, x_list), (y_axis, y_list)],
+            params=[x_axis, *x_list, y_axis, *y_list],
             num=num,
         )
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 def test_num_scan_fails_when_given_wrong_number_of_params(
-    run_engine: RunEngine, detectors: Sequence[StandardDetector], x_axis: Motor
+    run_engine: RunEngine, x_axis: Motor
 ):
     with pytest.raises(ValueError):
-        run_engine(num_scan(detectors=detectors, params=[(x_axis, [-1, 1, 5])], num=5))
+        run_engine(num_scan(detectors=[], params=[x_axis, -1, 1, 5], num=5))
 
 
 @pytest.mark.parametrize(
@@ -294,7 +280,6 @@ def test_num_scan_fails_when_given_wrong_number_of_params(
 )
 def test_num_scan_fails_when_given_bad_info(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -304,70 +289,67 @@ def test_num_scan_fails_when_given_bad_info(
     with pytest.raises(ValueError):
         run_engine(
             num_scan(
-                detectors=detectors,
-                params=[(x_axis, x_list), (y_axis, y_list)],
+                detectors=[],
+                params=[x_axis, *x_list, y_axis, *y_list],
                 num=num,
             )
         )
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([(-1.1, 1.1, 5), (2.2, -2.2, 3)], [(0, 1.1, 5), (2.2, 3.3, 5)])
 )
 def test_num_grid_scan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list[float | int],
+    x_list: tuple[float, float, int],
     y_axis: Motor,
-    y_list: list[float | int],
+    y_list: tuple[float, float, int],
 ):
     num = int(x_list[-1] * y_list[-1])
     run_engine(
         num_grid_scan(
             detectors=detectors,
-            params=[(x_axis, x_list), (y_axis, y_list)],
+            params=[x_axis, *x_list, y_axis, *y_list],
         )
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (x_list[2], y_list[2]))
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([(-1.1, 1.1, 5), (2.2, -2.2, 3)], [(0, 1.1, 5), (2.2, 3.3, 5)])
 )
 def test_num_grid_scan_when_not_snaking(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list[float | int],
+    x_list: tuple[float, float, int],
     y_axis: Motor,
-    y_list: list[float | int],
+    y_list: tuple[float, float, int],
 ):
     num = int(x_list[-1] * y_list[-1])
     run_engine(
         num_grid_scan(
             detectors=detectors,
-            params=[(x_axis, x_list), (y_axis, y_list)],
+            params=[x_axis, *x_list, y_axis, *y_list],
             snake_axes=False,
         )
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (x_list[2], y_list[2]))
 
 
 def test_num_grid_scan_fails_when_given_wrong_number_of_params(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
-        run_engine(
-            num_grid_scan(
-                detectors=detectors, params=[(x_axis, [0, 1.1, 2]), (y_axis, [1.1])]
-            )
-        )
+        run_engine(num_grid_scan(detectors=[], params=[x_axis, 0, 1.1, 2, y_axis, 1.1]))
 
 
 @pytest.mark.parametrize(
@@ -375,7 +357,6 @@ def test_num_grid_scan_fails_when_given_wrong_number_of_params(
 )
 def test_num_scan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -384,8 +365,8 @@ def test_num_scan_fails_when_asked_to_snake_slow_axis(
     with pytest.raises(ValueError):
         run_engine(
             num_grid_scan(
-                detectors=detectors,
-                params=[(x_axis, x_list), (y_axis, y_list)],
+                detectors=[],
+                params=[x_axis, *x_list, y_axis, *y_list],
                 snake_axes=[x_axis],
             )
         )
@@ -400,8 +381,9 @@ def test_num_rscan(
     x_list: list[float | int],
     num: int,
 ):
-    run_engine(num_rscan(detectors=detectors, params=[(x_axis, x_list)], num=num))
+    run_engine(num_rscan(detectors=detectors, params=[x_axis, *x_list], num=num))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
@@ -419,10 +401,11 @@ def test_num_rscan_with_two_axes(
 ):
     run_engine(
         num_rscan(
-            detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)], num=num
+            detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list], num=num
         )
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
@@ -430,7 +413,6 @@ def test_num_rscan_with_two_axes(
 )
 def test_num_rscan_fails_when_given_bad_info(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -440,56 +422,58 @@ def test_num_rscan_fails_when_given_bad_info(
     with pytest.raises(ValueError):
         run_engine(
             num_rscan(
-                detectors=detectors,
-                params=[(x_axis, x_list), (y_axis, y_list)],
+                detectors=[],
+                params=[x_axis, *x_list, y_axis, *y_list],
                 num=num,
             )
         )
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([(-1.1, 1.1, 5), (2.2, -2.2, 3)], [(0, 1.1, 5), (2.2, 3.3, 5)])
 )
 def test_num_grid_rscan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list[float | int],
+    x_list: tuple[float, float, int],
     y_axis: Motor,
-    y_list: list[float | int],
+    y_list: tuple[float, float, int],
 ):
     num = int(x_list[-1] * y_list[-1])
     run_engine(
         num_grid_rscan(
             detectors=detectors,
-            params=[(x_axis, x_list), (y_axis, y_list)],
+            params=[x_axis, *x_list, y_axis, *y_list],
         )
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (x_list[2], y_list[2]))
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([(-1.1, 1.1, 5), (2.2, -2.2, 3)], [(0, 1.1, 5), (2.2, 3.3, 5)])
 )
 def test_num_grid_rscan_when_not_snaking(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list[float | int],
+    x_list: tuple[float, float, int],
     y_axis: Motor,
-    y_list: list[float | int],
+    y_list: tuple[float, float, int],
 ):
     num = int(x_list[-1] * y_list[-1])
     run_engine(
         num_grid_rscan(
             detectors=detectors,
-            params=[(x_axis, x_list), (y_axis, y_list)],
+            params=[x_axis, *x_list, y_axis, *y_list],
             snake_axes=False,
         )
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (x_list[2], y_list[2]))
 
 
 @pytest.mark.parametrize(
@@ -497,7 +481,6 @@ def test_num_grid_rscan_when_not_snaking(
 )
 def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     x_list: list[float | int],
     y_axis: Motor,
@@ -506,8 +489,8 @@ def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
     with pytest.raises(ValueError):
         run_engine(
             num_grid_rscan(
-                detectors=detectors,
-                params=[(x_axis, x_list), (y_axis, y_list)],
+                detectors=[],
+                params=[x_axis, *x_list, y_axis, *y_list],
                 snake_axes=[x_axis],
             )
         )
@@ -515,9 +498,12 @@ def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
 
 @pytest.mark.parametrize(
     "x_list, y_list, grid, final_shape, final_length",
-    ([[0, 1, 2], [3, 4, 5], False, [3], 4], [[0, 1, 2], [3, 4, 5, 6], True, [3, 4], 4]),
+    (
+        [[0, 10, 1], [0, 5], False, (11,), 4],
+        [[0, 10, 1], [0, 5, 1], True, (11, 6), 4],
+    ),
 )
-def test_make_list_scan_args(
+def test_make_step_scan_args_and_shape(
     x_axis: Motor,
     x_list: list,
     y_axis: Motor,
@@ -526,8 +512,8 @@ def test_make_list_scan_args(
     final_shape: list,
     final_length: int,
 ):
-    args, shape = _make_list_scan_args(
-        params=[(x_axis, x_list), (y_axis, y_list)], grid=grid
+    args, shape = _make_step_scan_args_and_shape(
+        params=[x_axis, *x_list, y_axis, *y_list], grid=grid
     )
     assert len(args) == final_length
     assert shape == final_shape
@@ -538,8 +524,8 @@ def test_make_list_scan_args_fails_when_lists_are_different_lengths(
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
-        _make_list_scan_args(
-            params=[(x_axis, [0, 1, 2]), (y_axis, [0, 1, 2, 3])], grid=False
+        _make_step_scan_args_and_shape(
+            params=[x_axis, 0, 1, 2, y_axis, 0, 1, 2, 3], grid=False
         )
 
 
@@ -551,10 +537,10 @@ def test_list_scan(
     x_axis: Motor,
     x_list: list,
 ):
-    num = int(len(x_list))
-
-    run_engine(list_scan(detectors=detectors, params=[(x_axis, x_list)]))
+    num = len(x_list)
+    run_engine(list_scan(detectors=detectors, params=[x_axis, x_list]))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
@@ -574,23 +560,21 @@ def test_list_scan_with_two_axes(
     y_list: list,
 ):
     num = int(len(x_list))
-    run_engine(
-        list_scan(detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)])
-    )
+    run_engine(list_scan(detectors=detectors, params=[x_axis, x_list, y_axis, y_list]))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 def test_list_scan_fails_with_differnt_list_lengths(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
         run_engine(
             list_scan(
-                detectors=detectors,
-                params=[(x_axis, [1, 2, 3, 4, 5]), (y_axis, [1, 2, 3, 4])],
+                detectors=[],
+                params=[x_axis, [1, 2, 3, 4, 5], y_axis, [1, 2, 3, 4]],
             )
         )
 
@@ -607,15 +591,16 @@ def test_list_grid_scan(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
     y_axis: Motor,
-    y_list: list,
+    y_list: list[float | int],
 ):
     num = int(len(x_list) * len(y_list))
     run_engine(
-        list_grid_scan(detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)])
+        list_grid_scan(detectors=detectors, params=[x_axis, x_list, y_axis, y_list])
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (len(x_list), len(y_list)))
 
 
 @pytest.mark.parametrize("x_list", ([0, 1, 2, 3], [1.1, 2.2, 3.3]))
@@ -627,8 +612,9 @@ def test_list_rscan(
     x_list: list,
 ):
     num = int(len(x_list))
-    run_engine(list_rscan(detectors=detectors, params=[(x_axis, x_list)]))
+    run_engine(list_rscan(detectors=detectors, params=[x_axis, x_list]))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (len(x_list),))
 
 
 @pytest.mark.parametrize(
@@ -649,23 +635,21 @@ def test_list_rscan_with_two_axes(
 ):
     num = int(len(x_list))
 
-    run_engine(
-        list_rscan(detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)])
-    )
+    run_engine(list_rscan(detectors=detectors, params=[x_axis, x_list, y_axis, y_list]))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 def test_list_rscan_fails_with_differnt_list_lengths(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
     y_axis: Motor,
 ):
     with pytest.raises(ValueError):
         run_engine(
             list_rscan(
-                detectors=detectors,
-                params=[(x_axis, [1, 2, 3, 4, 5]), (y_axis, [1, 2, 3, 4])],
+                detectors=[],
+                params=[x_axis, [1, 2, 3, 4, 5], y_axis, [1, 2, 3, 4]],
             )
         )
 
@@ -689,11 +673,10 @@ def test_list_grid_rscan(
     num = int(len(x_list) * len(y_list))
 
     run_engine(
-        list_grid_rscan(
-            detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)]
-        )
+        list_grid_rscan(detectors=detectors, params=[x_axis, x_list, y_axis, y_list])
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (len(x_list), len(y_list)))
 
 
 @pytest.mark.parametrize(
@@ -748,36 +731,30 @@ def test_make_stepped_list_num(start: float, step: float):
     assert stepped_list[10] == 0
 
 
-def test_make_stepped_list_fails_when_given_equal_start_and_stop_values():
-    with pytest.raises(ValueError):
-        _make_stepped_list_step(start=1.1, stop=1.1, step=0.25)
+def test_make_stepped_list_num_fails_when_num_is_zero():
+    start = stop = 1.1
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"Start ({start}) and stop ({stop}) values cannot be the same."
+        ),
+    ):
+        _make_stepped_list_step(start=start, stop=stop, step=0.25)
 
 
-@pytest.mark.parametrize(
-    "x_list, y_list, grid, final_shape, final_length",
-    (
-        [[0, 1, 0.25], [0, 0.1], False, [5], 4],
-        [[0, 1, 0.25], [0, 1, 0.2], True, [5, 6], 4],
-        [[0, -1, -0.25], [0, -0.1], False, [5], 4],
-        [[0, -1, -0.25], [0, -1, -0.2], True, [5, 6], 4],
-    ),
-)
-def test_make_step_scan_args(
-    x_axis: Motor,
-    x_list: list[float],
-    y_axis: Motor,
-    y_list: list[float],
-    grid: bool,
-    final_shape: list,
-    final_length: int,
-):
-    args, shape = _make_step_scan_args(
-        params=[(x_axis, x_list), (y_axis, y_list)], grid=grid
-    )
-    assert shape == final_shape
-    assert len(args) == final_length
-    assert args[0] == x_axis
-    assert args[2] == y_axis
+def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values():
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Number of points (0) and number of steps (0) cannot be zero."),
+    ):
+        _make_stepped_list_num(start=1, step=0, num=0)
+
+
+def test_require_raises_error_if_not_correct_type():
+    with pytest.raises(
+        ValueError, match="Parameter test must be one of type str, got int."
+    ):
+        require(value=5, expected=str, name="test")
 
 
 @pytest.mark.parametrize(
@@ -791,16 +768,16 @@ def test_make_step_scan_args(
 )
 def test_make_step_scan_args_fails_when_given_incorrect_number_of_parameters(
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
     y_axis: Motor,
-    y_list: list,
+    y_list: list[float | int],
     z_axis: Motor,
-    z_list: list,
+    z_list: list[float | int],
     grid: bool,
 ):
     with pytest.raises(ValueError):
-        _make_step_scan_args(
-            params=[(x_axis, x_list), (y_axis, y_list), (z_axis, z_list)], grid=grid
+        _make_step_scan_args_and_shape(
+            params=[x_axis, *x_list, y_axis, *y_list, z_axis, *z_list], grid=grid
         )
 
 
@@ -812,11 +789,12 @@ def test_step_scan(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
     num,
 ):
-    run_engine(step_scan(detectors=detectors, params=[(x_axis, x_list)]))
+    run_engine(step_scan(detectors=detectors, params=[x_axis, *x_list]))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
@@ -832,23 +810,27 @@ def test_step_scan_with_multiple_axes(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
     y_axis: Motor,
-    y_list: list,
+    y_list: list[float | int],
     num,
 ):
     run_engine(
-        step_scan(detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)])
+        step_scan(detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list])
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list, num",
+    "x_list, expected_num_x, y_list, expected_num_y, snake",
     (
-        [[0, 1, 0.25], [0, 2, 0.5], 25],
-        [[-1, 1, 0.25], [1, -1, -0.5], 45],
-        [[0, 10, 2.5], [0, -10, -2.5], 25],
+        [[0, 1, 0.25], 5, [0, 2, 0.5], 5, True],
+        [[0, 1, 0.25], 5, [0, 2, 0.5], 5, False],
+        [[-1, 1, 0.25], 9, [1, -1, -0.5], 5, True],
+        [[-1, 1, 0.25], 9, [1, -1, -0.5], 5, False],
+        [[0, 10, 2.5], 5, [0, -10, -2.5], 5, True],
+        [[0, 10, 2.5], 5, [0, -10, -2.5], 5, False],
     ),
 )
 def test_step_grid_scan(
@@ -856,42 +838,22 @@ def test_step_grid_scan(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
+    expected_num_x: int,
     y_axis: Motor,
-    y_list: list,
-    num,
-):
-    run_engine(
-        step_grid_scan(detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)])
-    )
-    _assert_emitted(run_engine_documents, detectors, num)
-
-
-@pytest.mark.parametrize(
-    "x_list, y_list, num",
-    (
-        [[0, 1, 0.25], [0, 2, 0.5], 25],
-        [[-1, 1, 0.25], [1, -1, -0.5], 45],
-    ),
-)
-def test_step_grid_scan_when_not_snaking(
-    run_engine: RunEngine,
-    run_engine_documents: Mapping[str, list[dict]],
-    detectors: Sequence[StandardDetector],
-    x_axis: Motor,
-    x_list: list,
-    y_axis: Motor,
-    y_list: list,
-    num,
+    y_list: list[float | int],
+    expected_num_y: int,
+    snake: bool,
 ):
     run_engine(
         step_grid_scan(
             detectors=detectors,
-            params=[(x_axis, x_list), (y_axis, y_list)],
-            snake_axes=False,
+            params=[x_axis, *x_list, y_axis, *y_list],
+            snake_axes=snake,
         )
     )
-    _assert_emitted(run_engine_documents, detectors, num)
+    _assert_emitted(run_engine_documents, detectors, expected_num_x * expected_num_y)
+    assert_expected_shape(run_engine_documents, (expected_num_x, expected_num_y))
 
 
 @pytest.mark.parametrize(
@@ -901,31 +863,33 @@ def test_step_grid_scan_fails_when_given_incorrect_number_of_params(
     run_engine: RunEngine,
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
     y_axis: Motor,
-    y_list: list,
+    y_list: list[float | int],
 ):
     with pytest.raises(ValueError):
         run_engine(
             step_grid_scan(
-                detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)]
+                detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list]
             )
         )
 
 
 @pytest.mark.parametrize(
-    "x_list, num", ([[0, 1, 0.1], 11], [[-1, 1, 0.1], 21], [[0, 10, 1], 11])
+    "x_list, num",
+    ([[0, 1, 0.1], 11], [[-1, 1, 0.1], 21], [[0, 10, 1], 11]),
 )
 def test_step_rscan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
-    num,
+    x_list: list[float | int],
+    num: int,
 ):
-    run_engine(step_rscan(detectors=detectors, params=[(x_axis, x_list)]))
+    run_engine(step_rscan(detectors=detectors, params=[x_axis, *x_list]))
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
@@ -941,23 +905,27 @@ def test_step_rscan_with_multiple_axes(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
     y_axis: Motor,
-    y_list: list,
-    num,
+    y_list: list[float | int],
+    num: int,
 ):
     run_engine(
-        step_rscan(detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)])
+        step_rscan(detectors=detectors, params=[x_axis, *x_list, y_axis, *y_list])
     )
     _assert_emitted(run_engine_documents, detectors, num)
+    assert_expected_shape(run_engine_documents, (num,))
 
 
 @pytest.mark.parametrize(
-    "x_list, y_list, num",
+    "x_list, expected_num_x, y_list, expected_num_y, snake",
     (
-        [[0, 1, 0.25], [0, 2, 0.5], 25],
-        [[-1, 1, 0.25], [1, -1, -0.5], 45],
-        [[0, 10, 2.5], [0, -10, -2.5], 25],
+        [[0, 1, 0.25], 5, [0, 2, 0.5], 5, True],
+        [[0, 1, 0.25], 5, [0, 2, 0.5], 5, False],
+        [[-1, 1, 0.25], 9, [1, -1, -0.5], 5, True],
+        [[-1, 1, 0.25], 9, [1, -1, -0.5], 5, False],
+        [[0, 10, 2.5], 5, [0, -10, -2.5], 5, True],
+        [[0, 10, 2.5], 5, [0, -10, -2.5], 5, False],
     ),
 )
 def test_step_grid_rscan(
@@ -965,60 +933,101 @@ def test_step_grid_rscan(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
+    expected_num_x: int,
     y_axis: Motor,
-    y_list: list,
-    num,
-):
-    run_engine(
-        step_grid_rscan(
-            detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)]
-        )
-    )
-    _assert_emitted(run_engine_documents, detectors, num)
-
-
-@pytest.mark.parametrize(
-    "x_list, y_list, num",
-    (
-        [[0, 1, 0.25], [0, 2, 0.5], 25],
-        [[-1, 1, 0.25], [1, -1, -0.5], 45],
-    ),
-)
-def test_step_grid_rscan_when_not_snaking(
-    run_engine: RunEngine,
-    run_engine_documents: Mapping[str, list[dict]],
-    detectors: Sequence[StandardDetector],
-    x_axis: Motor,
-    x_list: list,
-    y_axis: Motor,
-    y_list: list,
-    num,
+    y_list: list[float | int],
+    expected_num_y: int,
+    snake: bool,
 ):
     run_engine(
         step_grid_rscan(
             detectors=detectors,
-            params=[(x_axis, x_list), (y_axis, y_list)],
-            snake_axes=False,
+            params=[x_axis, *x_list, y_axis, *y_list],
+            snake_axes=snake,
         )
     )
-    _assert_emitted(run_engine_documents, detectors, num)
+    _assert_emitted(run_engine_documents, detectors, expected_num_x * expected_num_y)
+    assert_expected_shape(run_engine_documents, (expected_num_x, expected_num_y))
+
+
+@pytest.mark.parametrize("x_list, y_list", ([[0, 1], [0, 1, 0.1]], [[0], [0, 1, 0.1]]))
+def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axes(
+    run_engine: RunEngine,
+    x_axis: Motor,
+    x_list: list[float | int],
+    y_axis: Motor,
+    y_list: list[float | int],
+):
+    with pytest.raises(
+        ValueError,
+        match="The axis must be movable, start, stop, step.",
+    ):
+        run_engine(
+            step_grid_scan(detectors=[], params=[x_axis, *x_list, y_axis, *y_list])
+        )
 
 
 @pytest.mark.parametrize(
     "x_list, y_list", ([[0, 1, 0.1], [0, 1, 0.1, 1]], [[0, 1, 0.1], [0]])
 )
-def test_step_grid_rscan_fails_when_given_incorrect_number_of_params(
+def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_second_axes(
     run_engine: RunEngine,
-    detectors: Sequence[StandardDetector],
     x_axis: Motor,
-    x_list: list,
+    x_list: list[float | int],
     y_axis: Motor,
-    y_list: list,
+    y_list: list[float | int],
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="The axis must be movable, start, stop, step.",
+    ):
         run_engine(
-            step_grid_rscan(
-                detectors=detectors, params=[(x_axis, x_list), (y_axis, y_list)]
-            )
+            step_grid_scan(detectors=[], params=[x_axis, *x_list, y_axis, *y_list])
         )
+
+
+@pytest.mark.parametrize(
+    "x_list, y_list", ([[0, 1, 0.1], [0, 1, 0.1]], [[0, 1, 0.1], [0]])
+)
+def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
+    run_engine: RunEngine,
+    x_axis: Motor,
+    x_list: list[float | int],
+    y_axis: Motor,
+    y_list: list[float | int],
+):
+    with pytest.raises(
+        ValueError,
+        match="The axis must be movable, start, stop.",
+    ):
+        run_engine(step_scan(detectors=[], params=[x_axis, *x_list, y_axis, *y_list]))
+
+
+def test_make_step_scan_args_and_shape_fails_with_invalid_type_args(
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(
+        ValueError,
+        match="Scan syntax only takes movables or numbers as parameters.",
+    ):
+        _make_step_scan_args_and_shape(
+            [x_axis, 1, "3", 1, y_axis, 1, "4", 1],  # type: ignore
+            grid=True,
+        )
+        _make_step_scan_args_and_shape(
+            [x_axis, 1, "3", 1, y_axis, 1, "4"],  # type: ignore
+            grid=False,
+        )
+
+
+def test_step_scan_fails_with_step_size_zero(
+    run_engine: RunEngine,
+    x_axis: Motor,
+):
+    with pytest.raises(
+        ValueError,
+        match="Step size 0 cannot be zero.",
+    ):
+        run_engine(step_scan(detectors=[], params=[x_axis, 1, 5, 0]))
