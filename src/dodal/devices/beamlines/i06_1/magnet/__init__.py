@@ -5,9 +5,9 @@ from .coordinates import (
     MagnetSphericalRequest,
 )
 from .movement import MagnetPositionError
+from .power_supply import MagnetAxisPowerSupply, ThreeMagnetAxisPowerSupply
 from .ramp_controller import (
     MagnetAxisRampRateController,
-    MagnetThreeAxesRampRateController,
 )
 from .superconducting_magnet import (
     FlyMagnetInfo,
@@ -25,7 +25,8 @@ __all__ = [
     "MagnetRequest",
     "MagnetPositionError",
     "MagnetAxisRampRateController",
-    "MagnetThreeAxesRampRateController",
+    "MagnetAxisPowerSupply",
+    "ThreeMagnetAxisPowerSupply",
     "FlyMagnetInfo",
     "MagnetAxis",
     "MagnetLimitStatus",
