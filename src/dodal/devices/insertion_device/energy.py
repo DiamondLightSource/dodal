@@ -63,7 +63,7 @@ class InsertionDeviceEnergy(StandardReadable, Movable[float], Preparable, Flyabl
         LOGGER.info(
             f"Flyscan info in energy: {value}. "
             + f"Flyscan info in gap: {gap_fly_motor_info}. "
-            + f"Speed: {gap_fly_motor_info.velocity}."
+            + f"Speed: {gap_fly_motor_info.speed}."
         )
         await id_controller.apple2_ref().gap_ref().prepare(value=gap_fly_motor_info)
 

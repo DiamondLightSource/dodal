@@ -7,18 +7,18 @@ from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
     SignalR,
-    SignalRW,
     SignalW,
     StandardReadableFormat,
     TimeoutCalculator,
     WatchableAsyncStatus,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.motor import MotorFlyCtx
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device.apple2_motors import (
     MotorStringSetpoint,
-    UnstoppableMotorMoveLogic,
+    UnstoppableMotorFlyableMoveLogic,
 )
 from dodal.devices.insertion_device.apple2_undulator_base import (
     SafeUndulatorMoverBase,
@@ -31,7 +31,7 @@ from dodal.devices.insertion_device.enum import UndulatorGateStatus
 
 
 @dataclass
-class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
+class UndulatorGapFlyableMoveLogic(UnstoppableMotorFlyableMoveLogic):
     """Move logic for the Apple2 undulator gap motor.
 
     Extends the standard motor move logic with Apple2-specific behaviour,
@@ -42,7 +42,7 @@ class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
     gate: SignalR[UndulatorGateStatus]
     status: SignalR[EnabledDisabledUpper]
     set_move: SignalW[int]
-    velocity: SignalRW[float]
+    min_velocity: SignalR[float]
 
     async def calculate_timeout(
         self, old_position: float, new_position: float
@@ -58,6 +58,20 @@ class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         await self.setpoint.set(new_position, timeout=timeout())
         await set_move_and_wait_for_gate(self.gate, self.set_move, timeout())
+
+    async def on_prepare(self, value: FlyMotorInfo) -> MotorFlyCtx:
+        max_velocity, min_velocity, egu = await asyncio.gather(
+            self.max_velocity.get_value(),
+            self.min_velocity.get_value(),
+            self.motor_egu.get_value(),
+        )
+        velocity = abs(value.speed)
+        if not (min_velocity <= velocity <= max_velocity):
+            raise ValueError(
+                f"Requested velocity {velocity} {egu}/s is out of bounds: "
+                f"must be between {min_velocity} and {max_velocity} {egu}/s."
+            )
+        return await super().on_prepare(value)
 
 
 class UndulatorGapMotor(MotorStringSetpoint):
@@ -86,7 +100,7 @@ class UndulatorGapMotor(MotorStringSetpoint):
         )
         # Motor is unstoppable.
         self.motor_stop = None
-        self._movable_logic = UndulatorGapMoveLogic(
+        self._fly_move_logic = UndulatorGapFlyableMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
             motor_stop=self.motor_stop,  # type: ignore
@@ -95,7 +109,11 @@ class UndulatorGapMotor(MotorStringSetpoint):
             dial_low_limit_travel=self.dial_low_limit_travel,
             dial_high_limit_travel=self.dial_high_limit_travel,
             velocity=self.velocity,
+            max_velocity=self.max_velocity,
+            min_velocity=self.min_velocity,
+            motor_egu=self.motor_egu,
             acceleration_time=self.acceleration_time,
+            motor_done_move=self.motor_done_move,
             # Specific to this class.
             gate=gate,
             status=status,
@@ -103,26 +121,8 @@ class UndulatorGapMotor(MotorStringSetpoint):
         )
 
     @cached_property
-    def movable_logic(self) -> UndulatorGapMoveLogic:
-        return self._movable_logic
-
-    @AsyncStatus.wrap
-    async def prepare(self, value: FlyMotorInfo) -> None:
-        """Prepare for a fly scan by moving to the run-up position at max velocity.
-        Stores fly info for later use in kickoff.
-        """
-        max_velocity, min_velocity, egu = await asyncio.gather(
-            self.max_velocity.get_value(),
-            self.min_velocity.get_value(),
-            self.motor_egu.get_value(),
-        )
-        velocity = abs(value.velocity)
-        if not (min_velocity <= velocity <= max_velocity):
-            raise ValueError(
-                f"Requested velocity {velocity} {egu}/s is out of bounds: "
-                f"must be between {min_velocity} and {max_velocity} {egu}/s."
-            )
-        await super().prepare(value)
+    def _logic(self) -> UndulatorGapFlyableMoveLogic:
+        return self._fly_move_logic
 
 
 class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
