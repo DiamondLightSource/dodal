@@ -9,21 +9,25 @@ from dodal.common.general_maths.absorber_geometry import (
     ThicknessProvider,
 )
 from dodal.common.general_maths.absorbers import FoilAbsorber, WedgeAbsorber
+from dodal.common.general_maths.interval import ClosedInterval
 from dodal.common.general_maths.material_absorption_maths import (
+    AbsorptionSpectrumSegment,
+    MaterialAbsorptionSpectrum,
     SingleRollOffAbsorptionCalculator,
 )
 
 # happy path
 
 
-def test_that_wedge_absorber_asks_geometry_model_for_thickness():
-    material_absorption_strut = MagicMock(spec=SingleRollOffAbsorptionCalculator)
+def test_that_wedge_absorber_asks_geometry_model_for_thickness() -> None:
+    material_absorption_strut = MagicMock(spec=MaterialAbsorptionSpectrum)
     material_absorption_strut.absorption_coefficient_per_cm.return_value = 1.9
     geometry_model = MagicMock(spec=TaperedGeometryProvider)
     geometry_model.taper_cotangent = 12.3
     geometry_model.thickness_cm_at_motor_position_mm.return_value = 0.5
+
     wedge_absorber = WedgeAbsorber(
-        material_absorption_model=material_absorption_strut,
+        spectrum=material_absorption_strut,
         geometry_model=geometry_model,
     )
     wedge_absorber.calculate_absorption_bn(
@@ -35,14 +39,14 @@ def test_that_wedge_absorber_asks_geometry_model_for_thickness():
     )
 
 
-def test_that_wedge_absorber_reports_faithful_absorption_result():
-    material_absorption_strut = MagicMock(spec=SingleRollOffAbsorptionCalculator)
+def test_that_wedge_absorber_reports_faithful_absorption_result() -> None:
+    material_absorption_strut = MagicMock(spec=MaterialAbsorptionSpectrum)
     material_absorption_strut.absorption_coefficient_per_cm.return_value = 2.5
     geometry_model = MagicMock(spec=TaperedGeometryProvider)
     geometry_model.taper_cotangent = 19.1
     geometry_model.thickness_cm_at_motor_position_mm.return_value = 0.72
     wedge_absorber = WedgeAbsorber(
-        material_absorption_model=material_absorption_strut,
+        spectrum=material_absorption_strut,
         geometry_model=geometry_model,
     )
     result = wedge_absorber.calculate_absorption_bn(
@@ -53,26 +57,26 @@ def test_that_wedge_absorber_reports_faithful_absorption_result():
     assert result == pytest.approx(expected_result)
 
 
-def test_that_foil_absorber_asks_geometry_model_for_thickness():
-    material_absorption_strut = MagicMock(spec=SingleRollOffAbsorptionCalculator)
+def test_that_foil_absorber_asks_geometry_model_for_thickness() -> None:
+    material_absorption_strut = MagicMock(spec=MaterialAbsorptionSpectrum)
     material_absorption_strut.absorption_coefficient_per_cm.return_value = 1.8
     geometry_model = MagicMock(spec=ThicknessProvider)
     geometry_model.get_thickness_cm.return_value = 0.5
     foil_absorber = FoilAbsorber(
-        material_absorption_model=material_absorption_strut,
+        spectrum=material_absorption_strut,
         geometry_model=geometry_model,
     )
     foil_absorber.calculate_absorption_bn(xray_energy_kev=12.3450)  # energy irrelevant
     geometry_model.get_thickness_cm.assert_called_once()
 
 
-def test_that_foil_absorber_reports_faithful_absorption_result():
-    material_absorption_strut = MagicMock(spec=SingleRollOffAbsorptionCalculator)
+def test_that_foil_absorber_reports_faithful_absorption_result() -> None:
+    material_absorption_strut = MagicMock(spec=MaterialAbsorptionSpectrum)
     material_absorption_strut.absorption_coefficient_per_cm.return_value = 0.63
     geometry_model = MagicMock(spec=ThicknessProvider)
     geometry_model.get_thickness_cm.return_value = 0.85
     foil_absorber = FoilAbsorber(
-        material_absorption_model=material_absorption_strut,
+        spectrum=material_absorption_strut,
         geometry_model=geometry_model,
     )
     result = foil_absorber.calculate_absorption_bn(
@@ -86,14 +90,44 @@ def test_that_foil_absorber_reports_faithful_absorption_result():
 
 
 @pytest.mark.parametrize(
-    "invalid_xray_energy",
+    "_out_of_bounds_xray_energy",
     [
-        None,
-        78,
-        106.7,
+        0,
+        4.309,
         -21.4501,
         -8,
-        0.02,
+        -0.02,
+        28.971,
+    ],
+)
+def test_that_foil_absorber_reports_raises_error_when_xray_energy_is_out_of_bounds(
+    _out_of_bounds_xray_energy,
+) -> None:
+    baseline_calculator = SingleRollOffAbsorptionCalculator(
+        material_factor_per_cm=2.5, roll_off=-0.97
+    )
+    valid_energy_interval = ClosedInterval(lower=4.5, upper=18.92)
+    segment = AbsorptionSpectrumSegment(
+        kev_energy_interval=valid_energy_interval,
+        absorption_calculator=baseline_calculator,
+    )
+    spectrum = MaterialAbsorptionSpectrum(intervals=(segment,))
+    geometry_model = MagicMock(spec=ThicknessProvider)
+    geometry_model.get_thickness_cm.return_value = 0.85
+    foil_absorber = FoilAbsorber(
+        spectrum=spectrum,
+        geometry_model=geometry_model,
+    )
+    with pytest.raises(ValueError):
+        foil_absorber.calculate_absorption_bn(
+            xray_energy_kev=_out_of_bounds_xray_energy
+        )
+
+
+@pytest.mark.parametrize(
+    "_invalid_xray_energy",
+    [
+        None,
         "",
         "J",
         object(),
@@ -104,29 +138,70 @@ def test_that_foil_absorber_reports_faithful_absorption_result():
     ],
 )
 def test_that_foil_absorber_reports_raises_error_when_xray_energy_is_invalid(
-    invalid_xray_energy,
-):
-    material_absorption_strut = MagicMock(spec=SingleRollOffAbsorptionCalculator)
-    material_absorption_strut.absorption_coefficient_per_cm.return_value = 0.63
+    _invalid_xray_energy,
+) -> None:
+    baseline_calculator = SingleRollOffAbsorptionCalculator(
+        material_factor_per_cm=2.5, roll_off=-0.97
+    )
+    valid_energy_interval = ClosedInterval(lower=4.5, upper=18.92)
+    segment = AbsorptionSpectrumSegment(
+        kev_energy_interval=valid_energy_interval,
+        absorption_calculator=baseline_calculator,
+    )
+    spectrum = MaterialAbsorptionSpectrum(intervals=(segment,))
     geometry_model = MagicMock(spec=ThicknessProvider)
     geometry_model.get_thickness_cm.return_value = 0.85
     foil_absorber = FoilAbsorber(
-        material_absorption_model=material_absorption_strut,
+        spectrum=spectrum,
         geometry_model=geometry_model,
     )
     with pytest.raises(ValidationError):
-        foil_absorber.calculate_absorption_bn(xray_energy_kev=invalid_xray_energy)
+        foil_absorber.calculate_absorption_bn(xray_energy_kev=_invalid_xray_energy)
 
 
 @pytest.mark.parametrize(
-    "invalid_xray_energy",
+    "_out_of_bounds_xray_energy",
     [
-        None,
-        42,
-        50.6,
+        0,
+        2.4,
+        1,
+        88,
+        75.32,
+        -50.6,
         -21.4501,
         -6,
-        0.04,
+    ],
+)
+def test_that_wedge_absorber_reports_raises_error_when_xray_energy_is_not_covered_by_modelled_spectrum(
+    _out_of_bounds_xray_energy,
+) -> None:
+    baseline_calculator = SingleRollOffAbsorptionCalculator(
+        material_factor_per_cm=2.5, roll_off=-0.97
+    )
+    valid_energy_interval = ClosedInterval(lower=4.5, upper=18.92)
+    segment = AbsorptionSpectrumSegment(
+        kev_energy_interval=valid_energy_interval,
+        absorption_calculator=baseline_calculator,
+    )
+    spectrum = MaterialAbsorptionSpectrum(intervals=(segment,))
+    geometry_model = MagicMock(spec=TaperedGeometryProvider)
+    geometry_model.taper_cotangent = 19.1
+    geometry_model.thickness_cm_at_motor_position_mm.return_value = 0.72
+    wedge_absorber = WedgeAbsorber(
+        spectrum=spectrum,
+        geometry_model=geometry_model,
+    )
+    with pytest.raises(ValueError):
+        wedge_absorber.calculate_absorption_bn(
+            xray_energy_kev=_out_of_bounds_xray_energy,
+            motor_position_mm=12.8,  # energy, motor position irrelevant
+        )
+
+
+@pytest.mark.parametrize(
+    "_invalid_xray_energy",
+    [
+        None,
         "",
         "o",
         object(),
@@ -137,26 +212,33 @@ def test_that_foil_absorber_reports_raises_error_when_xray_energy_is_invalid(
     ],
 )
 def test_that_wedge_absorber_reports_raises_error_when_xray_energy_is_invalid(
-    invalid_xray_energy,
-):
-    material_absorption_strut = MagicMock(spec=SingleRollOffAbsorptionCalculator)
-    material_absorption_strut.absorption_coefficient_per_cm.return_value = 2.5
+    _invalid_xray_energy,
+) -> None:
+    baseline_calculator = SingleRollOffAbsorptionCalculator(
+        material_factor_per_cm=2001.5, roll_off=-1.75
+    )
+    valid_energy_interval = ClosedInterval(lower=3.5, upper=28.92)
+    segment = AbsorptionSpectrumSegment(
+        kev_energy_interval=valid_energy_interval,
+        absorption_calculator=baseline_calculator,
+    )
+    spectrum = MaterialAbsorptionSpectrum(intervals=(segment,))
     geometry_model = MagicMock(spec=TaperedGeometryProvider)
-    geometry_model.taper_cotangent = 19.1
-    geometry_model.thickness_cm_at_motor_position_mm.return_value = 0.72
+    geometry_model.taper_cotangent = 15.1
+    geometry_model.thickness_cm_at_motor_position_mm.return_value = 0.82
     wedge_absorber = WedgeAbsorber(
-        material_absorption_model=material_absorption_strut,
+        spectrum=spectrum,
         geometry_model=geometry_model,
     )
     with pytest.raises(ValidationError):
         wedge_absorber.calculate_absorption_bn(
-            xray_energy_kev=invalid_xray_energy,
+            xray_energy_kev=_invalid_xray_energy,
             motor_position_mm=12.8,  # energy, motor position irrelevant
         )
 
 
 @pytest.mark.parametrize(
-    "invalid_motor_position",
+    "_invalid_motor_position",
     [
         None,
         "",
@@ -169,19 +251,19 @@ def test_that_wedge_absorber_reports_raises_error_when_xray_energy_is_invalid(
     ],
 )
 def test_that_wedge_absorber_reports_raises_error_when_motor_position_is_invalid(
-    invalid_motor_position,
-):
-    material_absorption_strut = MagicMock(spec=SingleRollOffAbsorptionCalculator)
+    _invalid_motor_position,
+) -> None:
+    material_absorption_strut = MagicMock(spec=MaterialAbsorptionSpectrum)
     material_absorption_strut.absorption_coefficient_per_cm.return_value = 2.5
     geometry_model = MagicMock(spec=TaperedGeometryProvider)
     geometry_model.taper_cotangent = 18.1
     geometry_model.thickness_cm_at_motor_position_mm.return_value = 0.62
     wedge_absorber = WedgeAbsorber(
-        material_absorption_model=material_absorption_strut,
+        spectrum=material_absorption_strut,
         geometry_model=geometry_model,
     )
     with pytest.raises(ValidationError):
         wedge_absorber.calculate_absorption_bn(
             xray_energy_kev=21.7,
-            motor_position_mm=invalid_motor_position,  # energy, motor position irrelevant
+            motor_position_mm=_invalid_motor_position,  # energy, motor position irrelevant
         )
