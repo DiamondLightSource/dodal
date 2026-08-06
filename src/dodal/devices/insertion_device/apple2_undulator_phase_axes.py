@@ -43,7 +43,7 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
         self.motor_stop = None
 
     @cached_property
-    def movable_logic(self) -> UnstoppableMotorFlyableMoveLogic:
+    def _logic(self) -> UnstoppableMotorFlyableMoveLogic:
         return UnstoppableMotorFlyableMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
