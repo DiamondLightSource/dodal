@@ -2,15 +2,14 @@ from functools import cache
 from pathlib import Path
 
 from daq_config_server.client import ConfigClient
-from ophyd_async.core import PathProvider
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
-from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
+
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.common.beamlines.beamline_utils import set_config_client
-from dodal.common.visit import StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
@@ -72,6 +71,7 @@ def config_client() -> ConfigClient:
     return client
 
 
+# NOTE Not entirely sure it needs this particular path provider so not in PR yet
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
