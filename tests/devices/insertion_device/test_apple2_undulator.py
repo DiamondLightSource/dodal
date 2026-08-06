@@ -41,20 +41,6 @@ from dodal.devices.insertion_device import (
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
-# @pytest.fixture
-# async def unstoppable_motor():
-#     async with init_devices(mock=True):
-#         unstoppable_motor = UnstoppableMotor(prefix="MOTOR:", name="unstopable_motor")
-#     return unstoppable_motor
-
-
-# async def test_unstoppable_motor_stop_not_implemented(
-#     unstoppable_motor: UnstoppableMotor, caplog: pytest.LogCaptureFixture
-# ):
-#     await unstoppable_motor.stop()
-#     assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
-
-
 async def test_in_motion_error(
     mock_id_gap: UndulatorGap,
     mock_phase_axes: UndulatorPhaseAxes,
@@ -91,6 +77,15 @@ async def test_gap_cal_timout(
     set_mock_value(mock_id_gap.motor.user_readback, readback)
     set_mock_value(mock_id_gap.motor.user_setpoint_str, str(target))
     assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
+
+
+async def test_unstoppable_motor_stop_not_implemented(
+    mock_id_gap: UndulatorGap, caplog: pytest.LogCaptureFixture
+):
+    await mock_id_gap.motor.stop()
+    assert (
+        caplog.records[0].msg == f"Stopping {mock_id_gap.motor.name} is not supported."
+    )
 
 
 async def test_given_gate_never_closes_then_setting_gaps_times_out(
