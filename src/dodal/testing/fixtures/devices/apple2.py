@@ -17,9 +17,9 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with init_devices(mock=True):
         mock_id_gap = UndulatorGap(prefix)
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_gap.motor.velocity, 1)
-    set_mock_value(mock_id_gap.motor.user_readback, 1)
-    set_mock_value(mock_id_gap.motor.user_setpoint_str, "1")
+    set_mock_value(mock_id_gap.velocity, 1)
+    set_mock_value(mock_id_gap.user_readback, 1)
+    set_mock_value(mock_id_gap.user_setpoint_str, "1")
     set_mock_value(mock_id_gap.status, EnabledDisabledUpper.ENABLED)
     return mock_id_gap
 

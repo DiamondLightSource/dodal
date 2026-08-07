@@ -73,28 +73,24 @@ async def test_gap_cal_timout(
     target: float,
     expected_timeout: float,
 ):
-    set_mock_value(mock_id_gap.motor.velocity, velocity)
-    set_mock_value(mock_id_gap.motor.user_readback, readback)
-    set_mock_value(mock_id_gap.motor.user_setpoint_str, str(target))
+    set_mock_value(mock_id_gap.velocity, velocity)
+    set_mock_value(mock_id_gap.user_readback, readback)
+    set_mock_value(mock_id_gap.user_setpoint_str, str(target))
     assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
 
 async def test_unstoppable_motor_stop_not_implemented(
     mock_id_gap: UndulatorGap, caplog: pytest.LogCaptureFixture
 ):
-    await mock_id_gap.motor.stop()
-    assert (
-        caplog.records[0].msg == f"Stopping {mock_id_gap.motor.name} is not supported."
-    )
+    await mock_id_gap.stop()
+    assert caplog.records[0].msg == f"Stopping {mock_id_gap.name} is not supported."
 
 
 async def test_given_gate_never_closes_then_setting_gaps_times_out(
     mock_id_gap: UndulatorGap,
 ):
-    callback_on_mock_put(
-        mock_id_gap.motor.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
-    )
+
+    mock_id_gap._movable_logic.calculate_timeout = AsyncMock(return_value=0.002)
     mock_id_gap.get_timeout = AsyncMock(return_value=0.002)
 
     with pytest.raises(TimeoutError):
@@ -113,7 +109,7 @@ async def test_gap_success_scan(
     mock_id_gap: UndulatorGap,
 ):
     callback_on_mock_put(
-        mock_id_gap.motor.user_setpoint,
+        mock_id_gap.user_setpoint,
         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
     output = range(0, 11, 1)
@@ -124,7 +120,7 @@ async def test_gap_success_scan(
     pos = new_pos()
 
     def set_complete_move():
-        set_mock_value(mock_id_gap.motor.user_readback, next(pos))
+        set_mock_value(mock_id_gap.user_readback, next(pos))
         set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
@@ -132,7 +128,7 @@ async def test_gap_success_scan(
     run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11))
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert run_engine_documents["event"][i]["data"][mock_id_gap.motor.name] == i
+        assert run_engine_documents["event"][i]["data"][mock_id_gap.name] == i
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
@@ -157,37 +153,37 @@ async def test_phase_status_error(mock_phase_axes: UndulatorPhaseAxes):
 
 
 async def test_gap_read_config(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.motor.velocity, 2)
-    set_mock_value(mock_id_gap.motor.motor_egu, "c")
+    set_mock_value(mock_id_gap.velocity, 2)
+    set_mock_value(mock_id_gap.motor_egu, "c")
     await assert_configuration(
         mock_id_gap,
         {
-            "mock_id_gap-motor-velocity": partial_reading(2.0),
-            "mock_id_gap-motor-motor_egu": partial_reading("c"),
-            "mock_id_gap-motor-offset": partial_reading(0.0),
+            "mock_id_gap-velocity": partial_reading(2.0),
+            "mock_id_gap-motor_egu": partial_reading("c"),
+            "mock_id_gap-offset": partial_reading(0.0),
         },
         full_match=False,
     )
 
 
 async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.motor.max_velocity, 20)
-    set_mock_value(mock_id_gap.motor.min_velocity, 11)
+    set_mock_value(mock_id_gap.max_velocity, 20)
+    set_mock_value(mock_id_gap.min_velocity, 11)
     with pytest.raises(ValueError):
         fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
         await mock_id_gap.prepare(fly_info)
 
 
 async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.motor.max_velocity, 30)
-    set_mock_value(mock_id_gap.motor.min_velocity, 1)
-    set_mock_value(mock_id_gap.motor.acceleration_time, 0.5)
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 1)
+    set_mock_value(mock_id_gap.acceleration_time, 0.5)
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
-    get_mock_put(mock_id_gap.motor.user_setpoint_str).assert_awaited_once_with(
+    get_mock_put(mock_id_gap.user_setpoint_str).assert_awaited_once_with(
         str(fly_info.ramp_up_start_pos(0.5))
     )
-    assert await mock_id_gap.motor.velocity.get_value() == 10
+    assert await mock_id_gap.velocity.get_value() == 10
 
 
 @pytest.mark.parametrize(
