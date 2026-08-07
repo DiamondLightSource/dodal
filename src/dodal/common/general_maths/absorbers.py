@@ -10,6 +10,9 @@ from dodal.common.general_maths.material_absorption_maths import (
     MaterialAbsorptionSpectrum,
     attenuation_from_natural_log_of_transmission,
 )
+from dodal.common.general_maths.transmission_interconversion import (
+    CANONICAL_NON_ABSORPTION,
+)
 
 
 @runtime_checkable
@@ -27,6 +30,22 @@ class FixedDepth(Protocol):
             N.B. logarithmic absorption units are used for system attenuation budget calculations.
         """
         ...
+
+
+class AbsentFixedDepth(FixedDepth):
+    """Fixed Depth aborber implementation for the absence of a foil in a filter wheel.
+
+    Args:
+        xray_energy_kev: The energy of the x-ray photons in kiloelectonvolts.
+
+    Returns:
+            Canonical value for not absorbing (in the logarithmic Barnett units, Bn).
+            N.B. logarithmic absorption units are used for system attenuation budget calculations.
+    """
+
+    @validate_call
+    def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
+        return CANONICAL_NON_ABSORPTION
 
 
 @runtime_checkable

@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from functools import cached_property
-from typing import Annotated, Literal, Protocol, runtime_checkable
+from typing import Annotated, Final, Literal, Protocol, runtime_checkable
 
 from pydantic import (
     BaseModel,
@@ -23,7 +23,7 @@ from dodal.common.general_maths.interval import (
     OpenInterval,
 )
 
-SupportedThicknessUnits = Annotated[
+SupportedThicknessUnits: Final = Annotated[
     Literal["cm", "mm", "um", "micron"], "Supported thickness units"
 ]
 
@@ -64,13 +64,14 @@ class FoilGeometry(BaseModel):
     """
 
     # Class-level private dictionary - defined once only when the class is loaded
-    _convertors: dict[str, Callable[[float], float]] = {
-        "cm": lambda t: t,
-        "mm": convert_mm_to_cm,
-        "um": convert_microns_to_cm,
-        "micron": convert_microns_to_cm,
-    }
-
+    _convertors: Final[dict[str, Callable[[float], float]]] = PrivateAttr(
+        {
+            "cm": lambda t: t,
+            "mm": convert_mm_to_cm,
+            "um": convert_microns_to_cm,
+            "micron": convert_microns_to_cm,
+        }
+    )
     unit: str
     numerical_value: Annotated[StrictFloat, Field(gt=0.0)]
     _foil_thickness: float = PrivateAttr(default=0.0)
