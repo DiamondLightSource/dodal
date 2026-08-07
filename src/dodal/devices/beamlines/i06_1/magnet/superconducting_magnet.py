@@ -356,7 +356,9 @@ class SuperConductingMagnetController(StandardReadable):
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
         await self._start_ramp.trigger()
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=None)
+        # Add a high bound limit to the timeout to avoid it getting stuck.
+        # https://github.com/DiamondLightSource/dodal/issues/2166
+        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=500)
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
