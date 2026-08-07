@@ -235,16 +235,16 @@ async def test_fail_i10_apple2_controller_set_undefined_pol(
 async def test_fail_i10_apple2_controller_set_id_not_ready(
     mock_id_controller: I10Apple2Controller,
 ):
-    gap = mock_id_controller.apple2_ref().gap_ref()
-    set_mock_value(gap.status, EnabledDisabledUpper.DISABLED)
+    phase = mock_id_controller.apple2_ref().phase_ref()
+    set_mock_value(phase.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
-    assert str(e.value) == gap.status.name + " is DISABLED and cannot move."
-    set_mock_value(gap.status, EnabledDisabledUpper.ENABLED)
-    set_mock_value(gap.gate, UndulatorGateStatus.OPEN)
+    assert str(e.value) == phase.status.name + " is DISABLED and cannot move."
+    set_mock_value(phase.status, EnabledDisabledUpper.ENABLED)
+    set_mock_value(phase.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
-    assert str(e.value) == gap.gate.name + " is already in motion."
+    assert str(e.value) == phase.gate.name + " is already in motion."
 
 
 async def test_fail_i10_apple2_controller_set_energy_has_default(
