@@ -42,7 +42,7 @@ jobs:
           path: example-services
 
       - name: Run docker compose
-        uses: hoverkraft-tech/compose-action@v2.6.0
+        uses: hoverkraft-tech/compose-action@v3.1.0
         with:
           compose-file: "./example-services/compose.yaml"
           services: |
