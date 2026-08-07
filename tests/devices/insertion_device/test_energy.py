@@ -209,7 +209,7 @@ async def test_energysetter_complete(
     energy_setter_fly_status = mock_beam_energy.complete()
     assert not energy_setter_fly_status.done
     await fake_id_fly_status.set(True)
-    assert mock_id_gap.motor._fly_status.done  # type: ignore
+    assert mock_id_gap._fly_status.done  # type: ignore
     assert not energy_setter_fly_status.done
     await fake_pgm_fly_status.set(True)
     assert mock_pgm.energy._fly_status.done  # type: ignore
