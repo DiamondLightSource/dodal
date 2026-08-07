@@ -54,6 +54,7 @@ class ZebraTTLOutputs(ZebraMappingValidations):
     TTL_XSPRESS3: int = Field(default=-1, ge=-1, le=4)
     TTL_PANDA: int = Field(default=-1, ge=-1, le=4)
     TTL_JUNGFRAU: int = Field(default=-1, ge=-1, le=4)
+    TTL_I0: int = Field(default=-1, ge=-1, le=4)
 
 
 class ZebraSources(ZebraMappingValidations):
