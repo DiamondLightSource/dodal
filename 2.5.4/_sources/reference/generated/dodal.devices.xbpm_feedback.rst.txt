@@ -1,0 +1,37 @@
+dodal.devices.xbpm\_feedback
+============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~xbpm_feedback.Pause
+   ~xbpm_feedback.XBPMFeedback
+
+
+
+
+.. automodule:: dodal.devices.xbpm_feedback
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

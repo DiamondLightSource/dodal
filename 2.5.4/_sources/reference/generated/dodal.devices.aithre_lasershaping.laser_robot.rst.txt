@@ -1,0 +1,37 @@
+dodal.devices.aithre\_lasershaping.laser\_robot
+===============================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.aithre_lasershaping
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~laser_robot.ForceBit
+   ~laser_robot.LaserRobot
+
+
+
+
+.. automodule:: dodal.devices.aithre_lasershaping.laser_robot
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

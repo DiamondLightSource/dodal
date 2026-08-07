@@ -1,0 +1,28 @@
+dodal.devices.electron\_analyser.base.ShutterCoordinatorADAcquireLogic
+======================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: ShutterCoordinatorADAcquireLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~ShutterCoordinatorADAcquireLogic.start_acquiring
+      
+      
+      ~ShutterCoordinatorADAcquireLogic.wait_for_idle
+      
+   
+   
+
+   
+   
+   

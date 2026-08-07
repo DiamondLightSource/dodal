@@ -1,0 +1,40 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCell
+===================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCell
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
