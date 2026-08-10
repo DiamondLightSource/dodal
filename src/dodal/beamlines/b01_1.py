@@ -4,11 +4,12 @@ from pathlib import Path
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import ADWriterFactory, NDROIStatIO
+from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.common.beamlines.device_helpers import DRV_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
@@ -56,7 +57,7 @@ def pandabrick(path_provider: PathProvider) -> HDFPanda:
     )
 
 
-@devices.factory()
+@devices.factory(skip=True)
 def pandabox(path_provider: PathProvider) -> HDFPanda:
     """Provides triggering of the detectors.
 
@@ -89,7 +90,7 @@ def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         pv_prefix,
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
-        driver_suffix=CAM_SUFFIX,
+        driver_suffix=DRV_SUFFIX,
         plugins={
             "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
         },
@@ -108,7 +109,7 @@ def imaging_detector(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
-        driver_suffix=CAM_SUFFIX,
+        driver_suffix=DRV_SUFFIX,
     )
 
 
@@ -120,8 +121,13 @@ def sample_stage() -> XYZStage:
         XYZStage: The XYZ sample stage device.
     """
     return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+        f"{PREFIX.beamline_prefix}-MO-SPEC-01:",
     )
+
+
+@devices.factory()
+def tomography_stage() -> Motor:
+    return Motor(f"{PREFIX.beamline_prefix}-MO-TOMO-01:THETA")
 
 
 @devices.factory()
