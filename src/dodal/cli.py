@@ -33,7 +33,6 @@ def main(ctx: click.Context) -> None:
 @click.option("-n", "--name", "device_manager", default="devices")
 def describe(beamline: str, device_manager: str) -> None:
     """Initialises a beamline module, gets the docs of all devices and prints them."""
-
     os.environ["BEAMLINE"] = beamline
 
     module_name = module_name_for_beamline(beamline)
@@ -81,10 +80,19 @@ def describe(beamline: str, device_manager: str) -> None:
     default=False,
 )
 @click.option("-n", "--name", "device_manager", default="devices")
-def connect(beamline: str, all: bool, sim_backend: bool, device_manager: str) -> None:
+@click.option(
+    "-t",
+    "--timeout",
+    is_flag=False,
+    help="Specify the timeout when connecting devices. Default is 5 seconds.",
+    default=5.0,
+)
+def connect(
+    beamline: str, all: bool, sim_backend: bool, device_manager: str, timeout: float
+) -> None:
     """Initialises a beamline module, connects to all devices, reports
-    any connection issues."""
-
+    any connection issues.
+    """
     os.environ["BEAMLINE"] = beamline
 
     # We need to make a fake path provider for any detectors that need one,
@@ -110,6 +118,7 @@ def connect(beamline: str, all: bool, sim_backend: bool, device_manager: str) ->
     ):
         devices, instance_exceptions, connect_exceptions = manager.build_and_connect(
             mock=sim_backend,
+            timeout=timeout,
         )
     else:
         print(f"No device manager named '{device_manager}' found in {mod}")

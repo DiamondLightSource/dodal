@@ -5,20 +5,34 @@ import numpy as np
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
+    DeviceMock,
     SignalR,
     StandardReadableFormat,
+    callback_on_mock_put,
+    default_mock_class,
     derived_signal_r,
+    set_mock_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
 from dodal.devices.electron_analyser.base.base_driver_io import (
     AbstractAnalyserDriverIO,
+    ElectronAnalyserPVConfig,
 )
 from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.specs_enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
 
 
+class MockSpecsAnalyserDriverIO(DeviceMock["SpecsAnalyserDriverIO"]):
+    async def connect(self, device: "SpecsAnalyserDriverIO"):
+        def _sync_psu_mode_rbv(value):
+            set_mock_value(device.psu_mode, value)
+
+        callback_on_mock_put(device.psu_mode_w, _sync_psu_mode_rbv)
+
+
+@default_mock_class(MockSpecsAnalyserDriverIO)
 class SpecsAnalyserDriverIO(
     AbstractAnalyserDriverIO[
         SpecsRegion[TLensMode, TPsuMode],
@@ -29,6 +43,8 @@ class SpecsAnalyserDriverIO(
     ],
     Generic[TLensMode, TPsuMode],
 ):
+    PV_CFG = ElectronAnalyserPVConfig()
+
     def __init__(
         self,
         prefix: str,
@@ -48,6 +64,7 @@ class SpecsAnalyserDriverIO(
         self.energy_channels = epics_signal_r(
             int, prefix + "TOTAL_POINTS_ITERATION_RBV"
         )
+        self.psu_mode_w = epics_signal_w(psu_mode_type, prefix + self.PV_CFG.psu_mode)
 
         super().__init__(
             prefix=prefix,
@@ -71,7 +88,7 @@ class SpecsAnalyserDriverIO(
             self.iterations.set(epics_region.iterations),
             self.acquisition_mode.set(epics_region.acquisition_mode),
             self.snapshot_values.set(epics_region.values),
-            self.psu_mode.set(epics_region.psu_mode),
+            self.psu_mode_w.set(epics_region.psu_mode),
             self.energy_mode.set(epics_region.energy_mode),
         )
         if epics_region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:

@@ -10,6 +10,7 @@ from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_value,
 )
 from ophyd_async.testing import (
@@ -191,7 +192,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
     get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
-        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+        str(fly_info.ramp_up_start_pos(0.5))
     )
 
     assert await mock_id_gap.velocity.get_value() == 10
@@ -283,18 +284,18 @@ async def test_phase_success_set(
 
     callback_on_mock_put(mock_phase_axes.set_move, lambda *_, **__: set_complete_move())
     run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
-    get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1, wait=True)
+    get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1)
     get_mock_put(mock_phase_axes.top_inner.user_setpoint).assert_called_once_with(
-        str(set_value.top_inner), wait=True
+        str(set_value.top_inner)
     )
     get_mock_put(mock_phase_axes.top_outer.user_setpoint).assert_called_once_with(
-        str(set_value.top_outer), wait=True
+        str(set_value.top_outer)
     )
     get_mock_put(mock_phase_axes.btm_inner.user_setpoint).assert_called_once_with(
-        str(set_value.btm_inner), wait=True
+        str(set_value.btm_inner)
     )
     get_mock_put(mock_phase_axes.btm_outer.user_setpoint).assert_called_once_with(
-        str(set_value.btm_outer), wait=True
+        str(set_value.btm_outer)
     )
 
     await assert_reading(
@@ -422,11 +423,12 @@ async def mock_locked_controller(
     configured_gap: float,
     configured_phase: float,
 ) -> DummyLockedApple2Controller:
-    mock_locked_controller = DummyLockedApple2Controller(
-        apple2=mock_locked_apple2,
-        gap_energy_motor_converter=lambda energy, pol: configured_gap,
-        phase_energy_motor_converter=lambda energy, pol: configured_phase,
-    )
+    with init_devices(mock=True):
+        mock_locked_controller = DummyLockedApple2Controller(
+            apple2=mock_locked_apple2,
+            gap_energy_motor_converter=lambda value, pol: configured_gap,
+            phase_energy_motor_converter=lambda value, pol: configured_phase,
+        )
     return mock_locked_controller
 
 
@@ -460,7 +462,7 @@ async def test_id_controller_energy_sets_correct_values(
     configured_gap: float,
     configured_phase: float,
 ):
-    mock_locked_apple2.set = AsyncMock()
+    mock_set = set_mock_attr(mock_locked_apple2, "set", AsyncMock())
     mock_locked_controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
     await mock_locked_controller.energy.set(100.0)
     expected_val = Apple2Val(
@@ -470,4 +472,4 @@ async def test_id_controller_energy_sets_correct_values(
         ),
         gap=configured_gap,
     )
-    mock_locked_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
+    mock_set.assert_awaited_once_with(id_motor_values=expected_val)

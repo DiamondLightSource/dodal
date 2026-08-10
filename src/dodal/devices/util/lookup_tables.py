@@ -1,5 +1,4 @@
-"""
-All the public methods in this module return a lookup table of some kind that
+"""All the public methods in this module return a lookup table of some kind that
 converts the source value s to a target value t for different values of s.
 """
 
@@ -18,19 +17,18 @@ async def energy_distance_table(
     comments: Sequence[str] = ["#", "Units"],
     skiprows: int = 0,
 ) -> np.ndarray:
-    """
-    Returns a numpy formatted lookup table for required positions of an ID gap to
+    """Returns a numpy formatted lookup table for required positions of an ID gap to
     provide emission at a given beam energy.
 
     Args:
-        lookup_table_path: Path to lookup table
-        comments: Lines starting with any of these strings will be ignored
-        skiprows: Number of rows to skip at the start of the file
+        lookup_table_path (str): Path to lookup table.
+        comments (Sequence[str], optional): Lines starting with any of these strings
+            will be ignored.
+        skiprows (int, optional): Number of rows to skip at the start of the file.
 
     Returns:
-        ndarray: Lookup table
+        ndarray: Lookup table.
     """
-
     # Slight cheat to make the file IO async, numpy doesn't do any real IO now, just
     # decodes the text
     async with aiofiles.open(lookup_table_path) as stream:
@@ -40,7 +38,8 @@ async def energy_distance_table(
 
 def parse_lookup_table(filename: str) -> list[Sequence]:
     """Parse a generic lookup table with a number of columns >= 2 and return a list \
-        in column major order of the values in it."""
+        in column major order of the values in it.
+    """
     LOGGER.info(f"Parsing lookup table file {filename}")
 
     lut_vals = zip(*loadtxt(filename, comments=["#", "Units"]), strict=False)
@@ -53,7 +52,8 @@ def linear_interpolation_lut(
     """Returns a callable that converts values by linear interpolation of lookup table
     values.
 
-    If the value falls outside the lookup table then the closest value will be used."""
+    If the value falls outside the lookup table then the closest value will be used.
+    """
     # numpy interp expects x-values to be increasing
     if not np.all(np.diff(s_values) > 0):
         LOGGER.info(
@@ -75,17 +75,16 @@ def linear_interpolation_lut(
 def linear_extrapolation_lut(
     s_values: Sequence[float], t_values: Sequence[float]
 ) -> Callable[[float], float]:
-    """
-    Return a callable that implements f(s) = t according to the conversion table data
-    supplied, with linear extrapolation outside that range. Inside the range of the table,
-    the function is equivalent to that returned by linear_interpolation_lut
+    """Return a callable that implements f(s) = t according to the conversion table data
+    supplied, with linear extrapolation outside that range. Inside the range of the
+    table, the function is equivalent to that returned by linear_interpolation_lut.
 
     Args:
-        s_values:  Values of the independent axis
-        t_values:  Values of the dependent axis
+        s_values (Sequence[float]): Values of the independent axis.
+        t_values (Sequence[float]): Values of the dependent axis.
 
     Returns:
-        A callable that returns t for the given s
+        Callable: A callable that returns t for the given s.
     """
     assert len(s_values) == len(t_values), (
         "Lookup table does not have the same number of values for each axis"

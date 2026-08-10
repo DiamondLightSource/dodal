@@ -31,9 +31,9 @@ class MyDevice(StandardReadable, Stageable):
         """
         Constructor for setting up instance of device.
 
-        Parameters:
-            prefix: Base PV used for connecting signals.
-            name: Name of the device.
+        Args:
+            prefix (str): Base PV used for connecting signals.
+            name (str): Name of the device.
         """
         with self.add_children_as_readables():
             self.signal_a = epics_signal_rw(float, prefix + "A")
@@ -74,7 +74,7 @@ from bluesky import RunEngine
 from bluesky import plan_stubs as bps
 from ophyd_async.core import OnOff, init_devices
 from ophyd_async.testing import assert_reading, get_mock_put, partial_reading
-from dodal.device.my_device import  MyDevice
+from dodal.device.my_device import MyDevice
 
 
 @pytest.fixture
@@ -111,15 +111,153 @@ async def test_my_device_read(sim_my_device: MyDevice, run_engine: RunEngine) ->
 `partial_reading` wraps the value given in a mapping like `{"value": ANY}`, so we are actually checking that the reading matches the expected structure.
 
 ```Python
-    prefix = sim_my_device.name
-    await assert_reading(
-        sim_my_device,
-        {
-            f"{prefix}-signal_a" : {"value": OnOff.ON},
-            f"{prefix}-signal_b" : {"value": 0},
-        }
-    )
+prefix = sim_my_device.name
+await assert_reading(
+    sim_my_device,
+    {
+        f"{prefix}-signal_a": {"value": OnOff.ON},
+        f"{prefix}-signal_b": {"value": 0},
+    },
+)
 ```
+
+## Using the mock_config_client fixture to read files
+Unit tests should not communicate with the real daq-config-server or read files from the DLS filesystem.
+
+Dodal provides a `mock_config_client` fixture in `conftest.py`. This fixture creates the ConfigClient and puts it into a mock mode. This reads test files directly from the local filesystem.
+
+Most tests only need to depend on this fixture:
+
+```python
+import pytest
+from pathlib import Path
+
+from daq_config_server.client import ConfigClient
+from dodal.devices.my_device import MyDevice
+from ophyd_async.core import init_devices
+
+
+@pytest.fixture
+def my_device(mock_config_client: ConfigClient) -> MyDevice:
+    with init_devices(mock=True):
+        return MyDevice(
+            config_client=mock_config_client,
+            path=Path("tests/test_data/example_lookup_table.json"),
+        )
+```
+
+### Mocking configuration files
+
+Some configuration files are not JSON-based and require custom parsing logic. These can be provided to the `ConfigClient` mock by adding the configuration path and its parsed model to the `path_to_mock_data` fixture.
+
+For example:
+
+```python
+from daq_config_server.testing import PathToMockDataDict
+
+
+@pytest.fixture
+def path_to_mock_data() -> PathToMockDataDict:
+    return {
+        TEST_HARD_UNDULATOR_LUT: parse_i09_hu_undulator_energy_gap_lut(
+            Path(TEST_HARD_UNDULATOR_LUT).read_text()
+        )
+    }
+```
+
+The mock `ConfigClient` defined in `tests/conftest.py` (which is an avaliable fixture for every test) is then configured with this data:
+
+```python
+from daq_config_server.client import ConfigClient
+from daq_config_server.testing import MockServerResponse, PathToMockDataDict
+
+
+@pytest.fixture
+def mock_config_client(path_to_mock_data: PathToMockDataDict) -> ConfigClient:
+    return ConfigClient(server_response=MockServerResponse(path_to_mock_data))
+```
+
+When `get_file_contents()` is called for `TEST_HARD_UNDULATOR_LUT`, the mock client returns the configured model without accessing the file or configuration service.
+
+This approach can be used for any configuration format that requires custom parsing.
+
+So a user who needs custom data to be return from the `ConfigClient` only needs to override the `path_to_mock_data` fixture and then the test needs a dependency on the `mock_config_client` fixture.
+
+
+## Testing beamline module imports and device creation
+
+The tests in `tests/common/beamlines/test_device_instantiation.py` validate that every beamline module can be imported and that all device factories successfully construct devices in a test environment.
+
+During import and device creation, many beamlines load configuration files using either:
+
+* `ConfigClient.get_file_contents()`
+* Module-level path constants that point to files on the DLS filesystem
+
+For example:
+
+```python
+BEAMLINE_PARAMETERS_PATH = (
+    "/dls_sw/i03/software/daq_configuration/json/beamlineParameters.json"
+)
+```
+
+These files are not available in unit test environments and must not be accessed during tests.
+
+To allow beamline import and device creation tests to run without access to the DLS filesystem, the `module_and_devices_for_beamline` fixture performs two forms of mocking:
+
+1. Configures `ConfigClient` with mock configuration data using `configure_mock()`.
+2. Replaces known module-level file path constants with paths to test data files.
+
+### Mocking beamline file paths
+
+Some beamlines contain module-level constants that directly reference files on the DLS filesystem. These constants are replaced after module import using the `MOCK_ATTRIBUTES_TABLE`.
+
+For example:
+
+```python
+MOCK_ATTRIBUTES_TABLE = {
+    "i03": {
+        "BEAMLINE_PARAMETERS_PATH": TEST_BEAMLINE_PARAMETERS_TXT,
+        "DAQ_CONFIGURATION_PATH": MOCK_DAQ_CONFIG_PATH,
+        "ZOOM_PARAMS_FILE": TEST_OAV_ZOOM_LEVELS,
+        "DISPLAY_CONFIG": TEST_DISPLAY_CONFIG,
+    },
+}
+```
+
+When the `i03` beamline is tested, these attributes are overwritten with paths to local test files:
+
+```python
+mock_beamline_module_filepaths("i03", beamline_module)
+```
+
+This allows device factories to load representative configuration data without accessing the real DLS filesystem.
+
+### Adding support for a new beamline
+
+If the device creation tests fail because a beamline attempts to access a file under `/dls` or `/dls_sw`, identify the module attribute containing the path and add an entry to `MOCK_ATTRIBUTES_TABLE`.
+
+For example:
+
+```python
+MOCK_ATTRIBUTES_TABLE = { 
+    ...
+    "iXX: {
+        "MY_CONFIGURATION_FILE": TEST_MY_CONFIGURATION_FILE
+    },
+    ...
+}
+```
+
+The replacement file should be committed to the test suite and contain the minimum configuration required for the beamline to initialise successfully.
+
+As a rule of thumb:
+
+* Use `mock_config_client` when configuration is loaded through `ConfigClient`.
+* Use `MOCK_ATTRIBUTES_TABLE` when a beamline module contains hard-coded filesystem paths.
+* If both mechanisms are used by a beamline, both may need to be configured for the tests to pass.
+
+
 
 ## Test performance and reliability
 

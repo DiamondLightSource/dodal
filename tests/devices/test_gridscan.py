@@ -15,10 +15,15 @@ from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_put_proceeds,
     set_mock_value,
 )
 
+from dodal.devices.beamlines.i02_1.fast_grid_scan import (
+    ZebraFastGridScanTwoD,
+    ZebraGridScanParamsTwoD,
+)
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
     GridScanInvalidError,
@@ -28,10 +33,6 @@ from dodal.devices.fast_grid_scan import (
     ZebraFastGridScanThreeD,
     ZebraGridScanParamsThreeD,
     set_fast_grid_scan_params,
-)
-from dodal.devices.i02_1.fast_grid_scan import (
-    ZebraFastGridScanTwoD,
-    ZebraGridScanParamsTwoD,
 )
 from dodal.devices.smargon import Smargon
 
@@ -459,12 +460,12 @@ async def test_timeout_on_complete_triggers_stop_and_logs_error(
     zebra_fast_grid_scan: ZebraFastGridScanThreeD,
 ):
     zebra_fast_grid_scan.COMPLETE_STATUS = 0.01
-    zebra_fast_grid_scan.stop_cmd = AsyncMock()
+    mock_trigger = set_mock_attr(zebra_fast_grid_scan.stop_cmd, "trigger", AsyncMock())
     set_mock_value(zebra_fast_grid_scan.status, 1)
     with pytest.raises(TimeoutError):
         await zebra_fast_grid_scan.complete()
     mock_log_error.assert_called_once()
-    zebra_fast_grid_scan.stop_cmd.trigger.assert_awaited_once()
+    mock_trigger.assert_awaited_once()
 
 
 async def test_i02_1_gridscan_has_2d_behaviour(
@@ -510,7 +511,6 @@ async def test_gridscan_prepare_writes_values_and_checks_readback(
             if len(put.mock_calls) > 0:
                 put.assert_called_once_with(
                     grid_scan_params.__dict__[signal_names_to_param_names[signal.name]],
-                    wait=True,
                 )
                 break
             await asyncio.sleep(0.01)
@@ -546,7 +546,7 @@ async def test_gridscan_prepare_checks_validity_after_writes(
         mock_put = getattr(parent, key)
         while len(mock_put.mock_calls) == 0:
             await asyncio.sleep(0.1)
-        mock_put.assert_called_with(grid_scan_params.__dict__[key], wait=True)
+        mock_put.assert_called_with(grid_scan_params.__dict__[key])
     assert not status.done
 
     for signal, expected_value in valid_state.items():

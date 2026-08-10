@@ -1,11 +1,5 @@
-from unittest.mock import MagicMock
-
 import pytest
-from daq_config_server.client import ConfigServer
-from ophyd_async.core import (
-    init_devices,
-    set_mock_value,
-)
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.insertion_device import (
     EnabledDisabledUpper,
@@ -18,21 +12,6 @@ from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     UndulatorLockedPhaseAxes,
 )
-
-
-@pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock_config_client = ConfigServer()
-
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        with open(file_path) as f:
-            return f.read()
-
-    mock_config_client.get_file_contents.side_effect = my_side_effect
-    return mock_config_client
 
 
 @pytest.fixture
@@ -109,8 +88,9 @@ async def mock_locked_apple2(
     mock_id_gap: UndulatorGap,
     mock_locked_phase_axes: UndulatorLockedPhaseAxes,
 ) -> Apple2[UndulatorLockedPhaseAxes]:
-    mock_locked_apple2 = Apple2[UndulatorLockedPhaseAxes](
-        id_gap=mock_id_gap,
-        id_phase=mock_locked_phase_axes,
-    )
+    with init_devices(mock=True):
+        mock_locked_apple2 = Apple2[UndulatorLockedPhaseAxes](
+            id_gap=mock_id_gap,
+            id_phase=mock_locked_phase_axes,
+        )
     return mock_locked_apple2

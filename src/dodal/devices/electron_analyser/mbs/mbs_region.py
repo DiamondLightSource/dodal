@@ -1,0 +1,70 @@
+from os.path import basename, splitext
+from typing import Generic, Self
+
+import xmltodict
+from ophyd_async.core import StrictEnum
+from pydantic import Field, field_validator
+
+from dodal.devices.electron_analyser.base.base_region import (
+    BaseRegion,
+    BaseSequence,
+    TLensMode,
+    TPassEnergy,
+)
+from dodal.devices.electron_analyser.mbs.mbs_enums import AcquisitionMode
+
+
+class MbsRegion(
+    BaseRegion[AcquisitionMode, TLensMode, TPassEnergy],
+    Generic[TLensMode, TPassEnergy],
+):
+    # Override base class with defaults
+    lens_mode: TLensMode
+    pass_energy: TPassEnergy
+    acquisition_mode: AcquisitionMode = AcquisitionMode.FIXED
+    low_energy: float = Field(default=800, alias="start_energy")
+    high_energy: float = Field(default=850, alias="end_energy")
+    centre_energy: float = Field(
+        default_factory=lambda data: (data["high_energy"] + data["low_energy"]) / 2
+    )
+    acquire_time: float = Field(default=1.0, alias="time_per_step")
+    energy_step: float = Field(default=0.1, alias="step_energy")
+    # Default is True as mbs ususally only uses one region.
+    enabled: bool = True
+
+    # Specific to this class
+    deflector_x: float = 0
+
+    @field_validator("pass_energy", mode="before")
+    @classmethod
+    def convert_pass_energy(cls, value):
+        # Allow for using enum or int.
+        if isinstance(value, StrictEnum):
+            return value
+        return f"PE{int(value):03d}"
+
+    @classmethod
+    def from_xml(cls, file: str) -> Self:
+        name = splitext(basename(file))[0]
+        with open(file) as f:
+            data = xmltodict.parse(f.read())
+        region = cls.model_validate(data["ARPESScanBean"])
+        region.name = name
+        # Convert from meV to eV
+        region.energy_step = round(region.energy_step / 1000.0, 6)
+        return region
+
+
+class MbsSequence(
+    BaseSequence[MbsRegion[TLensMode, TPassEnergy]], Generic[TLensMode, TPassEnergy]
+):
+    @classmethod
+    def from_xml(cls, file: str) -> Self:
+        regions = []
+        # Must find the region type annotation because reconstructing the generic
+        # manually doing MbsRegion[TLensMode, TPassEnergy].from_xml(file) will not work.
+        annotation = cls.model_fields["regions"].annotation
+        assert annotation is not None
+        region_type = annotation.__args__[0]
+        regions = [region_type.from_xml(file)]
+        return cls.model_validate({"regions": regions})

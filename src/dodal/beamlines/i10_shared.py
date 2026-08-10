@@ -1,31 +1,30 @@
-"""
-note:
-    I10 has two insertion devices one up(idu) and one down stream(idd).
-    It is worth noting that the downstream device is slightly longer,
-    so it can reach Mn edge for linear arbitrary.
-    idd == id1,    idu == id2.
+"""note:
+I10 has two insertion devices one up(idu) and one down stream(idd).
+It is worth noting that the downstream device is slightly longer,
+so it can reach Mn edge for linear arbitrary.
+idd == id1,    idu == id2.
 """
 
 from pathlib import Path
 
-from daq_config_server.client import ConfigServer
+from daq_config_server.client import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i10 import (
+from dodal.devices.beamlines.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
     I10SharedSlitsDrainCurrent,
-    PiezoMirror,
 )
-from dodal.devices.i10.i10_apple2 import (
+from dodal.devices.beamlines.i10.i10_apple2 import (
     I10Apple2,
     I10Apple2Controller,
     LinearArbitraryAngle,
 )
 
 # Imports taken from i10 while we work out how to deal with split end stations
-from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.beamlines.i10.i10_setting_data import I10Grating
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,
@@ -55,6 +54,11 @@ PREFIX = BeamlinePrefix(BL)
 devices = DeviceManager()
 
 
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
+
+
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
@@ -64,13 +68,15 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def first_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+def first_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @devices.factory()
 def pgm() -> PlaneGratingMonochromator:
-    "I10 Plane Grating Monochromator, it can change energy via pgm.energy.set(<energy>)"
+    """I10 Plane Grating Monochromator, it can change energy via
+    pgm.energy.set(<energy>).
+    """
     return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I10Grating,
@@ -79,13 +85,11 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def switching_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+def switching_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 """ID"""
-
-I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 
@@ -110,7 +114,7 @@ def idd_phase() -> UndulatorPhaseAxes:
 def idd_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        move_pv="RPQ1",
+        move_pv="JAW",
     )
 
 
@@ -120,21 +124,21 @@ def idd(
     idd_phase: UndulatorPhaseAxes,
     idd_jaw_phase: UndulatorJawPhase,
 ) -> I10Apple2:
-    """i10 downstream insertion device:"""
+    """i10 downstream insertion device."""
     return I10Apple2(id_gap=idd_gap, id_phase=idd_phase, id_jaw_phase=idd_jaw_phase)
 
 
 @devices.factory()
-def idd_controller(idd: I10Apple2) -> I10Apple2Controller:
+def idd_controller(idd: I10Apple2, config_client: ConfigClient) -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
     source = Source(column="Source", value="idd")
     idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
     idd_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
@@ -190,7 +194,7 @@ def idu_phase() -> UndulatorPhaseAxes:
 def idu_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-        move_pv="RPQ1",
+        move_pv="JAW",
     )
 
 
@@ -200,26 +204,26 @@ def idu(
     idu_phase: UndulatorPhaseAxes,
     idu_jaw_phase: UndulatorJawPhase,
 ) -> I10Apple2:
-    """i10 upstream insertion device"""
+    """i10 upstream insertion device."""
     return I10Apple2(id_gap=idu_gap, id_phase=idu_phase, id_jaw_phase=idu_jaw_phase)
 
 
 @devices.factory()
-def idu_controller(idd: I10Apple2) -> I10Apple2Controller:
+def idu_controller(idu: I10Apple2, config_client: ConfigClient) -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     source = Source(column="Source", value="idu")
     idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
     idu_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(
-        apple2=idd,
+        apple2=idu,
         gap_energy_motor_lut=idu_gap_energy_motor_lut,
         phase_energy_motor_lut=idu_phase_energy_motor_lut,
     )

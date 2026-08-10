@@ -1,9 +1,9 @@
 from math import isclose
+from typing import Any
 
 from ophyd_async.core import Reference, StandardReadable, StrictEnum, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
 
 
@@ -29,7 +29,7 @@ class Scintillator(StandardReadable):
         self,
         prefix: str,
         aperture_scatterguard: Reference[ApertureScatterguard],
-        beamline_parameters: GDABeamlineParameters,
+        beamline_parameters: dict[str, Any],
         name: str = "",
     ):
         with self.add_children_as_readables():

@@ -10,7 +10,7 @@ from dodal.beamlines import (
     "beamline,expected_module",
     {
         "i03": "i03",
-        "i20-1": "i20_1",
+        "i19-1": "i19_1",
         "i22": "i22",
     }.items(),
 )
@@ -25,7 +25,7 @@ def test_all_beamline_names_includes_non_overridden_modules():
 
 def test_all_beamline_names_includes_overriden_modules():
     beamlines = set(all_beamline_names())
-    assert "i20-1" in beamlines
+    assert "i19-1" in beamlines
     assert "i19-2" in beamlines
 
 

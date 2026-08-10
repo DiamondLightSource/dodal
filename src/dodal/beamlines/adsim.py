@@ -1,3 +1,4 @@
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.epics.adsimdetector import SimDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -25,32 +26,32 @@ Usage Example
 
 Start the simulated beamline by following the epics-containers tutorial at
 https://epics-containers.github.io/main/tutorials/launch_example.html
-And ensure that the signals are visible:
+And ensure that the signals are visible::
 
-```sh
-export EPICS_CA_ADDR_LIST=127.0.0.1:9064
-export EPICS_CA_NAME_SERVERS=127.0.0.1:9064
-export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075
-```
+    sh
+    export EPICS_CA_ADDR_LIST=127.0.0.1:9064
+    export EPICS_CA_NAME_SERVERS=127.0.0.1:9064
+    export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075
 
 How to use the devices in a plan:
-In an ipython terminal run:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-```python
-from bluesky.run_engine import RunEngine
+In an ipython terminal run::
 
-from dodal.beamlines.adsim import devices
-from dodal.plans import count
+    python
+    from bluesky.run_engine import RunEngine
+
+    from dodal.beamlines.adsim import devices
+    from dodal.plans import count
 
 
-run_engine = RunEngine()
+    run_engine = RunEngine()
 
-built = devices.build_and_connect().or_raise()
-d = built["det"]
-s = built["stage"]
+    built = devices.build_and_connect().or_raise()
+    d = built["det"]
+    s = built["stage"]
 
-run_engine(count([d], num=10))
-```
+    run_engine(count([d], num=10))
 """
 
 
@@ -82,7 +83,6 @@ def stage() -> XThetaStage:
 def det(path_provider) -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix=DET_SUFFIX,
     )

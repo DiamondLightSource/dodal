@@ -4,10 +4,12 @@ import threading
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
+from daq_config_server.client import ConfigClient
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector
@@ -27,6 +29,11 @@ def failed_status(failure: Exception) -> Status:
 
 class StatusError(Exception):
     pass
+
+
+@pytest.fixture(autouse=True)
+def always_set_config_client(mock_config_client: ConfigClient):
+    set_config_client(mock_config_client)
 
 
 @pytest.fixture
@@ -268,44 +275,26 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
     )
 
 
-# Also tests transition from change ROI to set_detector_threshold
-@patch("ophyd.status.Status.__and__")
-def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
-    mock_and, fake_eiger: EigerDetector
+def test_unsuccessful_roi_mode_change_results_in_callback_error(
+    fake_eiger: EigerDetector,
 ):
-    bad_status = Status()
-    bad_status.set_exception(StatusError("Failed setting ROI mode True"))
-    mock_and.return_value = bad_status
-    LOGGER.error = MagicMock()
+    for signal in [
+        fake_eiger.odin.file_writer.num_col_chunks,
+        fake_eiger.odin.file_writer.num_row_chunks,
+        fake_eiger.odin.file_writer.image_width,
+        fake_eiger.odin.file_writer.image_height,
+        fake_eiger.cam.roi_mode,
+    ]:
+        bad_status = Status()
+        bad_status.set_exception(StatusError(f"Failed setting {signal.name}"))
+        signal.set = MagicMock(return_value=bad_status)
+        LOGGER.error = MagicMock()
 
-    unwrapped_funcs = [
-        lambda: fake_eiger.change_roi_mode(enable=True),
-        lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.expected_energy_ev
-        ),
-    ]
-    with pytest.raises(StatusError):
-        run_functions_without_blocking(unwrapped_funcs).wait()
-    LOGGER.error.assert_called()
-
-
-@patch("ophyd.status.Status.__and__")
-def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
-    mock_and, fake_eiger: EigerDetector
-):
-    bad_status = Status()
-    bad_status.set_exception(StatusError("Failed setting ROI mode False"))
-    mock_and.return_value = bad_status
-    LOGGER.error = MagicMock()
-
-    unwrapped_funcs = [
-        lambda: fake_eiger.change_roi_mode(enable=False),
-        lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.expected_energy_ev
-        ),
-    ]
-    with pytest.raises(StatusError):
-        run_functions_without_blocking(unwrapped_funcs).wait()
+        unwrapped_funcs = [
+            lambda: fake_eiger.change_roi_mode(enable=True),
+        ]
+        with pytest.raises(StatusError, match=f"Failed setting {signal.name}"):
+            run_functions_without_blocking(unwrapped_funcs).wait()
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_and_wait_for_odin_state")
@@ -347,8 +336,8 @@ def test_stage_runs_successfully(
     set_up_eiger_to_stage_happily(fake_eiger)
     fake_eiger.stage()
     fake_eiger.arming_status.wait(1)  # This should complete long before 1s
-    # One log message kicking off arming, then one for each of the 13 arming stages
-    assert len(caplog.messages) == 14
+    # One log message kicking off arming, then one for each of the 17 arming stages
+    assert len(caplog.messages) == 18
 
 
 def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters_waited_on(
@@ -500,7 +489,7 @@ def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_cor
     fake_eiger.odin.wait_for_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
-    fake_eiger.set_num_triggers_and_captures()
+    fake_eiger.set_num_triggers_and_captures().wait()
     assert fake_eiger.cam.num_triggers.get() > fake_eiger.detector_params.num_triggers
     assert fake_eiger.odin.file_writer.num_capture.get() == 0
 

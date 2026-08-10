@@ -37,7 +37,7 @@ _EUROTHERM_RBV: str = ":RBV"
 
 
 class EurothermPID(StandardReadable):
-    """The class for the Eurotherm PID values"""
+    """The class for the Eurotherm PID values."""
 
     def __init__(
         self,
@@ -91,7 +91,7 @@ class EurothermGeneral(StandardReadable, Locatable[float], Generic[P]):
     @AsyncStatus.wrap
     async def set(self, value: float):
         """Set the blower to a specific temperature."""
-        await self.setpoint.set(value, wait=True)
+        await self.setpoint.set(value)
 
     async def locate(self) -> Location[float]:
         setpoint = await self.setpoint.get_value()
@@ -111,7 +111,8 @@ class UpdatingEurothermGeneral(EurothermGeneral):
 
 class EurothermAutotune(StandardReadable):
     """Newer versions of Eurotherm controllers have the ability to Autotune the
-    PID values, and this is the device"""
+    PID values, and this is the device.
+    """
 
     def __init__(
         self,
