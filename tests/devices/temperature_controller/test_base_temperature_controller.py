@@ -96,13 +96,13 @@ async def test_temperature_controller_readback(
     mock_controller: MockTemperatureController,
 ):
 
-    # await assert_reading(
-    #     mock_controller,
-    #     {
-    #         "mock_controller-sensor-sensor1": partial_reading(0.0),
-    #         "mock_controller-sensor-sensor2": partial_reading(0.0),
-    #     },
-    # )
+    await assert_reading(
+        mock_controller,
+        {
+            "mock_controller-sensor-sensor1": partial_reading(0.0),
+            "mock_controller-sensor-sensor2": partial_reading(0.0),
+        },
+    )
     await assert_configuration(
         mock_controller,
         {

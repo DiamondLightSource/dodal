@@ -28,14 +28,14 @@ async def test_temperature_controller_readback(
     hfm_temp_controller: HighFieldMagnetTemperatureController,
 ):
 
-    # await assert_reading(
-    #     hfm_temp_controller.sensor.channel["sorb"],
-    #     {
-    #         "hfm_temp_controller-sensor-sorb": partial_reading(0.0),
-    #         "hfm_temp_controller-sensor-he3_low": partial_reading(0.0),
-    #         "hfm_temp_controller-sensor-he3_high": partial_reading(0.0),
-    #     },
-    # )
+    await assert_reading(
+        hfm_temp_controller,
+        {
+            "hfm_temp_controller-sensor-sorb": partial_reading(0.0),
+            "hfm_temp_controller-sensor-he3_low": partial_reading(0.0),
+            "hfm_temp_controller-sensor-he3_high": partial_reading(0.0),
+        },
+    )
     await assert_configuration(
         hfm_temp_controller,
         {
