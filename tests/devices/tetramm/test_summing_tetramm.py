@@ -12,7 +12,7 @@ from ophyd_async.core import (
 
 from dodal.devices.tetramm.summing_tetramm import (
     SummingTetrammDetector,
-    TetrammTriggerLogic,
+    SummingTetrammTriggerLogic,
 )
 
 from .conftest import configure_tetramm
@@ -46,7 +46,7 @@ async def test_has_extra_plugins(summing_tetramm: SummingTetrammDetector):
     assert hasattr(summing_tetramm, "roi")
 
 
-async def test_describe_uses_averaging_shape(
+async def test_describe_uses_summing_shape(
     summing_tetramm: SummingTetrammDetector,
     static_path_provider: PathProvider,
 ):
@@ -54,7 +54,7 @@ async def test_describe_uses_averaging_shape(
     size 1, collapsing the [num_channels, to_average] shape of the base device.
     """
     trigger_info = TriggerInfo(
-        number_of_events=5,
+        number_of_events=1,
         trigger=DetectorTrigger.EXTERNAL_EDGE,
         deadtime=1e-4,
         livetime=1,
@@ -74,7 +74,7 @@ async def test_describe_uses_averaging_shape(
     assert await summing_tetramm.describe() == {
         "averaging_tetramm": {
             "source": expected_path,
-            "shape": [5, 1],
+            "shape": [1, 1],
             "dtype_numpy": "<f8",
             "dtype": "array",
             "external": "STREAM:",
@@ -107,24 +107,22 @@ async def test_prepare_connects_plugin_ports(
 async def test_prepare_sets_roi_and_proc_parameters(
     summing_tetramm: SummingTetrammDetector,
 ):
-    """prepare() sets roi binning from to_average and proc1 scale from values_per_reading."""
     to_average = 3
-    values_per_reading = 7
     set_mock_value(summing_tetramm.driver.to_average, to_average)
-    set_mock_value(summing_tetramm.driver.values_per_reading, values_per_reading)
 
     await summing_tetramm.prepare(
         TriggerInfo(
             number_of_events=1,
             trigger=DetectorTrigger.EXTERNAL_EDGE,
             deadtime=VALID_TEST_DEADTIME,
-            livetime=VALID_TEST_EXPOSURE_TIME,
+            livetime=5,
         )
     )
 
     assert (await summing_tetramm.roi.size_x.get_value()) == to_average
     assert (await summing_tetramm.roi.bin_x.get_value()) == to_average
-    assert (await summing_tetramm.proc1.scale.get_value()) == values_per_reading
+    assert (await summing_tetramm.driver.values_per_reading.get_value()) == 50
+    assert (await summing_tetramm.proc1.scale.get_value()) == 50
     assert (
         await summing_tetramm.proc1.enable_scale.get_value()
     ) == EnableDisable.ENABLE
@@ -150,8 +148,10 @@ async def test_set_exposure_sets_values_per_reading(
     max(minimum_samples, ceil(10 * exposure)), unlike the base class which does not
     set values_per_reading at all.
     """
-    trigger_logic = TetrammTriggerLogic(summing_tetramm.driver, summing_tetramm.file_io)
-    await trigger_logic.set_exposure(exposure)
+    trigger_logic = SummingTetrammTriggerLogic(
+        summing_tetramm.driver, summing_tetramm.file_io
+    )
+    await trigger_logic.set_values_per_reading(exposure)
 
     assert (
         await summing_tetramm.driver.values_per_reading.get_value()
