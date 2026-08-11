@@ -72,7 +72,7 @@ async def test_describe_uses_summing_shape(
     )
 
     assert await summing_tetramm.describe() == {
-        "averaging_tetramm": {
+        "tetramm": {
             "source": expected_path,
             "shape": [1, 1],
             "dtype_numpy": "<f8",
