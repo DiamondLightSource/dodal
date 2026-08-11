@@ -5,6 +5,7 @@ from typing import Protocol
 
 from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     DeviceMock,
     MovableLogic,
@@ -348,7 +349,7 @@ class SuperConductingMagnetController(StandardReadable):
 
         super().__init__(name)
 
-    async def _trigger_ramp(self):
+    async def _trigger_ramp(self, timeout: float = DEFAULT_TIMEOUT):
         # Setting invalid demand values should put the limit status in violation state.
         # Block ramp if in violation state.
         limit_status = await self.limit_status.get_value()
@@ -356,14 +357,16 @@ class SuperConductingMagnetController(StandardReadable):
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
         await self._start_ramp.trigger()
-        # Add a high bound limit to the timeout to avoid it getting stuck.
-        # https://github.com/DiamondLightSource/dodal/issues/2166
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=500)
+        await wait_for_value(
+            self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=timeout
+        )
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
 
-    async def _apply_step(self, step: MagnetRequest) -> None:
+    async def _apply_step(
+        self, step: MagnetRequest, timeout: float = DEFAULT_TIMEOUT
+    ) -> None:
         """Apply a single movement step and wait for the magnet ramp to complete.
 
         A movement step may update one or more cartesian axes simultaneously. Once
@@ -379,7 +382,7 @@ class SuperConductingMagnetController(StandardReadable):
             tasks.append(self.cart.z.demand.set(step.z))
         self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
-        await self._trigger_ramp()
+        await self._trigger_ramp(timeout=timeout)
 
     async def set_within_boundary(self, value: MagnetRequest):
         """Move the magnet to a new cartesian position while respecting mode limits.
@@ -422,7 +425,27 @@ class SuperConductingMagnetController(StandardReadable):
                 # Check each generated step is also within limit.
                 await self.psu_ref().check_axes_within_limit(step, mode)
                 movement_strategy.check_within_limits(current_readback, step)
-                await self._apply_step(step)
+                timeout = await self.calculate_timeout_per_step(
+                    current_readback=current_readback, value=step
+                )
+                await self._apply_step(step, timeout=timeout)
                 current_readback = await self.cart.get_readback_position()
         finally:
             self._moving = False
+
+    async def calculate_timeout_per_step(
+        self, current_readback: MagnetPosition, value: MagnetRequest
+    ) -> float:
+        """Calculate the timeout for a move based on the distance to move and the ramp rate."""
+        ramp_rates = await self.psu_ref().get_ramp_rate()
+        targets = (value.x, value.y, value.z)
+        currents = (current_readback.x, current_readback.y, current_readback.z)
+
+        max_axis_time = max(
+            abs(target - current) / rate if target is not None and rate > 0 else 0.0
+            for target, current, rate in zip(
+                targets, currents, ramp_rates, strict=False
+            )
+        )
+
+        return max_axis_time + DEFAULT_TIMEOUT
