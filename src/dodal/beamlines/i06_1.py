@@ -2,6 +2,10 @@ from dodal.beamlines.i06_shared import devices as i06_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_1 import DiffractionDichroism
+from dodal.devices.beamlines.i06_1.magnet import (
+    SuperConductingMagnetController,
+    ThreeMagnetAxisPowerSupply,
+)
 from dodal.devices.beamlines.i06_1.magnet.temperature_controller import (
     SuperConductingMagnetTemperatureController,
 )
@@ -20,12 +24,12 @@ devices.include(i06_shared_devices)
 
 
 @devices.factory()
-def diff_cooling_temperature_controller() -> Lakeshore336:
+def ls336_cooling() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")
 
 
 @devices.factory()
-def diff_heating_temperature_controller() -> Lakeshore336:
+def ls336_heating() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:")
 
 
@@ -43,4 +47,18 @@ def dd() -> DiffractionDichroism:
 def scm_temp_controller() -> SuperConductingMagnetTemperatureController:
     return SuperConductingMagnetTemperatureController(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:"
+    )
+
+
+@devices.factory()
+def scm_psu() -> ThreeMagnetAxisPowerSupply:
+    return ThreeMagnetAxisPowerSupply(f"{PREFIX.beamline_prefix}-EA-SMC")
+
+
+@devices.factory()
+def scmc(
+    scm_psu: ThreeMagnetAxisPowerSupply,
+) -> SuperConductingMagnetController:
+    return SuperConductingMagnetController(
+        f"{PREFIX.beamline_prefix}-EA-MAG-01:", scm_psu
     )
