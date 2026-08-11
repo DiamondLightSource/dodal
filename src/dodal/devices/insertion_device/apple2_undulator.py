@@ -51,7 +51,7 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         """
         gap = self.gap_ref()
         phase = self.phase_ref()
-        # Only need to check phase as it share motors share both status and gate with gap.
+        # Only need to check phase as gap share both status and gate with gap.
         await phase.raise_if_cannot_move()
         await asyncio.gather(
             phase.set_demand_positions(value=id_motor_values.extract_phase_val()),
