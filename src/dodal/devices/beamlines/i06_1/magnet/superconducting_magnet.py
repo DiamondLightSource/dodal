@@ -443,9 +443,7 @@ class SuperConductingMagnetController(StandardReadable):
 
         max_axis_time = max(
             abs(target - current) / rate if target is not None and rate > 0 else 0.0
-            for target, current, rate in zip(
-                targets, currents, ramp_rates, strict=False
-            )
+            for target, current, rate in zip(targets, currents, ramp_rates, strict=True)
         )
 
         return max_axis_time + DEFAULT_TIMEOUT
