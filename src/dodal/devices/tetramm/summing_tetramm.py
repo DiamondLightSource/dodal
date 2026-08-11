@@ -1,7 +1,6 @@
 import asyncio
 from math import ceil
 from typing import Annotated as A
-from typing import override
 
 from ophyd_async.core import (
     AsyncStatus,
@@ -83,9 +82,8 @@ class SummingTetrammDetector(TetrammDetector):
     This device uses an AD chain to provide this sum with the following logic:
     1. Take the raw values into the stats plugin to provide a sum of the 4 channels
     2. Use an ROI plugin to add all the values across the whole exposure time
-    3. Use the process plugin to multiple this all by the values per reading, this makes
-       the number independent of the sampling time used for averaging internally in the
-       device
+    3. Use the process plugin to multiply this all by the values per reading, this normalises
+       the output for different sample rates used in the device's internal averaging
     """
 
     def __init__(
@@ -118,11 +116,9 @@ class SummingTetrammDetector(TetrammDetector):
             prefix, path_provider, drv_suffix, fileio_suffix, plugins, name
         )
 
-    @override
     def get_shape(self) -> list[SignalR]:
         return [self._shape_of_one]
 
-    @override
     def get_detector_trigger_logic(self) -> DetectorTriggerLogic:
         return SummingTetrammTriggerLogic(self.driver, self.file_io)
 
