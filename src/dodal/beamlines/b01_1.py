@@ -102,6 +102,22 @@ def imaging_detector(path_provider: PathProvider) -> AravisDetector:
 
 
 @devices.factory()
+def tomography_detector(path_provider: PathProvider) -> AravisDetector:
+    """The Mako camera for the tomography experiment.
+
+    Looks at the sample position of the tomography theta stage.
+
+    Returns:
+        AravisDetector: The tomography camera device.
+    """
+    return AravisDetector(
+        f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix=DRV_SUFFIX,
+    )
+
+
+@devices.factory()
 def sample_stage() -> XYZStage:
     """An XYZ stage holding the sample.
 
