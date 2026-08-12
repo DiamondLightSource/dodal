@@ -135,7 +135,7 @@ def tomography_stage() -> Motor:
 
 
 @devices.factory()
-def pmac(sample_stage: XYZStage) -> PmacIO:
+def pmac(sample_stage: XYZStage, tomography_stage) -> PmacIO:
     """A Power PMAC.
 
     Returns:
@@ -143,6 +143,6 @@ def pmac(sample_stage: XYZStage) -> PmacIO:
     """
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
-        raw_motors=[sample_stage.y, sample_stage.x],
+        raw_motors=[sample_stage.y, sample_stage.x, tomography_stage],
         coord_nums=[1],
     )
