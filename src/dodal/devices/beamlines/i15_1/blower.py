@@ -44,7 +44,9 @@ class TemperatureMoveLogic(MovableLogic[float]):
 
         # If we're turning the blower off we do not need to wait as the temperature
         # reading is just the latent heat in the device and the sample is not being heated
-        if new_position != 0:
+        if new_position == 0:
+            await self.setpoint.set(0)
+        else:
             await set_and_wait_for_other_value(
                 self.setpoint,
                 new_position,

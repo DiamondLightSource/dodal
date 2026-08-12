@@ -104,7 +104,8 @@ async def test_settle_time_is_not_awaited_when_turning_off(
     ) as mock_sleep:
         await blower.temperature.set(0)
 
-    mock_sleep.assert_not_called()
+    # Sleep still has a single call from the callback mocking
+    mock_sleep.assert_called_once_with(0)
 
 
 async def test_stop_sets_temperature_to_zero(blower: Blower):
@@ -115,7 +116,7 @@ async def test_stop_sets_temperature_to_zero(blower: Blower):
 async def test_temperature_times_out_if_readback_does_not_change(blower: Blower):
     set_mock_value(blower.temperature._pneumatic, ValveState.OPEN)
 
-    def null_callback(*args, **kwargs):
+    def null_callback(*_, **__):
         return None
 
     callback_on_mock_put(blower.temperature._temperature_sp, null_callback)
