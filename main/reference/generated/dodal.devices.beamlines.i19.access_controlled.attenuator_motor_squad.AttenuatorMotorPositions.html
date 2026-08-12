@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions &#8212; dodal 2.5.5.dev1+gb4b38f1e0 documentation</title>
+    <title>dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions &#8212; dodal 2.5.5.dev2+gd2ab28fb3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=ef622f76"></script>
+    <script src="../../_static/documentation_options.js?v=c3704027"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1065,7 +1065,36 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.</span></span><span class="sig-name descname"><span class="pre">AttenuatorMotorPositions</span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i19/access_controlled/attenuator_motor_squad.html#AttenuatorMotorPositions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions" title="Link to this definition">#</a></dt>
-<dd><p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<dd><p>Motor positions for attentuators in the attenuation system, be they indices on a discrete steps motor or continuous positions on an axis, or axes.</p>
+<p>This is a validated dict which pairs off naming “tags” for each motor (e.g. “x” for a lateral x-axis motor or “w” for a filter wheel),
+with the corresponding int or float motor position ( or position demand / request ) as appropriate.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.continuous_positions">
+<span class="sig-name descname"><span class="pre">continuous_positions</span></span><a class="headerlink" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.continuous_positions" title="Link to this definition">#</a></dt>
+<dd><p>dict contributions pairing names of motors against the discrete motor position (likely to be in mm)/</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.discrete_indices">
+<span class="sig-name descname"><span class="pre">discrete_indices</span></span><a class="headerlink" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.discrete_indices" title="Link to this definition">#</a></dt>
+<dd><p>dict contributions pairing names of index stepping positioners against the discrete position index (e.g. for a filter wheel).</p>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<dl class="simple">
+<dt>( Given that i19 mounted a resin wedge on their x-axis motor,</dt><dd><p>an aluminium wedge on their y-axis motor and their first filter wheel we will name “w” … )</p>
+</dd>
+<dt>Request for motor changes:</dt><dd><p>{“x”: 20.4} and {“w”:3} might indicate a request to move x-axis to 20.4 mm and the wheel round to slot 3.</p>
+</dd>
+</dl>
+<p>Reporting of system motor positions (on say i19, where wheel index 1 is reserved for an EMPTY slot):
+{“x”: 28.62, “y”: 5.0} and {“w”: 1} might indicate the resin wedge is at 28.62 mm, aluminium wedge is OUT, filter wheel at EMPTY (OUT).”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<code class="xref any docutils literal notranslate"><span class="pre">ValidationError</span></code>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
 <p><code class="xref any docutils literal notranslate"><span class="pre">self</span></code> is explicitly positional-only to allow <code class="xref any docutils literal notranslate"><span class="pre">self</span></code> as a field name.</p>
@@ -1080,8 +1109,8 @@ validated to form a valid model.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">no_keys_clash</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_complete_demand</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.validated_and_complete" title="dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.validated_and_complete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_and_complete</span></code></a>()</p></td>
+<td><p>Reports back the validated combined position information.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1092,15 +1121,29 @@ validated to form a valid model.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_config</span></code></p></td>
 <td><p>Configuration for the model, should be a dictionary conforming to [<code class="xref any docutils literal notranslate"><span class="pre">ConfigDict</span></code>][pydantic.config.ConfigDict].</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">continuous_demands</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.continuous_positions" title="dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.continuous_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">continuous_positions</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">indexed_demands</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.discrete_indices" title="dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.discrete_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">discrete_indices</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.validated_and_complete">
+<span class="sig-name descname"><span class="pre">validated_and_complete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i19/access_controlled/attenuator_motor_squad.html#AttenuatorMotorPositions.validated_and_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.validated_and_complete" title="Link to this definition">#</a></dt>
+<dd><p>Reports back the validated combined position information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The validated union of both discrete motor index and continuous motor position contributions.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1152,7 +1195,12 @@ validated to form a valid model.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions"><code class="docutils literal notranslate"><span class="pre">AttenuatorMotorPositions</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions"><code class="docutils literal notranslate"><span class="pre">AttenuatorMotorPositions</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.continuous_positions"><code class="docutils literal notranslate"><span class="pre">AttenuatorMotorPositions.continuous_positions</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.discrete_indices"><code class="docutils literal notranslate"><span class="pre">AttenuatorMotorPositions.discrete_indices</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.validated_and_complete"><code class="docutils literal notranslate"><span class="pre">AttenuatorMotorPositions.validated_and_complete()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

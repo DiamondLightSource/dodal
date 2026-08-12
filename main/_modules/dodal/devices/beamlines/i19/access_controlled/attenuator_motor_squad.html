@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad &#8212; dodal 2.5.5.dev1+gb4b38f1e0 documentation</title>
+    <title>dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad &#8212; dodal 2.5.5.dev2+gd2ab28fb3 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../../_static/documentation_options.js?v=ef622f76"></script>
+    <script src="../../../../../../_static/documentation_options.js?v=c3704027"></script>
     <script src="../../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,7 +885,8 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Self</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Self</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -905,24 +906,46 @@ window.runMermaid = runMermaid;</script>
     <span class="n">ACCESS_DEVICE_NAME</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">PermittedKeyStr</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StringConstraints</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;^[A-Za-z0-9-_]+$&quot;</span><span class="p">)]</span>
+<span class="n">PermittedKeyStr</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">StringConstraints</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[_A-Za-z][A-Za-z0-9-_]*$&quot;</span><span class="p">)</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="AttenuatorMotorPositions">
 <a class="viewcode-back" href="../../../../../../reference/generated/dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.html#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AttenuatorMotorPositions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Motor positions for attentuators in the attenuation system, be they indices on a discrete steps motor or continuous positions on an axis, or axes.</span>
+
+<span class="sd">    This is a validated dict which pairs off naming &quot;tags&quot; for each motor (e.g. &quot;x&quot; for a lateral x-axis motor or &quot;w&quot; for a filter wheel),</span>
+<span class="sd">    with the corresponding int or float motor position ( or position demand / request ) as appropriate.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        continuous_positions: dict contributions pairing names of motors against the discrete motor position (likely to be in mm)/</span>
+<span class="sd">        discrete_indices: dict contributions pairing names of index stepping positioners against the discrete position index (e.g. for a filter wheel).</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        ( Given that i19 mounted a resin wedge on their x-axis motor,</span>
+<span class="sd">            an aluminium wedge on their y-axis motor and their first filter wheel we will name &quot;w&quot; ... )</span>
+
+<span class="sd">        Request for motor changes:</span>
+<span class="sd">            {&quot;x&quot;: 20.4} and {&quot;w&quot;:3} might indicate a request to move x-axis to 20.4 mm and the wheel round to slot 3.</span>
+
+<span class="sd">        Reporting of system motor positions (on say i19, where wheel index 1 is reserved for an EMPTY slot):</span>
+<span class="sd">        {&quot;x&quot;: 28.62, &quot;y&quot;: 5.0} and {&quot;w&quot;: 1} might indicate the resin wedge is at 28.62 mm, aluminium wedge is OUT, filter wheel at EMPTY (OUT).&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">continuous_demands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">StrictFloat</span> <span class="o">|</span> <span class="n">StrictInt</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">continuous_positions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">StrictFloat</span> <span class="o">|</span> <span class="n">StrictInt</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
-    <span class="n">indexed_demands</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">StrictInt</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">discrete_indices</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">StrictInt</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">no_keys_clash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-        <span class="n">common_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">continuous_demands</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indexed_demands</span><span class="p">)</span>
+        <span class="n">common_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">continuous_positions</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">discrete_indices</span><span class="p">)</span>
         <span class="n">common_key_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">common_keys</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">common_key_count</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
@@ -931,10 +954,29 @@ window.runMermaid = runMermaid;</script>
             <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Common </span><span class="si">{</span><span class="n">ks</span><span class="si">}</span><span class="s2"> found in distinct motor demands: </span><span class="si">{</span><span class="n">common_keys</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">validated_complete_demand</span><span class="p">(</span>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cached_merged_validated_dict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">StrictInt</span> <span class="o">|</span> <span class="n">StrictFloat</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_demands</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexed_demands</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lazily evaluate the merged dict, post validation and cache for future use.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The validated union of both discrete motor index and continuous motor position contributions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">continuous_positions</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">discrete_indices</span>
+
+<div class="viewcode-block" id="AttenuatorMotorPositions.validated_and_complete">
+<a class="viewcode-back" href="../../../../../../reference/generated/dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.html#dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad.AttenuatorMotorPositions.validated_and_complete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validated_and_complete</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">PermittedKeyStr</span><span class="p">,</span> <span class="n">StrictInt</span> <span class="o">|</span> <span class="n">StrictFloat</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reports back the validated combined position information.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The validated union of both discrete motor index and continuous motor position contributions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_merged_validated_dict</span></div>
+</div>
 
 
 
@@ -965,7 +1007,7 @@ window.runMermaid = runMermaid;</script>
             <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s2">&quot;experiment_hutch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_invoking_hutch</span><span class="p">,</span>
                 <span class="s2">&quot;access_device&quot;</span><span class="p">:</span> <span class="n">ACCESS_DEVICE_NAME</span><span class="p">,</span>
-                <span class="s2">&quot;attenuator_demands&quot;</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">validated_complete_demand</span><span class="p">(),</span>
+                <span class="s2">&quot;attenuator_demands&quot;</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">validated_and_complete</span><span class="p">(),</span>
             <span class="p">},</span>
             <span class="s2">&quot;instrument_session&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_session</span><span class="p">,</span>
         <span class="p">}</span>
