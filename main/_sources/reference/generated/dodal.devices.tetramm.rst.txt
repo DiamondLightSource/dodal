@@ -14,15 +14,8 @@ dodal.devices.tetramm
    :toctree:
    :recursive:
 
-   ~tetramm.TetrammArmLogic
-   ~tetramm.TetrammChannels
+   ~tetramm.SummingTetrammDetector
    ~tetramm.TetrammDetector
-   ~tetramm.TetrammDriver
-   ~tetramm.TetrammGeometry
-   ~tetramm.TetrammRange
-   ~tetramm.TetrammResolution
-   ~tetramm.TetrammTrigger
-   ~tetramm.TetrammTriggerLogic
 
 
 

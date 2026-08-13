@@ -22,6 +22,12 @@ dodal.devices.tetramm.TetrammDetector
       
       
       
+      ~TetrammDetector.get_detector_trigger_logic
+      
+      
+      
+      ~TetrammDetector.get_shape
+      
       
       
       
