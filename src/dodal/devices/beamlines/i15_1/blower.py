@@ -96,6 +96,8 @@ class Blower(SafeOrBeamPositioner):
     the given pneumatic is open to allow airflow.
     """
 
+    DEFAULT_SETTLE_TIME = 180
+
     def __init__(
         self,
         prefix: str,
@@ -109,7 +111,7 @@ class Blower(SafeOrBeamPositioner):
             float, f"{prefix}RR", f"{prefix}RR:RBV"
         )
 
-        self.settle_time_s = soft_signal_rw(float)
+        self.settle_time_s = soft_signal_rw(float, self.DEFAULT_SETTLE_TIME)
 
         with self.add_children_as_readables():
             self.temperature = Temperature(
