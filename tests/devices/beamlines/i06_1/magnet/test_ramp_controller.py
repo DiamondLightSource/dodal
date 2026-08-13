@@ -1,0 +1,52 @@
+import pytest
+from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading, partial_reading
+
+from dodal.devices.beamlines.i06_1.magnet import (
+    MagnetAxisRampRateController,
+)
+
+
+@pytest.fixture
+def magx_ramp_rate() -> MagnetAxisRampRateController:
+    with init_devices(mock=True):
+        magx_ramp_rate = MagnetAxisRampRateController("TEST:")
+    return magx_ramp_rate
+
+
+async def test_magx_ramp_rate_read(
+    magx_ramp_rate: MagnetAxisRampRateController,
+) -> None:
+    await assert_reading(magx_ramp_rate, {"magx_ramp_rate": partial_reading(0)})
+
+
+async def test_magx_ramp_rate_set(
+    magx_ramp_rate: MagnetAxisRampRateController,
+) -> None:
+    ramp_rate = 1
+    await magx_ramp_rate.set(ramp_rate)
+    assert await magx_ramp_rate.readback.get_value() == ramp_rate
+
+
+async def test_magx_ramp_rate_set_above_limit_throws_error(
+    magx_ramp_rate: MagnetAxisRampRateController,
+) -> None:
+    ramp_rate = 10
+    with pytest.raises(
+        ValueError,
+        match=f"Requested ramp rate {ramp_rate} exceeds the maximum limit of 2.0 for device {magx_ramp_rate.name}.",
+    ):
+        await magx_ramp_rate.set(ramp_rate)
+
+
+@pytest.fixture
+def axis_ramp_rate() -> MagnetAxisRampRateController:
+    with init_devices(mock=True):
+        axis_ramp_rate = MagnetAxisRampRateController("TEST:")
+    return axis_ramp_rate
+
+
+async def test_mag_three_axis_ramp_rate_read(
+    axis_ramp_rate: MagnetAxisRampRateController,
+) -> None:
+    await assert_reading(axis_ramp_rate, {"axis_ramp_rate": partial_reading(0)})
