@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.beamlines.i15_1.blower.Blower &#8212; dodal 2.5.5.dev2+gd2ab28fb3 documentation</title>
+    <title>dodal.devices.beamlines.i15_1.blower.Blower &#8212; dodal 2.5.5.dev3+gbf6f06859 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=c3704027"></script>
+    <script src="../../_static/documentation_options.js?v=db093325"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.beamlines.i15_1.cobra" href="dodal.devices.beamlines.i15_1.cobra.html" />
+    <link rel="next" title="dodal.devices.beamlines.i15_1.blower.Temperature" href="dodal.devices.beamlines.i15_1.blower.Temperature.html" />
     <link rel="prev" title="dodal.devices.beamlines.i15_1.blower" href="dodal.devices.beamlines.i15_1.blower.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -1063,7 +1063,10 @@
 <dt class="sig sig-object py" id="dodal.devices.beamlines.i15_1.blower.Blower">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.beamlines.i15_1.blower.</span></span><span class="sig-name descname"><span class="pre">Blower</span></span><a class="reference internal" href="../../_modules/dodal/devices/beamlines/i15_1/blower.html#Blower"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.beamlines.i15_1.blower.Blower" title="Link to this definition">#</a></dt>
 <dd><p>Blows hot air on to the sample, can be moved out of the beam to allow room for
-a robot load. Temperatures are set in C.</p>
+a robot load.</p>
+<p>Temperatures are set in C. When a temperature is set the device will wait to reach
+that temperature and then wait a settle time as defined in <code class="xref any docutils literal notranslate"><span class="pre">settle_time_s</span></code>. Setting
+a temperature of 0 will turn the blower off.</p>
 <p>For safety reasons the heater should only be turned on (set to a &gt;0 temperature) if
 the given pneumatic is open to allow airflow.</p>
 <dl class="field-list simple">
@@ -1090,6 +1093,9 @@ the given pneumatic is open to allow airflow.</p>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_SETTLE_TIME</span></code></p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1117,11 +1123,11 @@ the given pneumatic is open to allow airflow.</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.beamlines.i15_1.cobra.html"
+       href="dodal.devices.beamlines.i15_1.blower.Temperature.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.beamlines.i15_1.cobra</p>
+        <p class="prev-next-title">dodal.devices.beamlines.i15_1.blower.Temperature</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
