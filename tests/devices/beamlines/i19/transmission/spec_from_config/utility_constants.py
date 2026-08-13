@@ -1,4 +1,3 @@
-
 """Handy test constants, that this module will use for parametrized testing."""
 
 from math import (
@@ -41,14 +40,14 @@ NON_NUMERICALS: Final[tuple[Any, ...]] = (
 )
 
 UNSUPPORTED_ENERGY_UNITS: Final[tuple[str, ...]] = (
-        "meV",
-        "KILOelectronvolts",
-        "kev",
-        "k_eV",
-        "MeV",
-        "PeV",
-        "J",
-        "Joules",
-        "s",
-        "GHz",
-    )
+    "meV",
+    "KILOelectronvolts",
+    "kev",
+    "k_eV",
+    "MeV",
+    "PeV",
+    "J",
+    "Joules",
+    "s",
+    "GHz",
+)

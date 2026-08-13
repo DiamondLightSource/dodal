@@ -4,7 +4,8 @@ from pydantic import BaseModel, ConfigDict, Field, StrictFloat, model_validator
 
 from dodal.common.general_maths.interval import ClosedInterval, FloatInterval
 
-PHYSICAL_ROLL_OFF: Final[FloatInterval] = ClosedInterval(lower=-4.0,upper=-2.0)
+PHYSICAL_ROLL_OFF: Final[FloatInterval] = ClosedInterval(lower=-4.0, upper=-2.0)
+
 
 class FittedAbsorptionCurveSpec(BaseModel):
     """JSON built sub-dict of one absorption curve, used in specifying material absorption spectra.
@@ -27,7 +28,7 @@ class FittedAbsorptionCurveSpec(BaseModel):
     residuals_polynomial_coeffs: list[StrictFloat] = Field(default_factory=list)
 
     # Base Model internal setting to make this class immutable
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     @model_validator(mode="after")
     def validate_attributes(self) -> "FittedAbsorptionCurveSpec":
@@ -38,7 +39,7 @@ class FittedAbsorptionCurveSpec(BaseModel):
                 f"Photon absorption constant {self.photon_absorption} is invalid."
             )
         _msg = (
-            f"Absorption roll off {self.roll_off} does not seem likely on physics grounds." 
+            f"Absorption roll off {self.roll_off} does not seem likely on physics grounds."
             if self.roll_off < 0
             else "Absorption roll off is a negative exponent typically close to -3.0 ∓ 1"
         )

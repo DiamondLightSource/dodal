@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, model_validator
 
 
@@ -19,7 +18,7 @@ class EnergyIntervalSpec(BaseModel):
     upper: StrictFloat
 
     # Base Model internal setting to make this class immutable
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     @model_validator(mode="after")
     def validate_attributes(self) -> "EnergyIntervalSpec":
