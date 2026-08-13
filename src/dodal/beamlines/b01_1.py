@@ -125,7 +125,7 @@ def sample_stage() -> XYZStage:
         XYZStage: The XYZ sample stage device.
     """
     return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-SPEC-01:",
+        f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
     )
 
 
