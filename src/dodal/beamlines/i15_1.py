@@ -3,7 +3,7 @@ from pathlib import Path
 
 from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
-from ophyd_async.epics.adcore import ADWriterFactory, ContAcqDetector, NDPluginBaseIO
+from ophyd_async.epics.adcore import ADWriterFactory, ContAcqDetector
 from ophyd_async.epics.motor import Motor
 from ophyd_async.fastcs.eiger import EigerDetector
 
@@ -29,7 +29,7 @@ from dodal.devices.interlocks import EnumPLCInterlock, IntPLCInterlock, PSSInter
 from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.tetramm.summing_tetramm import SummingTetrammDetector
 from dodal.devices.zebra.zebra import Zebra, ZebraMapping
 from dodal.devices.zebra.zebra_constants_mapping import ZebraTTLOutputs
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
@@ -288,16 +288,11 @@ def fastcs_eiger(path_provider: PathProvider) -> EigerDetector:
 
 
 @devices.factory()
-def i0(path_provider: PathProvider) -> TetrammDetector:
-    return TetrammDetector(
+def i0(path_provider: PathProvider) -> SummingTetrammDetector:
+    return SummingTetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:",
         path_provider=path_provider,
         fileio_suffix="HDF:",
-        plugins={
-            "stats": NDPluginBaseIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:SumAll:"
-            )
-        },
     )
 
 
