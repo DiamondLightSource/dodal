@@ -3,6 +3,8 @@ from typing import Annotated
 
 from pydantic import Field, StrictFloat, validate_call
 
+CANONICAL_NON_ABSORPTION = 0  # Absorption (Bn) when absorber is absent
+
 _CANONICAL_BARNETT_CONVERSION = -1.0e3
 _REVERSE_BARNETT_CONVERSION = -1.0e-3
 
