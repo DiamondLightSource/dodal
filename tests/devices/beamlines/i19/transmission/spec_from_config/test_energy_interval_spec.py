@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from dodal.devices.beamlines.i19.transmission.spec_from_json.energy_interval_spec import (
+from dodal.devices.beamlines.i19.transmission.spec_from_config.energy_interval_spec import (
     EnergyIntervalSpec,
 )
 
@@ -15,6 +15,7 @@ from .utility_constants import (
 )
 
 # Happy path tests
+
 
 @pytest.mark.parametrize(
     "upper_bound",
@@ -147,10 +148,7 @@ def test_that_energy_interval_json_validation_fails_with_typo_in_upper_bound_key
         EnergyIntervalSpec(**d)
 
 
-@pytest.mark.parametrize(
-    "unsupported_units",
-    UNSUPPORTED_ENERGY_UNITS
-)
+@pytest.mark.parametrize("unsupported_units", UNSUPPORTED_ENERGY_UNITS)
 def test_that_energy_interval_json_validation_rejects_unsupported_energy_units(
     unsupported_units,
 ) -> None:
