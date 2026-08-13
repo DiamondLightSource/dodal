@@ -22,6 +22,7 @@ from tests.test_data import TEST_XPDF_LOCAL_PARAMETERS
 async def blower(mock_config_client: ConfigClient):
     async with init_devices(mock=True):
         blower = Blower("", "", "", mock_config_client, TEST_XPDF_LOCAL_PARAMETERS)
+    set_mock_value(blower.settle_time_s, 0)
     return blower
 
 
