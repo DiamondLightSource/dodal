@@ -33,11 +33,7 @@ dodal.devices.electron\_analyser.base.ElectronAnalyserDetector
       
       
       
-      ~ElectronAnalyserDetector.stage
       
-      
-      
-      ~ElectronAnalyserDetector.unstage
       
    
    

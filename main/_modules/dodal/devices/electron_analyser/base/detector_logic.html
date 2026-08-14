@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.detector_logic &#8212; dodal 2.5.5.dev5+gf5f3c89bd documentation</title>
+    <title>dodal.devices.electron_analyser.base.detector_logic &#8212; dodal 2.5.5.dev6+g25167f287 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=fb501f19"></script>
+    <script src="../../../../../_static/documentation_options.js?v=189d0156"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -888,46 +888,12 @@ window.runMermaid = runMermaid;</script>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorTriggerLogic</span><span class="p">,</span> <span class="n">SignalDict</span><span class="p">,</span> <span class="n">SignalR</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADAcquireLogic</span><span class="p">,</span> <span class="n">ADImageMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorTriggerLogic</span><span class="p">,</span> <span class="n">SignalDict</span><span class="p">,</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">SignalRW</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADImageMode</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_driver_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractAnalyserDriverIO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRegion</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericFastShutter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceSelector</span>
-
-
-<div class="viewcode-block" id="ShutterCoordinatorADAcquireLogic">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ShutterCoordinatorADAcquireLogic.html#dodal.devices.electron_analyser.base.ShutterCoordinatorADAcquireLogic">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ShutterCoordinatorADAcquireLogic</span><span class="p">(</span><span class="n">ADAcquireLogic</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extends the acquire logic to coordinate opening shutters before acquisition with</span>
-<span class="sd">    optional configuration of when to close.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">driver</span><span class="p">:</span> <span class="n">AbstractAnalyserDriverIO</span><span class="p">,</span>
-        <span class="n">shutter</span><span class="p">:</span> <span class="n">GenericFastShutter</span><span class="p">,</span>
-        <span class="n">close_shutter_when_idle</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shutter</span> <span class="o">=</span> <span class="n">shutter</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_close_shutter_when_idle</span> <span class="o">=</span> <span class="n">close_shutter_when_idle</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_acquiring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Open shutter before data collection</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shutter</span><span class="o">.</span><span class="n">open_state</span><span class="p">)</span>
-        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_acquiring</span><span class="p">()</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_idle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">wait_for_idle</span><span class="p">()</span>
-        <span class="c1"># Optionally close shutters between regions</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_close_shutter_when_idle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="ow">and</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_close_shutter_when_idle</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="p">):</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shutter</span><span class="o">.</span><span class="n">close_state</span><span class="p">)</span></div>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectedSource</span>
 
 
 <div class="viewcode-block" id="ElectronAnalyserTriggerLogic">
@@ -964,7 +930,7 @@ window.runMermaid = runMermaid;</script>
 
     <span class="n">driver</span><span class="p">:</span> <span class="n">AbstractAnalyserDriverIO</span>
     <span class="n">energy_source</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="n">source_selector</span><span class="p">:</span> <span class="n">SourceSelector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">source_selector</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="n">SelectedSource</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="RegionLogic.setup_with_region">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.RegionLogic.html#dodal.devices.electron_analyser.base.RegionLogic.setup_with_region">[docs]</a>

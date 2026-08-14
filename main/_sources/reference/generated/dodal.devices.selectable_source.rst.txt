@@ -14,8 +14,8 @@ dodal.devices.selectable\_source
    :toctree:
    :recursive:
 
+   ~selectable_source.DualEnergySource
    ~selectable_source.SelectedSource
-   ~selectable_source.SourceSelector
 
 
 

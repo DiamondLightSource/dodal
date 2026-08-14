@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.5.5.dev5+gf5f3c89bd documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_detector &#8212; dodal 2.5.5.dev6+g25167f287 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=fb501f19"></script>
+    <script src="../../../../../_static/documentation_options.js?v=189d0156"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,12 +885,10 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.electron_analyser.base.base_detector</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preparable</span><span class="p">,</span> <span class="n">Stageable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Array1D</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
@@ -905,40 +903,12 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnergyMode</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BaseRegion</span><span class="p">,</span>
-    <span class="n">BaseSequence</span><span class="p">,</span>
-    <span class="n">GenericRegion</span><span class="p">,</span>
-    <span class="n">TBaseRegion</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericRegion</span><span class="p">,</span> <span class="n">TBaseRegion</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_binding_energy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.detector_logic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ElectronAnalyserTriggerLogic</span><span class="p">,</span>
     <span class="n">RegionLogic</span><span class="p">,</span>
 <span class="p">)</span>
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">SequenceHolder</span><span class="p">(</span><span class="n">Stageable</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper to hold the sequence data for an electron analyser.</span>
-
-<span class="sd">    Used in scans when we need to hold the state of the configured sequence of regions</span>
-<span class="sd">    to give to the electron analyser for each step of a scan.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="n">BaseSequence</span><span class="p">[</span><span class="n">BaseRegion</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">BaseSequence</span><span class="p">[</span><span class="n">BaseRegion</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="ElectronAnalyserDetector">
@@ -963,15 +933,14 @@ window.runMermaid = runMermaid;</script>
         <span class="n">config_sigs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SignalR</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">SequenceHolder</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span> <span class="o">=</span> <span class="n">region_logic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_binding_energy_axis</span><span class="p">,</span>
             <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
-            <span class="n">energy_axis</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_axis</span><span class="p">,</span>
+            <span class="n">energy_axis</span><span class="o">=</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_axis</span><span class="p">,</span>
             <span class="n">excitation_energy</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">energy_source</span><span class="p">,</span>
-            <span class="n">energy_mode</span><span class="o">=</span><span class="n">region_logic</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_mode</span><span class="p">,</span>
+            <span class="n">energy_mode</span><span class="o">=</span><span class="n">driver</span><span class="o">.</span><span class="n">energy_mode</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span> <span class="o">=</span> <span class="n">region_logic</span>
         <span class="n">config_sigs</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">binding_energy_axis</span><span class="p">,</span> <span class="o">*</span><span class="n">config_sigs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">driver</span><span class="p">,</span>
@@ -1020,29 +989,6 @@ window.runMermaid = runMermaid;</script>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">TBaseRegion</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure detector with regions from plans.&quot;&quot;&quot;</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_logic</span><span class="o">.</span><span class="n">setup_with_region</span><span class="p">(</span><span class="n">region</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ElectronAnalyserDetector.stage">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.stage">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare the detector for use by ensuring it is idle and ready.</span>
-
-<span class="sd">        This method asynchronously stages the detector by disarming the controller to</span>
-<span class="sd">        ensure the detector is not actively acquiring data.</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            Any exceptions raised by the driver&#39;s stage or controller&#39;s disarm methods.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">stage</span><span class="p">())</span></div>
-
-
-<div class="viewcode-block" id="ElectronAnalyserDetector.unstage">
-<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.base.ElectronAnalyserDetector.unstage">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Disarm the detector.&quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">unstage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">.</span><span class="n">unstage</span><span class="p">())</span></div>
 </div>
 
 
