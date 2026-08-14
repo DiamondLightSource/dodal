@@ -1,0 +1,43 @@
+dodal.devices.common\_mirror.XYZPiezoSwitchingMirror
+====================================================
+
+.. currentmodule:: dodal.devices.common_mirror
+
+.. autoclass:: XYZPiezoSwitchingMirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

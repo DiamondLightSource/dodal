@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i19.access\_controlled.attenuator\_motor\_squad.AttenuatorMotorSquad
+============================================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad
+
+.. autoclass:: AttenuatorMotorSquad
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AttenuatorMotorSquad.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

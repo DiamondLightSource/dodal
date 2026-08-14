@@ -1,0 +1,81 @@
+dodal.devices.diamond\_filter.I03Filters
+========================================
+
+.. currentmodule:: dodal.devices.diamond_filter
+
+.. autoclass:: I03Filters
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I03Filters.EMPTY
+      
+      
+      ~I03Filters.TWO_HUNDRED
+      
+      
+      ~I03Filters.ONE_HUNDRED
+      
+   
+   

@@ -1,0 +1,38 @@
+dodal.devices.detector
+======================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~detector.DetectorParams
+   ~detector.TriggerMode
+   ~detector.DetectorDistanceToBeamXYConverter
+
+
+
+
+.. automodule:: dodal.devices.detector
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

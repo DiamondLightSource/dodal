@@ -1,0 +1,57 @@
+dodal.devices.tetramm.SummingTetrammDetector
+============================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: SummingTetrammDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SummingTetrammDetector.get_detector_trigger_logic
+      
+      
+      
+      ~SummingTetrammDetector.get_shape
+      
+      
+      
+      
+      ~SummingTetrammDetector.prepare
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.beamlines.i22.dcm
+===============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i22
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~dcm.DCM
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i22.dcm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

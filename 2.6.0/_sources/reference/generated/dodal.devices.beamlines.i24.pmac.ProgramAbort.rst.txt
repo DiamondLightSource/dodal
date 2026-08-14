@@ -1,0 +1,23 @@
+dodal.devices.beamlines.i24.pmac.ProgramAbort
+=============================================
+
+.. currentmodule:: dodal.devices.beamlines.i24.pmac
+
+.. autoclass:: ProgramAbort
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~ProgramAbort.trigger
+      
+   
+   
+
+   
+   
+   

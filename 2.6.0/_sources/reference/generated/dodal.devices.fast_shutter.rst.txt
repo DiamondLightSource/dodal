@@ -1,0 +1,39 @@
+dodal.devices.fast\_shutter
+===========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~fast_shutter.DualFastShutter
+   ~fast_shutter.FastShutter
+   ~fast_shutter.GenericFastShutter
+   ~fast_shutter.OpenClose
+
+
+
+
+.. automodule:: dodal.devices.fast_shutter
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
