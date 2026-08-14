@@ -52,7 +52,7 @@ class DualEnergySource(StandardReadable):
         selected_source: SignalRW[SelectedSource],
         name: str = "",
     ):
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_r(
                 self._energy_from_selected_source,
                 "eV",
