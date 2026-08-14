@@ -9,7 +9,7 @@ from ophyd_async.core import (
     StandardReadableFormat,
     TimeoutCalculator,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
 from dodal.devices.insertion_device.access_control import (
     UndulatorAccessControl,
@@ -68,7 +68,7 @@ class UndulatorGap(MotorStringSetpoint, UndulatorCoordinatableMove[float]):
         self, prefix: str, access_control: UndulatorAccessControl, name: str = ""
     ):
         self.user_setpoint_str = epics_signal_rw(str, prefix + "BLGSET")
-        self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
+        self.set_move = epics_signal_w(int, prefix + "BLGSETP")
         super().__init__(prefix + "BLGAPMTR", name=name)
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
