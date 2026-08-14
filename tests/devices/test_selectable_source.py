@@ -91,8 +91,8 @@ async def test_dual_energy_souce_read(
         {
             "source_selector": partial_reading(SelectedSource.SOURCE1),
             "dual_energy_source-energy": partial_reading(s1_val),
-            "source1_name": partial_reading(s1_val),
-            "source2_name": partial_reading(s2_val),
+            "source1": partial_reading(s1_val),
+            "source2": partial_reading(s2_val),
         },
     )
 
@@ -105,8 +105,8 @@ async def test_dual_energy_souce_read_configuration(
     await assert_configuration(
         dual_energy_source,
         {
-            "dual_energy_source-source1": partial_reading(source1.name),
-            "dual_energy_source-source2": partial_reading(source2.name),
+            "dual_energy_source-source1_name": partial_reading(source1.name),
+            "dual_energy_source-source2_name": partial_reading(source2.name),
         },
     )
 
