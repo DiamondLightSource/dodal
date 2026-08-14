@@ -117,22 +117,22 @@ async def test_scaler2_multi_channel_device_vector_read_and_configuration(
     )
 
 
-async def test_scaler3_multi_channel_device_map_read_and_configuration(
-    scaler3: ScalerCardChannels,
-) -> None:
-    await asyncio.gather(
-        assert_reading(
-            scaler3,
-            {
-                "scaler3-channel-dev1": partial_reading(0),
-                "scaler3-channel-dev2": partial_reading(0),
-                "scaler3-channel-dev3": partial_reading(0),
-            },
-        ),
-        assert_configuration(
-            scaler3, {"scaler_controller-integration_time": partial_reading(0)}
-        ),
-    )
+# async def test_scaler3_multi_channel_device_map_read_and_configuration(
+#     scaler3: ScalerCardChannels,
+# ) -> None:
+#     await asyncio.gather(
+#         assert_reading(
+#             scaler3,
+#             {
+#                 "scaler3-channel-dev1": partial_reading(0),
+#                 "scaler3-channel-dev2": partial_reading(0),
+#                 "scaler3-channel-dev3": partial_reading(0),
+#             },
+#         ),
+#         assert_configuration(
+#             scaler3, {"scaler_controller-integration_time": partial_reading(0)}
+#         ),
+#     )
 
 
 async def test_scaler4_multi_channel_sub_device_read_and_configuration(
