@@ -47,7 +47,9 @@ class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
 
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         await self.setpoint.set(new_position, timeout=timeout())
-        await self.access_control.set_move_and_wait_for_gate(self.set_move, timeout())
+        await self.access_control.move_and_wait_for_gate(
+            self.set_move, timeout=timeout()
+        )
 
 
 class UndulatorGap(MotorStringSetpoint, UndulatorCoordinatableMove[float]):

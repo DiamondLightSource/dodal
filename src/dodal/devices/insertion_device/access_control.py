@@ -9,6 +9,15 @@ from dodal.devices.insertion_device.enum import UndulatorGateStatus
 
 
 class UndulatorAccessControl(StandardReadable, Checkable[None]):
+    """Provides access-control and motion-gating signals for an undulator.
+
+    The access-control signals are shared by the undulator's individual
+    components, such as the gap and phase axes. This class verifies that the
+    undulator is enabled and not already moving before accepting a move, and
+    provides the common mechanism for triggering a move and waiting for the
+    undulator gate to close.
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
@@ -25,8 +34,9 @@ class UndulatorAccessControl(StandardReadable, Checkable[None]):
         if gate_val is UndulatorGateStatus.OPEN:
             raise RuntimeError(f"{self.gate.name} is already in motion.")
 
-    async def set_move_and_wait_for_gate(
-        self, set_move: SignalW[int], timeout: float | None
+    async def move_and_wait_for_gate(
+        self, *set_moves: SignalW[int], timeout: float | None
     ):
-        await set_move.set(1, timeout)
+        coroutine = [set_move.set(1, timeout) for set_move in set_moves]
+        await asyncio.gather(*coroutine)
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)

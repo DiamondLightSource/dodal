@@ -103,8 +103,8 @@ class UndulatorPhaseAxesBase(
         await self.set_demand_positions(value)
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
-        await self.access_control_ref().set_move_and_wait_for_gate(
-            self.set_move, timeout
+        await self.access_control_ref().move_and_wait_for_gate(
+            self.set_move, timeout=timeout
         )
 
 

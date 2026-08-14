@@ -86,9 +86,8 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             phase.set_demand_positions(id_motor_values.phase),
         )
         timeout = max(await asyncio.gather(gap.get_timeout(), phase.get_timeout()))
-        await asyncio.gather(
-            gap.set_move.set(value=1, timeout=timeout),
-            phase.set_move.set(value=1, timeout=timeout),
+        await access_control.move_and_wait_for_gate(
+            gap.set_move, phase.set_move, timeout=timeout
         )
         await wait_for_value(
             access_control.gate, UndulatorGateStatus.CLOSE, timeout=timeout
