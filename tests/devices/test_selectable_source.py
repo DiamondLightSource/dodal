@@ -17,7 +17,7 @@ from dodal.devices.selectable_source import (
 
 
 def test_get_obj_from_selected_source_get() -> None:
-    obj1, obj2 = 1, 2
+    obj1, obj2 = object(), object()
     selected_obj = get_obj_from_selected_source(SelectedSource.SOURCE1, obj1, obj2)
     assert selected_obj is obj1
     selected_obj = get_obj_from_selected_source(SelectedSource.SOURCE2, obj1, obj2)
@@ -91,8 +91,8 @@ async def test_dual_energy_souce_read(
         {
             "source_selector": partial_reading(SelectedSource.SOURCE1),
             "dual_energy_source-energy": partial_reading(s1_val),
-            "source1": partial_reading(s1_val),
-            "source2": partial_reading(s2_val),
+            "source1_name": partial_reading(s1_val),
+            "source2_name": partial_reading(s2_val),
         },
     )
 

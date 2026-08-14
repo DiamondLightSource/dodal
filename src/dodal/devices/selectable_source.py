@@ -63,8 +63,12 @@ class DualEnergySource(StandardReadable):
 
         self._validate_config_signal([source1, source2])
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.source1, _ = soft_signal_r_and_setter(str, initial_value=source1.name)
-            self.source2, _ = soft_signal_r_and_setter(str, initial_value=source2.name)
+            self.source1_name, _ = soft_signal_r_and_setter(
+                str, initial_value=source1.name
+            )
+            self.source2_name, _ = soft_signal_r_and_setter(
+                str, initial_value=source2.name
+            )
         self.add_readables([selected_source, source1, source2])
 
         super().__init__(name)
