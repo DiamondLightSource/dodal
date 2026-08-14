@@ -11,7 +11,7 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnergyMotorConvertor,
 )
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device.apple2 import (
     Apple2LockedPhasesVal,
     PhaseAxesType,
 )
@@ -190,7 +190,7 @@ class AppleKnotController(
         # get current apple2 value
         current_phase_top, current_gap = await asyncio.gather(
             self.apple2_ref().phase_ref().top_outer.user_readback.get_value(),
-            self.apple2_ref().gap_ref().motor.user_readback.get_value(),
+            self.apple2_ref().gap_ref().user_readback.get_value(),
         )
         current_apple2_val = self._get_apple2_value(
             current_gap, current_phase_top, Pol.NONE

@@ -28,22 +28,23 @@ from dodal.devices.beamlines.i10.i10_setting_data import I10Grating
 from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     BeamEnergy,
+    ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     Pol,
-    UndulatorGap,
     UndulatorGateStatus,
-    UndulatorJawPhase,
-    UndulatorPhaseAxes,
-)
-from dodal.devices.insertion_device.energy_motor_lookup import (
-    ConfigServerEnergyMotorLookup,
 )
 from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
     LookupTableColumnConfig,
     Source,
+)
+from dodal.devices.insertion_device.undulator import (
+    UndulatorAccessControl,
+    UndulatorGap,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.beamlines.i10.test_data import (
@@ -76,10 +77,14 @@ async def mock_id(
     mock_id_gap: UndulatorGap,
     mock_phase_axes: UndulatorPhaseAxes,
     mock_jaw_phase: UndulatorJawPhase,
+    mock_id_access_control: UndulatorAccessControl,
 ) -> I10Apple2:
     async with init_devices(mock=True):
         mock_id = I10Apple2(
-            id_gap=mock_id_gap, id_phase=mock_phase_axes, id_jaw_phase=mock_jaw_phase
+            gap=mock_id_gap,
+            phase=mock_phase_axes,
+            jaw_phase=mock_jaw_phase,
+            access_control=mock_id_access_control,
         )
     return mock_id
 
@@ -222,7 +227,7 @@ async def test_i10_apple2_controller_determine_pol(
 async def test_fail_i10_apple2_controller_set_undefined_pol(
     mock_id_controller: I10Apple2Controller,
 ):
-    set_mock_value(mock_id_controller.apple2_ref().gap_ref().motor.user_readback, 101)
+    set_mock_value(mock_id_controller.apple2_ref().gap_ref().user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
     assert (
@@ -234,17 +239,20 @@ async def test_fail_i10_apple2_controller_set_undefined_pol(
 
 async def test_fail_i10_apple2_controller_set_id_not_ready(
     mock_id_controller: I10Apple2Controller,
+    mock_id_access_control: UndulatorAccessControl,
 ):
-    gap = mock_id_controller.apple2_ref().gap_ref()
-    set_mock_value(gap.status, EnabledDisabledUpper.DISABLED)
+    set_mock_value(mock_id_access_control.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
-    assert str(e.value) == gap.status.name + " is DISABLED and cannot move."
-    set_mock_value(gap.status, EnabledDisabledUpper.ENABLED)
-    set_mock_value(gap.gate, UndulatorGateStatus.OPEN)
+    assert (
+        str(e.value)
+        == mock_id_access_control.status.name + " is DISABLED and cannot move."
+    )
+    set_mock_value(mock_id_access_control.status, EnabledDisabledUpper.ENABLED)
+    set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
-    assert str(e.value) == gap.gate.name + " is already in motion."
+    assert str(e.value) == mock_id_access_control.gate.name + " is already in motion."
 
 
 async def test_fail_i10_apple2_controller_set_energy_has_default(
@@ -355,9 +363,7 @@ async def test_id_polarisation_set(
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(
-            mock_id_controller.apple2_ref().gap_ref().motor.user_setpoint
-        )
+        gap = get_mock_put(mock_id_controller.apple2_ref().gap_ref().user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
@@ -563,9 +569,8 @@ async def test_linear_arbitrary_run_engine_scan(
     )
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=num_point, stop=1)
     apple2 = mock_id_controller.apple2_ref()
-    set_mock_value(apple2.gap_ref().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(apple2.phase_ref().gate, UndulatorGateStatus.CLOSE)
-    jaw_phase = get_mock_put(apple2.jaw_phase().jaw_phase.user_setpoint)
+    set_mock_value(apple2.access_control_ref().gate, UndulatorGateStatus.CLOSE)
+    jaw_phase = get_mock_put(apple2.jaw_phase_ref().jaw_phase.user_setpoint)
 
     poly = poly1d(
         DEFAULT_JAW_PHASE_POLY_PARAMS

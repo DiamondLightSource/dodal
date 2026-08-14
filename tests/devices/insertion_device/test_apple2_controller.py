@@ -7,15 +7,16 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
-    Apple2LockedPhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
     Pol,
-    UndulatorGateStatus,
+)
+from dodal.devices.insertion_device.undulator import (
+    Apple2LockedPhasesVal,
+    UndulatorAccessControl,
     UndulatorLockedPhaseAxes,
 )
 
@@ -26,23 +27,22 @@ TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 
 @pytest.fixture
 async def mock_locked_phase_axes(
-    prefix: str = "BLXX-EA-DET-007:",
+    mock_id_access_control: UndulatorAccessControl,
 ) -> UndulatorLockedPhaseAxes:
     async with init_devices(mock=True):
         mock_phase_axes = UndulatorLockedPhaseAxes(
-            prefix=prefix,
+            prefix="BLXX-EA-DET-007:",
             top_outer="RPQ1",
             btm_inner="RPQ4",
+            access_control=mock_id_access_control,
         )
     assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_phase_axes.top_outer.velocity, 2)
     set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
     set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
     set_mock_value(mock_phase_axes.btm_inner.user_readback, 2)
     set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 2)
     set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
     return mock_phase_axes
 
 

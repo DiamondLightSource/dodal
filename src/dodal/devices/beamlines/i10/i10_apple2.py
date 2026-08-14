@@ -15,14 +15,19 @@ from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
-    Apple2PhasesVal,
     Apple2Val,
-    UndulatorGap,
-    UndulatorJawPhase,
-    UndulatorPhaseAxes,
 )
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 from dodal.devices.insertion_device.enum import Pol
+from dodal.devices.insertion_device.undulator.access_control import (
+    UndulatorAccessControl,
+)
+from dodal.devices.insertion_device.undulator.gap import UndulatorGap
+from dodal.devices.insertion_device.undulator.phase_axes import (
+    Apple2PhasesVal,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
+)
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
@@ -35,22 +40,23 @@ class I10Apple2(Apple2[UndulatorPhaseAxes]):
     """I10Apple2 device is an apple2 with extra jaw phase motor.
 
     Args:
-        id_gap (UndulatorJawPhase): The gap motor of the undulator.
-        id_phase (UndulatorJawPhase): The phase motors of the undulator.
-        id_jaw_phase (UndulatorJawPhase): The jaw phase motor of the undulator.
+        gap (UndulatorJawPhase): The gap motor of the undulator.
+        phase (UndulatorJawPhase): The phase motors of the undulator.
+        jaw_phase (UndulatorJawPhase): The jaw phase motor of the undulator.
         name (str, optional): The name of the device, by default "".
     """
 
     def __init__(
         self,
-        id_gap: UndulatorGap,
-        id_phase: UndulatorPhaseAxes,
-        id_jaw_phase: UndulatorJawPhase,
+        gap: UndulatorGap,
+        phase: UndulatorPhaseAxes,
+        jaw_phase: UndulatorJawPhase,
+        access_control: UndulatorAccessControl,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
-            self.jaw_phase = Reference(id_jaw_phase)
-        super().__init__(id_gap=id_gap, id_phase=id_phase, name=name)
+            self.jaw_phase_ref = Reference(jaw_phase)
+        super().__init__(gap=gap, phase=phase, access_control=access_control, name=name)
 
 
 class I10Apple2Controller(Apple2Controller[I10Apple2]):
@@ -124,7 +130,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                 f"jaw_phase position for angle ({pol_angle}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.apple2_ref().jaw_phase().set(jaw_phase)
+        await self.apple2_ref().jaw_phase_ref().set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
@@ -144,8 +150,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     ) -> None:
         await super()._set_motors_from_energy_and_polarisation(energy, pol)
         if pol != Pol.LA:
-            await self.apple2_ref().jaw_phase().set(0)
-            await self.apple2_ref().jaw_phase().set_move.set(1)
+            await self.apple2_ref().jaw_phase_ref().set(0)
+            await self.apple2_ref().jaw_phase_ref().set_move.set(1)
 
     def _raise_if_not_la(self, pol: Pol) -> None:
         if pol != Pol.LA:

@@ -5,13 +5,16 @@ from typing import Generic
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, Reference, StandardReadable, wait_for_value
 
-from dodal.devices.insertion_device.apple2_undulator_gap import UndulatorGap
-from dodal.devices.insertion_device.apple2_undulator_phase_axes import (
+from dodal.devices.insertion_device.enum import UndulatorGateStatus
+from dodal.devices.insertion_device.undulator.access_control import (
+    UndulatorAccessControl,
+)
+from dodal.devices.insertion_device.undulator.gap import UndulatorGap
+from dodal.devices.insertion_device.undulator.phase_axes import (
     Apple2LockedPhasesVal,
     Apple2PhasesVal,
     PhaseAxesType,
 )
-from dodal.devices.insertion_device.enum import UndulatorGateStatus
 from dodal.log import LOGGER
 
 
@@ -19,9 +22,6 @@ from dodal.log import LOGGER
 class Apple2Val:
     gap: float
     phase: Apple2LockedPhasesVal | Apple2PhasesVal
-
-    def extract_phase_val(self):
-        return self.phase
 
 
 class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
@@ -33,15 +33,22 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             consisting offour phase motors.
 
     Args:
-        id_gap (UndulatorGap): An UndulatorGap device.
-        id_phase (UndulatorPhaseAxes): An UndulatorPhaseAxes device.
+        gap (UndulatorGap): An UndulatorGap device.
+        phase (UndulatorPhaseAxes): An UndulatorPhaseAxes device.
         name (str, optional): Name of the device.
     """
 
-    def __init__(self, id_gap: UndulatorGap, id_phase: PhaseAxesType, name=""):
+    def __init__(
+        self,
+        gap: UndulatorGap,
+        phase: PhaseAxesType,
+        access_control: UndulatorAccessControl,
+        name: str = "",
+    ):
         with self.add_children_as_readables():
-            self.gap_ref = Reference(id_gap)
-            self.phase_ref = Reference(id_phase)
+            self.gap_ref = Reference(gap)
+            self.phase_ref = Reference(phase)
+            self.access_control_ref = Reference(access_control)
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -51,18 +58,19 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         """
         gap = self.gap_ref()
         phase = self.phase_ref()
-        # Only need to check gap as the phase motors share both status and gate with gap.
-        await gap.raise_if_cannot_move()
+        access_control = self.access_control_ref()
+
+        LOGGER.info(f"Moving {self.name} apple2 motors to {id_motor_values}")
+        await access_control.check_value()
         await asyncio.gather(
-            phase.set_demand_positions(value=id_motor_values.extract_phase_val()),
-            gap.set_demand_positions(value=float(id_motor_values.gap)),
+            gap.set_demand_positions(id_motor_values.gap),
+            phase.set_demand_positions(id_motor_values.phase),
         )
         timeout = max(await asyncio.gather(gap.get_timeout(), phase.get_timeout()))
-        LOGGER.info(
-            f"Moving {self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
-        )
         await asyncio.gather(
             gap.set_move.set(value=1, timeout=timeout),
             phase.set_move.set(value=1, timeout=timeout),
         )
-        await wait_for_value(gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+        await wait_for_value(
+            access_control.gate, UndulatorGateStatus.CLOSE, timeout=timeout
+        )

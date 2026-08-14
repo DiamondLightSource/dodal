@@ -12,14 +12,14 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from dodal.devices.insertion_device.apple2_undulator import Apple2, Apple2Val
-from dodal.devices.insertion_device.apple2_undulator_phase_axes import (
+from dodal.devices.insertion_device.apple2 import Apple2, Apple2Val
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
+from dodal.devices.insertion_device.enum import Pol
+from dodal.devices.insertion_device.undulator.phase_axes import (
     Apple2PhasesVal,
     PhaseAxesType,
     UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
-from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -145,7 +145,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 top_inner=top_inner,
                 btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
-                gap=self.apple2_ref().gap_ref().motor.user_readback,
+                gap=self.apple2_ref().gap_ref().user_readback,
             )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
@@ -153,7 +153,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 set_derived=self._set_energy,
                 energy=self._energy,
                 pol=self.polarisation,
-                gap=self.apple2_ref().gap_ref().motor.user_readback,
+                gap=self.apple2_ref().gap_ref().user_readback,
                 derived_units=units,
             )
 
