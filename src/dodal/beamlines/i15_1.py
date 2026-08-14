@@ -42,6 +42,9 @@ XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.x
 XPDF_CRYSTAL_LUT_FILEPATH = (
     "/dls_sw/i15-1/software/daq_configuration/xpdf_crystal_lut.txt"
 )
+TTH_ANGLE_TO_COLLECTION_TIME_FILEPATH = (
+    "/dls_sw/i15-1/software/daq_configuration/tth_angle_to_collection_time.txt"
+)
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 
