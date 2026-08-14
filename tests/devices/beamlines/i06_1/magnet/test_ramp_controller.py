@@ -2,10 +2,7 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.beamlines.i06_1.magnet import (
-    MagnetAxisRampRateController,
-    MagnetThreeAxesRampRateController,
-)
+from dodal.devices.beamlines.i06_1.magnet import MagnetAxisRampRateController
 
 
 @pytest.fixture
@@ -41,20 +38,13 @@ async def test_magx_ramp_rate_set_above_limit_throws_error(
 
 
 @pytest.fixture
-def mag_three_axis_ramp_rate() -> MagnetThreeAxesRampRateController:
+def axis_ramp_rate() -> MagnetAxisRampRateController:
     with init_devices(mock=True):
-        mag_three_axis_ramp_rate = MagnetThreeAxesRampRateController("TEST:")
-    return mag_three_axis_ramp_rate
+        axis_ramp_rate = MagnetAxisRampRateController("TEST:")
+    return axis_ramp_rate
 
 
 async def test_mag_three_axis_ramp_rate_read(
-    mag_three_axis_ramp_rate: MagnetThreeAxesRampRateController,
+    axis_ramp_rate: MagnetAxisRampRateController,
 ) -> None:
-    await assert_reading(
-        mag_three_axis_ramp_rate,
-        {
-            "mag_three_axis_ramp_rate-x": partial_reading(0),
-            "mag_three_axis_ramp_rate-y": partial_reading(0),
-            "mag_three_axis_ramp_rate-z": partial_reading(0),
-        },
-    )
+    await assert_reading(axis_ramp_rate, {"axis_ramp_rate": partial_reading(0)})

@@ -49,9 +49,9 @@ from dodal.devices.beamlines.i06_1.magnet.movement import (
     SphericalMovement,
     UniaxialMovement,
 )
-from dodal.devices.beamlines.i06_1.magnet.ramp_controller import (
-    MagnetAxisRampRateController,
-    MagnetThreeAxesRampRateController,
+from dodal.devices.beamlines.i06_1.magnet.power_supply import (
+    MagnetAxisPowerSupply,
+    ThreeMagnetAxisPowerSupply,
 )
 
 
@@ -93,11 +93,11 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         self,
         prefix: str,
         axis_mode: MagnetMode,
-        ramp_rate: MagnetAxisRampRateController,
+        psu: MagnetAxisPowerSupply,
         magnet_set_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
     ):
-        self.ramp_rate_ref = Reference(ramp_rate)
+        self.psu_ref = Reference(psu)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, prefix + "RBV")
@@ -120,7 +120,7 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMagnetInfo):
         self._fly_info = value
-        await self.ramp_rate_ref().set(value.ramp_rate)
+        await self.psu_ref().ramp_rate.set(value.ramp_rate)
         await self.set(value.start_position)
 
     @AsyncStatus.wrap
@@ -153,19 +153,19 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
     def __init__(
         self,
         prefix: str,
-        ramp_rate: MagnetThreeAxesRampRateController,
+        psu: ThreeMagnetAxisPowerSupply,
         mag_within_boundary: MagnetMoveWithinBoundary,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
             self.x = MagnetAxis(
-                prefix + "X:", MagnetMode.UNIAXIAL_X, ramp_rate.x, mag_within_boundary
+                prefix + "X:", MagnetMode.UNIAXIAL_X, psu.x, mag_within_boundary
             )
             self.y = MagnetAxis(
-                prefix + "Y:", MagnetMode.UNIAXIAL_Y, ramp_rate.y, mag_within_boundary
+                prefix + "Y:", MagnetMode.UNIAXIAL_Y, psu.y, mag_within_boundary
             )
             self.z = MagnetAxis(
-                prefix + "Z:", MagnetMode.UNIAXIAL_Z, ramp_rate.z, mag_within_boundary
+                prefix + "Z:", MagnetMode.UNIAXIAL_Z, psu.z, mag_within_boundary
             )
         self._set_mag_within_boundary = mag_within_boundary
         super().__init__(name)
@@ -246,6 +246,17 @@ class MockSuperConductingMagnetController(
     the hardware as best we can.
     """
 
+    # Pulled directly from live IOC so can replicate behaviour in mock mode.
+    PSU_AXIS_LIMITS: dict[MagnetMode, tuple[float, float, float]] = {
+        MagnetMode.UNIAXIAL_X: (2, 0, 0),
+        MagnetMode.UNIAXIAL_Y: (0, 2, 0),
+        MagnetMode.UNIAXIAL_Z: (0, 0, 6),
+        MagnetMode.CUBIC: (2, 2, 2),
+        MagnetMode.QUADRANT_XY: (2, 2, 2),
+        MagnetMode.PLANAR_XZ: (2, 0, 2),
+        MagnetMode.SPHERICAL: (2, 2, 2),
+    }
+
     async def connect(self, device: "SuperConductingMagnetController"):
 
         async def _trigger_start_ramp():
@@ -264,13 +275,21 @@ class MockSuperConductingMagnetController(
 
         callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
 
-        async def _set_mode(value):
+        async def _set_mode(mode: MagnetMode):
             # Whenever mode is set, ioc automatically sets everything to zero and
             # triggers a ramp.
             set_mock_value(device.cart.x.demand, 0.0)
             set_mock_value(device.cart.y.demand, 0.0)
             set_mock_value(device.cart.z.demand, 0.0)
+            _configure_axis_limit(mode)
+
             await _trigger_start_ramp()
+
+        def _configure_axis_limit(mode: MagnetMode) -> None:
+            x, y, z = self.PSU_AXIS_LIMITS[mode]
+            set_mock_value(device.psu_ref().x.limit, x)
+            set_mock_value(device.psu_ref().y.limit, y)
+            set_mock_value(device.psu_ref().z.limit, z)
 
         callback_on_mock_put(device.mode, _set_mode)
         set_mock_value(device.limit_status, MagnetLimitStatus.OK)
@@ -305,7 +324,7 @@ class SuperConductingMagnetController(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        ramp_controllers: MagnetThreeAxesRampRateController,
+        psu: ThreeMagnetAxisPowerSupply,
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -313,7 +332,7 @@ class SuperConductingMagnetController(StandardReadable):
 
         with self.add_children_as_readables():
             self.cart = MagnetCartesianCoordinates(
-                prefix, ramp_controllers, self.set_within_boundary
+                prefix, psu, self.set_within_boundary
             )
             self.sph = MagnetSphericalCoordinates(self.cart, self.set_within_boundary)
 
@@ -321,6 +340,8 @@ class SuperConductingMagnetController(StandardReadable):
         self.limit_status = epics_signal_rw(MagnetLimitStatus, prefix + "LIMITSTATUS")
         # Make private so cannot trigger without going through magnet API.
         self._start_ramp = epics_triggerable_command(prefix + "STARTRAMP.PROC")
+
+        self.psu_ref = Reference(psu)
         # Used to block parallel moves that are not submitted together. Allows us to
         # always be sure we safely move the magnet using coordinated logic.
         self._moving = False
@@ -335,7 +356,9 @@ class SuperConductingMagnetController(StandardReadable):
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
         await self._start_ramp.trigger()
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=None)
+        # Add a high bound limit to the timeout to avoid it getting stuck.
+        # https://github.com/DiamondLightSource/dodal/issues/2166
+        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=500)
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
@@ -391,11 +414,13 @@ class SuperConductingMagnetController(StandardReadable):
             )
             # Check final requested position is within limits.
             movement_strategy.check_within_limits(current_readback, value)
+            await self.psu_ref().check_axes_within_limit(value, mode)
             for step in movement_strategy.move_steps(current_readback, value):
                 self.log.debug(
                     f"Applying movement step {step}. Current readback is {current_readback}."
                 )
-                # Check each generated step with the current readback is within limits.
+                # Check each generated step is also within limit.
+                await self.psu_ref().check_axes_within_limit(step, mode)
                 movement_strategy.check_within_limits(current_readback, step)
                 await self._apply_step(step)
                 current_readback = await self.cart.get_readback_position()

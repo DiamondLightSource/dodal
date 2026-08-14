@@ -1,6 +1,6 @@
 import asyncio
 import math
-from unittest.mock import AsyncMock, MagicMock, call, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
 from bluesky import FailedStatus, RunEngine
@@ -20,8 +20,8 @@ from dodal.devices.beamlines.i06_1.magnet import (
     MagnetRampStatus,
     MagnetRequest,
     MagnetSphericalPosition,
-    MagnetThreeAxesRampRateController,
     SuperConductingMagnetController,
+    ThreeMagnetAxisPowerSupply,
     movement,
 )
 from dodal.devices.beamlines.i06_1.magnet.movement import MovementStrategy
@@ -31,18 +31,18 @@ from tests.devices.beamlines.i06_1.magnet.utils import (
 
 
 @pytest.fixture
-def ramp_rate() -> MagnetThreeAxesRampRateController:
+def scmc_psu() -> ThreeMagnetAxisPowerSupply:
     with init_devices(mock=True):
-        ramp_rate = MagnetThreeAxesRampRateController("TEST:")
+        ramp_rate = ThreeMagnetAxisPowerSupply("TEST:")
     return ramp_rate
 
 
 @pytest.fixture
 def scmc(
-    ramp_rate: MagnetThreeAxesRampRateController,
+    scmc_psu: ThreeMagnetAxisPowerSupply,
 ) -> SuperConductingMagnetController:
     with init_devices(mock=True):
-        scmc = SuperConductingMagnetController("TEST:", ramp_rate)
+        scmc = SuperConductingMagnetController("TEST:", scmc_psu)
     return scmc
 
 
@@ -202,12 +202,14 @@ async def test_scmc_raises_error_if_limit_status_is_violation(
 )
 async def test_scmc_axis_with_ramp_rate_wired_correctly_with_prepare(
     scmc: SuperConductingMagnetController,
-    ramp_rate: MagnetThreeAxesRampRateController,
+    scmc_psu: ThreeMagnetAxisPowerSupply,
     mode: MagnetMode,
 ) -> None:
     await scmc.mode.set(mode)
     magnet_axis: MagnetAxis = getattr(scmc.cart, mode.axis_alias)
-    ramp_axis: MagnetAxisRampRateController = getattr(ramp_rate, mode.axis_alias)
+    ramp_axis: MagnetAxisRampRateController = getattr(
+        scmc_psu, mode.axis_alias
+    ).ramp_rate
 
     fly_info = FlyMagnetInfo(start_position=1, end_position=6, ramp_rate=1.5)
     await magnet_axis.prepare(fly_info)
@@ -334,35 +336,42 @@ async def test_scmc_magnet_mode_to_uniaxial_movement_strategy_configuration(
     )
 
 
-async def test_scmc_executes_movement_stragey_and_ramp_at_each_step(
+async def test_scmc_executes_movement_strategy_and_ramp_at_each_step(
     scmc: SuperConductingMagnetController,
 ) -> None:
-
     movement_strategy = MagicMock()
 
-    mov_str_return_values = [
-        movement.MagnetRequest(z=2),
-        movement.MagnetRequest(x=1, y=2, z=3),
+    move_steps = [
+        movement.MagnetRequest(x=0.5),
+        movement.MagnetRequest(x=1.2),
     ]
+    movement_strategy.move_steps.return_value = move_steps
+
     expected_apply_step_calls = [
-        call(movement.MagnetRequest(z=2)),
-        call(movement.MagnetRequest(x=1, y=2, z=3)),
+        call(movement.MagnetRequest(x=0.5)),
+        call(movement.MagnetRequest(x=1.2)),
     ]
-    movement_strategy.move_steps.return_value = mov_str_return_values
-
     scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_X] = movement_strategy
-
     scmc._trigger_ramp = AsyncMock()
 
-    with patch(
-        "dodal.devices.beamlines.i06_1.magnet.superconducting_magnet.SuperConductingMagnetController._apply_step",
+    with patch.object(
+        scmc,
+        "_apply_step",
         wraps=scmc._apply_step,
     ) as mock_apply_step:
+        # Configures PSU limits to X=2, Y=0, Z=0
         await scmc.mode.set(MagnetMode.UNIAXIAL_X)
-        await scmc.cart.x.set(4)
 
-        assert mock_apply_step.call_args_list == expected_apply_step_calls
-        assert scmc._trigger_ramp.call_count == len(mov_str_return_values)
+        # Target is within the X axis limit
+        await scmc.cart.x.set(1.2)
+
+    movement_strategy.move_steps.assert_called_once_with(
+        ANY,
+        movement.MagnetRequest(x=1.2),
+    )
+
+    assert mock_apply_step.call_args_list == expected_apply_step_calls
+    assert scmc._trigger_ramp.call_count == len(move_steps)
 
 
 async def test_external_parallel_moves_for_scmc_raise_error(
@@ -402,7 +411,8 @@ async def test_scmc_set_within_boundary_checks_each_movement_step(
             position_after_step_2,
         ]
     )
-    scmc.mode.get_value = AsyncMock(return_value=MagnetMode.QUADRANT_XY)
+    # Use actual set so it callbacks to the mock limits
+    await scmc.mode.set(MagnetMode.QUADRANT_XY)
     scmc._apply_step = AsyncMock()
 
     await scmc.set_within_boundary(target)
@@ -435,10 +445,37 @@ async def test_scmc_set_within_boundary_stops_when_step_is_outside_limits(
     scmc.cart.get_readback_position = AsyncMock(
         side_effect=[initial_position, MagnetPosition(x=0, y=1, z=0)]
     )
-    scmc.mode.get_value = AsyncMock(return_value=MagnetMode.QUADRANT_XY)
+    # Use actual set so it callbacks to the mock limits
+    await scmc.mode.set(MagnetMode.QUADRANT_XY)
     scmc._apply_step = AsyncMock()
 
     with pytest.raises(MagnetPositionError):
         await scmc.set_within_boundary(target)
     # The invalid second step must never be applied.
     scmc._apply_step.assert_awaited_once_with(steps[0])
+
+
+@pytest.mark.parametrize(
+    "mode, expected_limits",
+    [
+        (MagnetMode.UNIAXIAL_X, (2, 0, 0)),
+        (MagnetMode.UNIAXIAL_Y, (0, 2, 0)),
+        (MagnetMode.UNIAXIAL_Z, (0, 0, 6)),
+        (MagnetMode.CUBIC, (2, 2, 2)),
+        (MagnetMode.QUADRANT_XY, (2, 2, 2)),
+        (MagnetMode.PLANAR_XZ, (2, 0, 2)),
+        (MagnetMode.SPHERICAL, (2, 2, 2)),
+    ],
+)
+async def test_scmc_mock_axis_limits_are_correct(
+    scmc: SuperConductingMagnetController,
+    mode: MagnetMode,
+    expected_limits: tuple[float, float, float],
+):
+    await scmc.mode.set(mode)
+    limits = await asyncio.gather(
+        scmc.psu_ref().x.limit.get_value(),
+        scmc.psu_ref().y.limit.get_value(),
+        scmc.psu_ref().z.limit.get_value(),
+    )
+    assert limits == list(expected_limits)

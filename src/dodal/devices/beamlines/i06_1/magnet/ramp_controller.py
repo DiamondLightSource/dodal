@@ -23,7 +23,8 @@ class RampRateMovableLogic(MovableLogic[float]):
         limit = await self.limit.get_value()
         if new_position > limit:
             raise ValueError(
-                f"Requested ramp rate {new_position} exceeds the maximum limit of {limit} for device {self.readback.name}."
+                f"Requested ramp rate {new_position} exceeds the maximum limit of "
+                f"{limit} for device {self.readback.name}."
             )
 
     async def move(self, new_position: float, timeout: TimeoutCalculator):
@@ -57,20 +58,3 @@ class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
         return RampRateMovableLogic(
             readback=self.readback, setpoint=self.demand, limit=self.ramp_limit
         )
-
-
-class MagnetThreeAxesRampRateController(StandardReadable):
-    """Groups the ramp rate controllers for the x, y and z magnet axes.
-
-    This device is passed to :class:`SuperConductingMagnetController` so that each
-    :class:`MagnetAxis` can configure its own ramp rate during preparation for
-    fly scans.
-    """
-
-    def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables():
-            self.x = MagnetAxisRampRateController(prefix + "-01:")
-            self.y = MagnetAxisRampRateController(prefix + "-02:")
-            self.z = MagnetAxisRampRateController(prefix + "-03:")
-
-        super().__init__(name)

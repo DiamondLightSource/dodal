@@ -93,6 +93,10 @@ class SphericalMovement(MovementStrategy):
         ]
         # Do all decreasing of axes first as one step. This ensures we don't
         # quench the magnet.
+        # There are no reasons to do the increases in any particular order,
+        # providing we match the speed so that at no point H is beyond the limit
+        # so we can do them all in one step.
+        # https://github.com/DiamondLightSource/sm-bluesky/issues/356
         decrease_kwargs = {}
         increase_kwargs = {}
         for axis, old, new in decreases:
