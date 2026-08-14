@@ -11,11 +11,11 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnergyMotorConvertor,
 )
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device.enum import Pol
+from dodal.devices.insertion_device.phase_axes import (
     Apple2LockedPhasesVal,
     PhaseAxesType,
 )
-from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
 APPLE_KNOT_MAXIMUM_GAP_MOTOR_POSITION = 100.0
@@ -190,7 +190,7 @@ class AppleKnotController(
         # get current apple2 value
         current_phase_top, current_gap = await asyncio.gather(
             self.apple2_ref().phase_ref().top_outer.user_readback.get_value(),
-            self.apple2_ref().gap_ref().motor.user_readback.get_value(),
+            self.apple2_ref().gap_ref().user_readback.get_value(),
         )
         current_apple2_val = self._get_apple2_value(
             current_gap, current_phase_top, Pol.NONE

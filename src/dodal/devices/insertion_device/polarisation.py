@@ -8,7 +8,10 @@ from ophyd_async.core import (
     StandardReadableFormat,
 )
 
-from dodal.devices.insertion_device import MAXIMUM_MOVE_TIME, Apple2Controller
+from dodal.devices.insertion_device.apple2_controller import (
+    MAXIMUM_MOVE_TIME,
+    Apple2Controller,
+)
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 

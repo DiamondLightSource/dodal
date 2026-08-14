@@ -9,6 +9,10 @@ from dodal.devices.beamlines.i05_shared import (
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.insertion_device import (
     Apple2,
+    BeamEnergy,
+    InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
+    UndulatorAccessControl,
     UndulatorGap,
     UndulatorLockedPhaseAxes,
 )
@@ -16,8 +20,6 @@ from dodal.devices.insertion_device.apple_knot_controller import (
     AppleKnotController,
     AppleKnotPathFinder,
 )
-from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEnergy
-from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
@@ -43,16 +45,22 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def id_gap() -> UndulatorGap:
-    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+def id_accesscontrol() -> UndulatorAccessControl:
+    return UndulatorAccessControl(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def id_phase() -> UndulatorLockedPhaseAxes:
+def id_gap(id_accesscontrol: UndulatorAccessControl) -> UndulatorGap:
+    return UndulatorGap(f"{PREFIX.insertion_prefix}-MO-SERVC-01:", id_accesscontrol)
+
+
+@devices.factory()
+def id_phase(id_accesscontrol: UndulatorAccessControl) -> UndulatorLockedPhaseAxes:
     return UndulatorLockedPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="PL",
         btm_inner="PU",
+        access_control=id_accesscontrol,
     )
 
 
@@ -60,9 +68,12 @@ def id_phase() -> UndulatorLockedPhaseAxes:
 def id(
     id_gap: UndulatorGap,
     id_phase: UndulatorLockedPhaseAxes,
+    id_accesscontrol: UndulatorAccessControl,
 ) -> Apple2[UndulatorLockedPhaseAxes]:
     """i05 insertion device."""
-    return Apple2[UndulatorLockedPhaseAxes](id_gap=id_gap, id_phase=id_phase)
+    return Apple2[UndulatorLockedPhaseAxes](
+        gap=id_gap, phase=id_phase, access_control=id_accesscontrol
+    )
 
 
 @devices.factory()
