@@ -2,7 +2,6 @@ from typing import TypeVar
 
 from ophyd_async.core import (
     NotConnectedError,
-    Reference,
     SignalR,
     SignalRW,
     StandardReadable,
@@ -53,9 +52,6 @@ class DualEnergySource(StandardReadable):
         selected_source: SignalRW[SelectedSource],
         name: str = "",
     ):
-        self.selected_source_ref = Reference(selected_source)
-        self.source1_ref = Reference(source1)
-        self.source2_ref = Reference(source2)
         with self.add_children_as_readables():
             self.energy = derived_signal_r(
                 self._energy_from_selected_source,

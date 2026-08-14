@@ -9,13 +9,6 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.beamlines.i09 import Grating
-from dodal.devices.common_dcm import (
-    DoubleCrystalMonochromatorWithDSpacing,
-    PitchAndRollCrystal,
-    StationaryCrystal,
-)
-from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import (
     DualEnergySource,
     SelectedSource,
@@ -39,68 +32,81 @@ def source_selector() -> SignalRW[SelectedSource]:
 
 
 @pytest.fixture
+def source1() -> SignalRW[float]:
+    with init_devices(mock=True):
+        source1 = soft_signal_rw(float, initial_value=2200)
+    return source1
+
+
+@pytest.fixture
+def source2() -> SignalRW[float]:
+    with init_devices(mock=True):
+        source2 = soft_signal_rw(float, initial_value=500)
+    return source2
+
+
+@pytest.fixture
 async def dual_energy_source(
     source_selector: SignalRW[SelectedSource],
+    source1: SignalRW[float],
+    source2: SignalRW[float],
 ) -> DualEnergySource:
     with init_devices(mock=True):
-        dcm = DoubleCrystalMonochromatorWithDSpacing(
-            "DCM:", PitchAndRollCrystal, StationaryCrystal
-        )
-        pgm = PlaneGratingMonochromator("PGM:", Grating)
-    # Do in new context so that dcm and pgm are connected and named before giving to
-    # dual_energy_source.
-    with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
-            source1=dcm.energy_in_eV,
-            source2=pgm.energy.user_readback,
+            source1=source1,
+            source2=source2,
             selected_source=source_selector,
         )
-    await asyncio.gather(dcm.energy_in_keV.set(2.2), pgm.energy.set(500))
     return dual_energy_source
 
 
 async def test_dual_energy_source_energy_is_correct_when_switching_between_sources(
     dual_energy_source: DualEnergySource,
+    source_selector: SignalRW[SelectedSource],
+    source1: SignalRW[float],
+    source2: SignalRW[float],
 ) -> None:
-    dcm_energy_val = await dual_energy_source.source1_ref().get_value()
-    pgm_energy_val = await dual_energy_source.source2_ref().get_value()
+    s1_val, s2_val = await asyncio.gather(source1.get_value(), source2.get_value())
 
     # Make sure energy sources values are different for this test so we can tell them a
     # part when switching
-    assert dcm_energy_val != pgm_energy_val
+    assert s1_val != s2_val
 
-    await dual_energy_source.selected_source_ref().set(SelectedSource.SOURCE1)
-    await assert_value(dual_energy_source.energy, dcm_energy_val)
-    await dual_energy_source.selected_source_ref().set(SelectedSource.SOURCE2)
-    await assert_value(dual_energy_source.energy, pgm_energy_val)
+    await source_selector.set(SelectedSource.SOURCE1)
+    await assert_value(dual_energy_source.energy, s1_val)
+    await source_selector.set(SelectedSource.SOURCE2)
+    await assert_value(dual_energy_source.energy, s2_val)
 
 
-async def test_dual_energy_souce_read(dual_energy_source: DualEnergySource) -> None:
-    await dual_energy_source.selected_source_ref().set(SelectedSource.SOURCE1)
-
-    source1_energy_value = await dual_energy_source.source1_ref().get_value()
-    source2_energy_value = await dual_energy_source.source2_ref().get_value()
-
+async def test_dual_energy_souce_read(
+    dual_energy_source: DualEnergySource,
+    source_selector: SignalRW[SelectedSource],
+    source1: SignalRW[float],
+    source2: SignalRW[float],
+) -> None:
+    await source_selector.set(SelectedSource.SOURCE1)
+    s1_val, s2_val = await asyncio.gather(source1.get_value(), source2.get_value())
     await assert_reading(
         dual_energy_source,
         {
             "source_selector": partial_reading(SelectedSource.SOURCE1),
-            "dual_energy_source-energy": partial_reading(source1_energy_value),
-            "dcm-energy_in_eV": partial_reading(source1_energy_value),
-            "pgm-energy": partial_reading(source2_energy_value),
+            "dual_energy_source-energy": partial_reading(s1_val),
+            "source1": partial_reading(s1_val),
+            "source2": partial_reading(s2_val),
         },
     )
 
 
 async def test_dual_energy_souce_read_configuration(
     dual_energy_source: DualEnergySource,
+    source1: SignalRW[float],
+    source2: SignalRW[float],
 ) -> None:
-    prefix = dual_energy_source.name
     await assert_configuration(
         dual_energy_source,
         {
-            f"{prefix}-source1": partial_reading(dual_energy_source.source1_ref().name),
-            f"{prefix}-source2": partial_reading(dual_energy_source.source2_ref().name),
+            "dual_energy_source-source1": partial_reading(source1.name),
+            "dual_energy_source-source2": partial_reading(source2.name),
         },
     )
 
@@ -109,17 +115,15 @@ def test_dual_energy_source_validate_config_signal(
     source_selector: SignalRW[SelectedSource],
 ) -> None:
     with init_devices(mock=True):
-        dcm = DoubleCrystalMonochromatorWithDSpacing(
-            "DCM:", PitchAndRollCrystal, StationaryCrystal
-        )
-        pgm = PlaneGratingMonochromator("PGM:", Grating)
+        source1 = soft_signal_rw(float)
+        source2 = soft_signal_rw(float)
         with pytest.raises(
             NotConnectedError,
             match='Signal cannot have name "". Make sure the signal has been '
             "connected and named before passing to class DualEnergySource",
         ):
             DualEnergySource(
-                source1=dcm.energy_in_eV,
-                source2=pgm.energy.user_readback,
+                source1=source1,
+                source2=source2,
                 selected_source=source_selector,
             )
