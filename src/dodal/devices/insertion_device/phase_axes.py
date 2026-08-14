@@ -119,7 +119,6 @@ class UndulatorLockedPhaseAxes(UndulatorPhaseAxesBase[Apple2PhaseValType]):
         access_control: UndulatorAccessControl,
         name: str = "",
     ):
-        # Gap demand set point and readback
         with self.add_children_as_readables():
             self.top_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_outer}")
             self.btm_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_inner}")
@@ -174,7 +173,6 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
         access_control: UndulatorAccessControl,
         name: str = "",
     ):
-        # Gap demand set point and readback
         with self.add_children_as_readables():
             self.top_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_inner}")
             self.btm_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_outer}")
@@ -210,7 +208,6 @@ class UndulatorJawPhase(UndulatorPhaseAxesBase[float]):
         jaw_phase: str = "JAW",
         name: str = "",
     ):
-        # Gap demand set point and readback
         with self.add_children_as_readables():
             self.jaw_phase = UndulatorPhaseMotor(prefix=f"{prefix}BL{jaw_phase}")
         self.set_move = epics_signal_w(int, f"{prefix}BL{move_pv}" + "MOVE")
