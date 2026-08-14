@@ -11,10 +11,10 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.insertion_device.undulator.access_control import (
+from dodal.devices.insertion_device.access_control import (
     UndulatorAccessControl,
 )
-from dodal.devices.insertion_device.undulator.utils import (
+from dodal.devices.insertion_device.utils import (
     MotorStringSetpoint,
     UndulatorCoordinatableMove,
     UnstoppableMotorMoveLogic,

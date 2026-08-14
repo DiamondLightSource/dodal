@@ -29,20 +29,16 @@ from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     BeamEnergy,
     ConfigServerEnergyMotorLookup,
-    InsertionDeviceEnergy,
-    InsertionDevicePolarisation,
-    Pol,
-    UndulatorGateStatus,
-)
-from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
+    InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
     LookupTableColumnConfig,
+    Pol,
     Source,
-)
-from dodal.devices.insertion_device.undulator import (
     UndulatorAccessControl,
     UndulatorGap,
+    UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )

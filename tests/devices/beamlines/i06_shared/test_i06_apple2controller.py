@@ -4,10 +4,12 @@ import pytest
 from ophyd_async.core import init_devices, set_mock_attr
 
 from dodal.devices.beamlines.i06_shared import I06Apple2Controller
-from dodal.devices.insertion_device import Apple2, Apple2Val, Pol
-from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
-from dodal.devices.insertion_device.undulator import (
+from dodal.devices.insertion_device import (
+    Apple2,
     Apple2PhasesVal,
+    Apple2Val,
+    EnergyMotorLookup,
+    Pol,
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,

@@ -2,9 +2,10 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i06_shared import I06EpicsPolynomialDevice, I06Grating
 from dodal.devices.beamlines.i06_shared.i06_apple2_controller import I06Apple2Controller
-from dodal.devices.insertion_device import Apple2, InsertionDevicePolarisation
-from dodal.devices.insertion_device.energy import InsertionDeviceEnergy
-from dodal.devices.insertion_device.undulator import (
+from dodal.devices.insertion_device import (
+    Apple2,
+    InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorLockedPhaseAxes,

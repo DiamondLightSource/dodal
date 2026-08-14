@@ -6,17 +6,15 @@ import numpy as np
 import pytest
 from ophyd_async.core import AsyncStatus, init_devices, set_mock_value
 
-from dodal.devices.insertion_device import Pol
-from dodal.devices.insertion_device.energy_motor_lookup import (
+from dodal.devices.insertion_device import (
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ConfigServerEnergyMotorLookup,
     EnergyCoverage,
     EnergyMotorLookup,
     EpicsPolynomialEnergyMotorLookup,
-    StaticPolynomialEnergyMotorLookup,
-)
-from dodal.devices.insertion_device.lookup_table_models import (
-    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     LookupTable,
+    Pol,
+    StaticPolynomialEnergyMotorLookup,
 )
 from tests.devices.insertion_device.util import (
     GenerateConfigLookupTable,

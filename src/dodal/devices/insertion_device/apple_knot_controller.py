@@ -11,11 +11,11 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnergyMotorConvertor,
 )
-from dodal.devices.insertion_device.apple2 import (
+from dodal.devices.insertion_device.enum import Pol
+from dodal.devices.insertion_device.phase_axes import (
     Apple2LockedPhasesVal,
     PhaseAxesType,
 )
-from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
 APPLE_KNOT_MAXIMUM_GAP_MOTOR_POSITION = 100.0

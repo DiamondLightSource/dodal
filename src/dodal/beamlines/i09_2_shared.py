@@ -13,14 +13,10 @@ from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
+    ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     LookupTableColumnConfig,
-)
-from dodal.devices.insertion_device.energy_motor_lookup import (
-    ConfigServerEnergyMotorLookup,
-)
-from dodal.devices.insertion_device.undulator import (
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,

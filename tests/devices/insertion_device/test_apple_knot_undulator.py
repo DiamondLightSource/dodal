@@ -10,8 +10,8 @@ from dodal.devices.insertion_device import (
     AppleKnotController,
     AppleKnotPathFinder,
     Pol,
+    UndulatorLockedPhaseAxes,
 )
-from dodal.devices.insertion_device.undulator import UndulatorLockedPhaseAxes
 
 # mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = [

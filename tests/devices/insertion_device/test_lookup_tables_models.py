@@ -1,14 +1,14 @@
 import numpy as np
 import pytest
 
-from dodal.devices.insertion_device import Pol
-from dodal.devices.insertion_device.lookup_table_models import (
+from dodal.devices.insertion_device import (
     EnergyCoverage,
     LookupTable,
     LookupTableColumnConfig,
+    Pol,
     convert_csv_to_lookup,
-    read_file_and_skip,
 )
+from dodal.devices.insertion_device.lookup_table_models import read_file_and_skip
 from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 

@@ -13,23 +13,17 @@ from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
+    ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-)
-from dodal.devices.insertion_device.energy_motor_lookup import (
-    ConfigServerEnergyMotorLookup,
-)
-from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
-from dodal.devices.insertion_device.undulator import (
+    LookupTableColumnConfig,
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import (
-    Lakeshore336,
-)
+from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

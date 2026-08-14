@@ -12,8 +12,6 @@ from dodal.devices.insertion_device import (
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     LookupTableColumnConfig,
-)
-from dodal.devices.insertion_device.undulator import (
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,

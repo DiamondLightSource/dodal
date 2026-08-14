@@ -7,17 +7,18 @@ from dodal.devices.beamlines.i05_shared import (
     energy_to_phase_converter,
 )
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
-from dodal.devices.insertion_device import Apple2
-from dodal.devices.insertion_device.apple_knot_controller import (
-    AppleKnotController,
-    AppleKnotPathFinder,
-)
-from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEnergy
-from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
-from dodal.devices.insertion_device.undulator import (
+from dodal.devices.insertion_device import (
+    Apple2,
+    BeamEnergy,
+    InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorLockedPhaseAxes,
+)
+from dodal.devices.insertion_device.apple_knot_controller import (
+    AppleKnotController,
+    AppleKnotPathFinder,
 )
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator

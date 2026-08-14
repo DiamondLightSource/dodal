@@ -1,11 +1,12 @@
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
+    Apple2PhasesVal,
     Apple2Val,
     EnergyMotorLookup,
     Pol,
+    UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.undulator import Apple2PhasesVal, UndulatorPhaseAxes
 
 
 class I06Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):

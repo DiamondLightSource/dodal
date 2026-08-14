@@ -1,11 +1,9 @@
 import pytest
 
 from dodal.devices.insertion_device import (
-    AppleKnotPathFinder,
-)
-from dodal.devices.insertion_device.apple2 import (
     Apple2LockedPhasesVal,
     Apple2Val,
+    AppleKnotPathFinder,
 )
 
 # mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.

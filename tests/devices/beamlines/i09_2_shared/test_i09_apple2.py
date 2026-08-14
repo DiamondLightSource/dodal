@@ -14,24 +14,20 @@ from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_PHASE_POLY_DEG_COLUMNS,
 )
 from dodal.devices.insertion_device import (
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
     ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    Pol,
-)
-from dodal.devices.insertion_device.lookup_table_models import (
-    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
-    ROW_PHASE_CIRCULAR,
     LookupTableColumnConfig,
-)
-from dodal.devices.insertion_device.undulator import (
+    Pol,
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
+from dodal.devices.insertion_device.lookup_table_models import ROW_PHASE_CIRCULAR
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.beamlines.i09_2_shared.test_data import (
     TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT,

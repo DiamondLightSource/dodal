@@ -15,16 +15,12 @@ from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
-    Apple2Val,
-)
-from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
-from dodal.devices.insertion_device.enum import Pol
-from dodal.devices.insertion_device.undulator.access_control import (
-    UndulatorAccessControl,
-)
-from dodal.devices.insertion_device.undulator.gap import UndulatorGap
-from dodal.devices.insertion_device.undulator.phase_axes import (
     Apple2PhasesVal,
+    Apple2Val,
+    EnergyMotorLookup,
+    Pol,
+    UndulatorAccessControl,
+    UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )

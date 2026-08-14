@@ -31,17 +31,15 @@ from dodal.devices.insertion_device import (
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     LookupTableColumnConfig,
-)
-from dodal.devices.insertion_device.lookup_table_models import (
-    DEFAULT_GAP_FILE,
-    DEFAULT_PHASE_FILE,
     Source,
-)
-from dodal.devices.insertion_device.undulator import (
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
+)
+from dodal.devices.insertion_device.lookup_table_models import (
+    DEFAULT_GAP_FILE,
+    DEFAULT_PHASE_FILE,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron

@@ -10,12 +10,10 @@ from ophyd_async.core import (
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
+    Apple2LockedPhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
     Pol,
-)
-from dodal.devices.insertion_device.undulator import (
-    Apple2LockedPhasesVal,
     UndulatorAccessControl,
     UndulatorLockedPhaseAxes,
 )

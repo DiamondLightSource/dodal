@@ -25,16 +25,14 @@ from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
+    Apple2LockedPhasesVal,
+    Apple2PhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
     Pol,
-    UndulatorGateStatus,
-)
-from dodal.devices.insertion_device.undulator import (
-    Apple2LockedPhasesVal,
-    Apple2PhasesVal,
     UndulatorAccessControl,
     UndulatorGap,
+    UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,

@@ -11,12 +11,10 @@ from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
     BeamEnergy,
+    EnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-)
-from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
-from dodal.devices.insertion_device.lookup_table_models import LookupTable
-from dodal.devices.insertion_device.undulator import (
+    LookupTable,
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,

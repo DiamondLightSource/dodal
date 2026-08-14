@@ -20,9 +20,9 @@ from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,
     Pol,
+    UndulatorGap,
     UndulatorGateStatus,
 )
-from dodal.devices.insertion_device.undulator import UndulatorGap
 from dodal.devices.pgm import PlaneGratingMonochromator
 
 from .conftest import DummyApple2Controller

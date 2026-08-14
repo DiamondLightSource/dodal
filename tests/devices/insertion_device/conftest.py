@@ -7,15 +7,13 @@ from pytest import FixtureRequest
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
+    Apple2PhasesVal,
     Apple2Val,
     EnergyCoverage,
     EnergyMotorLookup,
     InsertionDeviceEnergy,
     LookupTable,
     Pol,
-)
-from dodal.devices.insertion_device.undulator import (
-    Apple2PhasesVal,
     UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,
