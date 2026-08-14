@@ -20,6 +20,7 @@ from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,
     Pol,
+    UndulatorAccessControl,
     UndulatorGap,
     UndulatorGateStatus,
 )
@@ -153,6 +154,7 @@ async def test_beam_energy_kickoff_set_correct_delay(
     mock_pgm: PlaneGratingMonochromator,
     mock_id_gap: UndulatorGap,
     mock_id_controller: DummyApple2Controller,
+    mock_id_access_control: UndulatorAccessControl,
 ):
     mock_id_controller.gap_energy_motor_converter = Mock(side_effect=[21.0, 20, 22.0])
     mock_id_controller.phase_energy_motor_converter = Mock(side_effect=[22.0, 22, 22.0])
@@ -168,9 +170,7 @@ async def test_beam_energy_kickoff_set_correct_delay(
     set_mock_value(mock_pgm.energy.low_limit_travel, 0)
     set_mock_value(mock_pgm.energy.high_limit_travel, 1000)
     set_mock_value(mock_pgm.energy.acceleration_time, pgm_acc_time)
-    set_mock_value(
-        mock_id_gap.movable_logic.access_control.gate, UndulatorGateStatus.CLOSE
-    )
+    set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.CLOSE)
     mock_id_gap_kickoff = set_mock_attr(mock_id_gap, "kickoff", AsyncMock())
     mock_pgm_energy_kickoff = set_mock_attr(mock_pgm.energy, "kickoff", AsyncMock())
     await mock_beam_energy.prepare(fly_info)
