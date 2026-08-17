@@ -49,19 +49,18 @@ async def set_move_and_wait_for_gate(
     await set_move.set(value=1, timeout=timeout)
     await wait_for_value(gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
+class UndulatorBase(abc.ABC, Generic[T]):
+    """Base class for Apple2 undulator devices that use gated motion.
 
-class SafeUndulatorBase(abc.ABC, Generic[T]):
-    """Base class for Apple2 undulator devices.
+    Subclasses implement writing demand positions and estimating move
+    timeouts, while this class provides the common sequence of:
 
-    Provides the common move sequence for Apple2 devices whose demand
-    positions are written separately from the command that starts motion.
-    Subclasses provide the device-specific logic for writing demand positions
-    and estimating how long a move should take.
+   
+    * writing demand positions,
+    * triggering the controller move,
 
     Attributes:
-        set_move: Signal used to trigger motion after demand positions have
-            been written. Writing a value of 1 starts the move; the
-            controller returns it to 0 when the move is complete.
+        set_move: Signal used to trigger motion after demands have been written.
     """
 
     # Nothing move until this is set to 1 and it will return to 0 when done
