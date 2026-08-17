@@ -5,14 +5,12 @@ from typing import Generic
 from numpy import sign
 
 from dodal.common import Rectangle2D
-from dodal.devices.insertion_device import (
+from dodal.devices.insertion_device.apple2_controller import (
     Apple2,
     Apple2Controller,
+    Apple2LockedPhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
-)
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2LockedPhasesVal,
     PhaseAxesType,
 )
 from dodal.devices.insertion_device.enum import Pol
