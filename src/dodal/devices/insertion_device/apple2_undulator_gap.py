@@ -19,7 +19,7 @@ from dodal.devices.insertion_device.apple2_motors import (
     UnstoppableMotorMoveLogic,
 )
 from dodal.devices.insertion_device.apple2_undulator_base import (
-    SafeUndulatorBase,
+    UndulatorBase,
     estimate_motor_timeout,
     estimate_motor_timeout_from_signals,
     set_move_and_wait_for_gate,
@@ -58,7 +58,7 @@ class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
         await set_move_and_wait_for_gate(self.gate, self.set_move, timeout())
 
 
-class UndulatorGap(SafeUndulatorBase[float], MotorStringSetpoint):
+class UndulatorGap(UndulatorBase[float], MotorStringSetpoint):
     """EPICS motor interface for the Apple2 undulator gap.
 
     Adapts the standard EPICS motor interface to the Apple2 undulator

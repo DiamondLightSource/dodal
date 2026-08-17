@@ -9,7 +9,7 @@ from .apple2_controller import (
     Apple2Val,
     EnergyMotorConvertor,
 )
-from .apple2_undulator_base import SafeUndulatorBase
+from .apple2_undulator_base import UndulatorBase
 from .apple2_undulator_gap import UndulatorGap
 from .apple2_undulator_phase_axes import (
     Apple2LockedPhasesVal,
@@ -45,7 +45,7 @@ __all__ = [
     "AppleKnotPathFinder",
     "UndulatorGap",
     "UndulatorPhaseAxes",
-    "SafeUndulatorBase",
+    "UndulatorBase",
     "UndulatorJawPhase",
     "Apple2Val",
     "Apple2PhasesVal",

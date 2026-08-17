@@ -16,7 +16,7 @@ from dodal.devices.insertion_device.apple2_motors import (
     UnstoppableMotorMoveLogic,
 )
 from dodal.devices.insertion_device.apple2_undulator_base import (
-    SafeUndulatorBase,
+    UndulatorBase,
     estimate_motor_timeout,
     estimate_motor_timeout_from_signals,
     set_move_and_wait_for_gate,
@@ -72,12 +72,10 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
 Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
 
 
-class SafeUndulatorMoverBase(
-    SafeUndulatorBase, StandardReadable, Movable[T], Generic[T]
-):
+class SafeUndulatorMoverBase(UndulatorBase, StandardReadable, Movable[T], Generic[T]):
     """Base class for movable Apple2 undulator devices using gated motion.
 
-    Extends :class:`SafeUndulatorBase` with the standard readable and movable
+    Extends :class:`UndulatorBase` with the standard readable and movable
     interfaces required by ophyd-async devices.
 
     The move sequence is:
