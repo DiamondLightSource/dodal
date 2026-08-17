@@ -3,11 +3,8 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable
-from ophyd_async.core import (
-    AsyncStatus,
-    StandardReadable,
-)
+from bluesky.protocols import Checkable, Movable
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
 from dodal.common.enums import EnabledDisabledUpper
@@ -72,7 +69,9 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
 Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
 
 
-class SafeUndulatorMoverBase(UndulatorBase, StandardReadable, Movable[T], Generic[T]):
+class SafeUndulatorMoverBase(
+    UndulatorBase, StandardReadable, Movable[T], Checkable[T], Generic[T]
+):
     """Base class for movable Apple2 undulator devices using gated motion.
 
     Extends :class:`UndulatorBase` with the standard readable and movable
@@ -106,6 +105,7 @@ class SafeUndulatorMoverBase(UndulatorBase, StandardReadable, Movable[T], Generi
     @AsyncStatus.wrap
     async def set(self, value: T):
         LOGGER.info(f"Setting {self.name} to {value}")
+        await self.check_value(value)
         await self.set_demand_positions(value)
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")

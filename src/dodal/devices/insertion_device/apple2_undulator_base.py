@@ -2,7 +2,6 @@ import abc
 import asyncio
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Checkable
 from ophyd_async.core import DEFAULT_TIMEOUT, SignalR, SignalW, wait_for_value
 
 from dodal.common.enums import EnabledDisabledUpper
@@ -46,7 +45,7 @@ async def set_move_and_wait_for_gate(
     await wait_for_value(gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
 
-class UndulatorBase(abc.ABC, Checkable[T], Generic[T]):
+class UndulatorBase(Generic[T]):
     """Base class for Apple2 undulator devices that use gated motion.
 
     Subclasses implement writing demand positions and estimating move
