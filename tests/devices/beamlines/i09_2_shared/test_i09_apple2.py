@@ -339,7 +339,7 @@ async def test_j09_apple2_controller_set_energy(
     mock_id_controller._polarisation_setpoint_set(pol)
     await mock_id_controller.energy.set(energy)
     mock_gap_setpoint = get_mock_put(
-        mock_id_controller.apple2_ref().gap_ref().motor.user_setpoint
+        mock_id_controller.apple2_ref().gap_ref().user_setpoint
     )
     assert float(mock_gap_setpoint.call_args_list[0].args[0]) == pytest.approx(
         expected_gap, abs=1

@@ -1,19 +1,31 @@
 import asyncio
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TypeVar
+from typing import Generic, TypeVar
 
-from ophyd_async.epics.core import epics_signal_r, epics_signal_w
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
+from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device.apple2_motors import (
     MotorStringSetpoint,
     UnstoppableMotorMoveLogic,
 )
 from dodal.devices.insertion_device.apple2_undulator_base import (
-    SafeUndulatorMoverBase,
+    SafeUndulatorBase,
     estimate_motor_timeout,
     estimate_motor_timeout_from_signals,
+    set_move_and_wait_for_gate,
+    undulator_check_move,
 )
+from dodal.devices.insertion_device.enum import UndulatorGateStatus
+from dodal.log import LOGGER
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -37,8 +49,8 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
     """
 
     def __init__(self, prefix: str, name: str = ""):
-        motor_pv = f"{prefix}MTR"
-        super().__init__(motor_pv, prefix + "SET", name=name)
+        self.user_setpoint_str = epics_signal_rw(str, prefix + "SET")
+        super().__init__(f"{prefix}MTR", name=name)
         del self.motor_stop
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
@@ -58,6 +70,41 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
 
 
 Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
+
+
+class SafeUndulatorMoverBase(
+    SafeUndulatorBase, StandardReadable, Movable[T], Generic[T]
+):
+    """Base class for Apple2 undulator devices that use gated motion.
+
+    Subclasses implement writing demand positions and estimating move
+    timeouts, while this class provides the common sequence of:
+
+    * checking that motion is permitted,
+    * writing demand positions,
+    * triggering the controller move,
+    * waiting for motion to complete.
+
+    Attributes:
+        gate: Gate status indicating whether the controller is moving.
+        status: Enable state of the undulator.
+        set_move: Signal used to trigger motion after demands have been written.
+    """
+
+    def __init__(self, prefix: str, name: str = ""):
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+        self.status = epics_signal_r(EnabledDisabledUpper, prefix + "IDBLENA")
+
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: T):
+        LOGGER.info(f"Setting {self.name} to {value}")
+        await undulator_check_move(self.status, self.gate)
+        await self.set_demand_positions(value)
+        timeout = await self.get_timeout()
+        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
+        await set_move_and_wait_for_gate(self.gate, self.set_move, timeout)
 
 
 class UndulatorLockedPhaseAxes(SafeUndulatorMoverBase[Apple2PhaseValType]):

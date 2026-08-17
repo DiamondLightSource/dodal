@@ -5,6 +5,7 @@ from typing import Generic
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, Reference, StandardReadable, wait_for_value
 
+from dodal.devices.insertion_device.apple2_undulator_base import undulator_check_move
 from dodal.devices.insertion_device.apple2_undulator_gap import UndulatorGap
 from dodal.devices.insertion_device.apple2_undulator_phase_axes import (
     Apple2LockedPhasesVal,
@@ -52,7 +53,7 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         gap = self.gap_ref()
         phase = self.phase_ref()
         # Only need to check gap as the phase motors share both status and gate with gap.
-        await gap.raise_if_cannot_move()
+        await undulator_check_move(gap.status, gap.gate)
         await asyncio.gather(
             phase.set_demand_positions(value=id_motor_values.extract_phase_val()),
             gap.set_demand_positions(value=float(id_motor_values.gap)),
