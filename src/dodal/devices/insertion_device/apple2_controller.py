@@ -16,7 +16,6 @@ from ophyd_async.core import (
     wait_for_value,
 )
 
-from dodal.devices.insertion_device.apple2_undulator_base import undulator_check_move
 from dodal.devices.insertion_device.apple2_undulator_gap import UndulatorGap
 from dodal.devices.insertion_device.apple2_undulator_phase_axes import (
     Apple2LockedPhasesVal,
@@ -71,8 +70,10 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         """
         gap = self.gap_ref()
         phase = self.phase_ref()
-        # Only need to check gap as the phase motors share both status and gate with gap.
-        await undulator_check_move(gap.status, gap.gate)
+        await asyncio.gather(
+            phase.check_value(id_motor_values.phase),
+            gap.check_value(id_motor_values.gap),
+        )
         await asyncio.gather(
             phase.set_demand_positions(value=id_motor_values.extract_phase_val()),
             gap.set_demand_positions(value=float(id_motor_values.gap)),

@@ -58,7 +58,7 @@ class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
         await set_move_and_wait_for_gate(self.gate, self.set_move, timeout())
 
 
-class UndulatorGap(UndulatorBase[float], MotorStringSetpoint):
+class UndulatorGap(MotorStringSetpoint, UndulatorBase[float]):
     """EPICS motor interface for the Apple2 undulator gap.
 
     Adapts the standard EPICS motor interface to the Apple2 undulator

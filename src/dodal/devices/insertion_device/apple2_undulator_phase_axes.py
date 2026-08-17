@@ -106,7 +106,6 @@ class SafeUndulatorMoverBase(UndulatorBase, StandardReadable, Movable[T], Generi
     @AsyncStatus.wrap
     async def set(self, value: T):
         LOGGER.info(f"Setting {self.name} to {value}")
-        await undulator_check_move(self.status, self.gate)
         await self.set_demand_positions(value)
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
@@ -135,6 +134,13 @@ class UndulatorLockedPhaseAxes(SafeUndulatorMoverBase[Apple2PhaseValType]):
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
             self.btm_inner.user_setpoint.set(value=value.btm_inner),
+        )
+
+    async def check_value(self, value: Apple2PhaseValType) -> None:
+        await undulator_check_move(self.status, self.gate)
+        await asyncio.gather(
+            self.top_outer.check_value(value.top_outer),
+            self.btm_inner.check_value(value.btm_inner),
         )
 
     async def get_timeout(self) -> float:
@@ -191,6 +197,15 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
             self.btm_outer.user_setpoint.set(value=value.btm_outer),
         )
 
+    async def check_value(self, value: Apple2PhasesVal) -> None:
+        await undulator_check_move(self.status, self.gate)
+        await asyncio.gather(
+            self.top_outer.check_value(value=value.top_outer),
+            self.top_inner.check_value(value=value.top_inner),
+            self.btm_inner.check_value(value=value.btm_inner),
+            self.btm_outer.check_value(value=value.btm_outer),
+        )
+
 
 class UndulatorJawPhase(SafeUndulatorMoverBase[float]):
     """A JawPhase movable, this is use for moving the jaw phase which is use to control
@@ -211,6 +226,10 @@ class UndulatorJawPhase(SafeUndulatorMoverBase[float]):
 
     async def set_demand_positions(self, value: float) -> None:
         await self.jaw_phase.user_setpoint.set(value=value)
+
+    async def check_value(self, value: float) -> None:
+        await undulator_check_move(self.status, self.gate)
+        await self.jaw_phase.check_value(value=value)
 
     async def get_timeout(self) -> float:
         """Get motor speed, current position and target position to calculate required

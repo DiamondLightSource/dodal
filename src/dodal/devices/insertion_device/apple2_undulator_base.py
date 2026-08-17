@@ -2,12 +2,8 @@ import abc
 import asyncio
 from typing import Generic, TypeVar
 
-from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
-    SignalR,
-    SignalW,
-    wait_for_value,
-)
+from bluesky.protocols import Checkable
+from ophyd_async.core import DEFAULT_TIMEOUT, SignalR, SignalW, wait_for_value
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device.enum import UndulatorGateStatus
@@ -49,13 +45,14 @@ async def set_move_and_wait_for_gate(
     await set_move.set(value=1, timeout=timeout)
     await wait_for_value(gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
-class UndulatorBase(abc.ABC, Generic[T]):
+
+class UndulatorBase(abc.ABC, Checkable[T], Generic[T]):
     """Base class for Apple2 undulator devices that use gated motion.
 
     Subclasses implement writing demand positions and estimating move
     timeouts, while this class provides the common sequence of:
 
-   
+
     * writing demand positions,
     * triggering the controller move,
 
@@ -69,6 +66,10 @@ class UndulatorBase(abc.ABC, Generic[T]):
     @abc.abstractmethod
     async def set_demand_positions(self, value: T) -> None:
         """Set the demand positions on the device without actually hitting move."""
+
+    @abc.abstractmethod
+    async def check_value(self, value: T) -> None:
+        """Check the new position is valid."""
 
     @abc.abstractmethod
     async def get_timeout(self) -> float | None:
