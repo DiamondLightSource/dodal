@@ -1,23 +1,19 @@
-import abc
 import asyncio
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Generic, TypeVar
+from typing import TypeVar
 
-from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, Reference, StandardReadable
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.insertion_device.access_control import (
-    UndulatorAccessControl,
-)
-from dodal.devices.insertion_device.utils import (
+from dodal.devices.insertion_device.apple2_motors import (
     MotorStringSetpoint,
-    UndulatorCoordinatableMove,
     UnstoppableMotorMoveLogic,
+)
+from dodal.devices.insertion_device.apple2_undulator_base import (
+    SafeUndulatorMoverBase,
+    estimate_motor_timeout,
     estimate_motor_timeout_from_signals,
 )
-from dodal.log import LOGGER
 
 
 @dataclass
@@ -42,8 +38,7 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
 
     def __init__(self, prefix: str, name: str = ""):
         motor_pv = f"{prefix}MTR"
-        self.user_setpoint_str = epics_signal_rw(str, prefix + "SET")
-        super().__init__(motor_pv, name=name)
+        super().__init__(motor_pv, prefix + "SET", name=name)
         del self.motor_stop
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
@@ -65,50 +60,7 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
 Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
 
 
-T = TypeVar("T")
-
-
-class UndulatorPhaseAxesBase(
-    abc.ABC, StandardReadable, Movable[T], UndulatorCoordinatableMove[T], Generic[T]
-):
-    """Base class for Apple2 undulator devices that use gated motion.
-
-    Subclasses implement writing demand positions and estimating move
-    timeouts, while this class provides the common sequence of:
-
-    * checking that motion is permitted,
-    * writing demand positions,
-    * triggering the controller move,
-    * waiting for motion to complete.
-
-    Attributes:
-        gate: Gate status indicating whether the controller is moving.
-        status: Enable state of the undulator.
-        set_move: Signal used to trigger motion after demands have been written.
-    """
-
-    def __init__(self, access_control: UndulatorAccessControl, name: str = ""):
-        # Gate keeper open when move is requested, closed when move is completed
-        self.access_control_ref = Reference(access_control)
-        super().__init__(name=name)
-
-    @abc.abstractmethod
-    async def set_demand_positions(self, value: T) -> None:
-        """Set the demand positions on the device without actually hitting move."""
-
-    @AsyncStatus.wrap
-    async def set(self, value: T):
-        LOGGER.info(f"Setting {self.name} to {value}")
-        await self.access_control_ref().check_value()
-        await self.set_demand_positions(value)
-        timeout = await self.get_timeout()
-        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
-        await self.access_control_ref().move_and_wait_for_gate(
-            self.set_move, timeout=timeout
-        )
-
-
-class UndulatorLockedPhaseAxes(UndulatorPhaseAxesBase[Apple2PhaseValType]):
+class UndulatorLockedPhaseAxes(SafeUndulatorMoverBase[Apple2PhaseValType]):
     """Two phase Motor to make up the locked id phase motion."""
 
     def __init__(
@@ -116,16 +68,16 @@ class UndulatorLockedPhaseAxes(UndulatorPhaseAxesBase[Apple2PhaseValType]):
         prefix: str,
         top_outer: str,
         btm_inner: str,
-        access_control: UndulatorAccessControl,
         name: str = "",
     ):
+        # Gap demand set point and readback
         with self.add_children_as_readables():
             self.top_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_outer}")
             self.btm_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_inner}")
         # Nothing move until this is set to 1 and it will return to 0 when done.
-        self.set_move = epics_signal_w(int, f"{prefix}BL{top_outer}" + "MOVE")
+        self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
         self.axes = [self.top_outer, self.btm_inner]
-        super().__init__(access_control, name)
+        super().__init__(prefix, name)
 
     async def set_demand_positions(self, value: Apple2PhaseValType) -> None:
         await asyncio.gather(
@@ -170,20 +122,14 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
         top_inner: str,
         btm_inner: str,
         btm_outer: str,
-        access_control: UndulatorAccessControl,
         name: str = "",
     ):
+        # Gap demand set point and readback
         with self.add_children_as_readables():
             self.top_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_inner}")
             self.btm_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_outer}")
 
-        super().__init__(
-            prefix,
-            top_outer=top_outer,
-            btm_inner=btm_inner,
-            access_control=access_control,
-            name=name,
-        )
+        super().__init__(prefix, top_outer=top_outer, btm_inner=btm_inner, name=name)
         self.axes.extend([self.top_inner, self.btm_outer])
 
     async def set_demand_positions(self, value: Apple2PhasesVal) -> None:
@@ -195,7 +141,7 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
         )
 
 
-class UndulatorJawPhase(UndulatorPhaseAxesBase[float]):
+class UndulatorJawPhase(SafeUndulatorMoverBase[float]):
     """A JawPhase movable, this is use for moving the jaw phase which is use to control
     the linear arbitrary polarisation but only on some of the beamline.
     """
@@ -204,14 +150,14 @@ class UndulatorJawPhase(UndulatorPhaseAxesBase[float]):
         self,
         prefix: str,
         move_pv: str,
-        access_control: UndulatorAccessControl,
         jaw_phase: str = "JAW",
         name: str = "",
     ):
+        # Gap demand set point and readback
         with self.add_children_as_readables():
             self.jaw_phase = UndulatorPhaseMotor(prefix=f"{prefix}BL{jaw_phase}")
-        self.set_move = epics_signal_w(int, f"{prefix}BL{move_pv}" + "MOVE")
-        super().__init__(access_control, name)
+        self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
+        super().__init__(prefix, name)
 
     async def set_demand_positions(self, value: float) -> None:
         await self.jaw_phase.user_setpoint.set(value=value)
@@ -220,11 +166,12 @@ class UndulatorJawPhase(UndulatorPhaseAxesBase[float]):
         """Get motor speed, current position and target position to calculate required
         timeout.
         """
-        return await estimate_motor_timeout_from_signals(
-            self.jaw_phase.user_setpoint_readback,
-            self.jaw_phase.user_readback,
-            self.jaw_phase.velocity,
+        setpoint, readback, velocity = await asyncio.gather(
+            self.jaw_phase.user_setpoint_readback.get_value(),
+            self.jaw_phase.user_readback.get_value(),
+            self.jaw_phase.velocity.get_value(),
         )
+        return estimate_motor_timeout(setpoint, readback, velocity)
 
 
 PhaseAxesType = TypeVar("PhaseAxesType", bound=UndulatorLockedPhaseAxes)

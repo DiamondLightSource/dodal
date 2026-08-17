@@ -57,7 +57,7 @@ async def test_id_set_energy_const_pol(
     phase = mock_locked_apple2.phase_ref()
     set_mock_value(phase.top_outer.user_readback, initial_phase_top_outer)
     set_mock_value(phase.btm_inner.user_readback, initial_phase_top_outer)
-    set_mock_value(mock_locked_apple2.gap_ref().user_readback, initial_gap)
+    set_mock_value(mock_locked_apple2.gap_ref().motor.user_readback, initial_gap)
     assert await mock_apple_knot_i05_controller.polarisation.get_value() == expected_pol
     await mock_apple_knot_i05_controller.energy.set(target_energy)
     assert await mock_apple_knot_i05_controller.polarisation.get_value() == expected_pol
@@ -82,7 +82,7 @@ async def test_id_set_pol(
 ):
     set_mock_value(mock_apple_knot_i05_controller._energy, initial_energy)
     set_mock_value(
-        mock_locked_apple2.gap_ref().user_readback,
+        mock_locked_apple2.gap_ref().motor.user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),
     )
     set_mock_value(
@@ -116,7 +116,7 @@ async def test_id_set_pol_fails(
 ):
     set_mock_value(mock_apple_knot_i05_controller._energy, initial_energy)
     set_mock_value(
-        mock_locked_apple2.gap_ref().user_readback,
+        mock_locked_apple2.gap_ref().motor.user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),
     )
     set_mock_value(
@@ -153,7 +153,7 @@ async def test_id_set_fails_exclusion_zone(
     phase = mock_locked_apple2.phase_ref()
     set_mock_value(phase.top_outer.user_readback, initial_phase_top_outer)
     set_mock_value(phase.btm_inner.user_readback, initial_phase_top_outer)
-    set_mock_value(mock_locked_apple2.gap_ref().user_readback, initial_gap)
+    set_mock_value(mock_locked_apple2.gap_ref().motor.user_readback, initial_gap)
     with pytest.raises(
         RuntimeError,
         match="No valid path found for move avoiding exclusion zones.",
@@ -176,7 +176,7 @@ async def test_id_set_fails_top_bottom_phase_mismatch(
     phase = mock_locked_apple2.phase_ref()
     set_mock_value(phase.top_outer.user_readback, initial_phase_top_outer)
     set_mock_value(phase.btm_inner.user_readback, initial_phase_bottom_inner)
-    set_mock_value(mock_locked_apple2.gap_ref().user_readback, 50.0)
+    set_mock_value(mock_locked_apple2.gap_ref().motor.user_readback, 50.0)
     with pytest.raises(
         RuntimeError,
         match=f"Upper phase {initial_phase_top_outer} and lower phase {initial_phase_bottom_inner} values are not close enough.",

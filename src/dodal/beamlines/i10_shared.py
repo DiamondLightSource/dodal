@@ -27,19 +27,20 @@ from dodal.devices.beamlines.i10.i10_setting_data import I10Grating
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.insertion_device import (
     BeamEnergy,
-    ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    LookupTableColumnConfig,
-    Source,
-    UndulatorAccessControl,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
+)
 from dodal.devices.insertion_device.lookup_table_models import (
     DEFAULT_GAP_FILE,
     DEFAULT_PHASE_FILE,
+    LookupTableColumnConfig,
+    Source,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
@@ -94,33 +95,26 @@ LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/confi
 
 
 @devices.factory()
-def idd_accesscontrol() -> UndulatorAccessControl:
-    return UndulatorAccessControl(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+def idd_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def idd_gap(idd_accesscontrol: UndulatorAccessControl) -> UndulatorGap:
-    return UndulatorGap(f"{PREFIX.insertion_prefix}-MO-SERVC-01:", idd_accesscontrol)
-
-
-@devices.factory()
-def idd_phase(idd_accesscontrol: UndulatorAccessControl) -> UndulatorPhaseAxes:
+def idd_phase() -> UndulatorPhaseAxes:
     return UndulatorPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="RPQ1",
         top_inner="RPQ2",
         btm_inner="RPQ3",
         btm_outer="RPQ4",
-        access_control=idd_accesscontrol,
     )
 
 
 @devices.factory()
-def idd_jaw_phase(idd_accesscontrol: UndulatorAccessControl) -> UndulatorJawPhase:
+def idd_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         move_pv="JAW",
-        access_control=idd_accesscontrol,
     )
 
 
@@ -129,15 +123,9 @@ def idd(
     idd_gap: UndulatorGap,
     idd_phase: UndulatorPhaseAxes,
     idd_jaw_phase: UndulatorJawPhase,
-    idd_accesscontrol: UndulatorAccessControl,
 ) -> I10Apple2:
     """i10 downstream insertion device."""
-    return I10Apple2(
-        gap=idd_gap,
-        phase=idd_phase,
-        jaw_phase=idd_jaw_phase,
-        access_control=idd_accesscontrol,
-    )
+    return I10Apple2(id_gap=idd_gap, id_phase=idd_phase, id_jaw_phase=idd_jaw_phase)
 
 
 @devices.factory()
@@ -187,33 +175,26 @@ def energy_dd(
 
 
 @devices.factory()
-def idu_accesscontrol() -> UndulatorAccessControl:
-    return UndulatorAccessControl(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
+def idu_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
 
 
 @devices.factory()
-def idu_gap(idu_accesscontrol: UndulatorAccessControl) -> UndulatorGap:
-    return UndulatorGap(f"{PREFIX.insertion_prefix}-MO-SERVC-21:", idu_accesscontrol)
-
-
-@devices.factory()
-def idu_phase(idu_accesscontrol: UndulatorAccessControl) -> UndulatorPhaseAxes:
+def idu_phase() -> UndulatorPhaseAxes:
     return UndulatorPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         top_outer="RPQ1",
         top_inner="RPQ2",
         btm_inner="RPQ3",
         btm_outer="RPQ4",
-        access_control=idu_accesscontrol,
     )
 
 
 @devices.factory()
-def idu_jaw_phase(idu_accesscontrol: UndulatorAccessControl) -> UndulatorJawPhase:
+def idu_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         move_pv="JAW",
-        access_control=idu_accesscontrol,
     )
 
 
@@ -222,15 +203,9 @@ def idu(
     idu_gap: UndulatorGap,
     idu_phase: UndulatorPhaseAxes,
     idu_jaw_phase: UndulatorJawPhase,
-    idu_accesscontrol: UndulatorAccessControl,
 ) -> I10Apple2:
     """i10 upstream insertion device."""
-    return I10Apple2(
-        gap=idu_gap,
-        phase=idu_phase,
-        jaw_phase=idu_jaw_phase,
-        access_control=idu_accesscontrol,
-    )
+    return I10Apple2(id_gap=idu_gap, id_phase=idu_phase, id_jaw_phase=idu_jaw_phase)
 
 
 @devices.factory()

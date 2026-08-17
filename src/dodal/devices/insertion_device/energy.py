@@ -79,7 +79,7 @@ class InsertionDeviceEnergy(StandardReadable, Movable[float], Preparable, Flyabl
             await self.id_controller()
             .apple2_ref()
             .gap_ref()
-            .acceleration_time.get_value()
+            .motor.acceleration_time.get_value()
         )
 
 

@@ -13,17 +13,20 @@ from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
-    ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    LookupTableColumnConfig,
-    UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
+)
+from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import Lakeshore336
+from dodal.devices.temperture_controller import (
+    Lakeshore336,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -60,38 +63,29 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def id_accesscontrol() -> UndulatorAccessControl:
-    return UndulatorAccessControl(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+def id_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def id_gap(id_accesscontrol: UndulatorAccessControl) -> UndulatorGap:
-    return UndulatorGap(f"{PREFIX.insertion_prefix}-MO-SERVC-01:", id_accesscontrol)
-
-
-@devices.factory()
-def id_phase(id_accesscontrol: UndulatorAccessControl) -> UndulatorPhaseAxes:
+def id_phase() -> UndulatorPhaseAxes:
     return UndulatorPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="PUO",
         top_inner="PUI",
         btm_inner="PLI",
         btm_outer="PLO",
-        access_control=id_accesscontrol,
     )
 
 
 @devices.factory()
 def id(
-    id_gap: UndulatorGap,
-    id_phase: UndulatorPhaseAxes,
-    id_accesscontrol: UndulatorAccessControl,
+    id_gap: UndulatorGap, id_phase: UndulatorPhaseAxes
 ) -> Apple2[UndulatorPhaseAxes]:
     """I21 insertion device."""
     return Apple2[UndulatorPhaseAxes](
-        gap=id_gap,
-        phase=id_phase,
-        access_control=id_accesscontrol,
+        id_gap=id_gap,
+        id_phase=id_phase,
     )
 
 

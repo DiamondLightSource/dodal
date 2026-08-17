@@ -1,33 +1,25 @@
 import abc
-import asyncio
 from dataclasses import dataclass
 from math import isclose
 from typing import Generic, Protocol, TypeVar
 
-from bluesky.protocols import Movable
 from ophyd_async.core import (
-    AsyncStatus,
     Reference,
     StandardReadable,
     StandardReadableFormat,
     derived_signal_rw,
     soft_signal_r_and_setter,
     soft_signal_rw,
-    wait_for_value,
 )
 
-from dodal.devices.insertion_device.access_control import (
-    UndulatorAccessControl,
-)
-from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
-from dodal.devices.insertion_device.enum import Pol, UndulatorGateStatus
-from dodal.devices.insertion_device.gap import UndulatorGap
-from dodal.devices.insertion_device.phase_axes import (
-    Apple2LockedPhasesVal,
+from dodal.devices.insertion_device.apple2_undulator import Apple2, Apple2Val
+from dodal.devices.insertion_device.apple2_undulator_phase_axes import (
     Apple2PhasesVal,
     PhaseAxesType,
     UndulatorPhaseAxes,
 )
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
+from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -35,63 +27,6 @@ MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
-
-
-@dataclass
-class Apple2Val:
-    gap: float
-    phase: Apple2LockedPhasesVal | Apple2PhasesVal
-
-
-class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
-    """Device representing the combined motor controls for an Apple2 undulator.
-
-    Attributes:
-        gap_ref (Reference[UndulatorGap]): The undulator gap motor device.
-        phase_ref (Reference[UndulatorPhaseAxes]): The undulator phase axes device,
-            consisting offour phase motors.
-
-    Args:
-        gap (UndulatorGap): An UndulatorGap device.
-        phase (UndulatorPhaseAxes): An UndulatorPhaseAxes device.
-        name (str, optional): Name of the device.
-    """
-
-    def __init__(
-        self,
-        gap: UndulatorGap,
-        phase: PhaseAxesType,
-        access_control: UndulatorAccessControl,
-        name: str = "",
-    ):
-        with self.add_children_as_readables():
-            self.gap_ref = Reference(gap)
-            self.phase_ref = Reference(phase)
-            self.access_control_ref = Reference(access_control)
-        super().__init__(name=name)
-
-    @AsyncStatus.wrap
-    async def set(self, id_motor_values: Apple2Val) -> None:
-        """Check ID is in a movable state and set all the demand value before moving
-        them all at the same time.
-        """
-        gap = self.gap_ref()
-        phase = self.phase_ref()
-        access_control = self.access_control_ref()
-
-        LOGGER.info(f"Moving {self.name} apple2 motors to {id_motor_values}")
-        await access_control.check_value()
-        await asyncio.gather(
-            gap.set_demand_positions(id_motor_values.gap),
-            phase.set_demand_positions(id_motor_values.phase),
-        )
-        timeout = max(await asyncio.gather(gap.get_timeout(), phase.get_timeout()))
-        await access_control.move_and_wait_for_gate(
-            gap.set_move, phase.set_move, timeout=timeout
-        )
-        await wait_for_value(
-            access_control.gate, UndulatorGateStatus.CLOSE, timeout=timeout
-        )
 
 
 class EnergyMotorConvertor(Protocol):
@@ -210,7 +145,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 top_inner=top_inner,
                 btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
-                gap=self.apple2_ref().gap_ref().user_readback,
+                gap=self.apple2_ref().gap_ref().motor.user_readback,
             )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
@@ -218,7 +153,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 set_derived=self._set_energy,
                 energy=self._energy,
                 pol=self.polarisation,
-                gap=self.apple2_ref().gap_ref().user_readback,
+                gap=self.apple2_ref().gap_ref().motor.user_readback,
                 derived_units=units,
             )
 

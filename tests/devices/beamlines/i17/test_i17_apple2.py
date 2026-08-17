@@ -8,12 +8,11 @@ from dodal.devices.insertion_device import (
     Apple2,
     Apple2PhasesVal,
     Apple2Val,
-    EnergyMotorLookup,
     Pol,
-    UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
 # mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
@@ -21,16 +20,10 @@ pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 @pytest.fixture
 async def mock_apple2(
-    mock_id_gap: UndulatorGap,
-    mock_phase_axes: UndulatorPhaseAxes,
-    mock_id_access_control: UndulatorAccessControl,
+    mock_id_gap: UndulatorGap, mock_phase_axes: UndulatorPhaseAxes
 ) -> Apple2:
     async with init_devices(mock=True):
-        mock_apple2 = Apple2(
-            gap=mock_id_gap,
-            phase=mock_phase_axes,
-            access_control=mock_id_access_control,
-        )
+        mock_apple2 = Apple2(id_gap=mock_id_gap, id_phase=mock_phase_axes)
     return mock_apple2
 
 

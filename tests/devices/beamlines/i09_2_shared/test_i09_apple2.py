@@ -14,20 +14,23 @@ from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_PHASE_POLY_DEG_COLUMNS,
 )
 from dodal.devices.insertion_device import (
-    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
-    ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    LookupTableColumnConfig,
-    Pol,
-    UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.lookup_table_models import ROW_PHASE_CIRCULAR
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
+)
+from dodal.devices.insertion_device.enum import Pol
+from dodal.devices.insertion_device.lookup_table_models import (
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+    ROW_PHASE_CIRCULAR,
+    LookupTableColumnConfig,
+)
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.beamlines.i09_2_shared.test_data import (
     TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT,
@@ -67,16 +70,10 @@ def mock_j09_phase_energy_motor_lookup(
 
 @pytest.fixture
 async def mock_apple2(
-    mock_id_gap: UndulatorGap,
-    mock_phase_axes: UndulatorPhaseAxes,
-    mock_id_access_control: UndulatorAccessControl,
+    mock_id_gap: UndulatorGap, mock_phase_axes: UndulatorPhaseAxes
 ) -> Apple2[UndulatorPhaseAxes]:
     async with init_devices(mock=True):
-        mock_apple2 = Apple2(
-            gap=mock_id_gap,
-            phase=mock_phase_axes,
-            access_control=mock_id_access_control,
-        )
+        mock_apple2 = Apple2(id_gap=mock_id_gap, id_phase=mock_phase_axes)
     return mock_apple2
 
 
@@ -342,7 +339,7 @@ async def test_j09_apple2_controller_set_energy(
     mock_id_controller._polarisation_setpoint_set(pol)
     await mock_id_controller.energy.set(energy)
     mock_gap_setpoint = get_mock_put(
-        mock_id_controller.apple2_ref().gap_ref().user_setpoint
+        mock_id_controller.apple2_ref().gap_ref().motor.user_setpoint
     )
     assert float(mock_gap_setpoint.call_args_list[0].args[0]) == pytest.approx(
         expected_gap, abs=1

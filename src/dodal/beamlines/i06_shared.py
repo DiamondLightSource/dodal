@@ -4,12 +4,11 @@ from dodal.devices.beamlines.i06_shared import I06EpicsPolynomialDevice, I06Grat
 from dodal.devices.beamlines.i06_shared.i06_apple2_controller import I06Apple2Controller
 from dodal.devices.insertion_device import (
     Apple2,
-    InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    UndulatorAccessControl,
     UndulatorGap,
     UndulatorLockedPhaseAxes,
 )
+from dodal.devices.insertion_device.energy import InsertionDeviceEnergy
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -43,33 +42,23 @@ def idd_polynomial() -> I06EpicsPolynomialDevice:
 
 
 @devices.factory()
-def idd_accesscontrol() -> UndulatorAccessControl:
-    return UndulatorAccessControl(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+def idd_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def idd_gap(idd_accesscontrol: UndulatorAccessControl) -> UndulatorGap:
-    return UndulatorGap(f"{PREFIX.insertion_prefix}-MO-SERVC-01:", idd_accesscontrol)
-
-
-@devices.factory()
-def idd_phase(idd_accesscontrol: UndulatorAccessControl) -> UndulatorLockedPhaseAxes:
+def idd_phase() -> UndulatorLockedPhaseAxes:
     return UndulatorLockedPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="PL",
         btm_inner="PU",
-        access_control=idd_accesscontrol,
     )
 
 
 @devices.factory()
-def idd(
-    idd_gap: UndulatorGap,
-    idd_phase: UndulatorLockedPhaseAxes,
-    idd_accesscontrol: UndulatorAccessControl,
-) -> Apple2:
+def idd(idd_gap: UndulatorGap, idd_phase: UndulatorLockedPhaseAxes) -> Apple2:
     """i06 downstream insertion device."""
-    return Apple2(gap=idd_gap, phase=idd_phase, access_control=idd_accesscontrol)
+    return Apple2(id_gap=idd_gap, id_phase=idd_phase)
 
 
 @devices.factory()
@@ -91,33 +80,23 @@ def idu_polynomial() -> I06EpicsPolynomialDevice:
 
 
 @devices.factory()
-def idu_accesscontrol() -> UndulatorAccessControl:
-    return UndulatorAccessControl(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
+def idu_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
 
 
 @devices.factory()
-def idu_gap(idu_accesscontrol: UndulatorAccessControl) -> UndulatorGap:
-    return UndulatorGap(f"{PREFIX.insertion_prefix}-MO-SERVC-21:", idu_accesscontrol)
-
-
-@devices.factory()
-def idu_phase(idu_accesscontrol: UndulatorAccessControl) -> UndulatorLockedPhaseAxes:
+def idu_phase() -> UndulatorLockedPhaseAxes:
     return UndulatorLockedPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         top_outer="PL",
         btm_inner="PU",
-        access_control=idu_accesscontrol,
     )
 
 
 @devices.factory()
-def idu(
-    idu_gap: UndulatorGap,
-    idu_phase: UndulatorLockedPhaseAxes,
-    idu_accesscontrol: UndulatorAccessControl,
-) -> Apple2:
+def idu(idu_gap: UndulatorGap, idu_phase: UndulatorLockedPhaseAxes) -> Apple2:
     """i06 upstream insertion device."""
-    return Apple2(gap=idu_gap, phase=idu_phase, access_control=idu_accesscontrol)
+    return Apple2(id_gap=idu_gap, id_phase=idu_phase)
 
 
 @devices.factory()

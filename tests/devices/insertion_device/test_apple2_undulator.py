@@ -30,7 +30,6 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnergyMotorConvertor,
     Pol,
-    UndulatorAccessControl,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
@@ -43,19 +42,18 @@ pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
 async def test_in_motion_error(
-    mock_id_access_control: UndulatorAccessControl,
     mock_id_gap: UndulatorGap,
     mock_phase_axes: UndulatorPhaseAxes,
     mock_jaw_phase: UndulatorJawPhase,
 ):
-    set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.OPEN)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
-    set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.OPEN)
+    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN)
     set_value = Apple2PhasesVal(3, 2, 5, 7)
     with pytest.raises(RuntimeError):
         await mock_phase_axes.set(set_value)
-    set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.OPEN)
+    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError):
         await mock_jaw_phase.set(2)
 
@@ -75,41 +73,36 @@ async def test_gap_cal_timout(
     target: float,
     expected_timeout: float,
 ):
-    set_mock_value(mock_id_gap.velocity, velocity)
-    set_mock_value(mock_id_gap.user_readback, readback)
-    set_mock_value(mock_id_gap.user_setpoint_str, str(target))
-    assert await mock_id_gap.movable_logic.calculate_timeout(
-        readback, target
-    ) == pytest.approx(expected_timeout, rel=0.1)
+    set_mock_value(mock_id_gap.motor.velocity, velocity)
+    set_mock_value(mock_id_gap.motor.user_readback, readback)
+    set_mock_value(mock_id_gap.motor.user_setpoint_str, str(target))
+    assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
 
 async def test_unstoppable_motor_stop_not_implemented(
     mock_id_gap: UndulatorGap, caplog: pytest.LogCaptureFixture
 ):
-    await mock_id_gap.stop()
-    assert caplog.records[0].msg == f"Stopping {mock_id_gap.name} is not supported."
+    await mock_id_gap.motor.stop()
+    assert (
+        caplog.records[0].msg == f"Stopping {mock_id_gap.motor.name} is not supported."
+    )
 
 
 async def test_given_gate_never_closes_then_setting_gaps_times_out(
     mock_id_gap: UndulatorGap,
-    mock_id_access_control: UndulatorAccessControl,
 ):
     callback_on_mock_put(
-        mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(
-            mock_id_access_control.gate, UndulatorGateStatus.OPEN
-        ),
+        mock_id_gap.motor.user_setpoint,
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
-    mock_id_gap.movable_logic.calculate_timeout = AsyncMock(return_value=0.002)
+    mock_id_gap.get_timeout = AsyncMock(return_value=0.002)
 
     with pytest.raises(TimeoutError):
         await mock_id_gap.set(2)
 
 
-async def test_gap_status_error(
-    mock_id_gap: UndulatorGap, mock_id_access_control: UndulatorAccessControl
-):
-    set_mock_value(mock_id_access_control.status, EnabledDisabledUpper.DISABLED)
+async def test_gap_status_error(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
 
@@ -118,13 +111,10 @@ async def test_gap_success_scan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     mock_id_gap: UndulatorGap,
-    mock_id_access_control: UndulatorAccessControl,
 ):
     callback_on_mock_put(
-        mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(
-            mock_id_access_control.gate, UndulatorGateStatus.OPEN
-        ),
+        mock_id_gap.motor.user_setpoint,
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
     output = range(0, 11, 1)
 
@@ -134,75 +124,70 @@ async def test_gap_success_scan(
     pos = new_pos()
 
     def set_complete_move():
-        set_mock_value(mock_id_gap.user_readback, next(pos))
-        set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.CLOSE)
+        set_mock_value(mock_id_gap.motor.user_readback, next(pos))
+        set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
 
     run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11))
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert run_engine_documents["event"][i]["data"][mock_id_gap.name] == i
+        assert run_engine_documents["event"][i]["data"][mock_id_gap.motor.name] == i
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
     mock_phase_axes: UndulatorPhaseAxes,
-    mock_id_access_control: UndulatorAccessControl,
 ):
     set_value = Apple2PhasesVal(3, 2, 5, 7)
 
     callback_on_mock_put(
         mock_phase_axes.top_outer.user_setpoint,
-        lambda *_, **__: set_mock_value(
-            mock_id_access_control.gate, UndulatorGateStatus.OPEN
-        ),
+        lambda *_, **__: set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN),
     )
     mock_phase_axes.get_timeout = AsyncMock(return_value=0.002)
     with pytest.raises(TimeoutError):
         await mock_phase_axes.set(set_value)
 
 
-async def test_phase_status_error(
-    mock_phase_axes: UndulatorPhaseAxes, mock_id_access_control: UndulatorAccessControl
-):
+async def test_phase_status_error(mock_phase_axes: UndulatorPhaseAxes):
     set_value = Apple2PhasesVal(3, 2, 5, 7)
-    set_mock_value(mock_id_access_control.status, EnabledDisabledUpper.DISABLED)
+    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_phase_axes.set(set_value)
 
 
 async def test_gap_read_config(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.velocity, 2)
-    set_mock_value(mock_id_gap.motor_egu, "c")
+    set_mock_value(mock_id_gap.motor.velocity, 2)
+    set_mock_value(mock_id_gap.motor.motor_egu, "c")
     await assert_configuration(
         mock_id_gap,
         {
-            "mock_id_gap-velocity": partial_reading(2.0),
-            "mock_id_gap-motor_egu": partial_reading("c"),
-            "mock_id_gap-offset": partial_reading(0.0),
+            "mock_id_gap-motor-velocity": partial_reading(2.0),
+            "mock_id_gap-motor-motor_egu": partial_reading("c"),
+            "mock_id_gap-motor-offset": partial_reading(0.0),
         },
         full_match=False,
     )
 
 
 async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.max_velocity, 20)
-    set_mock_value(mock_id_gap.min_velocity, 11)
+    set_mock_value(mock_id_gap.motor.max_velocity, 20)
+    set_mock_value(mock_id_gap.motor.min_velocity, 11)
     with pytest.raises(ValueError):
         fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
         await mock_id_gap.prepare(fly_info)
 
 
 async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.max_velocity, 30)
-    set_mock_value(mock_id_gap.min_velocity, 1)
-    set_mock_value(mock_id_gap.acceleration_time, 0.5)
+    set_mock_value(mock_id_gap.motor.max_velocity, 30)
+    set_mock_value(mock_id_gap.motor.min_velocity, 1)
+    set_mock_value(mock_id_gap.motor.acceleration_time, 0.5)
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
-    get_mock_put(mock_id_gap.user_setpoint_str).assert_awaited_once_with(
+    get_mock_put(mock_id_gap.motor.user_setpoint_str).assert_awaited_once_with(
         str(fly_info.ramp_up_start_pos(0.5))
     )
-    assert await mock_id_gap.velocity.get_value() == 10
+    assert await mock_id_gap.motor.velocity.get_value() == 10
 
 
 @pytest.mark.parametrize(
@@ -262,16 +247,12 @@ async def test_phase_cal_timout(
 
 
 async def test_phase_success_set(
-    mock_id_access_control: UndulatorAccessControl,
-    mock_phase_axes: UndulatorPhaseAxes,
-    run_engine: RunEngine,
+    mock_phase_axes: UndulatorPhaseAxes, run_engine: RunEngine
 ):
     set_value = Apple2PhasesVal(top_inner=3, top_outer=2, btm_inner=5, btm_outer=7)
     callback_on_mock_put(
         mock_phase_axes.top_inner.user_setpoint,
-        lambda *_, **__: set_mock_value(
-            mock_id_access_control.gate, UndulatorGateStatus.OPEN
-        ),
+        lambda *_, **__: set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN),
     )
 
     def set_complete_move():
@@ -291,7 +272,7 @@ async def test_phase_success_set(
             mock_phase_axes.btm_outer.user_readback,
             7,
         )
-        set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.CLOSE)
+        set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_phase_axes.set_move, lambda *_, **__: set_complete_move())
     run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
@@ -320,24 +301,20 @@ async def test_phase_success_set(
 
 
 async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
-    mock_jaw_phase: UndulatorJawPhase, mock_id_access_control: UndulatorAccessControl
+    mock_jaw_phase: UndulatorJawPhase,
 ):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
-        lambda *_, **__: set_mock_value(
-            mock_id_access_control.gate, UndulatorGateStatus.OPEN
-        ),
+        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
     mock_jaw_phase.get_timeout = AsyncMock(return_value=0.002)
     with pytest.raises(TimeoutError):
         await mock_jaw_phase.set(2)
 
 
-async def test_jaw_phase_status_error(
-    mock_jaw_phase: UndulatorJawPhase, mock_id_access_control: UndulatorAccessControl
-):
+async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
     set_value = 5
-    set_mock_value(mock_id_access_control.status, EnabledDisabledUpper.DISABLED)
+    set_mock_value(mock_jaw_phase.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_jaw_phase.set(set_value)
 
@@ -370,13 +347,10 @@ async def test_jaw_phase_success_scan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     mock_jaw_phase: UndulatorJawPhase,
-    mock_id_access_control: UndulatorAccessControl,
 ):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
-        lambda *_, **__: set_mock_value(
-            mock_id_access_control.gate, UndulatorGateStatus.OPEN
-        ),
+        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
     output = range(0, 11, 1)
 
@@ -387,7 +361,7 @@ async def test_jaw_phase_success_scan(
 
     def set_complete_move():
         set_mock_value(mock_jaw_phase.jaw_phase.user_readback, next(pos))
-        set_mock_value(mock_id_access_control.gate, UndulatorGateStatus.CLOSE)
+        set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_jaw_phase.set_move, lambda *_, **__: set_complete_move())
 

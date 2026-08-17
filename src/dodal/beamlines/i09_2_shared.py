@@ -13,14 +13,15 @@ from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
-    ConfigServerEnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    LookupTableColumnConfig,
-    UndulatorAccessControl,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
+)
+from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -54,35 +55,25 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def jid_accesscontrol() -> UndulatorAccessControl:
-    return UndulatorAccessControl(prefix=f"{J_PREFIX.insertion_prefix}-MO-SERVC-01:")
+def jgap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{J_PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
-def jgap(jid_accesscontrol: UndulatorAccessControl) -> UndulatorGap:
-    return UndulatorGap(f"{J_PREFIX.insertion_prefix}-MO-SERVC-01:", jid_accesscontrol)
-
-
-@devices.factory()
-def jphase(jid_accesscontrol: UndulatorAccessControl) -> UndulatorPhaseAxes:
+def jphase() -> UndulatorPhaseAxes:
     return UndulatorPhaseAxes(
         prefix=f"{J_PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="PUO",
         top_inner="PUI",
         btm_inner="PLI",
         btm_outer="PLO",
-        access_control=jid_accesscontrol,
     )
 
 
 @devices.factory()
-def jid(
-    jgap: UndulatorGap, jphase: UndulatorPhaseAxes, jid_accesscontrol
-) -> Apple2[UndulatorPhaseAxes]:
+def jid(jgap: UndulatorGap, jphase: UndulatorPhaseAxes) -> Apple2[UndulatorPhaseAxes]:
     """I09 soft x-ray insertion device."""
-    return Apple2[UndulatorPhaseAxes](
-        gap=jgap, phase=jphase, access_control=jid_accesscontrol
-    )
+    return Apple2[UndulatorPhaseAxes](id_gap=jgap, id_phase=jphase)
 
 
 @devices.factory()
