@@ -13,7 +13,7 @@ from ophyd_async.core import (
     TimeoutCalculator,
     WatchableAsyncStatus,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device.apple2_motors import (
@@ -141,7 +141,7 @@ class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
 
     def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix=prefix, name=name)
-        self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
+        self.set_move = epics_signal_w(int, prefix + "BLGSETP")
         with self.add_children_as_readables():
             self.motor = UndulatorGapMotor(
                 prefix, self.gate, self.status, self.set_move

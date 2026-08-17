@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import TypeVar
 
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_w
 
 from dodal.devices.insertion_device.apple2_motors import (
     MotorStringSetpoint,
@@ -74,7 +74,7 @@ class UndulatorLockedPhaseAxes(SafeUndulatorMoverBase[Apple2PhaseValType]):
             self.top_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_outer}")
             self.btm_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_inner}")
         # Nothing move until this is set to 1 and it will return to 0 when done.
-        self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
+        self.set_move = epics_signal_w(int, f"{prefix}BL{top_outer}" + "MOVE")
         self.axes = [self.top_outer, self.btm_inner]
         super().__init__(prefix, name)
 
@@ -153,7 +153,7 @@ class UndulatorJawPhase(SafeUndulatorMoverBase[float]):
     ):
         with self.add_children_as_readables():
             self.jaw_phase = UndulatorPhaseMotor(prefix=f"{prefix}BL{jaw_phase}")
-        self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
+        self.set_move = epics_signal_w(int, f"{prefix}BL{move_pv}" + "MOVE")
         super().__init__(prefix, name)
 
     async def set_demand_positions(self, value: float) -> None:
