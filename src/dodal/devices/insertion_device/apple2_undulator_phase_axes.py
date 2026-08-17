@@ -75,20 +75,28 @@ Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
 class SafeUndulatorMoverBase(
     SafeUndulatorBase, StandardReadable, Movable[T], Generic[T]
 ):
-    """Base class for Apple2 undulator devices that use gated motion.
+    """Base class for movable Apple2 undulator devices using gated motion.
 
-    Subclasses implement writing demand positions and estimating move
-    timeouts, while this class provides the common sequence of:
+    Extends :class:`SafeUndulatorBase` with the standard readable and movable
+    interfaces required by ophyd-async devices.
 
-    * checking that motion is permitted,
-    * writing demand positions,
-    * triggering the controller move,
-    * waiting for motion to complete.
+    The move sequence is:
+
+    * verify that the undulator is enabled and motion is permitted,
+    * write the requested demand positions,
+    * trigger the controller to start motion,
+    * monitor the gate until motion is complete.
+
+    Subclasses implement the device-specific demand-position handling and
+    move-timeout calculation.
 
     Attributes:
-        gate: Gate status indicating whether the controller is moving.
-        status: Enable state of the undulator.
-        set_move: Signal used to trigger motion after demands have been written.
+        gate: Read-only signal indicating the current gated motion state of
+            the controller.
+        status: Read-only signal indicating whether the undulator is enabled.
+        set_move: Signal used to trigger motion after demand positions have
+            been written. Writing a value of 1 starts the move; the controller
+            returns it to 0 when the move is complete.
     """
 
     def __init__(self, prefix: str, name: str = ""):

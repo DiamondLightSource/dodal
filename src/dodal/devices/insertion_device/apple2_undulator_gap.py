@@ -59,15 +59,20 @@ class UndulatorGapMoveLogic(UnstoppableMotorMoveLogic):
 
 
 class UndulatorGap(SafeUndulatorBase[float], MotorStringSetpoint):
-    """Motor record wrapper for the Apple2 undulator gap.
+    """EPICS motor interface for the Apple2 undulator gap.
 
-    This class adapts the standard EPICS motor interface to match the Apple2
-    controller by:
+    Adapts the standard EPICS motor interface to the Apple2 undulator
+    controller, where the gap setpoint is written as a string and motion is
+    started separately via the controller's move signal.
 
-    * exposing the string-valued setpoint as a float signal,
-    * using the dedicated gap velocity PV,
-    * disabling stopping,
-    * providing Apple2-specific move logic.
+    The Apple2-specific interface:
+
+    * exposes the string-valued controller setpoint as a float motor
+      setpoint,
+    * uses the dedicated Apple2 gap velocity PV,
+    * disables the standard motor stop signal because the gap cannot be
+      stopped once motion has started,
+    * uses the Apple2 gate and enable status signals to control motion.
     """
 
     def __init__(self, prefix: str, name: str = ""):
