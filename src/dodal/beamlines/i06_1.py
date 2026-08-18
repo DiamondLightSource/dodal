@@ -1,4 +1,4 @@
-from ophyd_async.core import DeviceMap, DeviceVector
+from ophyd_async.core import DeviceMap
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.beamlines.i06_shared import devices as i06_shared_devices
@@ -103,17 +103,16 @@ def scaler2_ppj(scaler2_controller: ScalerCardController):
     """Patch Panel J channels for scaler2_controller."""
     prefix = f"{J_PREFIX.beamline_prefix}-EA-USER-01:"
     return ScalerCardChannels(
-        channels=DeviceVector(
+        channels=DeviceMap(
             {
-                # Change to DeviceMap when on ophyd-async 0.20
-                1: epics_signal_r(float, prefix + "SC1-RAW"),  # ca61sr
-                2: epics_signal_r(float, prefix + "SC2-RAW"),  # ca62sr
-                3: epics_signal_r(float, prefix + "SC3-RAW"),  # ca63sr
-                4: epics_signal_r(float, prefix + "SC4-RAW"),  # ca64sr
-                5: epics_signal_r(float, prefix + "SC5-RAW"),  # ca65sr
-                6: epics_signal_r(float, prefix + "SC6-RAW"),  # ca66sr
-                7: epics_signal_r(float, prefix + "SC7-RAW"),  # ca67sr
-                8: epics_signal_r(float, prefix + "SC8-RAW"),  # ca68sr
+                "ca61sr": epics_signal_r(float, prefix + "SC1-RAW"),
+                "ca62sr": epics_signal_r(float, prefix + "SC2-RAW"),
+                "ca63sr": epics_signal_r(float, prefix + "SC3-RAW"),
+                "ca64sr": epics_signal_r(float, prefix + "SC4-RAW"),
+                "ca65sr": epics_signal_r(float, prefix + "SC5-RAW"),
+                "ca66sr": epics_signal_r(float, prefix + "SC6-RAW"),
+                "ca67sr": epics_signal_r(float, prefix + "SC7-RAW"),
+                "ca68sr": epics_signal_r(float, prefix + "SC8-RAW"),
             }
         ),
         controller=scaler2_controller,
