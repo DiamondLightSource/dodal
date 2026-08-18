@@ -79,7 +79,7 @@ class ScalerCardChannels(
     :class:`ScalerCardController` that controls the underlying scaler card. Multiple
     instances of this class can share the same controller, allowing different groups of
     scaler channels to be exposed as separate logical devices while being acquired by
-    the same physical scaler card. The channels are also added as readbales with the
+    the same physical scaler card. The channels are also added as readables with the
     controller, so the controller exposes all channels associated with the scaler card.
     This allows the controller to represent the complete set of scaler channels, while
     each  :class:`ScalerCardChannels` instance provides access to only its associated
