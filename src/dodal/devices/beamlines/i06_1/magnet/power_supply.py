@@ -58,3 +58,11 @@ class ThreeMagnetAxisPowerSupply(StandardReadable):
             self.y.check_axis_with_limit(pos.y, mode, MagnetMode.UNIAXIAL_Y.axis_alias),
             self.z.check_axis_with_limit(pos.z, mode, MagnetMode.UNIAXIAL_Z.axis_alias),
         )
+
+    async def get_ramp_rate(self) -> tuple[float, float, float]:
+        x, y, z = await asyncio.gather(
+            self.x.ramp_rate.readback.get_value(),
+            self.y.ramp_rate.readback.get_value(),
+            self.z.ramp_rate.readback.get_value(),
+        )
+        return x, y, z
