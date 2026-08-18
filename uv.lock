@@ -912,7 +912,7 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.5.1"
+version = "1.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -927,9 +927,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6f/a2/2fc42d3231be454be244c1dd19a1e36204fe68957b275fc37775efffc9ba/daq_config_server-1.5.1.tar.gz", hash = "sha256:e7dbcd335a1ec06faa777bc0f03039c90aa067b3b71df599cb59ae7cf5fac368", size = 236115, upload-time = "2026-07-28T14:03:52.265Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/50/50/5870d12cd0a1e93695c5dea7f5ad6714e1a8af6d48f9753678f5aa2a37b3/daq_config_server-1.5.2.tar.gz", hash = "sha256:ca8aada60107c0969f83112d3b6e1d07ab23d5e72d26a968e04bb36ec02f0507", size = 237348, upload-time = "2026-08-14T15:07:36.172Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/6a/7a8d2a4d7c35f1e384e58c559b44fa41d90878b67e1c9689831fe2a1d125/daq_config_server-1.5.1-py3-none-any.whl", hash = "sha256:3076083c3a9a007f635562654d834c8528997316e1764b4cbd46cb324e3904be", size = 35620, upload-time = "2026-07-28T14:03:51.285Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/5b/dc623b063822cae2494d6265ac1077406007495d42513ba2eae66e729b08/daq_config_server-1.5.2-py3-none-any.whl", hash = "sha256:7834f7479af40792a164355bd6acd15f32eeb6803b861eefb27dcb83355de786", size = 36376, upload-time = "2026-08-14T15:07:35.114Z" },
 ]
 
 [[package]]
@@ -1035,14 +1035,14 @@ requires-dist = [
     { name = "aiohttp" },
     { name = "bluesky", specifier = ">=1.14.5" },
     { name = "click" },
-    { name = "daq-config-server", specifier = "==1.5.1" },
+    { name = "daq-config-server", specifier = ">=1.5.2" },
     { name = "deepdiff" },
     { name = "graypy" },
     { name = "mysql-connector-python", specifier = "==9.5.0" },
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.20.1" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.21.1" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
