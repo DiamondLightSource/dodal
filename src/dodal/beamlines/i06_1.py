@@ -9,9 +9,12 @@ from dodal.devices.beamlines.i06_1.magnet import (
     SuperConductingMagnetController,
     ThreeMagnetAxisPowerSupply,
 )
+from dodal.devices.beamlines.i06_1.magnet.temperature_controller import (
+    SuperConductingMagnetTemperatureController,
+)
 from dodal.devices.motors import XYThetaStage
 from dodal.devices.scaler_card import ScalerCardChannels, ScalerCardController
-from dodal.devices.temperture_controller import Lakeshore336
+from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -43,6 +46,13 @@ def xabs() -> XYThetaStage:
 @devices.factory()
 def dd() -> DiffractionDichroism:
     return DiffractionDichroism(f"{J_PREFIX.beamline_prefix}-EA-DDIFF-01:")
+
+
+@devices.factory()
+def scm_temp_controller() -> SuperConductingMagnetTemperatureController:
+    return SuperConductingMagnetTemperatureController(
+        prefix=f"{J_PREFIX.beamline_prefix}-EA-TCTRL-01:"
+    )
 
 
 @devices.factory()
