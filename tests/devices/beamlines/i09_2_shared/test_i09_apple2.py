@@ -11,19 +11,18 @@ from ophyd_async.core import (
 
 from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
-    J09_PHASE_POLY_DEG_COLUMNS,
+    J09_PHASE_LOOKUP_TABLE,
 )
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
+    ConfigServerEnergyMotorLookup,
+    EnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     UndulatorGap,
     UndulatorPhaseAxes,
-)
-from dodal.devices.insertion_device.energy_motor_lookup import (
-    ConfigServerEnergyMotorLookup,
 )
 from dodal.devices.insertion_device.enum import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
@@ -34,9 +33,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.beamlines.i09_2_shared.test_data import (
     TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT,
-    TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT,
     TEST_SOFT_GAP_UNDULATOR_LUT,
-    TEST_SOFT_PHASE_UNDULATOR_LUT,
 )
 from tests.devices.insertion_device.util import (
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
@@ -58,14 +55,8 @@ def mock_j09_gap_energy_motor_lookup(
 
 
 @pytest.fixture
-def mock_j09_phase_energy_motor_lookup(
-    mock_config_client: ConfigClient,
-) -> ConfigServerEnergyMotorLookup:
-    return ConfigServerEnergyMotorLookup(
-        lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
-        config_client=mock_config_client,
-        path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
-    )
+def mock_j09_phase_energy_motor_lookup() -> EnergyMotorLookup:
+    return EnergyMotorLookup(J09_PHASE_LOOKUP_TABLE)
 
 
 @pytest.fixture
@@ -126,13 +117,9 @@ async def mock_id_pol(
 
 def test_j09_energy_motor_lookup_update_lut_success(
     mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
-    mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
 ):
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT, mock_j09_gap_energy_motor_lookup
-    )
-    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
-        TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT, mock_j09_phase_energy_motor_lookup
     )
 
 
