@@ -1,4 +1,4 @@
-from ophyd_async.core import DeviceVector, InOut, SignalRW, soft_signal_rw
+from ophyd_async.core import DeviceMap, InOut, SignalRW, soft_signal_rw
 from ophyd_async.epics.adcore import ADAcquireLogic
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -155,12 +155,12 @@ def scaler1_controller() -> ScalerCardController:
 def scaler1(scaler1_controller: ScalerCardController):
     prefix = f"{I_PREFIX.beamline_prefix}-EA-SCLR-01"
     return ScalerCardChannels(
-        channels=DeviceVector(
-            {  # Change to DeviceMap when on ophyd-async 0.20
-                0: epics_signal_r(float, prefix + ".S2"),  # hm3amp20
-                1: epics_signal_r(float, prefix + ".S3"),  # sm5amp8
-                2: epics_signal_r(float, prefix + ".S4"),  # smpmamp39
-                3: epics_signal_r(float, prefix + ".S5"),  # rfdamp10
+        channels=DeviceMap(
+            {
+                "hm3amp20": epics_signal_r(float, prefix + ".S2"),
+                "sm5amp8": epics_signal_r(float, prefix + ".S3"),
+                "smpmamp39": epics_signal_r(float, prefix + ".S4"),
+                "rfdamp10": epics_signal_r(float, prefix + ".S5"),
             }
         ),
         controller=scaler1_controller,
@@ -180,13 +180,12 @@ def scaler2_controller() -> ScalerCardController:
 def scaler2(scaler2_controller: ScalerCardController):
     prefix = f"{L_PREFIX.beamline_prefix}-VA-SCLR-01"
     return ScalerCardChannels(
-        channels=DeviceVector(
+        channels=DeviceMap(
             {
-                # Change to DeviceMap when on ophyd-async 0.20
-                0: epics_signal_r(float, prefix + ".S2"),  # hm3amp20
-                1: epics_signal_r(float, prefix + ".S3"),  # sm5amp8
-                2: epics_signal_r(float, prefix + ".S4"),  # smpmamp39
-                3: epics_signal_r(float, prefix + ".S5"),  # rfdamp10
+                "hm3amp20": epics_signal_r(float, prefix + ".S2"),
+                "sm5amp8": epics_signal_r(float, prefix + ".S3"),
+                "smpmamp39": epics_signal_r(float, prefix + ".S4"),
+                "rfdamp10": epics_signal_r(float, prefix + ".S5"),
             }
         ),
         controller=scaler2_controller,
