@@ -18,6 +18,7 @@ dodal.devices.beamlines.i10\_1
    ~i10_1.I10JScalerCard
    ~i10_1.ElectromagnetStage
    ~i10_1.HighFieldMagnet
+   ~i10_1.HighFieldMagnetTemperatureController
 
 
 

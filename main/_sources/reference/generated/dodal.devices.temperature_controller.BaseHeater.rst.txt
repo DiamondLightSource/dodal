@@ -1,0 +1,46 @@
+dodal.devices.temperature\_controller.BaseHeater
+================================================
+
+.. currentmodule:: dodal.devices.temperature_controller
+
+.. autoclass:: BaseHeater
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BaseHeater.setpoint
+      
+      
+      ~BaseHeater.output
+      
+   
+   
