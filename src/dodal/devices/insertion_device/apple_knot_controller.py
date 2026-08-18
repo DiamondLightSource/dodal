@@ -5,14 +5,12 @@ from typing import Generic
 from numpy import sign
 
 from dodal.common import Rectangle2D
-from dodal.devices.insertion_device import (
+from dodal.devices.insertion_device.apple2_controller import (
     Apple2,
     Apple2Controller,
+    Apple2LockedPhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
-)
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2LockedPhasesVal,
     PhaseAxesType,
 )
 from dodal.devices.insertion_device.enum import Pol
@@ -190,7 +188,7 @@ class AppleKnotController(
         # get current apple2 value
         current_phase_top, current_gap = await asyncio.gather(
             self.apple2_ref().phase_ref().top_outer.user_readback.get_value(),
-            self.apple2_ref().gap_ref().motor.user_readback.get_value(),
+            self.apple2_ref().gap_ref().user_readback.get_value(),
         )
         current_apple2_val = self._get_apple2_value(
             current_gap, current_phase_top, Pol.NONE

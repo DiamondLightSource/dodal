@@ -2,17 +2,14 @@ import asyncio
 from dataclasses import dataclass
 from functools import cached_property
 
-from bluesky.protocols import Flyable, Preparable
 from ophyd_async.core import (
-    AsyncStatus,
     FlyMotorInfo,
     SignalR,
     SignalW,
     StandardReadableFormat,
     TimeoutCalculator,
-    WatchableAsyncStatus,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from ophyd_async.epics.motor import MotorFlyCtx
 
 from dodal.common.enums import EnabledDisabledUpper
@@ -21,7 +18,7 @@ from dodal.devices.insertion_device.apple2_motors import (
     UnstoppableMotorFlyableMoveLogic,
 )
 from dodal.devices.insertion_device.apple2_undulator_base import (
-    SafeUndulatorMoverBase,
+    UndulatorBase,
     estimate_motor_timeout,
     estimate_motor_timeout_from_signals,
     set_move_and_wait_for_gate,
@@ -74,20 +71,26 @@ class UndulatorGapFlyableMoveLogic(UnstoppableMotorFlyableMoveLogic):
         return await super().on_prepare(value)
 
 
-class UndulatorGapMotor(MotorStringSetpoint):
-    """Motor record wrapper for the Apple2 undulator gap.
+class UndulatorGap(MotorStringSetpoint, UndulatorBase[float]):
+    """EPICS motor interface for the Apple2 undulator gap.
 
-    This class adapts the standard EPICS motor interface to match the Apple2
-    controller by:
+    Adapts the standard EPICS motor interface to the Apple2 undulator
+    controller, where the gap setpoint is written as a string and motion is
+    started separately via the controller's move signal.
 
-    * exposing the string-valued setpoint as a float signal,
-    * using the dedicated gap velocity PV,
-    * disabling stopping,
-    * providing Apple2-specific move logic.
+    The Apple2-specific interface:
+
+    * exposes the string-valued controller setpoint as a float motor
+      setpoint,
+    * uses the dedicated Apple2 gap velocity PV,
+    * disables the standard motor stop signal because the gap cannot be
+      stopped once motion has started,
+    * uses the Apple2 gate and enable status signals to control motion.
     """
 
-    def __init__(self, prefix: str, gate, status, set_move, name: str = ""):
-        super().__init__(prefix + "BLGAPMTR", prefix + "BLGSET", name=name)
+    def __init__(self, prefix: str, name: str = ""):
+        self.user_setpoint_str = epics_signal_rw(str, prefix + "BLGSET")
+        super().__init__(prefix + "BLGAPMTR", name=name)
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
         """ Clear the motor config_signal as we need new PV for velocity."""
@@ -99,11 +102,18 @@ class UndulatorGapMotor(MotorStringSetpoint):
             format=StandardReadableFormat.CONFIG_SIGNAL,
         )
         # Motor is unstoppable.
-        self.motor_stop = None
-        self._fly_move_logic = UndulatorGapFlyableMoveLogic(
+        del self.motor_stop
+
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+        self.status = epics_signal_r(EnabledDisabledUpper, prefix + "IDBLENA")
+        self.set_move = epics_signal_w(int, prefix + "BLGSETP")
+
+    @cached_property
+    def _logic(self) -> UndulatorGapFlyableMoveLogic:
+        return UndulatorGapFlyableMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            motor_stop=self.motor_stop,  # type: ignore
+            motor_stop=None,  # type: ignore
             low_limit_travel=self.low_limit_travel,
             high_limit_travel=self.high_limit_travel,
             dial_low_limit_travel=self.dial_low_limit_travel,
@@ -115,56 +125,15 @@ class UndulatorGapMotor(MotorStringSetpoint):
             acceleration_time=self.acceleration_time,
             motor_done_move=self.motor_done_move,
             # Specific to this class.
-            gate=gate,
-            status=status,
-            set_move=set_move,
+            gate=self.gate,
+            status=self.status,
+            set_move=self.set_move,
         )
 
-    @cached_property
-    def _logic(self) -> UndulatorGapFlyableMoveLogic:
-        return self._fly_move_logic
-
-
-class UndulatorGap(SafeUndulatorMoverBase[float], Flyable, Preparable):
-    """Apple2 undulator gap device.
-
-    Wraps an internal :class:`UndulatorGapMotor` and exposes the Apple2
-    controller interface, where demand positions are written separately from
-    triggering motion via a dedicated move PV.
-
-    Supports standard moves as well as fly scanning.
-
-    Args:
-        prefix: Beamline-specific PV prefix.
-        name: Device name.
-    """
-
-    def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix=prefix, name=name)
-        self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
-        with self.add_children_as_readables():
-            self.motor = UndulatorGapMotor(
-                prefix, self.gate, self.status, self.set_move
-            )
-
     async def set_demand_positions(self, value: float) -> None:
-        await self.motor.user_setpoint.set(value)
+        await self.user_setpoint.set(value)
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout_from_signals(
-            self.motor.user_setpoint, self.motor.user_readback, self.motor.velocity
+            self.user_setpoint, self.user_readback, self.velocity
         )
-
-    @AsyncStatus.wrap
-    async def prepare(self, value: FlyMotorInfo) -> None:
-        """Prepare for a fly scan by moving to the run-up position at max velocity.
-        Stores fly info for later use in kickoff.
-        """
-        await self.motor.prepare(value)
-
-    @AsyncStatus.wrap
-    async def kickoff(self):
-        await self.motor.kickoff()
-
-    def complete(self) -> WatchableAsyncStatus:
-        return self.motor.complete()

@@ -79,12 +79,12 @@ async def test_insertion_device_energy_prepare_success(
     time_for_move,
 ):
     gap = mock_id_controller.apple2_ref().gap_ref()
-    set_mock_value(gap.motor.max_velocity, 30)
-    set_mock_value(gap.motor.min_velocity, 1)
-    set_mock_value(gap.motor.low_limit_travel, 0)
-    set_mock_value(gap.motor.high_limit_travel, 200)
+    set_mock_value(gap.max_velocity, 30)
+    set_mock_value(gap.min_velocity, 1)
+    set_mock_value(gap.low_limit_travel, 0)
+    set_mock_value(gap.high_limit_travel, 200)
     set_mock_value(gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(gap.motor.acceleration_time, acceleration_time)
+    set_mock_value(gap.acceleration_time, acceleration_time)
     mock_id_controller._polarisation_setpoint_set(Pol.LH)
     mock_set = set_mock_attr(mock_id_energy, "set", AsyncMock())
     mid_gap_position = end_gap + start_gap / 2.0
@@ -98,9 +98,8 @@ async def test_insertion_device_energy_prepare_success(
     velocity = (end_gap - start_gap) / time_for_move
     ramp_up_start = start_gap - acceleration_time * velocity / 2.0
     mock_set.assert_awaited_once_with(energy=750)
-    get_mock_put(gap.motor.user_setpoint).assert_awaited_once_with(ramp_up_start)
-
-    assert await gap.motor.velocity.get_value() == abs(velocity)
+    get_mock_put(gap.user_setpoint_str).assert_awaited_once_with(str(ramp_up_start))
+    assert await gap.velocity.get_value() == abs(velocity)
 
 
 async def test_insertion_deviceenergy_kickoff_call_gap_kickoff(
@@ -164,12 +163,12 @@ async def test_beam_energy_kickoff_set_correct_delay(
     fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
     id_acc_time = 3
     pgm_acc_time = 1
-    set_mock_value(mock_id_gap.motor.max_velocity, 30)
-    set_mock_value(mock_id_gap.motor.min_velocity, 0.1)
-    set_mock_value(mock_id_gap.motor.acceleration_time, id_acc_time)
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 0.1)
+    set_mock_value(mock_id_gap.acceleration_time, id_acc_time)
     set_mock_value(mock_pgm.energy.max_velocity, 30)
-    set_mock_value(mock_id_gap.motor.low_limit_travel, 0)
-    set_mock_value(mock_id_gap.motor.high_limit_travel, 200)
+    set_mock_value(mock_id_gap.low_limit_travel, 0)
+    set_mock_value(mock_id_gap.high_limit_travel, 200)
     set_mock_value(mock_pgm.energy.low_limit_travel, 0)
     set_mock_value(mock_pgm.energy.high_limit_travel, 1000)
     set_mock_value(mock_pgm.energy.acceleration_time, pgm_acc_time)

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-from ophyd_async.core import derived_signal_rw
-from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.core import SignalRW, derived_signal_rw
 from ophyd_async.epics.motor import Motor, MotorFlyableMovableLogic
 
 from dodal.log import LOGGER
@@ -16,9 +15,10 @@ class MotorStringSetpoint(Motor):
     clients and the string representation required by the IOC.
     """
 
-    def __init__(self, prefix: str, user_setpoint_str_pv: str, name: str = ""):
+    user_setpoint_str: SignalRW[str]
+
+    def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix, name)
-        self.user_setpoint_str = epics_signal_rw(str, user_setpoint_str_pv)
         self.user_setpoint = derived_signal_rw(
             self._read_user_setpoint,
             self._set_user_setpoint,

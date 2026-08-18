@@ -2,13 +2,14 @@ from .apple2_controller import (
     MAXIMUM_GAP_MOTOR_POSITION,
     MAXIMUM_MOVE_TIME,
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+    Apple2,
     Apple2Controller,
     Apple2EnforceLHMoveController,
     Apple2Type,
+    Apple2Val,
     EnergyMotorConvertor,
 )
-from .apple2_undulator import Apple2, Apple2Val
-from .apple2_undulator_base import SafeUndulatorMoverBase
+from .apple2_undulator_base import UndulatorBase
 from .apple2_undulator_gap import UndulatorGap
 from .apple2_undulator_phase_axes import (
     Apple2LockedPhasesVal,
@@ -44,7 +45,7 @@ __all__ = [
     "AppleKnotPathFinder",
     "UndulatorGap",
     "UndulatorPhaseAxes",
-    "SafeUndulatorMoverBase",
+    "UndulatorBase",
     "UndulatorJawPhase",
     "Apple2Val",
     "Apple2PhasesVal",
