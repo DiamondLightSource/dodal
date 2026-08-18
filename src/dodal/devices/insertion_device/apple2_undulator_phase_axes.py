@@ -10,7 +10,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device.apple2_motors import (
     MotorStringSetpoint,
-    UnstoppableMotorMoveLogic,
+    UnstoppableMotorFlyableMoveLogic,
 )
 from dodal.devices.insertion_device.apple2_undulator_base import (
     UndulatorBase,
@@ -50,19 +50,23 @@ class UndulatorPhaseMotor(MotorStringSetpoint):
         super().__init__(f"{prefix}MTR", name=name)
         del self.motor_stop
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
+        self.motor_stop = None
 
     @cached_property
-    def movable_logic(self) -> UnstoppableMotorMoveLogic:
-        return UnstoppableMotorMoveLogic(
+    def _logic(self) -> UnstoppableMotorFlyableMoveLogic:
+        return UnstoppableMotorFlyableMoveLogic(
             readback=self.user_readback,
             setpoint=self.user_setpoint,
-            motor_stop=None,  # type: ignore
+            motor_stop=self.motor_stop,  # type: ignore
             low_limit_travel=self.low_limit_travel,
             high_limit_travel=self.high_limit_travel,
             dial_low_limit_travel=self.dial_low_limit_travel,
             dial_high_limit_travel=self.dial_high_limit_travel,
             velocity=self.velocity,
             acceleration_time=self.acceleration_time,
+            max_velocity=self.max_velocity,
+            motor_egu=self.motor_egu,
+            motor_done_move=self.motor_done_move,
         )
 
 

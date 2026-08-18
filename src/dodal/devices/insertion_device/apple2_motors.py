@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from ophyd_async.core import SignalRW, derived_signal_rw
-from ophyd_async.epics.motor import Motor, MotorMoveLogic
+from ophyd_async.epics.motor import Motor, MotorFlyableMovableLogic
 
 from dodal.log import LOGGER
 
@@ -33,7 +33,7 @@ class MotorStringSetpoint(Motor):
 
 
 @dataclass
-class UnstoppableMotorMoveLogic(MotorMoveLogic):
+class UnstoppableMotorFlyableMoveLogic(MotorFlyableMovableLogic):
     """Motor move logic for motors that cannot be stopped."""
 
     async def stop(self):

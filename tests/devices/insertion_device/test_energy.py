@@ -7,12 +7,11 @@ from bluesky.plan_stubs import prepare
 from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
+    WatchableAsyncStatus,
     get_mock_put,
     init_devices,
     set_mock_attr,
     set_mock_value,
-    soft_signal_rw,
-    wait_for_value,
 )
 
 from dodal.devices.insertion_device import (
@@ -112,13 +111,18 @@ async def test_insertion_deviceenergy_kickoff_call_gap_kickoff(
     mock_kickoff.assert_awaited_once()
 
 
-def test_insertion_device_energy_complete_call_gap_complete(
+async def test_insertion_device_energy_complete_calls_gap_complete(
     mock_id_energy: InsertionDeviceEnergy,
     mock_id_gap: UndulatorGap,
 ):
-    mock_complete = set_mock_attr(mock_id_gap, "complete", MagicMock())
-    mock_id_energy.complete()
-    mock_complete.assert_called_once()
+    expected_status = MagicMock(spec=WatchableAsyncStatus)
+    mock_complete = set_mock_attr(
+        mock_id_gap, "complete", MagicMock(return_value=expected_status)
+    )
+    status = mock_id_energy.complete()
+
+    assert status is expected_status
+    mock_complete.assert_called_once_with()
 
 
 async def test_insertion_device_energy_prepare_success_in_run_engine(
@@ -183,35 +187,43 @@ async def test_energysetter_complete(
     mock_sleep: AsyncMock,
     mock_beam_energy: BeamEnergy,
     mock_pgm: PlaneGratingMonochromator,
-    mock_id_gap: UndulatorGap,
     mock_id_energy: InsertionDeviceEnergy,
 ) -> None:
-    fake_id_fly_status = soft_signal_rw(bool, initial_value=False)
-    fake_pgm_fly_status = soft_signal_rw(bool, initial_value=False)
-    await asyncio.gather(
-        fake_pgm_fly_status.connect(mock=True), fake_id_fly_status.connect(mock=True)
-    )
+    id_complete_event = asyncio.Event()
+    pgm_complete_event = asyncio.Event()
 
     @AsyncStatus.wrap
-    async def get_status(signal):
-        await wait_for_value(signal, True, timeout=1)
+    async def wait_for_id_complete() -> None:
+        await id_complete_event.wait()
 
-    mock_id_gap._fly_status = get_status(fake_id_fly_status)  # type: ignore
+    @AsyncStatus.wrap
+    async def wait_for_pgm_complete() -> None:
+        await pgm_complete_event.wait()
 
-    mock_pgm.energy._fly_status = get_status(fake_pgm_fly_status)  # type: ignore
     set_mock_attr(mock_id_energy, "kickoff", AsyncMock())
+    set_mock_attr(
+        mock_id_energy, "complete", MagicMock(return_value=wait_for_id_complete())
+    )
+
     set_mock_attr(mock_pgm.energy, "kickoff", AsyncMock())
-    pgm_status = mock_pgm.energy.complete()
-    id_status = mock_id_gap.complete()
-    assert not id_status.done
-    assert not pgm_status.done
+    set_mock_attr(
+        mock_pgm.energy, "complete", MagicMock(return_value=wait_for_pgm_complete())
+    )
+
+    await mock_beam_energy.prepare(
+        FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    )
     await mock_beam_energy.kickoff()
+
     energy_setter_fly_status = mock_beam_energy.complete()
+
     assert not energy_setter_fly_status.done
-    await fake_id_fly_status.set(True)
-    assert mock_id_gap._fly_status.done  # type: ignore
+
+    id_complete_event.set()
+    await asyncio.sleep(0)
     assert not energy_setter_fly_status.done
-    await fake_pgm_fly_status.set(True)
-    assert mock_pgm.energy._fly_status.done  # type: ignore
+
+    pgm_complete_event.set()
     await energy_setter_fly_status
+
     assert energy_setter_fly_status.done
