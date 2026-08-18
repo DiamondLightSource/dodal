@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 2.6.1.dev5+g91a252074 documentation</title>
+    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 2.6.1.dev6+g7da7e4ee2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=e0f2ec9e"></script>
+    <script src="../../../../_static/documentation_options.js?v=4cf8e60c"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1293,6 +1293,9 @@ window.runMermaid = runMermaid;</script>
         <span class="n">apple2</span><span class="p">:</span> <span class="n">Apple2</span><span class="p">[</span><span class="n">PhaseAxesType</span><span class="p">],</span>
         <span class="n">gap_energy_motor_lut</span><span class="p">:</span> <span class="n">EnergyMotorLookup</span><span class="p">,</span>
         <span class="n">phase_energy_motor_lut</span><span class="p">:</span> <span class="n">EnergyMotorLookup</span><span class="p">,</span>
+        <span class="n">inverse_gap_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">maximum_gap_motor_position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span><span class="p">,</span>
+        <span class="n">maximum_phase_motor_position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">,</span>
         <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1302,6 +1305,9 @@ window.runMermaid = runMermaid;</script>
             <span class="n">apple2</span><span class="o">=</span><span class="n">apple2</span><span class="p">,</span>
             <span class="n">gap_energy_motor_converter</span><span class="o">=</span><span class="n">gap_energy_motor_lut</span><span class="o">.</span><span class="n">find_value_in_lookup_table</span><span class="p">,</span>
             <span class="n">phase_energy_motor_converter</span><span class="o">=</span><span class="n">phase_energy_motor_lut</span><span class="o">.</span><span class="n">find_value_in_lookup_table</span><span class="p">,</span>
+            <span class="n">inverse_gap_energy_motor_converter</span><span class="o">=</span><span class="n">inverse_gap_energy_motor_converter</span><span class="p">,</span>
+            <span class="n">maximum_gap_motor_position</span><span class="o">=</span><span class="n">maximum_gap_motor_position</span><span class="p">,</span>
+            <span class="n">maximum_phase_motor_position</span><span class="o">=</span><span class="n">maximum_phase_motor_position</span><span class="p">,</span>
             <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
