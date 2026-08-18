@@ -101,3 +101,26 @@ async def test_power_supply_read(psu: ThreeMagnetAxisPowerSupply):
             "psu-z-ramp_rate": partial_reading(0),
         },
     )
+
+
+@pytest.mark.parametrize(
+    "x_rate, y_rate, z_rate",
+    [
+        (1.0, 2.0, 0.5),
+        (0.1, 0.1, 0.1),
+        (5.0, 10.0, 2.5),
+    ],
+)
+async def test_three_magnet_axis_power_supply_get_ramp_rate(
+    psu: ThreeMagnetAxisPowerSupply,
+    x_rate: float,
+    y_rate: float,
+    z_rate: float,
+) -> None:
+    set_mock_value(psu.x.ramp_rate.readback, x_rate)
+    set_mock_value(psu.y.ramp_rate.readback, y_rate)
+    set_mock_value(psu.z.ramp_rate.readback, z_rate)
+
+    rates = await psu.get_ramp_rate()
+
+    assert rates == (x_rate, y_rate, z_rate)

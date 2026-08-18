@@ -6,7 +6,7 @@ import pytest
 from bluesky import FailedStatus, RunEngine
 from bluesky.plan_stubs import mv
 from bluesky.protocols import Reading
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import DEFAULT_TIMEOUT, init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.beamlines.i06_1.magnet import (
@@ -348,8 +348,8 @@ async def test_scmc_executes_movement_strategy_and_ramp_at_each_step(
     movement_strategy.move_steps.return_value = move_steps
 
     expected_apply_step_calls = [
-        call(movement.MagnetRequest(x=0.5)),
-        call(movement.MagnetRequest(x=1.2)),
+        call(movement.MagnetRequest(x=0.5), timeout=DEFAULT_TIMEOUT),
+        call(movement.MagnetRequest(x=1.2), timeout=DEFAULT_TIMEOUT),
     ]
     scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_X] = movement_strategy
     scmc._trigger_ramp = AsyncMock()
@@ -418,11 +418,17 @@ async def test_scmc_set_within_boundary_checks_each_movement_step(
     await scmc.set_within_boundary(target)
 
     assert movement_strategy.check_within_limits.call_args_list == [
-        call(initial_position, target),
+        call(
+            initial_position,
+            target,
+        ),
         call(initial_position, steps[0]),
         call(position_after_step_1, steps[1]),
     ]
-    assert scmc._apply_step.call_args_list == [call(steps[0]), call(steps[1])]
+    assert scmc._apply_step.call_args_list == [
+        call(steps[0], timeout=DEFAULT_TIMEOUT),
+        call(steps[1], timeout=DEFAULT_TIMEOUT),
+    ]
     assert scmc.cart.get_readback_position.call_count == 3
 
 
@@ -452,7 +458,7 @@ async def test_scmc_set_within_boundary_stops_when_step_is_outside_limits(
     with pytest.raises(MagnetPositionError):
         await scmc.set_within_boundary(target)
     # The invalid second step must never be applied.
-    scmc._apply_step.assert_awaited_once_with(steps[0])
+    scmc._apply_step.assert_awaited_once_with(steps[0], timeout=DEFAULT_TIMEOUT)
 
 
 @pytest.mark.parametrize(
@@ -479,3 +485,59 @@ async def test_scmc_mock_axis_limits_are_correct(
         scmc.psu_ref().z.limit.get_value(),
     )
     assert limits == list(expected_limits)
+
+
+@pytest.mark.parametrize(
+    "start_pos, ramp_rates, target_request, expected_max_time",
+    [
+        (
+            (1.0, 0.0, -1.0),
+            (1.0, 0.75, 0.5),
+            MagnetRequest(x=1.5, y=1.5, z=1.0),
+            4.0,
+        ),
+        (
+            (0.0, 0.0, 0.0),
+            (1.0, 1.0, 1.0),
+            MagnetRequest(x=1.5, y=1.5, z=0.0),
+            1.5,
+        ),
+        (
+            (0.0, 1.0, -1.0),
+            (1.0, 1.0, 1.0),
+            MagnetRequest(x=1.5, y=1.0, z=1.5),
+            2.5,
+        ),
+        (
+            (0.0, 0.0, -1.5),
+            (2.0, 2.0, 2.0),
+            MagnetRequest(x=None, y=None, z=1.5),
+            1.5,
+        ),
+    ],
+)
+async def test_scmc_set_within_boundary_timeout_set_correctly(
+    scmc: SuperConductingMagnetController,
+    start_pos: tuple[float, float, float],
+    ramp_rates: tuple[float, float, float],
+    target_request: MagnetRequest,
+    expected_max_time: float,
+) -> None:
+    set_mock_value(scmc.mode, MagnetMode.CUBIC)
+
+    start_x, start_y, start_z = start_pos
+    set_mock_value(scmc.cart.x.readback, start_x)
+    set_mock_value(scmc.cart.y.readback, start_y)
+    set_mock_value(scmc.cart.z.readback, start_z)
+
+    scmc.psu_ref().get_ramp_rate = AsyncMock(return_value=ramp_rates)
+    scmc.psu_ref().check_axes_within_limit = AsyncMock()
+
+    expected_timeout = expected_max_time + DEFAULT_TIMEOUT
+
+    with patch.object(scmc, "_apply_step", wraps=scmc._apply_step) as mock_apply_step:
+        await scmc.set_within_boundary(target_request)
+        mock_apply_step.assert_called_once_with(
+            target_request,
+            timeout=expected_timeout,
+        )
