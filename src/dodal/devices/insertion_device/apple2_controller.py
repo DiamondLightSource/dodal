@@ -386,6 +386,9 @@ class Apple2EnforceLHMoveController(
         apple2: Apple2[PhaseAxesType],
         gap_energy_motor_lut: EnergyMotorLookup,
         phase_energy_motor_lut: EnergyMotorLookup,
+        inverse_gap_energy_motor_converter: EnergyMotorConvertor | None = None,
+        maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
+        maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
         name: str = "",
     ) -> None:
@@ -395,6 +398,9 @@ class Apple2EnforceLHMoveController(
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
             phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
+            inverse_gap_energy_motor_converter=inverse_gap_energy_motor_converter,
+            maximum_gap_motor_position=maximum_gap_motor_position,
+            maximum_phase_motor_position=maximum_phase_motor_position,
             units=units,
             name=name,
         )

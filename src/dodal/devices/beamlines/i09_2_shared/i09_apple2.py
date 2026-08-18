@@ -1,4 +1,5 @@
-from dodal.devices.insertion_device import EnergyCoverage, LookupTable, Pol
+from dodal.devices.insertion_device import Pol, StaticPolynomialEnergyMotorLookup
+from dodal.devices.insertion_device.lookup_table_models import ROW_PHASE_CIRCULAR
 
 J09_GAP_POLY_DEG_COLUMNS = [
     "9th-order",
@@ -13,32 +14,17 @@ J09_GAP_POLY_DEG_COLUMNS = [
     "0th-order",
 ]
 
-J09_PHASE_LOOKUP_TABLE = LookupTable(
-    root={
-        Pol.LH: EnergyCoverage.generate(
-            min_energies=[0.104],
-            max_energies=[1.2],
-            poly1d_params=[[0]],
-        ),
-        Pol.LV: EnergyCoverage.generate(
-            min_energies=[0.22],
-            max_energies=[1.0],
-            poly1d_params=[[24.0]],
-        ),
-        Pol.PC: EnergyCoverage.generate(
-            min_energies=[0.145],
-            max_energies=[1.2],
-            poly1d_params=[[15.0]],
-        ),
-        Pol.NC: EnergyCoverage.generate(
-            min_energies=[0.145],
-            max_energies=[1.2],
-            poly1d_params=[[-15.0]],
-        ),
-        Pol.LH3: EnergyCoverage.generate(
-            min_energies=[0.7],
-            max_energies=[2.0],
-            poly1d_params=[[0]],
-        ),
-    }
+JO9_MAX_PHASE = ROW_PHASE_CIRCULAR * 2
+J09_ROW_PHASE_CIRCULAR = ROW_PHASE_CIRCULAR
+
+J09_PHASE_ENERGY_MOTOR_LOOKUP = StaticPolynomialEnergyMotorLookup(
+    min_value=0.1,
+    max_value=2.1,
+    poly_params={
+        Pol.LH: [0],
+        Pol.LV: [JO9_MAX_PHASE],
+        Pol.PC: [J09_ROW_PHASE_CIRCULAR],
+        Pol.NC: [-J09_ROW_PHASE_CIRCULAR],
+        Pol.LH3: [0],
+    },
 )
