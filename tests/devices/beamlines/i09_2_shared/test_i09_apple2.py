@@ -11,32 +11,27 @@ from ophyd_async.core import (
 
 from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
-    J09_PHASE_POLY_DEG_COLUMNS,
+    J09_PHASE_ENERGY_MOTOR_LOOKUP,
+    J09_ROW_PHASE_CIRCULAR,
+    JO9_MAX_PHASE,
 )
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
     BeamEnergy,
+    ConfigServerEnergyMotorLookup,
+    EnergyMotorLookup,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
+    Pol,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.insertion_device.energy_motor_lookup import (
-    ConfigServerEnergyMotorLookup,
-)
-from dodal.devices.insertion_device.enum import Pol
-from dodal.devices.insertion_device.lookup_table_models import (
-    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
-    ROW_PHASE_CIRCULAR,
-    LookupTableColumnConfig,
-)
+from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.beamlines.i09_2_shared.test_data import (
     TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT,
-    TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT,
     TEST_SOFT_GAP_UNDULATOR_LUT,
-    TEST_SOFT_PHASE_UNDULATOR_LUT,
 )
 from tests.devices.insertion_device.util import (
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
@@ -58,14 +53,8 @@ def mock_j09_gap_energy_motor_lookup(
 
 
 @pytest.fixture
-def mock_j09_phase_energy_motor_lookup(
-    mock_config_client: ConfigClient,
-) -> ConfigServerEnergyMotorLookup:
-    return ConfigServerEnergyMotorLookup(
-        lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
-        config_client=mock_config_client,
-        path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
-    )
+def mock_j09_phase_energy_motor_lookup() -> EnergyMotorLookup:
+    return J09_PHASE_ENERGY_MOTOR_LOOKUP
 
 
 @pytest.fixture
@@ -88,6 +77,7 @@ async def mock_id_controller(
             apple2=mock_apple2,
             gap_energy_motor_lut=mock_j09_gap_energy_motor_lookup,
             phase_energy_motor_lut=mock_j09_phase_energy_motor_lookup,
+            maximum_phase_motor_position=JO9_MAX_PHASE,
         )
     set_mock_value(mock_id_controller._energy, 0.5)
     return mock_id_controller
@@ -126,13 +116,9 @@ async def mock_id_pol(
 
 def test_j09_energy_motor_lookup_update_lut_success(
     mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
-    mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
 ):
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT, mock_j09_gap_energy_motor_lookup
-    )
-    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
-        TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT, mock_j09_phase_energy_motor_lookup
     )
 
 
@@ -140,10 +126,10 @@ def test_j09_energy_motor_lookup_update_lut_success(
     "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
     [
         (Pol.LH, 0, 0, 0, 0),
-        (Pol.LV, 24.0, 0, 24.0, 0),
-        (Pol.PC, 12, 0, 12, 0),
-        (Pol.NC, -12, 0, -12, 0),
-        (Pol.NONE, 8, 12, 2, -12),
+        (Pol.LV, JO9_MAX_PHASE, 0, JO9_MAX_PHASE, 0),
+        (Pol.PC, J09_ROW_PHASE_CIRCULAR, 0, J09_ROW_PHASE_CIRCULAR, 0),
+        (Pol.NC, -J09_ROW_PHASE_CIRCULAR, 0, -J09_ROW_PHASE_CIRCULAR, 0),
+        (Pol.NONE, 8, J09_ROW_PHASE_CIRCULAR, 2, -J09_ROW_PHASE_CIRCULAR),
     ],
 )
 async def test_j09_apple2_controller_determine_pol(
@@ -210,9 +196,9 @@ async def test_j09_apple2_controller_set_pol_lh(
     "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
     [
         (Pol.LH, 0, 0, 0, 0),
-        (Pol.LV, 24.0, 0, 24.0, 0),
-        (Pol.PC, 12, 0, 12, 0),
-        (Pol.NC, -12, 0, -12, 0),
+        (Pol.LV, JO9_MAX_PHASE, 0, JO9_MAX_PHASE, 0),
+        (Pol.PC, J09_ROW_PHASE_CIRCULAR, 0, J09_ROW_PHASE_CIRCULAR, 0),
+        (Pol.NC, -J09_ROW_PHASE_CIRCULAR, 0, -J09_ROW_PHASE_CIRCULAR, 0),
     ],
 )
 async def test_j09_apple2_controller_set_pol_does_nothing_when_pol_unchanged(
@@ -238,15 +224,9 @@ async def test_j09_apple2_controller_set_pol_does_nothing_when_pol_unchanged(
 @pytest.mark.parametrize(
     "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
     [
-        (
-            Pol.LV,
-            MAXIMUM_ROW_PHASE_MOTOR_POSITION,
-            0.0,
-            MAXIMUM_ROW_PHASE_MOTOR_POSITION,
-            0.0,
-        ),
-        (Pol.PC, ROW_PHASE_CIRCULAR, 0.0, ROW_PHASE_CIRCULAR, 0.0),
-        (Pol.NC, -ROW_PHASE_CIRCULAR, 0.0, -ROW_PHASE_CIRCULAR, 0.0),
+        (Pol.LV, JO9_MAX_PHASE, 0.0, JO9_MAX_PHASE, 0.0),
+        (Pol.PC, J09_ROW_PHASE_CIRCULAR, 0.0, J09_ROW_PHASE_CIRCULAR, 0.0),
+        (Pol.NC, -J09_ROW_PHASE_CIRCULAR, 0.0, -J09_ROW_PHASE_CIRCULAR, 0.0),
     ],
 )
 async def test_j09_apple2_controller_set_pol(
@@ -287,9 +267,9 @@ async def test_j09_apple2_controller_set_pol(
 @pytest.mark.parametrize(
     "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
     [
-        (Pol.LV, 24.0, 0.0, 24.0, 0.0),
-        (Pol.PC, 15.0, 0.0, 15.0, 0.0),
-        (Pol.NC, -15.0, 0.0, -15.0, 0.0),
+        (Pol.LV, JO9_MAX_PHASE, 0.0, JO9_MAX_PHASE, 0.0),
+        (Pol.PC, J09_ROW_PHASE_CIRCULAR, 0.0, J09_ROW_PHASE_CIRCULAR, 0.0),
+        (Pol.NC, -J09_ROW_PHASE_CIRCULAR, 0.0, -J09_ROW_PHASE_CIRCULAR, 0.0),
     ],
 )
 async def test_j09_apple2_controller_set_pol_does_not_go_via_lh_if_already_at_lh(
