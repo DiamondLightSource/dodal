@@ -2,9 +2,7 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.beamlines.i06_1.magnet import (
-    MagnetAxisRampRateController,
-)
+from dodal.devices.beamlines.i06_1.magnet import MagnetAxisRampRateController
 
 
 @pytest.fixture

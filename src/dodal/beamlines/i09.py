@@ -1,6 +1,6 @@
-from ophyd_async.core import InOut, SignalRW, soft_signal_rw
+from ophyd_async.core import DeviceMap, InOut, SignalRW, soft_signal_rw
 from ophyd_async.epics.adcore import ADAcquireLogic
-from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
@@ -12,7 +12,6 @@ from dodal.devices.beamlines.i09 import (
     PassEnergy,
     PsuMode,
 )
-from dodal.devices.beamlines.i09.scaler import ScalerController
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import (
     ElectronAnalyserTriggerLogic,
@@ -26,6 +25,7 @@ from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.scaler_card import ScalerCard, ScalerCardController
 from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperature_controller import Lakeshore336
@@ -142,11 +142,51 @@ def intensity_protection() -> SignalRW[IntensityProtection]:
     )
 
 
-@devices.factory
-def scaler1() -> ScalerController:
-    return ScalerController(f"{I_PREFIX.beamline_prefix}-EA-SCLR-01")
+@devices.factory()
+def scaler1_controller() -> ScalerCardController:
+    return ScalerCardController(
+        f"{I_PREFIX.beamline_prefix}-EA-SCLR-01",
+        start_count_suffix=".CNT",
+        count_suffix=".TP",
+    )
 
 
-@devices.factory
-def scaler2() -> ScalerController:
-    return ScalerController(f"{L_PREFIX.beamline_prefix}-VA-SCLR-01")
+@devices.factory()
+def scaler1(scaler1_controller: ScalerCardController):
+    prefix = f"{I_PREFIX.beamline_prefix}-EA-SCLR-01"
+    return ScalerCard(
+        channels=DeviceMap(
+            {
+                "hm3amp20": epics_signal_r(float, prefix + ".S2"),
+                "sm5amp8": epics_signal_r(float, prefix + ".S3"),
+                "smpmamp39": epics_signal_r(float, prefix + ".S4"),
+                "rfdamp10": epics_signal_r(float, prefix + ".S5"),
+            }
+        ),
+        controller=scaler1_controller,
+    )
+
+
+@devices.factory()
+def scaler2_controller() -> ScalerCardController:
+    return ScalerCardController(
+        f"{I_PREFIX.beamline_prefix}-EA-SCLR-01",
+        start_count_suffix=".CNT",
+        count_suffix=".TP",
+    )
+
+
+@devices.factory()
+def scaler2(scaler2_controller: ScalerCardController):
+    prefix = f"{L_PREFIX.beamline_prefix}-VA-SCLR-01"
+    return ScalerCard(
+        channels=DeviceMap(
+            {
+                "hm3amp20": epics_signal_r(float, prefix + ".S2"),
+                "sm5amp8": epics_signal_r(float, prefix + ".S3"),
+                "smpmamp39": epics_signal_r(float, prefix + ".S4"),
+                "rfdamp10": epics_signal_r(float, prefix + ".S5"),
+            }
+        ),
+        controller=scaler2_controller,
+    )
