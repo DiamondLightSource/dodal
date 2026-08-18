@@ -67,10 +67,12 @@ class ScalerCardController(StandardReadable, Triggerable, Movable[float]):
         await wait_for_value(self.start_count, False, None)
 
 
-T = TypeVar("T", bound=Device)
+DeviceT = TypeVar("DeviceT", bound=Device)
 
 
-class ScalerCardChannels(StandardReadable, Triggerable, Movable[float], Generic[T]):
+class ScalerCardChannels(
+    StandardReadable, Triggerable, Movable[float], Generic[DeviceT]
+):
     """Expose a logical group of channels from a scaler card.
 
     The channels are exposed as a readable device and are associated with a
@@ -85,7 +87,9 @@ class ScalerCardChannels(StandardReadable, Triggerable, Movable[float], Generic[
     while :meth:`trigger` starts the controller count and waits for it to complete.
     """
 
-    def __init__(self, channels: T, controller: ScalerCardController, name: str = ""):
+    def __init__(
+        self, channels: DeviceT, controller: ScalerCardController, name: str = ""
+    ):
         with self.add_children_as_readables():
             self.channel = channels
 
