@@ -51,7 +51,7 @@ async def hu_id_energy(
     undulator_order: UndulatorOrder,
     undulator_in_mm: UndulatorInMm,
 ) -> HardInsertionDeviceEnergy:
-    async with init_devices():
+    async with init_devices(mock=True):
         hu_id_energy = HardInsertionDeviceEnergy(
             undulator_order=undulator_order,
             undulator=undulator_in_mm,

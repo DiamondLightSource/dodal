@@ -6,6 +6,7 @@ from dodal.devices.beamlines.i10_1 import (
     ElectromagnetMagnetField,
     ElectromagnetStage,
     HighFieldMagnet,
+    HighFieldMagnetTemperatureController,
     I10JScalerCard,
 )
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
@@ -18,7 +19,7 @@ from dodal.devices.current_amplifiers import (
     FemtoDDPCA,
 )
 from dodal.devices.motors import XYPitchStage
-from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
+from dodal.devices.temperature_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -253,4 +254,28 @@ def high_field_magnet_stage() -> XYPitchStage:
 def high_field_magnet() -> HighFieldMagnet:
     return HighFieldMagnet(
         prefix=f"{PREFIX.beamline_prefix}-EA-SMC-01:",
+    )
+
+
+@devices.factory()
+def hfm_temp() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
+        sensor_map={"magnet_top": "", "magnet_bottom": "2", "bath_pressure": "3"},
+    )
+
+
+@devices.factory()
+def hfm_vti() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:",
+        sensor_map={"vti": "", "pot_1k": "3"},
+    )
+
+
+@devices.factory()
+def hfm_he3() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:",
+        sensor_map={"sorb": "", "he3_low": "2", "he3_high": "3"},
     )

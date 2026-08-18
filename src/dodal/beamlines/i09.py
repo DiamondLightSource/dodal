@@ -1,4 +1,5 @@
 from ophyd_async.core import InOut, SignalRW, soft_signal_rw
+from ophyd_async.epics.adcore import ADAcquireLogic
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
@@ -14,10 +15,8 @@ from dodal.devices.beamlines.i09 import (
 from dodal.devices.beamlines.i09.scaler import ScalerController
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import (
-    DualEnergySource,
     ElectronAnalyserTriggerLogic,
     RegionLogic,
-    ShutterCoordinatorADAcquireLogic,
 )
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
@@ -27,9 +26,9 @@ from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.selectable_source import SourceSelector
+from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import Lakeshore336
+from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -72,21 +71,17 @@ def psj2() -> HutchShutter:
 
 
 @devices.factory()
-def source_selector() -> SourceSelector:
-    return SourceSelector()
+def source_selector() -> SignalRW[SelectedSource]:
+    return soft_signal_rw(SelectedSource)
 
 
 @devices.factory()
 def dual_energy_source(
     dcm: DoubleCrystalMonochromatorWithDSpacing,
     pgm: PlaneGratingMonochromator,
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
 ) -> DualEnergySource:
-    return DualEnergySource(
-        dcm.energy_in_eV,
-        pgm.energy.user_readback,
-        source_selector.selected_source,
-    )
+    return DualEnergySource(dcm.energy_in_eV, pgm.energy.user_readback, source_selector)
 
 
 @devices.factory()
@@ -109,31 +104,21 @@ def fsj1() -> FastShutter[InOut]:
 
 @devices.factory()
 def dual_fast_shutter(
-    fsi1: FastShutter, fsj1: FastShutter, source_selector: SourceSelector
+    fsi1: FastShutter, fsj1: FastShutter, source_selector: SignalRW[SelectedSource]
 ) -> DualFastShutter[InOut]:
-    return DualFastShutter[InOut](fsi1, fsj1, source_selector.selected_source)
-
-
-@devices.factory()
-def ew4000_close_shutter_when_idle() -> SignalRW[bool]:
-    return soft_signal_rw(bool, initial_value=True)
+    return DualFastShutter[InOut](fsi1, fsj1, source_selector)
 
 
 @devices.factory()
 def ew4000(
-    dual_fast_shutter: DualFastShutter,
-    dual_energy_source: DualEnergySource,
-    source_selector: SourceSelector,
-    ew4000_close_shutter_when_idle: SignalRW[bool],
+    dual_energy_source: DualEnergySource, source_selector: SignalRW[SelectedSource]
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     prefix = f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     driver = VGScientaAnalyserDriverIO(prefix, LensMode, PsuMode, PassEnergy)
     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
         prefix,
         driver,
-        acquire_logic=ShutterCoordinatorADAcquireLogic(
-            driver, dual_fast_shutter, ew4000_close_shutter_when_idle
-        ),
+        acquire_logic=ADAcquireLogic(driver),
         trigger_logic=ElectronAnalyserTriggerLogic(driver),
         region_logic=RegionLogic(driver, dual_energy_source.energy, source_selector),
     )
