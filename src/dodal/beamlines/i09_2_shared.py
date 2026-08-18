@@ -6,7 +6,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09.enums import Grating
 from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
-    PHASE_LOOKUP_TABLE,
+    J09_PHASE_LOOKUP_TABLE,
 )
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.insertion_device import (
@@ -89,7 +89,7 @@ def jidcontroller(
             config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lut=EnergyMotorLookup(PHASE_LOOKUP_TABLE),
+        phase_energy_motor_lut=EnergyMotorLookup(J09_PHASE_LOOKUP_TABLE),
         units="keV",
     )
 

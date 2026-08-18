@@ -13,9 +13,7 @@ J09_GAP_POLY_DEG_COLUMNS = [
     "0th-order",
 ]
 
-J09_PHASE_POLY_DEG_COLUMNS = ["0th-order"]
-
-PHASE_LOOKUP_TABLE = LookupTable(
+J09_PHASE_LOOKUP_TABLE = LookupTable(
     root={
         Pol.LH: EnergyCoverage.generate(
             min_energies=[0.104],
