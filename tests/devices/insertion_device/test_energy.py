@@ -79,14 +79,13 @@ async def test_insertion_device_energy_prepare_success(
     acceleration_time,
     time_for_move,
 ):
-    set_mock_value(mock_id_controller.apple2().gap().max_velocity, 30)
-    set_mock_value(mock_id_controller.apple2().gap().min_velocity, 1)
-    set_mock_value(mock_id_controller.apple2().gap().low_limit_travel, 0)
-    set_mock_value(mock_id_controller.apple2().gap().high_limit_travel, 200)
-    set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(
-        mock_id_controller.apple2().gap().acceleration_time, acceleration_time
-    )
+    gap = mock_id_controller.apple2_ref().gap_ref()
+    set_mock_value(gap.max_velocity, 30)
+    set_mock_value(gap.min_velocity, 1)
+    set_mock_value(gap.low_limit_travel, 0)
+    set_mock_value(gap.high_limit_travel, 200)
+    set_mock_value(gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(gap.acceleration_time, acceleration_time)
     mock_id_controller._polarisation_setpoint_set(Pol.LH)
     mock_set = set_mock_attr(mock_id_energy, "set", AsyncMock())
     mid_gap_position = end_gap + start_gap / 2.0
@@ -100,11 +99,8 @@ async def test_insertion_device_energy_prepare_success(
     velocity = (end_gap - start_gap) / time_for_move
     ramp_up_start = start_gap - acceleration_time * velocity / 2.0
     mock_set.assert_awaited_once_with(energy=750)
-    get_mock_put(
-        mock_id_controller.apple2().gap().user_setpoint
-    ).assert_awaited_once_with(str(ramp_up_start))
-
-    assert await mock_id_controller.apple2().gap().velocity.get_value() == abs(velocity)
+    get_mock_put(gap.user_setpoint_str).assert_awaited_once_with(str(ramp_up_start))
+    assert await gap.velocity.get_value() == abs(velocity)
 
 
 async def test_insertion_deviceenergy_kickoff_call_gap_kickoff(
