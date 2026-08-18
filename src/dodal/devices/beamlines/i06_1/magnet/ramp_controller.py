@@ -23,7 +23,8 @@ class RampRateMovableLogic(MovableLogic[float]):
         limit = await self.limit.get_value()
         if new_position > limit:
             raise ValueError(
-                f"Requested ramp rate {new_position} exceeds the maximum limit of {limit} for device {self.readback.name}."
+                f"Requested ramp rate {new_position} exceeds the maximum limit of "
+                f"{limit} for device {self.readback.name}."
             )
 
     async def move(self, new_position: float, timeout: TimeoutCalculator):
