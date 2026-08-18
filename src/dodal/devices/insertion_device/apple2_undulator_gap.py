@@ -5,6 +5,7 @@ from functools import cached_property
 from ophyd_async.core import (
     FlyMotorInfo,
     SignalR,
+    SignalRW,
     SignalW,
     StandardReadableFormat,
     TimeoutCalculator,
@@ -40,6 +41,7 @@ class UndulatorGapFlyableMoveLogic(UnstoppableMotorFlyableMoveLogic):
     status: SignalR[EnabledDisabledUpper]
     set_move: SignalW[int]
     min_velocity: SignalR[float]
+    velocity: SignalRW[float]
 
     async def calculate_timeout(
         self, old_position: float, new_position: float
