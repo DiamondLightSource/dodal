@@ -4,6 +4,7 @@ from typing import Generic, TypeVar
 
 from bluesky.protocols import Movable, Reading, Triggerable
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     Device,
     DeviceMock,
@@ -64,7 +65,8 @@ class ScalerCardController(StandardReadable, Triggerable, Movable[float]):
     async def trigger(self):
         """Start a scaler count and wait for it to complete."""
         await self.start_count.set(True)
-        await wait_for_value(self.start_count, False, None)
+        timeout = await self.integration_time.get_value() + DEFAULT_TIMEOUT
+        await wait_for_value(self.start_count, False, timeout)
 
 
 DeviceT = TypeVar("DeviceT", bound=Device)
