@@ -27,8 +27,6 @@ dodal.devices.insertion\_device.UndulatorGap
       
       
       
-      ~UndulatorGap.prepare
-      
       
       
       
@@ -53,7 +51,6 @@ dodal.devices.insertion\_device.UndulatorGap
       
       
       
-      ~UndulatorGap.movable_logic
       
       
       

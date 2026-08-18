@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_undulator_gap &#8212; dodal 2.6.1.dev1+gfaf8c4499 documentation</title>
+    <title>dodal.devices.insertion_device.apple2_undulator_gap &#8212; dodal 2.6.1.dev2+g091ec0d4b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=34b61e5f"></script>
+    <script src="../../../../_static/documentation_options.js?v=775a1983"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -890,7 +890,6 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">FlyMotorInfo</span><span class="p">,</span>
     <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
@@ -899,11 +898,12 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TimeoutCalculator</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MotorFlyCtx</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnabledDisabledUpper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.apple2_motors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MotorStringSetpoint</span><span class="p">,</span>
-    <span class="n">UnstoppableMotorMoveLogic</span><span class="p">,</span>
+    <span class="n">UnstoppableMotorFlyableMoveLogic</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.apple2_undulator_base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UndulatorBase</span><span class="p">,</span>
@@ -916,7 +916,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGapMoveLogic</span><span class="p">(</span><span class="n">UnstoppableMotorMoveLogic</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGapFlyableMoveLogic</span><span class="p">(</span><span class="n">UnstoppableMotorFlyableMoveLogic</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Move logic for the Apple2 undulator gap motor.</span>
 
 <span class="sd">    Extends the standard motor move logic with Apple2-specific behaviour,</span>
@@ -927,6 +927,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">gate</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="n">UndulatorGateStatus</span><span class="p">]</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="n">EnabledDisabledUpper</span><span class="p">]</span>
     <span class="n">set_move</span><span class="p">:</span> <span class="n">SignalW</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">min_velocity</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
     <span class="n">velocity</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">calculate_timeout</span><span class="p">(</span>
@@ -943,6 +944,20 @@ window.runMermaid = runMermaid;</script>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_position</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">TimeoutCalculator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new_position</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">())</span>
         <span class="k">await</span> <span class="n">set_move_and_wait_for_gate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">timeout</span><span class="p">())</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">FlyMotorInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MotorFlyCtx</span><span class="p">:</span>
+        <span class="n">max_velocity</span><span class="p">,</span> <span class="n">min_velocity</span><span class="p">,</span> <span class="n">egu</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_velocity</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_velocity</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">motor_egu</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">speed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">min_velocity</span> <span class="o">&lt;=</span> <span class="n">velocity</span> <span class="o">&lt;=</span> <span class="n">max_velocity</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Requested velocity </span><span class="si">{</span><span class="n">velocity</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">egu</span><span class="si">}</span><span class="s2">/s is out of bounds: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;must be between </span><span class="si">{</span><span class="n">min_velocity</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">max_velocity</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">egu</span><span class="si">}</span><span class="s2">/s.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_prepare</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="UndulatorGap">
@@ -984,7 +999,9 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">EnabledDisabledUpper</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IDBLENA&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGSETP&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_logic</span> <span class="o">=</span> <span class="n">UndulatorGapMoveLogic</span><span class="p">(</span>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorGapFlyableMoveLogic</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">UndulatorGapFlyableMoveLogic</span><span class="p">(</span>
             <span class="n">readback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
             <span class="n">setpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="p">,</span>
             <span class="n">motor_stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
@@ -993,37 +1010,16 @@ window.runMermaid = runMermaid;</script>
             <span class="n">dial_low_limit_travel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dial_low_limit_travel</span><span class="p">,</span>
             <span class="n">dial_high_limit_travel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dial_high_limit_travel</span><span class="p">,</span>
             <span class="n">velocity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span>
+            <span class="n">max_velocity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_velocity</span><span class="p">,</span>
+            <span class="n">min_velocity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_velocity</span><span class="p">,</span>
+            <span class="n">motor_egu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_egu</span><span class="p">,</span>
             <span class="n">acceleration_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acceleration_time</span><span class="p">,</span>
+            <span class="n">motor_done_move</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motor_done_move</span><span class="p">,</span>
             <span class="c1"># Specific to this class.</span>
             <span class="n">gate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span>
             <span class="n">status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
             <span class="n">set_move</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="nd">@cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">movable_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorGapMoveLogic</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_movable_logic</span>
-
-<div class="viewcode-block" id="UndulatorGap.prepare">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorGap.html#dodal.devices.insertion_device.UndulatorGap.prepare">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">FlyMotorInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare for a fly scan by moving to the run-up position at max velocity.</span>
-<span class="sd">        Stores fly info for later use in kickoff.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">max_velocity</span><span class="p">,</span> <span class="n">min_velocity</span><span class="p">,</span> <span class="n">egu</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_velocity</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">min_velocity</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">motor_egu</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
-        <span class="p">)</span>
-        <span class="n">velocity</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">min_velocity</span> <span class="o">&lt;=</span> <span class="n">velocity</span> <span class="o">&lt;=</span> <span class="n">max_velocity</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Requested velocity </span><span class="si">{</span><span class="n">velocity</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">egu</span><span class="si">}</span><span class="s2">/s is out of bounds: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;must be between </span><span class="si">{</span><span class="n">min_velocity</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">max_velocity</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">egu</span><span class="si">}</span><span class="s2">/s.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
-
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
