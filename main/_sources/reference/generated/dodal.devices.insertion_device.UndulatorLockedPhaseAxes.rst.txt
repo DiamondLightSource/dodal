@@ -15,12 +15,14 @@ dodal.devices.insertion\_device.UndulatorLockedPhaseAxes
       
       
       
+      ~UndulatorLockedPhaseAxes.check_value
+      
+      
       
       
       
       
       ~UndulatorLockedPhaseAxes.get_timeout
-      
       
       
       
@@ -43,6 +45,9 @@ dodal.devices.insertion\_device.UndulatorLockedPhaseAxes
       
       
       
+      
+      
+      ~UndulatorLockedPhaseAxes.set_move
       
    
    

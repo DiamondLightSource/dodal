@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.Apple2 &#8212; dodal 2.5.5.dev6+g25167f287 documentation</title>
+    <title>dodal.devices.insertion_device.Apple2 &#8212; dodal 2.6.1.dev1+gfaf8c4499 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=189d0156"></script>
+    <script src="../../_static/documentation_options.js?v=34b61e5f"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -718,6 +718,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.AppleKnotPathFinder.html">dodal.devices.insertion_device.AppleKnotPathFinder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UndulatorGap.html">dodal.devices.insertion_device.UndulatorGap</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UndulatorPhaseAxes.html">dodal.devices.insertion_device.UndulatorPhaseAxes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UndulatorBase.html">dodal.devices.insertion_device.UndulatorBase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UndulatorJawPhase.html">dodal.devices.insertion_device.UndulatorJawPhase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html">dodal.devices.insertion_device.Apple2Val</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.Apple2PhasesVal.html">dodal.devices.insertion_device.Apple2PhasesVal</a></li>
@@ -729,15 +730,12 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UndulatorLockedPhaseAxes.html">dodal.devices.insertion_device.UndulatorLockedPhaseAxes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyCoverage.html">dodal.devices.insertion_device.EnergyCoverage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.Pol.html">dodal.devices.insertion_device.Pol</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnabledDisabledUpper.html">dodal.devices.insertion_device.EnabledDisabledUpper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UndulatorGateStatus.html">dodal.devices.insertion_device.UndulatorGateStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.Apple2LockedPhasesVal.html">dodal.devices.insertion_device.Apple2LockedPhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorLookup.html">dodal.devices.insertion_device.EnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html">dodal.devices.insertion_device.ConfigServerEnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.EpicsPolynomialEnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html">dodal.devices.insertion_device.EnergyMotorConvertor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html">dodal.devices.insertion_device.UnstoppableMotor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html">dodal.devices.insertion_device.InsertionDeviceEnergyBase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyCoverageEntry.html">dodal.devices.insertion_device.EnergyCoverageEntry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup.html">dodal.devices.insertion_device.StaticPolynomialEnergyMotorLookup</a></li>
 </ul>
@@ -1048,27 +1046,27 @@
 <h1>dodal.devices.insertion_device.Apple2<a class="headerlink" href="#dodal-devices-insertion-device-apple2" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.Apple2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.</span></span><span class="sig-name descname"><span class="pre">Apple2</span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple2_undulator.html#Apple2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.Apple2" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.</span></span><span class="sig-name descname"><span class="pre">Apple2</span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple2_controller.html#Apple2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.Apple2" title="Link to this definition">#</a></dt>
 <dd><p>Device representing the combined motor controls for an Apple2 undulator.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="dodal.devices.insertion_device.Apple2.gap">
-<span class="sig-name descname"><span class="pre">gap</span></span><a class="headerlink" href="#dodal.devices.insertion_device.Apple2.gap" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="dodal.devices.insertion_device.Apple2.gap_ref">
+<span class="sig-name descname"><span class="pre">gap_ref</span></span><a class="headerlink" href="#dodal.devices.insertion_device.Apple2.gap_ref" title="Link to this definition">#</a></dt>
 <dd><p>The undulator gap motor device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="dodal.devices.insertion_device.UndulatorGap.html#dodal.devices.insertion_device.UndulatorGap" title="dodal.devices.insertion_device.UndulatorGap">UndulatorGap</a></p>
+<dd class="field-odd"><p>Reference[<a class="reference internal" href="dodal.devices.insertion_device.UndulatorGap.html#dodal.devices.insertion_device.UndulatorGap" title="dodal.devices.insertion_device.UndulatorGap">UndulatorGap</a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="dodal.devices.insertion_device.Apple2.phase">
-<span class="sig-name descname"><span class="pre">phase</span></span><a class="headerlink" href="#dodal.devices.insertion_device.Apple2.phase" title="Link to this definition">#</a></dt>
-<dd><p>The undulator phase axes device, consisting of four
-phase motors.</p>
+<dt class="sig sig-object py" id="dodal.devices.insertion_device.Apple2.phase_ref">
+<span class="sig-name descname"><span class="pre">phase_ref</span></span><a class="headerlink" href="#dodal.devices.insertion_device.Apple2.phase_ref" title="Link to this definition">#</a></dt>
+<dd><p>The undulator phase axes device,
+consisting offour phase motors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="dodal.devices.insertion_device.UndulatorPhaseAxes.html#dodal.devices.insertion_device.UndulatorPhaseAxes" title="dodal.devices.insertion_device.UndulatorPhaseAxes">UndulatorPhaseAxes</a></p>
+<dd class="field-odd"><p>Reference[<a class="reference internal" href="dodal.devices.insertion_device.UndulatorPhaseAxes.html#dodal.devices.insertion_device.UndulatorPhaseAxes" title="dodal.devices.insertion_device.UndulatorPhaseAxes">UndulatorPhaseAxes</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1099,12 +1097,12 @@ phase motors.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.Apple2.set">
-<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_motor_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.apple2_undulator.Apple2Val"><span class="pre">Apple2Val</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple2_undulator.html#Apple2.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.Apple2.set" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_motor_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.apple2_controller.Apple2Val"><span class="pre">Apple2Val</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple2_controller.html#Apple2.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.Apple2.set" title="Link to this definition">#</a></dt>
 <dd><p>Check ID is in a movable state and set all the demand value before moving
 them all at the same time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>id_motor_values</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.apple2_undulator.Apple2Val"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apple2Val</span></code></a></span>)</p>
+<dd class="field-odd"><p><strong>id_motor_values</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.apple2_controller.Apple2Val"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apple2Val</span></code></a></span>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
@@ -1164,8 +1162,8 @@ them all at the same time.</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.Apple2"><code class="docutils literal notranslate"><span class="pre">Apple2</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.Apple2.gap"><code class="docutils literal notranslate"><span class="pre">Apple2.gap</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.Apple2.phase"><code class="docutils literal notranslate"><span class="pre">Apple2.phase</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.Apple2.gap_ref"><code class="docutils literal notranslate"><span class="pre">Apple2.gap_ref</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.Apple2.phase_ref"><code class="docutils literal notranslate"><span class="pre">Apple2.phase_ref</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.Apple2.set"><code class="docutils literal notranslate"><span class="pre">Apple2.set()</span></code></a></li>
 </ul>
 </li>

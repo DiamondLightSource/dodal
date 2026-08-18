@@ -33,7 +33,6 @@ dodal.devices.insertion\_device.UndulatorGap
       
       
       
-      
       ~UndulatorGap.set_demand_positions
       
       
@@ -54,10 +53,18 @@ dodal.devices.insertion\_device.UndulatorGap
       
       
       
+      ~UndulatorGap.movable_logic
       
       
       
-      ~UndulatorGap.user_setpoint
+      
+      ~UndulatorGap.min_velocity
+      
+      
+      ~UndulatorGap.user_setpoint_str
+      
+      
+      ~UndulatorGap.set_move
       
    
    

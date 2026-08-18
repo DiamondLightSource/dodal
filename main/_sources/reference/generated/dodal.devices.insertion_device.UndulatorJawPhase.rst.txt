@@ -15,12 +15,14 @@ dodal.devices.insertion\_device.UndulatorJawPhase
       
       
       
+      ~UndulatorJawPhase.check_value
+      
+      
       
       
       
       
       ~UndulatorJawPhase.get_timeout
-      
       
       
       
@@ -43,6 +45,9 @@ dodal.devices.insertion\_device.UndulatorJawPhase
       
       
       
+      
+      
+      ~UndulatorJawPhase.set_move
       
    
    

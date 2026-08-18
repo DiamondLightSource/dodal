@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple_knot_controller &#8212; dodal 2.5.5.dev6+g25167f287 documentation</title>
+    <title>dodal.devices.insertion_device.apple_knot_controller &#8212; dodal 2.6.1.dev1+gfaf8c4499 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=189d0156"></script>
+    <script src="../../../../_static/documentation_options.js?v=34b61e5f"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,20 +885,19 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.insertion_device.apple_knot_controller</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sign</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rectangle2D</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.apple2_controller</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Apple2</span><span class="p">,</span>
     <span class="n">Apple2Controller</span><span class="p">,</span>
+    <span class="n">Apple2LockedPhasesVal</span><span class="p">,</span>
     <span class="n">Apple2Val</span><span class="p">,</span>
     <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Apple2LockedPhasesVal</span><span class="p">,</span>
     <span class="n">PhaseAxesType</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
@@ -1071,24 +1070,24 @@ window.runMermaid = runMermaid;</script>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the top and bottom phase motors are in sync.</span>
 <span class="sd">        Raise an error if they are not within tolerance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">current_phase_top</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="n">current_phase_bottom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2_ref</span><span class="p">()</span><span class="o">.</span><span class="n">phase_ref</span><span class="p">()</span>
+        <span class="n">current_phase_top</span><span class="p">,</span> <span class="n">current_phase_bottom</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="n">phase</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="n">phase</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">isclose</span><span class="p">(</span><span class="n">current_phase_top</span><span class="p">,</span> <span class="n">current_phase_bottom</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Upper phase </span><span class="si">{</span><span class="n">current_phase_top</span><span class="si">}</span><span class="s2"> and lower phase </span><span class="si">{</span><span class="n">current_phase_bottom</span><span class="si">}</span><span class="s2"> values are not close enough.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Upper phase </span><span class="si">{</span><span class="n">current_phase_top</span><span class="si">}</span><span class="s2"> and lower phase </span><span class="si">{</span><span class="n">current_phase_bottom</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;values are not close enough.&quot;</span>
             <span class="p">)</span></div>
 
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_combined_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># get current apple2 value</span>
-        <span class="n">current_phase_top</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">current_phase_top</span><span class="p">,</span> <span class="n">current_gap</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apple2_ref</span><span class="p">()</span><span class="o">.</span><span class="n">phase_ref</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apple2_ref</span><span class="p">()</span><span class="o">.</span><span class="n">gap_ref</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
         <span class="p">)</span>
-        <span class="n">current_gap</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
         <span class="n">current_apple2_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_apple2_value</span><span class="p">(</span>
             <span class="n">current_gap</span><span class="p">,</span> <span class="n">current_phase_top</span><span class="p">,</span> <span class="n">Pol</span><span class="o">.</span><span class="n">NONE</span>
         <span class="p">)</span>
@@ -1105,7 +1104,7 @@ window.runMermaid = runMermaid;</script>
         <span class="c1"># execute the moves along the path</span>
         <span class="k">for</span> <span class="n">apple2_val</span> <span class="ow">in</span> <span class="n">manhattan_path</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Moving to apple2 values: </span><span class="si">{</span><span class="n">apple2_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">=</span><span class="n">apple2_val</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2_ref</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">=</span><span class="n">apple2_val</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_apple2_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Apple2Val</span><span class="p">:</span>
         <span class="n">apple2_val</span> <span class="o">=</span> <span class="n">Apple2Val</span><span class="p">(</span>
