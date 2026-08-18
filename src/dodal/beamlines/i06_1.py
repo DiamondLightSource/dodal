@@ -13,7 +13,7 @@ from dodal.devices.beamlines.i06_1.magnet.temperature_controller import (
     SuperConductingMagnetTemperatureController,
 )
 from dodal.devices.motors import XYThetaStage
-from dodal.devices.scaler_card import ScalerCardChannels, ScalerCardController
+from dodal.devices.scaler_card import ScalerCard, ScalerCardController
 from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -83,7 +83,7 @@ def scaler2_mag(scaler2_controller: ScalerCardController):
     """Magnet scaler card channels for scaler2_controller."""
     mag_prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
     current_amp_pv = f"{I_PREFIX.beamline_prefix}-DI-IAMP-04:I1C-RAW"
-    return ScalerCardChannels(
+    return ScalerCard(
         channels=DeviceMap(
             {
                 "tey": epics_signal_r(float, mag_prefix + "TEYC-RAW"),
@@ -102,7 +102,7 @@ def scaler2_mag(scaler2_controller: ScalerCardController):
 def scaler2_ppj(scaler2_controller: ScalerCardController):
     """Patch Panel J channels for scaler2_controller."""
     prefix = f"{J_PREFIX.beamline_prefix}-EA-USER-01:"
-    return ScalerCardChannels(
+    return ScalerCard(
         channels=DeviceMap(
             {
                 "ca61sr": epics_signal_r(float, prefix + "SC1-RAW"),

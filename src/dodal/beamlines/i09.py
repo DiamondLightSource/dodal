@@ -25,7 +25,7 @@ from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.scaler_card import ScalerCardChannels, ScalerCardController
+from dodal.devices.scaler_card import ScalerCard, ScalerCardController
 from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperature_controller import Lakeshore336
@@ -154,7 +154,7 @@ def scaler1_controller() -> ScalerCardController:
 @devices.factory()
 def scaler1(scaler1_controller: ScalerCardController):
     prefix = f"{I_PREFIX.beamline_prefix}-EA-SCLR-01"
-    return ScalerCardChannels(
+    return ScalerCard(
         channels=DeviceMap(
             {
                 "hm3amp20": epics_signal_r(float, prefix + ".S2"),
@@ -179,7 +179,7 @@ def scaler2_controller() -> ScalerCardController:
 @devices.factory()
 def scaler2(scaler2_controller: ScalerCardController):
     prefix = f"{L_PREFIX.beamline_prefix}-VA-SCLR-01"
-    return ScalerCardChannels(
+    return ScalerCard(
         channels=DeviceMap(
             {
                 "hm3amp20": epics_signal_r(float, prefix + ".S2"),

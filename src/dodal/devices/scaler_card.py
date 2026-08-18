@@ -72,9 +72,7 @@ class ScalerCardController(StandardReadable, Triggerable, Movable[float]):
 DeviceT = TypeVar("DeviceT", bound=Device)
 
 
-class ScalerCardChannels(
-    StandardReadable, Triggerable, Movable[float], Generic[DeviceT]
-):
+class ScalerCard(StandardReadable, Triggerable, Movable[float], Generic[DeviceT]):
     """Expose a logical group of channels from a scaler card.
 
     The channels are exposed as a readable device and are associated with a
@@ -84,7 +82,7 @@ class ScalerCardChannels(
     the same physical scaler card. The channels are also added as readables with the
     controller, so the controller exposes all channels associated with the scaler card.
     This allows the controller to represent the complete set of scaler channels, while
-    each  :class:`ScalerCardChannels` instance provides access to only its associated
+    each  :class:`ScalerCard` instance provides access to only its associated
     group. Calling :meth:`set` sets the scaler integration time via the controller,
     while :meth:`trigger` starts the controller count and waits for it to complete.
     """

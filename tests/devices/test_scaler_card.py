@@ -15,7 +15,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.scaler_card import ScalerCardChannels, ScalerCardController
+from dodal.devices.scaler_card import ScalerCard, ScalerCardController
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def scaler_controller() -> ScalerCardController:
 def scaler1(scaler_controller: ScalerCardController):
     """Single channel example."""
     with init_devices(mock=True):
-        scaler1 = ScalerCardChannels(
+        scaler1 = ScalerCard(
             channels=soft_signal_rw(float), controller=scaler_controller
         )
     return scaler1
@@ -39,7 +39,7 @@ def scaler1(scaler_controller: ScalerCardController):
 def scaler2(scaler_controller: ScalerCardController):
     """Multi channel example with device vector."""
     with init_devices(mock=True):
-        scaler2 = ScalerCardChannels(
+        scaler2 = ScalerCard(
             channels=DeviceVector(
                 {
                     0: epics_signal_r(float, "TEST1:"),
@@ -56,7 +56,7 @@ def scaler2(scaler_controller: ScalerCardController):
 def scaler3(scaler_controller: ScalerCardController):
     """Multi channel example with device map."""
     with init_devices(mock=True):
-        scaler3 = ScalerCardChannels(
+        scaler3 = ScalerCard(
             channels=DeviceMap(
                 {
                     "dev1": epics_signal_r(float, "TEST1:"),
@@ -81,7 +81,7 @@ class MultiChannelExample(StandardReadable):
 def scaler4(scaler_controller: ScalerCardController):
     """Multi channel example with sub device."""
     with init_devices(mock=True):
-        scaler4 = ScalerCardChannels(
+        scaler4 = ScalerCard(
             channels=MultiChannelExample(),
             controller=scaler_controller,
         )
@@ -89,7 +89,7 @@ def scaler4(scaler_controller: ScalerCardController):
 
 
 async def test_scaler1_single_channel_read_and_configuration(
-    scaler1: ScalerCardChannels,
+    scaler1: ScalerCard,
 ) -> None:
     await asyncio.gather(
         assert_reading(scaler1, {"scaler1-channel": partial_reading(0)}),
@@ -100,7 +100,7 @@ async def test_scaler1_single_channel_read_and_configuration(
 
 
 async def test_scaler2_multi_channel_device_vector_read_and_configuration(
-    scaler2: ScalerCardChannels,
+    scaler2: ScalerCard,
 ) -> None:
     await asyncio.gather(
         assert_reading(
@@ -118,7 +118,7 @@ async def test_scaler2_multi_channel_device_vector_read_and_configuration(
 
 
 async def test_scaler3_multi_channel_device_map_read_and_configuration(
-    scaler3: ScalerCardChannels,
+    scaler3: ScalerCard,
 ) -> None:
     await asyncio.gather(
         assert_reading(
@@ -136,7 +136,7 @@ async def test_scaler3_multi_channel_device_map_read_and_configuration(
 
 
 async def test_scaler4_multi_channel_sub_device_read_and_configuration(
-    scaler4: ScalerCardChannels,
+    scaler4: ScalerCard,
 ) -> None:
     await asyncio.gather(
         assert_reading(
@@ -161,17 +161,17 @@ async def test_scaler_controller_read_configuration(
 
 
 async def test_scaler_controller_read_when_used_with_channel(
-    scaler_controller: ScalerCardController, scaler1: ScalerCardChannels
+    scaler_controller: ScalerCardController, scaler1: ScalerCard
 ) -> None:
     await assert_reading(scaler_controller, {"scaler1-channel": partial_reading(0)})
 
 
 async def test_scaler_controller_read_when_used_with_multiple_channels(
     scaler_controller: ScalerCardController,
-    scaler1: ScalerCardChannels,
-    scaler2: ScalerCardChannels,
-    scaler3: ScalerCardChannels,
-    scaler4: ScalerCardChannels,
+    scaler1: ScalerCard,
+    scaler2: ScalerCard,
+    scaler3: ScalerCard,
+    scaler4: ScalerCard,
 ) -> None:
     """Using multiple channels should add their readables to the master controller."""
     await assert_reading(
@@ -197,7 +197,7 @@ async def test_scaler_controller_set(scaler_controller: ScalerCardController) ->
 
 
 async def test_scaler_card_channels_set_calls_controller_set(
-    scaler1: ScalerCardChannels,
+    scaler1: ScalerCard,
 ):
     set_mock = set_mock_attr(scaler1.controller_ref(), "set", AsyncMock())
     await scaler1.set(2)
@@ -205,7 +205,7 @@ async def test_scaler_card_channels_set_calls_controller_set(
 
 
 async def test_scaler_card_channels_trigger_calls_controller_trigger(
-    scaler1: ScalerCardChannels,
+    scaler1: ScalerCard,
 ):
     trigger_mock = set_mock_attr(scaler1.controller_ref(), "trigger", AsyncMock())
     await scaler1.trigger()
