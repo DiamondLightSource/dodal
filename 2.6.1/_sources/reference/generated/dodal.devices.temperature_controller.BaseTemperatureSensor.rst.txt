@@ -1,0 +1,42 @@
+dodal.devices.temperature\_controller.BaseTemperatureSensor
+===========================================================
+
+.. currentmodule:: dodal.devices.temperature_controller
+
+.. autoclass:: BaseTemperatureSensor
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BaseTemperatureSensor.set_name
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

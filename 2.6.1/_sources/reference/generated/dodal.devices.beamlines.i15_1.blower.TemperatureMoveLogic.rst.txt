@@ -1,0 +1,49 @@
+dodal.devices.beamlines.i15\_1.blower.TemperatureMoveLogic
+==========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.blower
+
+.. autoclass:: TemperatureMoveLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~TemperatureMoveLogic.move
+      
+      
+      ~TemperatureMoveLogic.stop
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TemperatureMoveLogic.TIMEOUT
+      
+      
+      ~TemperatureMoveLogic.pneumatic
+      
+      
+      ~TemperatureMoveLogic.settle_time_s
+      
+      
+      ~TemperatureMoveLogic.setpoint
+      
+      
+      ~TemperatureMoveLogic.readback
+      
+   
+   

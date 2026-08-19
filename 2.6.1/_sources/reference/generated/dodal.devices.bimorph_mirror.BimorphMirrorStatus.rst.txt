@@ -1,0 +1,81 @@
+dodal.devices.bimorph\_mirror.BimorphMirrorStatus
+=================================================
+
+.. currentmodule:: dodal.devices.bimorph_mirror
+
+.. autoclass:: BimorphMirrorStatus
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~BimorphMirrorStatus.IDLE
+      
+      
+      ~BimorphMirrorStatus.BUSY
+      
+      
+      ~BimorphMirrorStatus.ERROR
+      
+   
+   

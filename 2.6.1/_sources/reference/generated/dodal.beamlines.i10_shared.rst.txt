@@ -1,0 +1,33 @@
+dodal.beamlines.i10\_shared
+===========================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i10_shared
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+   
+   
+
+   
+   
+   

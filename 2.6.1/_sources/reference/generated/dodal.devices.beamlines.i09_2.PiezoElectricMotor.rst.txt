@@ -1,0 +1,50 @@
+dodal.devices.beamlines.i09\_2.PiezoElectricMotor
+=================================================
+
+.. currentmodule:: dodal.devices.beamlines.i09_2
+
+.. autoclass:: PiezoElectricMotor
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~PiezoElectricMotor.movable_logic
+      
+      
+      
+   
+   
