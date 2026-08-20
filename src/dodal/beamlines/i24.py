@@ -29,6 +29,7 @@ from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.robot import BartRobot
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -171,6 +172,11 @@ def jungfrau(
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
+
+
+@devices.factory()
+def robot() -> BartRobot:
+    return BartRobot(f"{PREFIX.beamline_prefix}-MO-ROBOT-01:")
 
 
 @devices.factory()
