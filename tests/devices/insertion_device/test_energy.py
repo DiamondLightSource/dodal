@@ -150,9 +150,20 @@ async def test_beam_energy_prepare_success(
     mock_pgm_energy_prepare.assert_awaited_once_with(fly_info)
 
 
+@pytest.mark.parametrize(
+    "id_acc_time, pgm_acc_time, expected_delay",
+    [
+        (3.0, 1.0, 2.0),
+        (1.0, 4.0, 3.0),
+        (2.0, 2.0, 0.0),
+    ],
+)
 @patch("asyncio.sleep", new_callable=AsyncMock)
 async def test_beam_energy_kickoff_set_correct_delay(
     mock_sleep: AsyncMock,
+    id_acc_time: float,
+    pgm_acc_time: float,
+    expected_delay: float,
     mock_beam_energy: BeamEnergy,
     mock_pgm: PlaneGratingMonochromator,
     mock_id_gap: UndulatorGap,
@@ -161,8 +172,6 @@ async def test_beam_energy_kickoff_set_correct_delay(
     mock_id_controller.gap_energy_motor_converter = Mock(side_effect=[21.0, 20, 22.0])
     mock_id_controller.phase_energy_motor_converter = Mock(side_effect=[22.0, 22, 22.0])
     fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
-    id_acc_time = 3
-    pgm_acc_time = 1
     set_mock_value(mock_id_gap.max_velocity, 30)
     set_mock_value(mock_id_gap.min_velocity, 0.1)
     set_mock_value(mock_id_gap.acceleration_time, id_acc_time)
@@ -177,7 +186,7 @@ async def test_beam_energy_kickoff_set_correct_delay(
     mock_pgm_energy_kickoff = set_mock_attr(mock_pgm.energy, "kickoff", AsyncMock())
     await mock_beam_energy.prepare(fly_info)
     await mock_beam_energy.kickoff()
-    mock_sleep.assert_called_with(pgm_acc_time - id_acc_time)
+    mock_sleep.assert_called_with(expected_delay)
     mock_id_gap_kickoff.assert_awaited_once()
     mock_pgm_energy_kickoff.assert_awaited_once()
 
