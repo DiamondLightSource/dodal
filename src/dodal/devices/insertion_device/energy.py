@@ -142,13 +142,13 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
             reverse=True,
         )
 
-        first_task = first.kickoff()
+        first_kickoff = first.kickoff()
 
         if delay := t_first - t_second:
             await asyncio.sleep(delay)
 
         await second.kickoff()
-        await first_task
+        await first_kickoff
 
         self._fly_status = self._combined_fly_status()
 
