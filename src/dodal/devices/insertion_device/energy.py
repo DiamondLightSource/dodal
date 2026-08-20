@@ -132,11 +132,22 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
             self.mono_energy().acceleration_time.get_value(),
             self.id_energy().get_id_acceleration_time(),
         )
-        start_offset_time = pgm_acceleration_time - gap_acceleration_time
 
-        await self.mono_energy().kickoff()
-        await asyncio.sleep(start_offset_time)
-        await self.id_energy().kickoff()
+        (t_first, first), (t_second, second) = sorted(
+            [
+                (gap_acceleration_time, self.id_energy()),
+                (pgm_acceleration_time, self.mono_energy()),
+            ],
+            reverse=True,
+        )
+
+        first_task = asyncio.gather(first.kickoff())
+
+        if delay := t_first - t_second:
+            await asyncio.sleep(delay)
+
+        await asyncio.gather(first_task, second.kickoff())
+
         self._fly_status = self._combined_fly_status()
 
     def complete(self) -> AsyncStatus:
