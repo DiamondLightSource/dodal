@@ -11,7 +11,6 @@ from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.admerlin import MerlinDetector
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
-from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 import dodal.log
@@ -192,7 +191,8 @@ def step_25() -> PmacIO:
 # def panda_02(path_provider: PathProvider) -> HDFPanda:
 def panda_02() -> HDFPanda:
     return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-TS-PANDA-02:",
+        # prefix=f"{PREFIX.beamline_prefix}-TS-PANDA-02:",
+        prefix=f"{PREFIX.beamline_prefix}-MO-PANDA-02:",
         # path_provider=get_path_provider(),
         path_provider=static_path,
         # path_provider=path_provider,
@@ -224,11 +224,11 @@ def merlin() -> MerlinDetector:
     )
 
 
-@devices.factory()
-def eiger(path_provider: PathProvider) -> EigerDetector:
-    return EigerDetector(
-        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
-        # OdinDataLogic(path_provider=static_path, detector_bit_depth=16),
-        path_provider=path_provider,
-        name="eiger",
-    )
+# @devices.factory()
+# def eiger(path_provider: PathProvider) -> EigerDetector:
+#     return EigerDetector(
+#         prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
+#         # OdinDataLogic(path_provider=static_path, detector_bit_depth=16),
+#         path_provider=path_provider,
+#         name="eiger",
+#     )
