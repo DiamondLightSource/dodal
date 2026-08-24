@@ -1,8 +1,10 @@
 from collections.abc import Callable
-from typing import Annotated, Literal, Protocol, Self, runtime_checkable
+from functools import cached_property
+from typing import Annotated, Literal, Protocol, runtime_checkable
 
 from pydantic import (
     BaseModel,
+    ConfigDict,
     Field,
     PrivateAttr,
     StrictFloat,
@@ -15,6 +17,10 @@ from dodal.common.general_maths.arithmetic_conversions import (
     convert_microns_to_cm,
     convert_mm_to_cm,
     get_straight_line_y,
+)
+from dodal.common.general_maths.interval import (
+    FloatInterval,
+    OpenInterval,
 )
 
 SupportedThicknessUnits = Annotated[
@@ -92,21 +98,23 @@ class WedgeGeometry(BaseModel):
 
     tip_mm: StrictFloat
     taper_cotangent: StrictFloat
-    _taper_gradient: float = PrivateAttr(default=0.0)
+
+    model_config = ConfigDict(frozen=True)
 
     @field_validator("taper_cotangent")
     @classmethod
-    def validate_taper_is_thin(cls, value: float) -> float:
-        bound = 5.0  # round number cotangent limit for thin wedge
-        if -bound < value < bound:
-            msg: str = f"taper_contangent must correspond to thin wedge, of magnitude {bound} or larger"
-            raise ValueError(msg)
+    def validate_taper_is_thin(cls, value: float, _magnitude=5) -> float:
+        _invalid_taper_range: FloatInterval = OpenInterval(
+            lower=-_magnitude, upper=_magnitude
+        )  # round number cotangent limit for thin wedge
+        if value in _invalid_taper_range:
+            _msg: str = f"taper_contangent must correspond to thin wedge, of magnitude {_magnitude} or larger"
+            raise ValueError(_msg)
         return value
 
-    @model_validator(mode="after")
-    def _calculate_gradient(self) -> Self:
-        self._taper_gradient = 1.0 / self.taper_cotangent
-        return self
+    @cached_property
+    def _taper_gradient(self) -> float:
+        return 1.0 / self.taper_cotangent
 
     def motor_position_mm_for_thickness_cm(
         self, *, thickness_cm: Annotated[StrictFloat, Field(ge=0.0)]
