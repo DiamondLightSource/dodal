@@ -102,7 +102,12 @@ def backlight() -> DualBacklight:
 
 @devices.factory()
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:")
+    """Get the i24 detector motion device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return YZStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+    )
 
 
 @devices.factory()

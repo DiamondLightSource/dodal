@@ -1,5 +1,6 @@
 import math
 from collections.abc import Callable
+from typing import Any, Final
 
 import pytest
 from pydantic import ValidationError
@@ -32,7 +33,7 @@ from .operator_inversion_pairing import OperatorInversionPairing
         ),  # tests transmission from arbitrary strong attenuation is strong attenuation
     ],
 )
-def test_transmission_from_attenutation(attenuation_bn, result):
+def test_transmission_from_attenutation(attenuation_bn, result) -> None:
     assert transmission_from_attenutation(attenuation_bn) == pytest.approx(result)
 
 
@@ -55,7 +56,7 @@ def test_transmission_from_attenutation(attenuation_bn, result):
         ),  # tests attenuation from natural log arbitrary low transmission
     ],
 )
-def test_natural_log_of_transmission_from_attenuation(attenuation_bn, result):
+def test_natural_log_of_transmission_from_attenuation(attenuation_bn, result) -> None:
     assert natural_log_of_transmission_from_attenuation(
         attenuation_bn
     ) == pytest.approx(result)
@@ -76,7 +77,7 @@ def test_natural_log_of_transmission_from_attenuation(attenuation_bn, result):
         ),  # tests attenuation from arbitrary high attenuation
     ],
 )
-def test_attenuation_from_transmission(transmission_as_fraction, result):
+def test_attenuation_from_transmission(transmission_as_fraction, result) -> None:
     assert attenuation_from_transmission(transmission_as_fraction) == pytest.approx(
         result
     )
@@ -97,7 +98,7 @@ def test_attenuation_from_transmission(transmission_as_fraction, result):
         ),  # tests log from arbitrary low transmission
     ],
 )
-def test_attenuation_from_natural_log_of_transmission(ln_t, result):
+def test_attenuation_from_natural_log_of_transmission(ln_t, result) -> None:
     assert attenuation_from_natural_log_of_transmission(ln_t) == pytest.approx(result)
 
 
@@ -124,7 +125,7 @@ def test_attenuation_log_transmssion_conversions_reciprocate_as_expected(
     f: Callable[[float], float],
     g: Callable[[float], float],
     numerical_args: list[float],
-):
+) -> None:
     op_pair = OperatorInversionPairing(f, g)
     for x in numerical_args:
         assert op_pair.composed_operator_is_consistent_with_identity_operator(x)
@@ -144,32 +145,47 @@ def test_transmission_attenuation_conversions_pair_off_to_form_identity_operatio
     f: Callable[[float], float],
     g: Callable[[float], float],
     numerical_args: list[float],
-):
+) -> None:
     for op_pair in [OperatorInversionPairing(f, g), OperatorInversionPairing(g, f)]:
         for x in numerical_args:
             assert op_pair.composed_operator_is_consistent_with_identity_operator(x)
 
 
-# inauspicious:
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
-def test_natural_log_of_transmission_from_attenuation_raises_error(bad_input):
+# inauspicious path tests
+
+INVALID_TRIAL_VALUES: Final[list[Any]] = [
+    True,
+    "",
+    "a",
+    "b00m!",
+    [],
+    KeyError(),
+    None,
+    math.tan,
+    object(),
+    False,
+]
+
+
+@pytest.mark.parametrize("bad_input", INVALID_TRIAL_VALUES)
+def test_natural_log_of_transmission_from_attenuation_raises_error(bad_input) -> None:
     with pytest.raises(ValidationError):
         natural_log_of_transmission_from_attenuation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
-def test_transmission_from_attenutation_raises_error(bad_input):
+@pytest.mark.parametrize("bad_input", INVALID_TRIAL_VALUES)
+def test_transmission_from_attenutation_raises_error(bad_input) -> None:
     with pytest.raises(ValidationError):
         transmission_from_attenutation(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
-def test_attenuation_from_transmission_raises_error(bad_input):
+@pytest.mark.parametrize("bad_input", INVALID_TRIAL_VALUES)
+def test_attenuation_from_transmission_raises_error(bad_input) -> None:
     with pytest.raises(ValidationError):
         attenuation_from_transmission(bad_input)
 
 
-@pytest.mark.parametrize("bad_input", ["a", [], None, math.sin, object(), False])
-def test_attenuation_from_natural_log_of_transmission_raises_error(bad_input):
+@pytest.mark.parametrize("bad_input", INVALID_TRIAL_VALUES)
+def test_attenuation_from_natural_log_of_transmission_raises_error(bad_input) -> None:
     with pytest.raises(ValidationError):
         attenuation_from_natural_log_of_transmission(bad_input)
