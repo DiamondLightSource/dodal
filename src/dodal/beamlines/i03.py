@@ -47,8 +47,8 @@ from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
-from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.scintillator import Scintillator
+from dodal.devices.slits import MinimalSlits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -236,8 +236,10 @@ def smargon() -> Smargon:
 
 
 @devices.factory()
-def s4_slit_gaps() -> S4SlitGaps:
-    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+def s4_slit_gaps() -> MinimalSlits:
+    return MinimalSlits(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-04:", x_gap="XGAP", y_gap="YGAP"
+    )
 
 
 @devices.factory()

@@ -288,6 +288,9 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         """Perform a sample load from the specified sample location or a sample unload
         if SAMPLE_LOCATION_EMPTY is specified.
 
+        If the a sample load is requested and there is already a sample loaded then
+        perform an unload first.
+
         Args:
             value (SampleLocation): the sample location to load to or
                                     SAMPLE_LOCATION_EMPTY to unload
@@ -295,4 +298,15 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         if value == SAMPLE_LOCATION_EMPTY:
             await self._unload()
         else:
+            current_puck = await self.current_sample.puck.get_value()
+            current_position = await self.current_sample.position.get_value()
+            if current_position != 0 and current_puck != 0:
+                LOGGER.info(
+                    f"Position {current_position} from puck {current_puck} already loaded, unloading first."
+                )
+                await self._unload()
+            elif (current_position == 0) != (current_puck == 0):
+                raise ValueError(
+                    f"Robot state is invalid with a current puck/position of {current_puck}/{current_position}"
+                )
             await self._load(value)

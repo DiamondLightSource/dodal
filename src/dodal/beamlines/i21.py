@@ -24,7 +24,7 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import (
+from dodal.devices.temperature_controller import (
     Lakeshore336,
 )
 from dodal.log import set_beamline as set_log_beamline
