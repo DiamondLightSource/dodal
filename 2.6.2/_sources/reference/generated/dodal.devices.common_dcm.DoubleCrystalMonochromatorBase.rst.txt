@@ -1,0 +1,40 @@
+dodal.devices.common\_dcm.DoubleCrystalMonochromatorBase
+========================================================
+
+.. currentmodule:: dodal.devices.common_dcm
+
+.. autoclass:: DoubleCrystalMonochromatorBase
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

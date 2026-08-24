@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i15\_1.attenuator.Attenuator
+====================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.attenuator
+
+.. autoclass:: Attenuator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Attenuator.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

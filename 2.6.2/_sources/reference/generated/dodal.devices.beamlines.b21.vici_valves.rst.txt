@@ -1,0 +1,38 @@
+dodal.devices.beamlines.b21.vici\_valves
+========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.b21
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~vici_valves.Valve1Positions
+   ~vici_valves.Valve2Positions
+   ~vici_valves.ViciValves
+
+
+
+
+.. automodule:: dodal.devices.beamlines.b21.vici_valves
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

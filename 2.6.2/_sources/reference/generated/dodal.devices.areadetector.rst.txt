@@ -1,0 +1,35 @@
+dodal.devices.areadetector
+==========================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.areadetector.plugins
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.areadetector
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,44 @@
+dodal.devices.robot.ControllerErrorCode
+=======================================
+
+.. currentmodule:: dodal.devices.robot
+
+.. autoclass:: ControllerErrorCode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~ControllerErrorCode.is_retryable
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~ControllerErrorCode.NO_ERROR
+      
+      
+      ~ControllerErrorCode.LIGHT_CURTAIN_TRIPPED
+      
+   
+   
