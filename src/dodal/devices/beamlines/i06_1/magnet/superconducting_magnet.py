@@ -263,7 +263,8 @@ class MockSuperConductingMagnetController(
     Unit tests that do not require simulated movement can disable it by
     setting ``steps`` to zero::
 
-        MockSuperConductingMagnetController(steps=0)
+        scmc = SuperConductingMagnetController(...)
+        await scmc.connect(mock=MockSuperConductingMagnetController(steps=0))
 
     Args:
         name: Name of the mock device.
