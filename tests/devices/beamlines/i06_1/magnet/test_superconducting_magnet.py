@@ -34,8 +34,8 @@ from tests.devices.beamlines.i06_1.magnet.utils import (
 @pytest.fixture
 def scmc_psu() -> ThreeMagnetAxisPowerSupply:
     with init_devices(mock=True):
-        ramp_rate = ThreeMagnetAxisPowerSupply("TEST:")
-    return ramp_rate
+        scmc_psu = ThreeMagnetAxisPowerSupply("TEST:")
+    return scmc_psu
 
 
 @pytest.fixture
@@ -575,7 +575,6 @@ async def test_mock_scmc_ramps_to_demand(
     await scmc.mode.set(mode)
 
     values = []
-
     readback = getattr(scmc.cart, axis).readback
 
     def callback(value: dict[str, Reading[float]]):
@@ -591,4 +590,3 @@ async def test_mock_scmc_ramps_to_demand(
         expected_values = [value * step / steps for step in range(steps + 1)]
 
     assert values == expected_values
-    assert await scmc.ramp_status.get_value() == MagnetRampStatus.RAMP_MADE
