@@ -243,8 +243,35 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
 class MockSuperConductingMagnetController(
     DeviceMock["SuperConductingMagnetController"]
 ):
-    """Add additional callback logic to our device to get the mock behaviour to simulate
-    the hardware as best we can.
+    """Mock controller that simulates the behaviour of the
+    SuperConductingMagnetController hardware.
+
+    The mock reproduces additional IOC behaviour that is not provided by the
+    standard device mock, including:
+
+    - Updating readback positions when a ramp is triggered.
+    - Resetting demand positions and configuring PSU limits when the mode
+      changes.
+    - Updating ramp and limit status signals.
+    - Simulating the movement of readback positions over time.
+
+    Movements are simulated over multiple steps by default so that beamline
+    operation in mock mode behaves similarly to the real hardware. This also
+    allows fly scans to be exercised in mock mode, with detector events
+    occurring while the magnet is moving.
+
+    Unit tests that do not require simulated movement can disable it by
+    setting ``steps`` to zero::
+
+        MockSuperConductingMagnetController(steps=0)
+
+    Args:
+        name: Name of the mock device.
+        parent: Parent mock device, if any.
+        steps: Number of intermediate positions used to simulate a movement.
+            A value less than or equal to zero makes movements instantaneous.
+        ramp_time: Total time in seconds over which a simulated movement takes
+            place. The time is divided equally between ``steps``.
     """
 
     # Pulled directly from live IOC so can replicate behaviour in mock mode.
@@ -258,8 +285,18 @@ class MockSuperConductingMagnetController(
         MagnetMode.SPHERICAL: (2, 2, 2),
     }
 
-    async def connect(self, device: "SuperConductingMagnetController"):
+    def __init__(
+        self,
+        name: str = "",
+        parent: DeviceMock | None = None,
+        steps: int = 10,
+        ramp_time: float = 1.0,
+    ):
+        super().__init__(name, parent)
+        self.steps = steps
+        self.ramp_time = ramp_time
 
+    async def connect(self, device: "SuperConductingMagnetController"):
         async def _trigger_start_ramp():
             # Whenever ramp is triggered for the ioc, readback values move to the
             # demand values. Simulate this behaviour here.
@@ -268,10 +305,30 @@ class MockSuperConductingMagnetController(
                 device.cart.y.demand.get_value(),
                 device.cart.z.demand.get_value(),
             )
+
+            x_r, y_r, z_r = await asyncio.gather(
+                device.cart.x.readback.get_value(),
+                device.cart.y.readback.get_value(),
+                device.cart.z.readback.get_value(),
+            )
+
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
-            set_mock_value(device.cart.x.readback, x_d)
-            set_mock_value(device.cart.y.readback, y_d)
-            set_mock_value(device.cart.z.readback, z_d)
+
+            if self.steps <= 0:
+                set_mock_value(device.cart.x.readback, x_d)
+                set_mock_value(device.cart.y.readback, y_d)
+                set_mock_value(device.cart.z.readback, z_d)
+            else:
+                for step in range(1, self.steps + 1):
+                    fraction = step / self.steps
+
+                    set_mock_value(device.cart.x.readback, x_r + (x_d - x_r) * fraction)
+                    set_mock_value(device.cart.y.readback, y_r + (y_d - y_r) * fraction)
+                    set_mock_value(device.cart.z.readback, z_r + (z_d - z_r) * fraction)
+
+                    if self.ramp_time:
+                        await asyncio.sleep(self.ramp_time / self.steps)
+
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
         callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001

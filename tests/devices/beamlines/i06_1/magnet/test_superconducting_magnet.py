@@ -20,6 +20,7 @@ from dodal.devices.beamlines.i06_1.magnet import (
     MagnetRampStatus,
     MagnetRequest,
     MagnetSphericalPosition,
+    MockSuperConductingMagnetController,
     SuperConductingMagnetController,
     ThreeMagnetAxisPowerSupply,
     movement,
@@ -38,11 +39,12 @@ def scmc_psu() -> ThreeMagnetAxisPowerSupply:
 
 
 @pytest.fixture
-def scmc(
+async def scmc(
     scmc_psu: ThreeMagnetAxisPowerSupply,
 ) -> SuperConductingMagnetController:
-    with init_devices(mock=True):
-        scmc = SuperConductingMagnetController("TEST:", scmc_psu)
+    # Optimise tests by making movement of readback to setpoint instant.
+    scmc = SuperConductingMagnetController("TEST:", scmc_psu, name="scmc")
+    await scmc.connect(mock=MockSuperConductingMagnetController(steps=0))
     return scmc
 
 
@@ -541,3 +543,52 @@ async def test_scmc_set_within_boundary_timeout_set_correctly(
             target_request,
             timeout=expected_timeout,
         )
+
+
+@pytest.mark.parametrize(
+    "steps, ramp_time",
+    [
+        pytest.param(0, 0.0, id="instant"),
+        pytest.param(4, 0.04, id="stepped"),
+    ],
+)
+@pytest.mark.parametrize(
+    "axis, mode, value",
+    [
+        pytest.param("x", MagnetMode.UNIAXIAL_X, 1.0, id="x"),
+        pytest.param("y", MagnetMode.UNIAXIAL_Y, 1.0, id="y"),
+        pytest.param("z", MagnetMode.UNIAXIAL_Z, 1.0, id="z"),
+    ],
+)
+async def test_mock_scmc_ramps_to_demand(
+    scmc_psu: ThreeMagnetAxisPowerSupply,
+    steps: int,
+    ramp_time: float,
+    axis: str,
+    mode: MagnetMode,
+    value: float,
+):
+    scmc = SuperConductingMagnetController("TEST", scmc_psu, name="scmc")
+    await scmc.connect(
+        mock=MockSuperConductingMagnetController(steps=steps, ramp_time=ramp_time)
+    )
+    await scmc.mode.set(mode)
+
+    values = []
+
+    readback = getattr(scmc.cart, axis).readback
+
+    def callback(value: dict[str, Reading[float]]):
+        values.append(value[readback.name]["value"])
+
+    readback.subscribe(callback)
+
+    await getattr(scmc.cart, axis).set(value)
+
+    if steps == 0:
+        expected_values = [0.0, value]
+    else:
+        expected_values = [value * step / steps for step in range(steps + 1)]
+
+    assert values == expected_values
+    assert await scmc.ramp_status.get_value() == MagnetRampStatus.RAMP_MADE
