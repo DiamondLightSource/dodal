@@ -294,8 +294,8 @@ class MockSuperConductingMagnetController(
         ramp_time: float = 1.0,
     ):
         super().__init__(name, parent)
-        self.steps = steps
-        self.ramp_time = ramp_time
+        self._steps = steps
+        self._ramp_time = ramp_time
 
     async def connect(self, device: "SuperConductingMagnetController"):
         async def _trigger_start_ramp():
@@ -315,20 +315,20 @@ class MockSuperConductingMagnetController(
 
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
 
-            if self.steps <= 0:
+            if self._steps <= 0:
                 set_mock_value(device.cart.x.readback, x_d)
                 set_mock_value(device.cart.y.readback, y_d)
                 set_mock_value(device.cart.z.readback, z_d)
             else:
-                for step in range(1, self.steps + 1):
-                    fraction = step / self.steps
+                for step in range(1, self._steps + 1):
+                    fraction = step / self._steps
 
                     set_mock_value(device.cart.x.readback, x_r + (x_d - x_r) * fraction)
                     set_mock_value(device.cart.y.readback, y_r + (y_d - y_r) * fraction)
                     set_mock_value(device.cart.z.readback, z_r + (z_d - z_r) * fraction)
 
-                    if self.ramp_time:
-                        await asyncio.sleep(self.ramp_time / self.steps)
+                    if self._ramp_time:
+                        await asyncio.sleep(self._ramp_time / self._steps)
 
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
