@@ -353,27 +353,30 @@ async def test_scmc_executes_movement_strategy_and_ramp_at_each_step(
         call(movement.MagnetRequest(x=0.5), timeout=DEFAULT_TIMEOUT),
         call(movement.MagnetRequest(x=1.2), timeout=DEFAULT_TIMEOUT),
     ]
-    scmc._MODE_MOVEMENT_STRATEGY[MagnetMode.UNIAXIAL_X] = movement_strategy
-    scmc._trigger_ramp = AsyncMock()
+    with patch.dict(
+        scmc._MODE_MOVEMENT_STRATEGY,
+        {MagnetMode.UNIAXIAL_X: movement_strategy},
+    ):
+        scmc._trigger_ramp = AsyncMock()
 
-    with patch.object(
-        scmc,
-        "_apply_step",
-        wraps=scmc._apply_step,
-    ) as mock_apply_step:
-        # Configures PSU limits to X=2, Y=0, Z=0
-        await scmc.mode.set(MagnetMode.UNIAXIAL_X)
+        with patch.object(
+            scmc,
+            "_apply_step",
+            wraps=scmc._apply_step,
+        ) as mock_apply_step:
+            # Configures PSU limits to X=2, Y=0, Z=0
+            await scmc.mode.set(MagnetMode.UNIAXIAL_X)
 
-        # Target is within the X axis limit
-        await scmc.cart.x.set(1.2)
+            # Target is within the X axis limit
+            await scmc.cart.x.set(1.2)
 
-    movement_strategy.move_steps.assert_called_once_with(
-        ANY,
-        movement.MagnetRequest(x=1.2),
-    )
+        movement_strategy.move_steps.assert_called_once_with(
+            ANY,
+            movement.MagnetRequest(x=1.2),
+        )
 
-    assert mock_apply_step.call_args_list == expected_apply_step_calls
-    assert scmc._trigger_ramp.call_count == len(move_steps)
+        assert mock_apply_step.call_args_list == expected_apply_step_calls
+        assert scmc._trigger_ramp.call_count == len(move_steps)
 
 
 async def test_external_parallel_moves_for_scmc_raise_error(
@@ -568,14 +571,14 @@ async def test_mock_scmc_ramps_to_demand(
     mode: MagnetMode,
     value: float,
 ):
-    scmc = SuperConductingMagnetController("TEST", scmc_psu, name="scmc")
+    scmc = SuperConductingMagnetController("PV:", scmc_psu, name="scmc")
     await scmc.connect(
         mock=MockSuperConductingMagnetController(steps=steps, ramp_time=ramp_time)
     )
     await scmc.mode.set(mode)
+    readback = getattr(scmc.cart, axis).readback
 
     values = []
-    readback = getattr(scmc.cart, axis).readback
 
     def callback(value: dict[str, Reading[float]]):
         values.append(value[readback.name]["value"])
