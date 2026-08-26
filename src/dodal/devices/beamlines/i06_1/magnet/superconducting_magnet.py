@@ -290,7 +290,7 @@ class MockSuperConductingMagnetController(
 
     async def connect(self, device: "SuperConductingMagnetController"):
         async def _trigger_start_ramp():
-            # Whenever ramp is triggered for the ioc, readback values move to the
+            # Whenever ramp is triggered for the IOC, readback values move to the
             # demand values. Simulate this behaviour here.
             x_d, y_d, z_d, x_r, y_r, z_r = await asyncio.gather(
                 device.cart.x.demand.get_value(),
@@ -300,18 +300,27 @@ class MockSuperConductingMagnetController(
                 device.cart.y.readback.get_value(),
                 device.cart.z.readback.get_value(),
             )
-            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
-
+            axes = (
+                (device.cart.x.readback, x_r, x_d),
+                (device.cart.y.readback, y_r, y_d),
+                (device.cart.z.readback, z_r, z_d),
+            )
+            # Only move the axis that has changed
+            axes_to_move = [
+                (rb, rb_val, demand) for rb, rb_val, demand in axes if rb_val != demand
+            ]
             # Use configured number of steps or use a single step, whichever is larger
             steps = max(self.steps, 1)
             step_time = self.ramp_time / steps if steps > 1 else 0
+
+            set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
             for step in range(1, steps + 1):
                 fraction = step / steps
-                set_mock_value(device.cart.x.readback, x_r + (x_d - x_r) * fraction)
-                set_mock_value(device.cart.y.readback, y_r + (y_d - y_r) * fraction)
-                set_mock_value(device.cart.z.readback, z_r + (z_d - z_r) * fraction)
-                await asyncio.sleep(step_time)
-
+                for readback, readback_value, demand in axes_to_move:
+                    set_mock_value(
+                        readback, readback_value + (demand - readback_value) * fraction
+                    )
+                    await asyncio.sleep(step_time)
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
         callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001

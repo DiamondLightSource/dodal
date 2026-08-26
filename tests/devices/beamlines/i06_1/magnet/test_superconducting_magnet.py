@@ -6,7 +6,7 @@ import pytest
 from bluesky import FailedStatus, RunEngine
 from bluesky.plan_stubs import mv
 from bluesky.protocols import Reading
-from ophyd_async.core import DEFAULT_TIMEOUT, init_devices, set_mock_value
+from ophyd_async.core import DEFAULT_TIMEOUT, SignalR, init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.beamlines.i06_1.magnet import (
@@ -563,7 +563,7 @@ async def test_scmc_set_within_boundary_timeout_set_correctly(
         pytest.param("z", MagnetMode.UNIAXIAL_Z, 1.0, id="z"),
     ],
 )
-async def test_mock_scmc_ramps_to_demand(
+async def test_mock_scmc_only_ramps_target_axis(
     scmc_psu: ThreeMagnetAxisPowerSupply,
     steps: int,
     ramp_time: float,
@@ -573,23 +573,34 @@ async def test_mock_scmc_ramps_to_demand(
 ):
     scmc = SuperConductingMagnetController("PV:", scmc_psu, name="scmc")
     await scmc.connect(
-        mock=MockSuperConductingMagnetController(steps=steps, ramp_time=ramp_time)
+        mock=MockSuperConductingMagnetController(
+            steps=steps,
+            ramp_time=ramp_time,
+        )
     )
     await scmc.mode.set(mode)
-    readback = getattr(scmc.cart, axis).readback
 
-    values = []
+    readbacks: dict[str, SignalR[float]] = {
+        axis: getattr(scmc.cart, axis).readback for axis in ("x", "y", "z")
+    }
+    values: dict[str, list[float]] = {axis: [] for axis in readbacks}
 
-    def callback(value: dict[str, Reading[float]]):
-        values.append(value[readback.name]["value"])
-
-    readback.subscribe(callback)
-
+    for axis_name, readback in readbacks.items():
+        readback_name = readback.name
+        readback.subscribe(
+            lambda value, axis_name=axis_name, readback_name=readback_name: values[
+                axis_name
+            ].append(value[readback_name]["value"])
+        )
     await getattr(scmc.cart, axis).set(value)
-
-    if steps == 0:
-        expected_values = [0.0, value]
-    else:
-        expected_values = [value * step / steps for step in range(steps + 1)]
-
-    assert values == expected_values
+    # The initial 0.0 is emitted when the readback subscription is created,
+    # followed by each value produced during the ramp.
+    assert values[axis] == [
+        0.0,
+        *(value * step / max(steps, 1) for step in range(1, max(steps, 1) + 1)),
+    ]
+    # Non-target axes should only emit their initial readback value and should not
+    # be updated by the ramp as value not changed.
+    for other_axis in readbacks:
+        if other_axis != axis:
+            assert values[other_axis] == [0.0]
