@@ -169,7 +169,9 @@ def jungfrau(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
         AutoMaxIncrementingPathProvider(path_provider),
-        "CAM:",
+        # The commissioning IOC serves its FastCS PVs at the root prefix, with no
+        # CAM: sub-prefix as the Odin-backed jungfrau has.
+        "",
     )
 
 
