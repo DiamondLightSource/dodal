@@ -22,7 +22,6 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
-from dodal.devices.beamlines.i19.access_controlled.read_only_dcm import ReadOnlyDCM
 from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
@@ -82,11 +81,6 @@ def path_provider() -> PathProvider:
     #     BL,
     #     Path("/dls/i19-2/data/2026/cm44169-3/"),
     # )
-
-
-@devices.factory()
-def dcm_ro() -> ReadOnlyDCM:
-    return ReadOnlyDCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @devices.factory()

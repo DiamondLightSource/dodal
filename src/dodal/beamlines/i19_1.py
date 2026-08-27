@@ -20,7 +20,6 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
-from dodal.devices.beamlines.i19.access_controlled.read_only_dcm import ReadOnlyDCM
 from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
@@ -73,11 +72,6 @@ def config_client() -> ConfigClient:
     client = ConfigClient.from_url()
     set_config_client(client)
     return client
-
-
-@devices.factory()
-def dcm_ro() -> ReadOnlyDCM:
-    return ReadOnlyDCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @devices.factory()
