@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 2.6.3.dev3+ga554a5db2 documentation</title>
+    <title>Device Standards &#8212; dodal 2.6.3.dev4+ge8b29c863 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=b0eee264"></script>
+    <script src="../_static/documentation_options.js?v=02c07508"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1089,7 +1089,7 @@ the device_factory decorator.</p>
             <span class="n">x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="nd">@device_factory</span><span class="p">()</span>
+    <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;FOO:&quot;</span><span class="p">)</span>
 

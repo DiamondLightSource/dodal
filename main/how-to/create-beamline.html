@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new beamline &#8212; dodal 2.6.3.dev3+ga554a5db2 documentation</title>
+    <title>Creating a new beamline &#8212; dodal 2.6.3.dev4+ge8b29c863 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=b0eee264"></script>
+    <script src="../_static/documentation_options.js?v=02c07508"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -513,7 +513,7 @@ beamline are instantiated. The file should be named after the colloquial name fo
 <p>Beamline modules (in <code class="docutils literal notranslate"><span class="pre">dodal.beamlines</span></code>) are code-as-configuration. They define the set of devices and common device
 settings needed for a particular beamline or group of similar beamlines (e.g. a beamline and its digital twin). Some
 of our tooling depends on the convention of <em>only</em> beamline modules going in this package. Common utilities should
-go somewhere else e.g. <code class="docutils literal notranslate"><span class="pre">dodal.utils</span></code> or <code class="docutils literal notranslate"><span class="pre">dodal.beamlines.common</span></code>.</p>
+go somewhere else e.g. <code class="docutils literal notranslate"><span class="pre">dodal.utils</span></code> or <code class="docutils literal notranslate"><span class="pre">dodal.common.beamlines</span></code>.</p>
 <p>The following example creates a fictitious beamline <code class="docutils literal notranslate"><span class="pre">w41</span></code>, with a simulated twin <code class="docutils literal notranslate"><span class="pre">s41</span></code>.
 <code class="docutils literal notranslate"><span class="pre">w41</span></code> needs to monitor the status of the Synchrotron and has an AdAravisDetector.
 <code class="docutils literal notranslate"><span class="pre">s41</span></code> has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.</p>
