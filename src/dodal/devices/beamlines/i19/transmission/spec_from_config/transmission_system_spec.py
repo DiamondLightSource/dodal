@@ -1,13 +1,17 @@
 from pydantic import (
     BaseModel,
     ConfigDict,
+    field_validator,
 )
 
 from dodal.devices.beamlines.i19.transmission.spec_from_config.lateral_motor_spec import (
-    LateralMotorsConfig,
+    LateralMotorSpec,
 )
 from dodal.devices.beamlines.i19.transmission.spec_from_config.material_absorption_spectrum_spec import (
     MaterialAbsorptionSpectralConfig,
+)
+from dodal.devices.beamlines.i19.transmission.spec_from_config.name_validation import (
+    AxisNameValidation,
 )
 from dodal.devices.beamlines.i19.transmission.spec_from_config.wedges_spec import (
     WedgesConfig,
@@ -31,10 +35,19 @@ class TransmissionSystemSpec(BaseModel):
         usage_priority: Beamline scientists policy on which absorbers to prefer using first.
     """
 
-    lateral_motors: LateralMotorsConfig
+    lateral_motors: dict[str, LateralMotorSpec]
     materials: MaterialAbsorptionSpectralConfig
     wedges: WedgesConfig
     wheels: WheelsConfig
 
     # Base Model internal setting to make this class immutable and valid
     model_config = ConfigDict(frozen=True, extra="forbid")
+
+    @field_validator("lateral_motors")
+    @classmethod
+    def validate_lateral_motor_axis_names(
+        cls, lateral_motors: dict[str, LateralMotorSpec]
+    ) -> dict[str, LateralMotorSpec]:
+        for axis_name in lateral_motors:
+            AxisNameValidation.validate_axis_name(axis_name=axis_name)
+        return lateral_motors

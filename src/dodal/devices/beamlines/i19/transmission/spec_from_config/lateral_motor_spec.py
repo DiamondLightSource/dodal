@@ -7,15 +7,6 @@ from pydantic import (
 )
 
 from dodal.common.general_maths.interval import ClosedInterval
-from dodal.devices.beamlines.i19.transmission.spec_from_config.name_validation import (
-    AxisNameValidation,
-)
-from dodal.devices.beamlines.i19.transmission.spec_from_config.system_aspect_base_parser import (
-    SystemAspectBaseParser,
-)
-from dodal.devices.beamlines.i19.transmission.spec_from_config.system_configuration import (
-    SystemConfiguration,
-)
 
 
 class LateralMotorSpec(BaseModel):
@@ -64,29 +55,3 @@ class LateralMotorSpec(BaseModel):
             return self
         msg: str = r"Inconsistent wedge geometry: Threshold not between max and out."
         raise ValueError(msg)
-
-
-class LateralMotorsConfig(SystemAspectBaseParser[LateralMotorSpec]):
-    """Maps from highest level configuration (JSON) dict to extract lateral motor specifications.
-
-    Uses base class method **extract_specifications** and some pythonic type handling magic.
-
-    See Also:
-        Base of this parser class, namely **SystemAspectBaseParser**
-    """
-
-    def validate_key_name(self, *, key_name: str) -> None:
-        AxisNameValidation.validate_axis_name(axis_name=key_name)
-
-    @classmethod
-    def extract_motors_specifications(
-        cls,
-        *,
-        system_configuration: SystemConfiguration,
-        motor_identifier: str,
-    ) -> LateralMotorSpec:
-        """Extracts wheel specification from configuration of the transmission system."""
-        _motors: dict[str, LateralMotorSpec] = cls.get_aspect_specifications(
-            system_configuration=system_configuration
-        )
-        return _motors[motor_identifier]

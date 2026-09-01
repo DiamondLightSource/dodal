@@ -4,13 +4,6 @@ from typing import Any, Final
 import pytest
 from pydantic import ValidationError
 
-from dodal.devices.beamlines.i19.transmission.spec_from_config.lateral_motor_spec import (
-    LateralMotorsConfig,
-    LateralMotorSpec,
-)
-from dodal.devices.beamlines.i19.transmission.spec_from_config.system_configuration import (
-    SystemConfiguration,
-)
 from dodal.devices.beamlines.i19.transmission.spec_from_config.transmission_system_spec import (
     TransmissionSystemSpec,
 )
@@ -29,16 +22,8 @@ JSON2: Final[dict[str, dict[str, Any]]] = FAKE_SYSTEM_SPECIFICATION_1_JSON
 def test_that_lateral_motors_can_be_extracted_from_configuration_blob(
     hardware_parameters: dict[str, dict[str, Any]],
 ) -> None:
-    _system_config: SystemConfiguration = SystemConfiguration(
-        structural_template=TransmissionSystemSpec,
-        hardware_parameters=hardware_parameters,
-    )
-    all_motors: dict[str, LateralMotorSpec] = (
-        LateralMotorsConfig.get_aspect_specifications(
-            system_configuration=_system_config
-        )
-    )
-    for axis, motor_spec in all_motors.items():
+    spec = TransmissionSystemSpec.model_validate(hardware_parameters)
+    for axis, motor_spec in spec.lateral_motors.items():
         assert motor_spec is not None, f"Lateral motor parameters for {axis} not found."
 
 
@@ -50,11 +35,8 @@ def test_that_all_lateral_motor_axis_names_can_be_read(
     hardware_parameters: dict[str, dict[str, Any]],
     expected_motor_axes: list[str],
 ) -> None:
-    _system_config: SystemConfiguration = SystemConfiguration(
-        structural_template=TransmissionSystemSpec,
-        hardware_parameters=hardware_parameters,
-    )
-    _axes = LateralMotorsConfig.name_all_specified(system_configuration=_system_config)
+    spec = TransmissionSystemSpec.model_validate(hardware_parameters)
+    _axes = spec.lateral_motors.keys()
     assert sorted(_axes) == sorted(expected_motor_axes)
 
 
@@ -64,14 +46,8 @@ def test_that_all_lateral_motor_axis_names_can_be_read(
 def test_that_lateral_motor_specs_have_interrogatable_form(
     motor_axis: str, expected_maximum_position: float
 ) -> None:
-    _system_config: SystemConfiguration = SystemConfiguration(
-        structural_template=TransmissionSystemSpec,
-        hardware_parameters=JSON2,
-    )
-    _extracted_motor = LateralMotorsConfig.extract_motors_specifications(
-        system_configuration=_system_config, motor_identifier=motor_axis
-    )
-    _max: float = _extracted_motor.max
+    spec = TransmissionSystemSpec.model_validate(JSON2)
+    _max: float = spec.lateral_motors[motor_axis].max
     assert _max == pytest.approx(expected=expected_maximum_position)
 
 
@@ -84,14 +60,8 @@ def test_that_lateral_motor_rejects_empty_json_blob() -> None:
     _copied_json = copy.deepcopy(JSON1)
     _null_motor = {"z": {}}
     _copied_json["lateral_motors"] |= _null_motor  # merge in the extra "motor"
-    _system_config: SystemConfiguration = SystemConfiguration(
-        structural_template=TransmissionSystemSpec,
-        hardware_parameters=_copied_json,
-    )
     with pytest.raises(ValidationError):
-        LateralMotorsConfig.get_aspect_specifications(
-            system_configuration=_system_config
-        )
+        TransmissionSystemSpec.model_validate(_copied_json)
 
 
 # typo here max <- Max
@@ -109,14 +79,8 @@ TYPO_MOTOR: Final[dict[str, Any]] = {
 def test_that_motor_json_blob_is_rejected_with_typo() -> None:
     _copied_json = copy.deepcopy(JSON1)
     _copied_json["lateral_motors"] |= TYPO_MOTOR  # merge in the new motor entry
-    _system_config: SystemConfiguration = SystemConfiguration(
-        structural_template=TransmissionSystemSpec,
-        hardware_parameters=_copied_json,
-    )
     with pytest.raises(ValidationError):
-        LateralMotorsConfig.get_aspect_specifications(
-            system_configuration=_system_config
-        )
+        TransmissionSystemSpec.model_validate(_copied_json)
 
 
 # out position is mid wedge - so invalid
@@ -147,15 +111,9 @@ def test_that_invalid_motor_is_rejected(
     invalid_motor: dict[str, dict[str, Any]],
 ) -> None:
     _copied_json = copy.deepcopy(JSON1)
-    _copied_json["lateral_motors"] |= INVALID_MOTOR_1  # merge in the new motor entry
-    _system_config: SystemConfiguration = SystemConfiguration(
-        structural_template=TransmissionSystemSpec,
-        hardware_parameters=_copied_json,
-    )
+    _copied_json["lateral_motors"] |= invalid_motor  # merge in the new motor entry
     with pytest.raises(ValidationError):
-        LateralMotorsConfig.get_aspect_specifications(
-            system_configuration=_system_config
-        )
+        TransmissionSystemSpec.model_validate(_copied_json)
 
 
 @pytest.mark.parametrize(
@@ -194,11 +152,5 @@ def test_that_motor_json_blob_is_rejected_without_valid_axis_name(
     }
     _copied_json = copy.deepcopy(JSON1)
     _copied_json["lateral_motors"] |= _misnamed_motor
-    _system_config: SystemConfiguration = SystemConfiguration(
-        structural_template=TransmissionSystemSpec,
-        hardware_parameters=_copied_json,
-    )
     with pytest.raises(ValidationError):
-        LateralMotorsConfig.get_aspect_specifications(
-            system_configuration=_system_config
-        )
+        TransmissionSystemSpec.model_validate(_copied_json)
