@@ -9,14 +9,13 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 
 
 class CurrentAmp(ABC, StandardReadable, Movable):
-    """
-    Base class for current amplifier, it contains the minimal functionality
-     a current amplifier needs:
+    """Base class for current amplifier, it contains the minimal functionality
+    a current amplifier needs:
 
     Attributes:
         gain_conversion_table (Enum): The conversion table between current
-        and gain setting.
-    """
+            and gain setting.
+    """  # noqa D415
 
     def __init__(self, gain_conversion_table: type[Enum], name: str = "") -> None:
         self.gain_conversion_table = gain_conversion_table
@@ -40,7 +39,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     async def get_gain(self) -> Enum:
-        """Get the current gain setting
+        """Get the current gain setting.
 
         Returns:
             Enum: The member name of the current gain setting in gain_conversion_table.
@@ -48,17 +47,16 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     async def get_upperlimit(self) -> float:
-        """Get the upper limit of the current amplifier"""
+        """Get the upper limit of the current amplifier."""
 
     @abstractmethod
     async def get_lowerlimit(self) -> float:
-        """Get the lower limit of the current amplifier"""
+        """Get the lower limit of the current amplifier."""
 
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable):
-    """
-    Base class for current amplifier counter, it contain the minimal implementations
-      required for a counter/detector to function with CurrentAmpDet:
+    """Base class for current amplifier counter, it contain the minimal implementations
+        required for a counter/detector to function with CurrentAmpDet.
 
     Attributes:
         count_per_volt (float): The conversion factor between counter output and voltage.
@@ -70,29 +68,29 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
 
     @abstractmethod
     async def get_count(self) -> float:
-        """ "Get count
+        """Get count.
 
         Returns:
-            float: Current count
+            float: Current count.
         """
 
     @abstractmethod
     async def get_count_per_sec(self) -> float:
-        """Get count per second
+        """Get count per second.
 
         Returns:
-            float: Current count per second
+            float: Current count per second.
         """
 
     @abstractmethod
     async def get_voltage_per_sec(self) -> float:
-        """Get count per second in voltage
+        """Get count per second in voltage.
 
         Returns:
-            float: Current count in volt per second
+            float: Current count in volt per second.
         """
 
     @abstractmethod
     @AsyncStatus.wrap
     async def prepare(self, value: float) -> None:
-        """Prepare method for setting up the counter"""
+        """Prepare method for setting up the counter."""

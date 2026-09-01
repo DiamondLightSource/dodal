@@ -1,4 +1,3 @@
-import asyncio
 from enum import Enum
 from math import isclose
 from typing import TypedDict, cast
@@ -7,15 +6,19 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
-    StrictEnum,
-    set_and_wait_for_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import XYZOmegaStage
+from dodal.devices.defered_move_utils import (
+    DeferMoves,
+    combined_move_to_motor_setpoints,
+    do_deferred_move,
+)
+from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
+from dodal.log import LOGGER
 
 
 class StubPosition(Enum):
@@ -62,25 +65,30 @@ class StubOffsets(Device):
             await self.to_robot_load.set(1)
 
 
-class DeferMoves(StrictEnum):
-    ON = "Defer On"
-    OFF = "Defer Off"
-
-
 class CombinedMove(TypedDict, total=False):
-    """A move on multiple axes at once using a deferred move"""
+    """A move on multiple axes at once using a deferred move.
+    Note that omega is excluded from the list of axes here since large omega moves
+    interfere with the precision of the other axes. In addition, the omega move is more
+    naturally specified as a wrapped angle which would not be in keeping with the other
+    axes which are specified as absolute angles.
+
+    Attributes:
+        x (float): target x-coordinate in mm
+        y (float): target y-coordinate in mm
+        z (float): target z-coordinate in mm
+        phi (float): target phi angle in degrees
+        chi (float): target chi angle in degrees
+    """
 
     x: float | None
     y: float | None
     z: float | None
-    omega: float | None
     phi: float | None
     chi: float | None
 
 
-class Smargon(XYZOmegaStage, Movable):
-    """
-    Real motors added to allow stops following pin load (e.g. real_x1.stop() )
+class Smargon(XYZWrappedOmegaStage, Movable):
+    """Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
     increasing the gap between x1 and x2 changes chi, moving together changes virtual x.
     Robot loading can nudge these and lead to errors.
@@ -114,22 +122,12 @@ class Smargon(XYZOmegaStage, Movable):
         axes will move at the same time. The put callbacks on the axes themselves will
         only come back after the motion on that axis finished.
         """
-        await self.defer_move.set(DeferMoves.ON)
-        try:
-            finished_moving = []
-            for motor_name, new_setpoint in value.items():
-                if new_setpoint is not None and isinstance(new_setpoint, int | float):
-                    axis: Motor = getattr(self, motor_name)
-                    await axis.check_motor_limit(
-                        await axis.user_setpoint.get_value(), new_setpoint
-                    )
-                    put_completion = await set_and_wait_for_value(
-                        axis.user_setpoint,
-                        new_setpoint,
-                        timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
-                        wait_for_set_completion=False,
-                    )
-                    finished_moving.append(put_completion)
-        finally:
-            await self.defer_move.set(DeferMoves.OFF)
-        await asyncio.gather(*finished_moving)
+        LOGGER.info("Doing smargon deferred move")
+
+        motor_moves = combined_move_to_motor_setpoints(value, self)
+
+        await do_deferred_move(
+            self.defer_move,
+            motor_moves,
+            self.DEFERRED_MOVE_SET_TIMEOUT,
+        )

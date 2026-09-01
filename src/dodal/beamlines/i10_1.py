@@ -1,8 +1,25 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
-from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
+from dodal.devices.beamlines.i10 import I10JDiagnostic, I10JSlits
+from dodal.devices.beamlines.i10_1 import (
+    ElectromagnetMagnetField,
+    ElectromagnetStage,
+    HighFieldMagnet,
+    HighFieldMagnetTemperatureController,
+    I10JScalerCard,
+)
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
+from dodal.devices.current_amplifiers import (
+    SR570,
+    CurrentAmpDet,
+    Femto3xxGainTable,
+    Femto3xxGainToCurrentTable,
+    Femto3xxRaiseTime,
+    FemtoDDPCA,
+)
+from dodal.devices.motors import XYPitchStage
+from dodal.devices.temperature_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -13,11 +30,21 @@ PREFIX = BeamlinePrefix("i10", "J")
 devices = DeviceManager()
 devices.include(i10_shared_devices)
 
+"""I10J Beamline Devices"""
+
 
 @devices.factory()
-def em_temperature_controller() -> Lakeshore336:
-    return Lakeshore336(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
+def mirror6_sr570() -> SR570:
+    return SR570(prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-07:")
+
+
+@devices.factory()
+def i10j_sr570_scaler_monitor(
+    mirror6_sr570: SR570,
+    electromagnet_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=mirror6_sr570, counter=electromagnet_scaler_card.mon
     )
 
 
@@ -34,5 +61,221 @@ def diagnostic() -> I10JDiagnostic:
 
 
 @devices.factory()
-def focusing_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
+def focusing_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
+
+
+"""I10J Electromagnet Devices"""
+
+
+@devices.factory()
+def electromagnet_field() -> ElectromagnetMagnetField:
+    return ElectromagnetMagnetField(
+        prefix=f"{PREFIX.beamline_prefix}-EA-MAGC-01:",
+    )
+
+
+@devices.factory()
+def electromagnet_stage() -> ElectromagnetStage:
+    return ElectromagnetStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-CRYO-01:",
+    )
+
+
+"""I10J Electromagnet Measurement Devices"""
+
+
+@devices.factory()
+def electromagnet_scaler_card() -> I10JScalerCard:
+    return I10JScalerCard(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SCLR-02:SCALERJ3",
+    )
+
+
+@devices.factory()
+def em_sr570_tey() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-08:",
+    )
+
+
+@devices.factory()
+def em_sr570_fy() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-09:",
+    )
+
+
+@devices.factory()
+def electromagnet_sr570_scaler_tey(
+    em_sr570_tey: SR570,
+    electromagnet_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=em_sr570_tey,
+        counter=electromagnet_scaler_card.tey,
+    )
+
+
+@devices.factory()
+def electromagnet_sr570_scaler_fy(
+    em_sr570_fy: SR570,
+    electromagnet_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=em_sr570_fy,
+        counter=electromagnet_scaler_card.fy,
+    )
+
+
+@devices.factory()
+def em_temperature_controller() -> Lakeshore336:
+    return Lakeshore336(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
+    )
+
+
+"""I10J HighField Magnet Measurement Devices"""
+
+
+"""Current Amplifiers."""
+
+
+@devices.factory()
+def hfm_femto_1() -> FemtoDDPCA:
+    return FemtoDDPCA(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-01:",
+        suffix="GAIN",
+        gain_table=Femto3xxGainTable,
+        gain_to_current_table=Femto3xxGainToCurrentTable,
+        raise_timetable=Femto3xxRaiseTime,
+    )
+
+
+@devices.factory()
+def hfm_femto_2() -> FemtoDDPCA:
+    return FemtoDDPCA(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-02:",
+        suffix="GAIN",
+        gain_table=Femto3xxGainTable,
+        gain_to_current_table=Femto3xxGainToCurrentTable,
+        raise_timetable=Femto3xxRaiseTime,
+    )
+
+
+@devices.factory()
+def hfm_femto3() -> FemtoDDPCA:
+    return FemtoDDPCA(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-03:",
+        suffix="GAIN",
+        gain_table=Femto3xxGainTable,
+        gain_to_current_table=Femto3xxGainToCurrentTable,
+        raise_timetable=Femto3xxRaiseTime,
+    )
+
+
+@devices.factory()
+def hfm_sr570_tey() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-04:",
+    )
+
+
+@devices.factory()
+def hfm_sr570_diode_1() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-05:",
+    )
+
+
+@devices.factory()
+def hfm_sr570_diode_2() -> SR570:
+    return SR570(
+        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-06:",
+    )
+
+
+# Scaler Cards
+@devices.factory()
+def hfm_scaler_card() -> I10JScalerCard:
+    return I10JScalerCard(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SCLR-01:SCALERJ2",
+    )
+
+
+# Photon detectors CurrentAmpDet Combinations.
+@devices.factory()
+def hfm_sr570_scaler_tey(
+    hfm_sr570_tey: SR570,
+    hfm_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=hfm_sr570_tey,
+        counter=hfm_scaler_card.tey,
+    )
+
+
+@devices.factory()
+def hfm_sr570_scaler_diode_1(
+    hfm_sr570_diode_1: SR570,
+    hfm_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=hfm_sr570_diode_1,
+        counter=hfm_scaler_card.fy,
+    )
+
+
+@devices.factory()
+def hfm_sr570_scaler_diode_2(
+    hfm_sr570_diode_2: SR570,
+    hfm_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=hfm_sr570_diode_2,
+        counter=hfm_scaler_card.fy2,
+    )
+
+
+"""I10J Hight Field Magnet Devices"""
+
+
+@devices.factory()
+def high_field_magnet_stage() -> XYPitchStage:
+    return XYPitchStage(
+        prefix=f"{PREFIX.beamline_prefix}-EA-MAG-01:",
+        x_infix="X",
+        y_infix="INSERT:Y",
+        pitch_infix="INSERT:ROTY",
+    )
+
+
+@devices.factory()
+def high_field_magnet() -> HighFieldMagnet:
+    return HighFieldMagnet(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SMC-01:",
+    )
+
+
+@devices.factory()
+def hfm_temp() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
+        sensor_map={"magnet_top": "", "magnet_bottom": "2", "bath_pressure": "3"},
+    )
+
+
+@devices.factory()
+def hfm_vti() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:",
+        sensor_map={"vti": "", "pot_1k": "3"},
+    )
+
+
+@devices.factory()
+def hfm_he3() -> HighFieldMagnetTemperatureController:
+    return HighFieldMagnetTemperatureController(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-03:",
+        sensor_map={"sorb": "", "he3_low": "2", "he3_high": "3"},
+    )

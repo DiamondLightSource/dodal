@@ -4,11 +4,7 @@ from ophyd_async.core import (
     StandardReadableFormat,
     StrictEnum,
 )
-from ophyd_async.epics.core import (
-    epics_signal_r,
-    epics_signal_rw,
-    epics_signal_x,
-)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 
 class TurboEnum(StrictEnum):
@@ -64,10 +60,10 @@ class OxfordCryoStream(StandardReadable):
         self.purge = epics_signal_x(f"{prefix}PURGE.PROC")
         self.hold = epics_signal_x(f"{prefix}HOLD.PROC")
         self.start = epics_signal_x(f"{prefix}RESTART.PROC")
-        self.pause = epics_signal_x(f"{prefix}PAUSE.PROC")
-        self.resume = epics_signal_x(f"{prefix}RESUME.PROC")
+        self.pause_ = epics_signal_x(f"{prefix}PAUSE.PROC")
+        self.resume_ = epics_signal_x(f"{prefix}RESUME.PROC")
         self.end = epics_signal_x(f"{prefix}END.PROC")
-        self.stop = epics_signal_x(f"{prefix}STOP.PROC")
+        self.stop_ = epics_signal_x(f"{prefix}STOP.PROC")
         self.plat = epics_signal_x(f"{prefix}PLAT.PROC")
         self.cool = epics_signal_x(f"{prefix}COOL.PROC")
         self.ramp = epics_signal_x(f"{prefix}RAMP.PROC")
@@ -87,6 +83,14 @@ class OxfordCryoJet(StandardReadable):
 
 
 class CryoStreamGantry(StandardReadable):
+    """Gantry controlling whether the standard Cryostream or the
+    HC1 cryostream is in position.
+
+    Note: this device is currently implemented read-only; moving the gantry without
+    adequate checks risks a collision if the gantry is moved while HC1 is selected
+    and in the IN position.
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.cryostream_selector = epics_signal_r(

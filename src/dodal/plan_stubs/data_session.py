@@ -15,8 +15,7 @@ DATA_GROUPS = "data_groups"
 def attach_data_session_metadata_wrapper(
     plan: MsgGenerator, provider: PathProvider | None = None
 ) -> MsgGenerator:
-    """
-    Attach data session metadata to the runs within a plan and make it correlate
+    """Attach data session metadata to the runs within a plan and make it correlate
     with an ophyd-async PathProvider.
 
     This updates the path provider (which in turn makes a call to to a service
@@ -24,14 +23,15 @@ def attach_data_session_metadata_wrapper(
     start document contains the correct data session.
 
     Args:
-        plan: The plan to preprocess
-        provider: The path provider that participating detectors are aware of.
+        plan (MsgGenerator): The plan to preprocess.
+        provider (PathProvider): The path provider that participating detectors are
+            aware of.
 
     Returns:
-        MsgGenerator: A plan
+        MsgGenerator: A plan.
 
     Yields:
-        Iterator[Msg]: Plan messages
+        Iterator[Msg]: Plan messages.
     """
     try:
         provider = provider or get_path_provider()

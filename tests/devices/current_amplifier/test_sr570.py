@@ -207,7 +207,7 @@ async def test_sr570_decrease_gain_bottom_out_fail(
 
 
 class MockSR570RaiseTimeTable(float, Enum):
-    """Mock raise time(s) for SR570 current amplifier to speed up test"""
+    """Mock raise time(s) for SR570 current amplifier to speed up test."""
 
     SEN_1 = 0
     SEN_2 = 0

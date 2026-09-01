@@ -1,4 +1,8 @@
-from dodal.common.beamlines.beamline_utils import device_factory
+from functools import cache
+
+from daq_config_server.client import ConfigClient
+
+from dodal.device_manager import DeviceManager
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
 from dodal.devices.aithre_lasershaping.laser_robot import LaserRobot
 from dodal.devices.oav.oav_detector import NullZoomController, OAVBeamCentreFile
@@ -11,7 +15,16 @@ DISPLAY_CONFIG = "/dls_sw/i23/software/aithre/aithre_display.configuration"
 PREFIX = "LA18L"
 
 
-@device_factory()
+devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
+
+
+@devices.factory()
 def goniometer() -> Goniometer:
     return Goniometer(
         f"{PREFIX}-MO-LSR-01:",
@@ -22,18 +35,22 @@ def goniometer() -> Goniometer:
     )
 
 
-@device_factory()
+@devices.factory()
 def robot() -> LaserRobot:
     return LaserRobot(f"{PREFIX}-MO-ROBOT-01:")
 
 
-@device_factory()
-def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
+@devices.factory()
+def oav(
+    config_client: ConfigClient, params: OAVConfigBeamCentre | None = None
+) -> OAVBeamCentreFile:
     config = (
         params
         if params is not None
         else OAVConfigBeamCentre(
-            zoom_params_file=ZOOM_PARAMS_FILE, display_config_file=DISPLAY_CONFIG
+            zoom_params_file=ZOOM_PARAMS_FILE,
+            display_config_file=DISPLAY_CONFIG,
+            config_client=config_client,
         )
     )
     return OAVBeamCentreFile(

@@ -20,7 +20,7 @@ class IPinGain(SubsetEnum):
 
 
 class IPin(StandardReadable):
-    """Simple device to get the ipin reading"""
+    """Simple device to get the ipin reading."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(

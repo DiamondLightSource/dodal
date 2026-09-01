@@ -8,8 +8,14 @@ from ophyd_async.epics.motor import Motor
 
 
 class PlaneGratingMonochromator(StandardReadable):
-    """
-    Plane grating monochromator, it is use in soft x-ray beamline to generate monochromic beam.
+    """Plane grating monochromator, it is use in soft x-ray beamline to generate
+    monochromic beam.
+
+    Args:
+        prefix (str): Beamline specific part of the PV.
+        grating (type[StrictEnum]): The Enum for the grating table.
+        grating_pv (str): The suffix PV part of grating PV.
+        name (str, optional): Name of the device.
     """
 
     def __init__(
@@ -19,18 +25,6 @@ class PlaneGratingMonochromator(StandardReadable):
         grating_pv: str = "GRATINGSELECT:SELECT",
         name: str = "",
     ) -> None:
-        """
-        Parameters
-        ----------
-        prefix:
-            Beamline specific part of the PV
-        grating:
-            The Enum for the grating table.
-        grating_pv:
-            The suffix pv part of grating Pv
-        name:
-            Name of the device
-        """
         with self.add_children_as_readables():
             self.energy = Motor(prefix + "ENERGY")
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):

@@ -9,8 +9,7 @@ import pytest
 
 @pytest.fixture
 async def event_loop_fuzzing():
-    """
-    This fixture can be used to try and detect / reproduce intermittent test failures
+    """This fixture can be used to try and detect / reproduce intermittent test failures
     caused by race conditions and timing issues, which are often difficult to replicate
     due to caching etc. causing timing to be different on a development machine compared
     to when the test runs in CI.

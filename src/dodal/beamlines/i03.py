@@ -1,12 +1,16 @@
 from functools import cache
+from os import getenv
 
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
-from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
+from dodal.common.beamlines.beamline_parameters import CONFIG_SERVER_URL_ENV_VAR
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_config_client, set_path_provider
+from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -17,6 +21,10 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
+from dodal.devices.beamlines.i03 import Beamstop
+from dodal.devices.beamlines.i03.beamsize import Beamsize
+from dodal.devices.beamlines.i03.dcm import DCM
+from dodal.devices.beamlines.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.collimation_table import CollimationTable
 from dodal.devices.cryostream import (
     CryoStreamGantry,
@@ -30,11 +38,8 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i03 import Beamstop
-from dodal.devices.i03.beamsize import Beamsize
-from dodal.devices.i03.dcm import DCM
-from dodal.devices.i03.undulator_dcm import UndulatorDCM
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -42,8 +47,8 @@ from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
-from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.scintillator import Scintillator
+from dodal.devices.slits import MinimalSlits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -57,7 +62,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.devices.zocalo import ZocaloResults, ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -66,7 +71,11 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
+BEAMLINE_PARAMETERS_PATH = (
+    "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters"
+)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
+DEFAULT_CONFIG_SERVER_ENDPOINT = "https://i03-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i03")
 set_log_beamline(BL)
@@ -85,7 +94,20 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return PandASubpathProvider()
+    provider = PandASubpathProvider()
+    set_path_provider(provider)
+    return provider
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    config_server_url = getenv(
+        CONFIG_SERVER_URL_ENV_VAR, DEFAULT_CONFIG_SERVER_ENDPOINT
+    )
+    client = ConfigClient.from_url(config_server_url)
+    set_config_client(client)
+    return client
 
 
 @devices.fixture
@@ -94,8 +116,8 @@ def daq_configuration_path() -> str:
 
 
 @devices.factory()
-def aperture_scatterguard() -> ApertureScatterguard:
-    params = get_beamline_parameters()
+def aperture_scatterguard(config_client: ConfigClient) -> ApertureScatterguard:
+    params = config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict)
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
@@ -113,10 +135,12 @@ def attenuator() -> BinaryFilterAttenuator:
 
 
 @devices.factory()
-def beamstop() -> Beamstop:
+def beamstop(config_client: ConfigClient) -> Beamstop:
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        beamline_parameters=get_beamline_parameters(),
+        beamline_parameters=config_client.get_file_contents(
+            BEAMLINE_PARAMETERS_PATH, dict
+        ),
     )
 
 
@@ -137,10 +161,11 @@ def vfm() -> FocusingMirrorWithStripes:
 
 
 @devices.factory()
-def mirror_voltages() -> MirrorVoltages:
+def mirror_voltages(config_client: ConfigClient) -> MirrorVoltages:
     return MirrorVoltages(
         prefix=f"{PREFIX.beamline_prefix}-MO-PSU-01:",
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
+        config_client=config_client,
     )
 
 
@@ -165,13 +190,13 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
     return eiger
 
 
-@devices.factory()
+# ophyd-async no longer works with a mixed ADOdin and fastCS Eiger. Need to update the
+# beamline to use a fastCS Odin and Eiger
+@devices.factory(skip=True)
 def fastcs_eiger(path_provider: PathProvider) -> FastEiger:
     return FastEiger(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-02:",
-        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 
@@ -190,11 +215,13 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
 
 @devices.factory()
 def oav(
+    config_client: ConfigClient,
     params: OAVConfigBeamCentre | None = None,
 ) -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params
+        or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG, config_client),
     )
 
 
@@ -203,14 +230,16 @@ def pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 
-@devices.factory()
+@devices.factory(use_factory_name=False)
 def smargon() -> Smargon:
-    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", name="gonio")
 
 
 @devices.factory()
-def s4_slit_gaps() -> S4SlitGaps:
-    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+def s4_slit_gaps() -> MinimalSlits:
+    return MinimalSlits(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-04:", x_gap="XGAP", y_gap="YGAP"
+    )
 
 
 @devices.factory()
@@ -219,9 +248,12 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
+def undulator(
+    baton: Baton, daq_configuration_path: str, config_client: ConfigClient
+) -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
         baton=baton,
     )
@@ -229,12 +261,16 @@ def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
 
 @devices.factory()
 def undulator_dcm(
-    undulator: UndulatorInKeV, dcm: DCM, daq_configuration_path: str
+    undulator: UndulatorInKeV,
+    dcm: DCM,
+    daq_configuration_path: str,
+    config_client: ConfigClient,
 ) -> UndulatorDCM:
     return UndulatorDCM(
         undulator=undulator,
         dcm=dcm,
         daq_configuration_path=daq_configuration_path,
+        config_client=config_client,
     )
 
 
@@ -260,13 +296,15 @@ def panda(path_provider: PathProvider) -> HDFPanda:
 
 
 @devices.factory()
-def sample_shutter() -> ZebraShutter:
-    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
+def sample_shutter() -> MXZebraShutter:
+    return MXZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @devices.factory()
-def hutch_shutter() -> HutchShutter:
-    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+def hutch_shutter() -> InterlockedHutchShutter:
+    return InterlockedHutchShutter(
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
+    )
 
 
 @devices.factory()
@@ -333,7 +371,9 @@ def qbpm() -> QBPM:
 
 @devices.factory()
 def baton() -> Baton:
-    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    _baton = Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+    set_commissioning_signal(_baton.commissioning)
+    return _baton
 
 
 @devices.factory()
@@ -342,11 +382,13 @@ def fluorescence_det_motion() -> FluorescenceDetector:
 
 
 @devices.factory()
-def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, config_client: ConfigClient
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
-        get_beamline_parameters(),
+        config_client.get_file_contents(BEAMLINE_PARAMETERS_PATH, dict),
     )
 
 

@@ -8,12 +8,12 @@ CROSSHAIR_FILL_COLOUR = "White"
 
 
 def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
-    """
-    Draw a crosshair at the beam centre coordinates specified.
+    """Draw a crosshair at the beam centre coordinates specified.
+
     Args:
-        image: The image to draw the crosshair onto. This is mutated.
-        beam_x: The x-coordinate of the crosshair (pixels)
-        beam_y: The y-coordinate of the crosshair (pixels)
+        image (Image): The image to draw the crosshair onto. This is mutated.
+        beam_x (int): The x-coordinate of the crosshair (pixels).
+        beam_y (int): The y-coordinate of the crosshair (pixels).
     """
     draw = ImageDraw.Draw(image)
     outline_width = 1
@@ -51,16 +51,18 @@ def compute_beam_centre_pixel_xy_for_mm_position(
     beam_pos_at_origin_px: Pixel,
     microns_per_pixel: tuple[float, float],
 ) -> Pixel:
-    """
-    Compute the location of the beam centre in pixels on a reference image.
-    Args:
-        sample_pos_mm: x, y location of the sample in mm relative to when the reference image
-            was taken.
-        beam_pos_at_origin_px: x, y position of the beam centre in the reference image (pixels)
-        microns_per_pixel: x, y scaling factor relating the sample position to the position in the image.
-    Returns:
-        x, y location of the beam centre (pixels)
+    """Compute the location of the beam centre in pixels on a reference image.
 
+    Args:
+        sample_pos_mm (tuple[float, float]): x, y location of the sample in mm relative
+            to when the reference image was taken.
+        beam_pos_at_origin_px (Pixel): x, y position of the beam centre in the reference
+            image (pixels).
+        microns_per_pixel (tuple[float, float]): x, y scaling factor relating the sample
+            position to the position in the image.
+
+    Returns:
+        Pixel: x, y location of the beam centre (pixels).
     """
 
     def centre(sample_pos, beam_pos, um_per_px) -> int:

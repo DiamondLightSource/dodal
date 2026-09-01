@@ -19,12 +19,12 @@ def _add_parallel_lines_to_image(
     orientation=Orientation.horizontal,
 ):
     """Draws horizontal or vertical parallel lines on a given image.
-    Draws a line of a given length and orientation starting from a given point; then \
-    draws a given number of parallel lines equally spaced with a given spacing. \
-    If the line is horizontal, the start point corresponds to left end of the initial \
-    line and the other parallel lines will be drawn below the initial line; if \
-    vertical, the start point corresponds to the top end of the initial line and the \
-    other parallel lines will be drawn to the right of the initial line. (0,0) is the \
+    Draws a line of a given length and orientation starting from a given point; then
+    draws a given number of parallel lines equally spaced with a given spacing.
+    If the line is horizontal, the start point corresponds to left end of the initial
+    line and the other parallel lines will be drawn below the initial line; if
+    vertical, the start point corresponds to the top end of the initial line and the
+    other parallel lines will be drawn to the right of the initial line. (0,0) is the
     top left of the image.
 
     Args:
@@ -32,11 +32,12 @@ def _add_parallel_lines_to_image(
         start_x (int): The x coordinate (in pixels) of the start of the initial line.
         start_y (int): The y coordinate (in pixels) of the start of the initial line.
         line_length (int): The length of each of the parallel lines in pixels.
-        spacing (float): The spacing, in pixels, between each parallel line. Strictly, \
+        spacing (float): The spacing, in pixels, between each parallel line. Strictly,
             there are spacing-1 pixels between each line
         num_lines (int): The total number of parallel lines to draw.
-        orientation (Orientation): The orientation (horizontal or vertical) of the \
-            parallel lines to draw."""
+        orientation (Orientation): The orientation (horizontal or vertical) of the
+            parallel lines to draw.
+    """
     lines = [
         (
             (

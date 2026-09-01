@@ -3,9 +3,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class ColorMode(StrictEnum):
-    """
-    Enum to store the various color modes of the camera. We use RGB1.
-    """
+    """Enum to store the various color modes of the camera. We use RGB1."""
 
     MONO = "Mono"
     BAYER = "Bayer"

@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pydantic import ValidationError
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from tests.devices.test_data import TEST_LUT_TXT
@@ -45,16 +46,15 @@ def test_if_path_provided_check_is_dir(tmp_path: Path):
         create_det_params_with_dir_and_prefix(file_path)
 
 
-@patch(
-    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
-)
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(MagicMock())
+
+
 @patch(
     "dodal.devices.detector.det_dist_to_beam_converter.linear_extrapolation_lut",
-    MagicMock(),
 )
-def test_correct_det_dist_to_beam_converter_path_passed_in(
-    mocked_parse_table, tmp_path: Path
-):
+def test_correct_det_dist_to_beam_converter_path_passed_in(mock_lut, tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,
@@ -73,10 +73,7 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(
     assert params.beam_xy_converter.lookup_file == "a fake directory"
 
 
-@patch(
-    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
-)
-def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
+def test_run_number_correct_when_not_specified(tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,
@@ -94,10 +91,7 @@ def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
     assert params.run_number == 1
 
 
-@patch(
-    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
-)
-def test_run_number_correct_when_specified(mocked_parse_table, tmp_path):
+def test_run_number_correct_when_specified(tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,

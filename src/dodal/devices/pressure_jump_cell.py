@@ -20,6 +20,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.common.enums import ValveState
+
 OPENSEQ_PULSE_LENGTH = 0.2
 
 
@@ -52,14 +54,6 @@ class PumpMotorDirectionState(StrictEnum):
     EMPTY = ""
     FORWARD = "Forward"
     REVERSE = "Reverse"
-
-
-class ValveState(StrictEnum):
-    FAULT = "Fault"
-    OPEN = "Open"
-    OPENING = "Opening"
-    CLOSED = "Closed"
-    CLOSING = "Closing"
 
 
 class FastValveState(StrictEnum):
@@ -101,10 +95,8 @@ class ValveControl(
 
 
 class AllValvesControl(StandardReadable):
-    """
-    The default IOC for this device only controls
-    specific valves. Other valves are under manual
-    control.
+    """The default IOC for this device only controls specific valves. Other valves are
+    under manual control.
     """
 
     def __init__(
@@ -165,12 +157,10 @@ class Pump(StandardReadable):
 
 
 class PressureTransducer(StandardReadable):
-    """
-    Pressure transducer for a high pressure X-ray cell.
+    """Pressure transducer for a high pressure X-ray cell.
     This is the chamber and there are three of them.
     1 is the start, 3 is where the sample is.
     NOTE: the distinction between the adc prefix and the cell prefix is kept here.
-
     """
 
     def __init__(
@@ -231,9 +221,7 @@ class DoJump(StandardReadable, Triggerable):
 
 
 class PressureJumpCellController(StandardReadable, Movable, Stoppable):
-    """
-    Top-level control for a fixed pressure or pressure jumps.
-    """
+    """Top-level control for a fixed pressure or pressure jumps."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
@@ -261,8 +249,8 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
 
     @AsyncStatus.wrap
     async def set(self, value: int):
-        """
-        Sets the desired pressure waiting for the device to complete the operation.
+        """Sets the desired pressure waiting for the device to complete the
+        operation.
         """
         timeout = await self.timeout.get_value()
 
@@ -293,10 +281,11 @@ class BusyMock(DeviceMock["PressureJumpCell"]):
 
 @default_mock_class(BusyMock)
 class PressureJumpCell(StandardReadable):
-    """
-    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
-    prefix: str
-        The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately
+    """High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
+
+    Args:
+        prefix (str): The prefix of beamline - SPECIAL - unusual that the cell prefix is
+            computed separately.
     """
 
     def __init__(

@@ -20,7 +20,7 @@ async def test_turbo_slit_set(slit: TurboSlit):
     await slit.set(0.5)
 
     assert get_mock_put(slit.xfine.user_setpoint).call_count == 1
-    get_mock_put(slit.xfine.user_setpoint).assert_called_once_with(0.5, wait=True)
+    get_mock_put(slit.xfine.user_setpoint).assert_called_once_with(0.5)
 
 
 async def test_turbo_slit_read(slit: TurboSlit):
