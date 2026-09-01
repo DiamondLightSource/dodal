@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_shutter &#8212; dodal 2.6.3.dev2+g39222235b documentation</title>
+    <title>dodal.devices.fast_shutter &#8212; dodal 2.6.3.dev3+ga554a5db2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=6e8756e8"></script>
+    <script src="../../../_static/documentation_options.js?v=b0eee264"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1059,6 +1059,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read_shutter_state</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_shutter_state</span><span class="p">,</span>
+            <span class="n">derived_datatype</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shutter1_ref</span><span class="p">()</span><span class="o">.</span><span class="n">open_state</span><span class="p">),</span>
             <span class="n">selected_shutter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_selected_shutter_ref</span><span class="p">(),</span>
             <span class="n">shutter1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_shutter1_ref</span><span class="p">()</span><span class="o">.</span><span class="n">shutter_state</span><span class="p">,</span>
             <span class="n">shutter2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_shutter2_ref</span><span class="p">()</span><span class="o">.</span><span class="n">shutter_state</span><span class="p">,</span>
