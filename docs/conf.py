@@ -52,7 +52,7 @@ extensions = [
     "sphinxcontrib.mermaid",
     # Signatures from type hinting
     "sphinx_autodoc_typehints",
-    # So we can write markdown files and  For jupiter notebooks
+    # So we can write markdown files and jupiter notebooks
     "myst_nb",
 ]
 
