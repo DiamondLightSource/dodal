@@ -118,6 +118,7 @@ class TemperatureSensor(StandardReadable, Generic[SensorDevice]):
             raw_to_derived=self._select_sensor,
             derived_units=None,
             derived_precision=None,
+            derived_datatype=None,
             active_sensor_name=self.active_sensor_name,
             **self._sensor_name_to_signal(),
         )
