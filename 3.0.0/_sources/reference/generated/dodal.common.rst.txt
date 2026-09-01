@@ -1,0 +1,48 @@
+﻿dodal.common
+============
+
+
+
+
+
+
+
+.. currentmodule:: dodal
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~common.EnabledDisabledUpper
+   ~common.InOutUpper
+   ~common.OnOffUpper
+   ~common.Rectangle2D
+
+
+
+
+.. automodule:: dodal.common
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      group_uuid
+      inject
+      in_micros
+      step_to_num
+   
+   
+
+   
+   
+   

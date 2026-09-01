@@ -1,0 +1,78 @@
+dodal.devices.watsonmarlow323\_pump.WatsonMarlow323PumpState
+============================================================
+
+.. currentmodule:: dodal.devices.watsonmarlow323_pump
+
+.. autoclass:: WatsonMarlow323PumpState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~WatsonMarlow323PumpState.STOPPED
+      
+      
+      ~WatsonMarlow323PumpState.STARTED
+      
+   
+   

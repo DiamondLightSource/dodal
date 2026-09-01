@@ -1,0 +1,40 @@
+dodal.devices.slits.SlitsY
+==========================
+
+.. currentmodule:: dodal.devices.slits
+
+.. autoclass:: SlitsY
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

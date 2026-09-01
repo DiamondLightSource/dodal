@@ -1,0 +1,48 @@
+dodal.devices.oav.oav\_detector.ZoomControllerWithBeamCentres
+=============================================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: ZoomControllerWithBeamCentres
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~ZoomControllerWithBeamCentres.level
+      
+      
+      ~ZoomControllerWithBeamCentres.percentage
+      
+   
+   
