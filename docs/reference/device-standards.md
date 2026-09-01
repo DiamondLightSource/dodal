@@ -48,7 +48,7 @@ When a device is named in this way, all of its child devices are named appropria
             x = Motor(prefix + "X")
             super().__init__(name)
 
-    @device_factory()
+    @devices.factory()
     def foo() -> MyDevice:
         return MyDevice("FOO:")
 
