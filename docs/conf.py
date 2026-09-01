@@ -52,8 +52,8 @@ extensions = [
     "sphinxcontrib.mermaid",
     # Signatures from type hinting
     "sphinx_autodoc_typehints",
-    # So we can write markdown files
-    "myst_parser",
+    # So we can write markdown files and jupiter notebooks
+    "myst_nb",
 ]
 
 # So we can use the ::: syntax
@@ -107,7 +107,7 @@ graphviz_output_format = "svg"
 default_role = "any"
 
 # The suffix of source filenames.
-source_suffix = [".rst", ".py"]
+source_suffix = [".rst", ".py", ".ipynb", ".md"]
 
 # The master toctree document.
 master_doc = "index"
