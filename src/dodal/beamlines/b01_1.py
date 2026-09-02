@@ -4,11 +4,12 @@ from pathlib import Path
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import ADWriterFactory, NDROIStatIO
+from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.common.beamlines.device_helpers import DRV_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
@@ -21,17 +22,6 @@ BL = "b01-1"
 PREFIX = BeamlinePrefix(BL, suffix="C")
 set_log_beamline(BL)
 set_utils_beamline(BL)
-
-"""
-NOTE: Due to ArgoCD and the k8s cluster configuration those PVs are not available remotely.
-You need to be on the beamline-local network to access them.
-The simplest way to do this is to `ssh b01-1-ws001` and run `dodal connect b01_1` from there.
-remember about the underscore in the beamline name.
-
-See the IOC status here:
-https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSync=&health=&namespace=&cluster=&labels=
-"""
-
 devices = DeviceManager()
 
 
@@ -55,7 +45,7 @@ def pandabrick(path_provider: PathProvider) -> HDFPanda:
     )
 
 
-@devices.factory()
+@devices.factory(skip=True)
 def pandabox(path_provider: PathProvider) -> HDFPanda:
     """Provides triggering of the detectors.
 
@@ -88,14 +78,14 @@ def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         pv_prefix,
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
-        driver_suffix=CAM_SUFFIX,
+        driver_suffix=DRV_SUFFIX,
         plugins={
             "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
         },
     )
 
 
-@devices.factory()
+@devices.factory(skip=True)
 def imaging_detector(path_provider: PathProvider) -> AravisDetector:
     """The Mako camera for the imaging experiment.
 
@@ -107,7 +97,23 @@ def imaging_detector(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
-        driver_suffix=CAM_SUFFIX,
+        driver_suffix=DRV_SUFFIX,
+    )
+
+
+@devices.factory()
+def tomography_detector(path_provider: PathProvider) -> AravisDetector:
+    """The Mako camera for the tomography experiment.
+
+    Looks at the sample position of the tomography theta stage.
+
+    Returns:
+        AravisDetector: The tomography camera device.
+    """
+    return AravisDetector(
+        f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix=DRV_SUFFIX,
     )
 
 
@@ -119,12 +125,17 @@ def sample_stage() -> XYZStage:
         XYZStage: The XYZ sample stage device.
     """
     return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+        f"{PREFIX.beamline_prefix}-MO-SPEC-01:",
     )
 
 
 @devices.factory()
-def pmac(sample_stage: XYZStage) -> PmacIO:
+def tomography_stage() -> Motor:
+    return Motor(f"{PREFIX.beamline_prefix}-MO-TOMO-01:THETA")
+
+
+@devices.factory()
+def pmac(sample_stage: XYZStage, tomography_stage) -> PmacIO:
     """A Power PMAC.
 
     Returns:
@@ -132,6 +143,6 @@ def pmac(sample_stage: XYZStage) -> PmacIO:
     """
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
-        raw_motors=[sample_stage.y, sample_stage.x],
+        raw_motors=[sample_stage.y, sample_stage.x, tomography_stage],
         coord_nums=[1],
     )
