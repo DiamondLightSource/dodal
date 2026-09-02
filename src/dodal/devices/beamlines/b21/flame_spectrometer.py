@@ -7,7 +7,7 @@ class FlameSpectrometer(StandardReadable):
         self.filepath = epics_signal_rw_rbv(str, f"pva://{prefix}FilePath")
         self.filename = epics_signal_rw_rbv(str, f"pva://{prefix}FileName")
         self.exposure_time = epics_signal_rw_rbv(
-            float, f"pva://{prefix}IntegrationTime"
+            float, f"pva://{prefix}Advanced:IntegrationTime"
         )
         self.capture = epics_signal_rw_rbv(bool, f"pva://{prefix}Capture")
         self.single_trigger = epics_signal_x(f"pva://{prefix}SingleScan")
