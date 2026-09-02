@@ -2,7 +2,8 @@ from functools import cache
 from pathlib import Path
 
 from ophyd_async.core import PathProvider
-from ophyd_async.epics.adandor import Andor2Detector
+from ophyd_async.epics.adandor import AndorDetector
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline
@@ -60,13 +61,12 @@ def lab_stage() -> XYZStage:
 
 
 @devices.factory()
-def andor2_det(path_provider: PathProvider) -> Andor2Detector:
+def andor2_det(path_provider: PathProvider) -> AndorDetector:
     """Andor model:DU897_BV."""
-    return Andor2Detector(
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
-        path_provider=path_provider,
-        drv_suffix=CAM_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+    return AndorDetector(
+        f"{PREFIX.beamline_prefix}-EA-DET-03:",
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix=CAM_SUFFIX,
     )
 
 

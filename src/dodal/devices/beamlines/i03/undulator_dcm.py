@@ -1,7 +1,7 @@
 import asyncio
 
 from bluesky.protocols import Movable
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables.mx_lut_models import (
     BeamlinePitchLookupTable,
     BeamlineRollLookupTable,

@@ -1,7 +1,7 @@
 from functools import cache
 from os import getenv
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
@@ -38,7 +38,8 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -46,8 +47,8 @@ from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
-from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.scintillator import Scintillator
+from dodal.devices.slits import MinimalSlits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -61,7 +62,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.devices.zocalo import ZocaloResults, ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -104,7 +105,7 @@ def config_client() -> ConfigClient:
     config_server_url = getenv(
         CONFIG_SERVER_URL_ENV_VAR, DEFAULT_CONFIG_SERVER_ENDPOINT
     )
-    client = ConfigClient(config_server_url)
+    client = ConfigClient.from_url(config_server_url)
     set_config_client(client)
     return client
 
@@ -189,13 +190,13 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
     return eiger
 
 
-@devices.factory()
+# ophyd-async no longer works with a mixed ADOdin and fastCS Eiger. Need to update the
+# beamline to use a fastCS Odin and Eiger
+@devices.factory(skip=True)
 def fastcs_eiger(path_provider: PathProvider) -> FastEiger:
     return FastEiger(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-02:",
-        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 
@@ -235,8 +236,10 @@ def smargon() -> Smargon:
 
 
 @devices.factory()
-def s4_slit_gaps() -> S4SlitGaps:
-    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+def s4_slit_gaps() -> MinimalSlits:
+    return MinimalSlits(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-04:", x_gap="XGAP", y_gap="YGAP"
+    )
 
 
 @devices.factory()
@@ -293,14 +296,14 @@ def panda(path_provider: PathProvider) -> HDFPanda:
 
 
 @devices.factory()
-def sample_shutter() -> ZebraShutter:
-    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
+def sample_shutter() -> MXZebraShutter:
+    return MXZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @devices.factory()
 def hutch_shutter() -> InterlockedHutchShutter:
     return InterlockedHutchShutter(
-        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
     )
 
 

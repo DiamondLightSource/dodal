@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
 from dodal.common.beamlines.beamline_utils import BL, set_config_client
@@ -16,13 +16,16 @@ from dodal.devices.attenuator.filter_selections import (
 from dodal.devices.beamlines.i24.aperture import Aperture
 from dodal.devices.beamlines.i24.beam_center import DetectorBeamCenter
 from dodal.devices.beamlines.i24.beamstop import Beamstop
-from dodal.devices.beamlines.i24.commissioning_jungfrau import CommissioningJungfrau
+from dodal.devices.beamlines.i24.commissioning_jungfrau import (
+    CommissioningJungfrauDetector,
+)
 from dodal.devices.beamlines.i24.dcm import DCM
 from dodal.devices.beamlines.i24.dual_backlight import DualBacklight
 from dodal.devices.beamlines.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.beamlines.i24.pmac import PMAC
 from dodal.devices.beamlines.i24.vgonio import VerticalGoniometer
-from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -33,7 +36,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -46,7 +49,7 @@ DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
-set_config_client(ConfigClient())
+set_config_client(ConfigClient.from_url())
 
 I24_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
@@ -71,7 +74,7 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    return ConfigClient()
+    return ConfigClient.from_url()
 
 
 @devices.factory()
@@ -99,7 +102,12 @@ def backlight() -> DualBacklight:
 
 @devices.factory()
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:")
+    """Get the i24 detector motion device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return YZStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+    )
 
 
 @devices.factory()
@@ -139,7 +147,7 @@ def zebra() -> Zebra:
 @devices.factory()
 def shutter() -> InterlockedHutchShutter:
     return InterlockedHutchShutter(
-        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
     )
 
 
@@ -154,16 +162,14 @@ def eiger_beam_center() -> DetectorBeamCenter:
 
 
 @devices.factory()
-def commissioning_jungfrau(
+def jungfrau(
     path_provider: PathProvider,
-) -> CommissioningJungfrau:
-    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
-    device in place of Odin while the detector is in commissioning.
-    """
-    return CommissioningJungfrau(
+) -> CommissioningJungfrauDetector:
+    return CommissioningJungfrauDetector(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
         AutoMaxIncrementingPathProvider(path_provider),
+        "CAM:",
     )
 
 
@@ -173,7 +179,7 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def sample_shutter() -> ZebraShutter:
-    return ZebraShutter(
+def sample_shutter() -> MXZebraShutter:
+    return MXZebraShutter(
         f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )

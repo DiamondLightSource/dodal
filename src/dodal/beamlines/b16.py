@@ -2,21 +2,16 @@ from functools import cache
 from pathlib import Path
 
 from ophyd_async.core import PathProvider
-from ophyd_async.epics.adcore import (
-    ADBaseIO,
-    ADTIFFWriter,
-    AreaDetector,
-)
+from ophyd_async.epics.adcore import AreaDetector
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
 from dodal.common.visit import (
     RemoteDirectoryServiceClient,
     StaticVisitPathProvider,
 )
 from dodal.device_manager import DeviceManager
-from dodal.devices.controllers import ConstantDeadTimeController
+from dodal.devices.beamlines.b16.detector import software_triggered_tiff_area_detector
 from dodal.devices.motors import XYZStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -61,12 +56,8 @@ def attorot1() -> Motor:
 
 @devices.factory()
 def fds2(path_provider: PathProvider) -> AreaDetector:
-    prefix = f"{PREFIX.beamline_prefix}-EA-FDS-02:"
-    return AreaDetector(
-        writer=ADTIFFWriter.with_io(prefix, path_provider, fileio_suffix=TIFF_SUFFIX),
-        controller=ConstantDeadTimeController(
-            driver=ADBaseIO(prefix + CAM_SUFFIX), deadtime=0.0
-        ),
+    return software_triggered_tiff_area_detector(
+        f"{PREFIX.beamline_prefix}-EA-FDS-02:", path_provider, deadtime=0
     )
 
 

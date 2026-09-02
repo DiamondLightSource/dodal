@@ -1,7 +1,3 @@
-from .base_controller import (
-    ElectronAnalyserController,
-    GenericElectronAnalyserController,
-)
 from .base_detector import ElectronAnalyserDetector, GenericElectronAnalyserDetector
 from .base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -20,11 +16,9 @@ from .base_region import (
     TLensMode,
 )
 from .base_util import to_binding_energy, to_kinetic_energy
-from .energy_sources import AbstractEnergySource, DualEnergySource, EnergySource
+from .detector_logic import ElectronAnalyserTriggerLogic, RegionLogic
 
 __all__ = [
-    "ElectronAnalyserController",
-    "GenericElectronAnalyserController",
     "ElectronAnalyserDetector",
     "GenericElectronAnalyserDetector",
     "AbstractAnalyserDriverIO",
@@ -41,7 +35,6 @@ __all__ = [
     "TLensMode",
     "to_binding_energy",
     "to_kinetic_energy",
-    "AbstractEnergySource",
-    "DualEnergySource",
-    "EnergySource",
+    "ElectronAnalyserTriggerLogic",
+    "RegionLogic",
 ]

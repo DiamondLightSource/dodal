@@ -1,15 +1,12 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    get_config_client,
-    set_config_client,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
@@ -24,7 +21,7 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.devices.slits import Slits
-from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.tetramm.tetramm import TetrammDetector
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump
 from dodal.log import set_beamline as set_log_beamline
@@ -53,16 +50,20 @@ def path_provider() -> PathProvider:
     )
 
 
-set_config_client(ConfigClient())
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
 
 
 @devices.factory()
 def d3(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
-        path_provider=path_provider,
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
+        ADWriterFactory.hdf(
+            path_provider=path_provider,
+            writer_suffix=HDF5_SUFFIX,
+        ),
+        driver_suffix="DET:",
     )
 
 
@@ -71,9 +72,8 @@ def d3(path_provider: PathProvider) -> AravisDetector:
 def d11(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
-        path_provider=path_provider,
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix="DET:",
     )
 
 
@@ -81,9 +81,8 @@ def d11(path_provider: PathProvider) -> AravisDetector:
 def d12(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-04:",
-        path_provider=path_provider,
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_SUFFIX,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix="DET:",
     )
 
 
@@ -167,10 +166,10 @@ def dcm() -> DCM:
 
 
 @devices.factory(mock=True)
-def undulator() -> UndulatorInKeV:
+def undulator(config_client: ConfigClient) -> UndulatorInKeV:
     return UndulatorInKeV(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        get_config_client(),
+        config_client,
         poles=80,
         length=2.0,
     )

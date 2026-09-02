@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
+from dodal.devices.beamlines.i09 import LensMode, PassEnergy
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     AcquisitionMode,
@@ -13,18 +13,8 @@ from dodal.devices.electron_analyser.vgscienta import (
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
-    get_test_sequence,
+    load_i09_vgscienta_test_seq,
 )
-
-
-@pytest.fixture
-def sequence() -> VGScientaSequence[LensMode, PsuMode, PassEnergy]:
-    return get_test_sequence(VGScientaSequence[LensMode, PsuMode, PassEnergy])
-
-
-@pytest.fixture
-def expected_region_class() -> type[VGScientaRegion[LensMode, PassEnergy]]:
-    return VGScientaRegion[LensMode, PassEnergy]
 
 
 @pytest.fixture
@@ -102,20 +92,12 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_load_sequence_using_alias_field_names_has_expected_enabled_region_names(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
-    expected_enabled_region_names: list[str],
-) -> None:
-    assert sequence.get_enabled_region_names() == expected_enabled_region_names
-    for i, region in enumerate(sequence.get_enabled_regions()):
-        assert region.name == expected_enabled_region_names[i]
-
-
 def test_load_sequence_using_alias_field_names_has_expected_values(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
-    for i, r in zip(sequence.regions, expected_region_values, strict=True):
+    for i, r in zip(
+        load_i09_vgscienta_test_seq().regions, expected_region_values, strict=True
+    ):
         assert_region_has_expected_values(i, r)
 
 
@@ -125,3 +107,8 @@ def test_region_loads_using_field_names_has_expected_values(
     for expected_region in expected_region_values:
         r = VGScientaRegion[LensMode, PassEnergy].model_validate(expected_region)
         assert_region_has_expected_values(r, expected_region)
+    seq = VGScientaSequence[LensMode, PassEnergy].model_validate(
+        {"regions": expected_region_values}
+    )
+    for r, expected_r in zip(seq.regions, expected_region_values, strict=True):
+        assert_region_has_expected_values(r, expected_r)

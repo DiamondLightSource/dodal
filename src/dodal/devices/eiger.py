@@ -5,7 +5,7 @@ from bluesky.protocols import Stageable
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
 from ophyd.signal import AttributeSignal
-from ophyd.status import AndStatus, Status, StatusBase, SubscriptionStatus
+from ophyd.status import Status, StatusBase, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
@@ -24,6 +24,7 @@ class EigerTimeouts:
     all_frames_timeout: int = 120
     arming_timeout: int = 60
     odin_stop_timeout: int = 30
+    odin_meta_active_timeout: int = 60
 
 
 class InternalEigerTriggerMode(Enum):
@@ -225,46 +226,54 @@ class EigerDetector(Device, Stageable):
             if enable
             else self.detector_params.detector_size_constants.det_size_pixels
         )
-        status = self.cam.roi_mode.set(
+        LOGGER.info(f"Setting cam.roi_mode to {1 if enable else 0}")
+        self.cam.roi_mode.set(
             1 if enable else 0, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.odin.file_writer.image_height.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug(f"Setting image_height to {detector_dimensions.height}")
+        self.odin.file_writer.image_height.set(
             detector_dimensions.height, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.odin.file_writer.image_width.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug(f"Setting image_width to {detector_dimensions.width}")
+        self.odin.file_writer.image_width.set(
             detector_dimensions.width, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.odin.file_writer.num_row_chunks.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug(f"Setting num_row_chunks to {detector_dimensions.height}")
+        self.odin.file_writer.num_row_chunks.set(
             detector_dimensions.height, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.odin.file_writer.num_col_chunks.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug(f"Setting num_col_chunks to {detector_dimensions.width}")
+        status = self.odin.file_writer.num_col_chunks.set(
             detector_dimensions.width, timeout=self.timeouts.general_status_timeout
         )
         return status
 
-    def set_cam_pvs(self) -> AndStatus:
+    def set_cam_pvs(self) -> StatusBase:
         LOGGER.info("Eiger arming: Setting eiger camera PVs...")
         assert self.detector_params is not None
-        status = self.cam.acquire_time.set(
+        self.cam.acquire_time.set(
             self.detector_params.exposure_time_s,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.acquire_period.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug("Setting cam acquire_period...")
+        self.cam.acquire_period.set(
             self.detector_params.exposure_time_s,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.num_exposures.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug("Setting cam num_exposures...")
+        self.cam.num_exposures.set(
             1, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.cam.image_mode.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug("Setting cam image_mode...")
+        self.cam.image_mode.set(
             self.cam.ImageMode.MULTIPLE,  # pyright: ignore[reportAttributeAccessIssue]
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.trigger_mode.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        LOGGER.debug("Setting cam trigger_mode...")
+        return self.cam.trigger_mode.set(
             InternalEigerTriggerMode.EXTERNAL_SERIES.value,
             timeout=self.timeouts.general_status_timeout,
         )
-        return status
 
     def set_odin_number_of_frame_chunks(self) -> Status:
         LOGGER.info("Eiger arming: Setting odin number of frames chunks...")
@@ -379,7 +388,9 @@ class EigerDetector(Device, Stageable):
 
     def _wait_for_odin_status(self) -> StatusBase:
         self.forward_bit_depth_to_filewriter()
-        await_value(self.odin.meta.active, 1).wait(self.timeouts.general_status_timeout)
+        await_value(self.odin.meta.active, 1).wait(
+            self.timeouts.odin_meta_active_timeout
+        )
 
         status = self.odin.file_writer.capture.set(
             1, timeout=self.timeouts.general_status_timeout

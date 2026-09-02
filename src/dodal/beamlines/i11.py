@@ -2,6 +2,7 @@ from functools import cache
 from pathlib import Path
 
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.epics.adcore import ADWriterFactory
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
@@ -43,14 +44,16 @@ def path_provider() -> PathProvider:
     return StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
 
 
-@devices.factory()
+# Mythen detector state does not match ophyd-async see https://jira.diamond.ac.uk/browse/I11-916
+@devices.factory(skip=True)
 def mythen3(path_provider: PathProvider) -> Mythen3:
     """Mythen3 Detector from PSI."""
     return Mythen3(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-07:",
-        path_provider=path_provider,
+        writer_factory=ADWriterFactory.hdf(
+            path_provider=path_provider, writer_suffix="HDF:"
+        ),
         drv_suffix=DET_SUFFIX,
-        fileio_suffix="HDF:",
     )
 
 

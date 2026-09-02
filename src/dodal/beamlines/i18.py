@@ -1,14 +1,10 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    get_config_client,
-    set_config_client,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
@@ -25,7 +21,7 @@ from dodal.devices.common_dcm import (
 from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.tetramm.tetramm import TetrammDetector
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -53,7 +49,9 @@ def path_provider() -> PathProvider:
     )
 
 
-set_config_client(ConfigClient())
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
 
 
 @devices.factory()
@@ -62,10 +60,8 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def undulator() -> UndulatorInKeV:
-    return UndulatorInKeV(
-        f"{PREFIX.insertion_prefix}-MO-SERVC-01:", get_config_client()
-    )
+def undulator(config_client: ConfigClient) -> UndulatorInKeV:
+    return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:", config_client)
 
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180
@@ -104,7 +100,6 @@ def i0(path_provider: PathProvider) -> TetrammDetector:
     return TetrammDetector(
         f"{PREFIX.beamline_prefix}-DI-XBPM-02:",
         path_provider=path_provider,
-        type="Cividec Diamond XBPM",
     )
 
 

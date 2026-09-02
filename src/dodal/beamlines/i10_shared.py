@@ -7,7 +7,7 @@ idd == id1,    idu == id2.
 
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -54,6 +54,11 @@ PREFIX = BeamlinePrefix(BL)
 devices = DeviceManager()
 
 
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
+
+
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
@@ -86,8 +91,6 @@ def switching_mirror() -> XYZPiezoCollimatingMirror:
 
 """ID"""
 
-I10_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
-
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 
 
@@ -111,7 +114,7 @@ def idd_phase() -> UndulatorPhaseAxes:
 def idd_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        move_pv="RPQ1",
+        move_pv="JAW",
     )
 
 
@@ -126,16 +129,16 @@ def idd(
 
 
 @devices.factory()
-def idd_controller(idd: I10Apple2) -> I10Apple2Controller:
+def idd_controller(idd: I10Apple2, config_client: ConfigClient) -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
     source = Source(column="Source", value="idd")
     idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
     idd_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
@@ -191,7 +194,7 @@ def idu_phase() -> UndulatorPhaseAxes:
 def idu_jaw_phase() -> UndulatorJawPhase:
     return UndulatorJawPhase(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-        move_pv="RPQ1",
+        move_pv="JAW",
     )
 
 
@@ -206,16 +209,16 @@ def idu(
 
 
 @devices.factory()
-def idu_controller(idu: I10Apple2) -> I10Apple2Controller:
+def idu_controller(idu: I10Apple2, config_client: ConfigClient) -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     source = Source(column="Source", value="idu")
     idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
     idu_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
-        config_client=I10_CONF_CLIENT,
+        config_client=config_client,
         lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -24,7 +24,7 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import (
+from dodal.devices.temperature_controller import (
     Lakeshore336,
 )
 from dodal.log import set_beamline as set_log_beamline
@@ -38,7 +38,6 @@ set_utils_beamline(BL)
 I21_PHASE_POLY_DEG_COLUMNS = ["b"]
 I21_GRATING_COLUMNS = "Grating"
 
-I21_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i21/software/gda/workspace_git/gda-diamond.git/configurations/i21-config/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "IDEnergy2GapCalibrations.csv"
 PHASE_LOOKUP_FILE_NAME = "IDEnergy2PhaseCalibrations.csv"
@@ -48,6 +47,11 @@ devices = DeviceManager()
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
+
+
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
 
 
 @devices.factory()
@@ -88,20 +92,21 @@ def id(
 @devices.factory()
 def id_controller(
     id: Apple2[UndulatorPhaseAxes],
+    config_client: ConfigClient,
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """I21 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=id,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(grating=I21_GRATING_COLUMNS),
-            config_client=I21_CONF_CLIENT,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(
                 grating=I21_GRATING_COLUMNS, poly_deg=I21_PHASE_POLY_DEG_COLUMNS
             ),
-            config_client=I21_CONF_CLIENT,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         units="eV",

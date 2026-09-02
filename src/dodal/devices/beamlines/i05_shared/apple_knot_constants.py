@@ -70,23 +70,23 @@ C_PHASE_POLYNOMIAL = Polynomial(
 )
 
 
-def energy_to_gap_converter(energy: float, pol: Pol) -> float:
+def energy_to_gap_converter(value: float, pol: Pol) -> float:
     if pol == Pol.LH:
-        return float(LH_GAP_POLYNOMIAL(energy))
+        return float(LH_GAP_POLYNOMIAL(value))
     if pol == Pol.LV:
-        return float(LV_GAP_POLYNOMIAL(energy))
+        return float(LV_GAP_POLYNOMIAL(value))
     if pol == Pol.PC or pol == Pol.NC:
-        return float(C_GAP_POLYNOMIAL(energy))
+        return float(C_GAP_POLYNOMIAL(value))
     return 0.0
 
 
-def energy_to_phase_converter(energy: float, pol: Pol) -> float:
+def energy_to_phase_converter(value: float, pol: Pol) -> float:
     if pol == Pol.LH:
         return 0.0
     if pol == Pol.LV:
         return 70.0
     if pol == Pol.PC:
-        return float(C_PHASE_POLYNOMIAL(energy))
+        return float(C_PHASE_POLYNOMIAL(value))
     if pol == Pol.NC:
-        return -float(C_PHASE_POLYNOMIAL(energy))
+        return -float(C_PHASE_POLYNOMIAL(value))
     return 0.0

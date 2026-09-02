@@ -1,9 +1,18 @@
+import asyncio
 from typing import Any
 
+import numpy as np
 import pytest
-from ophyd_async.core import InOut, init_devices, set_mock_value
+from ophyd_async.core import (
+    SignalR,
+    SignalRW,
+    init_devices,
+    set_mock_value,
+    soft_signal_rw,
+)
+from ophyd_async.epics.adcore import ADAcquireLogic
 
-from dodal.devices.beamlines import b07, b07_shared, i09
+from dodal.devices.beamlines import b07, b07_shared, i05_shared, i09
 from dodal.devices.beamlines.i09 import Grating
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
@@ -11,105 +20,70 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import (
-    BaseRegion,
-    BaseSequence,
-    DualEnergySource,
-    EnergySource,
+    ElectronAnalyserTriggerLogic,
+    RegionLogic,
 )
-from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.fast_shutter import DualFastShutter, FastShutter
+from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO, MbsDetector
+from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsDetector
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaAnalyserDriverIO,
+    VGScientaDetector,
+)
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.selectable_source import SourceSelector
+from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 
 
 @pytest.fixture
-async def source_selector() -> SourceSelector:
+async def source_selector() -> SignalRW[SelectedSource]:
     async with init_devices(mock=True):
-        source_selector = SourceSelector()
+        source_selector = soft_signal_rw(SelectedSource)
     return source_selector
 
 
 @pytest.fixture
-async def single_energy_source() -> EnergySource:
+async def source_energy() -> SignalR[float]:
     async with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
     await dcm.energy_in_keV.set(2.2)
-    async with init_devices(mock=True):
-        dcm_energy_source = EnergySource(dcm.energy_in_eV)
-
-    return dcm_energy_source
+    return dcm.energy_in_eV
 
 
 @pytest.fixture
-async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySource:
-    async with init_devices(mock=True):
+async def dual_energy_source(
+    source_selector: SignalRW[SelectedSource],
+) -> DualEnergySource:
+    with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
         pgm = PlaneGratingMonochromator("PGM:", Grating)
-    await dcm.energy_in_keV.set(2.2)
-    await pgm.energy.set(500)
-    async with init_devices(mock=True):
+    # Do in new context so that dcm and pgm are connected and named before giving to
+    # dual_energy_source.
+    with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
             source1=dcm.energy_in_eV,
             source2=pgm.energy.user_readback,
-            selected_source=source_selector.selected_source,
+            selected_source=source_selector,
         )
+    await asyncio.gather(dcm.energy_in_keV.set(2.2), pgm.energy.set(500))
     return dual_energy_source
 
 
 @pytest.fixture
-def shutter1() -> FastShutter[InOut]:
-    with init_devices(mock=True):
-        shutter1 = FastShutter[InOut](
-            pv="TEST:",
-            open_state=InOut.OUT,
-            close_state=InOut.IN,
-        )
-    return shutter1
-
-
-@pytest.fixture
-def shutter2() -> FastShutter[InOut]:
-    with init_devices(mock=True):
-        shutter2 = FastShutter[InOut](
-            pv="TEST:",
-            open_state=InOut.OUT,
-            close_state=InOut.IN,
-        )
-    return shutter2
-
-
-@pytest.fixture
-def dual_fast_shutter(
-    shutter1: FastShutter[InOut],
-    shutter2: FastShutter[InOut],
-    source_selector: SourceSelector,
-) -> DualFastShutter[InOut]:
-    with init_devices(mock=True):
-        dual_fast_shutter = DualFastShutter[InOut](
-            shutter1,
-            shutter2,
-            source_selector.selected_source,
-        )
-    return dual_fast_shutter
-
-
-@pytest.fixture
 async def b07b_specs150(
-    single_energy_source: EnergySource,
-    shutter1: FastShutter,
+    source_energy: SignalR[float],
 ) -> SpecsDetector[b07.LensMode, b07_shared.PsuMode]:
     with init_devices(mock=True):
+        prefix = "TEST:"
+        driver = SpecsAnalyserDriverIO(prefix, b07.LensMode, b07_shared.PsuMode)
         b07b_specs150 = SpecsDetector[b07.LensMode, b07_shared.PsuMode](
-            prefix="TEST:",
-            lens_mode_type=b07.LensMode,
-            psu_mode_type=b07_shared.PsuMode,
-            energy_source=single_energy_source,
-            shutter=shutter1,
+            prefix,
+            driver,
+            acquire_logic=ADAcquireLogic(driver),
+            trigger_logic=ElectronAnalyserTriggerLogic(driver),
+            region_logic=RegionLogic(driver, source_energy),
         )
     # Needed for specs so we don't get division by zero error.
     set_mock_value(b07b_specs150.driver.slices, 1)
@@ -119,31 +93,46 @@ async def b07b_specs150(
 @pytest.fixture
 async def ew4000(
     dual_energy_source: DualEnergySource,
-    dual_fast_shutter: DualFastShutter,
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
 ) -> VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy]:
     with init_devices(mock=True):
-        ew4000 = VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy](
-            prefix="TEST:",
-            lens_mode_type=i09.LensMode,
-            psu_mode_type=i09.PsuMode,
-            pass_energy_type=i09.PassEnergy,
-            energy_source=dual_energy_source,
-            shutter=dual_fast_shutter,
-            source_selector=source_selector,
+        prefix = "TEST:"
+        driver = VGScientaAnalyserDriverIO(
+            prefix, i09.LensMode, i09.PsuMode, i09.PassEnergy
         )
+        ew4000 = VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy](
+            prefix,
+            driver,
+            acquire_logic=ADAcquireLogic(driver),
+            trigger_logic=ElectronAnalyserTriggerLogic(driver),
+            region_logic=RegionLogic(
+                driver, dual_energy_source.energy, source_selector
+            ),
+        )
+    energy_axis = [1, 2, 3, 4, 5]
+    set_mock_value(ew4000.driver.energy_axis, np.array(energy_axis, dtype=float))
     return ew4000
 
 
 @pytest.fixture
-def region(
-    request: pytest.FixtureRequest,
-    sequence: BaseSequence[BaseRegion],
-) -> BaseRegion:
-    region = sequence.get_region_by_name(request.param)
-    if region is None:
-        raise ValueError("Region " + request.param + " is not found.")
-    return region
+async def i05_mbs_analyser(
+    source_energy: SignalR[float],
+) -> MbsDetector[i05_shared.LensMode, i05_shared.PassEnergy]:
+    with init_devices(mock=True):
+        prefix = "TEST:"
+        driver = MbsAnalyserDriverIO(prefix, i05_shared.LensMode, i05_shared.PassEnergy)
+        i05_mbs_analyser = MbsDetector[i05_shared.LensMode, i05_shared.PassEnergy](
+            prefix,
+            driver,
+            acquire_logic=ADAcquireLogic(driver),
+            trigger_logic=ElectronAnalyserTriggerLogic(driver),
+            region_logic=RegionLogic(driver, source_energy),
+        )
+    energy_axis = [1, 2, 3, 4, 5]
+    set_mock_value(
+        i05_mbs_analyser.driver.energy_axis, np.array(energy_axis, dtype=float)
+    )
+    return i05_mbs_analyser
 
 
 @pytest.fixture

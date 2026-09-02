@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 from functools import partial
 
 from bluesky.protocols import Movable
@@ -30,8 +30,22 @@ from dodal.log import LOGGER
 
 @dataclass
 class SampleLocation:
+    MAX_PUCK = 20
+    MAX_POSITION = 22
+
     puck: int
     position: int
+
+    def __post_init__(self):
+        if not (1 <= self.puck <= self.MAX_PUCK or self.puck == -1):
+            raise ValueError(
+                f"Puck must be between 1 and {self.MAX_PUCK}, got {self.puck}"
+            )
+
+        if not (1 <= self.position <= self.MAX_POSITION or self.position == -1):
+            raise ValueError(
+                f"position must be between 1 and {self.MAX_POSITION}, got {self.position}"
+            )
 
 
 SAMPLE_LOCATION_EMPTY = SampleLocation(-1, -1)
@@ -41,6 +55,11 @@ class ProgramNames(StrEnum):
     PUCK = "PUCK.MB6"
     BEAM = "BEAM.MB6"
     SPINNER = "MOTOR.MB6"
+
+
+class ErrorCodes(IntEnum):
+    NO_SAMPLE = 9030
+    OK = 0
 
 
 class ProgramRunning(StrictEnum):
@@ -197,6 +216,14 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
         await self._trigger_program_and_wait_for_complete(self.puck_pick)
 
+        if (
+            int(await self.controller_err_code.get_value())
+            == ErrorCodes.NO_SAMPLE.value
+        ):
+            raise ValueError(
+                f"Robot load failed, no sample found at puck {location.puck}, position {location.position}"
+            )
+
         await self._load_program_and_wait_for_loaded(
             self.beam_load_program, ProgramNames.BEAM
         )
@@ -261,6 +288,9 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         """Perform a sample load from the specified sample location or a sample unload
         if SAMPLE_LOCATION_EMPTY is specified.
 
+        If the a sample load is requested and there is already a sample loaded then
+        perform an unload first.
+
         Args:
             value (SampleLocation): the sample location to load to or
                                     SAMPLE_LOCATION_EMPTY to unload
@@ -268,4 +298,15 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         if value == SAMPLE_LOCATION_EMPTY:
             await self._unload()
         else:
+            current_puck = await self.current_sample.puck.get_value()
+            current_position = await self.current_sample.position.get_value()
+            if current_position != 0 and current_puck != 0:
+                LOGGER.info(
+                    f"Position {current_position} from puck {current_puck} already loaded, unloading first."
+                )
+                await self._unload()
+            elif (current_position == 0) != (current_puck == 0):
+                raise ValueError(
+                    f"Robot state is invalid with a current puck/position of {current_puck}/{current_position}"
+                )
             await self._load(value)

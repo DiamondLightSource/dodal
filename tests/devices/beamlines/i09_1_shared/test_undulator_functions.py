@@ -2,27 +2,25 @@ import re
 from unittest.mock import patch
 
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables import GenericLookupTable
 
 from dodal.devices.beamlines.i09_1_shared import (
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
 )
-
-pytest_plugins = ["dodal.testing.fixtures.devices.hard_undulator"]
+from tests.devices.beamlines.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
 
 
 @pytest.fixture()
 def lut(
     mock_config_client: ConfigClient,
 ) -> GenericLookupTable:
-    _lut = mock_config_client.get_file_contents(
-        file_path="path/to/lut",
+    return mock_config_client.get_file_contents(
+        file_path=TEST_HARD_UNDULATOR_LUT,
         desired_return_type=GenericLookupTable,
         reset_cached_result=True,
     )
-    return _lut
 
 
 @pytest.mark.parametrize(

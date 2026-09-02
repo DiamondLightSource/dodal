@@ -3,6 +3,7 @@ from pathlib import Path
 
 from ophyd_async.core import PathProvider
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -46,9 +47,8 @@ def choppers() -> XYStage:
 def det(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-MAP-01:",
-        path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix=DET_SUFFIX,
     )
 
 
@@ -57,9 +57,8 @@ def det(path_provider: PathProvider) -> AravisDetector:
 def diff(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-DIFF-01:",
-        path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
+        driver_suffix=DET_SUFFIX,
     )
 
 

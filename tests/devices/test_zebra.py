@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from ophyd_async.core import set_mock_value
+from ophyd_async.core import set_mock_attr, set_mock_value
 
 from dodal.devices.zebra.zebra import (
     ArmDemand,
@@ -36,8 +36,8 @@ async def test_position_compare_sets_signals():
         set_mock_value(fake_pc.arm.disarm_set, not demand)
         set_mock_value(fake_pc.arm.arm_set, demand)
 
-    fake_pc.arm.arm_set.set = AsyncMock(side_effect=mock_arm)
-    fake_pc.arm.disarm_set.set = AsyncMock(side_effect=mock_arm)
+    set_mock_attr(fake_pc.arm.arm_set, "set", AsyncMock(side_effect=mock_arm))
+    set_mock_attr(fake_pc.arm.disarm_set, "set", AsyncMock(side_effect=mock_arm))
 
     await fake_pc.gate_source.set(TrigSource.EXTERNAL)
     await fake_pc.gate_trigger.set(I03Axes.OMEGA)

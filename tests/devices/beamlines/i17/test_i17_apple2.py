@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_attr
 
 from dodal.devices.beamlines.i17.i17_apple2 import I17Apple2Controller
 from dodal.devices.insertion_device import (
@@ -14,7 +14,7 @@ from dodal.devices.insertion_device import (
 )
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
-# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+# mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
@@ -48,15 +48,15 @@ async def test_set_motors_from_energy_and_polarisation_sets_correct_values(
     mock_id_controller: I17Apple2Controller,
     mock_apple2: Apple2[UndulatorPhaseAxes],
 ):
-    mock_apple2.set = AsyncMock()
+    mock_set = set_mock_attr(mock_apple2, "set", AsyncMock())
     # Mock polarisation setpoint check
     mock_id_controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
     await mock_id_controller.energy.set(100.0)
     mock_id_controller.gap_energy_motor_converter.assert_called_once_with(  # type:ignore
-        energy=100.0, pol=Pol.LH
+        value=100.0, pol=Pol.LH
     )
     mock_id_controller.phase_energy_motor_converter.assert_called_once_with(  # type:ignore
-        energy=100.0, pol=Pol.LH
+        value=100.0, pol=Pol.LH
     )
     expected_val = Apple2Val(
         gap=42.0,
@@ -67,4 +67,4 @@ async def test_set_motors_from_energy_and_polarisation_sets_correct_values(
             btm_outer=0.0,
         ),
     )
-    mock_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
+    mock_set.assert_awaited_once_with(id_motor_values=expected_val)

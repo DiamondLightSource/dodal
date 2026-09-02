@@ -1,6 +1,6 @@
 from functools import cache
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import Reference
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -15,7 +15,6 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
 from dodal.devices.beamlines.i03.dcm import DCM
-from dodal.devices.beamlines.i04.beam_centre import CentreEllipseMethod
 from dodal.devices.beamlines.i04.beamsize import Beamsize
 from dodal.devices.beamlines.i04.constants import RedisConstants
 from dodal.devices.beamlines.i04.max_pixel import MaxPixel
@@ -29,6 +28,7 @@ from dodal.devices.flux import Flux
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
+from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
 from dodal.devices.oav.oav_detector import (
     OAVBeamCentrePV,
     ZoomControllerWithBeamCentres,
@@ -37,8 +37,8 @@ from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.robot import BartRobot
-from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.scintillator import Scintillator
+from dodal.devices.slits import MinimalSlits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -50,7 +50,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraSources,
     ZebraTTLOutputs,
 )
-from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.devices.zocalo.zocalo_results import ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
@@ -81,7 +81,7 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient(I04_CONFIG_SERVER_ENDPOINT)
+    client = ConfigClient.from_url(I04_CONFIG_SERVER_ENDPOINT)
     set_config_client(client)
     return client
 
@@ -120,8 +120,8 @@ def beamstop(config_client: ConfigClient) -> Beamstop:
 
 
 @devices.factory()
-def sample_shutter() -> ZebraShutter:
-    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
+def sample_shutter() -> MXZebraShutter:
+    return MXZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @devices.factory()
@@ -185,8 +185,10 @@ def zebra_fast_grid_scan() -> ZebraFastGridScanThreeD:
 
 
 @devices.factory()
-def s4_slit_gaps() -> S4SlitGaps:
-    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+def s4_slit_gaps() -> MinimalSlits:
+    return MinimalSlits(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-04:", x_gap="XGAP", y_gap="YGAP"
+    )
 
 
 @devices.fixture
