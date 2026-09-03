@@ -4,7 +4,13 @@ from unittest.mock import MagicMock, call
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import get_mock_put, init_devices, observe_value, set_mock_value
+from ophyd_async.core import (
+    get_mock_put,
+    init_devices,
+    observe_value,
+    set_mock_attr,
+    set_mock_value,
+)
 from ophyd_async.epics.motor import MotorLimitsError
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
@@ -100,7 +106,7 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
         (10, 20, 30, 15, -2000),  # phi goes beyond lower limit
     ],
 )
-async def test_given_set_with_value_outside_motor_limit(
+async def test_given_set_with_value_outside_motor_limit_then_error_raised(
     smargon: Smargon, test_x, test_y, test_z, test_chi, test_phi
 ):
     for motor in [
@@ -188,7 +194,7 @@ async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smarg
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
     class MyError(Exception): ...
 
-    smargon.x.user_setpoint.set = MagicMock(side_effect=MyError())
+    set_mock_attr(smargon.x.user_setpoint, "set", MagicMock(side_effect=MyError()))
     with pytest.raises(MyError):
         await smargon.set(CombinedMove(x=10))
 
@@ -203,7 +209,7 @@ async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out
     smargon.DEFERRED_MOVE_SET_TIMEOUT = 0.01  # type: ignore
 
     # Override the callback so it doesn't change the `user_setpoint`
-    smargon.x.user_setpoint.set = MagicMock()
+    set_mock_attr(smargon.x.user_setpoint, "set", MagicMock())
 
     with pytest.raises(TimeoutError):
         await smargon.set(CombinedMove(x=10))

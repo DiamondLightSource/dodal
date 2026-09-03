@@ -1,9 +1,9 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
-from ophyd_async.epics.adcore import ADWriterFactory, ContAcqDetector, NDPluginBaseIO
+from ophyd_async.epics.adcore import ADWriterFactory, ContAcqDetector
 from ophyd_async.epics.motor import Motor
 from ophyd_async.fastcs.eiger import EigerDetector
 
@@ -18,6 +18,7 @@ from dodal.devices.beamlines.i15_1.attenuator import Attenuator
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
+from dodal.devices.beamlines.i15_1.hexapod import Hexapod
 from dodal.devices.beamlines.i15_1.laue import LaueMonochrometer
 from dodal.devices.beamlines.i15_1.puck_detector import PuckDetect
 from dodal.devices.beamlines.i15_1.robot import Robot
@@ -25,11 +26,12 @@ from dodal.devices.hutch_shutter import (
     InterlockedHutchShutter,
 )
 from dodal.devices.interlocks import EnumPLCInterlock, IntPLCInterlock, PSSInterlock
-from dodal.devices.motors import XYPhiStage, XYStage, XYZStage, YZStage
+from dodal.devices.motors import XYPhiStage, XYStage, YZStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.tetramm.summing_tetramm import SummingTetrammDetector
 from dodal.devices.zebra.zebra import Zebra, ZebraMapping
+from dodal.devices.zebra.zebra_constants_mapping import ZebraTTLOutputs
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -62,7 +64,7 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient()
+    client = ConfigClient.from_url()
     set_config_client(client)
     return client
 
@@ -139,19 +141,10 @@ def f2y() -> Motor:
 
 
 @devices.factory()
-def hexapod() -> XYZStage:
-    return XYZStage(
+def hexapod() -> Hexapod:
+    return Hexapod(
         f"{PREFIX.beamline_prefix}-MO-HEX-01:",
-    )
-
-
-@devices.factory()
-def hexapod_rotation() -> XYZStage:
-    return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-HEX-01:",
-        x_infix="RX",
-        y_infix="RY",
-        z_infix="RZ",
+        f"{PREFIX.beamline_prefix}-MO-STEP-05:CS2:DeferMoves",
     )
 
 
@@ -295,25 +288,19 @@ def fastcs_eiger(path_provider: PathProvider) -> EigerDetector:
 
 
 @devices.factory()
-def i0(path_provider: PathProvider) -> TetrammDetector:
-    return TetrammDetector(
+def i0(path_provider: PathProvider) -> SummingTetrammDetector:
+    return SummingTetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:",
         path_provider=path_provider,
         fileio_suffix="HDF:",
-        plugins={
-            "stats": NDPluginBaseIO(
-                prefix=f"{PREFIX.beamline_prefix}-EA-JBPM-03:SumAll:"
-            )
-        },
     )
 
 
 @devices.factory()
 def zebra() -> Zebra:
-    return Zebra(
-        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
-        mapping=ZebraMapping(),
-    )
+    mapping = ZebraMapping(outputs=ZebraTTLOutputs(TTL_EIGER=3, TTL_I0=2))
+    zebra = Zebra(prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:", mapping=mapping)
+    return zebra
 
 
 @devices.factory()

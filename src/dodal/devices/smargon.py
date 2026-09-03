@@ -1,4 +1,3 @@
-import asyncio
 from enum import Enum
 from math import isclose
 from typing import TypedDict, cast
@@ -7,13 +6,16 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
-    StrictEnum,
-    set_and_wait_for_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.devices.defered_move_utils import (
+    DeferMoves,
+    combined_move_to_motor_setpoints,
+    do_deferred_move,
+)
 from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 from dodal.log import LOGGER
@@ -61,11 +63,6 @@ class StubOffsets(Device):
             )
         else:
             await self.to_robot_load.set(1)
-
-
-class DeferMoves(StrictEnum):
-    ON = "Defer On"
-    OFF = "Defer Off"
 
 
 class CombinedMove(TypedDict, total=False):
@@ -125,21 +122,12 @@ class Smargon(XYZWrappedOmegaStage, Movable):
         axes will move at the same time. The put callbacks on the axes themselves will
         only come back after the motion on that axis finished.
         """
-        LOGGER.info("Doing smargon move...")
-        await self.defer_move.set(DeferMoves.ON)
-        try:
-            finished_moving = []
-            for motor_name, new_setpoint in value.items():
-                if new_setpoint is not None and isinstance(new_setpoint, int | float):
-                    axis = getattr(self, motor_name)
-                    await axis.check_value(new_setpoint)
-                    put_completion = await set_and_wait_for_value(
-                        axis.user_setpoint,
-                        new_setpoint,
-                        timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
-                        wait_for_set_completion=False,
-                    )
-                    finished_moving.append(put_completion)
-        finally:
-            await self.defer_move.set(DeferMoves.OFF)
-        await asyncio.gather(*finished_moving)
+        LOGGER.info("Doing smargon deferred move")
+
+        motor_moves = combined_move_to_motor_setpoints(value, self)
+
+        await do_deferred_move(
+            self.defer_move,
+            motor_moves,
+            self.DEFERRED_MOVE_SET_TIMEOUT,
+        )

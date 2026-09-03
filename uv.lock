@@ -334,7 +334,7 @@ name = "cffi"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
+    { name = "pycparser" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/eb/56/b1ba7935a17738ae8453301356628e8147c79dbb825bcbc73dc7401f9846/cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529", size = 523588, upload-time = "2025-09-08T23:24:04.541Z" }
 wheels = [
@@ -696,7 +696,7 @@ wheels = [
 
 [[package]]
 name = "daq-config-server"
-version = "1.3.6"
+version = "1.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -711,9 +711,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/95/74/56eddf2a44efd981cc5678e74fd777f37c045a7f9b71b01143ee8be45715/daq_config_server-1.3.6.tar.gz", hash = "sha256:ec25a69eca6fbeca309f04763d53728000e39d509a3f43353b76721985e34ee2", size = 232081, upload-time = "2026-06-10T13:30:53.252Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/50/50/5870d12cd0a1e93695c5dea7f5ad6714e1a8af6d48f9753678f5aa2a37b3/daq_config_server-1.5.2.tar.gz", hash = "sha256:ca8aada60107c0969f83112d3b6e1d07ab23d5e72d26a968e04bb36ec02f0507", size = 237348, upload-time = "2026-08-14T15:07:36.172Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/0a/f225277d9b0133b6cd0e68f19d93af67db1fd76c9ccea9026563d53f2ffa/daq_config_server-1.3.6-py3-none-any.whl", hash = "sha256:948933c4d7f79ea609cff5774aeef3578ffda582d623e8d5bdf9aadf89df36b7", size = 33132, upload-time = "2026-06-10T13:30:52.176Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/5b/dc623b063822cae2494d6265ac1077406007495d42513ba2eae66e729b08/daq_config_server-1.5.2-py3-none-any.whl", hash = "sha256:7834f7479af40792a164355bd6acd15f32eeb6803b861eefb27dcb83355de786", size = 36376, upload-time = "2026-08-14T15:07:35.114Z" },
 ]
 
 [[package]]
@@ -817,14 +817,14 @@ requires-dist = [
     { name = "aiohttp" },
     { name = "bluesky", specifier = ">=1.14.5" },
     { name = "click" },
-    { name = "daq-config-server", specifier = ">=1.3.6" },
+    { name = "daq-config-server", specifier = ">=1.5.2" },
     { name = "deepdiff" },
     { name = "graypy" },
     { name = "mysql-connector-python", specifier = "==9.5.0" },
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.19.3" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.21.2" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -843,7 +843,7 @@ dev = [
     { name = "ispyb" },
     { name = "mypy" },
     { name = "myst-parser" },
-    { name = "ophyd-async", extras = ["sim"], specifier = ">=0.19.3" },
+    { name = "ophyd-async", extras = ["sim"], specifier = ">=0.20.1" },
     { name = "pre-commit" },
     { name = "psutil" },
     { name = "pydata-sphinx-theme", specifier = ">=0.12" },
@@ -2256,7 +2256,7 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.19.3"
+version = "0.21.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bluesky" },
@@ -2270,9 +2270,9 @@ dependencies = [
     { name = "stamina" },
     { name = "velocity-profile" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1d/20/1241051befc05c21c958206611f9ed058d81b8e8f92e3acf9f9d6936f2fc/ophyd_async-0.19.3.tar.gz", hash = "sha256:9cb76a8a08794a26c619a0420012e7248542501d036f16f3314221869e989984", size = 595679, upload-time = "2026-06-29T15:21:37.859Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/2d/af70bad5aedc290253157e4d3cb6bb0e88160fb373820e2944b7508b741e/ophyd_async-0.21.2.tar.gz", hash = "sha256:51b4163eae5a88339cbe8042ff153db26a32b97da4d7eef0e28c5f63ece5c64c", size = 678594, upload-time = "2026-08-28T15:03:49.625Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/2c/76ac5e485f6405fc0f1dbbd1c98b7c1137d4aa5c1e49ea9e69bbd8d22ae1/ophyd_async-0.19.3-py3-none-any.whl", hash = "sha256:ef6201edb52e5a54008d57cad1808626aa6493ba4a8fd015e08d14bcffbb697a", size = 232796, upload-time = "2026-06-29T15:21:36.46Z" },
+    { url = "https://files.pythonhosted.org/packages/57/a1/927924a80dc4fd58f3777783379bfb5b27159db4b258276c0824a8a7afa1/ophyd_async-0.21.2-py3-none-any.whl", hash = "sha256:eac362e897db1a3c667001c9a04f8b5b77e8716f040609887bd86c2e228841a4", size = 261323, upload-time = "2026-08-28T15:03:48.309Z" },
 ]
 
 [package.optional-dependencies]
@@ -3381,16 +3381,16 @@ wheels = [
 
 [[package]]
 name = "scanspec"
-version = "0.10.0"
+version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "numpy" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/7c/9d9de144ca0e0be895caf824f30e2c8d809c032b248fb3a6c92a4df30660/scanspec-0.10.0.tar.gz", hash = "sha256:8d0d93c4b5a3c74d983a38c6f6001d3cc574429a7a26604a31a61b82c373f0a9", size = 266550, upload-time = "2026-02-02T12:59:56.678Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/c3/7b3621a0eec53b7e348457de68a33a93314c5626523ab1481395811aa09e/scanspec-1.0.0.tar.gz", hash = "sha256:31d297861978e56bb6cfcaa15527bad5ba3dc158b3fc52142ecb5611a22e1b5a", size = 285029, upload-time = "2026-04-28T12:12:54.378Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/6d/8500f4bece0aa7cd2af374739f2944c9fa52f0fc5e1d9e65a366f37f494a/scanspec-0.10.0-py3-none-any.whl", hash = "sha256:0979cdcf9790573478f863c36844e1446e87996f945b1bd9c1dcbd7fb663ad92", size = 37728, upload-time = "2026-02-02T12:59:55.843Z" },
+    { url = "https://files.pythonhosted.org/packages/68/b9/f44b139096467996b4d85589d9880fd55f0c80a204d298a1b73d0adc2654/scanspec-1.0.0-py3-none-any.whl", hash = "sha256:4ad6dccd6ac19dbd8af888c80c5db53c70d6b8aee9d26c0ca174cebd3c396730", size = 37825, upload-time = "2026-04-28T12:12:53.084Z" },
 ]
 
 [[package]]

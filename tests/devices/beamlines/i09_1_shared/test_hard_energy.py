@@ -3,12 +3,9 @@ import re
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    assert_reading,
-    partial_reading,
-)
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i09_1_shared import (
     HardEnergy,
@@ -22,8 +19,7 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
-
-pytest_plugins = ["dodal.testing.fixtures.devices.hard_undulator"]
+from tests.devices.beamlines.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
 
 
 @pytest.fixture
@@ -55,12 +51,12 @@ async def hu_id_energy(
     undulator_order: UndulatorOrder,
     undulator_in_mm: UndulatorInMm,
 ) -> HardInsertionDeviceEnergy:
-    async with init_devices():
+    async with init_devices(mock=True):
         hu_id_energy = HardInsertionDeviceEnergy(
             undulator_order=undulator_order,
             undulator=undulator_in_mm,
             config_server=mock_config_client,
-            filepath="path/to/lut",
+            filepath=TEST_HARD_UNDULATOR_LUT,
             gap_to_energy_func=calculate_energy_i09_hu,
             energy_to_gap_func=calculate_gap_i09_hu,
         )
@@ -187,7 +183,6 @@ async def test_hu_energy_set_both_dcm_and_id_energy(
 
 
 async def test_hu_energy_move_energy_fails(
-    run_engine: RunEngine,
     hu_energy: HardEnergy,
 ):
     energy_value = 5.15

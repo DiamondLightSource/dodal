@@ -1,5 +1,5 @@
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.i15_1 import XpdfCrystalLookupTable
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
@@ -9,11 +9,11 @@ from tests.test_data import TEST_I15_1_CRYSTAL_LUT
 
 
 @pytest.fixture
-def laue_monochrometer():
+def laue_monochrometer(mock_config_client: ConfigClient):
     with init_devices(mock=True):
         monocrometer = LaueMonochrometer(
             prefix="",
-            config_client=ConfigClient(""),
+            config_client=mock_config_client,
             crystal_lut_path=TEST_I15_1_CRYSTAL_LUT,
         )
     return monocrometer

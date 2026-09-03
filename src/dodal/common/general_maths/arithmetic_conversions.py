@@ -1,5 +1,6 @@
 """Provides functions to convert between common units for attenuation."""
 
+from numpy.polynomial import polynomial
 from pydantic import StrictFloat, validate_call
 
 
@@ -105,3 +106,21 @@ def convert_ev_to_kev(energy_ev: StrictFloat) -> float:
         energy_ev (float): a value of kilo-electron volts
     """
     return energy_ev * 1e-3
+
+
+@validate_call
+def get_straight_line_y(
+    line_offset: StrictFloat, line_gradient: StrictFloat, x: StrictFloat
+) -> float:
+    """Convenient internal conversion method which delegates to numpy for a 1st order polynomial (line).
+
+    The traditional y = mx + c to compute y.
+
+    Args:
+        line_offset: the offset, where the modelled line intercepts the abscissa.
+        line_gradient: the gradient of the modelled line
+        x: the input coordinate of the point on the line, from which y is computed.
+    """
+    _coefficients = [line_offset, line_gradient]
+    _y = polynomial.polyval(x, _coefficients)
+    return float(_y)

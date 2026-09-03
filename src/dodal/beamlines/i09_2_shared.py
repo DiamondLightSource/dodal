@@ -1,12 +1,13 @@
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09.enums import Grating
 from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
-    J09_PHASE_POLY_DEG_COLUMNS,
+    J09_PHASE_ENERGY_MOTOR_LOOKUP,
+    J09_ROW_PHASE_CIRCULAR,
 )
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.insertion_device import (
@@ -25,16 +26,19 @@ from dodal.devices.insertion_device.lookup_table_models import LookupTableColumn
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-J09_CONF_CLIENT = ConfigClient(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
-PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
 
 BL = get_beamline_name("i09-2-shared")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
 K_PREFIX = BeamlinePrefix(BL, suffix="K")
 
 devices = DeviceManager()
+
+
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
 
 
 @devices.factory()
@@ -75,20 +79,18 @@ def jid(jgap: UndulatorGap, jphase: UndulatorPhaseAxes) -> Apple2[UndulatorPhase
 @devices.factory()
 def jidcontroller(
     jid: Apple2[UndulatorPhaseAxes],
+    config_client: ConfigClient,
 ) -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """J09 insertion device controller."""
     return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=jid,
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
-            config_client=J09_CONF_CLIENT,
+            config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
-            lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
-            config_client=J09_CONF_CLIENT,
-            path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
-        ),
+        phase_energy_motor_lut=J09_PHASE_ENERGY_MOTOR_LOOKUP,
+        maximum_phase_motor_position=J09_ROW_PHASE_CIRCULAR,
         units="keV",
     )
 

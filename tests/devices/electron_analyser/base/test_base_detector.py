@@ -16,6 +16,7 @@ from dodal.devices.electron_analyser.base import (
 from tests.devices.electron_analyser.helper_util import (
     generate_fixture_regions_pair,
     load_b07_specs_test_seq,
+    load_i05_mbs_test_xml_seq,
     load_i09_vgscienta_test_seq,
 )
 
@@ -47,22 +48,6 @@ async def test_base_analyser_detector_describe_configuration(
     await assert_value(sim_detector.binding_energy_axis, expected_binding_energy_axis)
 
 
-async def test_analyser_detector_stage(
-    sim_detector: GenericElectronAnalyserDetector,
-) -> None:
-    sim_detector.sequence.stage = AsyncMock()
-    await sim_detector.stage()
-    sim_detector.sequence.stage.assert_awaited_once()
-
-
-async def test_analyser_detector_unstage(
-    sim_detector: GenericElectronAnalyserDetector,
-) -> None:
-    sim_detector.sequence.unstage = AsyncMock()
-    await sim_detector.unstage()
-    sim_detector.sequence.unstage.assert_awaited_once()
-
-
 @pytest.mark.parametrize(
     ("sim_detector", "region"), DETECTOR_REGIONS_PAIR, indirect=["sim_detector"]
 )
@@ -81,6 +66,7 @@ def test_analyser_detector_set_called_region_logic_setup_with_region(
     [
         pytest.param("ew4000", load_i09_vgscienta_test_seq()),
         pytest.param("b07b_specs150", load_b07_specs_test_seq()),
+        pytest.param("i05_mbs_analyser", load_i05_mbs_test_xml_seq()),
     ],
     indirect=["sim_detector"],
 )
@@ -94,11 +80,9 @@ def test_analyser_read_configuration_is_unique_per_region(
     def multi_region_analyser_plan(
         analyser: GenericElectronAnalyserDetector, seq: GenericSequence
     ):
-        yield from bps.prepare(analyser.sequence, seq)
         yield from bps.open_run()
         yield from bps.stage(analyser)
-        assert analyser.sequence.data is not None
-        for region in analyser.sequence.data.get_enabled_regions():
+        for region in seq.get_enabled_regions():
             yield from bps.mv(analyser, region)
             yield from bps.trigger_and_read([analyser], name=region.name)
         yield from bps.unstage(analyser)

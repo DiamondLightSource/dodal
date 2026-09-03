@@ -6,16 +6,16 @@ from aiohttp.client import ClientConnectionError
 from bluesky.run_engine import RunEngine
 
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
-    AttenuatorMotorPositionDemands,
+    AttenuatorMotorPositions,
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
 
 
-def given_position_demands() -> AttenuatorMotorPositionDemands:
-    position_demand = MagicMock()
+def given_position_demands() -> AttenuatorMotorPositions:
+    position_demand = MagicMock(spec=AttenuatorMotorPositions)
     restful_payload = {"x": 54.3, "y": 72.1, "w": 4}
-    position_demand.validated_complete_demand = MagicMock(return_value=restful_payload)
+    position_demand.validated_and_complete = MagicMock(return_value=restful_payload)
     return position_demand
 
 
@@ -69,7 +69,7 @@ async def test_when_motor_squad_is_set_that_expected_request_params_are_passed(
     motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
-    position_demands: AttenuatorMotorPositionDemands = given_position_demands()
+    position_demands: AttenuatorMotorPositions = given_position_demands()
     await motors.set(position_demands)  # when motor position demand is set
 
     expected_hutch: str = invoking_hutch.value
@@ -129,7 +129,7 @@ async def test_that_error_is_logged_when_response_to_position_demand_set_indicat
     motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
-    position_demands: AttenuatorMotorPositionDemands = given_position_demands()
+    position_demands: AttenuatorMotorPositions = given_position_demands()
 
     logger.error.assert_not_called()
     await motors.set(position_demands)

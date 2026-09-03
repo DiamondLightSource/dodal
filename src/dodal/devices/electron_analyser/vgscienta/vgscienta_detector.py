@@ -53,7 +53,6 @@ class VGScientaDetector(
             driver.slices,
             driver.iterations,
             driver.total_steps,
-            driver.acquire_time,
             driver.total_time,
             driver.energy_axis,
             driver.angle_axis,

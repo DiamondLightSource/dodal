@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
 from dodal.common.beamlines.beamline_utils import BL, set_config_client
@@ -49,7 +49,7 @@ DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
-set_config_client(ConfigClient())
+set_config_client(ConfigClient.from_url())
 
 I24_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
@@ -74,7 +74,7 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    return ConfigClient()
+    return ConfigClient.from_url()
 
 
 @devices.factory()
@@ -102,7 +102,12 @@ def backlight() -> DualBacklight:
 
 @devices.factory()
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:")
+    """Get the i24 detector motion device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return YZStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+    )
 
 
 @devices.factory()

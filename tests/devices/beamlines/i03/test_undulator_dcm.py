@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables.insertion_device import (
     UndulatorEnergyGapLookupTable,
 )
@@ -11,7 +11,14 @@ from daq_config_server.models.lookup_tables.mx_lut_models import (
     BeamlinePitchLookupTable,
     BeamlineRollLookupTable,
 )
-from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
+from daq_config_server.testing import PathToMockDataDict
+from ophyd_async.core import (
+    AsyncStatus,
+    get_mock_put,
+    init_devices,
+    set_mock_attr,
+    set_mock_value,
+)
 
 from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.enums import EnabledDisabledUpper
@@ -48,17 +55,17 @@ def flush_event_loop_on_finish():
 
 
 @pytest.fixture(autouse=True)
-def always_set_config_client():
-    set_config_client(ConfigClient("test"))
+def always_set_config_client(mock_config_client: ConfigClient):
+    set_config_client(mock_config_client)
 
 
 @pytest.fixture
-async def fake_undulator_dcm() -> UndulatorDCM:
+async def fake_undulator_dcm(mock_config_client: ConfigClient) -> UndulatorDCM:
     async with init_devices(mock=True):
         baton = Baton("BATON-01:")
         undulator = UndulatorInKeV(
             "UND-01",
-            ConfigClient(""),
+            mock_config_client,
             name="undulator",
             poles=80,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -70,7 +77,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             undulator,
             dcm,
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
-            config_client=ConfigClient(""),
+            config_client=mock_config_client,
             name="undulator_dcm",
         )
     return undulator_dcm
@@ -86,23 +93,20 @@ async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
     assert fake_undulator_dcm.dcm_fixed_offset_mm == 25.6
 
 
+@pytest.fixture
+def path_to_mock_data() -> PathToMockDataDict:
+    return {
+        TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT: UndulatorEnergyGapLookupTable(
+            rows=[[5700, 5.4606], [7000, 6.045], [9700, 6.404]],
+        )
+    }
+
+
 @patch("dodal.devices.undulator.LOGGER")
 async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_logger: MagicMock,
     fake_undulator_dcm: UndulatorDCM,
 ):
-    mock_config_server = MagicMock()
-    mock_config_server.get_file_contents = MagicMock(
-        return_value=UndulatorEnergyGapLookupTable(
-            rows=[
-                [5700, 5.4606],
-                [7000, 6.045],
-                [9700, 6.404],
-            ],
-        )
-    )
-    fake_undulator_dcm.undulator_ref().config_server = mock_config_server
-
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
     set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_keV.user_readback, 5.7)
 
@@ -188,11 +192,15 @@ async def test_dcm_offset_only_set_when_energy_set_completes(
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
 
-    fake_undulator_dcm.dcm_ref().energy_in_keV.set = MagicMock(
-        return_value=AsyncStatus(release_dcm.wait())
+    set_mock_attr(
+        fake_undulator_dcm.dcm_ref().energy_in_keV,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_dcm.wait())),
     )
-    fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
-        return_value=AsyncStatus(release_undulator.wait())
+    set_mock_attr(
+        fake_undulator_dcm.undulator_ref().gap_motor,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_undulator.wait())),
     )
 
     offset_put = get_mock_put(fake_undulator_dcm.dcm_ref().offset_in_mm.user_setpoint)
@@ -211,27 +219,30 @@ async def test_dcm_offset_only_set_when_energy_set_completes(
 async def test_energy_set_only_complete_when_all_statuses_are_finished(
     fake_undulator_dcm: UndulatorDCM,
 ):
-    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.0)
-
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
 
-    fake_undulator_dcm.dcm_ref().energy_in_keV.set = MagicMock(
-        return_value=AsyncStatus(release_dcm.wait())
+    set_mock_attr(
+        fake_undulator_dcm.dcm_ref().energy_in_keV,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_dcm.wait())),
     )
-    fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
-        return_value=AsyncStatus(release_undulator.wait())
+    set_mock_attr(
+        fake_undulator_dcm.undulator_ref().gap_motor,
+        "set",
+        MagicMock(return_value=AsyncStatus(release_undulator.wait())),
     )
-
     status = fake_undulator_dcm.set(5.0)
+    done, _ = await asyncio.wait([status.task], timeout=0.1)
+    assert not done
 
-    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
-    assert not status.done
     release_dcm.set()
-    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
-    assert not status.done
+    done, _ = await asyncio.wait([status.task], timeout=0.1)
+    assert not done
+
     release_undulator.set()
-    await asyncio.wait_for(status, timeout=0.02)
+    done, _ = await asyncio.wait([status.task], timeout=0.1)
+    assert status.task in done
 
 
 async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_energy_is_not_set(

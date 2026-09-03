@@ -1,6 +1,9 @@
 import math
+from typing import Annotated
 
-from pydantic import StrictFloat, validate_call
+from pydantic import Field, StrictFloat, validate_call
+
+CANONICAL_NON_ABSORPTION = 0  # Absorption (Bn) when absorber is absent
 
 _CANONICAL_BARNETT_CONVERSION = -1.0e3
 _REVERSE_BARNETT_CONVERSION = -1.0e-3
@@ -8,8 +11,7 @@ _REVERSE_BARNETT_CONVERSION = -1.0e-3
 
 @validate_call
 def attenuation_from_natural_log_of_transmission(ln_t: StrictFloat) -> float:
-    """Converts from natural log of transmission fraction into Barnett attenuation units
-    .
+    """Converts from natural log of transmission fraction into Barnett attenuation units.
 
     Args:
         ln_t (StrictFloat): natural log of transmission fraction
@@ -21,7 +23,9 @@ def attenuation_from_natural_log_of_transmission(ln_t: StrictFloat) -> float:
 
 
 @validate_call
-def attenuation_from_transmission(transmission_as_fraction: StrictFloat) -> float:
+def attenuation_from_transmission(
+    transmission_as_fraction: Annotated[StrictFloat, Field(ge=0, le=1)],
+) -> float:
     """Converts from transmission fraction into Barnett attenuation units.
 
     Args:
@@ -35,25 +39,28 @@ def attenuation_from_transmission(transmission_as_fraction: StrictFloat) -> floa
 
 
 @validate_call
-def natural_log_of_transmission_from_attenuation(attenuation_bn: StrictFloat) -> float:
-    """Converts from Barnett attenuation units into natural log of transmission fraction
-    .
+def natural_log_of_transmission_from_attenuation(
+    attenuation_bn: Annotated[StrictFloat, Field(ge=0)],
+) -> float:
+    """Converts from Barnett attenuation units into natural log of transmission fraction.
 
     Args:
-        attenuation_bn (StrictFloat): Barnett attenuation units
+        attenuation_bn (StrictFloat): Barnett attenuation units - zero or a positive number
 
     Returns:
-        (float): natural log of transmission fraction
+        (float): natural log of transmission fraction - zero or, more usually, a negative number
     """
     return _REVERSE_BARNETT_CONVERSION * attenuation_bn
 
 
 @validate_call
-def transmission_from_attenutation(attenuation_bn: StrictFloat) -> float:
+def transmission_from_attenutation(
+    attenuation_bn: Annotated[StrictFloat, Field(ge=0)],
+) -> float:
     """Converts from Barnett attenuation units into transmission fraction.
 
     Args:
-        attenuation_bn (StrictFloat): Barnett attenuation units
+        attenuation_bn (StrictFloat): Barnett attenuation units - zero or a positive number
 
     Returns:
         (float): transmission fraction

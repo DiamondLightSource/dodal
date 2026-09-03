@@ -1,5 +1,5 @@
 import pytest
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.beamlines import i03, i04, i19_1, i19_2
 
@@ -16,4 +16,4 @@ from dodal.beamlines import i03, i04, i19_1, i19_2
 def test_config_client_has_correct_url_for_each_beamline(
     client: ConfigClient, expected_url: str
 ):
-    assert client._url == expected_url
+    assert client._server.url == expected_url

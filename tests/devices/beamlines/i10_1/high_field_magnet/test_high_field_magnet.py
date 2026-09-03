@@ -9,10 +9,10 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
+    get_mock_put,
     init_devices,
     set_mock_value,
 )
-from ophyd_async.core._movable import MoveTimeout
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i10_1.high_field_magnet.high_field_magnet import (
@@ -37,11 +37,17 @@ async def test_locate(high_field_magnet: HighFieldMagnet):
 
 
 async def test_stop_success(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.user_readback, 7.5)
-    set_mock_value(high_field_magnet.user_readback, 1.5)
+    readback = 7.5
+    setpoint = 1.5
+    set_mock_value(high_field_magnet.user_setpoint, setpoint)
+    set_mock_value(high_field_magnet.user_readback, readback)
     await high_field_magnet.stop()
-    assert high_field_magnet._set_success is False
-    assert await high_field_magnet.user_setpoint.get_value() == 1.5
+    get_mock_put(high_field_magnet.user_setpoint).assert_awaited_once_with(readback)
+    setpoint_val, readback_val = await asyncio.gather(
+        high_field_magnet.user_setpoint.get_value(),
+        high_field_magnet.user_readback.get_value(),
+    )
+    assert setpoint_val == readback_val == readback
 
 
 async def test_set_raises_runtime_error_when_stopped(
@@ -152,38 +158,6 @@ async def test_read(high_field_magnet: HighFieldMagnet):
     )
 
 
-@pytest.mark.parametrize(
-    "setpoint,readback,tolerance,expected",
-    [
-        (10.0, 10.005, 0.01, True),  # test positive tolerance
-        (10.0, 9.995, 0.01, True),
-        (10.0, 10.02, 0.01, False),
-        (10.0, 0.9, 0.01, False),
-        (10.0, 9.995, -0.01, True),  # test negative tolerance
-        (10.0, 10.0005, -0.01, True),
-        (10.0, 9.98, -0.01, False),
-        (10.0, 10.1, -0.01, False),
-    ],
-)
-async def test_tolerance_logic_within_tolerance(
-    high_field_magnet: HighFieldMagnet, setpoint, readback, tolerance, expected
-):
-    result = high_field_magnet._within_tolerance(
-        setpoint=setpoint, readback=readback, tolerance=tolerance
-    )
-    assert result is expected
-
-
-async def test_tolerance_logic_stop_clears_set_success_and_restores_setpoint(
-    high_field_magnet: HighFieldMagnet,
-):
-    set_mock_value(high_field_magnet.movable_logic.readback, 7.5)
-    set_mock_value(high_field_magnet.movable_logic.readback, 1.5)
-    await high_field_magnet.stop()
-    assert high_field_magnet._set_success is False
-    assert await high_field_magnet.movable_logic.setpoint.get_value() == 1.5
-
-
 async def test_tolerance_logic_calculate_timeout_with_zero_speed(
     high_field_magnet: HighFieldMagnet,
 ):
@@ -192,20 +166,6 @@ async def test_tolerance_logic_calculate_timeout_with_zero_speed(
         await high_field_magnet.movable_logic.calculate_timeout(
             old_position=0.0, new_position=10.0
         )
-
-
-async def test_tolerance_logic_move(high_field_magnet: HighFieldMagnet):
-    set_mock_value(high_field_magnet.movable_logic.readback, 0.0)
-    move_task = high_field_magnet.movable_logic.move(
-        new_position=10.0, timeout=MoveTimeout(5.0)
-    )
-    for value in [2.0, 5.0, 8.0, 9.5, 13.0]:
-        set_mock_value(high_field_magnet.movable_logic.readback, value)
-        await asyncio.sleep(0.0)
-        assert await high_field_magnet.within_tolerance.get_value() is False
-    set_mock_value(high_field_magnet.movable_logic.readback, 9.91)
-    await move_task
-    assert await high_field_magnet.within_tolerance.get_value() is True
 
 
 def test_run_engine_scan(
