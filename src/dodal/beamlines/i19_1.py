@@ -38,6 +38,9 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
+from dodal.devices.oav.beam_centre.centroid_from_epics import (
+    CentroidFromEpics,
+)
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 # NOTE All PVs for both hutches and the optics have the prefix BL19I
@@ -188,6 +191,11 @@ def zebra() -> Zebra:
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
     )
+
+
+@devices.factory()
+def beam_centre_from_epics() -> CentroidFromEpics:
+    return CentroidFromEpics("")
 
 
 @devices.factory()
