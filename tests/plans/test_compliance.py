@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from types import ModuleType
 from typing import Any, get_type_hints
 
+import pytest
 from bluesky.utils import MsgGenerator
 
 from dodal import plan_stubs
@@ -47,8 +48,8 @@ def assert_hard_requirements(plan: PlanGenerator, signature: inspect.Signature):
     assert plan.__doc__ is not None, f"'{plan.__name__}' has no docstring"
     for parameter in signature.parameters.values():
         assert (
-            parameter.kind is not parameter.VAR_POSITIONAL
-            and parameter.kind is not parameter.VAR_KEYWORD
+            # parameter.kind is not parameter.VAR_POSITIONAL  # BlueAPI should support *args
+            parameter.kind is not parameter.VAR_KEYWORD
         ), f"'{plan.__name__}' has variadic arguments"
 
 
@@ -63,16 +64,25 @@ def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signatu
     assert metadata.default is None, f"'{plan.__name__}' metadata default is mutable"
 
 
-def test_plans_comply():
-    for plan in get_all_available_generators(scans):
-        signature = inspect.Signature.from_callable(plan)
-        assert_hard_requirements(plan, signature)
-        assert_metadata_requirements(plan, signature)
+@pytest.mark.parametrize(
+    "plan",
+    get_all_available_generators(scans),
+    ids=lambda plan: plan.__name__,
+)
+def test_plan_comply(plan):
+    signature = inspect.Signature.from_callable(plan)
+    assert_hard_requirements(plan, signature)
+    assert_metadata_requirements(plan, signature)
 
 
-def test_stubs_comply():
-    for stub in get_all_available_generators(plan_stubs):
-        signature = inspect.Signature.from_callable(stub)
-        assert_hard_requirements(stub, signature)
-        if "metadata" in signature.parameters:
-            assert_metadata_requirements(stub, signature)
+@pytest.mark.parametrize(
+    "stub",
+    get_all_available_generators(plan_stubs),
+    ids=lambda stub: stub.__name__,
+)
+def test_stub_comply(stub):
+    signature = inspect.Signature.from_callable(stub)
+    assert_hard_requirements(stub, signature)
+
+    if "metadata" in signature.parameters:
+        assert_metadata_requirements(stub, signature)
