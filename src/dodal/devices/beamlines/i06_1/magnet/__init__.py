@@ -13,6 +13,7 @@ from .superconducting_magnet import (
     MagnetLimitStatus,
     MagnetMode,
     MagnetRampStatus,
+    MockSuperConductingMagnetController,
     SuperConductingMagnetController,
 )
 
@@ -30,5 +31,6 @@ __all__ = [
     "MagnetLimitStatus",
     "MagnetMode",
     "MagnetRampStatus",
+    "MockSuperConductingMagnetController",
     "SuperConductingMagnetController",
 ]
