@@ -1,10 +1,10 @@
 import operator
 from functools import reduce
-from typing import Annotated, Any
+from typing import Annotated
 
 import bluesky.plans as bp
 from bluesky.protocols import Movable
-from bluesky.utils import plan
+from bluesky.utils import CustomPlanMetadata, plan
 from cycler import Cycler, cycler
 from pydantic import Field, validate_call
 from scanspec.specs import Spec
@@ -23,7 +23,7 @@ def spec_scan(
         Spec[Movable],
         Field(description="ScanSpec modelling the path of the scan"),
     ],
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Generic plan for reading `detectors` at every point of a ScanSpec `Spec`.
     A `Spec` is an N-dimensional path.

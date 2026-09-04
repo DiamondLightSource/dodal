@@ -1,10 +1,9 @@
 from collections.abc import Iterable, Sequence
 from typing import Annotated as A
-from typing import Any
 
 import bluesky.plans as bp
 from bluesky.protocols import Movable
-from bluesky.utils import plan
+from bluesky.utils import CustomPlanMetadata, plan
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
@@ -52,7 +51,7 @@ def count(
             json_schema_extra={"units": "s"},
         ),
     ] = 0.0,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Read from a number of devices.
 
@@ -92,7 +91,7 @@ def num_scan(
     trajectory: MovableStartStopA,
     *extra_trajectories: MovableStartStopA,
     num: int,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors over a specified range.
 
@@ -134,7 +133,7 @@ def num_grid_scan(
     trajectory: MovableStartStopNumA,
     *extra_trajectories: MovableStartStopNumA,
     snake_axes: Iterable[Movable] | bool = True,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan independent multi-motor trajectories.
 
@@ -179,7 +178,7 @@ def num_rscan(
     trajectory: MovableStartStopA,
     *extra_trajectories: MovableStartStopA,
     num: int,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors relative to their current positions.
 
@@ -222,7 +221,7 @@ def num_grid_rscan(
     trajectory: MovableStartStopNumA,
     *extra_trajectories: MovableStartStopNumA,
     snake_axes: list | bool = True,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories relative to current positions.
 
@@ -268,7 +267,7 @@ def list_scan(
     detectors: DetectorsA,
     trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors through specified lists of positions.
 
@@ -315,7 +314,7 @@ def list_grid_scan(
     trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
     snake_axes: bool = True,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories through specified lists of positions.
 
@@ -362,7 +361,7 @@ def list_rscan(
     detectors: DetectorsA,
     trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors through relative positions.
 
@@ -406,7 +405,7 @@ def list_grid_rscan(
     trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
     snake_axes: bool = True,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories through relative positions.
 
@@ -453,7 +452,7 @@ def step_scan(
     detectors: DetectorsA,
     trajectory: MovableStartStopStepA,
     *extra_trajectories: MovableStartStepA,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors using specified step sizes.
 
@@ -498,7 +497,7 @@ def step_grid_scan(
     trajectory: MovableStartStopStepA,
     *extra_trajectories: MovableStartStopStepA,
     snake_axes: bool = True,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories using specified step sizes.
 
@@ -542,7 +541,7 @@ def step_rscan(
     detectors: DetectorsA,
     trajectory: MovableStartStopStepA,
     *extra_trajectories: MovableStartStepA,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors using relative step sizes.
 
@@ -587,7 +586,7 @@ def step_grid_rscan(
     trajectory: MovableStartStopStepA,
     *extra_trajectories: MovableStartStopStepA,
     snake_axes: bool = True,
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories using relative step sizes.
 
