@@ -14,11 +14,11 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import AsyncReadable, StandardDetector
+from ophyd_async.sim import SimMotor
 from ophyd_async.testing import assert_emitted
 from pydantic import ValidationError
 
-from dodal.devices.motors import Motor
-from dodal.plans.scans.annotations import (
+from dodal.plans.scans.types import (
     MovableListOfPoints,
     MovableStartStep,
     MovableStartStop,
@@ -253,8 +253,8 @@ def test_num_scan(
 
 def test_num_scan_fails_when_given_wrong_number_of_params(
     run_engine: RunEngine,
-    x_axis: Motor,
-    y_axis: Motor,
+    x_axis: SimMotor,
+    y_axis: SimMotor,
 ):
     with pytest.raises(ValueError):
         run_engine(num_scan([], x_axis, -1, 1, (y_axis, 1, 5, 1), num=5))  # type: ignore
@@ -292,8 +292,8 @@ def test_num_grid_scan(
 
 # def test_num_grid_scan_fails_when_given_wrong_number_of_params(
 #     run_engine: RunEngine,
-#     x_axis: Motor,
-#     y_axis: Motor,
+#     x_axis: SimMotor,
+#     y_axis: SimMotor,
 # ):
 #     with pytest.raises(ValueError):
 #         run_engine(num_grid_scan(detectors=[], params=[x_axis, 0, 1.1, 2, y_axis, 1.1]))
@@ -305,11 +305,11 @@ def test_num_grid_scan(
 )
 def test_num_scan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
-    x_axis: Motor,
+    x_axis: SimMotor,
     x_start: Number,
     x_stop: Number,
     x_num: int,
-    y_axis: Motor,
+    y_axis: SimMotor,
     y_start: Number,
     y_stop: Number,
     y_num: int,
@@ -356,9 +356,9 @@ def test_num_rscan(
 # )
 # def test_num_rscan_fails_when_given_bad_info(
 #     run_engine: RunEngine,
-#     x_axis: Motor,
+#     x_axis: SimMotor,
 #     x_list: list[float | int],
-#     y_axis: Motor,
+#     y_axis: SimMotor,
 #     y_list: list[float | int],
 #     num: int,
 # ):
@@ -404,8 +404,8 @@ def test_num_grid_rscan(
 
 def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
-    x_axis: Motor,
-    y_axis: Motor,
+    x_axis: SimMotor,
+    y_axis: SimMotor,
 ):
     with pytest.raises(ValueError):
         run_engine(
@@ -442,7 +442,7 @@ def test_list_scan(
 
 
 def test_list_scan_fails_with_differnt_list_lengths(
-    run_engine: RunEngine, x_axis: Motor, y_axis: Motor
+    run_engine: RunEngine, x_axis: SimMotor, y_axis: SimMotor
 ):
     with pytest.raises(ValueError):
         run_engine(list_scan([], (x_axis, [1, 2, 3, 4, 5]), (y_axis, [1, 2, 3, 4])))
@@ -476,7 +476,7 @@ def test_list_rscan(
 
 
 def test_list_rscan_fails_with_differnt_list_lengths(
-    run_engine: RunEngine, x_axis: Motor, y_axis: Motor
+    run_engine: RunEngine, x_axis: SimMotor, y_axis: SimMotor
 ):
     with pytest.raises(ValueError):
         run_engine(list_rscan([], (x_axis, [1, 2, 3, 4, 5]), (y_axis, [1, 2, 3, 4])))
@@ -648,7 +648,7 @@ def test_step_grid_rscan(
 
 def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axis(
     run_engine: RunEngine,
-    x_axis: Motor,
+    x_axis: SimMotor,
 ):
     with pytest.raises(
         ValueError,
@@ -662,8 +662,8 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axis(
 
 def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_other_axis(
     run_engine: RunEngine,
-    x_axis: Motor,
-    y_axis: Motor,
+    x_axis: SimMotor,
+    y_axis: SimMotor,
 ):
     with pytest.raises(
         ValueError,
@@ -677,7 +677,7 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_other_axis(
 
 def test_step_scan_fails_with_step_size_zero(
     run_engine: RunEngine,
-    x_axis: Motor,
+    x_axis: SimMotor,
 ):
     start = 1
     stop = 5
@@ -692,10 +692,12 @@ def test_step_scan_fails_with_step_size_zero(
     ):
         run_engine(step_scan([], (x_axis, start, stop, step)))
 
+    run_engine(step_scan([], (x_axis, start, stop, ["1"])))  # type: ignore
+
 
 def test_step_scan_fails_with_start_and_stop_being_same_value(
     run_engine: RunEngine,
-    x_axis: Motor,
+    x_axis: SimMotor,
 ):
     start = stop = 0
     step = 5
@@ -712,8 +714,8 @@ def test_step_scan_fails_with_start_and_stop_being_same_value(
 
 def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
     run_engine: RunEngine,
-    x_axis: Motor,
-    y_axis: Motor,
+    x_axis: SimMotor,
+    y_axis: SimMotor,
 ):
     with pytest.raises(
         ValueError,

@@ -1,8 +1,9 @@
 import re
 
 import pytest
+from ophyd_async.sim import SimMotor
 
-from dodal.plans.scans.annotations import MovableStartStep, MovableStartStopStep
+from dodal.plans.scans.types import MovableStartStep, MovableStartStopStep
 from dodal.plans.scans.utils import (
     _make_stepped_list_num,
     _make_stepped_list_step,
@@ -90,16 +91,18 @@ def test_round_list_elements(
         [2, -2, 0.2],
     ),
 )
-def test_make_stepped_list_step(start: float, stop: float, step: float):
-    stepped_list = _make_stepped_list_step(start, stop, step)
+def test_make_stepped_list_step(
+    x_axis: SimMotor, start: float, stop: float, step: float
+):
+    stepped_list = _make_stepped_list_step((x_axis, start, stop, step))
     stepped_list_length = len(stepped_list)
     assert stepped_list_length == 21
     assert stepped_list[0] / stepped_list[-1] == -1
     assert stepped_list[10] == 0
 
 
-def test_make_stepped_list_step_with_large_step():
-    stepped_list = _make_stepped_list_step(0, 1, 5)
+def test_make_stepped_list_step_with_large_step(x_axis: SimMotor):
+    stepped_list = _make_stepped_list_step((x_axis, 0, 1, 5))
     stepped_list_length = len(stepped_list)
     assert stepped_list_length == 2
     assert stepped_list[0] == 0
@@ -107,10 +110,11 @@ def test_make_stepped_list_step_with_large_step():
 
 
 @pytest.mark.parametrize("start, step", ([-1, 0.1], [-2, 0.2], [1, -0.1], [2, -0.2]))
-def test_make_stepped_list_num(start: float, step: float):
-    stepped_list = _make_stepped_list_num(start, step, num=21)
+def test_make_stepped_list_num(x_axis: SimMotor, start: float, step: float):
+    num = 21
+    stepped_list = _make_stepped_list_num((x_axis, start, step, num))
     stepped_list_length = len(stepped_list)
-    assert stepped_list_length == 21
+    assert stepped_list_length == num
     assert stepped_list[0] / stepped_list[-1] == -1
     assert stepped_list[10] == 0
 
@@ -127,12 +131,14 @@ def test_make_stepped_list_num(start: float, step: float):
 #         _make_stepped_list_step(start=start, stop=stop, step=0.25)
 
 
-def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values():
+def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values(
+    x_axis: SimMotor,
+):
     with pytest.raises(
         ValueError,
         match=re.escape("Number of points (0) and number of steps (0) cannot be zero."),
     ):
-        _make_stepped_list_num(start=1, step=0, num=0)
+        _make_stepped_list_num((x_axis, 1, 0, 0))
 
 
 # Not needed, move to wrap level.
