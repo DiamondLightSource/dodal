@@ -69,34 +69,31 @@ dodal.devices.electron\_analyser.mbs.SlitPosition
    .. autosummary::
    
       
-      ~SlitPosition.P100_0_1_CURVED
+      ~SlitPosition.S005_A05_STRAIGHT
       
       
-      ~SlitPosition.P200_0_1_STRAIGHT
+      ~SlitPosition.S010_A10_STRAIGHT
       
       
-      ~SlitPosition.P300_0_2_CURVED
+      ~SlitPosition.S010_A13_STRAIGHT
       
       
-      ~SlitPosition.P400_0_2_STRAIGHT
+      ~SlitPosition.S010_A19_STRAIGHT
       
       
-      ~SlitPosition.P500_0_2_STRAIGHT
+      ~SlitPosition.S020_A10_STRAIGHT
       
       
-      ~SlitPosition.P600_0_3_STRAIGHT
+      ~SlitPosition.S020_A19_STRAIGHT
       
       
-      ~SlitPosition.P700_0_5_STRAIGHT
+      ~SlitPosition.S040_A19_STRAIGHT
       
       
-      ~SlitPosition.P800_0_8_STRAIGHT
+      ~SlitPosition.S320_A54_STRAIGHT
       
       
-      ~SlitPosition.P850_3_HOLE
-      
-      
-      ~SlitPosition.P900_1_5_STRAIGHT
+      ~SlitPosition.S020_A10_CURVED
       
    
    

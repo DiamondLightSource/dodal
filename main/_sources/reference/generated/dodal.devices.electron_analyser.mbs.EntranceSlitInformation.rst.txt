@@ -61,13 +61,13 @@ dodal.devices.electron\_analyser.mbs.EntranceSlitInformation
       ~EntranceSlitInformation.direction
       
       
-      ~EntranceSlitInformation.setting
+      ~EntranceSlitInformation.shape
       
       
       ~EntranceSlitInformation.size
       
       
-      ~EntranceSlitInformation.shape
+      ~EntranceSlitInformation.aperture
       
    
    

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.mbs.mbs_analyser_slits &#8212; dodal 3.0.1.dev1+gfc58b6e1b documentation</title>
+    <title>dodal.devices.electron_analyser.mbs.mbs_analyser_slits &#8212; dodal 3.0.1.dev2+g73c97efd7 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=10f5b94f"></script>
+    <script src="../../../../../_static/documentation_options.js?v=f80047f1"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -903,34 +903,38 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="SlitPosition">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.mbs.SlitPosition.html#dodal.devices.electron_analyser.mbs.SlitPosition">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SlitPosition</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">P100_0_1_CURVED</span> <span class="o">=</span> <span class="s2">&quot;100 0.1 curved&quot;</span>
-    <span class="n">P200_0_1_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;200 0.1 straight&quot;</span>
-    <span class="n">P300_0_2_CURVED</span> <span class="o">=</span> <span class="s2">&quot;300 0.2 curved&quot;</span>
-    <span class="n">P400_0_2_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;400 0.2 straight&quot;</span>
-    <span class="n">P500_0_2_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;500 0.2 straight&quot;</span>
-    <span class="n">P600_0_3_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;600 0.3 straight&quot;</span>
-    <span class="n">P700_0_5_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;700 0.5 straight&quot;</span>
-    <span class="n">P800_0_8_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;800 0.8 straight&quot;</span>
-    <span class="n">P850_3_HOLE</span> <span class="o">=</span> <span class="s2">&quot;850 3 hole&quot;</span>
-    <span class="n">P900_1_5_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;900 1.5 straight&quot;</span></div>
+    <span class="n">S005_A05_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S0.05, A0.5&quot;</span>
+    <span class="n">S010_A10_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S0.1, A1.0&quot;</span>
+    <span class="n">S010_A13_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S0.1, A1.3&quot;</span>
+    <span class="n">S010_A19_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S0.1, A1.9&quot;</span>
+    <span class="n">S020_A10_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S0.2, A1.0&quot;</span>
+    <span class="n">S020_A19_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S0.2, A1.9&quot;</span>
+    <span class="n">S040_A19_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S0.4, A1.9&quot;</span>
+    <span class="n">S320_A54_STRAIGHT</span> <span class="o">=</span> <span class="s2">&quot;Straight, S3.2, A5.4&quot;</span>
+    <span class="n">S020_A10_CURVED</span> <span class="o">=</span> <span class="s2">&quot;Curved, S0.2, A1.0&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="EntranceSlitInformation">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.mbs.EntranceSlitInformation.html#dodal.devices.electron_analyser.mbs.EntranceSlitInformation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EntranceSlitInformation</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;vertical&quot;</span>
-    <span class="n">setting</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Vertical&quot;</span>
+    <span class="n">shape</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Curved&quot;</span>
     <span class="n">size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="n">shape</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;curved&quot;</span>
+    <span class="n">aperture</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_slit_positions</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">SlitPosition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-        <span class="n">setting</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">setting</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">setting</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">shape</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">aperture</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">size</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">)),</span>
+            <span class="n">aperture</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">aperture</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)),</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_slit_position</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SlitPosition</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">SlitPosition</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">setting</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">SlitPosition</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, S</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">, A</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
@@ -946,10 +950,10 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">slit_pos</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">SlitPosition</span><span class="p">,</span> <span class="n">pv</span><span class="p">)</span>
         <span class="c1"># Formatted slit info as individual soft signals for metadata</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction_w</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">setting</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setting_w</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size_w</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_w</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture_w</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size_w</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction_w</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
@@ -963,7 +967,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">val</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">slit_pos</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
         <span class="n">new_slit_info</span> <span class="o">=</span> <span class="n">EntranceSlitInformation</span><span class="o">.</span><span class="n">from_slit_positions</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_direction_w</span><span class="p">(</span><span class="n">new_slit_info</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_setting_w</span><span class="p">(</span><span class="n">new_slit_info</span><span class="o">.</span><span class="n">setting</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_aperture_w</span><span class="p">(</span><span class="n">new_slit_info</span><span class="o">.</span><span class="n">aperture</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_size_w</span><span class="p">(</span><span class="n">new_slit_info</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape_w</span><span class="p">(</span><span class="n">new_slit_info</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
