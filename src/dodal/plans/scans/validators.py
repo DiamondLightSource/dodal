@@ -7,15 +7,15 @@ from bluesky.protocols import HasName, Movable
 def trajectory_validator(
     *,
     length: int,
-    description: str,
+    template: str,
     validate: Callable[[str, tuple[Any, ...], str], None] | None = None,
 ) -> Callable[[Any], Any]:
     def validator(value: Any) -> Any:
         if not isinstance(value, tuple):
-            raise ValueError(f"Trajectory must be a tuple of {description}.")
+            raise ValueError(f"Trajectory must be a tuple of {template}.")
 
         if not value:
-            raise ValueError(f"Trajectory must contain {description}.")
+            raise ValueError(f"Trajectory must contain {template}.")
 
         movable = value[0]
 
@@ -30,11 +30,11 @@ def trajectory_validator(
         if len(value) != length:
             raise ValueError(
                 f"Trajectory for {movable_name} must contain exactly "
-                f"{length} values: {description}. "
+                f"{length} values: {template}. "
                 f"Got {len(value)} values: {formatted_value!r}"
             )
         if validate is not None:
-            validate(movable_name, value, description)
+            validate(movable_name, value, template)
 
         return value
 
@@ -44,7 +44,7 @@ def trajectory_validator(
 def validate_start_stop_step(
     movable_name: str,
     value: tuple[Any, ...],
-    description: str,
+    template: str,
 ) -> None:
     _, start, stop, step = value
 
@@ -52,11 +52,11 @@ def validate_start_stop_step(
         raise ValueError(
             f"Step size cannot be 0. "
             f"Received ({movable_name}, {start}, {stop}, {step}) for "
-            f"{description}."
+            f"{template}."
         )
 
     if start == stop:
         raise ValueError(
             f"Start and stop values cannot be the same. "
-            f"Received ({movable_name}, {start}, {stop}, {step}) for {description}."
+            f"Received ({movable_name}, {start}, {stop}, {step}) for {template}."
         )

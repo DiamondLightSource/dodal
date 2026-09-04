@@ -71,7 +71,7 @@ MovableStartStopStepA = A[
     BeforeValidator(
         trajectory_validator(
             length=4,
-            description="(movable, start, stop, step)",
+            template="(movable, start, stop, step)",
             validate=validate_start_stop_step,
         )
     ),
