@@ -8,6 +8,15 @@ from pydantic import (
     model_validator,
 )
 
+from dodal.common.general_maths.interval import ClosedInterval
+from dodal.common.general_maths.material_absorption_maths import (
+    AbsorptionCalculator,
+    AbsorptionSpectrumSegment,
+    CompoundAbsorptionCalculator,
+    MaterialAbsorptionSpectrum,
+    PolynomialAbsorptionCorrection,
+    SingleRollOffAbsorptionCalculator,
+)
 from dodal.devices.beamlines.i19.transmission.spec_from_config.energy_interval_spec import (
     EnergyIntervalSpec,
 )
@@ -49,6 +58,30 @@ class AbsorptionVsEnergyRelation(BaseModel):
     # Base Model internal setting to make this class immutable
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    def as_spectrum_segment(self) -> AbsorptionSpectrumSegment:
+        base_calculator = SingleRollOffAbsorptionCalculator(
+            material_factor_per_cm=self.fit_parameters.photon_absorption,
+            roll_off=self.fit_parameters.roll_off,
+        )
+        corrections: list[float] = [
+            float(c) for c in self.fit_parameters.residuals_polynomial_coeffs
+        ]
+        no_corrections: bool = len(corrections) < 1
+        calculator: AbsorptionCalculator = (
+            base_calculator
+            if no_corrections
+            else CompoundAbsorptionCalculator(
+                contributions=[
+                    base_calculator,
+                    PolynomialAbsorptionCorrection(coefficients_per_cm=corrections),
+                ]
+            )
+        )
+        energy_interval: ClosedInterval = self.valid_energies.as_interval
+        return AbsorptionSpectrumSegment(
+            kev_energy_interval=energy_interval, absorption_calculator=calculator
+        )
+
 
 class MaterialAbsorptionSpectrumSpec(BaseModel):
     """Configuration dict for the absorption spectrum of a specific material.
@@ -77,6 +110,12 @@ class MaterialAbsorptionSpectrumSpec(BaseModel):
         raise ValueError(
             "Absorption spectrum data should be a list or dict of fitted curves."
         )
+
+    def as_spectrum(self) -> MaterialAbsorptionSpectrum:
+        segments: list[AbsorptionSpectrumSegment] = [
+            k.as_spectrum_segment() for k in self.absorption_curves
+        ]
+        return MaterialAbsorptionSpectrum(intervals=tuple(segments))
 
 
 class MaterialAbsorptionSpectralConfig(

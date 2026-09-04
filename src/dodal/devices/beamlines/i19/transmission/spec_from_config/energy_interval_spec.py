@@ -1,6 +1,9 @@
+from functools import cached_property
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, model_validator
+
+from dodal.common.general_maths.interval import ClosedInterval
 
 
 class EnergyIntervalSpec(BaseModel):
@@ -22,9 +25,13 @@ class EnergyIntervalSpec(BaseModel):
     # Base Model internal setting to make this class immutable
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    @cached_property
+    def as_interval(self) -> ClosedInterval:
+        return ClosedInterval(lower=self.lower, upper=self.upper)
+
     @model_validator(mode="after")
-    def validate_attributes(self) -> "EnergyIntervalSpec":
-        if 0.0 < self.lower < self.upper:
+    def _validate_attributes(self) -> "EnergyIntervalSpec":
+        if self.lower < self.upper:
             return self
         _msg = f"Energy interval lower {self.lower} and upper {self.upper} bounds are in wrong order."
         raise ValueError(_msg)

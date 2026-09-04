@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -43,6 +45,22 @@ class WheelSpec(BaseModel):
             return self
         _msg: str = f"The permitted wheel slot indices {self.permissions} must include the 'out' slot position ({self.out} - but do not!"
         raise ValueError(_msg)
+
+    @cached_property
+    def all_active_indices(self) -> list[int]:
+        """Reports slot indices only for permitted, specified, wheel positions.
+
+        In detail this set comprises,
+            - the index of the OUT position ( which will, canonically, have to be an empty slot )
+            - plus the intersection of
+                -- slots with permission for present day use
+                -- slots with a specified foil absorber.
+
+        Note: You can have a foil defined without permission to use it.
+        Therefore need to check both specified foils and permissions:
+            Because permissions get edited more frequently than You want to type in foil specs.
+        """
+        return [p for p in self.permissions if p == self.out or str(p) in self.foils]
 
 
 class WheelsConfig(SystemAspectBaseParser[WheelSpec]):
