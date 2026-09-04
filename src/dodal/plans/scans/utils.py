@@ -22,7 +22,7 @@ def flatten(items: Iterable[Iterable[T]]) -> tuple[T, ...]:
 
 
 def get_bluesky_obj_name(obj) -> str:
-    return obj.name if isinstance(obj, HasName) else repr(obj)
+    return obj.name if isinstance(obj, HasName) else str(obj)
 
 
 def make_list_scan_shape(
@@ -206,14 +206,10 @@ def make_step_grid_scan_args_and_shape(
     """
     step_scan_args: list[MovableListOfPoints] = []
     shape: list[int] = []
-    try:
-        for trajectory in params:
-            movable, _, _, _ = trajectory
-            movable_values = _make_stepped_list_step(trajectory)
-            shape.append(len(movable_values))
-            step_scan_args.append((movable, movable_values))
+    for trajectory in params:
+        movable, _, _, _ = trajectory
+        movable_values = _make_stepped_list_step(trajectory)
+        shape.append(len(movable_values))
+        step_scan_args.append((movable, movable_values))
 
-        return step_scan_args, tuple(shape)
-
-    except Exception as e:
-        raise ValueError("Recieved input ") from e
+    return step_scan_args, tuple(shape)

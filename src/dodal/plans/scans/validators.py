@@ -44,17 +44,15 @@ def trajectory_validator(
         if not isinstance(value, tuple):
             raise ValueError(f"Trajectory must be a tuple of {template}.")
 
-        if not value:
-            raise ValueError(f"Trajectory must contain {template}.")
-
         movable = value[0]
+        formatted_values = (get_bluesky_obj_name(movable), *value[1:])
 
         if not isinstance(movable, Movable):
             raise ValueError(
-                "The first value in a trajectory must be Movable. "
-                f"Received {get_bluesky_obj_name(movable)!r}."
+                "The first value in a trajectory must implement the Movable protocol. "
+                f"{get_bluesky_obj_name(movable)} does not implement Movable. "
+                f"Received {formatted_values}."
             )
-        formatted_values = (get_bluesky_obj_name(movable), *value[1:])
 
         if len(value) != length:
             raise ValueError(

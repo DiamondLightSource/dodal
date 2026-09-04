@@ -29,7 +29,7 @@ MovableStartStepA = A[
         trajectory_validator(
             length=3,
             template="(movable, start, step)",
-            expected_type=MovableStartStop,
+            expected_type=MovableStartStep,
         )
     ),
 ]

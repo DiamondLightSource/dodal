@@ -723,3 +723,32 @@ def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
         ),
     ):
         run_engine(step_scan([], (x_axis, 0, 1, 0.1), (y_axis, 1, 5, 1)))  # type: ignore
+
+
+def test_scan_fails_when_not_using_movable(
+    run_engine: RunEngine,
+    x_axis: SimMotor,
+):
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "The first value in a trajectory must implement the Movable protocol. "
+            "y_axis does not implement Movable. "
+            "Received ('y_axis', 1, 5, 1)."
+        ),
+    ):
+        run_engine(step_scan([], (x_axis, 0, 1, 0.1), ("y_axis", 1, 5, 1)))  # type: ignore
+
+
+def test_scan_fails_when_using_invalid_structure(
+    run_engine: RunEngine,
+    x_axis: SimMotor,
+):
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Trajectory  has invalid types. Expected (movable, start, stop, step). "
+            "Received ('x_axis', 0, 1, [0.1])."
+        ),
+    ):
+        run_engine(step_rscan([], (x_axis, 0, 1, [0.1])))  # type: ignore
