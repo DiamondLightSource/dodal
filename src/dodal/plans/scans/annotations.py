@@ -1,11 +1,9 @@
-from collections.abc import Sequence
 from typing import Annotated as A
 
-from bluesky.protocols import Readable
-from ophyd_async.core import AsyncReadable
 from pydantic import BeforeValidator, Field
 
 from dodal.plans.scans.types import (
+    Detectors,
     MovableListOfPoints,
     MovableStartStep,
     MovableStartStop,
@@ -15,7 +13,7 @@ from dodal.plans.scans.types import (
 from dodal.plans.scans.validators import trajectory_validator
 
 DetectorsA = A[
-    Sequence[Readable | AsyncReadable],
+    Detectors,
     Field(
         description="Set of readable devices, will take a reading at each point",
     ),

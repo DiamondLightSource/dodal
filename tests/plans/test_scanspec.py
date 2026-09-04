@@ -37,7 +37,7 @@ def documents_from_expected_shape(
 
     docs: dict[str, list[Document]] = {}
     run_engine(
-        spec_scan({det}, spec),  # type: ignore
+        spec_scan([det], spec),
         lambda name, doc: docs.setdefault(name, []).append(doc),
     )
     return docs

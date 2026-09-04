@@ -119,16 +119,18 @@ def test_make_stepped_list_num(x_axis: SimMotor, start: float, step: float):
     assert stepped_list[10] == 0
 
 
-# Is this needed?
-# def test_make_stepped_list_num_fails_when_num_is_zero():
-#     start = stop = 1.1
-#     with pytest.raises(
-#         ValueError,
-#         match=re.escape(
-#             f"Start ({start}) and stop ({stop}) values cannot be the same."
-#         ),
-#     ):
-#         _make_stepped_list_step(start=start, stop=stop, step=0.25)
+def test_make_stepped_list_num_fails_when_num_is_zero(x_axis: SimMotor):
+    start = stop = 1.1
+    step = 0.25
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"Start and stop values cannot be the same. "
+            "Expected (movable, start, stop, step). "
+            f"Received (x_axis, {start}, {stop}, {step})."
+        ),
+    ):
+        _make_stepped_list_step((x_axis, start, stop, step))
 
 
 def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values(
@@ -136,7 +138,11 @@ def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values(
 ):
     with pytest.raises(
         ValueError,
-        match=re.escape("Number of points (0) and number of steps (0) cannot be zero."),
+        match=re.escape(
+            "Number of steps and number of points cannot be zero. "
+            "Expected (movable, start, step, num). "
+            "Received (x_axis, 1, 0, 0)."
+        ),
     ):
         _make_stepped_list_num((x_axis, 1, 0, 0))
 

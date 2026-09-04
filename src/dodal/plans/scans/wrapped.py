@@ -4,24 +4,22 @@ from typing import Any
 
 import bluesky.plans as bp
 from bluesky.protocols import Movable
+from bluesky.utils import plan
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 from dodal.plans.scans.annotations import (
     DetectorsA,
-    MovableListOfPoints,
     MovableListOfPointsA,
-    MovableStartStep,
-    MovableStartStop,
+    MovableStartStepA,
     MovableStartStopA,
-    MovableStartStopNum,
     MovableStartStopNumA,
-    MovableStartStopStep,
     MovableStartStopStepA,
 )
 from dodal.plans.scans.utils import (
     flatten,
+    make_list_scan_shape,
     make_step_grid_scan_args_and_shape,
     make_step_scan_args_and_shape,
 )
@@ -44,6 +42,7 @@ We may also need other adjustments for UI purposes, e.g.
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def count(
     detectors: DetectorsA,
     num: A[int, Field(description="Number of frames to collect", ge=1)] = 1,
@@ -73,9 +72,10 @@ def count(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def num_scan(
     detectors: DetectorsA,
-    trajectory: MovableStartStop,
+    trajectory: MovableStartStopA,
     *extra_axes: MovableStartStopA,
     num: int,
     metadata: dict[str, Any] | None = None,
@@ -94,9 +94,10 @@ def num_scan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def num_grid_scan(
     detectors: DetectorsA,
-    trajectory: MovableStartStopNum,
+    trajectory: MovableStartStopNumA,
     *extra_trajectories: MovableStartStopNumA,
     snake_axes: Iterable[Movable] | bool = False,
     metadata: dict[str, Any] | None = None,
@@ -117,9 +118,10 @@ def num_grid_scan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def num_rscan(
     detectors: DetectorsA,
-    trajectory: MovableStartStop,
+    trajectory: MovableStartStopA,
     *extra_trajectories: MovableStartStopA,
     num: int,
     metadata: dict[str, Any] | None = None,
@@ -138,9 +140,10 @@ def num_rscan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def num_grid_rscan(
     detectors: DetectorsA,
-    trajectory: MovableStartStopNum,
+    trajectory: MovableStartStopNumA,
     *extra_trajectories: MovableStartStopNumA,
     snake_axes: list | bool = True,
     metadata: dict[str, Any] | None = None,
@@ -160,26 +163,11 @@ def num_grid_rscan(
     )
 
 
-def _make_list_scan_shape(
-    params: Sequence[MovableListOfPoints], grid: bool
-) -> tuple[int, ...]:
-    shape = []
-    for param in params:
-        points = param[1]
-        # List arg must all be same size. If list missing or not same size, this will
-        # be validated by bp.list_scan.
-        dim = len(points)
-        shape.append(dim)
-        if not grid:
-            break
-
-    return tuple(shape)
-
-
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def list_scan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPoints,
+    trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
@@ -189,7 +177,7 @@ def list_scan(
     Wraps bluesky.plans.list_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(
+    metadata["shape"] = make_list_scan_shape(
         [trajectory, *extra_trajectories], grid=False
     )
     # typing is wrong for list scan.
@@ -201,9 +189,10 @@ def list_scan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def list_grid_scan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPoints,
+    trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
     snake_axes: bool = False,
     metadata: dict[str, Any] | None = None,
@@ -215,7 +204,7 @@ def list_grid_scan(
     bluesky.plans.list_grid_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(
+    metadata["shape"] = make_list_scan_shape(
         [trajectory, *extra_trajectories], grid=True
     )
     yield from bp.list_grid_scan(
@@ -227,9 +216,10 @@ def list_grid_scan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def list_rscan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPoints,
+    trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
@@ -239,7 +229,7 @@ def list_rscan(
     Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(
+    metadata["shape"] = make_list_scan_shape(
         [trajectory, *extra_trajectories], grid=False
     )
     yield from bp.rel_list_scan(
@@ -248,9 +238,10 @@ def list_rscan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def list_grid_rscan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPoints,
+    trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
     snake_axes: bool = True,
     metadata: dict[str, Any] | None = None,
@@ -262,7 +253,7 @@ def list_grid_rscan(
     bluesky.plans.rel_list_grid_scan(det, *args, md=metadata).
     """
     metadata = metadata or {}
-    metadata["shape"] = _make_list_scan_shape(
+    metadata["shape"] = make_list_scan_shape(
         [trajectory, *extra_trajectories], grid=True
     )
     yield from bp.rel_list_grid_scan(
@@ -274,10 +265,11 @@ def list_grid_rscan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def step_scan(
     detectors: DetectorsA,
     trajectory: MovableStartStopStepA,
-    *extra_trajectories: MovableStartStep,
+    *extra_trajectories: MovableStartStepA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent trajectories with specified step size.
@@ -293,6 +285,7 @@ def step_scan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def step_grid_scan(
     detectors: DetectorsA,
     trajectory: MovableStartStopStepA,
@@ -316,10 +309,11 @@ def step_grid_scan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def step_rscan(
     detectors: DetectorsA,
-    trajectory: MovableStartStopStep,
-    *extra_trajectories: MovableStartStep,
+    trajectory: MovableStartStopStepA,
+    *extra_trajectories: MovableStartStepA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan concurrent trajectories with specified step size, relative to position.
@@ -335,9 +329,10 @@ def step_rscan(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def step_grid_rscan(
     detectors: DetectorsA,
-    trajectory: MovableStartStopStep,
+    trajectory: MovableStartStopStepA,
     *extra_trajectories: MovableStartStopStepA,
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
     metadata: dict[str, Any] | None = None,

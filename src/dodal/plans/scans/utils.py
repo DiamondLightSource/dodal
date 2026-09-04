@@ -25,6 +25,22 @@ def get_bluesky_obj_name(obj) -> str:
     return obj.name if isinstance(obj, HasName) else repr(obj)
 
 
+def make_list_scan_shape(
+    params: Sequence[MovableListOfPoints], grid: bool
+) -> tuple[int, ...]:
+    shape = []
+    for param in params:
+        points = param[1]
+        # List arg must all be same size. If list missing or not same size, this will
+        # be validated by bp.list_scan.
+        dim = len(points)
+        shape.append(dim)
+        if not grid:
+            break
+
+    return tuple(shape)
+
+
 def _decimal_places(value: Number) -> int:
     """Return the number of decimal places represented by a numeric value.
 
@@ -114,14 +130,14 @@ def _make_stepped_list_num(values: MovableStartStopNum) -> list[Number]:
         A list containing ``num`` scan positions.
 
     Raises:
-        ValueError: If ``num`` or ``step`` is zero.
+        ValueError: If ``step`` or ``num`` is zero.
     """
     movable, start, step, num = values
     if num == 0 or step == 0:
         raise ValueError(
-            "Number of points and number of steps cannot be zero. "
+            "Number of steps and number of points cannot be zero. "
             "Expected (movable, start, step, num). "
-            f"Received ({get_bluesky_obj_name(movable), start, step, num}) "
+            f"Received ({get_bluesky_obj_name(movable)}, {start}, {step}, {num})."
         )
     stepped_list = [start + (n * step) for n in range(num)]
     rounded_stepped_list = _round_list_elements(stepped_list, [start, step])
