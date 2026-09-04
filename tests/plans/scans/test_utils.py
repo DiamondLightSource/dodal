@@ -54,16 +54,6 @@ def test_make_step_grid_scan_args_and_shape(
     assert shape == expected_shape
 
 
-# def test_make_list_scan_args_fails_when_lists_are_different_lengths(
-#     x_axis: Motor,
-#     y_axis: Motor,
-# ):
-#     with pytest.raises(ValueError):
-#         make_step_scan_args_and_shape(
-#             (x_axis, 0, 1, 2), (y_axis, 0, 1, 2, 3),
-#         )
-
-
 @pytest.mark.parametrize(
     "stepped_list, params, expected_rounded_element",
     (
@@ -145,47 +135,3 @@ def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values(
         ),
     ):
         _make_stepped_list_num((x_axis, 1, 0, 0))
-
-
-# Not needed, move to wrap level.
-# @pytest.mark.parametrize(
-#     "x_list, y_list, z_list, grid",
-#     (
-#         [[0, 1], [0, 0.2], [0, 0.5], False],
-#         [[0, 1, 0.25], [0, 0.2], [0, 1, 0.2, 0.5], False],
-#         [[0, 1, 0.25], [0, 0.2], [0, 1, 0.5], True],
-#         [[0, 1, 0.25], [0, 1, 0.2], [0, 0.5], True],
-#     ),
-# )
-# def test_make_step_scan_args_fails_when_given_incorrect_number_of_parameters(
-#     x_axis: Motor,
-#     x_list: list[Number],
-#     y_axis: Motor,
-#     y_list: list[Number],
-#     z_axis: Motor,
-#     z_list: list[Number],
-#     grid: bool,
-# ):
-#     with pytest.raises(ValueError):
-#         make_step_scan_args_and_shape(
-#             params=[x_axis, *x_list, y_axis, *y_list, z_axis, *z_list], grid=grid
-#         )
-
-
-# This needs to be moved to wrapped / validators
-# def test_make_step_scan_args_and_shape_fails_with_invalid_type_args(
-#     x_axis: Motor,
-#     y_axis: Motor,
-# ):
-#     with pytest.raises(
-#         ValueError,
-#         match="Scan syntax only takes movables or numbers as parameters.",
-#     ):
-#         make_step_scan_args_and_shape(
-#             [x_axis, 1, "3", 1, y_axis, 1, "4", 1],  # type: ignore
-#             grid=True,
-#         )
-#         make_step_scan_args_and_shape(
-#             [x_axis, 1, "3", 1, y_axis, 1, "4"],  # type: ignore
-#             grid=False,
-#         )

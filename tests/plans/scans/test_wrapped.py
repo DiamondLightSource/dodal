@@ -290,15 +290,6 @@ def test_num_grid_scan(
     assert_expected_shape(run_engine_documents, expected_shape)
 
 
-# def test_num_grid_scan_fails_when_given_wrong_number_of_params(
-#     run_engine: RunEngine,
-#     x_axis: SimMotor,
-#     y_axis: SimMotor,
-# ):
-#     with pytest.raises(ValueError):
-#         run_engine(num_grid_scan(detectors=[], params=[x_axis, 0, 1.1, 2, y_axis, 1.1]))
-
-
 @pytest.mark.parametrize(
     "x_start, x_stop, x_num, y_start, y_stop, y_num",
     ([-1.1, 1.1, 5, 2.2, -2.2, 3], [0, 1.1, 3, 2.2, 3.3, 5]),
@@ -349,27 +340,6 @@ def test_num_rscan(
     )
     _assert_emitted(run_engine_documents, detectors, num)
     assert_expected_shape(run_engine_documents, (num,))
-
-
-# @pytest.mark.parametrize(
-#     "x_list, y_list, num", ([[-1, 1], [2, 0], 0], [[-1, 1], [-1, 1], 3.5])
-# )
-# def test_num_rscan_fails_when_given_bad_info(
-#     run_engine: RunEngine,
-#     x_axis: SimMotor,
-#     x_list: list[float | int],
-#     y_axis: SimMotor,
-#     y_list: list[float | int],
-#     num: int,
-# ):
-#     with pytest.raises(ValueError):
-#         run_engine(
-#             num_rscan(
-#                 detectors=[],
-#                 params=[x_axis, *x_list, y_axis, *y_list],
-#                 num=num,
-#             )
-#         )
 
 
 @pytest.mark.parametrize(
