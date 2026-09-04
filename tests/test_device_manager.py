@@ -605,13 +605,12 @@ def test_v1_device_factory(dm: DeviceManager):
     def foo(_):
         pass
 
-    with patch("dodal.device_manager.wait_for_connection") as wfc:
-        devices = dm.build_all()
+    devices = dm.build_all()
 
     s1.assert_called_once_with(name="foo", prefix="S1_PREFIX")
     device = s1(name="foo", prefix="S1_PREFIX")
     assert devices.devices["foo"] is device
-    wfc.assert_called_once_with(device, timeout=DEFAULT_TIMEOUT)
+    s1().wait_for_connection.assert_called_once_with(timeout=DEFAULT_TIMEOUT)
 
 
 def test_v1_v2_name_clash(dm: DeviceManager):
@@ -651,9 +650,8 @@ def test_v1_no_wait(dm: DeviceManager):
     def foo(_):
         pass
 
-    with patch("dodal.device_manager.wait_for_connection") as wfc:
-        foo.build()
-    wfc.assert_not_called()
+    foo.build()
+    s1().wait_for_connection.assert_not_called()
 
 
 def test_connect_ignores_v1():
