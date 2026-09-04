@@ -31,9 +31,6 @@ https://github.com/DiamondLightSource/blueapi/issues/474
 Non-serialisable fields are ignored when they are optional.
 https://github.com/DiamondLightSource/blueapi/issues/711
 
-Using *args in plans is currently not supported.
-https://github.com/DiamondLightSource/blueapi/issues/1450
-
 We may also need other adjustments for UI purposes, e.g.
     - Forcing uniqueness or orderedness of Readables.
     - Limits and metadata (e.g. units).

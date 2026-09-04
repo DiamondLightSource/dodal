@@ -47,10 +47,9 @@ def get_all_available_generators(mod: ModuleType) -> Iterable[PlanGenerator]:
 def assert_hard_requirements(plan: PlanGenerator, signature: inspect.Signature):
     assert plan.__doc__ is not None, f"'{plan.__name__}' has no docstring"
     for parameter in signature.parameters.values():
-        assert (
-            # parameter.kind is not parameter.VAR_POSITIONAL  # BlueAPI should support *args
-            parameter.kind is not parameter.VAR_KEYWORD
-        ), f"'{plan.__name__}' has variadic arguments"
+        assert parameter.kind is not parameter.VAR_KEYWORD, (
+            f"'{plan.__name__}' has variadic arguments"
+        )
 
 
 def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signature):
