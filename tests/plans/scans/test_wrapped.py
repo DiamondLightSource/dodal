@@ -654,7 +654,7 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axis(
         ValueError,
         match=re.escape(
             f"Trajectory for {x_axis.name} must contain exactly 4 values: "
-            "(movable, start, stop, step). Got 3 values: ('x_axis', 0, 1)"
+            "(movable, start, stop, step). Got 3 values: ('x_axis', 1, 5)"
         ),
     ):
         run_engine(step_grid_scan([], (x_axis, 1, 5)))  # type: ignore
