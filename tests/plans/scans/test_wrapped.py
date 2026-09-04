@@ -653,8 +653,9 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axis(
     with pytest.raises(
         ValueError,
         match=re.escape(
-            f"Trajectory for {x_axis.name} must contain exactly 4 values: "
-            "(movable, start, stop, step). Got 3 values: ('x_axis', 1, 5)"
+            "Trajectory must contain exactly 4 values. "
+            "Expected (movable, start, stop, step). "
+            "Received 3 values: ('x_axis', 1, 5)"
         ),
     ):
         run_engine(step_grid_scan([], (x_axis, 1, 5)))  # type: ignore
@@ -668,8 +669,9 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_other_axis(
     with pytest.raises(
         ValueError,
         match=re.escape(
-            f"Trajectory for {y_axis.name} must contain exactly 4 values: "
-            "(movable, start, stop, step). Got 3 values: ('y_axis', 1, 2)"
+            "Trajectory must contain exactly 4 values. "
+            "Expected (movable, start, stop, step). "
+            "Received 3 values: ('y_axis', 1, 2)"
         ),
     ):
         run_engine(step_grid_scan([], (x_axis, 1, 5, 1), (y_axis, 1, 2)))  # type: ignore
@@ -679,20 +681,15 @@ def test_step_scan_fails_with_step_size_zero(
     run_engine: RunEngine,
     x_axis: SimMotor,
 ):
-    start = 1
-    stop = 5
-    step = 0
     with pytest.raises(
         ValueError,
         match=re.escape(
-            f"Step size cannot be 0. "
-            f"Received ({x_axis.name}, {start}, {stop}, {step})"
-            " for (movable, start, stop, step)."
+            "Step size cannot be 0. "
+            "Expected (movable, start, stop, step). "
+            "Received (x_axis, 1, 5, 0)"
         ),
     ):
-        run_engine(step_scan([], (x_axis, start, stop, step)))
-
-    run_engine(step_scan([], (x_axis, start, stop, ["1"])))  # type: ignore
+        run_engine(step_scan([], (x_axis, 1, 5, 0)))
 
 
 def test_step_scan_fails_with_start_and_stop_being_same_value(
@@ -704,9 +701,9 @@ def test_step_scan_fails_with_start_and_stop_being_same_value(
     with pytest.raises(
         ValueError,
         match=re.escape(
-            f"Start and stop values cannot be the same. "
-            f"Received ({x_axis.name}, {start}, {stop}, {step}) "
-            "for (movable, start, stop, step)."
+            "Start and stop values cannot be the same. "
+            "Expected (movable, start, stop, step). "
+            f"Received ({x_axis.name}, {start}, {stop}, {step})."
         ),
     ):
         run_engine(step_scan([], (x_axis, start, stop, step)))
@@ -719,6 +716,10 @@ def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
 ):
     with pytest.raises(
         ValueError,
-        match="The axis must be movable, start, stop.",
+        match=re.escape(
+            "Trajectory must contain exactly 3 values. "
+            "Expected (movable, start, step). "
+            "Received 4 values: ('y_axis', 1, 5, 1)"
+        ),
     ):
         run_engine(step_scan([], (x_axis, 0, 1, 0.1), (y_axis, 1, 5, 1)))  # type: ignore
