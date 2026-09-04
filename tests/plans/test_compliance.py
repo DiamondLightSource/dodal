@@ -5,8 +5,9 @@ from typing import Any, get_type_hints
 
 from bluesky.utils import MsgGenerator
 
-from dodal import plan_stubs, plans
+from dodal import plan_stubs
 from dodal.common.types import PlanGenerator
+from dodal.plans import scans
 
 """Bluesky distinguishes between `plans`: complete experimental proceedures, which open
 and close data collection runs, and which may be part of a larger plan that collect data
@@ -63,7 +64,7 @@ def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signatu
 
 
 def test_plans_comply():
-    for plan in get_all_available_generators(plans):
+    for plan in get_all_available_generators(scans):
         signature = inspect.Signature.from_callable(plan)
         assert_hard_requirements(plan, signature)
         assert_metadata_requirements(plan, signature)

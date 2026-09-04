@@ -3,25 +3,20 @@ from functools import reduce
 from typing import Annotated, Any
 
 import bluesky.plans as bp
-from bluesky.protocols import Movable, Readable
+from bluesky.protocols import Movable
 from cycler import Cycler, cycler
 from pydantic import Field, validate_call
 from scanspec.specs import Spec
 
 from dodal.common import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
+from dodal.plans.scans.annotations import DetectorsA
 
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def spec_scan(
-    detectors: Annotated[
-        set[Readable],
-        Field(
-            description="Set of readable devices, will take a reading at each point, \
-            in addition to any Movables in the Spec",
-        ),
-    ],
+    detectors: DetectorsA,
     spec: Annotated[
         Spec[Movable],
         Field(description="ScanSpec modelling the path of the scan"),

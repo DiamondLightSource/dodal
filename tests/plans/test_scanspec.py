@@ -16,7 +16,7 @@ from ophyd_async.core import StandardDetector
 from ophyd_async.sim import SimMotor
 from scanspec.specs import Line
 
-from dodal.plans import spec_scan
+from dodal.plans.scans import spec_scan
 
 
 @pytest.fixture
