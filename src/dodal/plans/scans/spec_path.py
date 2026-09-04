@@ -4,6 +4,7 @@ from typing import Annotated, Any
 
 import bluesky.plans as bp
 from bluesky.protocols import Movable
+from bluesky.utils import plan
 from cycler import Cycler, cycler
 from pydantic import Field, validate_call
 from scanspec.specs import Spec
@@ -15,6 +16,7 @@ from dodal.plans.scans.annotations import DetectorsA
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def spec_scan(
     detectors: DetectorsA,
     spec: Annotated[
