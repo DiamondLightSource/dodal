@@ -22,8 +22,7 @@ DetectorsA = A[
 MovableStartStepA = A[
     MovableStartStep,
     Field(
-        description="Additional trajectories, each specified as a tuple of "
-        "(movable, start, step)."
+        description="Trajectory defined by a movable, start position, and step size."
     ),
     BeforeValidator(
         trajectory_validator(
@@ -37,8 +36,7 @@ MovableStartStepA = A[
 MovableStartStopA = A[
     MovableStartStop,
     Field(
-        description="Additional trajectories, each specified as a tuple of "
-        "(movable, start, stop)."
+        description="Trajectory defined by a movable, start position, and stop position.",
     ),
     BeforeValidator(
         trajectory_validator(
@@ -52,8 +50,8 @@ MovableStartStopA = A[
 MovableStartStopNumA = A[
     MovableStartStopNum,
     Field(
-        description="Additional trajectories, each specified as a tuple of "
-        "(movable, start, stop, num)."
+        description="Trajectory defined by a movable, start position, stop position, "
+        "and number of points."
     ),
     BeforeValidator(
         trajectory_validator(
@@ -67,10 +65,7 @@ MovableStartStopNumA = A[
 MovableListOfPointsA = A[
     MovableListOfPoints,
     Field(
-        description="List of tuples (device, positions). For concurrent \
-            trajectories, provide '[(movable1, [point1, point2, ...]), (movable2, \
-            [point1, point2, ...]), ... , (movableN, [point1, point2, ...])]'. Number \
-            of points for each movable must be equal."
+        description="Trajectory defined by a movable and a list of positions to move to."
     ),
     BeforeValidator(
         trajectory_validator(
@@ -84,7 +79,8 @@ MovableListOfPointsA = A[
 MovableStartStopStepA = A[
     MovableStartStopStep,
     Field(
-        description="Tuple containing (movable, start, stop, step) for a scan trajectory."
+        description="Trajectory defined by a movable, start position, stop position, "
+        "and step size."
     ),
     BeforeValidator(
         trajectory_validator(

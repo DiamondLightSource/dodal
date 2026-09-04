@@ -57,10 +57,27 @@ def count(
     ] = 0.0,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Reads from a number of devices.
+    """Read from a number of devices.
 
-    Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable
-    parameters and metadata.
+    Args:
+        detectors: Devices to trigger and read.
+        num: Number of readings to collect.
+        delay: Delay between readings in seconds. A single value applies to
+            every gap. A sequence specifies an individual delay for each gap
+            and must contain ``num - 1`` values.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Collect 10 readings with a 1-second delay between each reading::
+
+            count([detector], num=10, delay=1.0)
+
+        Use a different delay for each gap::
+
+            count([detector], num=3, delay=[0.5, 1.0])
+
+    Wraps:
+        ``bluesky.plans.count(det, num, delay, md=metadata)``.
     """
     if isinstance(delay, Sequence):
         assert len(delay) == num - 1, (
@@ -76,20 +93,40 @@ def count(
 def num_scan(
     detectors: DetectorsA,
     trajectory: MovableStartStopA,
-    *extra_axes: MovableStartStopA,
+    *extra_trajectories: MovableStartStopA,
     num: int,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan concurrent single or multi-motor trajector(y/ies).
+    """Scan one or more motors over a specified range.
 
-    The scan is defined by number of points along scan trajector(y/ies). Wraps
-    bluesky.plans.scan(det, *args, num, md=metadata).
+    The scan is defined by the number of points along each trajectory.
+    All trajectories are scanned concurrently.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, start position,
+            and stop position.
+        *extra_trajectories: Additional trajectories to scan concurrently.
+        num: Number of points in the scan.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from 0 to 10 in 11 points::
+
+            num_scan([detector], (motor, 0, 10), num=11)
+
+        Scan two motors concurrently::
+
+            num_scan([detector], (x_motor, 0, 10), (y_motor, 5, 15), num=11)
+
+    Wraps:
+        ``bluesky.plans.scan(det, *args, num, md=metadata)``.
     """
     metadata = metadata or {}
     metadata["shape"] = (num,)
 
     yield from bp.scan(
-        detectors, *trajectory, *flatten(extra_axes), num=num, md=metadata
+        detectors, *trajectory, *flatten(extra_trajectories), num=num, md=metadata
     )
 
 
@@ -99,14 +136,35 @@ def num_grid_scan(
     detectors: DetectorsA,
     trajectory: MovableStartStopNumA,
     *extra_trajectories: MovableStartStopNumA,
-    snake_axes: Iterable[Movable] | bool = False,
+    snake_axes: Iterable[Movable] | bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan independent multi-motor trajectories.
 
-    The scan is defined by number of points along scan trajectories. Snakes all fast
-    axes by default (all axes but the first axis provided). Wraps
-    bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata).
+    Each trajectory is defined by a movable, start position, stop position,
+    and number of points. The trajectories are scanned independently to
+    produce a grid. By default, all axes except the first axis are snaked.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, start position,
+            stop position, and number of points.
+        *extra_trajectories: Additional trajectories to include in the grid.
+        snake_axes: Axes to snake, or ``True`` to snake all axes except the
+            first axis. ``False`` disables snaking.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from 0 to 10 using 11 points::
+
+            num_grid_scan([detector], (x_motor, 0, 10, 11))
+
+        Scan two motors over a 2D grid::
+
+            num_grid_scan([detector], (x_motor, 0, 10, 11), (y_motor, 0, 5, 6))
+
+    Wraps:
+        ``bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata)``.
     """
     yield from bp.grid_scan(
         detectors,
@@ -126,14 +184,35 @@ def num_rscan(
     num: int,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan concurrent trajector(y/ies), relative to current position(s).
+    """Scan one or more motors relative to their current positions.
 
-    The scan is defined by number of points along scan trajector(y/ies). Wraps
-    bluesky.plans.rel_scan(det, *args, num, md=metadata).
+    Each trajectory defines a relative start and stop position. The scan is
+    performed using the specified number of points, with all trajectories
+    scanned concurrently.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, relative start
+            position, and relative stop position.
+        *extra_trajectories: Additional trajectories to scan concurrently.
+        num: Number of points in the scan.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from its current position to 10 units above it,
+        using 11 points::
+
+            num_rscan([detector], (x_motor, 0, 10), num=11)
+
+        Scan two motors concurrently relative to their current positions::
+
+            num_rscan([detector], (x_motor, 0, 10), (y_motor, -5, 5), num=11)
+
+    Wraps:
+        ``bluesky.plans.rel_scan(det, *args, num, md=metadata)``.
     """
     metadata = metadata or {}
     metadata["shape"] = (num,)
-
     yield from bp.rel_scan(
         detectors, *trajectory, *flatten(extra_trajectories), num=num, md=metadata
     )
@@ -148,11 +227,34 @@ def num_grid_rscan(
     snake_axes: list | bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan independent trajectories, relative to current positions.
+    """Scan independent trajectories relative to current positions.
 
-    The scan is defined by number of points along scan trajectories. Snakes all fast
-    axes by default (all axes but the first axis provided). Wraps
-    bluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata).
+    Each trajectory is defined by a movable, relative start position, relative
+    stop position, and number of points. The trajectories are scanned
+    independently to produce a grid. By default, all axes except the first
+    axis are snaked.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, relative start
+            position, relative stop position, and number of points.
+        *extra_trajectories: Additional trajectories to include in the grid.
+        snake_axes: Axes to snake, or ``True`` to snake all axes except the
+            first axis. ``False`` disables snaking.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from its current position to 10 units above it,
+        using 11 points::
+
+            num_grid_rscan([detector], (x_motor, 0, 10, 11))
+
+        Scan two motors over a 2D grid relative to their current positions::
+
+            num_grid_rscan([detector], (x_motor, 0, 10, 11), (y_motor, -5, 5, 11))
+
+    Wraps:
+        ``bluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata)``.
     """
     yield from bp.rel_grid_scan(
         detectors,
@@ -171,10 +273,31 @@ def list_scan(
     *extra_trajectories: MovableListOfPointsA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan concurrent single or multi-motor trajector(y/ies).
+    """Scan one or more motors through specified lists of positions.
 
-    The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.list_scan(det, *args, md=metadata).
+    Each trajectory is defined by a movable and a list of positions. All
+    trajectories are scanned concurrently, with one point from each
+    trajectory used at each scan step.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable and a list of
+            positions.
+        *extra_trajectories: Additional trajectories to scan concurrently.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan a motor through a list of positions::
+
+            list_scan([detector], (x_motor, [0, 1, 2, 3]))
+
+        Scan two motors concurrently through corresponding lists of
+        positions::
+
+            list_scan([detector], (x_motor, [0, 1, 2]), (y_motor, [10, 20, 30]))
+
+    Wraps:
+        ``bluesky.plans.list_scan(det, *args, md=metadata)``.
     """
     metadata = metadata or {}
     metadata["shape"] = make_list_scan_shape(
@@ -194,14 +317,35 @@ def list_grid_scan(
     detectors: DetectorsA,
     trajectory: MovableListOfPointsA,
     *extra_trajectories: MovableListOfPointsA,
-    snake_axes: bool = False,
+    snake_axes: bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan independent trajectories.
+    """Scan independent trajectories through specified lists of positions.
 
-    The scan is defined by providing a list of points for each scan trajectory. Snakes
-    all fast axes by default (all axes but the first axis provided). Wraps
-    bluesky.plans.list_grid_scan(det, *args, md=metadata).
+    Each trajectory is defined by a movable and a list of positions. The
+    trajectories are scanned independently to produce a grid. By default,
+    snaking is disabled.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable and a list of
+            positions.
+        *extra_trajectories: Additional trajectories to include in the grid.
+        snake_axes: Whether to snake the fast axes. ``False`` disables
+            snaking.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor through a list of positions::
+
+            list_grid_scan([detector], (x_motor, [0, 1, 2, 3]))
+
+        Scan two motors over a 2D grid::
+
+            list_grid_scan([detector], (x_motor, [0, 1, 2]), (y_motor, [10, 20, 30]))
+
+    Wraps:
+        ``bluesky.plans.list_grid_scan(det, *args, md=metadata)``.
     """
     metadata = metadata or {}
     metadata["shape"] = make_list_scan_shape(
@@ -223,10 +367,31 @@ def list_rscan(
     *extra_trajectories: MovableListOfPointsA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan concurrent trajector(y/ies), relative to current position.
+    """Scan one or more motors through relative positions.
 
-    The scan is defined by providing a list of points for each scan trajectory.
-    Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata).
+    Each trajectory is defined by a movable and a list of positions relative
+    to the motor's current position. All trajectories are scanned concurrently,
+    with one point from each trajectory used at each scan step.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable and a list of
+            relative positions.
+        *extra_trajectories: Additional trajectories to scan concurrently.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan a motor through relative positions::
+
+            list_rscan([detector], (x_motor, [0, 1, 2, 3]))
+
+        Scan two motors concurrently through corresponding relative
+        positions::
+
+            list_rscan([detector], (x_motor, [0, 1, 2]), (y_motor, [-1, 0, 1]))
+
+    Wraps:
+        ``bluesky.plans.rel_list_scan(det, *args, md=metadata)``.
     """
     metadata = metadata or {}
     metadata["shape"] = make_list_scan_shape(
@@ -246,11 +411,32 @@ def list_grid_rscan(
     snake_axes: bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan independent trajectories, relative to current positions.
+    """Scan independent trajectories through relative positions.
 
-    The scan is defined by providing a list of points for each scan trajectory. Snakes
-    all fast axes by default (all axes but the first axis provided). Wraps
-    bluesky.plans.rel_list_grid_scan(det, *args, md=metadata).
+    Each trajectory is defined by a movable and a list of positions relative
+    to its current position. The trajectories are scanned independently to
+    produce a grid. By default, all axes except the first axis are snaked.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable and a list of
+            relative positions.
+        *extra_trajectories: Additional trajectories to include in the grid.
+        snake_axes: Whether to snake the fast axes. ``True`` enables snaking
+            and ``False`` disables it.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor through relative positions::
+
+            list_grid_rscan([detector], (x_motor, [0, 1, 2, 3]))
+
+        Scan two motors over a 2D grid relative to their current positions::
+
+            list_grid_rscan([detector], (x_motor, [0, 1, 2]), (y_motor, [-1, 0, 1]))
+
+    Wraps:
+        ``bluesky.plans.rel_list_grid_scan(det, *args, md=metadata)``.
     """
     metadata = metadata or {}
     metadata["shape"] = make_list_scan_shape(
@@ -272,10 +458,34 @@ def step_scan(
     *extra_trajectories: MovableStartStepA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan concurrent trajectories with specified step size.
+    """Scan one or more motors using specified step sizes.
 
-    Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_scan(det, *args, md=metadata).
+    The primary trajectory is defined by a movable, start position, stop
+    position, and step size. Additional trajectories are defined by a
+    movable, start position, and step size and contain the same number of
+    points as the primary trajectory. All trajectories are scanned
+    concurrently.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, start position,
+            stop position, and step size.
+        *extra_trajectories: Additional trajectories to scan concurrently,
+            defined by a movable, start position, and step size.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from 0 to 10 in steps of 1::
+
+            step_scan([detector], (x_motor, 0, 10, 1))
+
+        Scan two motors concurrently, with the second motor starting at 5
+        and using the same number of points as the primary trajectory::
+
+            step_scan([detector], (x_motor, 0, 10, 1), (y_motor, 5, 0.5))
+
+    Wraps:
+        ``bluesky.plans.list_scan(det, *args, md=metadata)``.
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = make_step_scan_args_and_shape(trajectory, extra_trajectories)
@@ -293,11 +503,32 @@ def step_grid_scan(
     snake_axes: bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan independent trajectories with specified step size.
+    """Scan independent trajectories using specified step sizes.
 
-    Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by
-    default (all axes but the first axis provided).
+    Each trajectory is defined by a movable, start position, stop position,
+    and step size. The trajectories are scanned independently to produce a
+    grid. By default, all axes except the first axis are snaked.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, start position,
+            stop position, and step size.
+        *extra_trajectories: Additional trajectories to include in the grid.
+        snake_axes: Whether to snake the fast axes. ``True`` enables snaking
+            and ``False`` disables it.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from 0 to 10 in steps of 1::
+
+            step_grid_scan([detector], (x_motor, 0, 10, 1))
+
+        Scan two motors over a 2D grid::
+
+            step_grid_scan([detector], (x_motor, 0, 10, 1), (y_motor, 0, 5, 1))
+
+    Wraps:
+        ``bluesky.plans.list_grid_scan(det, *args, md=metadata)``.
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = make_step_grid_scan_args_and_shape([trajectory, *extra_trajectories])
@@ -316,10 +547,34 @@ def step_rscan(
     *extra_trajectories: MovableStartStepA,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan concurrent trajectories with specified step size, relative to position.
+    """Scan one or more motors using relative step sizes.
 
-    Generates list(s) of points for each trajectory, used with
-    bluesky.plans.rel_list_scan(det, *args, md=metadata).
+    The primary trajectory is defined by a movable, relative start position,
+    relative stop position, and step size. Additional trajectories are defined
+    by a movable, relative start position, and step size and contain the same
+    number of points as the primary trajectory. All trajectories are scanned
+    concurrently.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, relative start
+            position, relative stop position, and step size.
+        *extra_trajectories: Additional trajectories to scan concurrently,
+            defined by a movable, relative start position, and step size.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from its current position to 10 units above it,
+        in steps of 1::
+
+            step_rscan([detector], (x_motor, 0, 10, 1))
+
+        Scan two motors concurrently using relative positions::
+
+            step_rscan([detector], (x_motor, 0, 10, 1), (y_motor, -5, 0.5))
+
+    Wraps:
+        ``bluesky.plans.rel_list_scan(det, *args, md=metadata)``.
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = make_step_scan_args_and_shape(trajectory, extra_trajectories)
@@ -334,14 +589,36 @@ def step_grid_rscan(
     detectors: DetectorsA,
     trajectory: MovableStartStopStepA,
     *extra_trajectories: MovableStartStopStepA,
-    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
+    snake_axes: bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
-    """Scan independent trajectories with specified step size, relative to position.
+    """Scan independent trajectories using relative step sizes.
 
-    Generates list(s) of points for each trajectory, used with
-    bluesky.plans.list_grid_scan(det, *args, md=metadata). Snakes all fast axes by
-    default (all axes but the first axis provided).
+    Each trajectory is defined by a movable, relative start position, relative
+    stop position, and step size. The trajectories are scanned independently
+    to produce a grid. By default, all axes except the first axis are snaked.
+
+    Args:
+        detectors: Devices to trigger and read at each scan point.
+        trajectory: Primary trajectory defined by a movable, relative start
+            position, relative stop position, and step size.
+        *extra_trajectories: Additional trajectories to include in the grid.
+        snake_axes: Whether to snake the fast axes. ``True`` enables snaking
+            and ``False`` disables it.
+        metadata: Additional metadata to include in the run.
+
+    Examples:
+        Scan one motor from its current position to 10 units above it,
+        in steps of 1::
+
+            step_grid_rscan([detector], (x_motor, 0, 10, 1))
+
+        Scan two motors over a 2D grid relative to their current positions::
+
+            step_grid_rscan([detector], (x_motor, 0, 10, 1), (y_motor, 0, 5, 1))
+
+    Wraps:
+        ``bluesky.plans.rel_list_grid_scan(det, *args, md=metadata)``.
     """
     # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = make_step_grid_scan_args_and_shape([trajectory, *extra_trajectories])
