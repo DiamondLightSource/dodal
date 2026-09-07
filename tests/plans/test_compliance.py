@@ -64,9 +64,7 @@ def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signatu
 
 
 @pytest.mark.parametrize(
-    "plan",
-    get_all_available_generators(scans),
-    ids=lambda plan: plan.__name__,
+    "plan", get_all_available_generators(scans), ids=lambda plan: plan.__name__
 )
 def test_plan_comply(plan):
     signature = inspect.Signature.from_callable(plan)
@@ -75,9 +73,7 @@ def test_plan_comply(plan):
 
 
 @pytest.mark.parametrize(
-    "stub",
-    get_all_available_generators(plan_stubs),
-    ids=lambda stub: stub.__name__,
+    "stub", get_all_available_generators(plan_stubs), ids=lambda stub: stub.__name__
 )
 def test_stub_comply(stub):
     signature = inspect.Signature.from_callable(stub)
