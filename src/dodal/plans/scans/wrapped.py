@@ -7,7 +7,6 @@ from bluesky.utils import CustomPlanMetadata, plan
 from pydantic import Field, NonNegativeFloat, PositiveInt, validate_call
 
 from dodal.common import MsgGenerator
-from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 from dodal.plans.scans.annotations import (
     DetectorsA,
     MovableListOfPositionsA,
@@ -36,7 +35,6 @@ We may also need other adjustments for UI purposes, e.g.
 """
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 @plan
 def count(
