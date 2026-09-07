@@ -29,3 +29,30 @@ async def test_given_attenuator_device_in_position_then_can_read(attenuator):
             "attenuator-transmission": partial_reading("100%"),
         },
     )
+
+
+@pytest.mark.parametrize(
+    "transmission, expected_position",
+    [
+        (100, AttenuatorPositions.TRANS_100),
+        (50, AttenuatorPositions.TRANS_50),
+        (10, AttenuatorPositions.TRANS_10),
+        (1, AttenuatorPositions.TRANS_1),
+        (0.1, AttenuatorPositions.TRANS_0_1),
+        (0.01, AttenuatorPositions.TRANS_0_01),
+        (0.001, AttenuatorPositions.TRANS_0_001),
+    ],
+)
+def test_transmission_float_is_converted_to_position(transmission, expected_position):
+    assert AttenuatorPositions.from_trans_float(transmission) is expected_position
+
+
+def test_unsupported_transmission_float_raises_value_error():
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Unsupported transmission: 2. "
+            "Supported transmissions are: 100%, 50%, 10%, 1%, 0.1%, 0.01%, 0.001%"
+        ),
+    ):
+        AttenuatorPositions.from_trans_float(2)
