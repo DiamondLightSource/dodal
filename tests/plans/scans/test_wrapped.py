@@ -703,7 +703,7 @@ def test_scan_fails_when_using_invalid_structure(
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "Trajectory  has invalid types. Expected (movable, start, stop, step). "
+            "Trajectory has invalid types. Expected (movable, start, stop, step). "
             "Received ('x_axis', 0, 1, [0.1])."
         ),
     ):

@@ -65,7 +65,7 @@ def trajectory_validator(
             ).validate_python(value, strict=False)
         except ValidationError as exc:
             raise ValueError(
-                f"Trajectory  has invalid types. Expected {template}. "
+                f"Trajectory has invalid types. Expected {template}. "
                 f"Received {formatted_values!r}."
             ) from exc
 
