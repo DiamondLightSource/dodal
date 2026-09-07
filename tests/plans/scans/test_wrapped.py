@@ -632,7 +632,7 @@ def test_step_scan_fails_with_step_size_zero(
         match=re.escape(
             "Step size cannot be 0. "
             "Expected (movable, start, stop, step). "
-            "Received (x_axis, 1, 5, 0)"
+            "Received (x_axis, 1.0, 5.0, 0.0)"
         ),
     ):
         run_engine(sw.step_scan([], (x_axis, 1, 5, 0)))
@@ -642,8 +642,8 @@ def test_step_scan_fails_with_start_and_stop_being_same_value(
     run_engine: RunEngine,
     x_axis: SimMotor,
 ):
-    start = stop = 0
-    step = 5
+    start = stop = 0.0
+    step = 5.0
     with pytest.raises(
         ValueError,
         match=re.escape(
@@ -694,7 +694,7 @@ def test_scan_fails_when_using_invalid_structure(
         ValueError,
         match=re.escape(
             "Trajectory has invalid types. Expected (movable, start, stop, step) with "
-            "expected types tuple[bluesky.protocols.Movable[float | int], float | int, float | int, float | int]. "
+            "expected types tuple[bluesky.protocols.Movable[float], float, float, float]. "
             "Received ('x_axis', 0, 1, [0.1])."
         ),
     ):
@@ -709,7 +709,7 @@ def test_num_grid_scan_fails_when_num_is_not_positive_int(
         ValueError,
         match=re.escape(
             "Trajectory has invalid types. Expected (movable, start, stop, num) with "
-            "expected types tuple[bluesky.protocols.Movable[float | int], float | int, float | int, typing.Annotated[int, Gt(gt=0)]]. "
+            "expected types tuple[bluesky.protocols.Movable[float], float, float, typing.Annotated[int, Gt(gt=0)]]. "
             "Received ('x_axis', 0, 1, -5)."
         ),
     ):

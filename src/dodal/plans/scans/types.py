@@ -5,16 +5,14 @@ from bluesky.protocols import Movable, Readable
 from ophyd_async.core import AsyncReadable
 from pydantic import PositiveInt
 
-Number = float | int
-
 Detectors = Sequence[Readable | AsyncReadable]
 
-MovableStartStep = tuple[Movable[Number], Number, Number]
+MovableStartStep = tuple[Movable[float], float, float]
 
-MovableStartStop = tuple[Movable[Number], Number, Number]
+MovableStartStop = tuple[Movable[float], float, float]
 
-MovableStartStopNum = tuple[Movable[Number], Number, Number, PositiveInt]
+MovableStartStopNum = tuple[Movable[float], float, float, PositiveInt]
 
 MovableListOfPoints = tuple[Movable[Any], Sequence[Any]]
 
-MovableStartStopStep = tuple[Movable[Number], Number, Number, Number]
+MovableStartStopStep = tuple[Movable[float], float, float, float]
