@@ -2,6 +2,7 @@ from collections.abc import Mapping, Sequence
 from typing import Generic
 
 import numpy as np
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -26,6 +27,7 @@ from dodal.devices.electron_analyser.base.detector_logic import (
 
 class ElectronAnalyserDetector(
     AreaDetector[TAbstractAnalyserDriverIO],
+    Movable[TBaseRegion],
     Generic[TAbstractAnalyserDriverIO, TBaseRegion],
 ):
     """Detector for data acquisition of electron analyser. Can be configured with

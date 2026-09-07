@@ -334,7 +334,7 @@ name = "cffi"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
+    { name = "pycparser" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/eb/56/b1ba7935a17738ae8453301356628e8147c79dbb825bcbc73dc7401f9846/cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529", size = 523588, upload-time = "2025-09-08T23:24:04.541Z" }
 wheels = [
@@ -824,7 +824,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.21.1" },
+    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.21.2" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -2256,7 +2256,7 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.21.1"
+version = "0.21.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bluesky" },
@@ -2270,9 +2270,9 @@ dependencies = [
     { name = "stamina" },
     { name = "velocity-profile" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/f0/91b6071faf34e87769e2522ddfabdd9fd592cd8fd12cabf4926408cab70b/ophyd_async-0.21.1.tar.gz", hash = "sha256:d0f2b9c72a444797484071b5f61b7ab0ae307d0779ca750daf2237c6ba5965ea", size = 668752, upload-time = "2026-08-04T08:53:00.232Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/2d/af70bad5aedc290253157e4d3cb6bb0e88160fb373820e2944b7508b741e/ophyd_async-0.21.2.tar.gz", hash = "sha256:51b4163eae5a88339cbe8042ff153db26a32b97da4d7eef0e28c5f63ece5c64c", size = 678594, upload-time = "2026-08-28T15:03:49.625Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0e/fd/aad3337b0d14352589af31719112d25f0f27958547c81ed0dc01301a1b3a/ophyd_async-0.21.1-py3-none-any.whl", hash = "sha256:a94ad8d02a3b03d9cb023d1e988dfc2dbb1ea9a22d6cbea25bbcd9575a8fe1ee", size = 258851, upload-time = "2026-08-04T08:52:58.863Z" },
+    { url = "https://files.pythonhosted.org/packages/57/a1/927924a80dc4fd58f3777783379bfb5b27159db4b258276c0824a8a7afa1/ophyd_async-0.21.2-py3-none-any.whl", hash = "sha256:eac362e897db1a3c667001c9a04f8b5b77e8716f040609887bd86c2e228841a4", size = 261323, upload-time = "2026-08-28T15:03:48.309Z" },
 ]
 
 [package.optional-dependencies]

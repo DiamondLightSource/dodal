@@ -1,16 +1,19 @@
+from typing import Generic, TypeVar
+
 from ophyd_async.core import WatchableAsyncStatus, Watcher
 
 from dodal.log import LOGGER
 
 Number = int | float
+NumberT = TypeVar("NumberT", bound=Number)
 
 
-class _LogOnPercentageProgressWatcher(Watcher[Number]):
+class _LogOnPercentageProgressWatcher(Watcher[NumberT], Generic[NumberT]):
     def __init__(
         self,
-        status: WatchableAsyncStatus[Number],
+        status: WatchableAsyncStatus[NumberT],
         message_prefix: str,
-        percent_interval: Number = 25,
+        percent_interval: NumberT = 25,
     ):
         self.percent_interval = percent_interval
         self._current_percent_interval = 0
@@ -23,9 +26,9 @@ class _LogOnPercentageProgressWatcher(Watcher[Number]):
 
     def __call__(
         self,
-        current: Number | None = None,
-        initial: Number | None = None,
-        target: Number | None = None,
+        current: NumberT | None = None,
+        initial: NumberT | None = None,
+        target: NumberT | None = None,
         name: str | None = None,
         unit: str | None = None,
         precision: int | None = None,
@@ -51,9 +54,9 @@ class _LogOnPercentageProgressWatcher(Watcher[Number]):
 
 
 def log_on_percentage_complete(
-    status: WatchableAsyncStatus[int | float],
+    status: WatchableAsyncStatus[NumberT],
     message_prefix: str,
-    percent_interval: int = 25,
+    percent_interval: NumberT = 25,
 ):
     """Add watcher to a WatchableAsyncStatus status which will periodically log a
     message based on percentage completion.
@@ -81,4 +84,4 @@ def log_on_percentage_complete(
     log_on_percentage_complete(status, "Data collection triggers received", 10)
     yield from bps.wait("collection complete")
     """
-    _LogOnPercentageProgressWatcher(status, message_prefix, percent_interval)
+    _LogOnPercentageProgressWatcher[NumberT](status, message_prefix, percent_interval)
