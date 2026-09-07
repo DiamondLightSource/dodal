@@ -282,11 +282,11 @@ class MockSuperConductingMagnetController(
         name: str = "",
         parent: DeviceMock | None = None,
         steps: int = 10,
-        ramp_time: float = 1.0,
+        ramp_duration: float = 1.0,
     ):
         super().__init__(name, parent)
         self.steps = steps
-        self.ramp_time = ramp_time
+        self.ramp_duration = ramp_duration
 
     async def connect(self, device: "SuperConductingMagnetController"):
         async def _trigger_start_ramp():
@@ -311,7 +311,7 @@ class MockSuperConductingMagnetController(
             ]
             # Use configured number of steps or use a single step, whichever is larger
             steps = max(self.steps, 1)
-            step_time = self.ramp_time / steps if steps > 1 else 0
+            step_time = self.ramp_duration / steps if steps > 1 else 0
 
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
             for step in range(1, steps + 1):

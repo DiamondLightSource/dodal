@@ -549,7 +549,7 @@ async def test_scmc_set_within_boundary_timeout_set_correctly(
 
 
 @pytest.mark.parametrize(
-    "steps, ramp_time",
+    "steps, ramp_duration",
     [
         pytest.param(0, 0.0, id="instant"),
         pytest.param(4, 0.04, id="stepped"),
@@ -566,7 +566,7 @@ async def test_scmc_set_within_boundary_timeout_set_correctly(
 async def test_mock_scmc_only_ramps_target_axis(
     scmc_psu: ThreeMagnetAxisPowerSupply,
     steps: int,
-    ramp_time: float,
+    ramp_duration: float,
     axis: str,
     mode: MagnetMode,
     value: float,
@@ -575,7 +575,7 @@ async def test_mock_scmc_only_ramps_target_axis(
     await scmc.connect(
         mock=MockSuperConductingMagnetController(
             steps=steps,
-            ramp_time=ramp_time,
+            ramp_duration=ramp_duration,
         )
     )
     await scmc.mode.set(mode)
