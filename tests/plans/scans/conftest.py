@@ -1,7 +1,7 @@
 import pytest
 
 from dodal.plans.scans.annotations import (
-    MovableListOfPoints,
+    MovableListOfPositions,
     MovableStartStep,
     MovableStartStop,
     MovableStartStopNum,
@@ -32,7 +32,7 @@ def trajectories_start_stop_num(
 @pytest.fixture
 def trajectories_with_list(
     request: pytest.FixtureRequest,
-) -> list[MovableListOfPoints]:
+) -> list[MovableListOfPositions]:
     return [(request.getfixturevalue(axis), points) for axis, points in request.param]
 
 

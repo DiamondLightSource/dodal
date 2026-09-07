@@ -20,7 +20,7 @@ from pydantic import ValidationError
 
 from dodal.plans.scans import wrapped as sw
 from dodal.plans.scans.types import (
-    MovableListOfPoints,
+    MovableListOfPositions,
     MovableStartStep,
     MovableStartStop,
     MovableStartStopNum,
@@ -377,7 +377,7 @@ def test_list_scan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
-    trajectories_with_list: list[MovableListOfPoints],
+    trajectories_with_list: list[MovableListOfPositions],
 ):
     num = len(trajectories_with_list[0][1])
     run_engine(
@@ -411,7 +411,7 @@ def test_list_rscan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
-    trajectories_with_list: list[MovableListOfPoints],
+    trajectories_with_list: list[MovableListOfPositions],
 ):
     num = len(trajectories_with_list[0][1])
     run_engine(
@@ -440,7 +440,7 @@ def test_list_grid_scan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
-    trajectories_with_list: list[MovableListOfPoints],
+    trajectories_with_list: list[MovableListOfPositions],
 ):
     shape = tuple(len(points) for _, points in trajectories_with_list)
     num = math.prod(shape)
@@ -465,7 +465,7 @@ def test_list_grid_rscan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
-    trajectories_with_list: list[MovableListOfPoints],
+    trajectories_with_list: list[MovableListOfPositions],
 ):
     shape = tuple(len(points) for _, points in trajectories_with_list)
     num = math.prod(shape)
