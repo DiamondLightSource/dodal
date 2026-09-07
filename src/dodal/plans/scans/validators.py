@@ -38,6 +38,7 @@ def trajectory_validator(
             movable, has the wrong number of values, or contains values of
             invalid types.
     """
+    type_adapter = TypeAdapter(expected_type, config={"arbitrary_types_allowed": True})
 
     def validator(value: Any) -> Any:
         """Validate a single trajectory value."""
@@ -60,9 +61,7 @@ def trajectory_validator(
                 f"Expected {template}. Received {len(value)} values: {formatted_values!r}"
             )
         try:
-            TypeAdapter(
-                expected_type, config={"arbitrary_types_allowed": True}
-            ).validate_python(value, strict=False)
+            type_adapter.validate_python(value, strict=False)
         except ValidationError as exc:
             raise ValueError(
                 f"Trajectory has invalid types. Expected {template} with expected "
