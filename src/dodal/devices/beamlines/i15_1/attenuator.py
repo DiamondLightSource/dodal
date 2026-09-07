@@ -17,6 +17,17 @@ class AttenuatorPositions(StrictEnum):
     TRANS_0_01 = "0.01%"
     TRANS_0_001 = "0.001%"
 
+    @classmethod
+    def from_trans_float(cls, trans: float) -> "AttenuatorPositions":
+        for position in cls:
+            if float(position.value.rstrip("%")) == trans:
+                return position
+        supported_transmissions = ", ".join(position.value for position in cls)
+        raise ValueError(
+            f"Unsupported transmission: {trans}. "
+            f"Supported transmissions are: {supported_transmissions}"
+        )
+
 
 class Attenuator(StandardReadable, Movable[AttenuatorPositions]):
     """A device to change the attenuation of the beam.
