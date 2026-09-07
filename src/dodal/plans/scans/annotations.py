@@ -4,7 +4,7 @@ from pydantic import BeforeValidator, Field
 
 from dodal.plans.scans.types import (
     Detectors,
-    MovableListOfPoints,
+    MovableListOfPositions,
     MovableStartStep,
     MovableStartStop,
     MovableStartStopNum,
@@ -62,8 +62,8 @@ MovableStartStopNumA = A[
     ),
 ]
 
-MovableListOfPointsA = A[
-    MovableListOfPoints,
+MovableListOfPositionsA = A[
+    MovableListOfPositions,
     Field(
         description="Trajectory defined by a movable and a list of positions to move to."
     ),
@@ -71,7 +71,7 @@ MovableListOfPointsA = A[
         trajectory_validator(
             length=2,
             template="(movable, [point1, point2, ...])",
-            expected_type=MovableListOfPoints,
+            expected_type=MovableListOfPositions,
         )
     ),
 ]

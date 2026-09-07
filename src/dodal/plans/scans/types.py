@@ -13,6 +13,6 @@ MovableStartStop = tuple[Movable[float], float, float]
 
 MovableStartStopNum = tuple[Movable[float], float, float, PositiveInt]
 
-MovableListOfPoints = tuple[Movable[Any], Sequence[Any]]
+MovableListOfPositions = tuple[Movable[Any], Sequence[Any]]
 
 MovableStartStopStep = tuple[Movable[float], float, float, float]

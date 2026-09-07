@@ -16,6 +16,7 @@ from .wrapped import (
 )
 
 __all__ = [
+    "spec_scan",
     "count",
     "list_grid_rscan",
     "list_grid_scan",
@@ -25,7 +26,6 @@ __all__ = [
     "num_grid_scan",
     "num_rscan",
     "num_scan",
-    "spec_scan",
     "step_grid_rscan",
     "step_grid_scan",
     "step_rscan",

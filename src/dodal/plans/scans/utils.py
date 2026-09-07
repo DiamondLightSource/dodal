@@ -6,7 +6,7 @@ import numpy as np
 from bluesky.protocols import HasName
 
 from dodal.plans.scans.types import (
-    MovableListOfPoints,
+    MovableListOfPositions,
     MovableStartStep,
     MovableStartStopNum,
     MovableStartStopStep,
@@ -25,7 +25,7 @@ def get_bluesky_obj_name(obj) -> str:
 
 
 def make_list_scan_shape(
-    params: Sequence[MovableListOfPoints], grid: bool
+    params: Sequence[MovableListOfPositions], grid: bool
 ) -> tuple[int, ...]:
     shape = []
     for param in params:
@@ -145,7 +145,7 @@ def _make_stepped_list_num(values: MovableStartStopNum) -> list[float]:
 
 def make_step_scan_args_and_shape(
     trajectory: MovableStartStopStep, extra_trajectories: Sequence[MovableStartStep]
-) -> tuple[list[MovableListOfPoints], tuple[int, ...]]:
+) -> tuple[list[MovableListOfPositions], tuple[int, ...]]:
     """Generate list-scan arguments for a step scan.
 
     The first trajectory defines the scan range and number of points using
@@ -170,7 +170,7 @@ def make_step_scan_args_and_shape(
     movable, _, _, _ = trajectory
     movable_values = _make_stepped_list_step(trajectory)
     shape = [len(movable_values)]
-    step_scan_args: list[MovableListOfPoints] = [(movable, movable_values)]
+    step_scan_args: list[MovableListOfPositions] = [(movable, movable_values)]
 
     for extra_t in extra_trajectories:
         movable, start, step = extra_t
@@ -184,7 +184,7 @@ def make_step_scan_args_and_shape(
 
 def make_step_grid_scan_args_and_shape(
     params: Sequence[MovableStartStopStep],
-) -> tuple[list[MovableListOfPoints], tuple[int, ...]]:
+) -> tuple[list[MovableListOfPositions], tuple[int, ...]]:
     """Generate list-grid-scan arguments for a stepped grid scan.
 
     Each trajectory defines an independent scan axis using
@@ -203,7 +203,7 @@ def make_step_grid_scan_args_and_shape(
         A tuple containing a list of the generated movable with the list of points and
         the scan shape, with one dimension for each trajectory.
     """
-    step_scan_args: list[MovableListOfPoints] = []
+    step_scan_args: list[MovableListOfPositions] = []
     shape: list[int] = []
     for trajectory in params:
         movable, _, _, _ = trajectory

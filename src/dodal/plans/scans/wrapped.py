@@ -10,7 +10,7 @@ from dodal.common import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 from dodal.plans.scans.annotations import (
     DetectorsA,
-    MovableListOfPointsA,
+    MovableListOfPositionsA,
     MovableStartStepA,
     MovableStartStopA,
     MovableStartStopNumA,
@@ -265,8 +265,8 @@ def num_grid_rscan(
 @plan
 def list_scan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPointsA,
-    *extra_trajectories: MovableListOfPointsA,
+    trajectory: MovableListOfPositionsA,
+    *extra_trajectories: MovableListOfPositionsA,
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors through specified lists of positions.
@@ -311,8 +311,8 @@ def list_scan(
 @plan
 def list_grid_scan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPointsA,
-    *extra_trajectories: MovableListOfPointsA,
+    trajectory: MovableListOfPositionsA,
+    *extra_trajectories: MovableListOfPositionsA,
     snake_axes: bool = True,
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
@@ -359,8 +359,8 @@ def list_grid_scan(
 @plan
 def list_rscan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPointsA,
-    *extra_trajectories: MovableListOfPointsA,
+    trajectory: MovableListOfPositionsA,
+    *extra_trajectories: MovableListOfPositionsA,
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors through relative positions.
@@ -402,8 +402,8 @@ def list_rscan(
 @plan
 def list_grid_rscan(
     detectors: DetectorsA,
-    trajectory: MovableListOfPointsA,
-    *extra_trajectories: MovableListOfPointsA,
+    trajectory: MovableListOfPositionsA,
+    *extra_trajectories: MovableListOfPositionsA,
     snake_axes: bool = True,
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
