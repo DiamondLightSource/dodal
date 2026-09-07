@@ -1,6 +1,6 @@
 import operator
 from functools import reduce
-from typing import Annotated
+from typing import Annotated as A
 
 import bluesky.plans as bp
 from bluesky.protocols import Movable
@@ -19,9 +19,8 @@ from dodal.plans.scans.annotations import DetectorsA
 @plan
 def spec_scan(
     detectors: DetectorsA,
-    spec: Annotated[
-        Spec[Movable],
-        Field(description="ScanSpec modelling the path of the scan"),
+    spec: A[
+        Spec[Movable], Field(description="ScanSpec modelling the path of the scan")
     ],
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
