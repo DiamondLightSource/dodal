@@ -363,7 +363,9 @@ def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
     x_axis: SimMotor,
     y_axis: SimMotor,
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="The list of axes 'snake_axes' contains the slowest motor"
+    ):
         run_engine(
             sw.num_grid_rscan(
                 [], (x_axis, 1, 6, 10), (y_axis, -10, 0, 5), snake_axes=[x_axis]
@@ -703,8 +705,24 @@ def test_scan_fails_when_using_invalid_structure(
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "Trajectory has invalid types. Expected (movable, start, stop, step). "
+            "Trajectory has invalid types. Expected (movable, start, stop, step) with "
+            "expected types tuple[bluesky.protocols.Movable[float | int], float | int, float | int, float | int]. "
             "Received ('x_axis', 0, 1, [0.1])."
         ),
     ):
         run_engine(sw.step_rscan([], (x_axis, 0, 1, [0.1])))  # type: ignore
+
+
+def test_num_grid_scan_fails_when_num_is_not_positive_int(
+    run_engine: RunEngine,
+    x_axis: SimMotor,
+):
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Trajectory has invalid types. Expected (movable, start, stop, num) with "
+            "expected types tuple[bluesky.protocols.Movable[float | int], float | int, float | int, typing.Annotated[int, Gt(gt=0)]]. "
+            "Received ('x_axis', 0, 1, -5)."
+        ),
+    ):
+        run_engine(sw.num_grid_scan([], (x_axis, 0, 1, -5)))  # type: ignore
