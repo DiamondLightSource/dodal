@@ -1,0 +1,34 @@
+dodal.devices.oav.snapshots.snapshot\_image\_processing
+=======================================================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.oav.snapshots.snapshot_image_processing
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      compute_beam_centre_pixel_xy_for_mm_position
+      draw_crosshair
+   
+   
+
+   
+   
+   

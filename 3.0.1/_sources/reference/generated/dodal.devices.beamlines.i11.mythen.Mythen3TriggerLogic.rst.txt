@@ -1,0 +1,35 @@
+dodal.devices.beamlines.i11.mythen.Mythen3TriggerLogic
+======================================================
+
+.. currentmodule:: dodal.devices.beamlines.i11.mythen
+
+.. autoclass:: Mythen3TriggerLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Mythen3TriggerLogic.get_deadtime
+      
+      
+      ~Mythen3TriggerLogic.prepare_edge
+      
+      
+      
+      ~Mythen3TriggerLogic.prepare_internal
+      
+      
+      ~Mythen3TriggerLogic.prepare_level
+      
+   
+   
+
+   
+   
+   

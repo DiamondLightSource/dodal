@@ -1,0 +1,43 @@
+dodal.devices.temperature\_controller
+=====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~temperature_controller.Lakeshore336
+   ~temperature_controller.Lakeshore340
+   ~temperature_controller.Lakeshore
+   ~temperature_controller.BaseHeater
+   ~temperature_controller.TemperatureSensor
+   ~temperature_controller.PID
+   ~temperature_controller.TemperatureController
+   ~temperature_controller.BaseTemperatureSensor
+
+
+
+
+.. automodule:: dodal.devices.temperature_controller
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,23 @@
+dodal.devices.beamlines.i15\_1.robot.MockRobot
+==============================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.robot
+
+.. autoclass:: MockRobot
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MockRobot.connect
+      
+   
+   
+
+   
+   
+   

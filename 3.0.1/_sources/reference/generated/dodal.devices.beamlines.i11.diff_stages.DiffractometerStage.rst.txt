@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i11.diff\_stages.DiffractometerStage
+============================================================
+
+.. currentmodule:: dodal.devices.beamlines.i11.diff_stages
+
+.. autoclass:: DiffractometerStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

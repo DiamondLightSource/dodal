@@ -1,0 +1,45 @@
+dodal.devices.undulator
+=======================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~undulator.BaseUndulator
+   ~undulator.UndulatorInKeV
+   ~undulator.UndulatorInMm
+   ~undulator.UndulatorOrder
+
+
+
+
+.. automodule:: dodal.devices.undulator
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      AccessError
+   
+   

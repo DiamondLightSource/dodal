@@ -1,0 +1,48 @@
+dodal.devices.beamlines.i10\_1.HighFieldMagnetTemperatureController
+===================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i10_1
+
+.. autoclass:: HighFieldMagnetTemperatureController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   

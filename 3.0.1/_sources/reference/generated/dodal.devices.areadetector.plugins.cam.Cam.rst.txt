@@ -1,0 +1,40 @@
+dodal.devices.areadetector.plugins.cam.Cam
+==========================================
+
+.. currentmodule:: dodal.devices.areadetector.plugins.cam
+
+.. autoclass:: Cam
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

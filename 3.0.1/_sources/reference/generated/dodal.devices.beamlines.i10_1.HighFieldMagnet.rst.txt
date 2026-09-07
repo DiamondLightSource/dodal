@@ -1,0 +1,59 @@
+dodal.devices.beamlines.i10\_1.HighFieldMagnet
+==============================================
+
+.. currentmodule:: dodal.devices.beamlines.i10_1
+
+.. autoclass:: HighFieldMagnet
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~HighFieldMagnet.complete
+      
+      
+      
+      
+      
+      ~HighFieldMagnet.kickoff
+      
+      
+      
+      ~HighFieldMagnet.prepare
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~HighFieldMagnet.movable_logic
+      
+      
+      
+   
+   

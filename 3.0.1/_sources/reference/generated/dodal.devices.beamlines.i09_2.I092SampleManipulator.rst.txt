@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i09\_2.I092SampleManipulator
+====================================================
+
+.. currentmodule:: dodal.devices.beamlines.i09_2
+
+.. autoclass:: I092SampleManipulator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,44 @@
+dodal.devices.beamlines.i09\_2.PiezoElectricMovableLogic
+========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i09_2
+
+.. autoclass:: PiezoElectricMovableLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~PiezoElectricMovableLogic.stop
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PiezoElectricMovableLogic.motor_stop
+      
+      
+      ~PiezoElectricMovableLogic.tolerance
+      
+      
+      ~PiezoElectricMovableLogic.setpoint
+      
+      
+      ~PiezoElectricMovableLogic.readback
+      
+   
+   

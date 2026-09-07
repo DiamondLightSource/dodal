@@ -1,0 +1,46 @@
+dodal.devices.beamsize.beamsize.BeamsizeBase
+============================================
+
+.. currentmodule:: dodal.devices.beamsize.beamsize
+
+.. autoclass:: BeamsizeBase
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BeamsizeBase.x_um
+      
+      
+      ~BeamsizeBase.y_um
+      
+   
+   

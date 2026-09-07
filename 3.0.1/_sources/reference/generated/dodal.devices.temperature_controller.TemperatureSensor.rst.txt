@@ -1,0 +1,48 @@
+dodal.devices.temperature\_controller.TemperatureSensor
+=======================================================
+
+.. currentmodule:: dodal.devices.temperature_controller
+
+.. autoclass:: TemperatureSensor
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~TemperatureSensor.set
+      
+      
+      ~TemperatureSensor.set_active_readback
+      
+      
+      ~TemperatureSensor.set_name
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

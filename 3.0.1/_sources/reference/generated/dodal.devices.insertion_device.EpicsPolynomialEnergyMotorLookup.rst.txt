@@ -1,0 +1,43 @@
+dodal.devices.insertion\_device.EpicsPolynomialEnergyMotorLookup
+================================================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: EpicsPolynomialEnergyMotorLookup
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      ~EpicsPolynomialEnergyMotorLookup.connect
+      
+      
+      
+      
+      ~EpicsPolynomialEnergyMotorLookup.trigger
+      
+      
+      ~EpicsPolynomialEnergyMotorLookup.update_lookup
+      
+      
+      ~EpicsPolynomialEnergyMotorLookup.update_lookup_table
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

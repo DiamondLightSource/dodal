@@ -1,0 +1,40 @@
+dodal.devices.motors.Stage
+==========================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: Stage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

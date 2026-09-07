@@ -1,0 +1,78 @@
+dodal.common.EnabledDisabledUpper
+=================================
+
+.. currentmodule:: dodal.common
+
+.. autoclass:: EnabledDisabledUpper
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnabledDisabledUpper.ENABLED
+      
+      
+      ~EnabledDisabledUpper.DISABLED
+      
+   
+   

@@ -1,0 +1,38 @@
+dodal.devices.beamlines.i09\_2
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i09_2.I092SampleManipulator
+   ~i09_2.PiezoElectricMotor
+   ~i09_2.PiezoElectricMovableLogic
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i09_2
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

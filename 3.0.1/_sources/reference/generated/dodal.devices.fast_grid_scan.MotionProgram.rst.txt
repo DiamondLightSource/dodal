@@ -1,0 +1,31 @@
+dodal.devices.fast\_grid\_scan.MotionProgram
+============================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: MotionProgram
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

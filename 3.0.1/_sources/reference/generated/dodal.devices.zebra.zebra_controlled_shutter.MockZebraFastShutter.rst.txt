@@ -1,0 +1,23 @@
+dodal.devices.zebra.zebra\_controlled\_shutter.MockZebraFastShutter
+===================================================================
+
+.. currentmodule:: dodal.devices.zebra.zebra_controlled_shutter
+
+.. autoclass:: MockZebraFastShutter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MockZebraFastShutter.connect
+      
+   
+   
+
+   
+   
+   

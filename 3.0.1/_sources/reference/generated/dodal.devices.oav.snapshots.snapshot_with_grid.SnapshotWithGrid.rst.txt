@@ -1,0 +1,44 @@
+dodal.devices.oav.snapshots.snapshot\_with\_grid.SnapshotWithGrid
+=================================================================
+
+.. currentmodule:: dodal.devices.oav.snapshots.snapshot_with_grid
+
+.. autoclass:: SnapshotWithGrid
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~SnapshotWithGrid.post_processing
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

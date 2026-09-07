@@ -1,0 +1,37 @@
+dodal.devices.attenuator
+========================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.attenuator.attenuator
+   dodal.devices.attenuator.filter
+   dodal.devices.attenuator.filter_selections
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.attenuator
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,33 @@
+dodal.beamlines.i21
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i21
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+   
+   
+
+   
+   
+   

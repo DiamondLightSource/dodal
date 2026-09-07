@@ -1,0 +1,50 @@
+dodal.devices.beamlines.i15\_1.blower.Temperature
+=================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.blower
+
+.. autoclass:: Temperature
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Temperature.movable_logic
+      
+      
+      
+   
+   

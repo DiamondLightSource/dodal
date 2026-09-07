@@ -1,0 +1,38 @@
+dodal.devices.beamlines.p60.LabXraySource
+=========================================
+
+.. currentmodule:: dodal.devices.beamlines.p60
+
+.. autoclass:: LabXraySource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~LabXraySource.AL_KALPHA
+      
+      
+      ~LabXraySource.MG_KALPHA
+      
+   
+   

@@ -1,0 +1,94 @@
+dodal.devices.fast\_grid\_scan.GridScanParamsCommon
+===================================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: GridScanParamsCommon
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~GridScanParamsCommon.grid_position_to_motor_position
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~GridScanParamsCommon.model_config
+      
+      
+      
+      
+      
+      ~GridScanParamsCommon.x_axis
+      
+      
+      ~GridScanParamsCommon.y_axis
+      
+      
+      ~GridScanParamsCommon.z_axis
+      
+      
+      ~GridScanParamsCommon.x_steps
+      
+      
+      ~GridScanParamsCommon.y_steps
+      
+      
+      ~GridScanParamsCommon.x_step_size_mm
+      
+      
+      ~GridScanParamsCommon.y_step_size_mm
+      
+      
+      ~GridScanParamsCommon.x_start_mm
+      
+      
+      ~GridScanParamsCommon.y1_start_mm
+      
+      
+      ~GridScanParamsCommon.z1_start_mm
+      
+      
+      ~GridScanParamsCommon.set_stub_offsets
+      
+      
+      ~GridScanParamsCommon.transmission_fraction
+      
+   
+   

@@ -1,0 +1,46 @@
+dodal.devices.undulator.BaseUndulator
+=====================================
+
+.. currentmodule:: dodal.devices.undulator
+
+.. autoclass:: BaseUndulator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~BaseUndulator.raise_if_not_enabled
+      
+      
+      
+      
+      ~BaseUndulator.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

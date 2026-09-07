@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i15.motors.NumberedTripleAxisStage
+==========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15.motors
+
+.. autoclass:: NumberedTripleAxisStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

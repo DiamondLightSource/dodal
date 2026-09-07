@@ -1,0 +1,37 @@
+dodal.devices.beamlines.i15\_1.safe\_or\_beam\_positioner
+=========================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i15_1
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~safe_or_beam_positioner.SafeOrBeamPosition
+   ~safe_or_beam_positioner.SafeOrBeamPositioner
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i15_1.safe_or_beam_positioner
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

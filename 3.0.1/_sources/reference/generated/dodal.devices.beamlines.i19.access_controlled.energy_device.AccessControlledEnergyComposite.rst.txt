@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i19.access\_controlled.energy\_device.AccessControlledEnergyComposite
+=============================================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.access_controlled.energy_device
+
+.. autoclass:: AccessControlledEnergyComposite
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AccessControlledEnergyComposite.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

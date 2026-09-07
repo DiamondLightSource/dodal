@@ -1,0 +1,41 @@
+dodal.devices.beamlines.i15\_1.robot.ErrorCodes
+===============================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.robot
+
+.. autoclass:: ErrorCodes
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~ErrorCodes.NO_SAMPLE
+      
+      
+      ~ErrorCodes.OK
+      
+   
+   

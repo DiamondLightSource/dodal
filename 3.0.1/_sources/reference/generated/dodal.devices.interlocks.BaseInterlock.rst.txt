@@ -1,0 +1,46 @@
+dodal.devices.interlocks.BaseInterlock
+======================================
+
+.. currentmodule:: dodal.devices.interlocks
+
+.. autoclass:: BaseInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BaseInterlock.status
+      
+      
+      ~BaseInterlock.bl_prefix
+      
+   
+   
