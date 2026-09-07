@@ -25,7 +25,6 @@ from dodal.plans.scans.types import (
     MovableStartStop,
     MovableStartStopNum,
     MovableStartStopStep,
-    Number,
 )
 
 
@@ -276,28 +275,17 @@ def test_num_grid_scan(
     assert_expected_shape(run_engine_documents, expected_shape)
 
 
-@pytest.mark.parametrize(
-    "x_start, x_stop, x_num, y_start, y_stop, y_num",
-    ([-1.1, 1.1, 5, 2.2, -2.2, 3], [0, 1.1, 3, 2.2, 3.3, 5]),
-)
 def test_num_scan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
     x_axis: SimMotor,
-    x_start: Number,
-    x_stop: Number,
-    x_num: int,
     y_axis: SimMotor,
-    y_start: Number,
-    y_stop: Number,
-    y_num: int,
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="The list of axes 'snake_axes' contains the slowest motor"
+    ):
         run_engine(
             sw.num_grid_scan(
-                [],
-                (x_axis, x_start, x_stop, x_num),
-                (y_axis, y_start, y_stop, y_num),
-                snake_axes=[x_axis],
+                [], (x_axis, -1.1, 1.1, 5), (y_axis, 2.2, -2.2, 3), snake_axes=[x_axis]
             )
         )
 
