@@ -4,7 +4,7 @@ from typing import Annotated as A
 import bluesky.plans as bp
 from bluesky.protocols import Movable
 from bluesky.utils import CustomPlanMetadata, plan
-from pydantic import Field, NonNegativeFloat, validate_call
+from pydantic import Field, NonNegativeFloat, PositiveInt, validate_call
 
 from dodal.common import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
@@ -90,7 +90,7 @@ def num_scan(
     detectors: DetectorsA,
     trajectory: MovableStartStopA,
     *extra_trajectories: MovableStartStopA,
-    num: int,
+    num: PositiveInt,
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors over a specified range.
@@ -177,7 +177,7 @@ def num_rscan(
     detectors: DetectorsA,
     trajectory: MovableStartStopA,
     *extra_trajectories: MovableStartStopA,
-    num: int,
+    num: PositiveInt,
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan one or more motors relative to their current positions.
@@ -220,7 +220,7 @@ def num_grid_rscan(
     detectors: DetectorsA,
     trajectory: MovableStartStopNumA,
     *extra_trajectories: MovableStartStopNumA,
-    snake_axes: list | bool = True,
+    snake_axes: Iterable[Movable] | bool = True,
     metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Scan independent trajectories relative to current positions.
