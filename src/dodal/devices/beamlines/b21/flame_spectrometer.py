@@ -1,17 +1,17 @@
 from bluesky.protocols import Stageable, Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, wait_for_value
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_w
 
 
 class FlameSpectrometer(StandardReadable, Stageable, Triggerable):
     def __init__(self, prefix: str, name: str = ""):
         self.filepath = epics_signal_rw_rbv(str, f"pva://{prefix}FilePath")
         self.filename = epics_signal_rw_rbv(str, f"pva://{prefix}FileName")
-        self.exposure_time_ms = epics_signal_rw_rbv(
+        self.exposure_time = epics_signal_rw_rbv(
             int, f"pva://{prefix}Advanced:IntegrationTime"
         )
         self.capture = epics_signal_rw_rbv(bool, f"pva://{prefix}Capture")
-        self.single_trigger = epics_signal_x(f"pva://{prefix}SingleScan")
+        self.single_trigger = epics_signal_w(bool, f"pva://{prefix}SingleScan")
 
         self.scan_in_progress = epics_signal_r(bool, f"pva://{prefix}ScanInProgress")
 
@@ -24,10 +24,9 @@ class FlameSpectrometer(StandardReadable, Stageable, Triggerable):
     @AsyncStatus.wrap
     async def trigger(self):
         exposure_time = await self.exposure_time_ms.get_value()
-        await self.single_trigger.trigger()
-        await wait_for_value(
-            self.scan_in_progress, False, timeout=exposure_time * 1000 + 2
-        )
+        trigger_status = self.single_trigger.set(True, timeout=None)
+        await wait_for_value(self.scan_in_progress, False, timeout=exposure_time + 10)
+        await trigger_status
 
     @AsyncStatus.wrap
     async def unstage(self):
