@@ -9,6 +9,8 @@ Detectors = Sequence[Readable | AsyncReadable]
 
 MovableStartStep = tuple[Movable[float], float, float]
 
+MovableStartStepNum = tuple[Movable[float], float, float, PositiveInt]
+
 MovableStartStop = tuple[Movable[float], float, float]
 
 MovableStartStopNum = tuple[Movable[float], float, float, PositiveInt]

@@ -123,17 +123,16 @@ def test_make_stepped_list_num_fails_when_num_is_zero(x_axis: SimMotor):
         _make_stepped_list_step((x_axis, start, stop, step))
 
 
-@pytest.mark.parametrize("stop, num", ([0, 10], [10, 0]))
-def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values(
-    x_axis: SimMotor, stop: float, num: int
+@pytest.mark.parametrize("step, num", ([0.0, 10], [0.5, 0]))
+def test_make_stepped_list_num_fails_when_step_or_num_are_zero(
+    x_axis: SimMotor, step: float, num: int
 ):
-    start = 1
+    args = (x_axis, 1.0, step, num)
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Number of steps and number of points cannot be zero. "
-            "Expected (movable, start, step, num). "
-            f"Received ({x_axis}, {start}, {stop}, {num})."
+            f"Expected (movable, start, step, num). Received {args}."
         ),
     ):
-        _make_stepped_list_num((x_axis, start, stop, num))
+        _make_stepped_list_num(args)
