@@ -1,6 +1,6 @@
 from collections.abc import Iterable, Sequence
 from decimal import Decimal
-from typing import TypeVar, cast
+from typing import cast
 
 import numpy as np
 
@@ -9,9 +9,8 @@ from dodal.plans.scans.types import (
     MovableStartStep,
     MovableStartStepNum,
     MovableStartStopStep,
+    T,
 )
-
-T = TypeVar("T")
 
 
 def flatten(items: Iterable[Iterable[T]]) -> tuple[T, ...]:
