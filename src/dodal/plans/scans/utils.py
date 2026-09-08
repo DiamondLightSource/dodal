@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import TypeVar, cast
 
 import numpy as np
-from bluesky.protocols import HasName
 
 from dodal.plans.scans.types import (
     MovableListOfPositions,
@@ -18,10 +17,6 @@ T = TypeVar("T")
 def flatten(items: Iterable[Iterable[T]]) -> tuple[T, ...]:
     """Flatten one level of nested iterables."""
     return tuple(item for group in items for item in group)
-
-
-def get_bluesky_obj_name(obj) -> str:
-    return obj.name if isinstance(obj, HasName) else str(obj)
 
 
 def make_list_scan_shape(
@@ -92,13 +87,13 @@ def _make_stepped_list_step(values: MovableStartStopStep) -> list[float]:
         raise ValueError(
             f"Step size cannot be 0. "
             "Expected (movable, start, stop, step). "
-            f"Received ({get_bluesky_obj_name(movable)}, {start}, {stop}, {step})."
+            f"Received ({movable}, {start}, {stop}, {step})."
         )
     if start == stop:
         raise ValueError(
             f"Start and stop values cannot be the same. "
             "Expected (movable, start, stop, step). "
-            f"Received ({get_bluesky_obj_name(movable)}, {start}, {stop}, {step})."
+            f"Received ({movable}, {start}, {stop}, {step})."
         )
     if abs(step) > abs(stop - start):
         step = stop - start
@@ -136,7 +131,7 @@ def _make_stepped_list_num(values: MovableStartStopNum) -> list[float]:
         raise ValueError(
             "Number of steps and number of points cannot be zero. "
             "Expected (movable, start, step, num). "
-            f"Received ({get_bluesky_obj_name(movable)}, {start}, {step}, {num})."
+            f"Received ({movable}, {start}, {step}, {num})."
         )
     stepped_list = [start + (n * step) for n in range(num)]
     rounded_stepped_list = _round_list_elements(stepped_list, [start, step])

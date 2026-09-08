@@ -117,21 +117,23 @@ def test_make_stepped_list_num_fails_when_num_is_zero(x_axis: SimMotor):
         match=re.escape(
             f"Start and stop values cannot be the same. "
             "Expected (movable, start, stop, step). "
-            f"Received (x_axis, {start}, {stop}, {step})."
+            f"Received ({x_axis}, {start}, {stop}, {step})."
         ),
     ):
         _make_stepped_list_step((x_axis, start, stop, step))
 
 
+@pytest.mark.parametrize("stop, num", ([0, 10], [10, 0]))
 def test_make_stepped_list_num_fails_when_given_equal_start_and_stop_values(
-    x_axis: SimMotor,
+    x_axis: SimMotor, stop: float, num: int
 ):
+    start = 1
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Number of steps and number of points cannot be zero. "
             "Expected (movable, start, step, num). "
-            "Received (x_axis, 1, 0, 0)."
+            f"Received ({x_axis}, {start}, {stop}, {num})."
         ),
     ):
-        _make_stepped_list_num((x_axis, 1, 0, 0))
+        _make_stepped_list_num((x_axis, start, stop, num))

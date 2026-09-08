@@ -596,15 +596,15 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axis(
     run_engine: RunEngine,
     x_axis: SimMotor,
 ):
+    args = (x_axis, 1, 5)
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Trajectory must contain exactly 4 values. "
-            "Expected (movable, start, stop, step). "
-            "Received 3 values: ('x_axis', 1, 5)"
+            f"Expected (movable, start, stop, step). Received 3 values: {args}"
         ),
     ):
-        run_engine(sw.step_grid_scan([], (x_axis, 1, 5)))  # type: ignore
+        run_engine(sw.step_grid_scan([], args))  # type: ignore
 
 
 def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_other_axis(
@@ -612,47 +612,46 @@ def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_other_axis(
     x_axis: SimMotor,
     y_axis: SimMotor,
 ):
+    args = (y_axis, 1, 2)
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Trajectory must contain exactly 4 values. "
-            "Expected (movable, start, stop, step). "
-            "Received 3 values: ('y_axis', 1, 2)"
+            f"Expected (movable, start, stop, step). Received 3 values: {args}"
         ),
     ):
-        run_engine(sw.step_grid_scan([], (x_axis, 1, 5, 1), (y_axis, 1, 2)))  # type: ignore
+        run_engine(sw.step_grid_scan([], (x_axis, 1, 5, 1), args))  # type: ignore
 
 
 def test_step_scan_fails_with_step_size_zero(
     run_engine: RunEngine,
     x_axis: SimMotor,
 ):
+    args = (x_axis, 1.0, 5.0, 0.0)
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Step size cannot be 0. "
-            "Expected (movable, start, stop, step). "
-            "Received (x_axis, 1.0, 5.0, 0.0)"
+            f"Expected (movable, start, stop, step). Received {args}"
         ),
     ):
-        run_engine(sw.step_scan([], (x_axis, 1, 5, 0)))
+        run_engine(sw.step_scan([], args))
 
 
 def test_step_scan_fails_with_start_and_stop_being_same_value(
     run_engine: RunEngine,
     x_axis: SimMotor,
 ):
-    start = stop = 0.0
-    step = 5.0
+    args = (x_axis, 0.0, 0.0, 5.0)
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Start and stop values cannot be the same. "
             "Expected (movable, start, stop, step). "
-            f"Received ({x_axis.name}, {start}, {stop}, {step})."
+            f"Received {args}."
         ),
     ):
-        run_engine(sw.step_scan([], (x_axis, start, stop, step)))
+        run_engine(sw.step_scan([], args))
 
 
 def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
@@ -660,15 +659,16 @@ def test_step_scan_fails_when_given_wrong_number_of_args_for_second_axes(
     x_axis: SimMotor,
     y_axis: SimMotor,
 ):
+    args = (y_axis, 1, 5, 1)
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Trajectory must contain exactly 3 values. "
             "Expected (movable, start, step). "
-            "Received 4 values: ('y_axis', 1, 5, 1)"
+            f"Received 4 values: {args}"
         ),
     ):
-        run_engine(sw.step_scan([], (x_axis, 0, 1, 0.1), (y_axis, 1, 5, 1)))  # type: ignore
+        run_engine(sw.step_scan([], (x_axis, 0, 1, 0.1), args))  # type: ignore
 
 
 def test_scan_fails_when_not_using_movable(
@@ -690,27 +690,29 @@ def test_scan_fails_when_using_invalid_structure(
     run_engine: RunEngine,
     x_axis: SimMotor,
 ):
+    args = (x_axis, 0, 1, [0.1])
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Trajectory has invalid types. Expected (movable, start, stop, step) with "
             "expected types tuple[bluesky.protocols.Movable[float], float, float, float]. "
-            "Received ('x_axis', 0, 1, [0.1])."
+            f"Received {args}."
         ),
     ):
-        run_engine(sw.step_rscan([], (x_axis, 0, 1, [0.1])))  # type: ignore
+        run_engine(sw.step_rscan([], args))  # type: ignore
 
 
 def test_num_grid_scan_fails_when_num_is_not_positive_int(
     run_engine: RunEngine,
     x_axis: SimMotor,
 ):
+    args = (x_axis, 0, 1, -5)
     with pytest.raises(
         ValueError,
         match=re.escape(
             "Trajectory has invalid types. Expected (movable, start, stop, num) with "
             "expected types tuple[bluesky.protocols.Movable[float], float, float, typing.Annotated[int, Gt(gt=0)]]. "
-            "Received ('x_axis', 0, 1, -5)."
+            f"Received {args}."
         ),
     ):
-        run_engine(sw.num_grid_scan([], (x_axis, 0, 1, -5)))  # type: ignore
+        run_engine(sw.num_grid_scan([], args))

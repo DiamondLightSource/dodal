@@ -4,8 +4,6 @@ from typing import Any
 from bluesky.protocols import Movable
 from pydantic import TypeAdapter, ValidationError
 
-from dodal.plans.scans.utils import get_bluesky_obj_name
-
 
 def trajectory_validator(
     length: int,
@@ -46,26 +44,25 @@ def trajectory_validator(
             raise ValueError(f"Trajectory must be a tuple of {template}.")
 
         movable = value[0]
-        formatted_values = (get_bluesky_obj_name(movable), *value[1:])
 
         if not isinstance(movable, Movable):
             raise ValueError(
                 "The first value in a trajectory must implement the Movable protocol. "
-                f"{get_bluesky_obj_name(movable)} does not implement Movable. "
-                f"Received {formatted_values}."
+                f"{movable} does not implement Movable. "
+                f"Received {value!r}."
             )
 
         if len(value) != length:
             raise ValueError(
                 f"Trajectory must contain exactly {length} values. "
-                f"Expected {template}. Received {len(value)} values: {formatted_values!r}"
+                f"Expected {template}. Received {len(value)} values: {value!r}"
             )
         try:
             type_adapter.validate_python(value, strict=False)
         except ValidationError as exc:
             raise ValueError(
                 f"Trajectory has invalid types. Expected {template} with expected "
-                f"types {expected_type}. Received {formatted_values!r}."
+                f"types {expected_type}. Received {value!r}."
             ) from exc
 
         return value
