@@ -75,7 +75,7 @@ def config_client() -> ConfigClient:
 @cache
 def path_provider() -> PathProvider:
     return StaticPathProvider(
-        UUIDFilenameProvider(), Path("/dls/i19-2/data/2026/cm44169-3/20260727_serial")
+            UUIDFilenameProvider(), Path("/dls/i19-2/data/2026/cm44169-4/20260907_serial")
     )
     # return StaticVisitPathProvider(
     #     BL,
