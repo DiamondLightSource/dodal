@@ -384,7 +384,13 @@ def test_list_scan(
 def test_list_scan_fails_with_differnt_list_lengths(
     run_engine: RunEngine, x_axis: SimMotor, y_axis: SimMotor
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "The lengths of all lists in *args must be the same. "
+            "However the lengths in args are : {'x_axis': 5, 'y_axis': 4}"
+        ),
+    ):
         run_engine(sw.list_scan([], (x_axis, [1, 2, 3, 4, 5]), (y_axis, [1, 2, 3, 4])))
 
 
