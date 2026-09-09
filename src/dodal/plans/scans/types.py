@@ -1,15 +1,13 @@
 from collections.abc import Sequence
 from typing import Any, TypeVar
 
-from bluesky import protocols as bp
-from ophyd_async.core import AsyncMovable, AsyncReadable
+from bluesky.protocols import Movable, Readable
+from ophyd_async.core import AsyncReadable
 from pydantic import PositiveInt
 
 T = TypeVar("T")
 
-Detectors = Sequence[bp.Readable | AsyncReadable]
-
-Movable = bp.Movable[T] | AsyncMovable[T]
+Detectors = Sequence[Readable | AsyncReadable]
 
 MovableStartStep = tuple[Movable[float], float, float]
 
