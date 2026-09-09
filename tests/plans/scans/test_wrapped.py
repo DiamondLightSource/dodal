@@ -174,21 +174,17 @@ def test_count_plan_produces_expected_datums(
     assert stream_datum and len(stream_datum) == len(data_keys) * length
 
 
-def _assert_emitted(
+def assert_re_docs(
     run_engine_documents: Mapping[str, list[dict]],
     detectors: Sequence[StandardDetector],
     num: int,
+    expected_shape: tuple[int, ...],
     start: int = 1,
     descriptor: int = 1,
     stream_resource: int = 2,
     stop: int = 1,
 ) -> None:
-    numbers = {
-        "start": start,
-        "descriptor": descriptor,
-        "event": num,
-        "stop": stop,
-    }
+    numbers = {"start": start, "descriptor": descriptor, "event": num, "stop": stop}
     # If detector, add stream parts.
     if len(detectors) > 0:
         # Order matters
@@ -201,6 +197,7 @@ def _assert_emitted(
             "stop": stop,
         }
     assert_emitted(run_engine_documents, **numbers)
+    assert_expected_shape(run_engine_documents, expected_shape)
 
 
 @pytest.fixture(params=[0, 1], ids=["0 detector(s)", "1 detector(s)"])
@@ -232,8 +229,7 @@ def test_num_scan(
             detectors, trajectories_start_stop[0], *trajectories_start_stop[1:], num=num
         )
     )
-    _assert_emitted(run_engine_documents, detectors, num)
-    assert_expected_shape(run_engine_documents, (num,))
+    assert_re_docs(run_engine_documents, detectors, num, (num,))
 
 
 def test_num_scan_fails_when_given_wrong_number_of_params(
@@ -271,8 +267,8 @@ def test_num_grid_scan(
         )
     )
     expected_shape = tuple(num for _, _, _, num in trajectories_start_stop_num)
-    _assert_emitted(run_engine_documents, detectors, math.prod(expected_shape))
-    assert_expected_shape(run_engine_documents, expected_shape)
+    expected_num = math.prod(expected_shape)
+    assert_re_docs(run_engine_documents, detectors, expected_num, expected_shape)
 
 
 def test_num_scan_fails_when_asked_to_snake_slow_axis(
@@ -312,8 +308,7 @@ def test_num_rscan(
             detectors, trajectories_start_stop[0], *trajectories_start_stop[1:], num=num
         )
     )
-    _assert_emitted(run_engine_documents, detectors, num)
-    assert_expected_shape(run_engine_documents, (num,))
+    assert_re_docs(run_engine_documents, detectors, num, (num,))
 
 
 @pytest.mark.parametrize(
@@ -342,8 +337,8 @@ def test_num_grid_rscan(
         )
     )
     expected_shape = tuple(num for _, _, _, num in trajectories_start_stop_num)
-    _assert_emitted(run_engine_documents, detectors, math.prod(expected_shape))
-    assert_expected_shape(run_engine_documents, expected_shape)
+    expected_num = math.prod(expected_shape)
+    assert_re_docs(run_engine_documents, detectors, expected_num, expected_shape)
 
 
 def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
@@ -379,12 +374,11 @@ def test_list_scan(
     detectors: Sequence[StandardDetector],
     trajectories_with_list: list[MovableListOfPositions],
 ):
-    num = len(trajectories_with_list[0][1])
+    expected_num = len(trajectories_with_list[0][1])
     run_engine(
         sw.list_scan(detectors, trajectories_with_list[0], *trajectories_with_list[1:])
     )
-    _assert_emitted(run_engine_documents, detectors, num)
-    assert_expected_shape(run_engine_documents, (num,))
+    assert_re_docs(run_engine_documents, detectors, expected_num, (expected_num,))
 
 
 def test_list_scan_fails_with_differnt_list_lengths(
@@ -413,12 +407,11 @@ def test_list_rscan(
     detectors: Sequence[StandardDetector],
     trajectories_with_list: list[MovableListOfPositions],
 ):
-    num = len(trajectories_with_list[0][1])
+    expected_num = len(trajectories_with_list[0][1])
     run_engine(
         sw.list_rscan(detectors, trajectories_with_list[0], *trajectories_with_list[1:])
     )
-    _assert_emitted(run_engine_documents, detectors, num)
-    assert_expected_shape(run_engine_documents, (num,))
+    assert_re_docs(run_engine_documents, detectors, expected_num, (expected_num,))
 
 
 def test_list_rscan_fails_with_differnt_list_lengths(
@@ -442,15 +435,14 @@ def test_list_grid_scan(
     detectors: Sequence[StandardDetector],
     trajectories_with_list: list[MovableListOfPositions],
 ):
-    shape = tuple(len(points) for _, points in trajectories_with_list)
-    num = math.prod(shape)
     run_engine(
         sw.list_grid_scan(
             detectors, trajectories_with_list[0], *trajectories_with_list[1:]
         )
     )
-    _assert_emitted(run_engine_documents, detectors, num)
-    assert_expected_shape(run_engine_documents, shape)
+    expected_shape = tuple(len(points) for _, points in trajectories_with_list)
+    expected_num = math.prod(expected_shape)
+    assert_re_docs(run_engine_documents, detectors, expected_num, expected_shape)
 
 
 @pytest.mark.parametrize(
@@ -467,15 +459,14 @@ def test_list_grid_rscan(
     detectors: Sequence[StandardDetector],
     trajectories_with_list: list[MovableListOfPositions],
 ):
-    shape = tuple(len(points) for _, points in trajectories_with_list)
-    num = math.prod(shape)
     run_engine(
         sw.list_grid_rscan(
             detectors, trajectories_with_list[0], *trajectories_with_list[1:]
         )
     )
-    _assert_emitted(run_engine_documents, detectors, num)
-    assert_expected_shape(run_engine_documents, shape)
+    expected_shape = tuple(len(points) for _, points in trajectories_with_list)
+    expected_num = math.prod(expected_shape)
+    assert_re_docs(run_engine_documents, detectors, expected_num, expected_shape)
 
 
 @pytest.mark.parametrize(
@@ -501,8 +492,7 @@ def test_step_scan(
             *trajectories_start_step,
         )
     )
-    _assert_emitted(run_engine_documents, detectors, expected_num)
-    assert_expected_shape(run_engine_documents, (expected_num,))
+    assert_re_docs(run_engine_documents, detectors, expected_num, (expected_num,))
 
 
 @pytest.mark.parametrize(
@@ -531,8 +521,8 @@ def test_step_grid_scan(
             snake_axes=snake,
         )
     )
-    _assert_emitted(run_engine_documents, detectors, math.prod(expected_shape))
-    assert_expected_shape(run_engine_documents, expected_shape)
+    expected_num = math.prod(expected_shape)
+    assert_re_docs(run_engine_documents, detectors, expected_num, expected_shape)
 
 
 @pytest.mark.parametrize(
@@ -558,8 +548,7 @@ def test_step_rscan(
             *trajectories_start_step,
         )
     )
-    _assert_emitted(run_engine_documents, detectors, expected_num)
-    assert_expected_shape(run_engine_documents, (expected_num,))
+    assert_re_docs(run_engine_documents, detectors, expected_num, (expected_num,))
 
 
 @pytest.mark.parametrize(
@@ -588,8 +577,8 @@ def test_step_grid_rscan(
             snake_axes=snake,
         )
     )
-    _assert_emitted(run_engine_documents, detectors, math.prod(expected_shape))
-    assert_expected_shape(run_engine_documents, expected_shape)
+    expected_num = math.prod(expected_shape)
+    assert_re_docs(run_engine_documents, detectors, expected_num, expected_shape)
 
 
 def test_step_grid_scan_fails_when_given_wrong_number_of_args_for_first_axis(
