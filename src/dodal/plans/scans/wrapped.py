@@ -297,7 +297,7 @@ def list_scan(
     metadata["shape"] = make_list_scan_shape(
         [trajectory, *extra_trajectories], grid=False
     )
-    # typing is wrong for list scan.
+    # typing is wrong for list scan https://github.com/bluesky/bluesky/pull/2064
     yield from bp.list_scan(
         detectors,
         *flatten([trajectory, *extra_trajectories]),  # type: ignore
