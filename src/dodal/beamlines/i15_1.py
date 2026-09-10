@@ -298,7 +298,7 @@ def i0(path_provider: PathProvider) -> SummingTetrammDetector:
 
 @devices.factory()
 def zebra() -> Zebra:
-    mapping = ZebraMapping(outputs=ZebraOutputs(TTL_EIGER=3, TTL_I0=2))
+    mapping = ZebraMapping(outputs=ZebraOutputs(LVDS_EIGER=3, TTL_I0=2))
     zebra = Zebra(prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:", mapping=mapping)
     return zebra
 
