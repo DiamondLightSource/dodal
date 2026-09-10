@@ -40,8 +40,8 @@ class ZebraMappingValidations(BaseModel):
         return self
 
 
-class ZebraTTLOutputs(ZebraMappingValidations):
-    """Maps hardware to the Zebra TTL output (1-4) that they're physically wired to, or
+class ZebraOutputs(ZebraMappingValidations):
+    """Maps hardware to the Zebra TTL and LVDS outputs (1-4) that they're physically wired to, or
     None if that hardware is not connected. A value of -1 means this hardware is not
     connected.
     """
@@ -55,6 +55,16 @@ class ZebraTTLOutputs(ZebraMappingValidations):
     TTL_PANDA: int = Field(default=-1, ge=-1, le=4)
     TTL_JUNGFRAU: int = Field(default=-1, ge=-1, le=4)
     TTL_I0: int = Field(default=-1, ge=-1, le=4)
+
+    LVDS_EIGER: int = Field(default=-1, ge=-1, le=4)
+    LVDS_PILATUS: int = Field(default=-1, ge=-1, le=4)
+    LVDS_FAST_SHUTTER: int = Field(default=-1, ge=-1, le=4)
+    LVDS_DETECTOR: int = Field(default=-1, ge=-1, le=4)
+    LVDS_SHUTTER: int = Field(default=-1, ge=-1, le=4)
+    LVDS_XSPRESS3: int = Field(default=-1, ge=-1, le=4)
+    LVDS_PANDA: int = Field(default=-1, ge=-1, le=4)
+    LVDS_JUNGFRAU: int = Field(default=-1, ge=-1, le=4)
+    LVDS_I0: int = Field(default=-1, ge=-1, le=4)
 
 
 class ZebraSources(ZebraMappingValidations):
@@ -84,11 +94,11 @@ class ZebraMapping(ZebraMappingValidations):
     """
 
     # Zebra ophyd signal for output can be accessed
-    # with, eg, zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR]
-    outputs: ZebraTTLOutputs = ZebraTTLOutputs()
+    # with, eg, zebra.output.out_ttl_pvs[zebra.mapping.outputs.TTL_DETECTOR]
+    outputs: ZebraOutputs = ZebraOutputs()
 
     # Zebra ophyd signal sources can be mapped to a zebra output by doing, eg,
-    # bps.abs_set(zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR],
+    # bps.abs_set(zebra.output.out_ttl_pvs[zebra.mapping.outputs.TTL_DETECTOR],
     # zebra.mapping.sources.AND3)
     sources: ZebraSources = ZebraSources()
 

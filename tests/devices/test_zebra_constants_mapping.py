@@ -6,7 +6,7 @@ from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     UnmappedZebraError,
     ZebraMapping,
-    ZebraTTLOutputs,
+    ZebraOutputs,
 )
 
 
@@ -17,10 +17,10 @@ async def fake_zebra(zebra_mapping: ZebraMapping):
 
 
 async def test_exception_when_accessing_mapping_set_to_minus_1():
-    mapping_no_output = ZebraMapping(outputs=ZebraTTLOutputs())
+    mapping_no_output = ZebraMapping(outputs=ZebraOutputs())
     with pytest.raises(
         UnmappedZebraError,
-        match="'ZebraTTLOutputs.TTL_EIGER' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration",
+        match="'ZebraOutputs.TTL_EIGER' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration",
     ):
         zebra = await fake_zebra(mapping_no_output)
         zebra.mapping.outputs.TTL_EIGER  # noqa: B018
@@ -32,7 +32,7 @@ def test_exception_when_multiple_fields_set_to_same_integer():
         ValueError,
         match=f"must be mapped to a unique integer. Duplicate fields: {expected_error_dict}",
     ):
-        ZebraMapping(outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_PANDA=1))
+        ZebraMapping(outputs=ZebraOutputs(TTL_DETECTOR=1, TTL_PANDA=1))
 
 
 async def test_validly_mapped_zebra_is_happy():

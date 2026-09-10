@@ -59,8 +59,8 @@ from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.devices.zocalo import ZocaloResults, ZocaloSource
@@ -82,7 +82,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 I03_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4),
+    outputs=ZebraOutputs(TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4),
     sources=ZebraSources(),
 )
 
