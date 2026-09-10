@@ -53,6 +53,8 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.setpoint = epics_signal_r(float, f"{prefix}AOFPITCH")
+            # Piezo not in a closed loop so readback drifting
             self.readback = epics_signal_r(float, f"{prefix}AOFPITCH:RBV")
         self.mirror = mirror_type
         super().__init__(hutch=hutch, instrument_session=instrument_session, name=name)
