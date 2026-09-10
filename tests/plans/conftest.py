@@ -1,14 +1,9 @@
 import asyncio
 from pathlib import Path, PurePath
-from unittest.mock import patch
 
 import pytest
 from daq_config_server.client import ConfigClient
-from ophyd_async.core import (
-    PathProvider,
-    StandardDetector,
-    init_devices,
-)
+from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 
 from dodal.devices.beamlines.i03.dcm import DCM
@@ -40,7 +35,7 @@ async def mock_undulator_and_dcm(
 
 
 @pytest.fixture
-def det(tmp_path: Path, path_provider) -> StandardDetector:
+def det(tmp_path: Path, static_path_provider: PathProvider) -> StandardDetector:
     class DevNullPatternGenerator(PatternGenerator):
         def __init__(self, sleep=asyncio.sleep):
             super().__init__(sleep)
@@ -63,7 +58,7 @@ def det(tmp_path: Path, path_provider) -> StandardDetector:
 
     pattern_generator = DevNullPatternGenerator()
     with init_devices(mock=True):
-        det = SimBlobDetector(path_provider, pattern_generator)
+        det = SimBlobDetector(static_path_provider, pattern_generator)
     return det
 
 
@@ -86,11 +81,3 @@ def z_axis() -> SimMotor:
     with init_devices(mock=True):
         z_axis = SimMotor()
     return z_axis
-
-
-@pytest.fixture
-def path_provider(static_path_provider: PathProvider):
-    # Prevents issue with leftover state from beamline tests
-    with patch("dodal.plan_stubs.data_session.get_path_provider") as mock:
-        mock.return_value = static_path_provider
-        yield static_path_provider
