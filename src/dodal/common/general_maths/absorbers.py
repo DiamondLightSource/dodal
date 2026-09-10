@@ -13,7 +13,12 @@ from dodal.common.general_maths.material_absorption_maths import (
 
 
 @runtime_checkable
-class FixedDepth(Protocol):
+class EnergyDependentAbsorber(Protocol):
+    def is_suitable_for_energy(self, *, xray_energy_kev: float) -> bool: ...
+
+
+@runtime_checkable
+class FixedDepth(EnergyDependentAbsorber):
     def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
         """Calculates absorption for a flat absorber of fixed depth.
 
@@ -30,7 +35,7 @@ class FixedDepth(Protocol):
 
 
 @runtime_checkable
-class VariableDepth(Protocol):
+class VariableDepth(EnergyDependentAbsorber):
     def calculate_absorption_bn(
         self,
         *,
@@ -83,8 +88,14 @@ class Absorber(BaseModel):
         _ln_t = -(thickness_cm * _alpha)
         return attenuation_from_natural_log_of_transmission(_ln_t)
 
+    def is_suitable_for_energy(self, *, xray_energy_kev: float) -> bool:
+        for a_modelled_energy_range in self.spectrum.intervals:
+            if xray_energy_kev in a_modelled_energy_range.kev_energy_interval:
+                return True
+        return False
 
-class FoilAbsorber(Absorber):
+
+class FoilAbsorber(Absorber, FixedDepth):
     """System level representation of an foil absorbing filter, typically wheel mounted.
 
     Attributes:
@@ -96,8 +107,7 @@ class FoilAbsorber(Absorber):
 
     geometry_model: ThicknessProvider
 
-    @validate_call
-    def calculate_absorption_bn(self, *, xray_energy_kev: StrictFloat) -> float:
+    def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
         # see Protocol API for FixedDepth (absorber)
         _thickness_cm = self.geometry_model.get_thickness_cm()
         return self._attenuation_bn(
@@ -105,8 +115,8 @@ class FoilAbsorber(Absorber):
         )
 
 
-class WedgeAbsorber(Absorber):
-    """System level representation of an foil absorbing filter, typically wheel mounted.
+class WedgeAbsorber(Absorber, VariableDepth):
+    """System level representation of a motor mounted tapered wedge absorber.
 
     Attributes:
         geometry_model: Shape model implementing the TaperedGeometryProvider protocol.
