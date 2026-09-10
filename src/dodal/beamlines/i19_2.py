@@ -92,7 +92,7 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 @devices.factory()
 def backlight() -> BacklightPosition:
-    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
+    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-BL-02:")
 
 
 @devices.factory()
