@@ -7,7 +7,6 @@ from typing import Generic, TypeVar
 import numpy as np
 from bluesky.plan_stubs import prepare
 from bluesky.protocols import Flyable, Preparable
-from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -100,34 +99,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     @property
     def z_axis(self) -> GridAxis:
         return GridAxis(self.z1_start_mm, 0, 1)
-
-    def grid_position_to_motor_position(self, grid_position: ndarray) -> ndarray:
-        """Converts a grid position, given as steps in the x, y, z grid,
-        to a real motor position.
-
-        Args:
-            grid_position (ndarray): The x, y, z position in grid steps. The origin is
-                at the centre of the first grid box
-
-        Returns:
-            ndarray: The motor position this corresponds to.
-
-        Raises:
-            IndexError if the desired position is outside the grid.
-        """
-        for position, axis in zip(
-            grid_position, [self.x_axis, self.y_axis, self.z_axis], strict=False
-        ):
-            if not axis.is_within(position):
-                raise IndexError(f"{grid_position} is outside the bounds of the grid")
-
-        return np.array(
-            [
-                self.x_axis.steps_to_motor_position(grid_position[0]),
-                self.y_axis.steps_to_motor_position(grid_position[1]),
-                self.z_axis.steps_to_motor_position(grid_position[2]),
-            ]
-        )
 
 
 class GridScanParamsThreeD(GridScanParamsCommon):
