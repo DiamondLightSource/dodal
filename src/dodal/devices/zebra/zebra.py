@@ -171,8 +171,11 @@ class ZebraOutputPanel(StandardReadable):
         self.pulse_1 = PulseOutput(prefix + "PULSE1")
         self.pulse_2 = PulseOutput(prefix + "PULSE2")
 
-        self.out_pvs: DeviceVector[SignalRW] = DeviceVector(
+        self.out_ttl_pvs: DeviceVector[SignalRW] = DeviceVector(
             {i: epics_signal_rw(float, prefix + f"OUT{i}_TTL") for i in range(1, 5)}
+        )
+        self.out_lvds_pvs: DeviceVector[SignalRW] = DeviceVector(
+            {i: epics_signal_rw(float, prefix + f"OUT{i}_LVDS") for i in range(1, 4)}
         )
         super().__init__(name)
 

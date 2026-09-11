@@ -31,7 +31,7 @@ from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm.summing_tetramm import SummingTetrammDetector
 from dodal.devices.zebra.zebra import Zebra, ZebraMapping
-from dodal.devices.zebra.zebra_constants_mapping import ZebraTTLOutputs
+from dodal.devices.zebra.zebra_constants_mapping import ZebraOutputs
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -298,7 +298,7 @@ def i0(path_provider: PathProvider) -> SummingTetrammDetector:
 
 @devices.factory()
 def zebra() -> Zebra:
-    mapping = ZebraMapping(outputs=ZebraTTLOutputs(TTL_EIGER=3, TTL_I0=2))
+    mapping = ZebraMapping(outputs=ZebraOutputs(LVDS_EIGER=3, TTL_I0=2))
     zebra = Zebra(prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:", mapping=mapping)
     return zebra
 

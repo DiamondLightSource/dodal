@@ -19,8 +19,8 @@ from dodal.devices.positioner import Positioner1D
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
@@ -51,7 +51,7 @@ def path_provider() -> PathProvider:
 
 
 I23_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=4),
+    outputs=ZebraOutputs(TTL_DETECTOR=1, TTL_SHUTTER=4),
     sources=ZebraSources(),
 )
 

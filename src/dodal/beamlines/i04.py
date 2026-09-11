@@ -47,8 +47,8 @@ from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.devices.zocalo import ZocaloResults
@@ -70,7 +70,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 I04_ZEBRA_MAPPING = ZebraMapping(
-    outputs=(ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
+    outputs=(ZebraOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
     sources=ZebraSources(),
 )
 PREFIX = BeamlinePrefix(BL)
