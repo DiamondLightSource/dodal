@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra.zebra &#8212; dodal 3.0.2.dev3+g3c6eab0c1 documentation</title>
+    <title>dodal.devices.zebra.zebra &#8212; dodal 3.0.2.dev4+gcfc632db1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=dcc6ece1"></script>
+    <script src="../../../../_static/documentation_options.js?v=cd7ecb7d"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1099,8 +1099,11 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">pulse_1</span> <span class="o">=</span> <span class="n">PulseOutput</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PULSE1&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pulse_2</span> <span class="o">=</span> <span class="n">PulseOutput</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PULSE2&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">out_pvs</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_ttl_pvs</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
             <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;OUT</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_TTL&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_lvds_pvs</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;OUT</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_LVDS&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)}</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 

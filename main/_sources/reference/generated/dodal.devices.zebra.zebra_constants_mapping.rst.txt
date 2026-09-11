@@ -16,8 +16,8 @@ dodal.devices.zebra.zebra\_constants\_mapping
 
    ~zebra_constants_mapping.ZebraMapping
    ~zebra_constants_mapping.ZebraMappingValidations
+   ~zebra_constants_mapping.ZebraOutputs
    ~zebra_constants_mapping.ZebraSources
-   ~zebra_constants_mapping.ZebraTTLOutputs
 
 
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra.zebra_constants_mapping &#8212; dodal 3.0.2.dev3+g3c6eab0c1 documentation</title>
+    <title>dodal.devices.zebra.zebra_constants_mapping &#8212; dodal 3.0.2.dev4+gcfc632db1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=dcc6ece1"></script>
+    <script src="../../../../_static/documentation_options.js?v=cd7ecb7d"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -933,12 +933,12 @@ window.runMermaid = runMermaid;</script>
 
 
 
-<div class="viewcode-block" id="ZebraTTLOutputs">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_constants_mapping.ZebraTTLOutputs.html#dodal.devices.zebra.zebra_constants_mapping.ZebraTTLOutputs">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ZebraTTLOutputs</span><span class="p">(</span><span class="n">ZebraMappingValidations</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps hardware to the Zebra TTL output (1-4) that they&#39;re physically wired to, or</span>
-<span class="sd">    None if that hardware is not connected. A value of -1 means this hardware is not</span>
-<span class="sd">    connected.</span>
+<div class="viewcode-block" id="ZebraOutputs">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zebra.zebra_constants_mapping.ZebraOutputs.html#dodal.devices.zebra.zebra_constants_mapping.ZebraOutputs">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZebraOutputs</span><span class="p">(</span><span class="n">ZebraMappingValidations</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps hardware to the Zebra TTL outputs (1-4) and LVDS outputs (1-3) that they&#39;re</span>
+<span class="sd">    physically wired to, or None if that hardware is not connected. A value of -1 means</span>
+<span class="sd">    this hardware is not connected.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">TTL_EIGER</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -949,7 +949,17 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TTL_XSPRESS3</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">TTL_PANDA</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">TTL_JUNGFRAU</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-    <span class="n">TTL_I0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+    <span class="n">TTL_I0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">LVDS_EIGER</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_PILATUS</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_FAST_SHUTTER</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_DETECTOR</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_SHUTTER</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_XSPRESS3</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_PANDA</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_JUNGFRAU</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">LVDS_I0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
 
 
 
@@ -985,11 +995,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Zebra ophyd signal for output can be accessed</span>
-    <span class="c1"># with, eg, zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR]</span>
-    <span class="n">outputs</span><span class="p">:</span> <span class="n">ZebraTTLOutputs</span> <span class="o">=</span> <span class="n">ZebraTTLOutputs</span><span class="p">()</span>
+    <span class="c1"># with, eg, zebra.output.out_ttl_pvs[zebra.mapping.outputs.TTL_DETECTOR]</span>
+    <span class="n">outputs</span><span class="p">:</span> <span class="n">ZebraOutputs</span> <span class="o">=</span> <span class="n">ZebraOutputs</span><span class="p">()</span>
 
     <span class="c1"># Zebra ophyd signal sources can be mapped to a zebra output by doing, eg,</span>
-    <span class="c1"># bps.abs_set(zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR],</span>
+    <span class="c1"># bps.abs_set(zebra.output.out_ttl_pvs[zebra.mapping.outputs.TTL_DETECTOR],</span>
     <span class="c1"># zebra.mapping.sources.AND3)</span>
     <span class="n">sources</span><span class="p">:</span> <span class="n">ZebraSources</span> <span class="o">=</span> <span class="n">ZebraSources</span><span class="p">()</span>
 
