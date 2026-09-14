@@ -9,6 +9,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
+from dodal.devices.eurotherm import EurothermGeneral
 from dodal.devices.turbo_slit import TurboSlit
 from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
@@ -76,6 +77,11 @@ def panda2(path_provider: PathProvider) -> HDFPanda:
         f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=path_provider,
     )
+
+
+@devices.factory()
+def eurotherm2k() -> EurothermGeneral:
+    return EurothermGeneral(prefix="BL51P-TS-TEMP-02:EUROTHERM:", name="eurotherm2k")
 
 
 # Use mock device until motors are reconnected on the beamline
