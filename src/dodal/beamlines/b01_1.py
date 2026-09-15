@@ -111,7 +111,7 @@ def tomography_detector(path_provider: PathProvider) -> AravisDetector:
         AravisDetector: The tomography camera device.
     """
     return AravisDetector(
-        f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
+        f"{PREFIX.beamline_prefix}-DI-DCAM-05:",
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix=DRV_SUFFIX,
     )
