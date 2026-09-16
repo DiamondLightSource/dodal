@@ -22,6 +22,8 @@ class FilterWheel(StandardReadable):
         filter_selections: type[StrictEnum | SubsetEnum],
         name: str = "",
     ):
+        self.filter_selections: type[StrictEnum | SubsetEnum] = filter_selections
+
         filter_prefix: str = f"{prefix}{filter_infix}"
         with self.add_children_as_readables():
             self.user_setpoint = epics_signal_rw(

@@ -1,6 +1,6 @@
 from typing import Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict, StrictFloat, validate_call
+from pydantic import BaseModel, ConfigDict
 
 from dodal.common.general_maths.absorber_geometry import (
     TaperedGeometryProvider,
@@ -12,8 +12,16 @@ from dodal.common.general_maths.material_absorption_maths import (
 )
 
 
+class _EnergyEligibility(Protocol):
+    """A material specific absorption calculator available for specific energies."""
+
+    def is_eligible_for_energy(self, *, xray_energy_kev: float) -> bool: ...
+
+
 @runtime_checkable
-class FixedDepth(Protocol):
+class FixedDepth(_EnergyEligibility, Protocol):
+    """Energy specific absorption calculator for fixed depth of a specific material - typically in a foil absorber."""
+
     def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
         """Calculates absorption for a flat absorber of fixed depth.
 
@@ -30,7 +38,9 @@ class FixedDepth(Protocol):
 
 
 @runtime_checkable
-class VariableDepth(Protocol):
+class VariableDepth(_EnergyEligibility, Protocol):
+    """Energy specific absorption calculator for variable depth of a specific material - typically in a wedge absorber."""
+
     def calculate_absorption_bn(
         self,
         *,
@@ -48,6 +58,28 @@ class VariableDepth(Protocol):
         Returns:
             Absorption in the logarithmic Barnett units (Bn).
             N.B. logarithmic absorption units are used for system attenuation budget calculations.
+        """
+        ...
+
+    def calculate_theoretical_motor_position_mm_to_absorb_by(
+        self,
+        *,
+        absorption_demand_bn: float,
+        xray_energy_kev: float,
+    ) -> float:
+        """Calculates theoritcal lateral motor position to achieve a given absorption.
+
+        A wedge absorber mounted on a lateral axis motor, typically using mm for position.
+
+        Args:
+            absorption_demand_bn: In logarithmic Barnett units (Bn).
+                N.B. logarithmic absorption units are used for
+                system attenuation budget calculations.
+
+            xray_energy_kev: The energy of the x-ray photons (kiloelectronvolts).
+
+        Returns:
+            motor_position_mm: The wedge position as defined in motor coordinates (mm).
         """
         ...
 
@@ -96,8 +128,7 @@ class FoilAbsorber(Absorber):
 
     geometry_model: ThicknessProvider
 
-    @validate_call
-    def calculate_absorption_bn(self, *, xray_energy_kev: StrictFloat) -> float:
+    def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
         # see Protocol API for FixedDepth (absorber)
         _thickness_cm = self.geometry_model.get_thickness_cm()
         return self._attenuation_bn(
@@ -117,12 +148,11 @@ class WedgeAbsorber(Absorber):
 
     geometry_model: TaperedGeometryProvider
 
-    @validate_call
     def calculate_absorption_bn(
         self,
         *,
-        xray_energy_kev: StrictFloat,
-        motor_position_mm: StrictFloat,
+        xray_energy_kev: float,
+        motor_position_mm: float,
     ) -> float:
         # see Protocol API for VariableDepth (absorber)
         _thickness_cm = self.geometry_model.thickness_cm_at_motor_position_mm(
@@ -130,4 +160,18 @@ class WedgeAbsorber(Absorber):
         )
         return self._attenuation_bn(
             xray_energy_kev=xray_energy_kev, thickness_cm=_thickness_cm
+        )
+
+    def calculate_theoretical_motor_position_mm_to_absorb_by(
+        self,
+        *,
+        absorption_demand_bn: float,
+        xray_energy_kev: float,
+    ) -> float:
+        _required_thickness = (
+            absorption_demand_bn
+            / self.spectrum.absorption_coefficient_per_cm(energy_kev=xray_energy_kev)
+        )
+        return self.geometry_model.motor_position_mm_for_thickness_cm(
+            thickness_cm=_required_thickness
         )
