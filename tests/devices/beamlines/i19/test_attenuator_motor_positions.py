@@ -1,3 +1,4 @@
+
 import ast
 import math
 from typing import Any, Final
@@ -369,7 +370,7 @@ def test_that_attenuator_motor_keys_accepts_leading_underscores_or_upper_case_le
 # Unhappy path tests below
 
 
-def test_that_attenuator_motor_positions_raises_error_when_discrete_and_continuouss_overload_axis_label() -> (
+def test_that_attenuator_motor_positions_raises_error_when_discrete_and_continuous_overload_axis_label() -> (
     None
 ):
     wedge_positions = {"x": 0.1, "v": 90.1}
@@ -526,3 +527,4 @@ def test_that_attenuator_motor_positions_creation_raises_error_when_indexed_posi
             continuous_positions=wedge_positions,
             discrete_indices=wheel_positions,
         )
+

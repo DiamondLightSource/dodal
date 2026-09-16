@@ -15,7 +15,6 @@ PermittedKeyStr = Annotated[
     str, StringConstraints(pattern=r"^[_A-Za-z][A-Za-z0-9-_]*$")
 ]
 
-
 @final
 class AttenuatorMotorPositions(BaseModel):
     """Motor positions for attentuators in the attenuation system, be they indices on a discrete steps motor or continuous positions on an axis, or axes.
@@ -46,6 +45,7 @@ class AttenuatorMotorPositions(BaseModel):
     discrete_indices: dict[PermittedKeyStr, Annotated[StrictInt, Field(gt=0)]] = Field(
         default_factory=dict, kw_only=True
     )
+
 
     @staticmethod
     def _confirm_no_keys_clash(a: dict[str, Any], b: dict[str, Any]) -> None:
@@ -101,5 +101,7 @@ class AttenuatorMotorPositions(BaseModel):
                 discrete_indices=self.discrete_indices | other.discrete_indices,
             )
 
+
     def __repr__(self) -> str:
         return f"{self.validated_and_complete}"
+
