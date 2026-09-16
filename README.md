@@ -7,6 +7,12 @@
 
 Ophyd devices and other utils that could be used across DLS beamlines
 
+<<<<<<< before updating
+=======
+This is where you should write a short paragraph that describes what your module does,
+how it does it, and why people should use it.
+
+>>>>>>> after updating
 What            | Where
 :---:           | :---:
 Source          | <https://github.com/DiamondLightSource/dodal>
