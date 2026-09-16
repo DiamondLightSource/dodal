@@ -60,7 +60,7 @@ def test_that_attenuator_motor_positions_with_for_one_wedge_provides_expected_re
         continuous_positions=wedge_position_demands,
         discrete_indices=wheel_position_demands,
     )
-    restful_payload = position_demand.validated_and_complete()
+    restful_payload = position_demand.validated_and_complete
     assert restful_payload["y"] == trial_motor_position_mm
 
 
@@ -130,7 +130,7 @@ def test_that_attenuator_motor_positions_for_only_one_wheel_provides_expected_re
         continuous_positions=wedge_position_demands,
         discrete_indices=wheel_position_demands,
     )
-    restful_payload = position_demand.validated_and_complete()
+    restful_payload = position_demand.validated_and_complete
     assert restful_payload["w"] == trial_index
 
 
@@ -151,7 +151,7 @@ def test_that_empty_attenuator_motor_positions_provides_empty_rest_format() -> N
         continuous_positions=wedge_position_demands,
         discrete_indices=wheel_position_demands,
     )
-    restful_payload = position_demand.validated_and_complete()
+    restful_payload = position_demand.validated_and_complete
     expected_rest_dict = {}
     assert restful_payload == expected_rest_dict
 
@@ -185,7 +185,7 @@ def test_that_attenuator_motor_positions_triplet_provides_expected_rest_format()
         continuous_positions=wedge_position_demands,
         discrete_indices=wheel_position_demands,
     )
-    restful_payload = position_demand.validated_and_complete()
+    restful_payload = position_demand.validated_and_complete
     expected_rest_dict = {"x": 0.1, "y": 90.1, "w": 6}
     assert restful_payload == expected_rest_dict
 
@@ -203,7 +203,7 @@ def test_that_attenuator_motor_keys_accepts_leading_underscores_or_upper_case_le
         continuous_positions=wedge_position_demands,
         discrete_indices=wheel_position_demands,
     )
-    restful_payload = position_demand.validated_and_complete()
+    restful_payload = position_demand.validated_and_complete
     expected_rest_dict = {"_x": 0.1, "Y": 90.1, "_W": trial_index}
     assert restful_payload == expected_rest_dict
 
