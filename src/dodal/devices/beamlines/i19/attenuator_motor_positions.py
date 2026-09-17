@@ -1,4 +1,3 @@
-
 from functools import cached_property
 from typing import Annotated, Self
 
@@ -15,6 +14,7 @@ from pydantic.types import StringConstraints
 PermittedKeyStr = Annotated[
     str, StringConstraints(pattern=r"^[_A-Za-z][A-Za-z0-9-_]*$")
 ]
+
 
 class AttenuatorMotorPositions(BaseModel):
     """Motor positions for attentuators in the attenuation system, be they indices on a discrete steps motor or continuous positions on an axis, or axes.
