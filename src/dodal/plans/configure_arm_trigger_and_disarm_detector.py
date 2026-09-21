@@ -23,7 +23,10 @@ def configure_arm_trigger_and_disarm_detector(
     detector_params: DetectorParams,
     trigger_info: TriggerInfo,
 ):
-    yield from configure_and_arm_detector(eiger, detector_params, trigger_info)
+    yield from configure_and_arm_detector(
+        eiger, detector_params, trigger_info, group="configure_and_arm"
+    )
+    yield from bps.wait(group="configure_and_arm")
     start = time.time()
     yield from bps.kickoff(eiger, wait=True)
     LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
