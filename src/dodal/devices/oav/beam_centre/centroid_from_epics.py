@@ -7,8 +7,7 @@ from ophyd_async.epics.core import (
 
 
 class CentroidFromEpics(StandardReadable):
-    """
-    Needs plugn chain CAM -> CC( to make B/W) -> STAT.
+    """Needs plugn chain CAM -> CC( to make B/W) -> STAT.
 
     Need to spend some time thinking about taking X/Y croping on CAM into account
     """

@@ -27,6 +27,9 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
+from dodal.devices.oav.beam_centre.centroid_from_epics import (
+    CentroidFromEpics,
+)
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -38,9 +41,6 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
-from dodal.devices.oav.beam_centre.centroid_from_epics import (
-    CentroidFromEpics,
-)
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 # NOTE All PVs for both hutches and the optics have the prefix BL19I
