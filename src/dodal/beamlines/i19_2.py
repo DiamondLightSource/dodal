@@ -31,6 +31,7 @@ from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.motors import XYZPhiStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -106,6 +107,11 @@ def beamstop() -> BeamStop:
 @devices.factory()
 def diffractometer() -> FourCircleDiffractometer:
     return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
+
+
+@devices.factory()
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
 
 
 @devices.factory()
