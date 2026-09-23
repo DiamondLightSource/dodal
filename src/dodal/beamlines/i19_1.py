@@ -34,8 +34,8 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -50,7 +50,7 @@ set_utils_beamline(BL)
 I19_1_COMMISSIONING_INSTR_SESSION: str = "cm44168-3"
 
 I19_1_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_PILATUS=1),
+    outputs=ZebraOutputs(TTL_PILATUS=1),
     sources=ZebraSources(),
 )
 

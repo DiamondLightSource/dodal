@@ -86,9 +86,11 @@ class ZebraFastShutter(GenericFastShutter[OpenClose]):
         set_pv: str,
         get_pv: str,
         name: str = "",
+        inverted: bool = False,
     ):
         self._set_pv = epics_signal_w(YesNo, set_pv)
         self._get_pv = epics_signal_r(int, get_pv)
+        self._inverted = inverted
         super().__init__(OpenClose.OPEN, OpenClose.CLOSE, name)
 
     def _create_shutter_state(self) -> SignalRW[OpenClose]:
@@ -99,11 +101,18 @@ class ZebraFastShutter(GenericFastShutter[OpenClose]):
         )
 
     def _read_shutter_state(self, get_pv: int) -> OpenClose:
-        return OpenClose.CLOSE if get_pv == 0 else OpenClose.OPEN
+        if self._inverted:
+            return OpenClose.CLOSE if get_pv == 1 else OpenClose.OPEN
+
+        return OpenClose.OPEN if get_pv == 1 else OpenClose.CLOSE
 
     async def _set_shutter_state(self, value: OpenClose):
-        set_value = YesNo.YES if value == OpenClose.OPEN else YesNo.NO
-        readback_value = 1 if value == OpenClose.OPEN else 0
+        if self._inverted:
+            set_value = YesNo.NO if value == OpenClose.OPEN else YesNo.YES
+            readback_value = 0 if value == OpenClose.OPEN else 1
+        else:
+            set_value = YesNo.YES if value == OpenClose.OPEN else YesNo.NO
+            readback_value = 1 if value == OpenClose.OPEN else 0
         await set_and_wait_for_other_value(
             self._set_pv, set_value, self._get_pv, readback_value
         )

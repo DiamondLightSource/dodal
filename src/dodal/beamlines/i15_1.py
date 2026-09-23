@@ -14,7 +14,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
-from dodal.devices.beamlines.i15_1.attenuator import Attenuator
+from dodal.devices.beamlines.i15_1.attenuators import FastAttenuator, SlowAttenuator
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
@@ -31,7 +31,7 @@ from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm.summing_tetramm import SummingTetrammDetector
 from dodal.devices.zebra.zebra import Zebra, ZebraMapping
-from dodal.devices.zebra.zebra_constants_mapping import ZebraTTLOutputs
+from dodal.devices.zebra.zebra_constants_mapping import ZebraOutputs
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraFastShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -246,8 +246,13 @@ def puck_detect() -> PuckDetect:
 
 
 @devices.factory()
-def attenuator() -> Attenuator:
-    return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
+def slow_attenuator() -> SlowAttenuator:
+    return SlowAttenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
+
+
+@devices.factory()
+def fast_attenuator() -> FastAttenuator:
+    return FastAttenuator(f"{PREFIX.beamline_prefix}-DI-PHDGN-01:")
 
 
 @devices.factory()
@@ -277,6 +282,7 @@ def fast_shutter() -> ZebraFastShutter:
     return ZebraFastShutter(
         set_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:SOFT_IN:B3",
         get_pv=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:OUT4_TTL:STA",
+        inverted=True,
     )
 
 
@@ -298,7 +304,7 @@ def i0(path_provider: PathProvider) -> SummingTetrammDetector:
 
 @devices.factory()
 def zebra() -> Zebra:
-    mapping = ZebraMapping(outputs=ZebraTTLOutputs(TTL_EIGER=3, TTL_I0=2))
+    mapping = ZebraMapping(outputs=ZebraOutputs(LVDS_EIGER=3, TTL_I0=2))
     zebra = Zebra(prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:", mapping=mapping)
     return zebra
 
