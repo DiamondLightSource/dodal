@@ -26,8 +26,8 @@ from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -39,7 +39,7 @@ set_utils_beamline(BL)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i02-1/software/daq_configuration"
 
 I02_1_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=4),
+    outputs=ZebraOutputs(TTL_EIGER=4),
     sources=ZebraSources(),
 )
 
