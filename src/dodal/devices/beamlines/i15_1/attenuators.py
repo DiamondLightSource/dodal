@@ -1,11 +1,15 @@
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceMock,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
     SubsetEnum,
+    callback_on_mock_put,
+    default_mock_class,
     set_and_wait_for_other_value,
+    set_mock_value,
 )
 from ophyd_async.epics.core import (
     epics_signal_r,
@@ -16,15 +20,15 @@ from ophyd_async.epics.core import (
 
 class FastAttenuatorState(StrictEnum):
     FAULT = "Fault"
-    OUT = "Open"
+    OUT = "Out"
     OPENING = "Opening"
-    IN = "Closed"
+    IN = "In"
     CLOSING = "Closing"
 
 
 class FastAttenuatorDemand(SubsetEnum):
-    IN = "Close"
-    OUT = "Open"
+    IN = "In"
+    OUT = "Out"
 
 
 class SlowAttenuatorPositions(StrictEnum):
@@ -77,6 +81,18 @@ class SlowAttenuator(StandardReadable, Movable[SlowAttenuatorPositions]):
         await self.transmission.set(value)
 
 
+class MockFastAttenuator(DeviceMock["FastAttenuator"]):
+    async def connect(self, device: "FastAttenuator") -> None:
+        def set_readback(value: FastAttenuatorDemand, *_, **__):
+            if value == FastAttenuatorDemand.IN:
+                set_mock_value(device.status, FastAttenuatorState.IN)
+            elif value == FastAttenuatorDemand.OUT:
+                set_mock_value(device.status, FastAttenuatorState.OUT)
+
+        callback_on_mock_put(device.control, set_readback)
+
+
+@default_mock_class(MockFastAttenuator)
 class FastAttenuator(StandardReadable, Movable[FastAttenuatorDemand]):
     """A pneumatic attenuator that can quickly be put into the beam.
 
