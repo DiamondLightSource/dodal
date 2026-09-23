@@ -20,7 +20,7 @@ class ColourMode(StrictEnum):
 
 
 class CentroidFromEpics(StandardReadable):
-    """Has the PVs to set up the CAM -> CC -> STAT plugin chain and gets the centroid.
+    """Device to set up the CAM -> CC -> STAT plugin chain and get the centroid.
 
     Need to spend some time thinking about taking X/Y croping on CAM into account
     """
