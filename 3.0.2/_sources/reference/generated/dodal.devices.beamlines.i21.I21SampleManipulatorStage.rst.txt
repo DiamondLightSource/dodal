@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i21.I21SampleManipulatorStage
+=====================================================
+
+.. currentmodule:: dodal.devices.beamlines.i21
+
+.. autoclass:: I21SampleManipulatorStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

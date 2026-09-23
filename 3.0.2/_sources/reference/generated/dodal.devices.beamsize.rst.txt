@@ -1,0 +1,35 @@
+dodal.devices.beamsize
+======================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.beamsize.beamsize
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.beamsize
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,34 @@
+dodal.beamlines.i24
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i24
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+      path_provider
+   
+   
+
+   
+   
+   

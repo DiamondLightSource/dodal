@@ -1,0 +1,49 @@
+dodal.devices.xspress3.xspress3.Xspress3
+========================================
+
+.. currentmodule:: dodal.devices.xspress3.xspress3
+
+.. autoclass:: Xspress3
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~Xspress3.stage
+      
+      
+      ~Xspress3.unstage
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~Xspress3.channels
+      
+      
+      ~Xspress3.get_roi_calc_status
+      
+      
+      ~Xspress3.roi_mca
+      
+      
+      ~Xspress3.dt_corrected_latest_mca
+      
+   
+   

@@ -1,0 +1,84 @@
+dodal.devices.interlocks.PLCInterlockState
+==========================================
+
+.. currentmodule:: dodal.devices.interlocks
+
+.. autoclass:: PLCInterlockState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PLCInterlockState.FAILED
+      
+      
+      ~PLCInterlockState.RUN_ILKS_OK
+      
+      
+      ~PLCInterlockState.OK
+      
+      
+      ~PLCInterlockState.DISARMED
+      
+   
+   

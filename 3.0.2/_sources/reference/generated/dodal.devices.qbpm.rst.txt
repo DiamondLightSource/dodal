@@ -1,0 +1,36 @@
+dodal.devices.qbpm
+==================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~qbpm.QBPM
+
+
+
+
+.. automodule:: dodal.devices.qbpm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

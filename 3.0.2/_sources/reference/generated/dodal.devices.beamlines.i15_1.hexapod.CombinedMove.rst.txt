@@ -1,0 +1,54 @@
+dodal.devices.beamlines.i15\_1.hexapod.CombinedMove
+===================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.hexapod
+
+.. autoclass:: CombinedMove
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~CombinedMove.x
+      
+      
+      ~CombinedMove.y
+      
+      
+      ~CombinedMove.z
+      
+      
+      ~CombinedMove.rx
+      
+      
+      ~CombinedMove.ry
+      
+      
+      ~CombinedMove.rz
+      
+   
+   

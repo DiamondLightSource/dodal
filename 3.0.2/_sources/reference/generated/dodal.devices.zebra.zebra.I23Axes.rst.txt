@@ -1,0 +1,23 @@
+dodal.devices.zebra.zebra.I23Axes
+=================================
+
+.. currentmodule:: dodal.devices.zebra.zebra
+
+.. autoclass:: I23Axes
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I23Axes.OMEGA
+      
+   
+   

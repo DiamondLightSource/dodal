@@ -1,0 +1,23 @@
+dodal.devices.interlocks.MockIntPLCInterlock
+============================================
+
+.. currentmodule:: dodal.devices.interlocks
+
+.. autoclass:: MockIntPLCInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MockIntPLCInterlock.connect
+      
+   
+   
+
+   
+   
+   

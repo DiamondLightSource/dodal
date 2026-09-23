@@ -1,0 +1,99 @@
+dodal.devices.synchrotron.Suffix
+================================
+
+.. currentmodule:: dodal.devices.synchrotron
+
+.. autoclass:: Suffix
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Suffix.SIGNAL
+      
+      
+      ~Suffix.MODE
+      
+      
+      ~Suffix.USERCOUNTDOWN
+      
+      
+      ~Suffix.BEAMENERGY
+      
+      
+      ~Suffix.COUNTDOWN
+      
+      
+      ~Suffix.STACOUNTDN
+      
+      
+      ~Suffix.ENDCOUNTDOWN
+      
+      
+      ~Suffix.TOPUPSTATE
+      
+      
+      ~Suffix.FILLPERIOD
+      
+   
+   

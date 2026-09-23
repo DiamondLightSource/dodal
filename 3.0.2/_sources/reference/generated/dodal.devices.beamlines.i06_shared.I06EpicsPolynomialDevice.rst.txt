@@ -1,0 +1,34 @@
+dodal.devices.beamlines.i06\_shared.I06EpicsPolynomialDevice
+============================================================
+
+.. currentmodule:: dodal.devices.beamlines.i06_shared
+
+.. autoclass:: I06EpicsPolynomialDevice
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~I06EpicsPolynomialDevice.trigger
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

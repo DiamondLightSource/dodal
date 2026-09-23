@@ -1,0 +1,50 @@
+dodal.devices.oav.utils.EdgeOutputArrayImageType
+================================================
+
+.. currentmodule:: dodal.devices.oav.utils
+
+.. autoclass:: EdgeOutputArrayImageType
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~EdgeOutputArrayImageType.ORIGINAL
+      
+      
+      ~EdgeOutputArrayImageType.GREYSCALE
+      
+      
+      ~EdgeOutputArrayImageType.PREPROCESSED
+      
+      
+      ~EdgeOutputArrayImageType.CANNY_EDGES
+      
+      
+      ~EdgeOutputArrayImageType.CLOSED_EDGES
+      
+   
+   

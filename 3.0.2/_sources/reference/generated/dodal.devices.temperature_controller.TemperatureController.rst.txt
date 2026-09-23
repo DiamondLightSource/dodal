@@ -1,0 +1,50 @@
+dodal.devices.temperature\_controller.TemperatureController
+===========================================================
+
+.. currentmodule:: dodal.devices.temperature_controller
+
+.. autoclass:: TemperatureController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~TemperatureController.movable_logic
+      
+      
+      
+   
+   

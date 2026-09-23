@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i10\_1.I10JScalerCard
+=============================================
+
+.. currentmodule:: dodal.devices.beamlines.i10_1
+
+.. autoclass:: I10JScalerCard
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,58 @@
+dodal.devices.current\_amplifiers.SR570
+=======================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: SR570
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~SR570.decrease_gain
+      
+      
+      
+      
+      ~SR570.get_gain
+      
+      
+      ~SR570.get_lowerlimit
+      
+      
+      ~SR570.get_upperlimit
+      
+      
+      ~SR570.increase_gain
+      
+      
+      
+      
+      ~SR570.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.common\_dcm.StationaryCrystal
+===========================================
+
+.. currentmodule:: dodal.devices.common_dcm
+
+.. autoclass:: StationaryCrystal
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

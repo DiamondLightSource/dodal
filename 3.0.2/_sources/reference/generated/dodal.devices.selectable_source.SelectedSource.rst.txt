@@ -1,0 +1,78 @@
+dodal.devices.selectable\_source.SelectedSource
+===============================================
+
+.. currentmodule:: dodal.devices.selectable_source
+
+.. autoclass:: SelectedSource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SelectedSource.SOURCE1
+      
+      
+      ~SelectedSource.SOURCE2
+      
+   
+   

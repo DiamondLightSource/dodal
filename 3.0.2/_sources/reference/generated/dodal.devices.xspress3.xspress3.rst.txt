@@ -1,0 +1,39 @@
+dodal.devices.xspress3.xspress3
+===============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.xspress3
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~xspress3.AcquireRBVState
+   ~xspress3.DetectorState
+   ~xspress3.TriggerMode
+   ~xspress3.Xspress3
+
+
+
+
+.. automodule:: dodal.devices.xspress3.xspress3
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

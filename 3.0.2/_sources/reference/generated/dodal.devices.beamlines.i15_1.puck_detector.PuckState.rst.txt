@@ -1,0 +1,81 @@
+dodal.devices.beamlines.i15\_1.puck\_detector.PuckState
+=======================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.puck_detector
+
+.. autoclass:: PuckState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PuckState.NO_PUCK
+      
+      
+      ~PuckState.PUCK
+      
+      
+      ~PuckState.LID
+      
+   
+   

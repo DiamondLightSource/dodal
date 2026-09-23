@@ -1,0 +1,62 @@
+dodal.devices.current\_amplifiers.Femto3xxGainToCurrentTable
+============================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: Femto3xxGainToCurrentTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_1
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_2
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_3
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_4
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_5
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_6
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_7
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_8
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_9
+      
+      
+      ~Femto3xxGainToCurrentTable.SEN_10
+      
+   
+   

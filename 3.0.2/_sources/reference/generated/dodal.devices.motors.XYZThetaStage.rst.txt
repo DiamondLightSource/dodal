@@ -1,0 +1,40 @@
+dodal.devices.motors.XYZThetaStage
+==================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZThetaStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

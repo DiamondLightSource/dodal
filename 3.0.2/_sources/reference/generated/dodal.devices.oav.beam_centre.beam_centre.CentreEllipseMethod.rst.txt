@@ -1,0 +1,43 @@
+dodal.devices.oav.beam\_centre.beam\_centre.CentreEllipseMethod
+===============================================================
+
+.. currentmodule:: dodal.devices.oav.beam_centre.beam_centre
+
+.. autoclass:: CentreEllipseMethod
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~CentreEllipseMethod.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

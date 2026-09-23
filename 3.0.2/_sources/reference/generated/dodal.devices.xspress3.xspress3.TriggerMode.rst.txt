@@ -1,0 +1,99 @@
+dodal.devices.xspress3.xspress3.TriggerMode
+===========================================
+
+.. currentmodule:: dodal.devices.xspress3.xspress3
+
+.. autoclass:: TriggerMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TriggerMode.SOFTWARE
+      
+      
+      ~TriggerMode.HARDWARE
+      
+      
+      ~TriggerMode.BURST
+      
+      
+      ~TriggerMode.TTL_VETO_ONLY
+      
+      
+      ~TriggerMode.IDC
+      
+      
+      ~TriggerMode.SOTWARE_START_STOP
+      
+      
+      ~TriggerMode.TTL_BOTH
+      
+      
+      ~TriggerMode.LVDS_VETO_ONLY
+      
+      
+      ~TriggerMode.LVDS_BOTH
+      
+   
+   

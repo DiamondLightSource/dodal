@@ -1,0 +1,78 @@
+dodal.devices.eurotherm.AutoManual
+==================================
+
+.. currentmodule:: dodal.devices.eurotherm
+
+.. autoclass:: AutoManual
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AutoManual.AUTO
+      
+      
+      ~AutoManual.MANUAL
+      
+   
+   

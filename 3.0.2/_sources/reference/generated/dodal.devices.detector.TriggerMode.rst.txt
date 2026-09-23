@@ -1,0 +1,26 @@
+dodal.devices.detector.TriggerMode
+==================================
+
+.. currentmodule:: dodal.devices.detector
+
+.. autoclass:: TriggerMode
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TriggerMode.SET_FRAMES
+      
+      
+      ~TriggerMode.FREE_RUN
+      
+   
+   

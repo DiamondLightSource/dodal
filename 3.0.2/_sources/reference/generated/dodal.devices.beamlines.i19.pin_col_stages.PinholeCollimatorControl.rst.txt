@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i19.pin\_col\_stages.PinholeCollimatorControl
+=====================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.pin_col_stages
+
+.. autoclass:: PinholeCollimatorControl
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~PinholeCollimatorControl.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

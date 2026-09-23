@@ -1,0 +1,87 @@
+dodal.devices.synchrotron.TopUpState
+====================================
+
+.. currentmodule:: dodal.devices.synchrotron
+
+.. autoclass:: TopUpState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TopUpState.OFF
+      
+      
+      ~TopUpState.RUNNING
+      
+      
+      ~TopUpState.STOPPING
+      
+      
+      ~TopUpState.FAILED
+      
+      
+      ~TopUpState.NO_PROCESS
+      
+   
+   

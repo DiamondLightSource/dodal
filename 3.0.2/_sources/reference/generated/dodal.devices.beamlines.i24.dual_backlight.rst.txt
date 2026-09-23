@@ -1,0 +1,38 @@
+dodal.devices.beamlines.i24.dual\_backlight
+===========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i24
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~dual_backlight.BacklightPositioner
+   ~dual_backlight.BacklightPositions
+   ~dual_backlight.DualBacklight
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i24.dual_backlight
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.xspress3
+======================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.xspress3.xspress3
+   dodal.devices.xspress3.xspress3_channel
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.xspress3
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

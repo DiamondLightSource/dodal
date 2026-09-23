@@ -1,0 +1,40 @@
+dodal.devices.focusing\_mirror.SimpleMirror
+===========================================
+
+.. currentmodule:: dodal.devices.focusing_mirror
+
+.. autoclass:: SimpleMirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

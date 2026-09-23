@@ -1,0 +1,124 @@
+dodal.devices.electron\_analyser.mbs.MbsAnalyserDriverIO
+========================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.mbs
+
+.. autoclass:: MbsAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~MbsAnalyserDriverIO.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~MbsAnalyserDriverIO.PV_CFG
+      
+      
+      
+      
+      
+      
+      ~MbsAnalyserDriverIO.acquire_time
+      
+      
+      ~MbsAnalyserDriverIO.acquire_period
+      
+      
+      ~MbsAnalyserDriverIO.num_images
+      
+      
+      ~MbsAnalyserDriverIO.image_mode
+      
+      
+      ~MbsAnalyserDriverIO.detector_state
+      
+      
+      ~MbsAnalyserDriverIO.acquire
+      
+      
+      ~MbsAnalyserDriverIO.wait_for_plugins
+      
+      
+      ~MbsAnalyserDriverIO.manufacturer
+      
+      
+      ~MbsAnalyserDriverIO.model
+      
+      
+      ~MbsAnalyserDriverIO.serial_number
+      
+      
+      ~MbsAnalyserDriverIO.sdk_version
+      
+      
+      ~MbsAnalyserDriverIO.firmware_version
+      
+      
+      ~MbsAnalyserDriverIO.port_name
+      
+      
+      ~MbsAnalyserDriverIO.unique_id
+      
+      
+      ~MbsAnalyserDriverIO.nd_attributes_file
+      
+      
+      ~MbsAnalyserDriverIO.array_size_x
+      
+      
+      ~MbsAnalyserDriverIO.array_size_y
+      
+      
+      ~MbsAnalyserDriverIO.array_size_z
+      
+      
+      ~MbsAnalyserDriverIO.array_size0
+      
+      
+      ~MbsAnalyserDriverIO.array_size1
+      
+      
+      ~MbsAnalyserDriverIO.array_size2
+      
+      
+      ~MbsAnalyserDriverIO.color_mode
+      
+      
+      ~MbsAnalyserDriverIO.data_type
+      
+      
+      ~MbsAnalyserDriverIO.array_counter
+      
+      
+      ~MbsAnalyserDriverIO.ad_core_version
+      
+      
+      ~MbsAnalyserDriverIO.driver_version
+      
+   
+   
