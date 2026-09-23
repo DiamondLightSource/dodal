@@ -71,6 +71,6 @@ def analyser(
             analyser_slits.direction,
             analyser_slits.size,
             analyser_slits.shape,
-            analyser_slits.setting,
+            analyser_slits.aperture,
         ),
     )

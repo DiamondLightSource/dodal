@@ -36,8 +36,8 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -53,7 +53,7 @@ set_utils_beamline(BL)
 I19_2_COMMISSIONING_INSTR_SESSION: str = "cm40639-5"
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(),
+    outputs=ZebraOutputs(),
     sources=ZebraSources(),
 )
 
@@ -95,7 +95,7 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 @devices.factory()
 def backlight() -> BacklightPosition:
-    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
+    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-BL-02:")
 
 
 @devices.factory()
