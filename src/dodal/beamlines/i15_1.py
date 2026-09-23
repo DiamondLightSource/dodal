@@ -14,7 +14,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
-from dodal.devices.beamlines.i15_1.attenuator import Attenuator
+from dodal.devices.beamlines.i15_1.attenuators import FastAttenuator, SlowAttenuator
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
@@ -246,8 +246,13 @@ def puck_detect() -> PuckDetect:
 
 
 @devices.factory()
-def attenuator() -> Attenuator:
-    return Attenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
+def slow_attenuator() -> SlowAttenuator:
+    return SlowAttenuator(f"{PREFIX.beamline_prefix}-OP-ATTN-02:")
+
+
+@devices.factory()
+def fast_attenuator() -> FastAttenuator:
+    return FastAttenuator(f"{PREFIX.beamline_prefix}-DI-PHDGN-01:")
 
 
 @devices.factory()
