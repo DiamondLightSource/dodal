@@ -1,5 +1,4 @@
-from .spec_path import spec_scan
-from .wrapped import (
+from .blueapi_wrapped import (
     count,
     list_grid_rscan,
     list_grid_scan,
@@ -14,9 +13,9 @@ from .wrapped import (
     step_rscan,
     step_scan,
 )
+from .spec_path import spec_scan
 
 __all__ = [
-    "spec_scan",
     "count",
     "list_grid_rscan",
     "list_grid_scan",
@@ -30,4 +29,5 @@ __all__ = [
     "step_grid_scan",
     "step_rscan",
     "step_scan",
+    "spec_scan",
 ]
