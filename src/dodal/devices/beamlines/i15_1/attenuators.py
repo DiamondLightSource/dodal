@@ -1,7 +1,13 @@
+import asyncio
+import math
+import string
+
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceMock,
+    DeviceVector,
+    SignalR,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -16,6 +22,7 @@ from ophyd_async.epics.core import (
     epics_signal_rw,
     epics_signal_w,
 )
+from ophyd_async.epics.motor import Motor
 
 
 class FastAttenuatorState(StrictEnum):
@@ -70,7 +77,33 @@ class SlowAttenuator(StandardReadable, Movable[SlowAttenuatorPositions]):
             self.transmission = epics_signal_rw(
                 SlowAttenuatorPositions, f"{prefix}MP1:SELECT"
             )
+
+        self._underlying_motor = Motor(f"{prefix}Y")
+        self._positions = DeviceVector[SignalR[float]](
+            {
+                i: epics_signal_r(float, f"{prefix}P1:VAL{letter}")
+                for i, letter in enumerate(list(string.ascii_uppercase[:10]))
+            }
+        )
+        self._timeout = 20
         super().__init__(name)
+
+    async def _calculate_max_timeout(self) -> float:
+        """Calculate the time needed to move between the two furthest apart positions."""
+        motor_leeway = 2  # Add a small buffer to the calculated timeout
+        values = await asyncio.gather(
+            *(position.get_value() for position in self._positions.values())
+        )
+        non_zero_values = [value for value in values if not math.isclose(value, 0)]
+        if not non_zero_values:
+            return self._timeout
+        max_distance = max(non_zero_values) - min(non_zero_values)
+        velocity = await self._underlying_motor.velocity.get_value()
+        return max_distance / velocity + motor_leeway
+
+    async def connect(self, *args, **kwargs) -> None:
+        await super().connect(*args, **kwargs)
+        self._timeout = await self._calculate_max_timeout()
 
     @AsyncStatus.wrap
     async def set(self, value: SlowAttenuatorPositions):
@@ -78,7 +111,7 @@ class SlowAttenuator(StandardReadable, Movable[SlowAttenuatorPositions]):
 
         Will raise ValueError if the percentage is not possible.
         """
-        await self.transmission.set(value)
+        await self.transmission.set(value, timeout=self._timeout)
 
 
 class MockFastAttenuator(DeviceMock["FastAttenuator"]):
