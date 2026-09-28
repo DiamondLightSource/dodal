@@ -103,6 +103,9 @@ class SlowAttenuator(StandardReadable, Movable[SlowAttenuatorPositions]):
 
     async def connect(self, *args, **kwargs) -> None:
         await super().connect(*args, **kwargs)
+        # The timeout will only ever change if there are large hardware changes so
+        # calculating it on connect is a good balance between making it somewhat flexible
+        # whilst not introducing the overhead of re-calculating on every move
         self._timeout = await self._calculate_max_timeout()
 
     @AsyncStatus.wrap
