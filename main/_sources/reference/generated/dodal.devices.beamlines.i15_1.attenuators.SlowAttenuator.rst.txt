@@ -16,6 +16,8 @@ dodal.devices.beamlines.i15\_1.attenuators.SlowAttenuator
       
       
       
+      ~SlowAttenuator.connect
+      
       
       
       
