@@ -74,6 +74,7 @@ dev = [
     "types-mock",
     "types-PyYAML",
     "types-aiofiles",
+    "myst-nb>=1.4.0",
 ]
 
 [project.scripts]
