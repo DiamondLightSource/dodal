@@ -23,6 +23,8 @@ from ophyd_async.fastcs.jungfrau._trigger_logic import JungfrauTriggerLogic
 
 from dodal.log import LOGGER
 
+ACQUISITION_STOP_TIMEOUT_S = 60
+
 
 class JungfrauCommissioningWriter(StandardReadable):
     """Implementation of the temporary filewriter used for Jungfrau commissioning on i24.
@@ -121,6 +123,12 @@ class CommissioningJungfrauDetector(StandardDetector):
         drv_connector = fastcs_connector(prefix + drv_suffix)
         self.detector = JungfrauDriverIO(connector=drv_connector)
         drv_connector.create_children_from_annotations(self.detector)
+        # AcquisitionStop takes ~20s to complete on the commissioning IOC, which is
+        # longer than ophyd-async's 10s Command default, so unstage() fails with a
+        # TimeoutError after the stop has in fact been accepted. A Command's timeout is
+        # only settable at construction, and these children are built from annotations,
+        # so there is no public way to pass one in.
+        self.detector.acquisition_stop._timeout = ACQUISITION_STOP_TIMEOUT_S  # noqa: SLF001
         self.writer = JungfrauCommissioningWriter(writer_prefix)
         self.acquisition_type = soft_signal_rw(
             AcquisitionType, AcquisitionType.STANDARD
