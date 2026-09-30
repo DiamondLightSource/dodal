@@ -24,4 +24,5 @@ For all hardware in the shared optics hutch, the architecture should follow this
 
 :::{seealso}
 [Optics hutch implementation on I19](https://diamondlightsource.github.io/i19-bluesky/main/explanations/decisions/0004-optics-blueapi-architecture.html) for an example.
+[MMG and SSG beamlines requirement](https://github.com/DiamondLightSource/dodal/issues/1530#issuecomment-3292301349). Please check if current proposal describe here meets the use cases described in this link.
 :::
