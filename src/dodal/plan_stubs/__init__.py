@@ -1,4 +1,4 @@
-from .wrapped import (
+from .blueapi_wrapped import (
     move,
     move_relative,
     rd,
