@@ -205,6 +205,13 @@ class Robot(StandardReadable, Movable[SampleLocation]):
     async def _load(self, location: SampleLocation):
         await self._set_spinner_state(SpinnerState.OFF)
 
+        if (
+            int(await self.controller_err_code.get_value())
+            == ErrorCodes.NO_SAMPLE.value
+        ):
+            LOGGER.warning("Resetting robot as controller is in NO_SAMPLE error")
+            await self.reset.trigger()
+
         await self._load_program_and_wait_for_loaded(
             self.puck_load_program, ProgramNames.PUCK
         )
