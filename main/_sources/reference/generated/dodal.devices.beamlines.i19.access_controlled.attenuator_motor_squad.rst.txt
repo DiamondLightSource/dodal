@@ -14,7 +14,6 @@ dodal.devices.beamlines.i19.access\_controlled.attenuator\_motor\_squad
    :toctree:
    :recursive:
 
-   ~attenuator_motor_squad.AttenuatorMotorPositions
    ~attenuator_motor_squad.AttenuatorMotorSquad
 
 
