@@ -195,7 +195,7 @@ def zebra() -> Zebra:
 
 @devices.factory()
 def beam_centre_from_epics() -> CentroidFromEpics:
-    return CentroidFromEpics("")
+    return CentroidFromEpics(f"{PREFIX.beamline_prefix}-EA-OAV-01:")
 
 
 @devices.factory()
