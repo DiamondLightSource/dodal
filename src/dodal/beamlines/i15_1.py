@@ -65,7 +65,7 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient.from_url()
+    client = ConfigClient.from_url("https://i15-1-daq-config.diamond.ac.uk")
     set_config_client(client)
     return client
 
