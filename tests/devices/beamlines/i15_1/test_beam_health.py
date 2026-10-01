@@ -15,5 +15,5 @@ async def beam_health():
 async def test_beam_healthy_read_as_bool(
     pv_value: float, expected_healthy: bool, beam_health: BeamHealth
 ):
-    set_mock_value(beam_health._healthy_float, pv_value)
+    set_mock_value(beam_health._healthy, pv_value)
     assert await beam_health.healthy.get_value() is expected_healthy
