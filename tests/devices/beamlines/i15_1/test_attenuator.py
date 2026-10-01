@@ -89,3 +89,35 @@ async def test_moving_fast_attenuator_out_sets_readback(fast_attenuator):
             "fast_attenuator-status": partial_reading(FastAttenuatorState.OUT),
         },
     )
+
+
+async def test_calculate_max_timeout_ignores_zero_positions_and_uses_velocity(
+    slow_attenuator,
+):
+    for i, value in enumerate([0, 5, 0, 20, -10]):
+        set_mock_value(slow_attenuator._positions[i], value)
+    set_mock_value(slow_attenuator._underlying_motor.velocity, 5)
+
+    timeout = await slow_attenuator._calculate_max_timeout()
+
+    assert timeout == 8
+
+
+async def test_calculate_max_timeout_with_all_zero_positions_except_two(
+    slow_attenuator,
+):
+    for i in slow_attenuator._positions:
+        set_mock_value(slow_attenuator._positions[i], 0)
+    set_mock_value(slow_attenuator._positions[0], -3)
+    set_mock_value(slow_attenuator._positions[1], 3)
+    set_mock_value(slow_attenuator._underlying_motor.velocity, 2)
+
+    timeout = await slow_attenuator._calculate_max_timeout()
+
+    assert timeout == 5
+
+
+async def test_given_all_zero_positions_default_timeout_is_used_on_connect(
+    slow_attenuator,
+):
+    assert slow_attenuator._timeout == 20
