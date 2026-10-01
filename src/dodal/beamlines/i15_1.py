@@ -15,6 +15,7 @@ from dodal.devices.beamlines.i15.motors import NumberedTripleAxisStage
 from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
 from dodal.devices.beamlines.i15_1.attenuators import FastAttenuator, SlowAttenuator
+from dodal.devices.beamlines.i15_1.beam_health import BeamHealth
 from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
@@ -64,7 +65,7 @@ def path_provider() -> PathProvider:
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient.from_url()
+    client = ConfigClient.from_url("https://i15-1-daq-config.diamond.ac.uk")
     set_config_client(client)
     return client
 
@@ -357,3 +358,8 @@ def cam_3(path_provider: PathProvider) -> ContAcqDetector:
         driver_suffix=CAM_SUFFIX,
         cb_suffix="CIRC:",
     )
+
+
+@devices.factory()
+def beam_health():
+    return BeamHealth(f"{PREFIX.beamline_prefix}-DI-BPM-01:")
