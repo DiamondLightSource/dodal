@@ -26,6 +26,7 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
 )
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -98,6 +99,11 @@ def beam_centre() -> CentreEllipseMethod:
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
         overlay_channel=7,
     )
+
+
+@devices.factory()
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
 
 
 @devices.factory()
