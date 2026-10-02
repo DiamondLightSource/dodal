@@ -22,11 +22,12 @@ async def test_set_plugin_chain(centroid_device: CentroidFromEpics):
     assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
 
 
-async def test_centroid_can_be_read(centroid_device: CentroidFromEpics):
+async def test_centroid_position_can_be_read(centroid_device: CentroidFromEpics):
     await assert_reading(
         centroid_device,
         {
             "mock_centroid-beam_centre_x": partial_reading(706),
             "mock_centroid-beam_centre_y": partial_reading(283),
         },
+        False,
     )

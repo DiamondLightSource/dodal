@@ -32,17 +32,24 @@ class CentroidFromEpics(StandardReadable):
         stat_infix: str = STAT_INFIX,
         name: str = "",
     ):
-        self.stat_array_port = epics_signal_rw_rbv(
-            str, f"{prefix}{stat_infix}NDArrayPort"
-        )
-        self.centroid_threshold = epics_signal_rw(
-            float, f"{prefix}{stat_infix}CentroidThreshold"
-        )
-        self.beam_centre_y = epics_signal_r(float, f"{prefix}{stat_infix}CentroidY_RBV")
-        self.beam_centre_x = epics_signal_r(float, f"{prefix}{stat_infix}CentroidX_RBV")
+        with self.add_children_as_readables():
+            self.stat_array_port = epics_signal_rw_rbv(
+                str, f"{prefix}{stat_infix}NDArrayPort"
+            )
+            self.centroid_threshold = epics_signal_rw(
+                float, f"{prefix}{stat_infix}CentroidThreshold"
+            )
+            self.beam_centre_y = epics_signal_r(
+                float, f"{prefix}{stat_infix}CentroidY_RBV"
+            )
+            self.beam_centre_x = epics_signal_r(
+                float, f"{prefix}{stat_infix}CentroidX_RBV"
+            )
 
-        self.cc_array_port = epics_signal_rw_rbv(str, f"{prefix}{cc_infix}NDArrayPort")
-        self.colour_mode = epics_signal_rw(
-            ColourMode, f"{prefix}{cc_infix}ColorModeOut"
-        )
+            self.cc_array_port = epics_signal_rw_rbv(
+                str, f"{prefix}{cc_infix}NDArrayPort"
+            )
+            self.colour_mode = epics_signal_rw(
+                ColourMode, f"{prefix}{cc_infix}ColorModeOut"
+            )
         super().__init__(name)
