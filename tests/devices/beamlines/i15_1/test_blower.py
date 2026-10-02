@@ -162,4 +162,4 @@ async def test_calibrated_blower_returns_calibrated_temperature_based_on_raw(
     calibrated_blower: CalibratedBlower,
 ):
     await calibrated_blower.raw_temperature.set(759.721816599402)
-    assert await calibrated_blower.temperature.get_value() == 499.9999999999999
+    assert await calibrated_blower.temperature.get_value() == pytest.approx(500)
