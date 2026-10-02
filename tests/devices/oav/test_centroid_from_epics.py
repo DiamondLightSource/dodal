@@ -27,6 +27,6 @@ async def test_centroid_can_be_read(centroid_device: CentroidFromEpics):
         centroid_device,
         {
             "mock_centroid-beam_centre_x": partial_reading(706),
-            "mock_centroid-beam_centre_y": partial_reading(18),
+            "mock_centroid-beam_centre_y": partial_reading(283),
         },
     )
