@@ -6,7 +6,7 @@ from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 
 
 @pytest.fixture
-def centroid_device() -> CentroidFromEpics:
+async def centroid_device() -> CentroidFromEpics:
     with init_devices(mock=True):
         device = CentroidFromEpics("", name="mock_centroid")
     set_mock_value(device.beam_centre_x, 706)
