@@ -6,15 +6,14 @@ from .coordinates import (
 )
 from .movement import MagnetPositionError
 from .power_supply import MagnetAxisPowerSupply, ThreeMagnetAxisPowerSupply
-from .ramp_controller import (
-    MagnetAxisRampRateController,
-)
+from .ramp_controller import MagnetAxisRampRateController
 from .superconducting_magnet import (
     FlyMagnetInfo,
     MagnetAxis,
     MagnetLimitStatus,
     MagnetMode,
     MagnetRampStatus,
+    MockSuperConductingMagnetController,
     SuperConductingMagnetController,
 )
 
@@ -32,5 +31,6 @@ __all__ = [
     "MagnetLimitStatus",
     "MagnetMode",
     "MagnetRampStatus",
+    "MockSuperConductingMagnetController",
     "SuperConductingMagnetController",
 ]

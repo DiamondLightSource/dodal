@@ -161,6 +161,7 @@ class DualFastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
         return derived_signal_rw(
             self._read_shutter_state,
             self._set_shutter_state,
+            derived_datatype=type(self._shutter1_ref().open_state),
             selected_shutter=self._selected_shutter_ref(),
             shutter1=self._shutter1_ref().shutter_state,
             shutter2=self._shutter2_ref().shutter_state,

@@ -9,10 +9,8 @@ from pydantic import Field, validate_call
 from scanspec.specs import Spec
 
 from dodal.common import MsgGenerator
-from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def spec_scan(
     detectors: Annotated[

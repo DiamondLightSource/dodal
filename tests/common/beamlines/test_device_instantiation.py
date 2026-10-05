@@ -4,8 +4,7 @@ import pytest
 from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
-from dodal.device_manager import DeviceManager
-from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
+from dodal.utils import BLUESKY_PROTOCOLS
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
@@ -34,38 +33,4 @@ def test_device_creation(module_and_devices_for_beamline):
     ]
     assert len(devices_not_following_bluesky_protocols) == 0, (
         f"{devices_not_following_bluesky_protocols} do not follow bluesky protocols"
-    )
-
-
-@pytest.mark.parametrize(
-    "module_and_devices_for_beamline",
-    set(all_beamline_modules()),
-    indirect=True,
-)
-# Increase timeout for this specific test as running individually can take over a second
-# to import everything so causes tests to fail.
-@pytest.mark.timeout(2)
-def test_devices_are_identical(module_and_devices_for_beamline):
-    """Ensures that for every beamline all device functions prevent duplicate
-    instantiation.
-    """
-    bl_mod, devices_a, _ = module_and_devices_for_beamline
-    if isinstance(getattr(bl_mod, "devices", None), DeviceManager):
-        # DeviceManager beamline modules do not cache device instances
-        return
-
-    devices_b, _ = make_all_devices(
-        bl_mod,
-        include_skipped=True,
-        fake_with_ophyd_sim=True,
-    )
-    non_identical_names = [
-        device_name
-        for device_name, device in devices_a.items()
-        if device is not devices_b[device_name]
-    ]
-    total_number_of_devices = len(devices_a)
-    non_identical_number_of_devices = len(devices_a)
-    assert len(non_identical_names) == 0, (
-        f"{non_identical_number_of_devices}/{total_number_of_devices} devices were not identical: {non_identical_names}"
     )

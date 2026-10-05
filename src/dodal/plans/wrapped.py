@@ -9,7 +9,6 @@ from ophyd_async.core import AsyncReadable
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
-from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
 """This module wraps plan(s) from bluesky.plans until required handling for them is
 moved into bluesky or better handled in downstream services.
@@ -26,7 +25,6 @@ We may also need other adjustments for UI purposes, e.g.
 """
 
 
-@attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
 def count(
     detectors: Annotated[

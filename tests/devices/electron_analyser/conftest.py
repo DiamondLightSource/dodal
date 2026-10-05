@@ -1,10 +1,11 @@
+import asyncio
 from typing import Any
 
 import numpy as np
 import pytest
 from ophyd_async.core import (
-    InOut,
     SignalR,
+    SignalRW,
     init_devices,
     set_mock_value,
     soft_signal_rw,
@@ -19,10 +20,8 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import (
-    DualEnergySource,
     ElectronAnalyserTriggerLogic,
     RegionLogic,
-    ShutterCoordinatorADAcquireLogic,
 )
 from dodal.devices.electron_analyser.mbs import MbsAnalyserDriverIO, MbsDetector
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsDetector
@@ -30,15 +29,14 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaDetector,
 )
-from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.selectable_source import SourceSelector
+from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 
 
 @pytest.fixture
-async def source_selector() -> SourceSelector:
+async def source_selector() -> SignalRW[SelectedSource]:
     async with init_devices(mock=True):
-        source_selector = SourceSelector()
+        source_selector = soft_signal_rw(SelectedSource)
     return source_selector
 
 
@@ -53,63 +51,24 @@ async def source_energy() -> SignalR[float]:
 
 
 @pytest.fixture
-async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySource:
-    async with init_devices(mock=True):
+async def dual_energy_source(
+    source_selector: SignalRW[SelectedSource],
+) -> DualEnergySource:
+    with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
         pgm = PlaneGratingMonochromator("PGM:", Grating)
-    await dcm.energy_in_keV.set(2.2)
-    await pgm.energy.set(500)
-    async with init_devices(mock=True):
+    # Do in new context so that dcm and pgm are connected and named before giving to
+    # dual_energy_source.
+    with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
             source1=dcm.energy_in_eV,
             source2=pgm.energy.user_readback,
-            selected_source=source_selector.selected_source,
+            selected_source=source_selector,
         )
+    await asyncio.gather(dcm.energy_in_keV.set(2.2), pgm.energy.set(500))
     return dual_energy_source
-
-
-@pytest.fixture
-async def dual_source_energy(dual_energy_source: DualEnergySource) -> SignalR[float]:
-    return dual_energy_source.energy
-
-
-@pytest.fixture
-def shutter1() -> FastShutter[InOut]:
-    with init_devices(mock=True):
-        shutter1 = FastShutter[InOut](
-            pv="TEST:",
-            open_state=InOut.OUT,
-            close_state=InOut.IN,
-        )
-    return shutter1
-
-
-@pytest.fixture
-def shutter2() -> FastShutter[InOut]:
-    with init_devices(mock=True):
-        shutter2 = FastShutter[InOut](
-            pv="TEST:",
-            open_state=InOut.OUT,
-            close_state=InOut.IN,
-        )
-    return shutter2
-
-
-@pytest.fixture
-def dual_fast_shutter(
-    shutter1: FastShutter[InOut],
-    shutter2: FastShutter[InOut],
-    source_selector: SourceSelector,
-) -> DualFastShutter[InOut]:
-    with init_devices(mock=True):
-        dual_fast_shutter = DualFastShutter[InOut](
-            shutter1,
-            shutter2,
-            source_selector.selected_source,
-        )
-    return dual_fast_shutter
 
 
 @pytest.fixture
@@ -134,21 +93,17 @@ async def b07b_specs150(
 @pytest.fixture
 async def ew4000(
     dual_energy_source: DualEnergySource,
-    dual_fast_shutter: DualFastShutter,
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
 ) -> VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy]:
     with init_devices(mock=True):
         prefix = "TEST:"
         driver = VGScientaAnalyserDriverIO(
             prefix, i09.LensMode, i09.PsuMode, i09.PassEnergy
         )
-        close_shutter_when_idle = soft_signal_rw(bool, initial_value=True)
         ew4000 = VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy](
             prefix,
             driver,
-            acquire_logic=ShutterCoordinatorADAcquireLogic(
-                driver, dual_fast_shutter, close_shutter_when_idle
-            ),
+            acquire_logic=ADAcquireLogic(driver),
             trigger_logic=ElectronAnalyserTriggerLogic(driver),
             region_logic=RegionLogic(
                 driver, dual_energy_source.energy, source_selector

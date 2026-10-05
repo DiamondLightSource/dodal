@@ -5,6 +5,7 @@ from typing import Protocol
 
 from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     DeviceMock,
     MovableLogic,
@@ -242,8 +243,27 @@ class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPositi
 class MockSuperConductingMagnetController(
     DeviceMock["SuperConductingMagnetController"]
 ):
-    """Add additional callback logic to our device to get the mock behaviour to simulate
-    the hardware as best we can.
+    """Mock controller that simulates the behaviour of the
+    SuperConductingMagnetController hardware.
+
+    The mock reproduces additional IOC behaviour that is not provided by the
+    standard device mock, including:
+
+    - Updating readback positions when a ramp is triggered.
+    - Resetting demand positions back to zero, configuring PSU limits, and triggering a
+      ramp when the mode changes.
+    - Simulating the movement of readback positions over time.
+
+    Movements are simulated over multiple steps by default so that beamline
+    operation in mock mode behaves similarly to the real hardware. This also
+    allows fly scans to be exercised in mock mode, with detector events
+    occurring while the magnet is moving.
+
+    Unit tests that do not require simulated movement can disable it by
+    setting ``steps`` to zero::
+
+        scmc = SuperConductingMagnetController(..., name="scmc")
+        await scmc.connect(mock=MockSuperConductingMagnetController(steps=0))
     """
 
     # Pulled directly from live IOC so can replicate behaviour in mock mode.
@@ -257,20 +277,50 @@ class MockSuperConductingMagnetController(
         MagnetMode.SPHERICAL: (2, 2, 2),
     }
 
-    async def connect(self, device: "SuperConductingMagnetController"):
+    def __init__(
+        self,
+        name: str = "",
+        parent: DeviceMock | None = None,
+        steps: int = 10,
+        ramp_duration: float = 1.0,
+    ):
+        super().__init__(name, parent)
+        self.steps = steps
+        self.ramp_duration = ramp_duration
 
+    async def connect(self, device: "SuperConductingMagnetController"):
         async def _trigger_start_ramp():
-            # Whenever ramp is triggered for the ioc, readback values move to the
+            # Whenever ramp is triggered for the IOC, readback values move to the
             # demand values. Simulate this behaviour here.
-            x_d, y_d, z_d = await asyncio.gather(
+            x_d, y_d, z_d, x_r, y_r, z_r = await asyncio.gather(
                 device.cart.x.demand.get_value(),
                 device.cart.y.demand.get_value(),
                 device.cart.z.demand.get_value(),
+                device.cart.x.readback.get_value(),
+                device.cart.y.readback.get_value(),
+                device.cart.z.readback.get_value(),
             )
+            axes = (
+                (device.cart.x.readback, x_r, x_d),
+                (device.cart.y.readback, y_r, y_d),
+                (device.cart.z.readback, z_r, z_d),
+            )
+            # Only move the axis that has changed
+            axes_to_move = [
+                (rb, rb_val, demand) for rb, rb_val, demand in axes if rb_val != demand
+            ]
+            # Use configured number of steps or use a single step, whichever is larger
+            steps = max(self.steps, 1)
+            step_time = self.ramp_duration / steps if steps > 1 else 0
+
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMPING)
-            set_mock_value(device.cart.x.readback, x_d)
-            set_mock_value(device.cart.y.readback, y_d)
-            set_mock_value(device.cart.z.readback, z_d)
+            for step in range(1, steps + 1):
+                fraction = step / steps
+                for readback, readback_value, demand in axes_to_move:
+                    set_mock_value(
+                        readback, readback_value + (demand - readback_value) * fraction
+                    )
+                    await asyncio.sleep(step_time)
             set_mock_value(device.ramp_status, MagnetRampStatus.RAMP_MADE)
 
         callback_on_mock_execute(device._start_ramp, _trigger_start_ramp)  # noqa: SLF001
@@ -348,7 +398,7 @@ class SuperConductingMagnetController(StandardReadable):
 
         super().__init__(name)
 
-    async def _trigger_ramp(self):
+    async def _trigger_ramp(self, timeout: float = DEFAULT_TIMEOUT):
         # Setting invalid demand values should put the limit status in violation state.
         # Block ramp if in violation state.
         limit_status = await self.limit_status.get_value()
@@ -356,14 +406,16 @@ class SuperConductingMagnetController(StandardReadable):
             raise MagnetPositionError(f"{self.limit_status.name} is at {limit_status}")
         self.log.info("About to start ramping the magnet.")
         await self._start_ramp.trigger()
-        # Add a high bound limit to the timeout to avoid it getting stuck.
-        # https://github.com/DiamondLightSource/dodal/issues/2166
-        await wait_for_value(self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=500)
+        await wait_for_value(
+            self.ramp_status, MagnetRampStatus.RAMP_MADE, timeout=timeout
+        )
         self.log.info(
             f"Ramping complete. Ramp status is now {MagnetRampStatus.RAMP_MADE}"
         )
 
-    async def _apply_step(self, step: MagnetRequest) -> None:
+    async def _apply_step(
+        self, step: MagnetRequest, timeout: float = DEFAULT_TIMEOUT
+    ) -> None:
         """Apply a single movement step and wait for the magnet ramp to complete.
 
         A movement step may update one or more cartesian axes simultaneously. Once
@@ -379,7 +431,7 @@ class SuperConductingMagnetController(StandardReadable):
             tasks.append(self.cart.z.demand.set(step.z))
         self.log.info(f"About to set demand values of the magnet to {step}.")
         await asyncio.gather(*tasks)
-        await self._trigger_ramp()
+        await self._trigger_ramp(timeout=timeout)
 
     async def set_within_boundary(self, value: MagnetRequest):
         """Move the magnet to a new cartesian position while respecting mode limits.
@@ -422,7 +474,25 @@ class SuperConductingMagnetController(StandardReadable):
                 # Check each generated step is also within limit.
                 await self.psu_ref().check_axes_within_limit(step, mode)
                 movement_strategy.check_within_limits(current_readback, step)
-                await self._apply_step(step)
+                timeout = await self.calculate_timeout_per_step(
+                    current_readback=current_readback, value=step
+                )
+                await self._apply_step(step, timeout=timeout)
                 current_readback = await self.cart.get_readback_position()
         finally:
             self._moving = False
+
+    async def calculate_timeout_per_step(
+        self, current_readback: MagnetPosition, value: MagnetRequest
+    ) -> float:
+        """Calculate the timeout for a move based on the distance to move and the ramp rate."""
+        ramp_rates = await self.psu_ref().get_ramp_rate()
+        targets = (value.x, value.y, value.z)
+        currents = (current_readback.x, current_readback.y, current_readback.z)
+
+        max_axis_time = max(
+            abs(target - current) / rate if target is not None and rate > 0 else 0.0
+            for target, current, rate in zip(targets, currents, ramp_rates, strict=True)
+        )
+
+        return max_axis_time + DEFAULT_TIMEOUT

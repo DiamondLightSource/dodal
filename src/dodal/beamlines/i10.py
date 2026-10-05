@@ -18,7 +18,7 @@ from dodal.devices.beamlines.i10.rasor.rasor_scaler_cards import RasorScalerCard
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.motors import XYStage, XYZStage
-from dodal.devices.temperture_controller import (
+from dodal.devices.temperature_controller import (
     Lakeshore340,
 )
 from dodal.log import set_beamline as set_log_beamline

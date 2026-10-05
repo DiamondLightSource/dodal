@@ -33,7 +33,7 @@ from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYPitchStage, XYRollStage, XYStage
 from dodal.devices.slits import Slits, SlitsWithIndividualBlades
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.tetramm.tetramm import TetrammDetector
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump
 from dodal.log import set_beamline as set_log_beamline

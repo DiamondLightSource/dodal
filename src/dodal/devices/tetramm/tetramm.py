@@ -101,19 +101,22 @@ class TetrammTriggerLogic(DetectorTriggerLogic):
     async def prepare_level(self, num: int):
         await self.driver.trigger_mode.set(TetrammTrigger.EXT_TRIGGER)
 
-    async def set_exposure(self, exposure: float):
-        sample_time = await self.driver.sample_time.get_value()
-
-        minimum_samples = self._minimal_values_per_reading[
+    async def minimum_values_per_reading(self):
+        return self._minimal_values_per_reading[
             await self.driver.read_format.get_value()
         ]
 
+    async def set_exposure(self, exposure: float):
+        sample_time = await self.driver.sample_time.get_value()
+
+        minimum_values_per_reading = await self.minimum_values_per_reading()
+
         samples = int(exposure / sample_time)
 
-        if samples < minimum_samples:
+        if samples < minimum_values_per_reading:
             raise ValueError(
                 "Tetramm exposure time must be at least "
-                f"{minimum_samples * sample_time}s, asked to set it to {exposure}s"
+                f"{minimum_values_per_reading * sample_time}s, asked to set it to {exposure}s"
             )
 
         await self.driver.averaging_time.set(samples * sample_time)
@@ -183,13 +186,13 @@ class TetrammDetector(StandardDetector):
                 driver=self.driver,  # type: ignore
                 path_provider=path_provider,
                 array_description=NDArrayDescription(
-                    shape_signals=[self.num_channels, self.driver.to_average],
+                    shape_signals=self.get_shape(),
                     data_type_signal=self.driver.data_type,
                     color_mode_signal=self.driver.color_mode,
                 ),
                 plugins=list(plugins.values()),
             ),
-            TetrammTriggerLogic(self.driver, self.file_io),
+            self.get_detector_trigger_logic(),
             TetrammArmLogic(self.driver, self.file_io.capture),
         )
 
@@ -205,6 +208,12 @@ class TetrammDetector(StandardDetector):
             self.driver.averaging_time,
             self.driver.sample_time,
         )
+
+    def get_shape(self) -> list[SignalR]:
+        return [self.num_channels, self.driver.to_average]
+
+    def get_detector_trigger_logic(self) -> DetectorTriggerLogic:
+        return TetrammTriggerLogic(self.driver, self.file_io)
 
     @AsyncStatus.wrap
     async def prepare(self, value: TriggerInfo):

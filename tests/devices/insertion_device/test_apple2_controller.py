@@ -7,12 +7,12 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
+from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
     Apple2LockedPhasesVal,
     Apple2Val,
-    EnabledDisabledUpper,
     EnergyMotorConvertor,
     Pol,
     UndulatorGateStatus,
@@ -174,8 +174,9 @@ async def test_id_polarisation_set_for_id_controller(
     expect_btm_inner: float,
 ):
     await mock_locked_controller.polarisation.set(pol)
-    set_mock_value(mock_locked_apple2.phase().top_outer.user_readback, expect_top_outer)
-    set_mock_value(mock_locked_apple2.phase().btm_inner.user_readback, expect_btm_inner)
+    phase = mock_locked_apple2.phase_ref()
+    set_mock_value(phase.top_outer.user_readback, expect_top_outer)
+    set_mock_value(phase.btm_inner.user_readback, expect_btm_inner)
     assert await mock_locked_controller.polarisation.get_value() == pol
 
 

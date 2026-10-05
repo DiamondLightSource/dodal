@@ -21,7 +21,7 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.devices.slits import Slits
-from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.tetramm.tetramm import TetrammDetector
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump
 from dodal.log import set_beamline as set_log_beamline
