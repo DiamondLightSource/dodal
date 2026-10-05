@@ -155,7 +155,7 @@ async def test_calibrated_blower_sets_raw_temperature_based_on_calibration(
     await calibrated_blower.temperature.set(500)
     get_mock_put(
         calibrated_blower.raw_temperature._temperature_sp
-    ).assert_called_once_with(759.721816599402)
+    ).assert_called_once_with(pytest.approx(759.721816599402))
 
 
 async def test_calibrated_blower_returns_calibrated_temperature_based_on_raw(
