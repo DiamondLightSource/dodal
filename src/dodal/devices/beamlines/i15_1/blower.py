@@ -153,8 +153,14 @@ class CalibratedBlower(Blower):
         super().__init__(
             prefix, motion_pv, pneumatic_pv, config_client, xpdf_parameters_path, name
         )
-        self.temperature_calibration = config_client.get_file_contents(
-            temperature_calibration_path, desired_return_type=TemperatureCalibration
+        self.config_client = config_client
+        self.temperature_calibration_path = temperature_calibration_path
+
+    @cached_property
+    def temperature_calibration(self):
+        return self.config_client.get_file_contents(
+            self.temperature_calibration_path,
+            desired_return_type=TemperatureCalibration,
         )
 
     def get_temperature(self, raw_temperature: float) -> float:
