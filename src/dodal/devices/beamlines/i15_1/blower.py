@@ -157,7 +157,7 @@ class CalibratedBlower(Blower):
         self.temperature_calibration_path = temperature_calibration_path
 
     @cached_property
-    def temperature_calibration(self):
+    def temperature_calibration(self) -> TemperatureCalibration:
         return self.config_client.get_file_contents(
             self.temperature_calibration_path,
             desired_return_type=TemperatureCalibration,
