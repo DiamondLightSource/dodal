@@ -1,3 +1,5 @@
+import asyncio
+
 from bluesky.protocols import Preparable
 from ophyd_async.core import (
     AsyncStatus,
@@ -9,6 +11,9 @@ from pydantic import BaseModel
 
 CC_INFIX = "CC:"
 STAT_INFIX = "STAT:"
+
+CAM_PLUGIN_NAME = "OAV1.cam"
+CC_PLUGIN_NAME = "OAV1.cc"
 
 
 class ColourMode(StrictEnum):
@@ -60,7 +65,9 @@ class CentroidFromEpics(StandardReadable, Preparable):
     @AsyncStatus.wrap
     async def prepare(self, value: CentroidSettings):
         """Prepare the camera to read the centroid by setting up the plugin chain."""
-        await self.cc_array_port.set("OAV1.cam")
-        await self.colour_mode.set(value.colour_mode)
-        await self.stat_array_port.set("OAV1.cc")
-        await self.centroid_threshold.set(value.threshold)
+        await asyncio.gather(
+            self.cc_array_port.set(CAM_PLUGIN_NAME),
+            self.colour_mode.set(value.colour_mode),
+            self.stat_array_port.set(CC_PLUGIN_NAME),
+            self.centroid_threshold.set(value.threshold),
+        )
