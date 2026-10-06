@@ -1,8 +1,12 @@
+from bluesky.protocols import Preparable
 from ophyd_async.core import (
+    AsyncStatus,
     StandardReadable,
     StrictEnum,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
+
+from pydantic import BaseModel
 
 CC_INFIX = "CC:"
 STAT_INFIX = "STAT:"
@@ -18,11 +22,14 @@ class ColourMode(StrictEnum):
     YUV422 = "YUV422"
     YUV421 = "YUV421"
 
+# NOTE will also need to make a triggerable to start it up (all the enables etc)
+class CentroidSettings(BaseModel):
+    threshold: float
+    colour_mode: ColourMode
 
-class CentroidFromEpics(StandardReadable):
+
+class CentroidFromEpics(StandardReadable, Preparable):
     """Device to set up the CAM -> CC -> STAT plugin chain and get the centroid.
-
-    Need to spend some time thinking about taking X/Y croping on CAM into account
     """
 
     def __init__(
@@ -32,10 +39,13 @@ class CentroidFromEpics(StandardReadable):
         stat_infix: str = STAT_INFIX,
         name: str = "",
     ):
+        self.stat_array_port = epics_signal_rw_rbv(
+            str, f"{prefix}{stat_infix}NDArrayPort"
+        )
+        self.cc_array_port = epics_signal_rw_rbv(
+            str, f"{prefix}{cc_infix}NDArrayPort"
+        )
         with self.add_children_as_readables():
-            self.stat_array_port = epics_signal_rw_rbv(
-                str, f"{prefix}{stat_infix}NDArrayPort"
-            )
             self.centroid_threshold = epics_signal_rw(
                 float, f"{prefix}{stat_infix}CentroidThreshold"
             )
@@ -45,11 +55,14 @@ class CentroidFromEpics(StandardReadable):
             self.beam_centre_x = epics_signal_r(
                 float, f"{prefix}{stat_infix}CentroidX_RBV"
             )
-
-            self.cc_array_port = epics_signal_rw_rbv(
-                str, f"{prefix}{cc_infix}NDArrayPort"
-            )
             self.colour_mode = epics_signal_rw(
                 ColourMode, f"{prefix}{cc_infix}ColorModeOut"
             )
         super().__init__(name)
+    
+    @AsyncStatus.wrap
+    async def prepare(self, value: CentroidSettings):
+        await self.cc_array_port.set("OAV1.cam")
+        await self.colour_mode.set(value.colour_mode)
+        await self.stat_array_port.set("OAV1.cc")
+        await self.centroid_threshold.set(value.threshold)
