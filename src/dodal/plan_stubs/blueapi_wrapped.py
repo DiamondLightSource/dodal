@@ -6,7 +6,7 @@ import bluesky.plan_stubs as bps
 from bluesky.protocols import Movable, Readable, Stoppable
 from bluesky.utils import MsgGenerator
 
-"""Wrappers for Bluesky built-in plan stubs with type hinting."""
+"""Wrappers for Bluesky built-in plan stubs with type hinting to be comptable with blueapi."""
 
 Group = Annotated[str, "String identifier used by 'wait' or stubs that await"]
 
