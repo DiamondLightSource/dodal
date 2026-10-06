@@ -2,7 +2,11 @@ import pytest
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics, CentroidSettings, ColourMode
+from dodal.devices.oav.beam_centre.centroid_from_epics import (
+    CentroidFromEpics,
+    CentroidSettings,
+    ColourMode,
+)
 
 
 @pytest.fixture
@@ -14,11 +18,17 @@ async def centroid_device() -> CentroidFromEpics:
     return device
 
 
-@pytest.mark.parametrize("threshold, colour_mode", [(20, ColourMode.MONO), (10, ColourMode.RGB1)])
+@pytest.mark.parametrize(
+    "threshold, colour_mode", [(20, ColourMode.MONO), (10, ColourMode.RGB1)]
+)
 async def test_prepare_sets_the_plugin_chain(
-    threshold: float, colour_mode: ColourMode, centroid_device: CentroidFromEpics,
+    threshold: float,
+    colour_mode: ColourMode,
+    centroid_device: CentroidFromEpics,
 ):
-    await centroid_device.prepare(CentroidSettings(threshold=threshold, colour_mode=colour_mode))
+    await centroid_device.prepare(
+        CentroidSettings(threshold=threshold, colour_mode=colour_mode)
+    )
 
     assert await centroid_device.stat_array_port.get_value() == "OAV1.cc"
     assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
