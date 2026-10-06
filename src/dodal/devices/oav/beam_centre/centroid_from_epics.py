@@ -29,7 +29,6 @@ class ColourMode(StrictEnum):
     YUV421 = "YUV421"
 
 
-# NOTE will also need to make a triggerable to start it up (all the enables etc)
 class CentroidSettings(BaseModel):
     threshold: float
     colour_mode: ColourMode
