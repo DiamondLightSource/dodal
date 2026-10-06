@@ -1,11 +1,13 @@
 import asyncio
 
-from bluesky.protocols import Preparable
+from bluesky.protocols import Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
+    EnableDisable,
     StandardReadable,
     StrictEnum,
 )
+from ophyd_async.epics.adcore import NDStatsIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
 from pydantic import BaseModel
 
@@ -33,7 +35,7 @@ class CentroidSettings(BaseModel):
     colour_mode: ColourMode
 
 
-class CentroidFromEpics(StandardReadable, Preparable):
+class CentroidFromEpics(StandardReadable, Preparable, Triggerable):
     """Device to set up the CAM -> CC -> STAT plugin chain and get the centroid."""
 
     def __init__(
@@ -43,22 +45,19 @@ class CentroidFromEpics(StandardReadable, Preparable):
         stat_infix: str = STAT_INFIX,
         name: str = "",
     ):
-        self.stat_array_port = epics_signal_rw_rbv(
-            str, f"{prefix}{stat_infix}NDArrayPort"
-        )
-        self.cc_array_port = epics_signal_rw_rbv(str, f"{prefix}{cc_infix}NDArrayPort")
         with self.add_children_as_readables():
-            self.centroid_threshold = epics_signal_rw(
-                float, f"{prefix}{stat_infix}CentroidThreshold"
-            )
-            self.beam_centre_y = epics_signal_r(
-                float, f"{prefix}{stat_infix}CentroidY_RBV"
-            )
-            self.beam_centre_x = epics_signal_r(
-                float, f"{prefix}{stat_infix}CentroidX_RBV"
+            self.cc_array_port = epics_signal_rw_rbv(
+                str, f"{prefix}{cc_infix}NDArrayPort"
             )
             self.colour_mode = epics_signal_rw(
                 ColourMode, f"{prefix}{cc_infix}ColorModeOut"
+            )
+            self.stats = NDStatsIO(prefix=f"{prefix}{STAT_INFIX}")
+            self.beam_centre_x = epics_signal_r(
+                float, f"{prefix}{stat_infix}CentroidX_RBV"
+            )
+            self.beam_centre_y = epics_signal_r(
+                float, f"{prefix}{stat_infix}CentroidY_RBV"
             )
         super().__init__(name)
 
@@ -68,6 +67,26 @@ class CentroidFromEpics(StandardReadable, Preparable):
         await asyncio.gather(
             self.cc_array_port.set(CAM_PLUGIN_NAME),
             self.colour_mode.set(value.colour_mode),
-            self.stat_array_port.set(CC_PLUGIN_NAME),
-            self.centroid_threshold.set(value.threshold),
+            self.stats.nd_array_port.set(CC_PLUGIN_NAME),
+            self.stats.centroid_threshold.set(value.threshold),
+        )
+
+    @AsyncStatus.wrap
+    async def trigger(self):
+        """Once the device is prepared, switch on the stats plugin.
+
+        This is done by enabling the callback and setting the ComputeCentroid and
+        ComputeStatistics PVs to YES.
+        (Note that Histogram and Profiles may be needed as well, needs testing.)
+
+        This step may be needed as keeping this plugin always running uses a lot of CPU,
+        thus the beamline may have switched it off.
+        """
+        await asyncio.gather(
+            self.stats.enable_callbacks.set(EnableDisable.ENABLE),
+            self.stats.compute_statistics.set(True),
+            self.stats.compute_centroid.set(True),
+            # NOTE To test if actually necessary
+            self.stats.compute_profiles.set(True),
+            self.stats.compute_histogram.set(True),
         )

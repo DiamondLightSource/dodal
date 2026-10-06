@@ -30,10 +30,20 @@ async def test_prepare_sets_the_plugin_chain(
         CentroidSettings(threshold=threshold, colour_mode=colour_mode)
     )
 
-    assert await centroid_device.stat_array_port.get_value() == "OAV1.cc"
+    assert await centroid_device.stats.nd_array_port.get_value() == "OAV1.cc"
     assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
-    assert await centroid_device.centroid_threshold.get_value() == threshold
+    assert await centroid_device.stats.centroid_threshold.get_value() == threshold
     assert await centroid_device.colour_mode.get_value() == colour_mode.value
+
+
+async def test_trigger_starts_the_stat_plugin(centroid_device: CentroidFromEpics):
+    await centroid_device.trigger()
+
+    assert await centroid_device.stats.enable_callbacks.get_value() == "Enable"
+    assert await centroid_device.stats.compute_statistics.get_value()
+    assert await centroid_device.stats.compute_centroid.get_value()
+    assert await centroid_device.stats.compute_profiles.get_value()
+    assert await centroid_device.stats.compute_histogram.get_value()
 
 
 async def test_centroid_position_can_be_read(centroid_device: CentroidFromEpics):
