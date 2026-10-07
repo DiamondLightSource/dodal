@@ -6,6 +6,7 @@ from ophyd_async.core import (
     get_mock,
     get_mock_put,
     init_devices,
+    set_mock_attr,
     set_mock_value,
 )
 
@@ -25,6 +26,15 @@ async def robot() -> Robot:
 
     set_mock_value(robot.puck_sel, 0)  # Set initial position
     set_mock_value(robot.pos_sel, 0)  # Set initial position
+
+    callback_on_mock_put(
+        robot._spinner_on,
+        lambda *_, **__: set_mock_value(robot._spinner_rbv, SpinnerState.ON),
+    )
+    callback_on_mock_put(
+        robot._spinner_off,
+        lambda *_, **__: set_mock_value(robot._spinner_rbv, SpinnerState.OFF),
+    )
 
     robot.PROGRAM_LOADED_TIMEOUT = 0.05
     robot.PROGRAM_STARTED_RUNNING_TIMEOUT = 0.05

@@ -291,7 +291,9 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         await self._trigger_program_and_wait_for_complete(
             signal_to_set, wait_for_program_running=False
         )
-        await wait_for_value(self.spinner, new_state, 5)
+        await wait_for_value(
+            self._spinner_rbv, new_state, self.PROGRAM_COMPLETED_TIMEOUT
+        )
 
     def _get_spinner_state(self, rbv: SpinnerState) -> SpinnerState:
         # This function is needed so that the derived signal picks up the type hints
