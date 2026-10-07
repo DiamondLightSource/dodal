@@ -6,7 +6,6 @@ from ophyd_async.core import (
     get_mock,
     get_mock_put,
     init_devices,
-    set_mock_attr,
     set_mock_value,
 )
 
