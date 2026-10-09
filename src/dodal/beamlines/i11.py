@@ -3,6 +3,7 @@ from pathlib import Path
 
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adcore import ADWriterFactory
+from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
@@ -147,4 +148,12 @@ def dcm() -> DCM:
     return DCM(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         xtal_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
+    )
+
+
+@devices.factory()
+def panda(path_provider: PathProvider) -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=path_provider,
     )
