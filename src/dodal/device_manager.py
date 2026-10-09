@@ -9,19 +9,15 @@ from types import NoneType
 from typing import (
     Annotated,
     Any,
-    Concatenate,
     Generic,
     NamedTuple,
     ParamSpec,
     Self,
-    TypeAlias,
     TypeVar,
 )
 
 from bluesky.run_engine import get_bluesky_event_loop
-from ophyd.device import Device as OphydV1Device
-from ophyd.sim import make_fake_device
-from ophyd_async.core import Device as OphydV2Device
+from ophyd_async.core import Device
 
 DEFAULT_TIMEOUT = 30
 NO_DOCS = "No documentation available."
@@ -31,12 +27,11 @@ Args = ParamSpec("Args")
 
 SkipType = bool | Callable[[], bool]
 
-V1 = TypeVar("V1", bound=OphydV1Device)
-V2 = TypeVar("V2", bound=OphydV2Device)
-AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
+TDevice = TypeVar("TDevice", bound=Device)
 
-DeviceFactoryDecorator = Callable[[Callable[Args, V2]], "DeviceFactory[Args, V2]"]
-OphydInitialiser = Callable[Concatenate[V1, Args], V1 | None]
+DeviceFactoryDecorator = Callable[
+    [Callable[Args, TDevice]], "DeviceFactory[Args, TDevice]"
+]
 
 _EMPTY = object()
 """Sentinel value to distinguish between missing values and present but null values."""
@@ -64,7 +59,7 @@ class LazyFixtures(UserDict[str, Any]):
         return self.data[key]
 
 
-class DeviceFactory(Generic[Args, V2]):
+class DeviceFactory(Generic[Args, TDevice]):
     """Wrapper around a device factory (any function returning a device) that holds
     a reference to a device manager that can provide dependencies, along with
     default connection information for how the created device should be connected.
@@ -72,7 +67,7 @@ class DeviceFactory(Generic[Args, V2]):
 
     def __init__(
         self,
-        factory: Callable[Args, V2],
+        factory: Callable[Args, TDevice],
         use_factory_name: bool,
         timeout: float,
         mock: bool,
@@ -138,7 +133,7 @@ class DeviceFactory(Generic[Args, V2]):
         name: str | None = None,
         timeout: float | None = None,
         **fixtures,
-    ) -> V2:
+    ) -> TDevice:
         """Build this device, building any dependencies first."""
         devices = self._manager.build_devices(
             self,
@@ -152,11 +147,11 @@ class DeviceFactory(Generic[Args, V2]):
             device.set_name(name)
         return device  # type: ignore - it's us, honest
 
-    def create(self, *args: Args.args, **kwargs: Args.kwargs) -> V2:
+    def create(self, *args: Args.args, **kwargs: Args.kwargs) -> TDevice:
         # TODO: Remove when v1 support is no longer required - see #1718
         return self(*args, **kwargs)
 
-    def __call__(self, *args: Args.args, **kwargs: Args.kwargs) -> V2:
+    def __call__(self, *args: Args.args, **kwargs: Args.kwargs) -> TDevice:
         device = self.factory(*args, **kwargs)
         if self.use_factory_name:
             device.set_name(self.name)
@@ -165,105 +160,6 @@ class DeviceFactory(Generic[Args, V2]):
     def __repr__(self) -> str:
         params = inspect.signature(self.factory)
         return f"<{self.name}: DeviceFactory{params}>"
-
-
-# TODO: Remove when ophyd v1 support is no longer required - see #1718
-class V1DeviceFactory(Generic[Args, V1]):
-    """Wrapper around an ophyd v1 device that holds a reference to a device
-    manager that can provide dependencies, along with default connection
-    information for how the created device should be connected.
-    """
-
-    def __init__(
-        self,
-        *,
-        factory: type[V1],
-        prefix: str,
-        mock: bool,
-        skip: SkipType,
-        wait: bool,
-        timeout: int,
-        init: OphydInitialiser[V1, Args],
-        manager: "DeviceManager",
-    ):
-        self.factory = factory
-        self.prefix = prefix
-        self.mock = mock
-        self._skip = skip
-        self.wait = wait
-        self.timeout = timeout
-        self.post_create = init or (lambda x: x)
-        self._manager = manager
-        wraps(init)(self)
-        self.__doc__ = _format_doc(self, factory)
-
-    @property
-    def name(self) -> str:
-        """Name of the underlying factory function."""
-        return self.post_create.__name__
-
-    @cached_property
-    def dependencies(self) -> set[str]:
-        """Names of all parameters."""
-        sig = inspect.signature(self.post_create)
-        # first parameter should be the device we've just built
-        _, *params = sig.parameters.values()
-        return {para.name for para in params if para.kind is not Parameter.VAR_KEYWORD}
-
-    @cached_property
-    def optional_dependencies(self) -> set[str]:
-        """Names of optional dependencies."""
-        sig = inspect.signature(self.post_create)
-        _, *params = sig.parameters.values()
-        return {para.name for para in params if para.default is not Parameter.empty}
-
-    @property
-    def skip(self) -> bool:
-        """Whether this device should be skipped as part of build_all - it will
-        still be built if a required device depends on it.
-        """
-        return self._skip() if callable(self._skip) else self._skip
-
-    def mock_if_needed(self, mock=False) -> Self:
-        # TODO: Remove when Ophyd V1 support is no longer required - see #1718
-        factory = (
-            make_fake_device(self.factory) if (self.mock or mock) else self.factory
-        )
-        return self.__class__(
-            factory=factory,
-            prefix=self.prefix,
-            mock=mock or self.mock,
-            skip=self._skip,
-            wait=self.wait,
-            timeout=self.timeout,
-            init=self.post_create,
-            manager=self._manager,
-        )
-
-    def __call__(self, dev: V1, *args: Args.args, **kwargs: Args.kwargs):
-        """Call the wrapped function to make decorator transparent."""
-        return self.post_create(dev, *args, **kwargs)
-
-    def create(self, *args: Args.args, **kwargs: Args.kwargs) -> V1:
-        device = self.factory(name=self.name, prefix=self.prefix)
-        if self.wait:
-            device.wait_for_connection(timeout=self.timeout)
-        self.post_create(device, *args, **kwargs)
-        return device
-
-    def build(self, mock: bool = False, fixtures: dict[str, Any] | None = None) -> V1:
-        """Build this device, building any dependencies first."""
-        devices = self._manager.build_devices(
-            self,
-            fixtures=fixtures,
-            mock=mock,
-        ).or_raise()
-
-        device = devices.devices[self.name]
-        return device  # type: ignore - it's us really, promise
-
-    def __repr__(self) -> str:
-        return f"<{self.name}: V1DeviceFactory[{self.factory.__name__}]>"
 
 
 class ConnectionSpec(NamedTuple):
@@ -276,7 +172,7 @@ class ConnectionSpec(NamedTuple):
 class ConnectionResult(NamedTuple):
     """Wrapper around results of building and connecting devices."""
 
-    devices: dict[str, AnyDevice]
+    devices: dict[str, Device]
     build_errors: dict[str, Exception]
     connection_errors: dict[str, Exception]
 
@@ -294,7 +190,7 @@ class ConnectionResult(NamedTuple):
 class DeviceBuildResult(NamedTuple):
     """Wrapper around the results of building devices."""
 
-    devices: dict[str, AnyDevice]
+    devices: dict[str, Device]
     errors: dict[str, Exception]
     connection_specs: dict[str, ConnectionSpec]
 
@@ -304,11 +200,7 @@ class DeviceBuildResult(NamedTuple):
         connected = {}
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
         for name, device in self.devices.items():
-            if not isinstance(device, OphydV2Device):
-                # TODO: Remove when ophyd v1 support is no longer required - see #1718
-                # V1 devices are connected at creation time assuming wait is not set to False
-                connected[name] = device
-                continue
+            connected[name] = device
             mock, dev_timeout = self.connection_specs[name]
             timeout = timeout or dev_timeout or DEFAULT_TIMEOUT
             fut = asyncio.run_coroutine_threadsafe(
@@ -341,15 +233,13 @@ class DeviceManager:
 
     _factories: dict[str, DeviceFactory]
     _fixtures: dict[str, Callable[[], Any]]
-    _v1_factories: dict[str, V1DeviceFactory]
 
     def __init__(self):
         self._factories = {}
-        self._v1_factories = {}
         self._fixtures = {}
 
-    def get_all_factories(self) -> dict[str, V1DeviceFactory | DeviceFactory]:
-        return self._factories | self._v1_factories
+    def get_all_factories(self) -> dict[str, DeviceFactory]:
+        return self._factories
 
     def fixture(self, func: Callable[[], T]) -> Callable[[], T]:
         """Add a function that can provide fixtures required by the factories."""
@@ -372,57 +262,21 @@ class DeviceManager:
         # Bug in pyright means type checking doesn't recognise 'DeviceManager'
         # as this class and fails with private member access
         common = self._factories.keys() & other._factories  # noqa SLF001
-        common |= self._v1_factories.keys() & other._v1_factories  # noqa SLF001
-        common |= self._factories.keys() & other._v1_factories  # noqa SLF001
-        common |= self._v1_factories.keys() & other._factories  # noqa SLF001
         if common:
             raise ValueError(
                 f"Duplicate factories in included device manager: {common}"
             )
 
         self._factories.update(other._factories)  # noqa SLF001
-        self._v1_factories.update(other._v1_factories)  # noqa SLF001
 
         # duplicate fixtures are not checked as fixtures can be overridden
         self._fixtures.update(other._fixtures)  # noqa SLF001
 
-    def v1_init(
-        self,
-        factory: type[V1],
-        prefix: str,
-        mock: bool = False,
-        skip: SkipType = False,
-        wait: bool = True,
-        timeout: int = DEFAULT_TIMEOUT,
-    ):
-        """Register an ophyd v1 device.
-
-        The function this decorates is an initialiser that takes a built device
-        and is not used to create the device.
-        """
-
-        def decorator(init: OphydInitialiser[V1, Args]) -> V1DeviceFactory[Args, V1]:
-            name = init.__name__
-            if name in self:
-                raise ValueError(f"Duplicate factory name: {name}")
-            device_factory = V1DeviceFactory(
-                factory=factory,
-                prefix=prefix,
-                mock=mock,
-                skip=skip,
-                wait=wait,
-                timeout=timeout,
-                init=init,
-                manager=self,
-            )
-            self._v1_factories[name] = device_factory
-            return device_factory
-
-        return decorator
-
     # Overload for using as plain decorator, ie: @devices.factory
     @typing.overload
-    def factory(self, func: Callable[Args, V2], /) -> DeviceFactory[Args, V2]: ...
+    def factory(
+        self, func: Callable[Args, TDevice], /
+    ) -> DeviceFactory[Args, TDevice]: ...
 
     # Overload for using as configurable decorator, eg: @devices.factory(skip=True)
     @typing.overload
@@ -434,11 +288,11 @@ class DeviceManager:
         timeout: float = DEFAULT_TIMEOUT,
         mock: bool = False,
         skip: SkipType = False,
-    ) -> Callable[[Callable[Args, V2]], DeviceFactory[Args, V2]]: ...
+    ) -> Callable[[Callable[Args, TDevice]], DeviceFactory[Args, TDevice]]: ...
 
     def factory(
         self,
-        func: Callable[Args, V2] | None = None,
+        func: Callable[Args, TDevice] | None = None,
         /,
         use_factory_name: Annotated[bool, "Use factory name as name of device"] = True,
         timeout: Annotated[
@@ -449,8 +303,8 @@ class DeviceManager:
             SkipType,
             "mark the factory to be (conditionally) skipped when beamline is imported by external program",
         ] = False,
-    ) -> DeviceFactory[Args, V2] | DeviceFactoryDecorator[Args, V2]:
-        def decorator(func: Callable[Args, V2]) -> DeviceFactory[Args, V2]:
+    ) -> DeviceFactory[Args, TDevice] | DeviceFactoryDecorator[Args, TDevice]:
+        def decorator(func: Callable[Args, TDevice]) -> DeviceFactory[Args, TDevice]:
             if func.__name__ in self:
                 raise ValueError(f"Duplicate factory name: {func.__name__}")
             factory = DeviceFactory(func, use_factory_name, timeout, mock, skip, self)
@@ -492,7 +346,7 @@ class DeviceManager:
 
     def build_devices(
         self,
-        *factories: DeviceFactory | V1DeviceFactory,
+        *factories: DeviceFactory[Args, TDevice],
         fixtures: Mapping[str, Any] | None = None,
         mock: bool = False,
     ) -> DeviceBuildResult:
@@ -506,9 +360,7 @@ class DeviceManager:
         order = self._build_order(
             {dep: self[dep] for dep in build_list}, fixtures=fixtures
         )
-        built: dict[str, AnyDevice] = {
-            override: fixtures[override] for override in common
-        }
+        built: dict[str, Device] = {override: fixtures[override] for override in common}
         connection_specs: dict[str, ConnectionSpec] = {}
         errors = {}
         for device in order:
@@ -528,9 +380,6 @@ class DeviceManager:
                     is not _EMPTY
                 }
                 try:
-                    if isinstance(factory, V1DeviceFactory):
-                        # TODO: Remove when ophyd v1 support is no longer required - see #1718
-                        factory = factory.mock_if_needed(mock)
                     built_device = factory.create(**params)
                     built[device] = built_device
                     connection_specs[device] = ConnectionSpec(
@@ -542,15 +391,15 @@ class DeviceManager:
 
         return DeviceBuildResult(built, errors, connection_specs)
 
-    def __contains__(self, name):
-        return name in self._factories or name in self._v1_factories
+    def __contains__(self, name: str) -> bool:
+        return name in self._factories
 
-    def __getitem__(self, name):
-        return self._factories.get(name) or self._v1_factories[name]
+    def __getitem__(self, name: str) -> DeviceFactory:
+        return self._factories[name]
 
     def _expand_dependencies(
         self,
-        factories: Iterable[DeviceFactory[..., V2] | V1DeviceFactory[..., V1]],
+        factories: Iterable[DeviceFactory[..., TDevice]],
         available_fixtures: Mapping[str, Any],
     ) -> set[str]:
         """Determine full list of devices that are required to build the given devices.
@@ -581,7 +430,7 @@ class DeviceManager:
 
     def _build_order(
         self,
-        factories: dict[str, DeviceFactory[..., V2] | V1DeviceFactory[..., V1]],
+        factories: dict[str, DeviceFactory[..., TDevice]],
         fixtures: Mapping[str, Any],
     ) -> list[str]:
         """Determine the order devices in which devices should be build to ensure
@@ -619,14 +468,14 @@ class DeviceManager:
         return order
 
     def __len__(self) -> int:
-        return len(self._factories) + len(self._v1_factories)
+        return len(self._factories)
 
     def __repr__(self) -> str:
         return f"<DeviceManager: {len(self)} devices>"
 
 
 def _format_doc(
-    factory: DeviceFactory | V1DeviceFactory, return_type: type[V1 | V2] | None
+    factory: DeviceFactory, return_type: type[TDevice] | None
 ) -> str | None:
     """Helper function to combine the doc strings of our factory instance and the
     return type of the function we wrap.
@@ -638,5 +487,5 @@ def _format_doc(
     return _type_docs(return_type)
 
 
-def _type_docs(target: type[V1 | V2]) -> str:
+def _type_docs(target: type[TDevice]) -> str:
     return f"{target.__name__}:\n\n{cleandoc(target.__doc__ or NO_DOCS)}"
