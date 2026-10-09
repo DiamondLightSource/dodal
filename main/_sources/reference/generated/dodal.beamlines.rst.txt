@@ -40,6 +40,7 @@
    dodal.beamlines.i10_1
    dodal.beamlines.i10_shared
    dodal.beamlines.i11
+   dodal.beamlines.i13
    dodal.beamlines.i13_1
    dodal.beamlines.i15
    dodal.beamlines.i15_1
