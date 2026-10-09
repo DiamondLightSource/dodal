@@ -1,18 +1,12 @@
 from textwrap import dedent
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock
 
 import pytest
-from ophyd.device import Device as OphydV1Device
-from ophyd_async.core import Device as OphydV2Device
+from ophyd_async.core import Device
 from ophyd_async.sim import SimMotor
 from pytest import RaisesExc, RaisesGroup
 
-from dodal.device_manager import (
-    DEFAULT_TIMEOUT,
-    DeviceBuildResult,
-    DeviceManager,
-    LazyFixtures,
-)
+from dodal.device_manager import DEFAULT_TIMEOUT, DeviceManager, LazyFixtures
 
 
 @pytest.fixture
@@ -24,7 +18,7 @@ def test_single_factory(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
-    def sim() -> OphydV2Device:
+    def sim() -> Device:
         return s1()
 
     devices = dm.build_all()
@@ -301,22 +295,17 @@ def test_circular_dependencies_error(dm: DeviceManager):
 # chasing coverage numbers
 def test_repr(dm: DeviceManager):
     s1 = Mock()
-    s2: type[OphydV1Device] = Mock()  # type: ignore
+    s2: type[Device] = Mock()  # type: ignore
     s2.__name__ = "S2"
 
     @dm.factory
     def foo(one: int) -> SimMotor:
         return s1(one)
 
-    @dm.v1_init(s2, prefix="S2_PREFIX")
-    def bar(_):
-        pass
-
-    assert repr(dm) == "<DeviceManager: 2 devices>"
+    assert repr(dm) == "<DeviceManager: 1 devices>"
     assert (
         repr(foo) == "<foo: DeviceFactory(one: int) -> ophyd_async.sim._motor.SimMotor>"
     )
-    assert repr(bar) == "<bar: V1DeviceFactory[S2]>"
 
 
 def test_build_errors_are_caught(dm: DeviceManager):
@@ -441,7 +430,7 @@ def test_devices_or_raise(dm: DeviceManager):
 
 
 def test_connect(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
 
     @dm.factory
     def foo():
@@ -457,7 +446,7 @@ def test_connect(dm: DeviceManager):
 
 
 def test_build_and_connect(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
 
     @dm.factory
     def foo():
@@ -473,7 +462,7 @@ def test_build_and_connect(dm: DeviceManager):
 
 
 def test_factory_options(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
 
     @dm.factory(mock=True, timeout=12)
     def foo():
@@ -486,7 +475,7 @@ def test_factory_options(dm: DeviceManager):
 
 
 def test_connect_failures(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
     err = ValueError("Not connected")
     s1.return_value.connect.side_effect = err
 
@@ -501,7 +490,7 @@ def test_connect_failures(dm: DeviceManager):
 
 
 def test_connect_or_raise_without_errors(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
 
     @dm.factory
     def foo():
@@ -515,7 +504,7 @@ def test_connect_or_raise_without_errors(dm: DeviceManager):
 
 
 def test_connect_or_raise_with_build_errors(dm: DeviceManager):
-    Mock(return_value=Mock(spec=OphydV2Device))
+    Mock(return_value=Mock(spec=Device))
 
     @dm.factory
     def foo():
@@ -526,7 +515,7 @@ def test_connect_or_raise_with_build_errors(dm: DeviceManager):
 
 
 def test_connect_or_raise_with_connect_errors(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
     s1.return_value.connect.side_effect = ValueError("foo connection")
 
     @dm.factory
@@ -538,7 +527,7 @@ def test_connect_or_raise_with_connect_errors(dm: DeviceManager):
 
 
 def test_build_and_connect_immediately(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
 
     @dm.factory
     def foo():
@@ -587,7 +576,7 @@ def test_skip_is_ignored_if_device_is_required(dm: DeviceManager):
 
 
 def test_mock_all(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
 
     @dm.factory
     def foo():
@@ -597,104 +586,9 @@ def test_mock_all(dm: DeviceManager):
     s1().connect.assert_called_once_with(mock=True, timeout=11)
 
 
-def test_v1_device_factory(dm: DeviceManager):
-    s1 = MagicMock(spec=OphydV1Device)
-    s1.__name__ = "S1"
-
-    @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
-    def foo(_):
-        pass
-
-    devices = dm.build_all()
-
-    s1.assert_called_once_with(name="foo", prefix="S1_PREFIX")
-    device = s1(name="foo", prefix="S1_PREFIX")
-    assert devices.devices["foo"] is device
-    s1().wait_for_connection.assert_called_once_with(timeout=DEFAULT_TIMEOUT)
-
-
-def test_v1_v2_name_clash(dm: DeviceManager):
-    s1 = Mock()
-    s2 = MagicMock()
-
-    @dm.factory
-    def foo():  # type: ignore foo is overridden below
-        return s1()
-
-    with pytest.raises(ValueError, match="name"):
-
-        @dm.v1_init(s2, prefix="S2_PREFIX")  # type:ignore
-        def foo(_):
-            pass
-
-
-def test_v1_decorator_is_transparent(dm: DeviceManager):
-    s1 = MagicMock(__name__="S1")
-
-    @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
-    def foo(s):
-        # arbitrary setup method
-        s.special_init_method()
-
-    dev = Mock()
-    foo(dev)
-
-    dev.special_init_method.assert_called_once()
-    s1.assert_not_called()
-
-
-def test_v1_no_wait(dm: DeviceManager):
-    s1 = MagicMock(__name__="S1")
-
-    @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)  # type: ignore
-    def foo(_):
-        pass
-
-    foo.build()
-    s1().wait_for_connection.assert_not_called()
-
-
-def test_connect_ignores_v1():
-    v1 = Mock(spec=OphydV1Device)
-    dbr = DeviceBuildResult({"foo": v1}, {}, {})
-    con = dbr.connect()
-    # mock raises exception if connect is called
-    assert con.devices == {"foo": v1}
-
-
-def test_v1_mocking(dm: DeviceManager):
-    s1 = Mock(__name__="S1", return_value=Mock(spec=OphydV1Device))
-
-    @dm.v1_init(s1, prefix="S1_PREFIX", mock=True)  # type: ignore
-    def foo(_):
-        pass
-
-    with patch("dodal.device_manager.make_fake_device") as mfd:
-        dm.build_all()
-        mfd.assert_called_once_with(s1)
-
-
-def test_v1_init_params(dm: DeviceManager):
-    # values are passed from fixtures
-    s1 = Mock(__name__="S1", return_value=Mock(spec=OphydV1Device))
-    s1.return_value.mock_add_spec(["set_up_with"])
-
-    @dm.fixture
-    def one():
-        return "one"
-
-    @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)  # type: ignore
-    def foo(s, one, two):
-        s.set_up_with(one, two)
-
-    dm.build_devices(foo, fixtures={"two": 2})
-    s1.assert_called_once_with(name="foo", prefix="S1_PREFIX")
-    s1().set_up_with.assert_called_once_with("one", 2)
-
-
 def test_inherited_device_manager(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
-    s2 = Mock(return_value=Mock(spec=OphydV2Device))
+    s1 = Mock(return_value=Mock(spec=Device))
+    s2 = Mock(return_value=Mock(spec=Device))
 
     @dm.factory
     def foo():
@@ -715,7 +609,7 @@ def test_inherited_device_manager(dm: DeviceManager):
 
 
 def test_inherited_device_manager_duplicate_name():
-    device = Mock(return_value=Mock(spec=OphydV2Device))
+    device = Mock(return_value=Mock(spec=Device))
 
     dm = DeviceManager()
     dm2 = DeviceManager()
@@ -823,11 +717,11 @@ def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager)
             Documentation for DocsDevice.""")
 
 
-class NoDocsDevice(OphydV2Device):
+class NoDocsDevice(Device):
     pass
 
 
-class DocsDevice(OphydV2Device):
+class DocsDevice(Device):
     """Documentation for DocsDevice."""
 
 
@@ -856,65 +750,3 @@ def test_docs_no_docs_available_added_for_no_docs_device(dm: DeviceManager):
             NoDocsDevice:
 
             No documentation available.""")
-
-
-class NoDocsV1Device(OphydV1Device):
-    pass
-
-
-class DocsV1Device(OphydV1Device):
-    """Docs for DocsV1Device."""
-
-    pass
-
-
-def test_docstrings_for_v1_factory(dm: DeviceManager):
-    @dm.v1_init(NoDocsV1Device, prefix="DEMO")
-    def v1_undoc(dev: NoDocsV1Device):
-        pass
-
-    assert v1_undoc.__doc__ == dedent("""\
-            NoDocsV1Device:
-
-            No documentation available.""")
-
-
-def test_docstrings_for_v1_factory_with_docs(dm: DeviceManager):
-    @dm.v1_init(NoDocsV1Device, prefix="DEMO")
-    def v1_doc(dev: NoDocsV1Device):
-        """Docs for v1_doc."""
-        pass
-
-    assert v1_doc.__doc__ == dedent("""\
-            Docs for v1_doc.
-
-            NoDocsV1Device:
-
-            No documentation available.""")
-    pass
-
-
-def test_docstrings_for_v1_doc_factory(dm: DeviceManager):
-    @dm.v1_init(DocsV1Device, prefix="DEMO")
-    def v1_undoc(dev: DocsV1Device):
-        pass
-
-    assert v1_undoc.__doc__ == dedent("""\
-            DocsV1Device:
-
-            Docs for DocsV1Device.""")
-
-
-def test_docstrings_for_v1_doc_factory_with_docs(dm: DeviceManager):
-    @dm.v1_init(DocsV1Device, prefix="DEMO")
-    def v1_doc(dev: DocsV1Device):
-        """Docs for v1_doc."""
-        pass
-
-    assert v1_doc.__doc__ == dedent("""\
-            Docs for v1_doc.
-
-            DocsV1Device:
-
-            Docs for DocsV1Device.""")
-    pass
