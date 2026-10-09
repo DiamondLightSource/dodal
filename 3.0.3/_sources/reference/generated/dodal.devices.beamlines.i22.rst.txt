@@ -1,0 +1,37 @@
+dodal.devices.beamlines.i22
+===========================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.beamlines.i22.dcm
+   dodal.devices.beamlines.i22.fswitch
+   dodal.devices.beamlines.i22.nxsas
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i22
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

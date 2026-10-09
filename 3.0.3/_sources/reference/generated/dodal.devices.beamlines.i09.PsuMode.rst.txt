@@ -1,0 +1,78 @@
+dodal.devices.beamlines.i09.PsuMode
+===================================
+
+.. currentmodule:: dodal.devices.beamlines.i09
+
+.. autoclass:: PsuMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PsuMode.HIGH
+      
+      
+      ~PsuMode.LOW
+      
+   
+   

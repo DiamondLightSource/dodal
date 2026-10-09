@@ -1,0 +1,40 @@
+dodal.devices.slits.MinimalSlits
+================================
+
+.. currentmodule:: dodal.devices.slits
+
+.. autoclass:: MinimalSlits
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

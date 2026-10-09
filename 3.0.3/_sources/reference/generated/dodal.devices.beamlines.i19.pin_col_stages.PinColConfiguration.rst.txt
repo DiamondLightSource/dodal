@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i19.pin\_col\_stages.PinColConfiguration
+================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.pin_col_stages
+
+.. autoclass:: PinColConfiguration
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

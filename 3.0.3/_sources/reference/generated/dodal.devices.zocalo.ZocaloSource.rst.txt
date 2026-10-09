@@ -1,0 +1,78 @@
+dodal.devices.zocalo.ZocaloSource
+=================================
+
+.. currentmodule:: dodal.devices.zocalo
+
+.. autoclass:: ZocaloSource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ZocaloSource.CPU
+      
+      
+      ~ZocaloSource.GPU
+      
+   
+   

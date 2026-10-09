@@ -1,0 +1,40 @@
+dodal.devices.common\_dcm.PitchAndRollCrystal
+=============================================
+
+.. currentmodule:: dodal.devices.common_dcm
+
+.. autoclass:: PitchAndRollCrystal
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

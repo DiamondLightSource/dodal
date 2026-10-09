@@ -1,0 +1,87 @@
+dodal.devices.beamlines.i15\_1.attenuators.FastAttenuatorState
+==============================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.attenuators
+
+.. autoclass:: FastAttenuatorState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FastAttenuatorState.FAULT
+      
+      
+      ~FastAttenuatorState.OUT
+      
+      
+      ~FastAttenuatorState.OPENING
+      
+      
+      ~FastAttenuatorState.IN
+      
+      
+      ~FastAttenuatorState.CLOSING
+      
+   
+   

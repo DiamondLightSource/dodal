@@ -1,0 +1,41 @@
+dodal.devices.movable.MovableWithToleranceLogic
+===============================================
+
+.. currentmodule:: dodal.devices.movable
+
+.. autoclass:: MovableWithToleranceLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~MovableWithToleranceLogic.move
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~MovableWithToleranceLogic.tolerance
+      
+      
+      ~MovableWithToleranceLogic.setpoint
+      
+      
+      ~MovableWithToleranceLogic.readback
+      
+   
+   

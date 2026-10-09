@@ -1,0 +1,36 @@
+dodal.devices.collimation\_table
+================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~collimation_table.CollimationTable
+
+
+
+
+.. automodule:: dodal.devices.collimation_table
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

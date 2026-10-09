@@ -1,0 +1,43 @@
+dodal.devices.bimorph\_mirror.BimorphMirror
+===========================================
+
+.. currentmodule:: dodal.devices.bimorph_mirror
+
+.. autoclass:: BimorphMirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BimorphMirror.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,41 @@
+dodal.devices.beamlines.i15\_1.attenuators
+==========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i15_1
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~attenuators.FastAttenuator
+   ~attenuators.FastAttenuatorDemand
+   ~attenuators.FastAttenuatorState
+   ~attenuators.MockFastAttenuator
+   ~attenuators.SlowAttenuator
+   ~attenuators.SlowAttenuatorPositions
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i15_1.attenuators
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

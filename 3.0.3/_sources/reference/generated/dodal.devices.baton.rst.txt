@@ -1,0 +1,36 @@
+dodal.devices.baton
+===================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~baton.Baton
+
+
+
+
+.. automodule:: dodal.devices.baton
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

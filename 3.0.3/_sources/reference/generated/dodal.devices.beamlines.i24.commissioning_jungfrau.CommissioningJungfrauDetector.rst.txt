@@ -1,0 +1,51 @@
+dodal.devices.beamlines.i24.commissioning\_jungfrau.CommissioningJungfrauDetector
+=================================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i24.commissioning_jungfrau
+
+.. autoclass:: CommissioningJungfrauDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~CommissioningJungfrauDetector.prepare
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.synchrotron
+=========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~synchrotron.Prefix
+   ~synchrotron.Suffix
+   ~synchrotron.Synchrotron
+   ~synchrotron.SynchrotronMode
+   ~synchrotron.TopUpState
+
+
+
+
+.. automodule:: dodal.devices.synchrotron
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

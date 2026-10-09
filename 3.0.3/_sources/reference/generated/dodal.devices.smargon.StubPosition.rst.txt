@@ -1,0 +1,26 @@
+dodal.devices.smargon.StubPosition
+==================================
+
+.. currentmodule:: dodal.devices.smargon
+
+.. autoclass:: StubPosition
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~StubPosition.CURRENT_AS_CENTER
+      
+      
+      ~StubPosition.RESET_TO_ROBOT_LOAD
+      
+   
+   

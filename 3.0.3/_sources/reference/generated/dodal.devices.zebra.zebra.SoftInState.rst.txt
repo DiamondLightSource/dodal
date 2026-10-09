@@ -1,0 +1,78 @@
+dodal.devices.zebra.zebra.SoftInState
+=====================================
+
+.. currentmodule:: dodal.devices.zebra.zebra
+
+.. autoclass:: SoftInState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SoftInState.YES
+      
+      
+      ~SoftInState.NO
+      
+   
+   

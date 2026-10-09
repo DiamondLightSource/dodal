@@ -1,0 +1,26 @@
+dodal.devices.robot.SampleLocation
+==================================
+
+.. currentmodule:: dodal.devices.robot
+
+.. autoclass:: SampleLocation
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SampleLocation.puck
+      
+      
+      ~SampleLocation.pin
+      
+   
+   

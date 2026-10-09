@@ -1,0 +1,116 @@
+dodal.devices.current\_amplifiers.SR570GainToCurrentTable
+=========================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: SR570GainToCurrentTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~SR570GainToCurrentTable.SEN_1
+      
+      
+      ~SR570GainToCurrentTable.SEN_2
+      
+      
+      ~SR570GainToCurrentTable.SEN_3
+      
+      
+      ~SR570GainToCurrentTable.SEN_4
+      
+      
+      ~SR570GainToCurrentTable.SEN_5
+      
+      
+      ~SR570GainToCurrentTable.SEN_6
+      
+      
+      ~SR570GainToCurrentTable.SEN_7
+      
+      
+      ~SR570GainToCurrentTable.SEN_8
+      
+      
+      ~SR570GainToCurrentTable.SEN_9
+      
+      
+      ~SR570GainToCurrentTable.SEN_10
+      
+      
+      ~SR570GainToCurrentTable.SEN_11
+      
+      
+      ~SR570GainToCurrentTable.SEN_12
+      
+      
+      ~SR570GainToCurrentTable.SEN_13
+      
+      
+      ~SR570GainToCurrentTable.SEN_14
+      
+      
+      ~SR570GainToCurrentTable.SEN_15
+      
+      
+      ~SR570GainToCurrentTable.SEN_16
+      
+      
+      ~SR570GainToCurrentTable.SEN_17
+      
+      
+      ~SR570GainToCurrentTable.SEN_18
+      
+      
+      ~SR570GainToCurrentTable.SEN_19
+      
+      
+      ~SR570GainToCurrentTable.SEN_20
+      
+      
+      ~SR570GainToCurrentTable.SEN_21
+      
+      
+      ~SR570GainToCurrentTable.SEN_22
+      
+      
+      ~SR570GainToCurrentTable.SEN_23
+      
+      
+      ~SR570GainToCurrentTable.SEN_24
+      
+      
+      ~SR570GainToCurrentTable.SEN_25
+      
+      
+      ~SR570GainToCurrentTable.SEN_26
+      
+      
+      ~SR570GainToCurrentTable.SEN_27
+      
+      
+      ~SR570GainToCurrentTable.SEN_28
+      
+   
+   

@@ -1,0 +1,46 @@
+dodal.devices.interlocks.PSSInterlock
+=====================================
+
+.. currentmodule:: dodal.devices.interlocks
+
+.. autoclass:: PSSInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~PSSInterlock.status
+      
+      
+      ~PSSInterlock.bl_prefix
+      
+   
+   

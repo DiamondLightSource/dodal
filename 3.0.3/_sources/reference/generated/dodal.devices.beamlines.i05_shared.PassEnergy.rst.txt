@@ -1,0 +1,96 @@
+dodal.devices.beamlines.i05\_shared.PassEnergy
+==============================================
+
+.. currentmodule:: dodal.devices.beamlines.i05_shared
+
+.. autoclass:: PassEnergy
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PassEnergy.PE001
+      
+      
+      ~PassEnergy.PE002
+      
+      
+      ~PassEnergy.PE005
+      
+      
+      ~PassEnergy.PE010
+      
+      
+      ~PassEnergy.PE020
+      
+      
+      ~PassEnergy.PE050
+      
+      
+      ~PassEnergy.PE100
+      
+      
+      ~PassEnergy.PE200
+      
+   
+   

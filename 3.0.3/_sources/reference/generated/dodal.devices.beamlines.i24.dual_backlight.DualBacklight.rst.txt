@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i24.dual\_backlight.DualBacklight
+=========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i24.dual_backlight
+
+.. autoclass:: DualBacklight
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~DualBacklight.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

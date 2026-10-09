@@ -1,0 +1,78 @@
+dodal.common.OnOffUpper
+=======================
+
+.. currentmodule:: dodal.common
+
+.. autoclass:: OnOffUpper
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~OnOffUpper.ON
+      
+      
+      ~OnOffUpper.OFF
+      
+   
+   

@@ -1,0 +1,34 @@
+dodal.devices.insertion\_device.Apple2Val
+=========================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: Apple2Val
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~Apple2Val.extract_phase_val
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Apple2Val.gap
+      
+      
+      ~Apple2Val.phase
+      
+   
+   

@@ -1,0 +1,104 @@
+dodal.devices.current\_amplifiers.SR570FullGainTable
+====================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: SR570FullGainTable
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SR570FullGainTable.SEN_1
+      
+      
+      ~SR570FullGainTable.SEN_2
+      
+      
+      ~SR570FullGainTable.SEN_3
+      
+      
+      ~SR570FullGainTable.SEN_4
+      
+      
+      ~SR570FullGainTable.SEN_5
+      
+      
+      ~SR570FullGainTable.SEN_6
+      
+      
+      ~SR570FullGainTable.SEN_7
+      
+      
+      ~SR570FullGainTable.SEN_8
+      
+      
+      ~SR570FullGainTable.SEN_9
+      
+      
+      ~SR570FullGainTable.SEN_10
+      
+      
+      ~SR570FullGainTable.SEN_11
+      
+      
+      ~SR570FullGainTable.SEN_12
+      
+      
+      ~SR570FullGainTable.SEN_13
+      
+      
+      ~SR570FullGainTable.SEN_14
+      
+      
+      ~SR570FullGainTable.SEN_15
+      
+      
+      ~SR570FullGainTable.SEN_16
+      
+      
+      ~SR570FullGainTable.SEN_17
+      
+      
+      ~SR570FullGainTable.SEN_18
+      
+      
+      ~SR570FullGainTable.SEN_19
+      
+      
+      ~SR570FullGainTable.SEN_20
+      
+      
+      ~SR570FullGainTable.SEN_21
+      
+      
+      ~SR570FullGainTable.SEN_22
+      
+      
+      ~SR570FullGainTable.SEN_23
+      
+      
+      ~SR570FullGainTable.SEN_24
+      
+      
+      ~SR570FullGainTable.SEN_25
+      
+      
+      ~SR570FullGainTable.SEN_26
+      
+      
+      ~SR570FullGainTable.SEN_27
+      
+      
+      ~SR570FullGainTable.SEN_28
+      
+   
+   

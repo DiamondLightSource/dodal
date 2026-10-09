@@ -1,0 +1,105 @@
+dodal.devices.xspress3.xspress3.DetectorState
+=============================================
+
+.. currentmodule:: dodal.devices.xspress3.xspress3
+
+.. autoclass:: DetectorState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DetectorState.IDLE
+      
+      
+      ~DetectorState.ACQUIRE
+      
+      
+      ~DetectorState.READOUT
+      
+      
+      ~DetectorState.CORRECT
+      
+      
+      ~DetectorState.SAVING
+      
+      
+      ~DetectorState.ABORTING
+      
+      
+      ~DetectorState.ERROR
+      
+      
+      ~DetectorState.WAITING
+      
+      
+      ~DetectorState.INTILTIALIZING
+      
+      
+      ~DetectorState.DISCONNECTED
+      
+      
+      ~DetectorState.ABORTED
+      
+   
+   

@@ -1,0 +1,110 @@
+dodal.devices.zebra.zebra\_constants\_mapping.ZebraOutputs
+==========================================================
+
+.. currentmodule:: dodal.devices.zebra.zebra_constants_mapping
+
+.. autoclass:: ZebraOutputs
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~ZebraOutputs.model_config
+      
+      
+      
+      
+      
+      ~ZebraOutputs.TTL_EIGER
+      
+      
+      ~ZebraOutputs.TTL_PILATUS
+      
+      
+      ~ZebraOutputs.TTL_FAST_SHUTTER
+      
+      
+      ~ZebraOutputs.TTL_DETECTOR
+      
+      
+      ~ZebraOutputs.TTL_SHUTTER
+      
+      
+      ~ZebraOutputs.TTL_XSPRESS3
+      
+      
+      ~ZebraOutputs.TTL_PANDA
+      
+      
+      ~ZebraOutputs.TTL_JUNGFRAU
+      
+      
+      ~ZebraOutputs.TTL_I0
+      
+      
+      ~ZebraOutputs.LVDS_EIGER
+      
+      
+      ~ZebraOutputs.LVDS_PILATUS
+      
+      
+      ~ZebraOutputs.LVDS_FAST_SHUTTER
+      
+      
+      ~ZebraOutputs.LVDS_DETECTOR
+      
+      
+      ~ZebraOutputs.LVDS_SHUTTER
+      
+      
+      ~ZebraOutputs.LVDS_XSPRESS3
+      
+      
+      ~ZebraOutputs.LVDS_PANDA
+      
+      
+      ~ZebraOutputs.LVDS_JUNGFRAU
+      
+      
+      ~ZebraOutputs.LVDS_I0
+      
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.scintillator.Scintillator
+=======================================
+
+.. currentmodule:: dodal.devices.scintillator
+
+.. autoclass:: Scintillator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

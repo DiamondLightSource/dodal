@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i04.Beamstop
+====================================
+
+.. currentmodule:: dodal.devices.beamlines.i04
+
+.. autoclass:: Beamstop
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

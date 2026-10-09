@@ -1,0 +1,40 @@
+dodal.devices.motors.XYZWrappedOmegaStage
+=========================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZWrappedOmegaStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
