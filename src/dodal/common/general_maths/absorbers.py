@@ -12,8 +12,13 @@ from dodal.common.general_maths.material_absorption_maths import (
 )
 
 
+class _EnergyEligibility(Protocol):
+    """Internal parent Protocol which endows the calculator."""
+    def is_eligible_for_energy(self, *,  xray_energy_kev: float) -> bool: ...
+
+
 @runtime_checkable
-class FixedDepth(Protocol):
+class FixedDepth(_EnergyEligibility, Protocol):
     def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
         """Calculates absorption for a flat absorber of fixed depth.
 
@@ -30,7 +35,7 @@ class FixedDepth(Protocol):
 
 
 @runtime_checkable
-class VariableDepth(Protocol):
+class VariableDepth(_EnergyEligibility, Protocol):
     def calculate_absorption_bn(
         self,
         *,
