@@ -1,4 +1,5 @@
 from functools import cache
+from os import getenv
 from pathlib import Path
 
 from daq_config_server import ConfigClient
@@ -6,8 +7,9 @@ from ophyd_async.core import InOut, PathProvider, StrictEnum
 from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.epics.adpilatus import PilatusDetector
 
+from dodal.common.beamlines.beamline_parameters import CONFIG_SERVER_URL_ENV_VAR
 from dodal.beamlines.aithre import DISPLAY_CONFIG, ZOOM_PARAMS_FILE
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline, set_config_client
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
@@ -30,7 +32,7 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i23/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i23/software/daq_configuration/domain/display.configuration"
-I23_CONFIG_SERVER_ENDPOINT = "https://i23-daq-config.diamond.ac.uk"
+DEFAULT_CONFIG_SERVER_ENDPOINT = "https://i23-daq-config.diamond.ac.uk"
 
 BL = get_beamline_name("i23")
 PREFIX = BeamlinePrefix(BL)
@@ -43,8 +45,12 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    return ConfigClient()
-
+    config_server_url = getenv(
+        CONFIG_SERVER_URL_ENV_VAR, DEFAULT_CONFIG_SERVER_ENDPOINT
+    )
+    client = ConfigClient(config_server_url)
+    set_config_client(client)
+    return client
 
 @devices.fixture
 @cache
