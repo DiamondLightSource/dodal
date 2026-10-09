@@ -4,6 +4,9 @@ from functools import cached_property
 
 import numpy as np
 from daq_config_server.client import ConfigClient
+from daq_config_server.models.i15_1.temperature_calibration import (
+    TemperatureCalibration,
+)
 from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllerParams,
 )
@@ -15,6 +18,7 @@ from ophyd_async.core import (
     StandardMovable,
     StandardReadable,
     TimeoutCalculator,
+    derived_signal_rw,
     set_and_wait_for_other_value,
     soft_signal_rw,
 )
@@ -114,11 +118,56 @@ class Blower(SafeOrBeamPositioner):
         self.settle_time_s = soft_signal_rw(float, self.DEFAULT_SETTLE_TIME)
 
         with self.add_children_as_readables():
-            self.temperature = Temperature(
+            self.raw_temperature = Temperature(
                 prefix, pneumatic_pv, Reference(self.settle_time_s)
+            )
+            self.temperature = derived_signal_rw(
+                raw_to_derived=self.get_temperature,
+                set_derived=self.set_temperature,
+                raw_temperature=self.raw_temperature,
             )
 
         super().__init__(motion_pv, config_client, xpdf_parameters_path, name)
 
     def get_config(self) -> TemperatureControllerParams:
         return self.get_full_config().blower
+
+    def get_temperature(self, raw_temperature: float) -> float:
+        return raw_temperature
+
+    async def set_temperature(self, desired_temp: float):
+        await self.raw_temperature.set(desired_temp)
+
+
+class CalibratedBlower(Blower):
+    def __init__(
+        self,
+        prefix: str,
+        motion_pv: str,
+        pneumatic_pv: str,
+        config_client: ConfigClient,
+        xpdf_parameters_path: str,
+        temperature_calibration_path: str,
+        name: str = "",
+    ):
+        super().__init__(
+            prefix, motion_pv, pneumatic_pv, config_client, xpdf_parameters_path, name
+        )
+        self.config_client = config_client
+        self.temperature_calibration_path = temperature_calibration_path
+
+    @cached_property
+    def temperature_calibration(self) -> TemperatureCalibration:
+        return self.config_client.get_file_contents(
+            self.temperature_calibration_path,
+            desired_return_type=TemperatureCalibration,
+        )
+
+    def get_temperature(self, raw_temperature: float) -> float:
+        return self.temperature_calibration.real_to_setpoint.inverse_calc(
+            raw_temperature
+        )
+
+    async def set_temperature(self, desired_temp: float):
+        raw_temp = self.temperature_calibration.real_to_setpoint.calc(desired_temp)
+        await self.raw_temperature.set(raw_temp)

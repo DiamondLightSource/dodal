@@ -16,7 +16,7 @@ from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
 from dodal.devices.beamlines.i15_1.attenuators import FastAttenuator, SlowAttenuator
 from dodal.devices.beamlines.i15_1.beam_health import BeamHealth
-from dodal.devices.beamlines.i15_1.blower import Blower
+from dodal.devices.beamlines.i15_1.blower import Blower, CalibratedBlower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
 from dodal.devices.beamlines.i15_1.hexapod import Hexapod
@@ -39,9 +39,11 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i15-1")  # Default used when not on a live beamline
 PREFIX = BeamlinePrefix(BL, suffix="J")
+DAQ_CONFIGURATION_PATH = "/dls_sw/i15-1/software/daq_configuration/"
 XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
-XPDF_CRYSTAL_LUT_FILEPATH = (
-    "/dls_sw/i15-1/software/daq_configuration/xpdf_crystal_lut.txt"
+XPDF_CRYSTAL_LUT_FILEPATH = DAQ_CONFIGURATION_PATH + "xpdf_crystal_lut.txt"
+BLOWER_TEMPERATURE_CALIBRATION_FILEPATH = (
+    DAQ_CONFIGURATION_PATH + "temperature_calibration/blower_calibration.txt"
 )
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
@@ -93,6 +95,18 @@ def blower(config_client: ConfigClient) -> Blower:
         f"{PREFIX.beamline_prefix}-DI-PHDGN-03:STA",
         config_client,
         XPDF_PARAMETERS_FILEPATH,
+    )
+
+
+@devices.factory()
+def calibrated_blower(config_client: ConfigClient) -> CalibratedBlower:
+    return CalibratedBlower(
+        f"{PREFIX.beamline_prefix}-EA-BLOW-01:",
+        f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
+        f"{PREFIX.beamline_prefix}-DI-PHDGN-03:STA",
+        config_client,
+        XPDF_PARAMETERS_FILEPATH,
+        BLOWER_TEMPERATURE_CALIBRATION_FILEPATH,
     )
 
 
