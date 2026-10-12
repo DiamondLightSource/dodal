@@ -34,6 +34,8 @@ class TemperatureMoveLogic(MovableLogic[float]):
     # to make sure it's accurate, for now an hour is fine
     TIMEOUT = 60 * 60
 
+    START_SETTLE_TIME_WHEN_WITHIN = 1
+
     async def stop(self):
         await self.setpoint.set(0)
 
@@ -51,7 +53,9 @@ class TemperatureMoveLogic(MovableLogic[float]):
                 self.setpoint,
                 new_position,
                 self.readback,
-                lambda v: bool(np.isclose(v, new_position)),
+                lambda v: bool(
+                    np.isclose(v, new_position, rtol=self.START_SETTLE_TIME_WHEN_WITHIN)
+                ),
                 timeout=self.TIMEOUT,
             )
             await asyncio.sleep(await self.settle_time_s.get_value())
