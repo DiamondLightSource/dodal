@@ -128,3 +128,21 @@ async def test_temperature_times_out_if_readback_does_not_change(blower: Blower)
     ):
         with pytest.raises(TimeoutError):
             await blower.temperature.set(100)
+
+
+async def test_temperature_does_not_time_out_if_large_readback_tolerance(
+    blower: Blower,
+):
+    set_mock_value(blower.temperature._pneumatic, ValveState.OPEN)
+    await blower.temperature._rbv_tolerance().set(1000)
+
+    def null_callback(*_, **__):
+        return None
+
+    callback_on_mock_put(blower.temperature._temperature_sp, null_callback)
+
+    with patch(
+        "dodal.devices.beamlines.i15_1.blower.TemperatureMoveLogic.TIMEOUT",
+        new=0.01,
+    ):
+        await blower.temperature.set(100)
