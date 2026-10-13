@@ -13,6 +13,8 @@ from dodal.devices.oav.beam_centre.centroid_from_epics import (
 async def centroid_device() -> CentroidFromEpics:
     with init_devices(mock=True):
         device = CentroidFromEpics("", name="mock_centroid")
+    set_mock_value(device.cam_port_name, "OAV.cam")
+    set_mock_value(device.cc_port_name, "OAV.cc")
     set_mock_value(device.beam_centre_x, 706)
     set_mock_value(device.beam_centre_y, 283)
     return device
@@ -30,8 +32,8 @@ async def test_prepare_sets_the_plugin_chain(
         CentroidSettings(threshold=threshold, colour_mode=colour_mode)
     )
 
-    assert await centroid_device.stats.nd_array_port.get_value() == "OAV1.cc"
-    assert await centroid_device.cc_array_port.get_value() == "OAV1.cam"
+    assert await centroid_device.stats.nd_array_port.get_value() == "OAV.cc"
+    assert await centroid_device.cc_array_port.get_value() == "OAV.cam"
     assert await centroid_device.stats.centroid_threshold.get_value() == threshold
     assert await centroid_device.colour_mode.get_value() == colour_mode.value
 

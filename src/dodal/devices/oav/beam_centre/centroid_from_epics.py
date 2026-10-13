@@ -14,9 +14,6 @@ from pydantic import BaseModel
 CC_INFIX = "CC:"
 STAT_INFIX = "STAT:"
 
-CAM_PLUGIN_NAME = "OAV1.cam"
-CC_PLUGIN_NAME = "OAV1.cc"
-
 
 class ColourMode(StrictEnum):
     MONO = "Mono"
@@ -45,6 +42,8 @@ class CentroidFromEpics(StandardReadable, Preparable, Triggerable):
         name: str = "",
     ):
         with self.add_children_as_readables():
+            self.cam_port_name = epics_signal_r(str, f"{prefix}CAM:PortName_RBV")
+            self.cc_port_name = epics_signal_r(str, f"{prefix}{CC_INFIX}PortName_RBV")
             self.cc_array_port = epics_signal_rw_rbv(
                 str, f"{prefix}{cc_infix}NDArrayPort"
             )
@@ -63,10 +62,12 @@ class CentroidFromEpics(StandardReadable, Preparable, Triggerable):
     @AsyncStatus.wrap
     async def prepare(self, value: CentroidSettings):
         """Prepare the camera to read the centroid by setting up the plugin chain."""
+        _cam_port_name = await self.cam_port_name.get_value()
+        _cc_port_name = await self.cc_port_name.get_value()
         await asyncio.gather(
-            self.cc_array_port.set(CAM_PLUGIN_NAME),
+            self.cc_array_port.set(_cam_port_name),
             self.colour_mode.set(value.colour_mode),
-            self.stats.nd_array_port.set(CC_PLUGIN_NAME),
+            self.stats.nd_array_port.set(_cc_port_name),
             self.stats.centroid_threshold.set(value.threshold),
         )
 
