@@ -32,7 +32,14 @@ class CentroidSettings(BaseModel):
 
 
 class CentroidFromEpics(StandardReadable, Preparable, Triggerable):
-    """Device to set up the CAM -> CC -> STAT plugin chain and get the centroid."""
+    """Device to set up the CAM -> CC -> STAT plugin chain and get the centroid.
+
+    The CC plugin is used to set the colour mode (Mono for black and white).
+    The STAT plugin is used to calculate the centroid and threshold needs to be set to
+    eliminate noise.
+    Note that the STAT plugin may be disabled on some beamlines so it needs to be
+    switched on.
+    """
 
     def __init__(
         self,
