@@ -21,18 +21,18 @@ def test_diodes_use_pvs_for_their_channel(diodes: RGBDiodes) -> None:
 
 
 async def test_diodes_read_values_and_configure_gain(diodes: RGBDiodes) -> None:
-    set_mock_value(diodes.red, 1.0)
-    set_mock_value(diodes.green, 2.0)
-    set_mock_value(diodes.blue, 3.0)
+    set_mock_value(diodes.red, 1)
+    set_mock_value(diodes.green, 2)
+    set_mock_value(diodes.blue, 3)
     set_mock_value(diodes.gain, "Auto")
     set_mock_value(diodes.gain_readback, "1uA")
 
     await assert_reading(
         diodes,
         {
-            "diodes-red": partial_reading(1.0),
-            "diodes-green": partial_reading(2.0),
-            "diodes-blue": partial_reading(3.0),
+            "diodes-red": partial_reading(1),
+            "diodes-green": partial_reading(2),
+            "diodes-blue": partial_reading(3),
         },
     )
     await assert_configuration(
