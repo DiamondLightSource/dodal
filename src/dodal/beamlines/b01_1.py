@@ -98,7 +98,8 @@ def spectroscopy_diodes() -> RGBDiodes:
         RGBDiodes: The diodes device.
     """
     return RGBDiodes(
-        panda_prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:FmcIn:Val",
+        # The pandabox serves its PVs over PVA rather than CA
+        panda_prefix=f"pva://{PREFIX.beamline_prefix}-EA-PANDA-01:FmcIn:Val",
         amplifier_prefix=f"{PREFIX.beamline_prefix}-DI-LOCUM-01:",
     )
 

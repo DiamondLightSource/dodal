@@ -16,14 +16,16 @@ def test_diodes_use_pvs_for_their_channel(diodes: RGBDiodes) -> None:
     assert diodes.red.source == "mock+ca://PANDA:FmcIn:Val5"
     assert diodes.green.source == "mock+ca://PANDA:FmcIn:Val4"
     assert diodes.blue.source == "mock+ca://PANDA:FmcIn:Val7"
-    assert diodes.gain.source == "mock+ca://LOCUM:MRREADBACK"
+    assert diodes.gain.source == "mock+ca://LOCUM:SETRANGE"
+    assert diodes.gain_readback.source == "mock+ca://LOCUM:MRREADBACK"
 
 
 async def test_diodes_read_values_and_configure_gain(diodes: RGBDiodes) -> None:
     set_mock_value(diodes.red, 1.0)
     set_mock_value(diodes.green, 2.0)
     set_mock_value(diodes.blue, 3.0)
-    set_mock_value(diodes.gain, "1uA")
+    set_mock_value(diodes.gain, "Auto")
+    set_mock_value(diodes.gain_readback, "1uA")
 
     await assert_reading(
         diodes,
@@ -33,4 +35,10 @@ async def test_diodes_read_values_and_configure_gain(diodes: RGBDiodes) -> None:
             "diodes-blue": partial_reading(3.0),
         },
     )
-    await assert_configuration(diodes, {"diodes-gain": partial_reading("1uA")})
+    await assert_configuration(
+        diodes,
+        {
+            "diodes-gain": partial_reading("Auto"),
+            "diodes-gain_readback": partial_reading("1uA"),
+        },
+    )
