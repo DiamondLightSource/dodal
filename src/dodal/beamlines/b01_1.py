@@ -46,7 +46,7 @@ def pandabrick(path_provider: PathProvider) -> HDFPanda:
     )
 
 
-@devices.factory(skip=True)
+@devices.factory()
 def pandabox(path_provider: PathProvider) -> HDFPanda:
     """Provides triggering of the detectors.
 
