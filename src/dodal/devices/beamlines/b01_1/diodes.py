@@ -22,9 +22,9 @@ class RGBDiodes(StandardReadable):
         red (SignalR): The live amplified red diode signal.
         green (SignalR): The live amplified green diode signal.
         blue (SignalR): The live amplified blue diode signal.
-        gain (SignalRW): The measuring range of the amplifier, e.g. "1uA", which is
-            shared by all of its channels. Can also be set to "Auto", in which case
-            it reads back the range the amplifier has chosen.
+        gain (SignalRW): The requested measuring range of the amplifier, e.g. "1uA"
+            or "Auto", which is shared by all of its channels.
+        gain_readback (SignalR): The measuring range the amplifier is actually on.
     """
 
     def __init__(
@@ -41,10 +41,7 @@ class RGBDiodes(StandardReadable):
             self.green = epics_signal_r(float, f"{panda_prefix}{green_channel}")
             self.blue = epics_signal_r(float, f"{panda_prefix}{blue_channel}")
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Read the gain as a string as the setpoint has an extra "Auto" choice
-            self.gain = epics_signal_rw(
-                str,
-                read_pv=f"{amplifier_prefix}MRREADBACK",
-                write_pv=f"{amplifier_prefix}SETRANGE",
-            )
+            # Separate signals as the setpoint has an extra "Auto" choice
+            self.gain = epics_signal_rw(str, f"{amplifier_prefix}SETRANGE")
+            self.gain_readback = epics_signal_r(str, f"{amplifier_prefix}MRREADBACK")
         super().__init__(name=name)
