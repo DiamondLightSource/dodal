@@ -21,7 +21,7 @@ from dodal.devices.common_dcm import (
 from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.tetramm.tetramm import TetrammDetector
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name

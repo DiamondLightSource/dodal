@@ -33,8 +33,8 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.log import set_beamline as set_log_beamline
@@ -52,7 +52,7 @@ set_utils_beamline(BL)
 set_config_client(ConfigClient.from_url())
 
 I24_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
+    outputs=ZebraOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
 
@@ -102,7 +102,12 @@ def backlight() -> DualBacklight:
 
 @devices.factory()
 def detector_motion() -> YZStage:
-    return YZStage(prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:")
+    """Get the i24 detector motion device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return YZStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+    )
 
 
 @devices.factory()

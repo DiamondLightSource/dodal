@@ -6,7 +6,8 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09.enums import Grating
 from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
-    J09_PHASE_POLY_DEG_COLUMNS,
+    J09_PHASE_ENERGY_MOTOR_LOOKUP,
+    J09_ROW_PHASE_CIRCULAR,
 )
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.insertion_device import (
@@ -27,7 +28,6 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
-PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
 
 BL = get_beamline_name("i09-2-shared")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
@@ -89,11 +89,8 @@ def jidcontroller(
             config_client=config_client,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
-            lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
-            config_client=config_client,
-            path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
-        ),
+        phase_energy_motor_lut=J09_PHASE_ENERGY_MOTOR_LOOKUP,
+        maximum_phase_motor_position=J09_ROW_PHASE_CIRCULAR,
         units="keV",
     )
 

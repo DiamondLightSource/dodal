@@ -10,6 +10,7 @@ from ophyd_async.core import (
     callback_on_mock_put,
     get_mock,
     get_mock_put,
+    set_mock_attr,
     set_mock_value,
 )
 
@@ -152,10 +153,12 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
     device = bart_robot
     _set_fast_robot_timeouts(device)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
-    device.load.trigger = AsyncMock(side_effect=device.load.trigger)
+    mock_trigger = set_mock_attr(
+        device.load, "trigger", AsyncMock(side_effect=device.load.trigger)
+    )
     with pytest.raises(RobotLoadError):
         await device.set(SampleLocation(15, 10))
-    device.load.trigger.assert_called_once()
+    mock_trigger.assert_called_once()
     last_log = patch_logger.mock_calls[1].args[0]
     assert WAIT_FOR_BEAMLINE_DISABLE_MSG in last_log
 
@@ -168,12 +171,14 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     device = bart_robot
     _set_fast_robot_timeouts(device)
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
-    device.load.trigger = AsyncMock(side_effect=device.load.trigger)
+    mock_trigger = set_mock_attr(
+        device.load, "trigger", AsyncMock(side_effect=device.load.trigger)
+    )
     with pytest.raises(RobotLoadError) as exc_info:
         await device.set(SampleLocation(15, 10))
 
     try:
-        device.load.trigger.assert_called_once()
+        mock_trigger.assert_called_once()
         last_log = patch_logger.mock_calls[1].args[0]
         assert WAIT_FOR_BEAMLINE_DISABLE_MSG in last_log
     except AssertionError:

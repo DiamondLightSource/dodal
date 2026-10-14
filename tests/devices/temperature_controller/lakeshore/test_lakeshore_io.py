@@ -1,6 +1,6 @@
 from ophyd_async.core import StrictEnum, init_devices
 
-from dodal.devices.temperture_controller.lakeshore.lakeshore_io import (
+from dodal.devices.temperature_controller.lakeshore.lakeshore_io import (
     LakeshoreBaseIO,
 )
 

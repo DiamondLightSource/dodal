@@ -54,7 +54,7 @@ def configure_arm_trigger_and_disarm_detector(
     yield from bps.kickoff(eiger, wait=True)
     LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
     start = time.time()
-    yield from bps.trigger(eiger.detector.trigger, wait=True)
+    yield from bps.trigger(eiger.detector.trigger_, wait=True)
     LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.complete(eiger, wait=True)

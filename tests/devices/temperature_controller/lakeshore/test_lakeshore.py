@@ -10,7 +10,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import StrictEnum, init_devices
 from ophyd_async.testing import assert_configuration, assert_reading
 
-from dodal.devices.temperture_controller import (
+from dodal.devices.temperature_controller import (
     Lakeshore,
 )
 

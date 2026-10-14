@@ -11,7 +11,7 @@ class BacklightPosition(StandardReadable, Movable[InOutUpper]):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.position = epics_signal_rw(InOutUpper, f"{prefix}AD1:choiceButton")
+        self.position = epics_signal_rw(InOutUpper, f"{prefix}choiceButton")
         super().__init__(name)
 
     @AsyncStatus.wrap

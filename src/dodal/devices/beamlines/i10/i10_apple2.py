@@ -124,7 +124,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                 f"jaw_phase position for angle ({pol_angle}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.apple2().jaw_phase().set(jaw_phase)
+        await self.apple2_ref().jaw_phase().set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
@@ -144,8 +144,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     ) -> None:
         await super()._set_motors_from_energy_and_polarisation(energy, pol)
         if pol != Pol.LA:
-            await self.apple2().jaw_phase().set(0)
-            await self.apple2().jaw_phase().set_move.set(1)
+            await self.apple2_ref().jaw_phase().set(0)
+            await self.apple2_ref().jaw_phase().set_move.set(1)
 
     def _raise_if_not_la(self, pol: Pol) -> None:
         if pol != Pol.LA:

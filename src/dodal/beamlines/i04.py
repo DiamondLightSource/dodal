@@ -37,8 +37,8 @@ from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.robot import BartRobot
-from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.scintillator import Scintillator
+from dodal.devices.slits import MinimalSlits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -47,8 +47,8 @@ from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.devices.zebra.zebra_controlled_shutter import MXZebraShutter
 from dodal.devices.zocalo import ZocaloResults
@@ -70,7 +70,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 I04_ZEBRA_MAPPING = ZebraMapping(
-    outputs=(ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
+    outputs=(ZebraOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
     sources=ZebraSources(),
 )
 PREFIX = BeamlinePrefix(BL)
@@ -185,8 +185,10 @@ def zebra_fast_grid_scan() -> ZebraFastGridScanThreeD:
 
 
 @devices.factory()
-def s4_slit_gaps() -> S4SlitGaps:
-    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+def s4_slit_gaps() -> MinimalSlits:
+    return MinimalSlits(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-04:", x_gap="XGAP", y_gap="YGAP"
+    )
 
 
 @devices.fixture
