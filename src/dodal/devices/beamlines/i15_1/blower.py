@@ -1,8 +1,8 @@
 import asyncio
+import math
 from dataclasses import dataclass
 from functools import cached_property
 
-import numpy as np
 from daq_config_server.client import ConfigClient
 from daq_config_server.models.i15_1.xpdf_parameters import (
     TemperatureControllerParams,
@@ -29,6 +29,7 @@ from dodal.devices.beamlines.i15_1.safe_or_beam_positioner import SafeOrBeamPosi
 class TemperatureMoveLogic(MovableLogic[float]):
     pneumatic: SignalR[ValveState]
     settle_time_s: SignalRW[float]
+    rbv_tolerance: SignalRW[float]
 
     # We could work this out better based on ramp rate but would need more calibration
     # to make sure it's accurate, for now an hour is fine
@@ -47,11 +48,12 @@ class TemperatureMoveLogic(MovableLogic[float]):
         if new_position == 0:
             await self.setpoint.set(0)
         else:
+            rbv_tolerance = await self.rbv_tolerance.get_value()
             await set_and_wait_for_other_value(
                 self.setpoint,
                 new_position,
                 self.readback,
-                lambda v: bool(np.isclose(v, new_position)),
+                lambda v: math.isclose(v, new_position, abs_tol=rbv_tolerance),
                 timeout=self.TIMEOUT,
             )
             await asyncio.sleep(await self.settle_time_s.get_value())
@@ -63,6 +65,7 @@ class Temperature(StandardReadable, StandardMovable[float]):
         prefix: str,
         pneumatic_pv: str,
         settle_time_s: Reference[SignalRW[float]],
+        rbv_tolerance: Reference[SignalRW[float]],
     ) -> None:
         with self.add_children_as_readables(format=Format.HINTED_SIGNAL):
             self._temperature_rbv = epics_signal_r(float, f"{prefix}PV:RBV")
@@ -72,6 +75,7 @@ class Temperature(StandardReadable, StandardMovable[float]):
             self._pneumatic = epics_signal_r(ValveState, pneumatic_pv)
 
         self._settle_time_s = settle_time_s
+        self._rbv_tolerance = rbv_tolerance
         super().__init__()
 
     @cached_property
@@ -81,6 +85,7 @@ class Temperature(StandardReadable, StandardMovable[float]):
             readback=self._temperature_rbv,
             pneumatic=self._pneumatic,
             settle_time_s=self._settle_time_s(),
+            rbv_tolerance=self._rbv_tolerance(),
         )
 
 
@@ -88,15 +93,18 @@ class Blower(SafeOrBeamPositioner):
     """Blows hot air on to the sample, can be moved out of the beam to allow room for
     a robot load.
 
-    Temperatures are set in C. When a temperature is set the device will wait to reach
-    that temperature and then wait a settle time as defined in `settle_time_s`. Setting
-    a temperature of 0 will turn the blower off.
+    Temperatures are set in C. When a temperature is set the device will wait until the
+    readback temperature is within `rbv_tolerance` of the setpoint and then wait a
+    settle time as defined in `settle_time_s`.
+
+    Setting a temperature of 0 will turn the blower off.
 
     For safety reasons the heater should only be turned on (set to a >0 temperature) if
     the given pneumatic is open to allow airflow.
     """
 
     DEFAULT_SETTLE_TIME = 180
+    DEFAULT_RBV_TOLERANCE = 1
 
     def __init__(
         self,
@@ -112,10 +120,14 @@ class Blower(SafeOrBeamPositioner):
         )
 
         self.settle_time_s = soft_signal_rw(float, self.DEFAULT_SETTLE_TIME)
+        self.rbv_tolerance = soft_signal_rw(float, self.DEFAULT_RBV_TOLERANCE)
 
         with self.add_children_as_readables():
             self.temperature = Temperature(
-                prefix, pneumatic_pv, Reference(self.settle_time_s)
+                prefix,
+                pneumatic_pv,
+                Reference(self.settle_time_s),
+                Reference(self.rbv_tolerance),
             )
 
         super().__init__(motion_pv, config_client, xpdf_parameters_path, name)

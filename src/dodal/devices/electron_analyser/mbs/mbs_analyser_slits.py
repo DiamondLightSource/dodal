@@ -14,31 +14,35 @@ from pydantic import BaseModel
 
 
 class SlitPosition(StrictEnum):
-    P100_0_1_CURVED = "100 0.1 curved"
-    P200_0_1_STRAIGHT = "200 0.1 straight"
-    P300_0_2_CURVED = "300 0.2 curved"
-    P400_0_2_STRAIGHT = "400 0.2 straight"
-    P500_0_2_STRAIGHT = "500 0.2 straight"
-    P600_0_3_STRAIGHT = "600 0.3 straight"
-    P700_0_5_STRAIGHT = "700 0.5 straight"
-    P800_0_8_STRAIGHT = "800 0.8 straight"
-    P850_3_HOLE = "850 3 hole"
-    P900_1_5_STRAIGHT = "900 1.5 straight"
+    S005_A05_STRAIGHT = "Straight, S0.05, A0.5"
+    S010_A10_STRAIGHT = "Straight, S0.1, A1.0"
+    S010_A13_STRAIGHT = "Straight, S0.1, A1.3"
+    S010_A19_STRAIGHT = "Straight, S0.1, A1.9"
+    S020_A10_STRAIGHT = "Straight, S0.2, A1.0"
+    S020_A19_STRAIGHT = "Straight, S0.2, A1.9"
+    S040_A19_STRAIGHT = "Straight, S0.4, A1.9"
+    S320_A54_STRAIGHT = "Straight, S3.2, A5.4"
+    S020_A10_CURVED = "Curved, S0.2, A1.0"
 
 
 class EntranceSlitInformation(BaseModel):
-    direction: str = "vertical"
-    setting: int = 100
+    direction: str = "Vertical"
+    shape: str = "Curved"
     size: float = 0.1
-    shape: str = "curved"
+    aperture: float = 1.0
 
     @classmethod
     def from_slit_positions(cls, pos: SlitPosition) -> Self:
-        setting, size, shape = str(pos).split()
-        return cls(setting=int(setting), size=float(size), shape=shape)
+        shape, size, aperture = str(pos).split(", ")
+        return cls(
+            direction="Vertical",
+            shape=shape,
+            size=float(size.removeprefix("S")),
+            aperture=float(aperture.removeprefix("A")),
+        )
 
     def to_slit_position(self) -> SlitPosition:
-        return SlitPosition(f"{self.setting} {self.size:g} {self.shape}")
+        return SlitPosition(f"{self.shape}, S{self.size:g}, A{self.aperture:.1f}")
 
 
 class EntranceSlitInformationDevice(StandardReadable):
@@ -51,10 +55,10 @@ class EntranceSlitInformationDevice(StandardReadable):
         self.slit_pos = epics_signal_rw(SlitPosition, pv)
         # Formatted slit info as individual soft signals for metadata
         with self.add_children_as_readables():
-            self.direction, self._direction_w = soft_signal_r_and_setter(str)
-            self.setting, self._setting_w = soft_signal_r_and_setter(int)
-            self.size, self._size_w = soft_signal_r_and_setter(float)
             self.shape, self._shape_w = soft_signal_r_and_setter(str)
+            self.aperture, self._aperture_w = soft_signal_r_and_setter(float)
+            self.size, self._size_w = soft_signal_r_and_setter(float)
+            self.direction, self._direction_w = soft_signal_r_and_setter(str)
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -68,7 +72,7 @@ class EntranceSlitInformationDevice(StandardReadable):
         val = value[self.slit_pos.name]["value"]
         new_slit_info = EntranceSlitInformation.from_slit_positions(val)
         self._direction_w(new_slit_info.direction)
-        self._setting_w(new_slit_info.setting)
+        self._aperture_w(new_slit_info.aperture)
         self._size_w(new_slit_info.size)
         self._shape_w(new_slit_info.shape)
 

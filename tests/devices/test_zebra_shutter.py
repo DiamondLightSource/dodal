@@ -58,6 +58,13 @@ def int_fast_shutter() -> ZebraFastShutter:
     return shutter
 
 
+@pytest.fixture
+def inverted_int_fast_shutter() -> ZebraFastShutter:
+    with init_devices(mock=True):
+        shutter = ZebraFastShutter(set_pv="SET", get_pv="GET", inverted=True)
+    return shutter
+
+
 @pytest.mark.parametrize(
     "pv_value, expected_reading",
     [
@@ -122,3 +129,45 @@ async def test_when_fast_shutter_state_changed_then_pv_readback_correct(
             ),
         },
     )
+
+
+@pytest.mark.parametrize(
+    "pv_value, expected_reading",
+    [
+        [0, OpenClose.OPEN],
+        [1, OpenClose.CLOSE],
+    ],
+)
+async def test_given_inverted_fast_shutter_pv_at_int_then_reads_expected_enum(
+    inverted_int_fast_shutter: ZebraFastShutter,
+    pv_value: int,
+    expected_reading: OpenClose,
+):
+    set_mock_value(inverted_int_fast_shutter._get_pv, pv_value)
+
+    await assert_reading(
+        inverted_int_fast_shutter,
+        {
+            f"{inverted_int_fast_shutter.name}-shutter_state": partial_reading(
+                expected_reading
+            ),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "fast_shutter_state, expected_pv_value",
+    [
+        [OpenClose.CLOSE, YesNo.YES],
+        [OpenClose.OPEN, YesNo.NO],
+    ],
+)
+async def test_when_inverted_fast_shutter_state_changed_then_pv_set_correctly(
+    inverted_int_fast_shutter: ZebraFastShutter,
+    fast_shutter_state: OpenClose,
+    expected_pv_value: int,
+):
+    await inverted_int_fast_shutter.set(fast_shutter_state)
+
+    mock = get_mock_put(inverted_int_fast_shutter._set_pv)
+    mock.assert_called_once_with(expected_pv_value)
