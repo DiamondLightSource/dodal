@@ -100,7 +100,7 @@ class CentroidFromEpics(StandardReadable, Preparable, Stageable):
 
     @AsyncStatus.wrap
     async def unstage(self):
-        """Swicth the stats plugin back off once done."""
+        """Switch the stats plugin back off once done."""
         await asyncio.gather(
             self.stats.enable_callbacks.set(EnableDisable.DISABLE),
             self.stats.compute_statistics.set(False),
