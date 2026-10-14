@@ -38,14 +38,24 @@ async def test_prepare_sets_the_plugin_chain(
     assert await centroid_device.colour_mode.get_value() == colour_mode.value
 
 
-async def test_trigger_starts_the_stat_plugin(centroid_device: CentroidFromEpics):
-    await centroid_device.trigger()
+async def test_stage_starts_the_stat_plugin(centroid_device: CentroidFromEpics):
+    await centroid_device.stage()
 
     assert await centroid_device.stats.enable_callbacks.get_value() == "Enable"
     assert await centroid_device.stats.compute_statistics.get_value()
     assert await centroid_device.stats.compute_centroid.get_value()
     assert await centroid_device.stats.compute_profiles.get_value()
     assert await centroid_device.stats.compute_histogram.get_value()
+
+
+async def test_unstage_stops_the_stat_plugin(centroid_device: CentroidFromEpics):
+    await centroid_device.unstage()
+
+    assert await centroid_device.stats.enable_callbacks.get_value() == "Disable"
+    assert await centroid_device.stats.compute_statistics.get_value() is False
+    assert await centroid_device.stats.compute_centroid.get_value() is False
+    assert await centroid_device.stats.compute_profiles.get_value() is False
+    assert await centroid_device.stats.compute_histogram.get_value() is False
 
 
 async def test_centroid_position_can_be_read(centroid_device: CentroidFromEpics):

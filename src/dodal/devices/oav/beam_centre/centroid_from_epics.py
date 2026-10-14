@@ -1,6 +1,6 @@
 import asyncio
 
-from bluesky.protocols import Preparable, Triggerable
+from bluesky.protocols import Preparable, Stageable
 from ophyd_async.core import (
     AsyncStatus,
     EnableDisable,
@@ -31,7 +31,7 @@ class CentroidSettings(BaseModel):
     colour_mode: ColourMode
 
 
-class CentroidFromEpics(StandardReadable, Preparable, Triggerable):
+class CentroidFromEpics(StandardReadable, Preparable, Stageable):
     """Device to set up the CAM -> CC -> STAT plugin chain and get the centroid.
 
     The CC plugin is used to set the colour mode (Mono for black and white).
@@ -79,7 +79,7 @@ class CentroidFromEpics(StandardReadable, Preparable, Triggerable):
         )
 
     @AsyncStatus.wrap
-    async def trigger(self):
+    async def stage(self):
         """Once the device is prepared, switch on the stats plugin.
 
         This is done by enabling the callback and setting the ComputeCentroid and
@@ -96,4 +96,16 @@ class CentroidFromEpics(StandardReadable, Preparable, Triggerable):
             # NOTE To test if actually necessary
             self.stats.compute_profiles.set(True),
             self.stats.compute_histogram.set(True),
+        )
+
+    @AsyncStatus.wrap
+    async def unstage(self):
+        """Swicth the stats plugin back off once done."""
+        await asyncio.gather(
+            self.stats.enable_callbacks.set(EnableDisable.DISABLE),
+            self.stats.compute_statistics.set(False),
+            self.stats.compute_centroid.set(False),
+            # NOTE To test if actually necessary
+            self.stats.compute_profiles.set(False),
+            self.stats.compute_histogram.set(False),
         )
