@@ -11,7 +11,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DRV_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.b01_1.diodes import RGBDiodes
+from dodal.devices.current_amplifiers import EnzLocum
 from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -87,21 +87,15 @@ def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
 
 
 @devices.factory()
-def spectroscopy_diodes() -> RGBDiodes:
-    """The diodes for the spectroscopy experiment.
+def locum() -> EnzLocum:
+    """The Enz Locum4 low current amplifier for the spectroscopy diodes.
 
-    An alternative to the spectroscopy detector, using 3 RGB diodes running
-    through the Enz LoCuM4 low current amplifier into the pandabox. This gives
-    the live values and gains, the triggered values are captured by the pandabox.
+    Amplifies the 3 RGB diodes.
 
     Returns:
-        RGBDiodes: The diodes device.
+        EnzLocum: The current amplifier device.
     """
-    return RGBDiodes(
-        # The pandabox serves its PVs over PVA rather than CA
-        panda_prefix=f"pva://{PREFIX.beamline_prefix}-EA-PANDA-01:FmcIn:Val",
-        amplifier_prefix=f"{PREFIX.beamline_prefix}-DI-LOCUM-01:",
-    )
+    return EnzLocum(f"{PREFIX.beamline_prefix}-DI-LOCUM-01:")
 
 
 @devices.factory()
