@@ -78,7 +78,6 @@ class EnzLocum(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Separate signals as the setpoint has an extra "Auto" choice
             self.range = epics_signal_rw(EnzLocumRange, f"{prefix}SETRANGE")
             self.range_readback = epics_signal_r(
                 EnzLocumRangeReadback, f"{prefix}MRREADBACK"

@@ -7,10 +7,6 @@ from dodal.devices.current_amplifiers import EnzLocum
 class RGBDiodes(StandardReadable):
     """Red, green and blue diodes read through an Enz Locum current amplifier.
 
-    The amplifier outputs are wired into the analogue inputs of a PandA. This device
-    only provides the live values and the amplifier settings. The triggered min, max
-    and mean values are captured by PCAP and written by the PandA device itself.
-
     Attributes:
         red (SignalR): The live amplified red diode signal, in raw counts.
         green (SignalR): The live amplified green diode signal, in raw counts.
@@ -32,6 +28,6 @@ class RGBDiodes(StandardReadable):
             self.red = epics_signal_r(int, f"{panda_prefix}{red_channel}")
             self.green = epics_signal_r(int, f"{panda_prefix}{green_channel}")
             self.blue = epics_signal_r(int, f"{panda_prefix}{blue_channel}")
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.CHILD):
             self.amplifier = EnzLocum(amplifier_prefix)
         super().__init__(name=name)
