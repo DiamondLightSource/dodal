@@ -179,14 +179,18 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
         super().__init__(name)
 
-    async def _trigger_program_and_wait_for_complete(self, trigger_signal: SignalX):
+    async def _trigger_program_and_wait_for_complete(
+        self, trigger_signal: SignalX, wait_for_program_running=True
+    ):
         await trigger_signal.trigger()
 
-        await wait_for_value(
-            self.program_running,
-            ProgramRunning.PROGRAM_RUNNING,
-            timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
-        )
+        if wait_for_program_running:
+            # Can cause a race condition for very short programs
+            await wait_for_value(
+                self.program_running,
+                ProgramRunning.PROGRAM_RUNNING,
+                timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
+            )
         await wait_for_value(
             self.program_running,
             ProgramRunning.NO_PROGRAM_RUNNING,
@@ -284,7 +288,12 @@ class Robot(StandardReadable, Movable[SampleLocation]):
             self._spinner_off if new_state == SpinnerState.OFF else self._spinner_on
         )
 
-        await self._trigger_program_and_wait_for_complete(signal_to_set)
+        await self._trigger_program_and_wait_for_complete(
+            signal_to_set, wait_for_program_running=False
+        )
+        await wait_for_value(
+            self._spinner_rbv, new_state, self.PROGRAM_COMPLETED_TIMEOUT
+        )
 
     def _get_spinner_state(self, rbv: SpinnerState) -> SpinnerState:
         # This function is needed so that the derived signal picks up the type hints
