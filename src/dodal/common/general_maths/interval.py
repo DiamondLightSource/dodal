@@ -51,12 +51,20 @@ class FloatInterval(BaseModel):
 class ClosedInterval(FloatInterval):
     """Interval with inclusive end points."""
 
+    def __str__(self):
+        return (
+            f"Closed interval between included end points [{self.lower},{self.upper}]"
+        )
+
     def _includes(self, x: float) -> bool:
         return self.lower <= x <= self.upper
 
 
 class ClosedOpenInterval(FloatInterval):
     """Interval with inclusive lower endpoint and exclusive upper endpoint."""
+
+    def __str__(self):
+        return f"Interval from included, to below excluded end point [{self.lower},{self.upper})"
 
     def _includes(self, x: float) -> bool:
         return self.lower <= x < self.upper
@@ -65,12 +73,18 @@ class ClosedOpenInterval(FloatInterval):
 class OpenInterval(FloatInterval):
     """Interval with exclusive end points."""
 
+    def __str__(self):
+        return f"Open interval between excluded end points ({self.lower},{self.upper})"
+
     def _includes(self, x: float) -> bool:
         return self.lower < x < self.upper
 
 
 class OpenClosedInterval(FloatInterval):
     """Interval with exclusive lower endpoint and inclusive upper endpoint."""
+
+    def __str__(self):
+        return f"Interval above excluded, up to included end point ({self.lower},{self.upper}]"
 
     def _includes(self, x: float) -> bool:
         return self.lower < x <= self.upper
