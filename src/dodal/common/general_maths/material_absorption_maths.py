@@ -233,7 +233,7 @@ def attenuation_at_depth_cm(
     absorption_coefficient_per_cm: Annotated[StrictFloat, Field(gt=0)],
 ) -> float:
     """Calculates attenuation in Barnett units, where 1000 Bn equivalent to 1/e,
-    0Bn to 1 and 2000 Bn to 1/(e^2).
+    0 Bn to 1 and 2000 Bn to 1/(e^2).
 
     Args:
         depth_cm (StrictFloat): Depth of absorber (zero or positive).

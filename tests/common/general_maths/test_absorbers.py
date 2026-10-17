@@ -8,7 +8,7 @@ from dodal.common.general_maths.absorber_geometry import (
     TaperedGeometryProvider,
     ThicknessProvider,
 )
-from dodal.common.general_maths.absorbers import FoilAbsorber, WedgeAbsorber
+from dodal.common.general_maths.absorbers import WedgeAbsorber, _FoilAbsorber
 from dodal.common.general_maths.interval import ClosedInterval
 from dodal.common.general_maths.material_absorption_maths import (
     AbsorptionSpectrumSegment,
@@ -62,7 +62,7 @@ def test_that_foil_absorber_asks_geometry_model_for_thickness() -> None:
     material_absorption_strut.absorption_coefficient_per_cm.return_value = 1.8
     geometry_model = MagicMock(spec=ThicknessProvider)
     geometry_model.get_thickness_cm.return_value = 0.5
-    foil_absorber = FoilAbsorber(
+    foil_absorber = _FoilAbsorber(
         spectrum=material_absorption_strut,
         geometry_model=geometry_model,
     )
@@ -75,7 +75,7 @@ def test_that_foil_absorber_reports_faithful_absorption_result() -> None:
     material_absorption_strut.absorption_coefficient_per_cm.return_value = 0.63
     geometry_model = MagicMock(spec=ThicknessProvider)
     geometry_model.get_thickness_cm.return_value = 0.85
-    foil_absorber = FoilAbsorber(
+    foil_absorber = _FoilAbsorber(
         spectrum=material_absorption_strut,
         geometry_model=geometry_model,
     )
@@ -114,7 +114,7 @@ def test_that_foil_absorber_reports_raises_error_when_xray_energy_is_out_of_boun
     spectrum = MaterialAbsorptionSpectrum(intervals=(segment,))
     geometry_model = MagicMock(spec=ThicknessProvider)
     geometry_model.get_thickness_cm.return_value = 0.85
-    foil_absorber = FoilAbsorber(
+    foil_absorber = _FoilAbsorber(
         spectrum=spectrum,
         geometry_model=geometry_model,
     )
@@ -151,7 +151,7 @@ def test_that_foil_absorber_reports_raises_error_when_xray_energy_is_invalid(
     spectrum = MaterialAbsorptionSpectrum(intervals=(segment,))
     geometry_model = MagicMock(spec=ThicknessProvider)
     geometry_model.get_thickness_cm.return_value = 0.85
-    foil_absorber = FoilAbsorber(
+    foil_absorber = _FoilAbsorber(
         spectrum=spectrum,
         geometry_model=geometry_model,
     )
