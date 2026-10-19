@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i24.commissioning_jungfrau &#8212; dodal 3.0.4.dev3+g0655dbb80 documentation</title>
+    <title>dodal.devices.beamlines.i24.commissioning_jungfrau &#8212; dodal 3.0.4.dev4+g74113d36f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=bc53f558"></script>
+    <script src="../../../../../_static/documentation_options.js?v=d25ad228"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -910,6 +910,8 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
+<span class="n">ACQUISITION_STOP_TIMEOUT_S</span> <span class="o">=</span> <span class="mi">60</span>
+
 
 <div class="viewcode-block" id="JungfrauCommissioningWriter">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriter.html#dodal.devices.beamlines.i24.commissioning_jungfrau.JungfrauCommissioningWriter">[docs]</a>
@@ -1016,6 +1018,12 @@ window.runMermaid = runMermaid;</script>
         <span class="n">drv_connector</span> <span class="o">=</span> <span class="n">fastcs_connector</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">drv_suffix</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">JungfrauDriverIO</span><span class="p">(</span><span class="n">connector</span><span class="o">=</span><span class="n">drv_connector</span><span class="p">)</span>
         <span class="n">drv_connector</span><span class="o">.</span><span class="n">create_children_from_annotations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">)</span>
+        <span class="c1"># AcquisitionStop takes ~20s to complete on the commissioning IOC, which is</span>
+        <span class="c1"># longer than ophyd-async&#39;s 10s Command default, so unstage() fails with a</span>
+        <span class="c1"># TimeoutError after the stop has in fact been accepted. A Command&#39;s timeout is</span>
+        <span class="c1"># only settable at construction, and these children are built from annotations,</span>
+        <span class="c1"># so there is no public way to pass one in.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">acquisition_stop</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="n">ACQUISITION_STOP_TIMEOUT_S</span>  <span class="c1"># noqa: SLF001</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">JungfrauCommissioningWriter</span><span class="p">(</span><span class="n">writer_prefix</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_type</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span>
             <span class="n">AcquisitionType</span><span class="p">,</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">STANDARD</span>
