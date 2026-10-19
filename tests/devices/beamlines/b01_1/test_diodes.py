@@ -1,9 +1,12 @@
+from unittest.mock import patch
+
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.beamlines.b01_1.diodes import RGBDiodes
 from dodal.devices.current_amplifiers import (
+    EnzLocum,
     EnzLocumBiasSource,
     EnzLocumBiasSourceReadback,
     EnzLocumIntegrationWindow,
@@ -23,7 +26,14 @@ def test_diodes_use_pvs_for_their_channel(diodes: RGBDiodes) -> None:
     assert diodes.red.source == "mock+ca://PANDA:FmcIn:Val5"
     assert diodes.green.source == "mock+ca://PANDA:FmcIn:Val4"
     assert diodes.blue.source == "mock+ca://PANDA:FmcIn:Val7"
-    assert diodes.amplifier.range.source == "mock+ca://LOCUM:SETRANGE"
+
+
+def test_diodes_create_amplifier_with_its_prefix() -> None:
+    with patch(
+        "dodal.devices.beamlines.b01_1.diodes.EnzLocum", wraps=EnzLocum
+    ) as mock_locum:
+        RGBDiodes("PANDA:FmcIn:Val", "LOCUM:")
+    mock_locum.assert_called_once_with("LOCUM:")
 
 
 async def test_diodes_read_values(diodes: RGBDiodes) -> None:
