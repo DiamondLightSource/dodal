@@ -1,0 +1,40 @@
+dodal.devices.beamlines.b01\_1.diodes.RGBDiodes
+===============================================
+
+.. currentmodule:: dodal.devices.beamlines.b01_1.diodes
+
+.. autoclass:: RGBDiodes
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

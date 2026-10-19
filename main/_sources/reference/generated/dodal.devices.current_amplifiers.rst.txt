@@ -14,6 +14,12 @@ dodal.devices.current\_amplifiers
    :toctree:
    :recursive:
 
+   ~current_amplifiers.EnzLocum
+   ~current_amplifiers.EnzLocumBiasSource
+   ~current_amplifiers.EnzLocumBiasSourceReadback
+   ~current_amplifiers.EnzLocumIntegrationWindow
+   ~current_amplifiers.EnzLocumRange
+   ~current_amplifiers.EnzLocumRangeReadback
    ~current_amplifiers.FemtoDDPCA
    ~current_amplifiers.Femto3xxGainTable
    ~current_amplifiers.Femto3xxRaiseTime

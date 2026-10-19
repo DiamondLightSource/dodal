@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.b01_1 &#8212; dodal 3.0.4.dev4+g74113d36f documentation</title>
+    <title>dodal.beamlines.b01_1 &#8212; dodal 3.0.4.dev5+gf0c45d3bb documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=d25ad228"></script>
+    <script src="../../../_static/documentation_options.js?v=2f70995f"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -901,6 +901,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.device_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DRV_SUFFIX</span><span class="p">,</span> <span class="n">HDF5_SUFFIX</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.b01_1.diodes</span><span class="w"> </span><span class="kn">import</span> <span class="n">RGBDiodes</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.synchrotron</span><span class="w"> </span><span class="kn">import</span> <span class="n">Synchrotron</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
@@ -938,7 +939,7 @@ window.runMermaid = runMermaid;</script>
     <span class="p">)</span>
 
 
-<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">pandabox</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HDFPanda</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides triggering of the detectors.</span>
 
@@ -978,19 +979,22 @@ window.runMermaid = runMermaid;</script>
     <span class="p">)</span>
 
 
-<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">imaging_detector</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AravisDetector</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Mako camera for the imaging experiment.</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spectroscopy_diodes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RGBDiodes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The diodes for the spectroscopy experiment.</span>
 
-<span class="sd">    Looks at the on-axis viewing screen.</span>
+<span class="sd">    An alternative to the spectroscopy detector, using 3 RGB diodes running</span>
+<span class="sd">    through the Enz Locum4 low current amplifier into the pandabox. This gives</span>
+<span class="sd">    the live values and amplifier settings, the triggered values are captured by</span>
+<span class="sd">    the pandabox.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        AravisDetector: The imaging camera device.</span>
+<span class="sd">        RGBDiodes: The diodes device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">AravisDetector</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-DCAM-01:&quot;</span><span class="p">,</span>
-        <span class="n">ADWriterFactory</span><span class="o">.</span><span class="n">hdf</span><span class="p">(</span><span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span> <span class="n">writer_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">),</span>
-        <span class="n">driver_suffix</span><span class="o">=</span><span class="n">DRV_SUFFIX</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">RGBDiodes</span><span class="p">(</span>
+        <span class="c1"># The pandabox serves its PVs over PVA rather than CA</span>
+        <span class="n">panda_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;pva://</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-PANDA-01:FmcIn:Val&quot;</span><span class="p">,</span>
+        <span class="n">amplifier_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-LOCUM-01:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 

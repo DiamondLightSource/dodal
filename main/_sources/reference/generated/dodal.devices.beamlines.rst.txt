@@ -9,6 +9,7 @@ dodal.devices.beamlines
    :toctree:
    :recursive:
 
+   dodal.devices.beamlines.b01_1
    dodal.devices.beamlines.b07
    dodal.devices.beamlines.b07_1
    dodal.devices.beamlines.b07_shared

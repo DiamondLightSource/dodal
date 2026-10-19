@@ -1,0 +1,84 @@
+dodal.devices.current\_amplifiers.EnzLocumBiasSource
+====================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: EnzLocumBiasSource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnzLocumBiasSource.PLUS
+      
+      
+      ~EnzLocumBiasSource.MINUS
+      
+      
+      ~EnzLocumBiasSource.EXTERNAL
+      
+      
+      ~EnzLocumBiasSource.GROUND
+      
+   
+   
