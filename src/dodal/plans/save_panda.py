@@ -2,7 +2,9 @@ import argparse
 import os
 import sys
 from argparse import ArgumentParser
+from importlib import import_module
 from pathlib import Path
+from types import ModuleType
 from typing import cast
 
 from bluesky.run_engine import RunEngine
@@ -12,7 +14,6 @@ from ophyd_async.plan_stubs import (
 )
 
 from dodal.beamlines import module_name_for_beamline
-from dodal.utils import make_device
 
 
 def main(argv: list[str] | None = None):
@@ -70,19 +71,28 @@ def main(argv: list[str] | None = None):
     return 0
 
 
+def build_and_connect_device(module: str | ModuleType, device_name: str = "panda"):
+    if isinstance(module, str):
+        module = import_module(module)
+
+    if panda := getattr(module, device_name, None):
+        return panda.build(connect_immediately=True)
+    else:
+        raise ValueError(f"No panda device found in {module}")
+
+
 def _save_panda(beamline, device_name, output_directory, file_name):
     run_engine = RunEngine()
     print("Creating devices...")
     module_name = module_name_for_beamline(beamline)
     try:
-        devices = make_device(
-            f"dodal.beamlines.{module_name}", device_name, connect_immediately=True
-        )
+        # Build and connect panda
+        panda = build_and_connect_device(f"dodal.beamlines.{module_name}", device_name)
+        print("Panda device built and connected")
     except Exception as error:
         sys.stderr.write(f"Couldn't create device {device_name}: {error}\n")
         sys.exit(1)
 
-    panda = devices[device_name]
     print(
         f"Saving to {output_directory}/{file_name} from {device_name} on {beamline}..."
     )

@@ -3,7 +3,7 @@ import pytest
 from dodal.devices.insertion_device import (
     AppleKnotPathFinder,
 )
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device.apple2_controller import (
     Apple2LockedPhasesVal,
     Apple2Val,
 )

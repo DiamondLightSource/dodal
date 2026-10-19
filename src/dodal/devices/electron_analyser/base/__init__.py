@@ -16,12 +16,7 @@ from .base_region import (
     TLensMode,
 )
 from .base_util import to_binding_energy, to_kinetic_energy
-from .detector_logic import (
-    ElectronAnalyserTriggerLogic,
-    RegionLogic,
-    ShutterCoordinatorADAcquireLogic,
-)
-from .energy_sources import DualEnergySource
+from .detector_logic import ElectronAnalyserTriggerLogic, RegionLogic
 
 __all__ = [
     "ElectronAnalyserDetector",
@@ -42,6 +37,4 @@ __all__ = [
     "to_kinetic_energy",
     "ElectronAnalyserTriggerLogic",
     "RegionLogic",
-    "ShutterCoordinatorADAcquireLogic",
-    "DualEnergySource",
 ]

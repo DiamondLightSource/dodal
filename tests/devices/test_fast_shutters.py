@@ -3,11 +3,11 @@ import asyncio
 import pytest
 from bluesky import RunEngine
 from bluesky import plan_stubs as bps
-from ophyd_async.core import InOut, OnOff, init_devices
+from ophyd_async.core import InOut, OnOff, SignalRW, init_devices, soft_signal_rw
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.fast_shutter import DualFastShutter, FastShutter
-from dodal.devices.selectable_source import SelectedSource, SourceSelector
+from dodal.devices.selectable_source import SelectedSource
 
 
 @pytest.fixture
@@ -80,9 +80,9 @@ def shutter2() -> FastShutter[InOut]:
 
 
 @pytest.fixture
-def source_selector() -> SourceSelector:
+def source_selector() -> SignalRW[SelectedSource]:
     with init_devices(mock=True):
-        source_selector = SourceSelector()
+        source_selector = soft_signal_rw(SelectedSource)
     return source_selector
 
 
@@ -90,14 +90,10 @@ def source_selector() -> SourceSelector:
 def dual_fast_shutter(
     shutter1: FastShutter[InOut],
     shutter2: FastShutter[InOut],
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
 ) -> DualFastShutter[InOut]:
     with init_devices(mock=True):
-        dual_fast_shutter = DualFastShutter[InOut](
-            shutter1,
-            shutter2,
-            source_selector.selected_source,
-        )
+        dual_fast_shutter = DualFastShutter[InOut](shutter1, shutter2, source_selector)
     return dual_fast_shutter
 
 
@@ -105,7 +101,7 @@ async def test_dual_fast_shutter_read_shutter_state(
     shutter1: FastShutter,
     shutter2: FastShutter,
     dual_fast_shutter: DualFastShutter,
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
     run_engine: RunEngine,
 ) -> None:
     # Setup test so that the two shutters are not in the same state so test can tell
@@ -124,7 +120,7 @@ async def test_dual_fast_shutter_set_shutter_state(
     shutter1: FastShutter,
     shutter2: FastShutter,
     dual_fast_shutter: DualFastShutter,
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
     run_engine: RunEngine,
 ) -> None:
     run_engine(bps.mv(source_selector, SelectedSource.SOURCE2))
@@ -176,7 +172,7 @@ async def test_dual_fast_shutter_read(
     dual_fast_shutter: DualFastShutter,
     shutter1: FastShutter,
     shutter2: FastShutter,
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
 ) -> None:
     shutter1_read, shutter2_read, source_selector_read = await asyncio.gather(
         shutter1.read(), shutter2.read(), source_selector.read()
@@ -212,7 +208,7 @@ async def test_dual_fast_shutter_read_configuration(
 
 async def test_dual_fast_shutter_raises_error_if_shutters_have_different_open_close_states(
     shutter1: FastShutter,
-    source_selector: SourceSelector,
+    source_selector: SignalRW[SelectedSource],
 ) -> None:
     with init_devices(mock=True):
         other_shutter = FastShutter(
@@ -224,4 +220,4 @@ async def test_dual_fast_shutter_raises_error_if_shutters_have_different_open_cl
         match=f"{shutter1.open_state} is not same value as {other_shutter.open_state}",
     ):
         with init_devices(mock=True):
-            DualFastShutter(shutter1, other_shutter, source_selector.selected_source)
+            DualFastShutter(shutter1, other_shutter, source_selector)

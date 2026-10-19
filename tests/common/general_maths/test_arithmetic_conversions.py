@@ -1,5 +1,6 @@
 import math
 from collections.abc import Callable
+from typing import Any, Final
 
 import pydantic
 import pytest
@@ -21,43 +22,58 @@ from tests.common.general_maths.operator_inversion_pairing import (
 
 
 # expected success tests (the 'Happy Path'): All numbers here are arbitrary
-@pytest.mark.parametrize("input,result", [(1.0, 0.1), (100.0, 10.0)])
-def test_conversion_from_millimetres_to_centimetres(input, result):
+@pytest.mark.parametrize(
+    "input,result", [(19.2, 1.92), (105.1, 10.51), (0, 0), (0.72, 0.072)]
+)
+def test_conversion_from_millimetres_to_centimetres(input, result) -> None:
     assert convert_mm_to_cm(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1.0, 10), (0.1, 1.0)])
-def test_conversion_from_centimetres_to_millimetres(input, result):
+@pytest.mark.parametrize("input,result", [(3.6, 36), (2, 20), (0, 0), (0.254, 2.54)])
+def test_conversion_from_centimetres_to_millimetres(input, result) -> None:
     assert convert_cm_to_mm(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(0.01, 1.0), (1.0, 100.0)])
-def test_conversion_to_percentage_from_factor(input, result):
+@pytest.mark.parametrize(
+    "input,result", [(0.063, 6.3), (1, 100), (0, 0), (0.548, 54.8)]
+)
+def test_conversion_to_percentage_from_factor(input, result) -> None:
     assert convert_factor_to_percentage(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1.0, 0.01), (100, 1.0)])
-def test_conversion_to_factor_from_percentage(input, result):
+@pytest.mark.parametrize(
+    "input,result", [(1.0, 0.01), (100, 1), (0, 0), (82.6, 0.826), (0.4, 0.004)]
+)
+def test_conversion_to_factor_from_percentage(input, result) -> None:
     assert convert_percentage_to_factor(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1000.0, 1.0), (10000.0, 10.0)])
-def test_conversion_from_microns_to_millimeters(input, result):
+@pytest.mark.parametrize(
+    "input,result", [(0, 0), (512.4, 0.5124), (1000.0, 1.0), (12708.0, 12.708)]
+)
+def test_conversion_from_microns_to_millimeters(input, result) -> None:
     assert convert_microns_to_mm(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1.0, 1000.0), (10, 10000.0)])
-def test_conversion_from_millimeters_to_microns(input, result):
+@pytest.mark.parametrize(
+    "input,result", [(0, 0), (0.42, 420), (1.0, 1000.0), (12.5, 12500.0)]
+)
+def test_conversion_from_millimeters_to_microns(input, result) -> None:
     assert convert_mm_to_microns(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(1000, 1.0), (100, 0.1)])
-def test_conversion_from_electronvolts_to_kiloelectronvolts(input, result):
+@pytest.mark.parametrize(
+    "input,result", [(12398.425, 12.398425), (2050, 2.05), (813, 0.813)]
+)
+def test_conversion_from_electronvolts_to_kiloelectronvolts(input, result) -> None:
     assert convert_ev_to_kev(input) == pytest.approx(result)
 
 
-@pytest.mark.parametrize("input,result", [(10000.0, 1.0), (1000, 0.1)])
-def test_conversion_from_microns_to_centimetres(input, result):
+@pytest.mark.parametrize(
+    "input,result",
+    [(0, 0), (40000.0, 4.0), (1200, 0.12), (7056, 0.7056), (804.2, 0.08042)],
+)
+def test_conversion_from_microns_to_centimetres(input, result) -> None:
     assert convert_microns_to_cm(input) == pytest.approx(result)
 
 
@@ -78,7 +94,7 @@ def test_conversion_from_microns_to_centimetres(input, result):
         (5.2, 0.0, -8.64, 5.2),
     ],
 )
-def test_straight_line_conversion(c, m, x, expected_y):
+def test_straight_line_conversion(c, m, x, expected_y) -> None:
     assert get_straight_line_y(line_offset=c, line_gradient=m, x=x) == pytest.approx(
         expected_y
     )
@@ -122,7 +138,7 @@ def test_reciprocal_function_pairs_nest_consistent_with_identity(
     f: Callable[[float], float],
     g: Callable[[float], float],
     numerical_args: list[float],
-):
+) -> None:
     for op_pair in [
         OperatorInversionPairing(f, g),
         OperatorInversionPairing(g, f),
@@ -133,107 +149,129 @@ def test_reciprocal_function_pairs_nest_consistent_with_identity(
 
 # The inauspicuous path
 
+NON_NUMERICAL_EXAMPLES: Final[list[Any]] = [
+    "",
+    "a",
+    [],
+    None,
+    math.sin,
+    object(),
+    KeyError(),
+    False,
+    True,
+]
+
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_microns_to_cm_raises_error_with_bad_input(bad_input):
+def test_convert_microns_to_cm_raises_error_with_non_numerical_input(
+    non_numerical_input,
+) -> None:
     with pytest.raises(pydantic.ValidationError):
-        convert_microns_to_cm(bad_input)
+        convert_microns_to_cm(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_ev_to_kev_raises_error_with_bad_input(bad_input):
+def test_convert_ev_to_kev_raises_error_with_non_numerical_input(non_numerical_input):
     with pytest.raises(pydantic.ValidationError):
-        convert_ev_to_kev(bad_input)
+        convert_ev_to_kev(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_microns_to_mm_raises_error_with_bad_input(bad_input):
+def test_convert_microns_to_mm_raises_error_with_non_numerical_input(
+    non_numerical_input,
+):
     with pytest.raises(pydantic.ValidationError):
-        convert_microns_to_mm(bad_input)
+        convert_microns_to_mm(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_mm_to_microns_raises_error_with_bad_input(bad_input):
+def test_convert_mm_to_microns_raises_error_with_non_numerical_input(
+    non_numerical_input,
+):
     with pytest.raises(pydantic.ValidationError):
-        convert_mm_to_microns(bad_input)
+        convert_mm_to_microns(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), True],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_factor_to_percentage_raises_error_with_bad_input(bad_input):
+def test_convert_factor_to_percentage_raises_error_with_non_numerical_input(
+    non_numerical_input,
+):
     with pytest.raises(pydantic.ValidationError):
-        convert_factor_to_percentage(bad_input)
+        convert_factor_to_percentage(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_percentage_to_factor_raises_error_with_bad_input(bad_input):
+def test_convert_percentage_to_factor_raises_error_with_non_numerical_input(
+    non_numerical_input,
+):
     with pytest.raises(pydantic.ValidationError):
-        convert_percentage_to_factor(bad_input)
+        convert_percentage_to_factor(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_mm_to_cm_raises_error_with_bad_input(bad_input):
+def test_convert_mm_to_cm_raises_error_with_non_numerical_input(non_numerical_input):
     with pytest.raises(pydantic.ValidationError):
-        convert_mm_to_cm(bad_input)
+        convert_mm_to_cm(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), True],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_convert_cm_to_mm_raises_error_with_bad_input(bad_input):
+def test_convert_cm_to_mm_raises_error_with_non_numerical_input(non_numerical_input):
     with pytest.raises(pydantic.ValidationError):
-        convert_cm_to_mm(bad_input)
+        convert_cm_to_mm(non_numerical_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.log, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_straight_line_calculator_raises_error_with_bad_offset(bad_input):
+def test_straight_line_calculator_raises_error_with_bad_offset(non_numerical_input):
     _probe_x = 11.1
     _line_gradient = -2.07
     with pytest.raises(pydantic.ValidationError):
-        get_straight_line_y(bad_input, _line_gradient, _probe_x)
+        get_straight_line_y(non_numerical_input, _line_gradient, _probe_x)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.sin, object(), True],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_straight_line_calculator_raises_error_with_bad_gradient(bad_input):
+def test_straight_line_calculator_raises_error_with_bad_gradient(non_numerical_input):
     _probe_x = -11.1
     _line_offset = 14.2
     with pytest.raises(pydantic.ValidationError):
-        get_straight_line_y(_line_offset, bad_input, _probe_x)
+        get_straight_line_y(_line_offset, non_numerical_input, _probe_x)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
-    ["", "a", [], None, math.tan, object(), False],
+    "non_numerical_input",
+    NON_NUMERICAL_EXAMPLES,
 )
-def test_straight_line_calculator_raises_error_with_bad_x_value(bad_input):
+def test_straight_line_calculator_raises_error_with_bad_x_value(non_numerical_input):
     _line_offset = 0.1
     _line_gradient = 5.4
     with pytest.raises(pydantic.ValidationError):
-        get_straight_line_y(_line_offset, _line_gradient, bad_input)
+        get_straight_line_y(_line_offset, _line_gradient, non_numerical_input)

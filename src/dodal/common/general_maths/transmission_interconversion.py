@@ -3,6 +3,8 @@ from typing import Annotated
 
 from pydantic import Field, StrictFloat, validate_call
 
+CANONICAL_NON_ABSORPTION = 0  # Absorption (Bn) when absorber is absent
+
 _CANONICAL_BARNETT_CONVERSION = -1.0e3
 _REVERSE_BARNETT_CONVERSION = -1.0e-3
 
@@ -52,7 +54,7 @@ def natural_log_of_transmission_from_attenuation(
 
 
 @validate_call
-def transmission_from_attenutation(
+def transmission_from_attenuation(
     attenuation_bn: Annotated[StrictFloat, Field(ge=0)],
 ) -> float:
     """Converts from Barnett attenuation units into transmission fraction.

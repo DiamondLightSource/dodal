@@ -1,43 +1,12 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from ophyd_async.core import DetectorTriggerLogic, SignalDict, SignalR
-from ophyd_async.epics.adcore import ADAcquireLogic, ADImageMode
+from ophyd_async.core import DetectorTriggerLogic, SignalDict, SignalR, SignalRW
+from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices.electron_analyser.base.base_driver_io import AbstractAnalyserDriverIO
 from dodal.devices.electron_analyser.base.base_region import BaseRegion
-from dodal.devices.fast_shutter import GenericFastShutter
-from dodal.devices.selectable_source import SourceSelector
-
-
-class ShutterCoordinatorADAcquireLogic(ADAcquireLogic):
-    """Extends the acquire logic to coordinate opening shutters before acquisition with
-    optional configuration of when to close.
-    """
-
-    def __init__(
-        self,
-        driver: AbstractAnalyserDriverIO,
-        shutter: GenericFastShutter,
-        close_shutter_when_idle: SignalR[bool] | None = None,
-    ):
-        self._shutter = shutter
-        self._close_shutter_when_idle = close_shutter_when_idle
-        super().__init__(driver)
-
-    async def start_acquiring(self):
-        # Open shutter before data collection
-        await self._shutter.set(self._shutter.open_state)
-        await super().start_acquiring()
-
-    async def wait_for_idle(self):
-        await super().wait_for_idle()
-        # Optionally close shutters between regions
-        if (
-            self._close_shutter_when_idle is not None
-            and await self._close_shutter_when_idle.get_value()
-        ):
-            await self._shutter.set(self._shutter.close_state)
+from dodal.devices.selectable_source import SelectedSource
 
 
 @dataclass
@@ -66,7 +35,7 @@ class RegionLogic:
 
     driver: AbstractAnalyserDriverIO
     energy_source: SignalR[float]
-    source_selector: SourceSelector | None = None
+    source_selector: SignalRW[SelectedSource] | None = None
 
     async def setup_with_region(self, region: BaseRegion) -> None:
         """Logic to correctly wrap the driver with a region."""

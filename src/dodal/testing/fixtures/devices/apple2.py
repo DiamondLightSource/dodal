@@ -1,28 +1,25 @@
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
 
+from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.insertion_device import (
-    EnabledDisabledUpper,
+    Apple2,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
-    UndulatorPhaseAxes,
-)
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2,
     UndulatorLockedPhaseAxes,
+    UndulatorPhaseAxes,
 )
 
 
 @pytest.fixture
 async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with init_devices(mock=True):
-        mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
-    assert mock_id_gap.name == "mock_id_gap"
+        mock_id_gap = UndulatorGap(prefix)
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
-    set_mock_value(mock_id_gap.user_setpoint, "1")
+    set_mock_value(mock_id_gap.user_setpoint_str, "1")
     set_mock_value(mock_id_gap.status, EnabledDisabledUpper.ENABLED)
     return mock_id_gap
 
@@ -88,8 +85,9 @@ async def mock_locked_apple2(
     mock_id_gap: UndulatorGap,
     mock_locked_phase_axes: UndulatorLockedPhaseAxes,
 ) -> Apple2[UndulatorLockedPhaseAxes]:
-    mock_locked_apple2 = Apple2[UndulatorLockedPhaseAxes](
-        id_gap=mock_id_gap,
-        id_phase=mock_locked_phase_axes,
-    )
+    with init_devices(mock=True):
+        mock_locked_apple2 = Apple2[UndulatorLockedPhaseAxes](
+            id_gap=mock_id_gap,
+            id_phase=mock_locked_phase_axes,
+        )
     return mock_locked_apple2

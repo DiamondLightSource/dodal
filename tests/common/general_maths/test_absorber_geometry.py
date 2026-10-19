@@ -1,4 +1,5 @@
 import math
+from typing import Any, Literal
 
 import pydantic
 import pytest
@@ -9,7 +10,7 @@ from dodal.common.general_maths.absorber_geometry import FoilGeometry, WedgeGeom
 
 
 @pytest.mark.parametrize(
-    "distance_unit, numerical_thickness_in_specified_unit, expected_thickness_cm",
+    "_distance_unit, _numerical_thickness_in_specified_unit, _expected_thickness_cm",
     [
         ("cm", 0.193, 0.193),
         ("um", 150.0, 0.015),
@@ -18,16 +19,18 @@ from dodal.common.general_maths.absorber_geometry import FoilGeometry, WedgeGeom
     ],
 )
 def test_foil_absorber_reports_thickness_in_cm_when_validly_specified(
-    distance_unit, numerical_thickness_in_specified_unit, expected_thickness_cm
-):
+    _distance_unit: str,
+    _numerical_thickness_in_specified_unit: float,
+    _expected_thickness_cm: float,
+) -> None:
     flat_absorber = FoilGeometry(
-        unit=distance_unit, numerical_value=numerical_thickness_in_specified_unit
+        unit=_distance_unit, numerical_value=_numerical_thickness_in_specified_unit
     )
-    assert flat_absorber.get_thickness_cm() == pytest.approx(expected_thickness_cm)
+    assert flat_absorber.get_thickness_cm() == pytest.approx(_expected_thickness_cm)
 
 
 @pytest.mark.parametrize(
-    "tip, taper_cotangent, probed_position_mm, expected_thickness_cm",
+    "_tip, _taper_cotangent, _probed_position_mm, _expected_thickness_cm",
     [
         (-5, 5.0, -5.0, 0.0),
         (2, -10.0, -15.2, 0.172),
@@ -36,16 +39,19 @@ def test_foil_absorber_reports_thickness_in_cm_when_validly_specified(
     ],
 )
 def test_wedge_geometry_reports_correct_thickness_in_cm(
-    tip, taper_cotangent, probed_position_mm, expected_thickness_cm
-):
-    wedge_absorber = WedgeGeometry(tip_mm=tip, taper_cotangent=taper_cotangent)
+    _tip: float | Literal[-5] | Literal[2],
+    _taper_cotangent: float,
+    _probed_position_mm: float,
+    _expected_thickness_cm: float,
+) -> None:
+    wedge_absorber = WedgeGeometry(tip_mm=_tip, taper_cotangent=_taper_cotangent)
     assert wedge_absorber.thickness_cm_at_motor_position_mm(
-        motor_position_mm=probed_position_mm
-    ) == pytest.approx(expected_thickness_cm)
+        motor_position_mm=_probed_position_mm
+    ) == pytest.approx(_expected_thickness_cm)
 
 
 @pytest.mark.parametrize(
-    "tip, taper_cotangent, required_thickness_cm, expected_motor_position_mm",
+    "_tip, _taper_cotangent, _required_thickness_cm, _expected_motor_position_mm",
     [
         (-5.0, 10.0, 0.04, -1.0),
         (3, -10.0, 0.172, -14.2),
@@ -54,19 +60,22 @@ def test_wedge_geometry_reports_correct_thickness_in_cm(
     ],
 )
 def test_wedge_geometry_reports_correct_motor_position_mm_to_achieve_requested_thickness(
-    tip, taper_cotangent, required_thickness_cm, expected_motor_position_mm
-):
-    wedge_absorber = WedgeGeometry(tip_mm=tip, taper_cotangent=taper_cotangent)
+    _tip: float | Literal[3],
+    _taper_cotangent: float,
+    _required_thickness_cm: float,
+    _expected_motor_position_mm: float,
+) -> None:
+    wedge_absorber = WedgeGeometry(tip_mm=_tip, taper_cotangent=_taper_cotangent)
     assert wedge_absorber.motor_position_mm_for_thickness_cm(
-        thickness_cm=required_thickness_cm
-    ) == pytest.approx(expected_motor_position_mm)
+        thickness_cm=_required_thickness_cm
+    ) == pytest.approx(_expected_motor_position_mm)
 
 
 # inauspicious path
 
 
 @pytest.mark.parametrize(
-    "bad_input",
+    "_bad_number",
     [
         "",
         "k",
@@ -81,14 +90,14 @@ def test_wedge_geometry_reports_correct_motor_position_mm_to_achieve_requested_t
     ],
 )
 def test_foil_absorber_raises_error_when_given_invalid_input_for_numerical_thickness(
-    bad_input,
-):
+    _bad_number: Any,
+) -> None:
     with pytest.raises(pydantic.ValidationError):
-        FoilGeometry(unit="cm", numerical_value=bad_input)
+        FoilGeometry(unit="cm", numerical_value=_bad_number)
 
 
 @pytest.mark.parametrize(
-    "unsupported_unit",
+    "_unsupported_unit",
     [
         "",
         "12",
@@ -105,14 +114,14 @@ def test_foil_absorber_raises_error_when_given_invalid_input_for_numerical_thick
     ],
 )
 def test_foil_absorber_raises_error_when_asked_to_use_unsupported_distance_units(
-    unsupported_unit,
-):
+    _unsupported_unit: Any,
+) -> None:
     with pytest.raises(KeyError):
-        FoilGeometry(unit=unsupported_unit, numerical_value=1.1)
+        FoilGeometry(unit=_unsupported_unit, numerical_value=1.1)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
+    "_bad_input",
     [
         -9,
         0,
@@ -127,13 +136,15 @@ def test_foil_absorber_raises_error_when_asked_to_use_unsupported_distance_units
         False,
     ],
 )
-def test_foil_absorber_raises_error_when_given_invalid_distance_units(bad_input):
+def test_foil_absorber_raises_error_when_given_invalid_distance_units(
+    _bad_input: Any,
+) -> None:
     with pytest.raises(pydantic.ValidationError):
-        FoilGeometry(unit=bad_input, numerical_value=1.1)
+        FoilGeometry(unit=_bad_input, numerical_value=1.1)
 
 
 @pytest.mark.parametrize(
-    "taper_cotangent",
+    "_taper_cotangent",
     [
         0,
         1,
@@ -148,13 +159,15 @@ def test_foil_absorber_raises_error_when_given_invalid_distance_units(bad_input)
         1.16,
     ],
 )
-def test_wedge_absorber_raises_error_when_given_chunky_wedge_angle(taper_cotangent):
+def test_wedge_absorber_raises_error_when_given_chunky_wedge_angle(
+    _taper_cotangent: float,
+) -> None:
     with pytest.raises(pydantic.ValidationError):
-        WedgeGeometry(tip_mm=4.8, taper_cotangent=taper_cotangent)
+        WedgeGeometry(tip_mm=4.8, taper_cotangent=_taper_cotangent)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
+    "_bad_input",
     [
         "",
         "k",
@@ -166,13 +179,15 @@ def test_wedge_absorber_raises_error_when_given_chunky_wedge_angle(taper_cotange
         True,
     ],
 )
-def test_wedge_absorber_raises_error_when_given_invalid_input_for_taper(bad_input):
+def test_wedge_absorber_raises_error_when_given_invalid_input_for_taper(
+    _bad_input: Any,
+) -> None:
     with pytest.raises(pydantic.ValidationError):
-        WedgeGeometry(tip_mm=3.17, taper_cotangent=bad_input)
+        WedgeGeometry(tip_mm=3.17, taper_cotangent=_bad_input)
 
 
 @pytest.mark.parametrize(
-    "bad_input",
+    "_bad_input",
     [
         "",
         "k",
@@ -185,7 +200,7 @@ def test_wedge_absorber_raises_error_when_given_invalid_input_for_taper(bad_inpu
     ],
 )
 def test_wedge_absorber_raises_error_when_given_invalid_input_for_tip_position(
-    bad_input,
-):
+    _bad_input: Any,
+) -> None:
     with pytest.raises(pydantic.ValidationError):
-        WedgeGeometry(tip_mm=bad_input, taper_cotangent=-7.6)
+        WedgeGeometry(tip_mm=_bad_input, taper_cotangent=-7.6)
