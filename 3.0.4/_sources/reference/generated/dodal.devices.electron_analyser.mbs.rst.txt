@@ -1,0 +1,43 @@
+dodal.devices.electron\_analyser.mbs
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~mbs.EntranceSlitInformationDevice
+   ~mbs.EntranceSlitInformation
+   ~mbs.SlitPosition
+   ~mbs.MbsDetector
+   ~mbs.MbsAnalyserDriverIO
+   ~mbs.AcquisitionMode
+   ~mbs.MbsRegion
+   ~mbs.MbsSequence
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.mbs
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

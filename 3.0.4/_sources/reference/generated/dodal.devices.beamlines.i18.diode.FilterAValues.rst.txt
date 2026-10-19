@@ -1,0 +1,111 @@
+dodal.devices.beamlines.i18.diode.FilterAValues
+===============================================
+
+.. currentmodule:: dodal.devices.beamlines.i18.diode
+
+.. autoclass:: FilterAValues
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FilterAValues.AL_2MM
+      
+      
+      ~FilterAValues.AL_1_5MM
+      
+      
+      ~FilterAValues.AL_1_25MM
+      
+      
+      ~FilterAValues.AL_0_8MM
+      
+      
+      ~FilterAValues.AL_0_55MM
+      
+      
+      ~FilterAValues.AL_0_5MM
+      
+      
+      ~FilterAValues.AL_0_3MM
+      
+      
+      ~FilterAValues.AL_0_25MM
+      
+      
+      ~FilterAValues.AL_0_15MM
+      
+      
+      ~FilterAValues.AL_0_1MM
+      
+      
+      ~FilterAValues.AL_0_05MM
+      
+      
+      ~FilterAValues.AL_0_025MM
+      
+      
+      ~FilterAValues.AL_GAP
+      
+   
+   

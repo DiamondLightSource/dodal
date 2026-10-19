@@ -1,0 +1,33 @@
+dodal.devices.status
+====================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.status
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      await_value
+   
+   
+
+   
+   
+   

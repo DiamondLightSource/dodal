@@ -1,0 +1,49 @@
+dodal.devices.oav.oav\_detector.NullZoomController
+==================================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: NullZoomController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~NullZoomController.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~NullZoomController.level
+      
+      
+      ~NullZoomController.percentage
+      
+   
+   

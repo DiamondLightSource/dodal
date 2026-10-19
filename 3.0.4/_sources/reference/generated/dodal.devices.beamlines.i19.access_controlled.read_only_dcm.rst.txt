@@ -1,0 +1,36 @@
+dodal.devices.beamlines.i19.access\_controlled.read\_only\_dcm
+==============================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i19.access_controlled
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~read_only_dcm.ReadOnlyDCM
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i19.access_controlled.read_only_dcm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,47 @@
+dodal.devices.electron\_analyser.base.ElectronAnalyserTriggerLogic
+==================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: ElectronAnalyserTriggerLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~ElectronAnalyserTriggerLogic.config_sigs
+      
+      
+      
+      ~ElectronAnalyserTriggerLogic.get_deadtime
+      
+      
+      
+      
+      ~ElectronAnalyserTriggerLogic.prepare_internal
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ElectronAnalyserTriggerLogic.deadtime
+      
+      
+      ~ElectronAnalyserTriggerLogic.driver
+      
+      
+      ~ElectronAnalyserTriggerLogic.config_signals
+      
+   
+   

@@ -1,0 +1,42 @@
+dodal.devices.movable
+=====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~movable.MovableWithToleranceLogic
+
+
+
+
+.. automodule:: dodal.devices.movable
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      is_within_tolerance
+   
+   
+
+   
+   
+   

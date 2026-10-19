@@ -1,0 +1,40 @@
+﻿dodal.plan\_stubs
+=================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.plan_stubs
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      move
+      move_relative
+      rd
+      set_absolute
+      set_relative
+      sleep
+      stop
+      wait
+   
+   
+
+   
+   
+   

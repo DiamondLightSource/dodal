@@ -1,0 +1,96 @@
+dodal.devices.current\_amplifiers.EnzLocumRangeReadback
+=======================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: EnzLocumRangeReadback
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnzLocumRangeReadback.RANGE_100PA
+      
+      
+      ~EnzLocumRangeReadback.RANGE_1NA
+      
+      
+      ~EnzLocumRangeReadback.RANGE_10NA
+      
+      
+      ~EnzLocumRangeReadback.RANGE_100NA
+      
+      
+      ~EnzLocumRangeReadback.RANGE_1UA
+      
+      
+      ~EnzLocumRangeReadback.RANGE_10UA
+      
+      
+      ~EnzLocumRangeReadback.RANGE_100UA
+      
+      
+      ~EnzLocumRangeReadback.RANGE_1MA
+      
+   
+   

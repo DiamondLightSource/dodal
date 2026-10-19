@@ -1,0 +1,23 @@
+dodal.devices.scaler\_card.MockScalerCardController
+===================================================
+
+.. currentmodule:: dodal.devices.scaler_card
+
+.. autoclass:: MockScalerCardController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MockScalerCardController.connect
+      
+   
+   
+
+   
+   
+   

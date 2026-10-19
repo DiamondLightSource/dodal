@@ -1,0 +1,35 @@
+dodal.common.Rectangle2D
+========================
+
+.. currentmodule:: dodal.common
+
+.. autoclass:: Rectangle2D
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~Rectangle2D.contains
+      
+      
+      ~Rectangle2D.get_max_x
+      
+      
+      ~Rectangle2D.get_max_y
+      
+      
+      ~Rectangle2D.get_min_x
+      
+      
+      ~Rectangle2D.get_min_y
+      
+   
+   
+
+   
+   
+   

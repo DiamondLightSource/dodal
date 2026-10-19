@@ -1,0 +1,37 @@
+dodal.devices.electron\_analyser.base.RegionLogic
+=================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: RegionLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~RegionLogic.setup_with_region
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~RegionLogic.source_selector
+      
+      
+      ~RegionLogic.driver
+      
+      
+      ~RegionLogic.energy_source
+      
+   
+   

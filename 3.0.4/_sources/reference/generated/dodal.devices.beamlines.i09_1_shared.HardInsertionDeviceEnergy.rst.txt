@@ -1,0 +1,46 @@
+dodal.devices.beamlines.i09\_1\_shared.HardInsertionDeviceEnergy
+================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i09_1_shared
+
+.. autoclass:: HardInsertionDeviceEnergy
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~HardInsertionDeviceEnergy.get_look_up_table
+      
+      
+      
+      
+      ~HardInsertionDeviceEnergy.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

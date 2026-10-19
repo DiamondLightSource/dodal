@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i15\_1.robot.CurrentSample
+==================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.robot
+
+.. autoclass:: CurrentSample
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

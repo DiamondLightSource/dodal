@@ -1,0 +1,81 @@
+dodal.devices.cryostream.TurboEnum
+==================================
+
+.. currentmodule:: dodal.devices.cryostream
+
+.. autoclass:: TurboEnum
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TurboEnum.OFF
+      
+      
+      ~TurboEnum.ON
+      
+      
+      ~TurboEnum.AUTO
+      
+   
+   

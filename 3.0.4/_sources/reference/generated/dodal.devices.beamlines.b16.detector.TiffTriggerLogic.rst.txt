@@ -1,0 +1,31 @@
+dodal.devices.beamlines.b16.detector.TiffTriggerLogic
+=====================================================
+
+.. currentmodule:: dodal.devices.beamlines.b16.detector
+
+.. autoclass:: TiffTriggerLogic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~TiffTriggerLogic.get_deadtime
+      
+      
+      
+      
+      ~TiffTriggerLogic.prepare_internal
+      
+      
+   
+   
+
+   
+   
+   

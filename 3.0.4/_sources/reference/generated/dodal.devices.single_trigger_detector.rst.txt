@@ -1,0 +1,36 @@
+dodal.devices.single\_trigger\_detector
+=======================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~single_trigger_detector.SingleTriggerDetector
+
+
+
+
+.. automodule:: dodal.devices.single_trigger_detector
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
