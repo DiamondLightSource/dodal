@@ -10,6 +10,7 @@ dodal.devices.oav.beam\_centre
    :recursive:
 
    dodal.devices.oav.beam_centre.beam_centre
+   dodal.devices.oav.beam_centre.centroid_from_epics
 
 
 

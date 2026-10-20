@@ -1,0 +1,61 @@
+dodal.devices.oav.beam\_centre.centroid\_from\_epics.CentroidSettings
+=====================================================================
+
+.. currentmodule:: dodal.devices.oav.beam_centre.centroid_from_epics
+
+.. autoclass:: CentroidSettings
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~CentroidSettings.model_config
+      
+      
+      
+      
+      
+      ~CentroidSettings.threshold
+      
+      
+      ~CentroidSettings.colour_mode
+      
+   
+   
