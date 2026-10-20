@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 3.0.5.dev4+gb48576c3d documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 3.0.5.dev5+gce25b5ed7 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=e5e53899"></script>
+    <script src="../../../../../_static/documentation_options.js?v=eeb813a1"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1037,10 +1037,19 @@ window.runMermaid = runMermaid;</script>
     <span class="n">PROGRAM_COMPLETED_TIMEOUT</span> <span class="o">=</span> <span class="mf">60.0</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">current_sample_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_rbv</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">SpinnerState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">SPINNER_STATE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_off</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION0.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_on</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION1.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:LOAD.PROC&quot;</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="c1"># Any signals that should be read at every point in the scan</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">puck_sel</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:PUCK_SEL&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pos_sel</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:POS_SEL&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">spinner</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_spinner_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_spinner_state</span><span class="p">,</span> <span class="n">rbv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_spinner_rbv</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">current_sample</span> <span class="o">=</span> <span class="n">CurrentSample</span><span class="p">(</span><span class="n">current_sample_prefix</span><span class="p">)</span>
 
@@ -1061,15 +1070,6 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">controller_err_message</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
             <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">CNTL_ERR_MSG&quot;</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_rbv</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">SpinnerState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">SPINNER_STATE&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_off</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION0.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_on</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:ACTION1.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_load_program</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">MOTOR:LOAD.PROC&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">spinner</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_spinner_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_spinner_state</span><span class="p">,</span> <span class="n">rbv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_spinner_rbv</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">puck_pick</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">robot_prefix</span><span class="si">}</span><span class="s2">PUCK:ACTION0.PROC&quot;</span><span class="p">)</span>
