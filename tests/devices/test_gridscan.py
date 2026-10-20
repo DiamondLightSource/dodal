@@ -567,19 +567,20 @@ async def test_gridscan_prepare_times_out_for_validity_check(
     for signal, expected_value in valid_state.items():
         if signal.name != f"{device_name}-device_scan_invalid":
             set_mock_value(signal, 0 if expected_value else 1)
+    grid_scan_device.VALIDITY_CHECK_TIMEOUT = 0.01
 
     status = grid_scan_device.prepare(grid_scan_params)
 
     with pytest.raises(
         GridScanInvalidError,
-        match="Gridscan parameters not validated after 0.5s",
+        match="Gridscan parameters not validated after 0.01s",
     ) as exc_info:
         await status
     cause = exc_info.value.__cause__
     assert (
         cause
         and cause.args[0]
-        == f"{device_name}-scan_invalid didn't match 0.0 in 0.5s, last value 1.0"
+        == f"{device_name}-scan_invalid didn't match 0.0 in 0.01s, last value 1.0"
     )
 
 

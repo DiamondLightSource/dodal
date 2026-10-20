@@ -320,6 +320,7 @@ async def test_robot_load_fails_if_new_puck_and_pin_not_reported(
     robot_which_never_reports_new_pin: BartRobot,
 ):
     robot = robot_which_never_reports_new_pin
+    _set_fast_robot_timeouts(robot)
     with pytest.raises(RobotLoadError, match="Robot timed out"):
         await robot.set(SampleLocation(15, 10))
 
@@ -479,6 +480,7 @@ async def test_unloading_the_robot_times_out_if_unloading_takes_too_long(
     robot_for_unload,
 ):
     robot, trigger_completed, drying_completed = robot_for_unload
+    _set_fast_robot_timeouts(robot)
     drying_completed.set()
     unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 
@@ -490,6 +492,7 @@ async def test_unloading_the_robot_times_out_if_unloading_takes_too_long(
 
 async def test_unloading_the_robot_times_out_if_drying_takes_too_long(robot_for_unload):
     robot, trigger_completed, drying_completed = robot_for_unload
+    _set_fast_robot_timeouts(robot)
     trigger_completed.set()
     unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 

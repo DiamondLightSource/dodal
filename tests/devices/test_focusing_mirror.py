@@ -32,7 +32,7 @@ def mirror_voltage_with_set_to_value(
     mirror_voltage: SingleMirrorVoltage, new_value: MirrorVoltageDemand, spins: int = 0
 ) -> SingleMirrorVoltage:
     async def set_demand_accepted_after_delay():
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.01)
         nonlocal spins
         if spins > 0:
             set_mock_value(
