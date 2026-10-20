@@ -26,7 +26,11 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
 )
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
+from dodal.devices.oav.beam_centre.centroid_from_epics import (
+    CentroidFromEpics,
+)
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -34,8 +38,8 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -50,7 +54,7 @@ set_utils_beamline(BL)
 I19_1_COMMISSIONING_INSTR_SESSION: str = "cm44168-3"
 
 I19_1_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_PILATUS=1),
+    outputs=ZebraOutputs(TTL_PILATUS=1),
     sources=ZebraSources(),
 )
 
@@ -98,6 +102,11 @@ def beam_centre() -> CentreEllipseMethod:
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
         overlay_channel=7,
     )
+
+
+@devices.factory()
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
 
 
 @devices.factory()
@@ -188,6 +197,11 @@ def zebra() -> Zebra:
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
     )
+
+
+@devices.factory()
+def beam_centre_from_epics() -> CentroidFromEpics:
+    return CentroidFromEpics(f"{PREFIX.beamline_prefix}-EA-OAV-01:")
 
 
 @devices.factory()

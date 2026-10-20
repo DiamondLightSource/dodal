@@ -9,7 +9,7 @@ from dodal.common.general_maths.transmission_interconversion import (
     attenuation_from_natural_log_of_transmission,
     attenuation_from_transmission,
     natural_log_of_transmission_from_attenuation,
-    transmission_from_attenutation,
+    transmission_from_attenuation,
 )
 
 from .operator_inversion_pairing import OperatorInversionPairing
@@ -33,8 +33,8 @@ from .operator_inversion_pairing import OperatorInversionPairing
         ),  # tests transmission from arbitrary strong attenuation is strong attenuation
     ],
 )
-def test_transmission_from_attenutation(attenuation_bn, result) -> None:
-    assert transmission_from_attenutation(attenuation_bn) == pytest.approx(result)
+def test_transmission_from_attenuation(attenuation_bn, result) -> None:
+    assert transmission_from_attenuation(attenuation_bn) == pytest.approx(result)
 
 
 @pytest.mark.parametrize(
@@ -136,7 +136,7 @@ def test_attenuation_log_transmssion_conversions_reciprocate_as_expected(
     [
         (
             attenuation_from_transmission,
-            transmission_from_attenutation,
+            transmission_from_attenuation,
             [0.92, 0.68, 0.147, 0.00013],
         )
     ],
@@ -174,9 +174,9 @@ def test_natural_log_of_transmission_from_attenuation_raises_error(bad_input) ->
 
 
 @pytest.mark.parametrize("bad_input", INVALID_TRIAL_VALUES)
-def test_transmission_from_attenutation_raises_error(bad_input) -> None:
+def test_transmission_from_attenuation_raises_error(bad_input) -> None:
     with pytest.raises(ValidationError):
-        transmission_from_attenutation(bad_input)
+        transmission_from_attenuation(bad_input)
 
 
 @pytest.mark.parametrize("bad_input", INVALID_TRIAL_VALUES)

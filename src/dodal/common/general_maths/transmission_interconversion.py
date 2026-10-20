@@ -54,7 +54,7 @@ def natural_log_of_transmission_from_attenuation(
 
 
 @validate_call
-def transmission_from_attenutation(
+def transmission_from_attenuation(
     attenuation_bn: Annotated[StrictFloat, Field(ge=0)],
 ) -> float:
     """Converts from Barnett attenuation units into transmission fraction.
