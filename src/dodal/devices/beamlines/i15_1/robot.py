@@ -128,9 +128,12 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
     def __init__(self, robot_prefix: str, current_sample_prefix: str, name: str = ""):
         with self.add_children_as_readables():
-            # Any signals that should be read at every point in the scan
             self.puck_sel = epics_signal_rw_rbv(float, f"{robot_prefix}PUCK:PUCK_SEL")
             self.pos_sel = epics_signal_rw_rbv(float, f"{robot_prefix}PUCK:POS_SEL")
+
+            self.spinner = derived_signal_rw(
+                self._get_spinner_state, self._set_spinner_state, rbv=self._spinner_rbv
+            )
 
         self.current_sample = CurrentSample(current_sample_prefix)
 
@@ -157,10 +160,6 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         self._spinner_off = epics_signal_x(f"{robot_prefix}MOTOR:ACTION0.PROC")
         self._spinner_on = epics_signal_x(f"{robot_prefix}MOTOR:ACTION1.PROC")
         self._spinner_load_program = epics_signal_x(f"{robot_prefix}MOTOR:LOAD.PROC")
-
-        self.spinner = derived_signal_rw(
-            self._get_spinner_state, self._set_spinner_state, rbv=self._spinner_rbv
-        )
 
         self.puck_pick = epics_signal_x(f"{robot_prefix}PUCK:ACTION0.PROC")
         self.puck_place = epics_signal_x(f"{robot_prefix}PUCK:ACTION1.PROC")
