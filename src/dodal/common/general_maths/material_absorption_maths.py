@@ -1,3 +1,4 @@
+import numbers
 from collections.abc import Callable
 from typing import Annotated, Final, Protocol, runtime_checkable
 
@@ -52,10 +53,18 @@ class BaseAbsorptionCalculator(AbsorptionCalculator):
         # store the calculator functionality in the base class
         self._calculate: Final[Callable[[float], float]] = _calculation
 
-    @validate_call
+    @staticmethod
+    def _validate_x_ray_energy(xray_energy_kev: float) -> None:
+        if not isinstance(xray_energy_kev, numbers.Real):
+            raise TypeError("X-ray energy needs to be a real positive number")
+        if not xray_energy_kev > 0.0:
+            raise ValueError("X-ray energy cannot be zero, nor negative.")
+
+
     def absorption_coefficient_per_cm(
-        self, *, energy_kev: Annotated[StrictFloat, Field(gt=0)]
+        self, *, energy_kev: float]
     ) -> float:
+        self._validate_x_ray_energy(xray_energy_kev=energy_kev)
         return self._calculate(energy_kev)
 
 
@@ -174,7 +183,7 @@ class MaterialAbsorptionSpectrum(BaseModel):
     )
 
     def absorption_coefficient_per_cm(
-        self, *, energy_kev: Annotated[StrictFloat, Field(gt=0)]
+        self, *, energy_kev: float]
     ) -> float:
         """Logarithmic contribution to x-ray absorption per cm (depth into absorber) at a particular photon energy.
 
@@ -200,8 +209,9 @@ class MaterialAbsorptionSpectrum(BaseModel):
                     absorption_model.absorption_calculator.absorption_coefficient_per_cm
                 )
                 return absorption_coeff(energy_kev=energy_kev)
-        _msg = f"Absorption of x-ray energy at {energy_kev} keV is outside the valid interval of any calculator in this modelled spectrum."
-        raise ValueError(_msg)
+        raise ValueError(
+            f"Absorption of x-ray energy at {energy_kev} keV is outside the valid interval of any calculator in this modelled spectrum."
+        )
 
 
 @validate_call
