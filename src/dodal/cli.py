@@ -5,11 +5,10 @@ from collections.abc import Mapping
 import click
 from bluesky.run_engine import RunEngine
 from click.exceptions import ClickException
-from ophyd_async.core import NotConnectedError
+from ophyd_async.core import Device, NotConnectedError
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
 from dodal.device_manager import DeviceManager
-from dodal.utils import AnyDevice
 
 from . import __version__
 
@@ -133,7 +132,7 @@ def connect(
 
 
 def _report_successful_devices(
-    devices: Mapping[str, AnyDevice],
+    devices: Mapping[str, Device],
     sim_backend: bool,
 ) -> None:
     sim_statement = " (sim mode)" if sim_backend else ""
