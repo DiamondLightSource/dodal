@@ -66,13 +66,15 @@ def id(
 
 
 @devices.factory()
-def m1_collimating_mirror() -> XYZPitchYawRollStage:
+def m1() -> XYZPitchYawRollStage:
+    """Collimating mirror."""
     return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 # will connect after https://jira.diamond.ac.uk/browse/I05-731
 @devices.factory(skip=True)
-def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
+def m3mj6() -> XYZPiezoSwitchingMirror:
+    """Switching mirror."""
     return XYZPiezoSwitchingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
         mirrors=M3MJ6Mirror,
