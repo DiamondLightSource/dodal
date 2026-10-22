@@ -1,4 +1,5 @@
 import asyncio
+import math
 from collections.abc import Mapping
 from contextlib import asynccontextmanager
 from typing import Any
@@ -8,6 +9,7 @@ from ophyd_async.core import (
     StandardReadable,
     StrictEnum,
     set_and_wait_for_value,
+    wait_for_value,
 )
 from ophyd_async.epics.motor import Motor
 
@@ -71,7 +73,12 @@ async def do_deferred_move(
                 timeout=timeout,
                 wait_for_set_completion=False,
             )
+            assert await axis.user_setpoint.get_value() == value
 
             finished.append(status)
 
     await asyncio.gather(*finished)
+
+    for axis, value in moves.items():
+        await wait_for_value(axis.motor_done_move, 1, timeout=5)
+        assert math.isclose(await axis.user_readback.get_value(), value, abs_tol=0.1)
