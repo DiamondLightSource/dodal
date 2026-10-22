@@ -1,0 +1,37 @@
+dodal.devices.beamlines.i19.diffractometer
+==========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i19
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~diffractometer.DetectorMotion
+   ~diffractometer.FourCircleDiffractometer
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i19.diffractometer
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

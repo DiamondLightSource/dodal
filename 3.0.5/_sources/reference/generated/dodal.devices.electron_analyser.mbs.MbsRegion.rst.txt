@@ -1,0 +1,108 @@
+dodal.devices.electron\_analyser.mbs.MbsRegion
+==============================================
+
+.. currentmodule:: dodal.devices.electron_analyser.mbs
+
+.. autoclass:: MbsRegion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~MbsRegion.convert_pass_energy
+      
+      
+      
+      
+      
+      ~MbsRegion.from_xml
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~MbsRegion.model_config
+      
+      
+      
+      
+      
+      ~MbsRegion.lens_mode
+      
+      
+      ~MbsRegion.pass_energy
+      
+      
+      ~MbsRegion.acquisition_mode
+      
+      
+      ~MbsRegion.low_energy
+      
+      
+      ~MbsRegion.high_energy
+      
+      
+      ~MbsRegion.centre_energy
+      
+      
+      ~MbsRegion.acquire_time
+      
+      
+      ~MbsRegion.energy_step
+      
+      
+      ~MbsRegion.enabled
+      
+      
+      ~MbsRegion.deflector_x
+      
+      
+      ~MbsRegion.name
+      
+      
+      ~MbsRegion.iterations
+      
+      
+      ~MbsRegion.excitation_energy_source
+      
+      
+      ~MbsRegion.energy_mode
+      
+   
+   

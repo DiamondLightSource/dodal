@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i19.transmission.energy\_specific\_attenuation.EnergySpecificAttenuation
+================================================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.transmission.energy_specific_attenuation
+
+.. autoclass:: EnergySpecificAttenuation
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~EnergySpecificAttenuation.is_comparable_to
+      
+      
+      ~EnergySpecificAttenuation.is_usefully_reducible_by
+      
+      
+      ~EnergySpecificAttenuation.reduce_attenuation_by
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnergySpecificAttenuation.attenuation_bn
+      
+      
+      ~EnergySpecificAttenuation.energy_kev
+      
+   
+   

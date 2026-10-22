@@ -1,0 +1,78 @@
+dodal.devices.xspress3.xspress3.AcquireRBVState
+===============================================
+
+.. currentmodule:: dodal.devices.xspress3.xspress3
+
+.. autoclass:: AcquireRBVState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AcquireRBVState.DONE
+      
+      
+      ~AcquireRBVState.ACQUIRE
+      
+   
+   

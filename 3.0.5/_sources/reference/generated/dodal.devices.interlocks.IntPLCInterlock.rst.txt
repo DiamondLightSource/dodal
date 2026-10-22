@@ -1,0 +1,46 @@
+dodal.devices.interlocks.IntPLCInterlock
+========================================
+
+.. currentmodule:: dodal.devices.interlocks
+
+.. autoclass:: IntPLCInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~IntPLCInterlock.status
+      
+      
+      ~IntPLCInterlock.bl_prefix
+      
+   
+   

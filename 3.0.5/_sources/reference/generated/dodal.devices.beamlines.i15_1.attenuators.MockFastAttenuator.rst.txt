@@ -1,0 +1,23 @@
+dodal.devices.beamlines.i15\_1.attenuators.MockFastAttenuator
+=============================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.attenuators
+
+.. autoclass:: MockFastAttenuator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MockFastAttenuator.connect
+      
+   
+   
+
+   
+   
+   

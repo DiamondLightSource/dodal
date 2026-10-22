@@ -1,0 +1,41 @@
+dodal.devices.hutch\_shutter.HutchShutter
+=========================================
+
+.. currentmodule:: dodal.devices.hutch_shutter
+
+.. autoclass:: HutchShutter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

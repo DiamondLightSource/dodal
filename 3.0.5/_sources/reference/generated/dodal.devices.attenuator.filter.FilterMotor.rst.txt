@@ -1,0 +1,40 @@
+dodal.devices.attenuator.filter.FilterMotor
+===========================================
+
+.. currentmodule:: dodal.devices.attenuator.filter
+
+.. autoclass:: FilterMotor
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

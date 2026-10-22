@@ -1,0 +1,78 @@
+dodal.devices.defered\_move\_utils.DeferMoves
+=============================================
+
+.. currentmodule:: dodal.devices.defered_move_utils
+
+.. autoclass:: DeferMoves
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DeferMoves.ON
+      
+      
+      ~DeferMoves.OFF
+      
+   
+   

@@ -1,0 +1,43 @@
+dodal.devices.webcam.Webcam
+===========================
+
+.. currentmodule:: dodal.devices.webcam
+
+.. autoclass:: Webcam
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Webcam.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

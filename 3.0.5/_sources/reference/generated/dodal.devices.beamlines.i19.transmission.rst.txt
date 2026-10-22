@@ -1,0 +1,35 @@
+dodal.devices.beamlines.i19.transmission
+========================================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.beamlines.i19.transmission.energy_specific_attenuation
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i19.transmission
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

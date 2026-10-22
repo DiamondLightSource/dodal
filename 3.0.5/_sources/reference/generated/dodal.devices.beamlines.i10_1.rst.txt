@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i10\_1
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i10_1.ElectromagnetMagnetField
+   ~i10_1.I10JScalerCard
+   ~i10_1.ElectromagnetStage
+   ~i10_1.HighFieldMagnet
+   ~i10_1.HighFieldMagnetTemperatureController
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i10_1
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

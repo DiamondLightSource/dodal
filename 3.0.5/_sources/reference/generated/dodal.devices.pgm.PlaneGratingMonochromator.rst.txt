@@ -1,0 +1,40 @@
+dodal.devices.pgm.PlaneGratingMonochromator
+===========================================
+
+.. currentmodule:: dodal.devices.pgm
+
+.. autoclass:: PlaneGratingMonochromator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

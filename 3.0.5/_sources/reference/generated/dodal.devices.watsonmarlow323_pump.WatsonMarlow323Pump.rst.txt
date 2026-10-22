@@ -1,0 +1,40 @@
+dodal.devices.watsonmarlow323\_pump.WatsonMarlow323Pump
+=======================================================
+
+.. currentmodule:: dodal.devices.watsonmarlow323_pump
+
+.. autoclass:: WatsonMarlow323Pump
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

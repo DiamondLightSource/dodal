@@ -1,0 +1,78 @@
+dodal.devices.xspress3.xspress3\_channel.AcquireState
+=====================================================
+
+.. currentmodule:: dodal.devices.xspress3.xspress3_channel
+
+.. autoclass:: AcquireState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AcquireState.DONE
+      
+      
+      ~AcquireState.ACQUIRE
+      
+   
+   

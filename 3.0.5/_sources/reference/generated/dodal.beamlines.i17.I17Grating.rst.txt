@@ -1,0 +1,78 @@
+dodal.beamlines.i17.I17Grating
+==============================
+
+.. currentmodule:: dodal.beamlines.i17
+
+.. autoclass:: I17Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I17Grating.AU_400
+      
+      
+      ~I17Grating.SI_400
+      
+   
+   

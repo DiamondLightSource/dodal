@@ -1,0 +1,44 @@
+dodal.devices.current\_amplifiers.SR570RaiseTimeTable
+=====================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: SR570RaiseTimeTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~SR570RaiseTimeTable.SEN_1
+      
+      
+      ~SR570RaiseTimeTable.SEN_2
+      
+      
+      ~SR570RaiseTimeTable.SEN_3
+      
+      
+      ~SR570RaiseTimeTable.SEN_4
+      
+   
+   

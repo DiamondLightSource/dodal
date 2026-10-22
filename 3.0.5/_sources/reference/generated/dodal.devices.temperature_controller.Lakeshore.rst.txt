@@ -1,0 +1,43 @@
+dodal.devices.temperature\_controller.Lakeshore
+===============================================
+
+.. currentmodule:: dodal.devices.temperature_controller
+
+.. autoclass:: Lakeshore
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Lakeshore.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

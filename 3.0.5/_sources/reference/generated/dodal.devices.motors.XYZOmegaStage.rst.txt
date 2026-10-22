@@ -1,0 +1,40 @@
+dodal.devices.motors.XYZOmegaStage
+==================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZOmegaStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

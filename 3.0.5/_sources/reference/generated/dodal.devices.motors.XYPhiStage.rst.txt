@@ -1,0 +1,40 @@
+dodal.devices.motors.XYPhiStage
+===============================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYPhiStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
