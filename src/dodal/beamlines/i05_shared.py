@@ -71,8 +71,7 @@ def m1() -> XYZPitchYawRollStage:
     return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
-# will connect after https://jira.diamond.ac.uk/browse/I05-731
-@devices.factory(skip=True)
+@devices.factory()
 def m3mj6() -> XYZPiezoSwitchingMirror:
     """Switching mirror."""
     return XYZPiezoSwitchingMirror(
