@@ -26,6 +26,7 @@ def eh1_vfm_piezo() -> AccessControlledPiezoActuator:
             name="mock_vfm_piezo",
         )
     v_piezo.url = "http://test.url"
+    set_mock_value(v_piezo.setpoint, 0.7)
     set_mock_value(v_piezo.readback, 1.0)
     return v_piezo
 
@@ -41,6 +42,7 @@ def eh2_hfm_piezo() -> AccessControlledPiezoActuator:
             name="mock_hfm_piezo",
         )
     h_piezo.url = "http://test.url"
+    set_mock_value(h_piezo.setpoint, 0.99)
     set_mock_value(h_piezo.readback, 1.0)
     return h_piezo
 
@@ -66,7 +68,11 @@ async def test_vfm_piezo_rbv_value_can_be_read(
     eh1_vfm_piezo: AccessControlledPiezoActuator,
 ):
     await assert_reading(
-        eh1_vfm_piezo, {"mock_vfm_piezo-readback": partial_reading(1.0)}
+        eh1_vfm_piezo,
+        {
+            "mock_vfm_piezo-setpoint": partial_reading(0.7),
+            "mock_vfm_piezo-readback": partial_reading(1.0),
+        },
     )
 
 
@@ -74,7 +80,11 @@ async def test_hfm_piezo_rbv_value_can_be_read(
     eh2_hfm_piezo: AccessControlledPiezoActuator,
 ):
     await assert_reading(
-        eh2_hfm_piezo, {"mock_hfm_piezo-readback": partial_reading(1.0)}
+        eh2_hfm_piezo,
+        {
+            "mock_hfm_piezo-setpoint": partial_reading(0.99),
+            "mock_hfm_piezo-readback": partial_reading(1.0),
+        },
     )
 
 

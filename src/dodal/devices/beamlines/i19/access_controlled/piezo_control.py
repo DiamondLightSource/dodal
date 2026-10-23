@@ -53,6 +53,10 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            # The readback value is always slightly drifting so we also need to be able
+            # to read the setpoint in order to know the exact value and calculate by how
+            # much to nudge.
+            self.setpoint = epics_signal_r(float, f"{prefix}AOFPITCH")
             self.readback = epics_signal_r(float, f"{prefix}AOFPITCH:RBV")
         self.mirror = mirror_type
         super().__init__(hutch=hutch, instrument_session=instrument_session, name=name)

@@ -163,3 +163,16 @@ async def test_calibrated_blower_returns_calibrated_temperature_based_on_raw(
 ):
     await calibrated_blower.raw_temperature.set(759.721816599402)
     assert await calibrated_blower.temperature.get_value() == pytest.approx(500)
+
+
+async def test_temperature_does_not_time_out_if_large_readback_tolerance(
+    blower: Blower,
+):
+    set_mock_value(blower.temperature._pneumatic, ValveState.OPEN)
+    await blower.temperature._rbv_tolerance().set(1000)
+
+    with patch(
+        "dodal.devices.beamlines.i15_1.blower.TemperatureMoveLogic.TIMEOUT",
+        new=0.01,
+    ):
+        await blower.temperature.set(100)
