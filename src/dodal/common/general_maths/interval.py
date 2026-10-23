@@ -1,3 +1,5 @@
+from numbers import Real
+
 from pydantic import BaseModel, ConfigDict, StrictFloat, model_validator
 
 
@@ -35,11 +37,15 @@ class FloatInterval(BaseModel):
         ...
 
     def __contains__(self, item: object) -> bool:
-        if isinstance(item, (int, float)):
-            return self._includes(item)
+        if isinstance(item, bool):
+            raise TypeError("Booleans cannot be found inside a FloatInterval")
+        if isinstance(item, Real):
+            return self._includes(float(item))
         if isinstance(item, FloatInterval):
             return item.lower in self and item.upper in self
-        return False
+        raise TypeError(
+            f"Objects of type {type(item)} cannot be found inside a FloatInterval."
+        )
 
     def __hash__(self) -> int:
         # Generate a stable hash based on the interval boundaries and class type
