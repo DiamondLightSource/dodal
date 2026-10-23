@@ -31,6 +31,7 @@
    dodal.beamlines.i06_2
    dodal.beamlines.i06_shared
    dodal.beamlines.i07
+   dodal.beamlines.i08
    dodal.beamlines.i09
    dodal.beamlines.i09_1
    dodal.beamlines.i09_1_shared
