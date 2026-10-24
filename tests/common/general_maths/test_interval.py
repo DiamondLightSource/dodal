@@ -1,3 +1,6 @@
+import math
+from typing import Any, Final
+
 import pytest
 
 from dodal.common.general_maths.interval import (
@@ -8,12 +11,18 @@ from dodal.common.general_maths.interval import (
     OpenInterval,
 )
 
-# Happy path
+ALL_CONCRETE_INTERVAL_TYPES: tuple[type[FloatInterval], ...] = (
+    ClosedInterval,
+    ClosedOpenInterval,
+    OpenClosedInterval,
+    OpenInterval,
+)
 
+# Happy path
 
 @pytest.mark.parametrize(
     "_interval_cls",
-    [ClosedInterval, ClosedOpenInterval, OpenClosedInterval, OpenInterval],
+    ALL_CONCRETE_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "_probed_x, _lower, _upper",
@@ -35,7 +44,7 @@ from dodal.common.general_maths.interval import (
         ),
     ],
 )
-def test_all_interval_types_recognise_point_when_unamiguously_within(
+def test_all_interval_types_recognise_point_when_unambiguously_within(
     _interval_cls: type[FloatInterval], _probed_x: float, _lower: float, _upper: float
 ) -> None:
     interval = _interval_cls(lower=_lower, upper=_upper)
@@ -44,7 +53,7 @@ def test_all_interval_types_recognise_point_when_unamiguously_within(
 
 @pytest.mark.parametrize(
     "_interval_cls",
-    [ClosedInterval, ClosedOpenInterval, OpenClosedInterval, OpenInterval],
+    ALL_CONCRETE_INTERVAL_TYPES
 )
 @pytest.mark.parametrize(
     "_probed_x, _lower, _upper",
@@ -66,7 +75,7 @@ def test_all_interval_types_recognise_point_when_unamiguously_within(
         ),
     ],
 )
-def test_all_interval_types_recognise_point_when_unamiguously_without(
+def test_all_interval_types_recognise_point_when_unambiguously_without(
     _interval_cls: type[FloatInterval], _probed_x: float, _lower: float, _upper: float
 ) -> None:
     interval = _interval_cls(lower=_lower, upper=_upper)
@@ -118,7 +127,7 @@ def test_open_closed_and_open_intervals_do_not_suffer_hash_collisions() -> None:
 
 @pytest.mark.parametrize(
     "_interval_cls",
-    [ClosedInterval, ClosedOpenInterval, OpenClosedInterval, OpenInterval],
+    ALL_CONCRETE_INTERVAL_TYPES
 )
 @pytest.mark.parametrize(
     "_lower, _upper",
@@ -147,7 +156,7 @@ def test_all_interval_types_recognise_another_interval_lies_outside(
 
 @pytest.mark.parametrize(
     "_interval_cls",
-    [ClosedInterval, ClosedOpenInterval, OpenClosedInterval, OpenInterval],
+    ALL_CONCRETE_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "_lower, _upper",
@@ -180,10 +189,39 @@ def test_all_interval_types_recognise_another_interval_lies_inside(
 
 # Inauspicious path
 
+NON_NUMERICAL_TYPES: Final[tuple[Any, ...]] = (
+    "",
+    "Hello",
+    "3.5",
+    "-16",
+    KeyError(),
+    math.sin,
+    True,
+    False,
+    object(),
+    "&",
+)
 
 @pytest.mark.parametrize(
     "_interval_cls",
-    [ClosedInterval, ClosedOpenInterval, OpenClosedInterval, OpenInterval],
+    ALL_CONCRETE_INTERVAL_TYPES,
+)
+@pytest.mark.parametrize(
+    "_invalid_type",
+    NON_NUMERICAL_TYPES,
+)
+def test_that_any_interval_asked_if_invalid_type_lies_within_raises_type_error(
+    _interval_cls: type[FloatInterval],
+    _invalid_type: Any
+) -> None:
+    _interval = _interval_cls(lower=-81.4, upper=127.6543)
+    with pytest.raises(TypeError):
+        _check = _invalid_type in _interval
+
+
+@pytest.mark.parametrize(
+    "_interval_cls",
+    ALL_CONCRETE_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "_lower, _upper",

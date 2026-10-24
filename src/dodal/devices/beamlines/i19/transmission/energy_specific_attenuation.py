@@ -3,10 +3,23 @@ from dataclasses import dataclass
 from numbers import Real
 from typing import Any
 
+from dodal.common.general_maths.material_absorption_maths import (
+    UnphysicalPhotonEnergyError,
+)
 from dodal.common.general_maths.transmission_interconversion import (
     CANONICAL_NON_ABSORPTION,
+    UnphysicalAttenuationError,
 )
 
+
+class IncompatibleAttenuationComparisonError(ValueError):
+    """Raised when two energy specific attenuations are incompatibly at distinct energies.
+
+    For example, if a demand for 1000 Bn is made at 8 keV,
+    and a filter wheel foil absorber provides 800 Bn at 25 keV,
+    any operation to subtract the latter from the former should raise this error.
+    """
+    ...
 
 @dataclass(frozen=True)
 class EnergySpecificAttenuation:
@@ -30,11 +43,11 @@ class EnergySpecificAttenuation:
 
     def _validate_arguments_by_range(self):
         if self.attenuation_bn < CANONICAL_NON_ABSORPTION:
-            raise ValueError(
+            raise UnphysicalAttenuationError(
                 f"Invalidly initialised with {self.attenuation_bn} Bn. Any attenuation in logarithmic Barnett Units cannot be less than {CANONICAL_NON_ABSORPTION}."
             )
         if not self.energy_kev > 0:
-            raise ValueError(
+            raise UnphysicalPhotonEnergyError(
                 f"Invalidly initialised with {self.energy_kev} keV.  Photon energy must be a positive number."
             )
 
@@ -73,7 +86,7 @@ class EnergySpecificAttenuation:
         self, other: "EnergySpecificAttenuation", *, in_validation_mode: bool = False
     ):
         if in_validation_mode:
-            raise ValueError(
+            raise IncompatibleAttenuationComparisonError(
                 f"Cannot perform meaningful attenuation comparison distinct energies {self.energy_kev} keV and {other.energy_kev} keV."
             )
         else:
@@ -103,6 +116,13 @@ class EnergySpecificAttenuation:
         if self.is_usefully_reducible_by(other, in_validation_mode=True):
             return self._create_residual_by_subtracting(other)
         else:
-            raise ValueError(
+            raise UnphysicalAttenuationError(
                 "Reduction would exceed attenuation of original demand - leading to an invalid negative residual"
             )
+
+    @classmethod
+    def transparently_not_attenuating(
+        cls, *, energy_kev: float
+    ) -> "EnergySpecificAttenuation":
+        """Factory method for a fully transparent (non-attenuating) state at any given photon energy."""
+        return cls(attenuation_bn=CANONICAL_NON_ABSORPTION, energy_kev=energy_kev)
