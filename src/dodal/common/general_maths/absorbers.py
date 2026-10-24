@@ -7,13 +7,33 @@ from dodal.common.general_maths.absorber_geometry import (
     ThicknessProvider,
 )
 from dodal.common.general_maths.material_absorption_maths import (
+    IneligibleEnergyError,
     MaterialAbsorptionSpectrum,
     attenuation_from_natural_log_of_transmission,
 )
 
 
+class SpectrallyDependent(Protocol):
+
+    def is_eligible_for_energy(
+        self,
+        *,
+        xray_energy_kev: float,
+    ) -> bool:
+        """Reports in the negative if this calculator does not model absorption at the energy of interest.
+
+        Args:
+            xray_energy_kev: The energy of the x-ray photons (kiloelectronvolts).
+
+        Returns:
+            True if absorption at the given energy is modelled, False if not.
+        """
+        ...
+
+
 @runtime_checkable
-class FixedDepth(Protocol):
+class FixedDepth(SpectrallyDependent, Protocol):
+
     def calculate_absorption_bn(self, *, xray_energy_kev: float) -> float:
         """Calculates absorption for a flat absorber of fixed depth.
 
@@ -30,7 +50,8 @@ class FixedDepth(Protocol):
 
 
 @runtime_checkable
-class VariableDepth(Protocol):
+class VariableDepth(SpectrallyDependent, Protocol):
+
     def calculate_absorption_bn(
         self,
         *,
@@ -79,9 +100,29 @@ class Absorber(BaseModel):
         Returns:
             Attenuation in 'system budget friendly' logarithmic units (Barnett units, Bn).
         """
-        _alpha = self.spectrum.absorption_coefficient_per_cm(energy_kev=xray_energy_kev)
-        _ln_t = -(thickness_cm * _alpha)
-        return attenuation_from_natural_log_of_transmission(_ln_t)
+        if self.is_eligible_for_energy(xray_energy_kev=xray_energy_kev):
+            _alpha = self.spectrum.absorption_coefficient_per_cm(energy_kev=xray_energy_kev)
+            _ln_t = -(thickness_cm * _alpha)
+            return attenuation_from_natural_log_of_transmission(_ln_t)
+        else:
+            raise IneligibleEnergyError(
+                f"Absorption of x-ray energy at {xray_energy_kev} keV lies outside all modelled sections of the spectrum."
+            )
+
+    def is_eligible_for_energy(
+        self,
+        *,
+        xray_energy_kev: float,
+    ) -> bool:
+        """Reports in the negative if this calculator does not model absorption at the energy of interest.
+
+        Args:
+            xray_energy_kev: The energy of the x-ray photons (kiloelectronvolts).
+
+        Returns:
+            True if absorption at the given energy is modelled, False if not.
+        """
+        return xray_energy_kev in self.spectrum
 
 
 class FoilAbsorber(Absorber):

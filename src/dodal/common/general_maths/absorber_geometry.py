@@ -1,3 +1,4 @@
+
 from collections.abc import Callable
 from functools import cached_property
 from typing import Annotated, Literal, Protocol, runtime_checkable
@@ -44,6 +45,11 @@ class TaperedGeometryProvider(Protocol):
 
     Used here to make WedgeAbsorber easier to test.
     """
+
+    def motor_position_mm_for_thickness_cm(
+        self, *, thickness_cm: Annotated[StrictFloat, Field(ge=0.0)]
+    ) -> float: ...
+
 
     def thickness_cm_at_motor_position_mm(
         self, *, motor_position_mm: StrictFloat
