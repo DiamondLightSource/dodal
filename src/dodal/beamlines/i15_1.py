@@ -42,9 +42,7 @@ PREFIX = BeamlinePrefix(BL, suffix="J")
 DAQ_CONFIGURATION_PATH = "/dls_sw/i15-1/software/daq_configuration/"
 XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
 XPDF_CRYSTAL_LUT_FILEPATH = DAQ_CONFIGURATION_PATH + "xpdf_crystal_lut.txt"
-BLOWER_TEMPERATURE_CALIBRATION_FILEPATH = (
-    DAQ_CONFIGURATION_PATH + "temperature_calibration/blower_calibration.txt"
-)
+
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 
