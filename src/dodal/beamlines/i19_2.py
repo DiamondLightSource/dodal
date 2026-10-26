@@ -29,13 +29,14 @@ from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.motors import XYZPhiStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -51,7 +52,7 @@ set_utils_beamline(BL)
 I19_2_COMMISSIONING_INSTR_SESSION: str = "cm40639-5"
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(),
+    outputs=ZebraOutputs(),
     sources=ZebraSources(),
 )
 
@@ -103,6 +104,11 @@ def beamstop() -> BeamStop:
 @devices.factory()
 def diffractometer() -> FourCircleDiffractometer:
     return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
+
+
+@devices.factory()
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
 
 
 @devices.factory()
