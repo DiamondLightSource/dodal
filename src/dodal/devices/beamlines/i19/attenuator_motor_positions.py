@@ -58,8 +58,9 @@ class AttenuatorMotorPositions(BaseModel):
         common_key_count = len(common_keys)
         if common_key_count > 0:
             ks: str = "key" if common_key_count == 1 else "keys"
-            error_msg = f"Common {ks} found in motor positions: {common_keys}"
-            raise ValueError(error_msg)
+            raise ValueError(
+                f"Common {ks} found in motor positions: {common_keys}"
+            )
 
     @model_validator(mode="after")
     def no_keys_clash(self) -> Self:
