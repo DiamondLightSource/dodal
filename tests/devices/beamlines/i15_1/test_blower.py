@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -14,7 +15,7 @@ from ophyd_async.core import (
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.common.enums import ValveState
-from dodal.devices.beamlines.i15_1.blower import Blower, CalibratedBlower
+from dodal.devices.beamlines.i15_1.blower import Blower
 from tests.test_data import (
     TEST_I15_1_TEMPERATURE_CALIBRATION,
     TEST_XPDF_LOCAL_PARAMETERS,
@@ -32,16 +33,16 @@ async def blower(mock_config_client: ConfigClient):
 @pytest.fixture
 async def calibrated_blower(mock_config_client: ConfigClient):
     async with init_devices(mock=True):
-        blower = CalibratedBlower(
+        blower = Blower(
             "",
             "",
             "",
             mock_config_client,
             TEST_XPDF_LOCAL_PARAMETERS,
-            TEST_I15_1_TEMPERATURE_CALIBRATION,
         )
     set_mock_value(blower.settle_time_s, 0)
     set_mock_value(blower.raw_temperature._pneumatic, ValveState.OPEN)
+    blower.prepare(Path(TEST_I15_1_TEMPERATURE_CALIBRATION))
     return blower
 
 
@@ -150,7 +151,7 @@ async def test_temperature_times_out_if_readback_does_not_change(blower: Blower)
 
 
 async def test_calibrated_blower_sets_raw_temperature_based_on_calibration(
-    calibrated_blower: CalibratedBlower,
+    calibrated_blower: Blower,
 ):
     await calibrated_blower.temperature.set(500)
     get_mock_put(
@@ -159,7 +160,7 @@ async def test_calibrated_blower_sets_raw_temperature_based_on_calibration(
 
 
 async def test_calibrated_blower_returns_calibrated_temperature_based_on_raw(
-    calibrated_blower: CalibratedBlower,
+    calibrated_blower: Blower,
 ):
     await calibrated_blower.raw_temperature.set(759.721816599402)
     assert await calibrated_blower.temperature.get_value() == pytest.approx(500)
@@ -168,11 +169,19 @@ async def test_calibrated_blower_returns_calibrated_temperature_based_on_raw(
 async def test_temperature_does_not_time_out_if_large_readback_tolerance(
     blower: Blower,
 ):
-    set_mock_value(blower.temperature._pneumatic, ValveState.OPEN)
-    await blower.temperature._rbv_tolerance().set(1000)
+    set_mock_value(blower.raw_temperature._pneumatic, ValveState.OPEN)
+    await blower.raw_temperature._rbv_tolerance().set(1000)
 
     with patch(
         "dodal.devices.beamlines.i15_1.blower.TemperatureMoveLogic.TIMEOUT",
         new=0.01,
     ):
         await blower.temperature.set(100)
+
+
+async def test_blower_resets_temp_calibration_path_on_unstage(
+    calibrated_blower: Blower,
+):
+    assert await calibrated_blower.temperature_calibration_path.get_value()
+    await calibrated_blower.unstage()
+    assert not await calibrated_blower.temperature_calibration_path.get_value()

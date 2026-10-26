@@ -4,18 +4,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 
-from bluesky.protocols import (
-    Collectable,
-    Flyable,
-    HasHints,
-    Hints,
-    Preparable,
-    Reading,
-    Stageable,
-    StreamAsset,
-    Triggerable,
-    WritesStreamAssets,
-)
+from bluesky.protocols import Preparable, Stageable
 from daq_config_server.client import ConfigClient
 from daq_config_server.models.i15_1.temperature_calibration import (
     TemperatureCalibration,
@@ -31,10 +20,7 @@ from ophyd_async.core import (
     SignalRW,
     StandardMovable,
     StandardReadable,
-    StandardReadableFormat,
-    StrictEnum,
     TimeoutCalculator,
-    derived_signal_r,
     derived_signal_rw,
     set_and_wait_for_other_value,
     soft_signal_rw,
@@ -142,7 +128,7 @@ class Blower(SafeOrBeamPositioner, Preparable, Stageable):
 
         self.settle_time_s = soft_signal_rw(float, self.DEFAULT_SETTLE_TIME)
         self.rbv_tolerance = soft_signal_rw(float, self.DEFAULT_RBV_TOLERANCE)
-        self.temperature_calibration_filepath = soft_signal_rw(str, "")
+        self.temperature_calibration_path = soft_signal_rw(str, "")
 
         with self.add_children_as_readables():
             self.raw_temperature = Temperature(
@@ -155,6 +141,7 @@ class Blower(SafeOrBeamPositioner, Preparable, Stageable):
                 raw_to_derived=self.get_temperature,
                 set_derived=self.set_temperature,
                 raw_temperature=self.raw_temperature,
+                temperature_calibration_path=self.temperature_calibration_path,
             )
 
         super().__init__(motion_pv, config_client, xpdf_parameters_path, name)
@@ -170,17 +157,15 @@ class Blower(SafeOrBeamPositioner, Preparable, Stageable):
     def get_temperature(
         self,
         raw_temperature: float,
-        temperature_calibration_filepath: str,
+        temperature_calibration_path: str,
     ) -> float:
-        if temperature_calibration_filepath:
-            calibration = self.get_temperature_calibration(
-                temperature_calibration_filepath
-            )
+        if temperature_calibration_path:
+            calibration = self.get_temperature_calibration(temperature_calibration_path)
             return calibration.real_to_setpoint.inverse_calc(raw_temperature)
         return raw_temperature
 
     async def set_temperature(self, desired_temp: float):
-        if calibration_path := await self.temperature_calibration_filepath.get_value():
+        if calibration_path := await self.temperature_calibration_path.get_value():
             calibration = self.get_temperature_calibration(calibration_path)
             raw_temp = calibration.real_to_setpoint.calc(desired_temp)
         else:
@@ -191,8 +176,8 @@ class Blower(SafeOrBeamPositioner, Preparable, Stageable):
     async def prepare(self, value: Path):
         self.config_client.reset_cache()
         assert value.is_file(), f"File path {value} does not exist."
-        await self.temperature_calibration_filepath.set(str(value))
+        await self.temperature_calibration_path.set(str(value))
 
     @AsyncStatus.wrap
     async def unstage(self):
-        await self.temperature_calibration_filepath.set("")
+        await self.temperature_calibration_path.set("")

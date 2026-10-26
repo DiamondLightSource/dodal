@@ -16,7 +16,7 @@ from dodal.devices.beamlines.i15.multilayer_mirror import MultiLayerMirror
 from dodal.devices.beamlines.i15.rail import Rail
 from dodal.devices.beamlines.i15_1.attenuators import FastAttenuator, SlowAttenuator
 from dodal.devices.beamlines.i15_1.beam_health import BeamHealth
-from dodal.devices.beamlines.i15_1.blower import Blower, CalibratedBlower
+from dodal.devices.beamlines.i15_1.blower import Blower
 from dodal.devices.beamlines.i15_1.cobra import Cobra
 from dodal.devices.beamlines.i15_1.cryostream import Cryostream
 from dodal.devices.beamlines.i15_1.hexapod import Hexapod
@@ -95,18 +95,6 @@ def blower(config_client: ConfigClient) -> Blower:
         f"{PREFIX.beamline_prefix}-DI-PHDGN-03:STA",
         config_client,
         XPDF_PARAMETERS_FILEPATH,
-    )
-
-
-@devices.factory()
-def calibrated_blower(config_client: ConfigClient) -> CalibratedBlower:
-    return CalibratedBlower(
-        f"{PREFIX.beamline_prefix}-EA-BLOW-01:",
-        f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE",
-        f"{PREFIX.beamline_prefix}-DI-PHDGN-03:STA",
-        config_client,
-        XPDF_PARAMETERS_FILEPATH,
-        BLOWER_TEMPERATURE_CALIBRATION_FILEPATH,
     )
 
 
