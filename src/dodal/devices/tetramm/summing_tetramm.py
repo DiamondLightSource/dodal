@@ -50,6 +50,7 @@ class NDProc(NDPluginBaseIO):
 
     enable_scale: A[SignalRW[EnableDisable], PvSuffix.rbv("EnableOffsetScale")]
     scale: A[SignalRW[float], PvSuffix.rbv("Scale")]
+    enable_filter: A[SignalRW[EnableDisable], PvSuffix.rbv("EnableFilter")]
 
 
 class SummingTetrammTriggerLogic(TetrammTriggerLogic):
@@ -140,6 +141,7 @@ class SummingTetrammDetector(TetrammDetector):
         )
 
         await self.proc1.enable_scale.set(EnableDisable.ENABLE)
+        await self.proc1.enable_filter.set(EnableDisable.DISABLE)
 
         values_per_reading = await self.driver.values_per_reading.get_value()
         to_average = await self.driver.to_average.get_value()
