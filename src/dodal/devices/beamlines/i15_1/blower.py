@@ -23,6 +23,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.common.enums import ValveState
 from dodal.devices.beamlines.i15_1.safe_or_beam_positioner import SafeOrBeamPositioner
+from dodal.log import LOGGER
 
 
 @dataclass
@@ -56,7 +57,11 @@ class TemperatureMoveLogic(MovableLogic[float]):
                 lambda v: math.isclose(v, new_position, abs_tol=rbv_tolerance),
                 timeout=self.TIMEOUT,
             )
-            await asyncio.sleep(await self.settle_time_s.get_value())
+            settle_time = self.settle_time_s.get_value()
+            LOGGER.info(
+                f"Temp setpoint {self.readback} reached, waiting settle time {settle_time}"
+            )
+            await asyncio.sleep(await settle_time)
 
 
 class Temperature(StandardReadable, StandardMovable[float]):
