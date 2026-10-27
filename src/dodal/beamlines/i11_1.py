@@ -91,7 +91,7 @@ def dcam4(path_provider: PathProvider) -> AravisDetector:
     )
 
 
-# TODO: Add the perkin elmer as a detector!
+# TODO: Create and add the Pixium as a detector!
 # @devices.factory()
-# def perkin_elmer() -> PerkinElmer:
-#     return PerkinElmer(prefix=f"{PREFIX}-EA-DET-02:")
+# def pixium() -> Pixium:
+#     return Pixium(prefix=f"{PREFIX}-EA-DET-02:")
