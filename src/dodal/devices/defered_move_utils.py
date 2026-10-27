@@ -73,6 +73,8 @@ async def do_deferred_move(
                 timeout=timeout,
                 wait_for_set_completion=False,
             )
+            # Should remove this assert once we are confident it's not an issue
+            # See https://github.com/DiamondLightSource/dodal/issues/2252
             assert await axis.user_setpoint.get_value() == value
 
             finished.append(status)
