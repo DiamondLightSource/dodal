@@ -1,3 +1,4 @@
+from functools import cached_property
 from numbers import Real
 
 from pydantic import BaseModel, ConfigDict, StrictFloat, model_validator
@@ -17,6 +18,11 @@ class FloatInterval(BaseModel):
     upper: StrictFloat
 
     model_config = ConfigDict(frozen=True)
+
+    @cached_property
+    def span(self) -> float:
+        return self.upper-self.lower
+
 
     @model_validator(mode="after")
     def _ensure_order(self) -> "FloatInterval":

@@ -3,6 +3,8 @@
 from numpy.polynomial import polynomial
 from pydantic import StrictFloat, validate_call
 
+from dodal.common.general_maths.interval import FloatInterval
+
 
 @validate_call
 def convert_percentage_to_factor(pc: StrictFloat) -> float:
@@ -124,3 +126,30 @@ def get_straight_line_y(
     _coefficients = [line_offset, line_gradient]
     _y = polynomial.polyval(x, _coefficients)
     return float(_y)
+
+
+@validate_call
+def parametric_position(
+    interval: FloatInterval,
+    parametric_fraction: StrictFloat,
+    strictly_interpolation=True,
+) -> float:
+    if strictly_interpolation and (
+        parametric_fraction < 0.0 or parametric_fraction > 1.0
+    ):
+        raise ValueError(
+            "Cannot strictly interpolate for parameterised position outside interval"
+        )
+    return get_straight_line_y(
+        line_offset=interval.lower, line_gradient=interval.span, x=parametric_fraction
+    )
+
+
+@validate_call
+def parametric_fraction(interval: FloatInterval, value: StrictFloat) -> float:
+    reciprocal_of_span = 1.0 / interval.span
+    return get_straight_line_y(
+        line_offset=-reciprocal_of_span * interval.lower,
+        line_gradient=reciprocal_of_span,
+        x=value,
+    )
