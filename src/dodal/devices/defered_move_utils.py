@@ -81,6 +81,12 @@ async def do_deferred_move(
 
     await asyncio.gather(*finished)
 
+    # We wait on the move done PV as from experience, we can't always rely on the callback.
+    # See https://github.com/DiamondLightSource/dodal/pull/2244#pullrequestreview-5654481664
+    await asyncio.gather(
+        *(wait_for_value(axis.motor_done_move, 1, timeout=5) for axis in moves)
+    )
+
+    # Verify the readback is suitably close to the target value
     for axis, value in moves.items():
-        await wait_for_value(axis.motor_done_move, 1, timeout=5)
         assert math.isclose(await axis.user_readback.get_value(), value, abs_tol=0.1)
