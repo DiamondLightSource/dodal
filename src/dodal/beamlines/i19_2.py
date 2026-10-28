@@ -61,6 +61,9 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
 MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
 
+DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/daq_configuration"
+BEAMLINE_PARAMETERS_PATH = f"{DAQ_CONFIGURATION_PATH}/domain/beamline.parameters"
+
 
 devices = DeviceManager()
 
@@ -100,8 +103,12 @@ def backlight() -> BacklightPosition:
 
 
 @devices.factory()
-def beamstop() -> BeamStop:
-    return BeamStop(prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:")
+def beamstop(config_client: ConfigClient) -> BeamStop:
+    return BeamStop(
+        prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:",
+        beamline_parameters=BEAMLINE_PARAMETERS_PATH,
+        config_client=config_client,
+    )
 
 
 @devices.factory()
