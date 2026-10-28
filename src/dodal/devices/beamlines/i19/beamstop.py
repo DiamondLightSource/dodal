@@ -51,6 +51,7 @@ class BeamStop(XYZStage):
 
     @AsyncStatus.wrap
     async def set(self, value: InOutUpper):
+        """Move the beamstop in and out of the beam. Only the x motor needs to move for this."""
         params_key = BEAMSTOP_IN_KEY if value is InOutUpper.IN else BEAMSTOP_OUT_KEY
         x_position = self._get_position_from_beamline_parameters(params_key)
         await self.x.set(x_position)
