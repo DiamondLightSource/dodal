@@ -37,12 +37,6 @@ class PolynomCompoundMotors(
         square: float = 0.0,
         name: str = "",
     ) -> None:
-        """Constructor
-        Args:
-            master: (Motor) Master motor.
-            slave: (Motor) Slave motor.
-            name: (str) Name of the compound motor. Optional.
-        """
         self.master_ref = Reference(master)
         self.slave_ref = Reference(slave)
 
@@ -51,9 +45,10 @@ class PolynomCompoundMotors(
             self.offset = soft_signal_rw(float, initial_value=offset)
             self.step = soft_signal_rw(float, initial_value=step)
             self.square = soft_signal_rw(float, initial_value=square)
+
             # Allow user to see what the device is configured as.
-            self.master_name = derived_signal_r(self._read_master_name, test="!")
-            self.slave_name = derived_signal_r(self._read_slave_name, test="!")
+            self.master_name = derived_signal_r(self._read_master_name)
+            self.slave_name = derived_signal_r(self._read_slave_name)
 
         # Expose motor readbacks as hinted signals.
         self.add_readables(
@@ -63,14 +58,11 @@ class PolynomCompoundMotors(
 
         super().__init__(name=name)
 
-    def read_name(self, device: Motor) -> str:
-        return device.name
-
-    def _read_master_name(self, test: str) -> str:
+    def _read_master_name(self) -> str:
         """Sync configured master device name."""
         return self.master_ref().name
 
-    def _read_slave_name(self, test: str) -> str:
+    def _read_slave_name(self) -> str:
         """Sync configured slave device name."""
         return self.slave_ref().name
 
