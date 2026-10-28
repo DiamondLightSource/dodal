@@ -39,6 +39,9 @@ class BeamStop(XYZStage):
 
         super().__init__(prefix, name)
 
+    # Temorary step until
+    # https://github.com/DiamondLightSource/daq-config-server/pull/219 is merged
+    # and released. After that, get_file_contents should be enough.
     def _read_beamline_parameters(self) -> str:
         return self._config_client.get_file_contents(self._beamline_parameters)
 
