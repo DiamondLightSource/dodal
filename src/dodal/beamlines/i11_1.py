@@ -55,9 +55,10 @@ def synchrotron() -> Synchrotron:
 
 @devices.factory()
 def dcm() -> DCM:
+    """This is the same one as i11, and prefixed with i11."""
     return DCM(
-        prefix=f"{PREFIX}-MO-DCM-01:",
-        xtal_prefix=f"{PREFIX}-DI-DCM-01:",
+        prefix="BL11I-MO-DCM-01:",
+        xtal_prefix="BL11I-DI-DCM-01:",
     )
 
 
