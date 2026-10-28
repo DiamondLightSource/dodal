@@ -1,17 +1,13 @@
 import asyncio
 
-import numpy as np
-from bluesky.protocols import (
-    Locatable,
-    Location,
-    Stoppable,
-)
+from bluesky.protocols import Locatable, Location, Stoppable
 from ophyd_async.core import (
-    Array1D,
     AsyncStatus,
     Reference,
     StandardReadable,
     StandardReadableFormat,
+    derived_signal_r,
+    soft_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
 
@@ -21,55 +17,80 @@ class PolynomCompoundMotors(
     Locatable[float],
     Stoppable,
 ):
-    """Compound motor controller that synchronizes the movement of multiple motors
-    based on polynomial relationships.
+    """Compound motor that moves a slave according to a polynomial of the master.
 
-    When the master motor is moved, all driven (slave) motors are asynchronously moved
-    to positions calculated using polynomial coefficients from master motor position.
-    The master motor is always included with a default polynomial coefficient
-    of [0.0, 1.0], representing a direct mapping. Driven motors' positions are
-    calculated using NumPy's polynomial evaluation.
+    The slave position is calculated as:
 
-    Args:
-        master(Motor): master motor.
-        driven_dict (dict[Motor, Array1D[np.float64]]): dictionary that defines mapping
-            of each driven motor to its polynomial coefficients (NumPy array).
-        name (str,optional): name of the device. Defaults to an empty string.
+        slave_position = offset + step * master_position
+                        + square * master_position**2
+
+    The polynomial coefficients (offset, step, and square) are exposed as
+    writable soft signals and can be configured or changed at runtime.
     """
 
     def __init__(
         self,
         master: Motor,
-        driven_dict: dict[Motor, Array1D[np.float64]],
+        slave: Motor,
+        offset: float = 0.0,
+        step: float = 0.0,
+        square: float = 0.0,
         name: str = "",
     ) -> None:
-        self.motor_coeff_dict: dict[Reference[Motor], Array1D[np.float64]] = {}
-
-        # master motor added with polynomial coeff (0,1)
+        """Constructor
+        Args:
+            master: (Motor) Master motor.
+            slave: (Motor) Slave motor.
+            name: (str) Name of the compound motor. Optional.
+        """
         self.master_ref = Reference(master)
-        self.motor_coeff_dict[self.master_ref] = np.array([0.0, 1.0])
+        self.slave_ref = Reference(slave)
 
-        # slave motors added with coefficients from input parameters
-        for slave in driven_dict.keys():
-            self.motor_coeff_dict[Reference(slave)] = driven_dict[slave]
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            # Writable soft signals for configuring the polynomial.
+            self.offset = soft_signal_rw(float, initial_value=offset)
+            self.step = soft_signal_rw(float, initial_value=step)
+            self.square = soft_signal_rw(float, initial_value=square)
+            # Allow user to see what the device is configured as.
+            self.master_name = derived_signal_r(self._read_master_name, test="!")
+            self.slave_name = derived_signal_r(self._read_slave_name, test="!")
 
+        # Expose motor readbacks as hinted signals.
         self.add_readables(
-            [ref().user_readback for ref in self.motor_coeff_dict.keys()],
+            [master.user_readback, slave.user_readback],
             StandardReadableFormat.HINTED_SIGNAL,
         )
+
         super().__init__(name=name)
+
+    def read_name(self, device: Motor) -> str:
+        return device.name
+
+    def _read_master_name(self, test: str) -> str:
+        """Sync configured master device name."""
+        return self.master_ref().name
+
+    def _read_slave_name(self, test: str) -> str:
+        """Sync configured slave device name."""
+        return self.slave_ref().name
 
     @AsyncStatus.wrap
     async def set(self, new_position: float) -> None:
+        offset, step, square = await asyncio.gather(
+            self.offset.get_value(),
+            self.step.get_value(),
+            self.square.get_value(),
+        )
+        slave_position = offset + step * new_position + square * new_position**2
+
         await asyncio.gather(
-            *[
-                ref().set(float(np.polynomial.polynomial.polyval(new_position, coeff)))
-                for ref, coeff in self.motor_coeff_dict.items()
-            ]
+            self.master_ref().set(new_position), self.slave_ref().set(slave_position)
         )
 
-    async def stop(self, success=False):
-        await asyncio.gather(*[ref().stop() for ref in self.motor_coeff_dict.keys()])
+    async def stop(self, success: bool = False) -> None:
+        await asyncio.gather(
+            self.master_ref().stop(success), self.slave_ref().stop(success)
+        )
 
     async def locate(self) -> Location[float]:
         return await self.master_ref().locate()

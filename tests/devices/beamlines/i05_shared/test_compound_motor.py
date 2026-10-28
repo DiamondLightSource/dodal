@@ -1,10 +1,12 @@
-import numpy as np
+import asyncio
+from unittest.mock import AsyncMock
+
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_attr
 from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.beamlines.i05_shared import PolynomCompoundMotors
 
@@ -30,58 +32,109 @@ async def z_motor() -> Motor:
     return z_motor
 
 
-@pytest.fixture
-async def mock_compound(
-    x_motor: Motor,
-    y_motor: Motor,
-    z_motor: Motor,
-) -> PolynomCompoundMotors:
+# https://github.com/bluesky/ophyd-async/issues/1471
+# async def test_config_includes(compound: PolynomCompoundMotors):
+#     await assert_configuration(
+#         compound,
+#         {
+#             "compound-offset": partial_reading(0.0),
+#             "compound-step": partial_reading(0.0),
+#             "compound-square": partial_reading(0.0),
+#             "compound-master_name": partial_reading(compound.master_ref().name),
+#             "compound-slave_name": partial_reading(compound.slave_ref().name),
+#         },
+#     )
+
+
+async def test_compound_initial_values_are_set(x_motor: Motor, y_motor: Motor):
+    expected_offset = 2
+    expected_step = 1.5
+    expected_square = 3
     async with init_devices(mock=True):
-        mock_compound = PolynomCompoundMotors(
+        compound = PolynomCompoundMotors(
             x_motor,
-            {
-                y_motor: np.array([1.0, 2.0], dtype=np.float64),
-                z_motor: np.array([-1.0, 0.5], dtype=np.float64),
-            },
+            y_motor,
+            offset=expected_offset,
+            step=expected_step,
+            square=expected_square,
         )
-    return mock_compound
 
-
-async def test_config_includes(mock_compound: PolynomCompoundMotors):
-    await assert_configuration(
-        mock_compound,
-        {},
+    offset, step, square = await asyncio.gather(
+        compound.offset.get_value(),
+        compound.step.get_value(),
+        compound.square.get_value(),
     )
+    assert offset == expected_offset
+    assert step == expected_step
+    assert square == expected_square
 
 
-async def test_read_includes(mock_compound: PolynomCompoundMotors):
+@pytest.fixture
+async def compound(x_motor: Motor, y_motor: Motor) -> PolynomCompoundMotors:
+    async with init_devices(mock=True):
+        compound = PolynomCompoundMotors(x_motor, y_motor)
+    return compound
+
+
+async def test_compound_read(compound: PolynomCompoundMotors):
     await assert_reading(
-        mock_compound,
+        compound,
         {
             "x_motor": partial_reading(0.0),
             "y_motor": partial_reading(0.0),
-            "z_motor": partial_reading(0.0),
         },
     )
 
 
-async def test_move(
-    mock_compound: PolynomCompoundMotors,
-    run_engine: RunEngine,
+async def test_compound_move(
+    compound: PolynomCompoundMotors,
 ):
     new_position = 10.0
-    run_engine(bps.mv(mock_compound, new_position))
-    for motor, coeff in mock_compound.motor_coeff_dict.items():
-        expected_position = float(np.polynomial.polynomial.polyval(new_position, coeff))
-        actual_position = await motor().user_readback.get_value()
-        assert actual_position == expected_position
+    offset = 1.0
+    step = 2.0
+    square = 3.0
+
+    await asyncio.gather(
+        compound.offset.set(offset),
+        compound.step.set(step),
+        compound.square.set(square),
+    )
+    await compound.set(new_position)
+
+    expected_slave_position = offset + step * new_position + square * new_position**2
+
+    master_val, slave_val = await asyncio.gather(
+        compound.master_ref().user_readback.get_value(),
+        compound.slave_ref().user_readback.get_value(),
+    )
+    assert master_val == new_position
+    assert slave_val == expected_slave_position
 
 
-async def test_move_and_locate(
-    mock_compound: PolynomCompoundMotors,
+async def test_compound_move_and_locate(
+    compound: PolynomCompoundMotors,
     run_engine: RunEngine,
 ):
     new_position = 1.23
-    run_engine(bps.mv(mock_compound, new_position))
-    located_position = await mock_compound.locate()
-    assert located_position == {"setpoint": new_position, "readback": new_position}
+
+    run_engine(bps.mv(compound, new_position))
+
+    located_position = await compound.locate()
+
+    assert located_position == {
+        "setpoint": new_position,
+        "readback": new_position,
+    }
+
+
+@pytest.mark.parametrize("success", [True, False])
+async def test_compound_stop(compound: PolynomCompoundMotors, success: bool):
+    master_mock_stop = AsyncMock()
+    slave_mock_stop = AsyncMock()
+    set_mock_attr(compound.master_ref(), "stop", master_mock_stop)
+    set_mock_attr(compound.slave_ref(), "stop", slave_mock_stop)
+
+    await compound.stop(success)
+
+    master_mock_stop.assert_awaited_once_with(success)
+    slave_mock_stop.assert_awaited_once_with(success)
