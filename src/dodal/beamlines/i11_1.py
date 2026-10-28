@@ -89,9 +89,3 @@ def dcam4(path_provider: PathProvider) -> AravisDetector:
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix="CAM:",
     )
-
-
-# TODO: Create and add the Pixium as a detector!
-# @devices.factory()
-# def pixium() -> Pixium:
-#     return Pixium(prefix=f"{PREFIX}-EA-DET-02:")
