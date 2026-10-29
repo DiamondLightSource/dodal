@@ -1,4 +1,5 @@
 import asyncio
+import math
 from collections.abc import Mapping
 from contextlib import asynccontextmanager
 from typing import Any
@@ -8,6 +9,7 @@ from ophyd_async.core import (
     StandardReadable,
     StrictEnum,
     set_and_wait_for_value,
+    wait_for_value,
 )
 from ophyd_async.epics.motor import Motor
 
@@ -71,7 +73,20 @@ async def do_deferred_move(
                 timeout=timeout,
                 wait_for_set_completion=False,
             )
+            # Should remove this assert once we are confident it's not an issue
+            # See https://github.com/DiamondLightSource/dodal/issues/2252
+            assert await axis.user_setpoint.get_value() == value
 
             finished.append(status)
 
     await asyncio.gather(*finished)
+
+    # We wait on the move done PV as from experience, we can't always rely on the callback.
+    # See https://github.com/DiamondLightSource/dodal/pull/2244#pullrequestreview-5654481664
+    await asyncio.gather(
+        *(wait_for_value(axis.motor_done_move, 1, timeout=5) for axis in moves)
+    )
+
+    # Verify the readback is suitably close to the target value
+    for axis, value in moves.items():
+        assert math.isclose(await axis.user_readback.get_value(), value, abs_tol=0.1)
