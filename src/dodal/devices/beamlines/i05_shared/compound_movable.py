@@ -18,7 +18,7 @@ from ophyd_async.core import (
 
 
 @dataclass
-class PolynomCompoundMovableLogic(MovableLogic):
+class PolynomCompoundMovableLogic(MovableLogic[float]):
     master: StandardMovable[float]
     slave: StandardMovable[float]
     offset: SignalR[float]
