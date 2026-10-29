@@ -106,6 +106,7 @@ def backlight() -> BacklightPosition:
 def beamstop(config_client: ConfigClient) -> BeamStop:
     return BeamStop(
         prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:",
+        hutch=HutchState.EH2,
         beamline_parameters=BEAMLINE_PARAMETERS_PATH,
         config_client=config_client,
     )

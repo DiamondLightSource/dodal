@@ -95,6 +95,7 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 def beamstop(config_client: ConfigClient) -> BeamStop:
     return BeamStop(
         prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:",
+        hutch=HutchState.EH1,
         beamline_parameters=BEAMLINE_PARAMETERS_PATH,
         config_client=config_client,
     )
