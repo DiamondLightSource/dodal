@@ -1,21 +1,53 @@
 import asyncio
+from dataclasses import dataclass
+from functools import cached_property
+from typing import TypeVar
 
-from bluesky.protocols import Locatable, Location, Stoppable
 from ophyd_async.core import (
-    AsyncStatus,
+    DeviceMock,
+    MovableLogic,
     Reference,
+    SignalR,
+    StandardMovable,
     StandardReadable,
     StandardReadableFormat,
+    TimeoutCalculator,
+    default_mock_class,
     derived_signal_r,
     soft_signal_rw,
 )
-from ophyd_async.epics.motor import Motor
+
+StandardMovableT = TypeVar("StandardMovableT", bound=StandardMovable[float])
 
 
+@dataclass
+class PolyCompoundMotorMovableLogic(MovableLogic):
+    master: StandardMovable[float]
+    slave: StandardMovable[float]
+    offset: SignalR[float]
+    step: SignalR[float]
+    square: SignalR[float]
+
+    async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
+        offset, step, square = await asyncio.gather(
+            self.offset.get_value(),
+            self.step.get_value(),
+            self.square.get_value(),
+        )
+        slave_position = offset + step * new_position + square * new_position**2
+
+        await asyncio.gather(
+            self.master.set(new_position), self.slave.set(slave_position)
+        )
+
+    async def stop(self) -> None:
+        await asyncio.gather(self.master.stop(), self.slave.stop())
+
+
+@default_mock_class(DeviceMock)
 class PolynomCompoundMotors(
+    StandardMovable[float],
     StandardReadable,
-    Locatable[float],
-    Stoppable,
 ):
     """Compound motor that moves a slave according to a polynomial of the master.
 
@@ -30,8 +62,8 @@ class PolynomCompoundMotors(
 
     def __init__(
         self,
-        master: Motor,
-        slave: Motor,
+        master: StandardMovable[float],
+        slave: StandardMovable[float],
         offset: float = 0.0,
         step: float = 0.0,
         square: float = 0.0,
@@ -52,10 +84,22 @@ class PolynomCompoundMotors(
             )
             self.slave_name = derived_signal_r(self._read_slave_name, dummy=self.offset)
 
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            # This is needed so that StandardMovable doesn't rename the master readback
+            # signal to this device name.
+            self.readback = derived_signal_r(
+                self._readback_read, readback=master.movable_logic.readback
+            )
+
         # Expose motor readbacks as readables
-        self.add_readables([master.user_readback, slave.user_readback])
+        self.add_readables(
+            [master.movable_logic.readback, slave.movable_logic.readback]
+        )
 
         super().__init__(name=name)
+
+    def _readback_read(self, readback: float) -> float:
+        return readback
 
     # https://github.com/bluesky/ophyd-async/issues/1471
     # Providing dummy signal needed due to bug.
@@ -69,23 +113,14 @@ class PolynomCompoundMotors(
         """Sync configured slave device name."""
         return self.slave_ref().name
 
-    @AsyncStatus.wrap
-    async def set(self, new_position: float) -> None:
-        offset, step, square = await asyncio.gather(
-            self.offset.get_value(),
-            self.step.get_value(),
-            self.square.get_value(),
+    @cached_property
+    def movable_logic(self) -> MovableLogic:
+        return PolyCompoundMotorMovableLogic(
+            readback=self.readback,
+            setpoint=self.master_ref().movable_logic.setpoint,
+            master=self.master_ref(),
+            slave=self.slave_ref(),
+            offset=self.offset,
+            step=self.step,
+            square=self.square,
         )
-        slave_position = offset + step * new_position + square * new_position**2
-
-        await asyncio.gather(
-            self.master_ref().set(new_position), self.slave_ref().set(slave_position)
-        )
-
-    async def stop(self, success: bool = False) -> None:
-        await asyncio.gather(
-            self.master_ref().stop(success), self.slave_ref().stop(success)
-        )
-
-    async def locate(self) -> Location[float]:
-        return await self.master_ref().locate()
