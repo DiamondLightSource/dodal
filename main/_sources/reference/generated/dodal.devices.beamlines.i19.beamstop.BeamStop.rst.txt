@@ -21,6 +21,9 @@ dodal.devices.beamlines.i19.beamstop.BeamStop
       
       
       
+      ~BeamStop.set
+      
+      
       
       
    

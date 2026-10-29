@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i19.beamstop &#8212; dodal 3.0.6.dev5+g31999b071 documentation</title>
+    <title>dodal.devices.beamlines.i19.beamstop &#8212; dodal 3.0.6.dev6+g546b1fefe documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=11c55cc0"></script>
+    <script src="../../../../../_static/documentation_options.js?v=3c5823b7"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,10 +885,23 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamlines.i19.beamstop</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">beamline_parameters_to_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_x</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">InOutUpper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.beamlines.i19.access_controlled.blueapi_device</span><span class="w"> </span><span class="kn">import</span> <span class="n">HutchState</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZStage</span>
+
+<span class="n">BEAMSTOP_IN_KEY</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">HutchState</span><span class="o">.</span><span class="n">EH1</span><span class="p">:</span> <span class="s2">&quot;beamstop_inbeam_y&quot;</span><span class="p">,</span>
+    <span class="n">HutchState</span><span class="o">.</span><span class="n">EH2</span><span class="p">:</span> <span class="s2">&quot;beamstop_inbeam_x&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">BEAMSTOP_OUT_KEY</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">HutchState</span><span class="o">.</span><span class="n">EH1</span><span class="p">:</span> <span class="s2">&quot;beamstop_outbeam_y&quot;</span><span class="p">,</span>
+    <span class="n">HutchState</span><span class="o">.</span><span class="n">EH2</span><span class="p">:</span> <span class="s2">&quot;beamstop_outbeam_x&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="HomeGroup">
@@ -915,10 +928,50 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="BeamStop">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i19.beamstop.BeamStop.html#dodal.devices.beamlines.i19.beamstop.BeamStop">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BeamStop</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">hutch</span><span class="p">:</span> <span class="n">HutchState</span><span class="p">,</span>
+        <span class="n">beamline_parameters</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_beamline_parameters</span> <span class="o">=</span> <span class="n">beamline_parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config_client</span> <span class="o">=</span> <span class="n">config_client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hutch</span> <span class="o">=</span> <span class="n">hutch</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">homing</span> <span class="o">=</span> <span class="n">HomingControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">HM&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># Temorary step until</span>
+    <span class="c1"># https://github.com/DiamondLightSource/daq-config-server/pull/219 is merged</span>
+    <span class="c1"># and released. After that, get_file_contents should be enough.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_beamline_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beamline_parameters</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_position_from_beamline_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">beamline_parameters_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_beamline_parameters</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+<div class="viewcode-block" id="BeamStop.set">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.beamlines.i19.beamstop.BeamStop.html#dodal.devices.beamlines.i19.beamstop.BeamStop.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">InOutUpper</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the beamstop in and out of the beam.</span>
+<span class="sd">        For EH2, only the x motor needs to move while for EH1 only the y motor moves.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params_key</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">BEAMSTOP_IN_KEY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hutch</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">InOutUpper</span><span class="o">.</span><span class="n">IN</span>
+            <span class="k">else</span> <span class="n">BEAMSTOP_OUT_KEY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_hutch</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_position_from_beamline_parameters</span><span class="p">(</span><span class="n">params_key</span><span class="p">)</span>
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hutch</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">HutchState</span><span class="o">.</span><span class="n">EH1</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+            <span class="k">case</span> <span class="n">HutchState</span><span class="o">.</span><span class="n">EH2</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">position</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

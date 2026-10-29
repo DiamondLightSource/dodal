@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i19_2 &#8212; dodal 3.0.6.dev5+g31999b071 documentation</title>
+    <title>dodal.beamlines.i19_2 &#8212; dodal 3.0.6.dev6+g546b1fefe documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=11c55cc0"></script>
+    <script src="../../../_static/documentation_options.js?v=3c5823b7"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -951,6 +951,9 @@ window.runMermaid = runMermaid;</script>
 <span class="n">SHARED_CONFIG_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i19-1/software/i19-acquisition/i19-shared&quot;</span>
 <span class="n">MIRROR_ENERGY_FILE_PATH</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SHARED_CONFIG_PATH</span><span class="si">}</span><span class="s2">/json/MirrorEnergyRanges.json&quot;</span>
 
+<span class="n">DAQ_CONFIGURATION_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i19-2/software/daq_configuration&quot;</span>
+<span class="n">BEAMLINE_PARAMETERS_PATH</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DAQ_CONFIGURATION_PATH</span><span class="si">}</span><span class="s2">/domain/beamline.parameters&quot;</span>
+
 
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
 
@@ -996,8 +999,13 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">beamstop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">BeamStop</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">BeamStop</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-ABSB-02:&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">beamstop</span><span class="p">(</span><span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BeamStop</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">BeamStop</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-ABSB-02:&quot;</span><span class="p">,</span>
+        <span class="n">hutch</span><span class="o">=</span><span class="n">HutchState</span><span class="o">.</span><span class="n">EH2</span><span class="p">,</span>
+        <span class="n">beamline_parameters</span><span class="o">=</span><span class="n">BEAMLINE_PARAMETERS_PATH</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
