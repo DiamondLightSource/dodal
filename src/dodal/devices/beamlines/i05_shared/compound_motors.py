@@ -47,8 +47,10 @@ class PolynomCompoundMotors(
             self.square = soft_signal_rw(float, initial_value=square)
 
             # Allow user to see what the device is configured as.
-            self.master_name = derived_signal_r(self._read_master_name)
-            self.slave_name = derived_signal_r(self._read_slave_name)
+            self.master_name = derived_signal_r(
+                self._read_master_name, dummy=self.offset
+            )
+            self.slave_name = derived_signal_r(self._read_slave_name, dummy=self.offset)
 
         # Expose motor readbacks as hinted signals.
         self.add_readables(
@@ -58,11 +60,15 @@ class PolynomCompoundMotors(
 
         super().__init__(name=name)
 
-    def _read_master_name(self) -> str:
+    # https://github.com/bluesky/ophyd-async/issues/1471
+    # Providing dummy signal needed due to bug.
+    def _read_master_name(self, dummy: float) -> str:
         """Sync configured master device name."""
         return self.master_ref().name
 
-    def _read_slave_name(self) -> str:
+    # https://github.com/bluesky/ophyd-async/issues/1471
+    # Providing dummy signal needed due to bug.
+    def _read_slave_name(self, dummy: float) -> str:
         """Sync configured slave device name."""
         return self.slave_ref().name
 

@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices, set_mock_attr
+from ophyd_async.core import Reference, init_devices, set_mock_attr
 from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import assert_reading, partial_reading
+from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.beamlines.i05_shared import PolynomCompoundMotors
 
@@ -62,42 +62,41 @@ async def compound(x_motor: Motor, y_motor: Motor) -> PolynomCompoundMotors:
     return compound
 
 
-# https://github.com/bluesky/ophyd-async/issues/1471
-# async def test_config_includes(compound: PolynomCompoundMotors):
-#     await assert_configuration(
-#         compound,
-#         {
-#             "compound-offset": partial_reading(0.0),
-#             "compound-step": partial_reading(0.0),
-#             "compound-square": partial_reading(0.0),
-#             "compound-master_name": partial_reading(compound.master_ref().name),
-#             "compound-slave_name": partial_reading(compound.slave_ref().name),
-#         },
-#     )
+async def test_config_includes(compound: PolynomCompoundMotors):
+    await assert_configuration(
+        compound,
+        {
+            "compound-offset": partial_reading(0.0),
+            "compound-step": partial_reading(0.0),
+            "compound-square": partial_reading(0.0),
+            "compound-master_name": partial_reading(compound.master_ref().name),
+            "compound-slave_name": partial_reading(compound.slave_ref().name),
+        },
+    )
 
-# https://github.com/bluesky/ophyd-async/issues/1471
-# async def test_compound_change_ref_updates_master_and_slave_name_signal(
-#     compound: PolynomCompoundMotors, x_motor: Motor, y_motor: Motor
-# ):
-#     assert compound.master_ref() == x_motor
-#     assert compound.slave_ref() == y_motor
 
-#     master_name, slave_name = await asyncio.gather(
-#         compound.master_name.get_value(), compound.slave_name.get_value()
-#     )
+async def test_compound_change_ref_updates_master_and_slave_name_signal(
+    compound: PolynomCompoundMotors, x_motor: Motor, y_motor: Motor
+):
+    assert compound.master_ref() == x_motor
+    assert compound.slave_ref() == y_motor
 
-#     assert master_name == x_motor.name
-#     assert slave_name == y_motor.name
+    master_name, slave_name = await asyncio.gather(
+        compound.master_name.get_value(), compound.slave_name.get_value()
+    )
 
-#     compound.master_ref = Reference(y_motor)
-#     compound.slave_ref = Reference(x_motor)
+    assert master_name == x_motor.name
+    assert slave_name == y_motor.name
 
-#     master_name, slave_name = await asyncio.gather(
-#         compound.master_name.get_value(), compound.slave_name.get_value()
-#     )
+    compound.master_ref = Reference(y_motor)
+    compound.slave_ref = Reference(x_motor)
 
-#     assert master_name == y_motor.name
-#     assert slave_name == x_motor.name
+    expected_master_name, expected_slave_name = await asyncio.gather(
+        compound.master_name.get_value(), compound.slave_name.get_value()
+    )
+
+    assert y_motor.name == expected_master_name
+    assert x_motor.name == expected_slave_name
 
 
 async def test_compound_read(compound: PolynomCompoundMotors):
