@@ -39,10 +39,10 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i15-1")  # Default used when not on a live beamline
 PREFIX = BeamlinePrefix(BL, suffix="J")
+DAQ_CONFIGURATION_PATH = "/dls_sw/i15-1/software/daq_configuration/"
 XPDF_PARAMETERS_FILEPATH = "/dls_sw/i15-1/software/gda_var/xpdfLocalParameters.xml"
-XPDF_CRYSTAL_LUT_FILEPATH = (
-    "/dls_sw/i15-1/software/daq_configuration/xpdf_crystal_lut.txt"
-)
+XPDF_CRYSTAL_LUT_FILEPATH = DAQ_CONFIGURATION_PATH + "xpdf_crystal_lut.txt"
+
 set_log_beamline(BL)  # Configure logging and util functions
 set_utils_beamline(BL)
 
