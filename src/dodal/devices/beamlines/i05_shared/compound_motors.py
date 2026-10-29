@@ -52,11 +52,8 @@ class PolynomCompoundMotors(
             )
             self.slave_name = derived_signal_r(self._read_slave_name, dummy=self.offset)
 
-        # Expose motor readbacks as hinted signals.
-        self.add_readables(
-            [master.user_readback, slave.user_readback],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
+        # Expose motor readbacks as readables
+        self.add_readables([master.user_readback, slave.user_readback])
 
         super().__init__(name=name)
 
