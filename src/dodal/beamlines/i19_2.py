@@ -61,7 +61,7 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
 MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
 
-DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/daq_configuration"
+DAQ_CONFIGURATION_PATH = "/dls_sw/i19-2/software/daq_configuration"
 BEAMLINE_PARAMETERS_PATH = f"{DAQ_CONFIGURATION_PATH}/domain/beamline.parameters"
 
 
