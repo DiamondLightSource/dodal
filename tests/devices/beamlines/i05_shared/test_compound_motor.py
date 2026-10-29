@@ -78,6 +78,12 @@ async def test_compound_change_ref_updates_master_and_slave_name_signal(
     x_motor: StandardMovable[float],
     y_motor: StandardMovable[float],
 ):
+    x_motor_val = 1
+    y_motor_val = 2
+    await asyncio.gather(x_motor.set(x_motor_val), y_motor.set(y_motor_val))
+
+    assert await compound.readback.get_value() == x_motor_val
+
     assert compound.master_ref() == x_motor
     assert compound.slave_ref() == y_motor
 
@@ -97,6 +103,8 @@ async def test_compound_change_ref_updates_master_and_slave_name_signal(
 
     assert y_motor.name == expected_master_name
     assert x_motor.name == expected_slave_name
+
+    assert await compound.readback.get_value() == y_motor_val
 
 
 async def test_compound_read(compound: PolynomCompoundMotors):
