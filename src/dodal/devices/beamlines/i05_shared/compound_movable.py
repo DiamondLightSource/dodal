@@ -39,6 +39,8 @@ class PolynomCompoundMovableLogic(MovableLogic[float]):
         slave_pos = self._calc_slave_pos(
             new_pos=new_position, offset=offset, step=step, square=square
         )
+        # Timeout will be calculated directly by master and slave as they are
+        # standard movables so safe to ignore.
         await asyncio.gather(self.master.set(new_position), self.slave.set(slave_pos))
 
     async def stop(self) -> None:
