@@ -1,7 +1,6 @@
 import asyncio
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TypeVar
 
 from ophyd_async.core import (
     DeviceMock,
@@ -17,11 +16,9 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-StandardMovableT = TypeVar("StandardMovableT", bound=StandardMovable[float])
-
 
 @dataclass
-class PolyCompoundMotorMovableLogic(MovableLogic):
+class PolynomCompoundMovableLogic(MovableLogic):
     master: StandardMovable[float]
     slave: StandardMovable[float]
     offset: SignalR[float]
@@ -49,11 +46,11 @@ class PolyCompoundMotorMovableLogic(MovableLogic):
 
 
 @default_mock_class(DeviceMock)
-class PolynomCompoundMotors(
+class PolynomCompoundMovable(
     StandardMovable[float],
     StandardReadable,
 ):
-    """Compound motor that moves a slave according to a polynomial of the master.
+    """Compound device that moves a slave device according to a polynomial of the master.
 
     The slave position is calculated as:
 
@@ -119,7 +116,7 @@ class PolynomCompoundMotors(
 
     @cached_property
     def movable_logic(self) -> MovableLogic:
-        return PolyCompoundMotorMovableLogic(
+        return PolynomCompoundMovableLogic(
             readback=self.readback,
             setpoint=self.master_ref().movable_logic.setpoint,
             master=self.master_ref(),

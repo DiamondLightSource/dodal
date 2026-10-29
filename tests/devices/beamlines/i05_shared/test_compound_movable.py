@@ -6,7 +6,7 @@ from ophyd_async.core import Reference, StandardMovable, init_devices, set_mock_
 from ophyd_async.epics.motor import Motor
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.beamlines.i05_shared import PolynomCompoundMotors
+from dodal.devices.beamlines.i05_shared import PolynomCompoundMovable
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ async def test_compound_initial_values_are_set(x_motor: Motor, y_motor: Motor):
     expected_step = 1.5
     expected_square = 3
     async with init_devices(mock=True):
-        compound = PolynomCompoundMotors(
+        compound = PolynomCompoundMovable(
             x_motor,
             y_motor,
             offset=expected_offset,
@@ -54,13 +54,13 @@ async def test_compound_initial_values_are_set(x_motor: Motor, y_motor: Motor):
 
 
 @pytest.fixture
-async def compound(x_motor: Motor, y_motor: Motor) -> PolynomCompoundMotors:
+async def compound(x_motor: Motor, y_motor: Motor) -> PolynomCompoundMovable:
     async with init_devices(mock=True):
-        compound = PolynomCompoundMotors(x_motor, y_motor)
+        compound = PolynomCompoundMovable(x_motor, y_motor)
     return compound
 
 
-async def test_config_includes(compound: PolynomCompoundMotors):
+async def test_config_includes(compound: PolynomCompoundMovable):
     await assert_configuration(
         compound,
         {
@@ -74,7 +74,7 @@ async def test_config_includes(compound: PolynomCompoundMotors):
 
 
 async def test_compound_change_ref_updates_master_and_slave_name_signal(
-    compound: PolynomCompoundMotors,
+    compound: PolynomCompoundMovable,
     x_motor: StandardMovable[float],
     y_motor: StandardMovable[float],
 ):
@@ -107,7 +107,7 @@ async def test_compound_change_ref_updates_master_and_slave_name_signal(
     # assert await compound.readback.get_value() == y_motor_val
 
 
-async def test_compound_read(compound: PolynomCompoundMotors):
+async def test_compound_read(compound: PolynomCompoundMovable):
     await assert_reading(
         compound,
         {
@@ -118,7 +118,7 @@ async def test_compound_read(compound: PolynomCompoundMotors):
     )
 
 
-async def test_compound_move(compound: PolynomCompoundMotors):
+async def test_compound_move(compound: PolynomCompoundMovable):
     new_position = 10.0
     offset = 1.0
     step = 2.0
@@ -141,7 +141,7 @@ async def test_compound_move(compound: PolynomCompoundMotors):
     assert slave_val == expected_slave_position
 
 
-async def test_compound_stop(compound: PolynomCompoundMotors):
+async def test_compound_stop(compound: PolynomCompoundMovable):
     master_mock_stop = AsyncMock()
     slave_mock_stop = AsyncMock()
     set_mock_attr(compound.master_ref(), "stop", master_mock_stop)

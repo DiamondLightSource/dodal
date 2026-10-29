@@ -3,7 +3,7 @@ from dodal.devices.beamlines.i05_shared import (
     APPLE_KNOT_EXCLUSION_ZONES,
     Grating,
     M3MJ6Mirror,
-    PolynomCompoundMotors,
+    PolynomCompoundMovable,
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
@@ -33,6 +33,39 @@ devices = DeviceManager()
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
+
+
+@devices.factory()
+def m1() -> XYZPitchYawRollStage:
+    """Collimating mirror."""
+    return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+
+
+@devices.factory()
+def m3mj6() -> XYZPiezoSwitchingMirror:
+    """Switching mirror."""
+    return XYZPiezoSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
+        mirrors=M3MJ6Mirror,
+    )
+
+
+@devices.factory
+def m1mj6_pitch(
+    m1: XYZPitchYawRollStage, m3mj6: XYZPiezoSwitchingMirror
+) -> PolynomCompoundMovable:
+    return PolynomCompoundMovable(
+        master=m1.pitch, slave=m3mj6.x, offset=6.75958, step=-0.0104762
+    )
+
+
+@devices.factory
+def m1es_pitch(
+    m1mj6_pitch: PolynomCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
+) -> PolynomCompoundMovable:
+    return PolynomCompoundMovable(
+        master=m1mj6_pitch, slave=m3mj6.pitch, offset=5005, step=0.27
+    )
 
 
 @devices.factory()
@@ -67,21 +100,6 @@ def id(
 
 
 @devices.factory()
-def m1() -> XYZPitchYawRollStage:
-    """Collimating mirror."""
-    return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
-
-
-@devices.factory()
-def m3mj6() -> XYZPiezoSwitchingMirror:
-    """Switching mirror."""
-    return XYZPiezoSwitchingMirror(
-        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
-        mirrors=M3MJ6Mirror,
-    )
-
-
-@devices.factory()
 def id_controller(
     id: Apple2[UndulatorLockedPhaseAxes],
 ) -> AppleKnotController[UndulatorLockedPhaseAxes]:
@@ -112,21 +130,3 @@ def energy(
     id_energy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     return BeamEnergy(id_energy=id_energy, mono=pgm.energy)
-
-
-@devices.factory
-def m1mj6_pitch(
-    m1: XYZPitchYawRollStage, m3mj6: XYZPiezoSwitchingMirror
-) -> PolynomCompoundMotors:
-    return PolynomCompoundMotors(
-        master=m1.pitch, slave=m3mj6.x, offset=6.75958, step=-0.0104762
-    )
-
-
-@devices.factory
-def m1es_pitch(
-    m1mj6_pitch: PolynomCompoundMotors, m3mj6: XYZPiezoSwitchingMirror
-) -> PolynomCompoundMotors:
-    return PolynomCompoundMotors(
-        master=m1mj6_pitch, slave=m3mj6.pitch, offset=5005, step=0.27
-    )
