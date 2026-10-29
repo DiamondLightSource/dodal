@@ -92,7 +92,7 @@ class PolynomCompoundMovable(
                 self._readback_read, readback=master.movable_logic.readback
             )
 
-        # Expose motor readbacks as readables
+        # Expose readbacks as readables
         self.add_readables(
             [master.movable_logic.readback, slave.movable_logic.readback]
         )
