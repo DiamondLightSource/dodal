@@ -4,21 +4,36 @@ from unittest.mock import Mock, patch
 import pytest
 from bluesky import RunEngine
 from click.testing import CliRunner, Result
-from ophyd.device import DEFAULT_CONNECTION_TIMEOUT
-from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
-    LazyMock,
-    NotConnectedError,
-)
+from ophyd_async.core import Device, NotConnectedError
 
 from dodal import __version__
 from dodal.cli import main
 from dodal.device_manager import DeviceManager
-from dodal.utils import AnyDevice, OphydV1Device, OphydV2Device
 
 # Test with an example beamline, device instantiation is already tested
 # in beamline unit tests
 EXAMPLE_BEAMLINE = "i22"
+
+
+def device_results(
+    ophyd_async_happy_devices: int = 0,
+    ophyd_async_failures: int = 0,
+) -> tuple[dict[str, Device], dict[str, Exception]]:
+    devices = {
+        **{
+            f"ophyd_async_happy_device_{i}": Device(
+                name=f"ophyd_async_happy_device_{i}"
+            )
+            for i in range(ophyd_async_happy_devices)
+        },
+    }
+    exceptions: dict[str, Exception] = {
+        **{
+            f"ophyd_async_failed_device_{i}": TimeoutError()
+            for i in range(ophyd_async_failures)
+        },
+    }
+    return devices, exceptions
 
 
 @pytest.fixture(autouse=True)
@@ -40,53 +55,6 @@ def test_cli_version(runner: CliRunner):
     )
 
     assert result.stdout == f"{__version__}\n"
-
-
-class UnconnectableOphydDevice(OphydV1Device):
-    def wait_for_connection(
-        self,
-        all_signals: bool = False,
-        timeout=DEFAULT_CONNECTION_TIMEOUT,
-    ) -> None:
-        raise RuntimeError(f"{self.name}: fake connection error for tests")
-
-
-class UnconnectableOphydAsyncDevice(OphydV2Device):
-    async def connect(
-        self,
-        mock: bool | LazyMock = False,
-        timeout: float = DEFAULT_TIMEOUT,
-        force_reconnect: bool = False,
-    ) -> None:
-        raise RuntimeError(f"{self.name}: fake connection error for tests")
-
-
-def device_results(
-    ophyd_async_happy_devices: int = 0,
-    ophyd_async_failures: int = 0,
-    ophyd_happy_devices: int = 0,
-    ophyd_failures: int = 0,
-) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
-    devices = {
-        **{
-            f"ophyd_async_happy_device_{i}": OphydV2Device(
-                name=f"ophyd_async_happy_device_{i}"
-            )
-            for i in range(ophyd_async_happy_devices)
-        },
-        **{
-            f"ophyd_happy_device_{i}": OphydV1Device(name=f"ophyd_happy_device_{i}")
-            for i in range(ophyd_happy_devices)
-        },
-    }
-    exceptions: dict[str, Exception] = {
-        **{
-            f"ophyd_async_failed_device_{i}": TimeoutError()
-            for i in range(ophyd_async_failures)
-        },
-        **{f"ophyd_failed_device_{i}": TimeoutError() for i in range(ophyd_failures)},
-    }
-    return devices, exceptions
 
 
 def test_cli_sets_beamline_environment_variable(runner: CliRunner):
@@ -120,31 +88,15 @@ def test_cli_connect_in_sim_mode(runner: CliRunner):
 @pytest.mark.parametrize(
     "devices,expected_connections",
     [
-        # Ophyd-Async Only
         (device_results(ophyd_async_happy_devices=6), 6),
         (device_results(ophyd_async_happy_devices=3, ophyd_async_failures=3), 3),
         (device_results(ophyd_async_happy_devices=2, ophyd_async_failures=2), 2),
         (device_results(ophyd_async_failures=3), 0),
-        # Ophyd Only
-        (device_results(ophyd_happy_devices=6), 6),
-        (device_results(ophyd_happy_devices=3, ophyd_failures=3), 3),
-        (device_results(ophyd_happy_devices=2, ophyd_failures=2), 2),
-        (device_results(ophyd_failures=3), 0),
-        # Mixture
-        (
-            device_results(
-                ophyd_happy_devices=1,
-                ophyd_failures=1,
-                ophyd_async_happy_devices=1,
-                ophyd_async_failures=1,
-            ),
-            2,
-        ),
     ],
 )
 def test_cli_connect_reports_correct_number_of_connected_devices(
     runner: CliRunner,
-    devices: tuple[dict[str, AnyDevice], dict[str, Exception]],
+    devices: tuple[dict[str, Device], dict[str, Exception]],
     expected_connections: int,
 ):
     result = _mock_connect(
@@ -160,28 +112,15 @@ def test_cli_connect_reports_correct_number_of_connected_devices(
 @pytest.mark.parametrize(
     "devices",
     [
-        # Ophyd-Async Only
         device_results(ophyd_async_failures=6),
         device_results(ophyd_async_happy_devices=3, ophyd_async_failures=3),
         device_results(ophyd_async_failures=3),
         device_results(ophyd_async_happy_devices=2, ophyd_async_failures=2),
-        # Ophyd Only
-        device_results(ophyd_failures=6),
-        device_results(ophyd_happy_devices=3, ophyd_failures=3),
-        device_results(ophyd_failures=3),
-        device_results(ophyd_happy_devices=2, ophyd_failures=2),
-        # Mixture
-        device_results(
-            ophyd_happy_devices=1,
-            ophyd_failures=1,
-            ophyd_async_happy_devices=1,
-            ophyd_async_failures=1,
-        ),
     ],
 )
 def test_cli_connect_when_devices_error(
     runner: CliRunner,
-    devices: tuple[dict[str, AnyDevice], dict[str, Exception]],
+    devices: tuple[dict[str, Device], dict[str, Exception]],
 ):
     with pytest.raises(NotConnectedError):
         _mock_connect(
@@ -238,7 +177,7 @@ def test_device_manager_init(runner: CliRunner, mock: bool, timeout: float):
 def _mock_connect(
     *args,
     runner: CliRunner,
-    devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = ({}, {}),
+    devices: tuple[dict[str, Device], dict[str, Exception]] = ({}, {}),
     catch_exceptions: bool = False,
 ) -> Result:
     with patch(

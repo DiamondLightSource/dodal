@@ -10,7 +10,6 @@ from typing import TypedDict
 
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
-from ophyd.log import logger as ophyd_logger
 
 LOGGER = logging.getLogger("Dodal")
 # Temporarily duplicated https://github.com/bluesky/ophyd-async/issues/550
@@ -232,7 +231,7 @@ def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
     Only required if dodal is NOT managed by BlueAPI.
 
     """
-    for logger in [ophyd_logger, bluesky_logger, ophyd_async_logger]:
+    for logger in [bluesky_logger, ophyd_async_logger]:
         logger.parent = parent_logger
         logger.setLevel(logging.DEBUG)
 

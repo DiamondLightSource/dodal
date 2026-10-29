@@ -10,7 +10,6 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
@@ -35,13 +34,6 @@ from dodal.devices.fast_grid_scan import (
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
-
-
-def discard_status(st: Status | DeviceStatus):
-    try:
-        st.wait(0.01)
-    except BaseException:
-        pass
 
 
 @pytest.fixture
