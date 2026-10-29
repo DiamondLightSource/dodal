@@ -3,6 +3,7 @@ from dodal.devices.beamlines.i05_shared import (
     APPLE_KNOT_EXCLUSION_ZONES,
     Grating,
     M3MJ6Mirror,
+    PolynomCompoundMotors,
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
@@ -111,3 +112,21 @@ def energy(
     id_energy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     return BeamEnergy(id_energy=id_energy, mono=pgm.energy)
+
+
+@devices.factory
+def m1mj6_pitch(
+    m1: XYZPitchYawRollStage, m3mj6: XYZPiezoSwitchingMirror
+) -> PolynomCompoundMotors:
+    return PolynomCompoundMotors(
+        master=m1.pitch, slave=m3mj6.x, offset=6.75958, step=-0.0104762
+    )
+
+
+@devices.factory
+def m1es_pitch(
+    m1mj6_pitch: PolynomCompoundMotors, m3mj6: XYZPiezoSwitchingMirror
+) -> PolynomCompoundMotors:
+    return PolynomCompoundMotors(
+        master=m1mj6_pitch, slave=m3mj6.pitch, offset=5005, step=0.27
+    )
