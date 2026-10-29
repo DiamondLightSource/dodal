@@ -12,21 +12,21 @@ from dodal.devices.beamlines.i05_shared import PolynomCompoundMotors
 @pytest.fixture
 async def x_motor() -> Motor:
     async with init_devices(mock=True):
-        x_motor = Motor("")
+        x_motor = Motor("TEST:X")
     return x_motor
 
 
 @pytest.fixture
 async def y_motor() -> Motor:
     async with init_devices(mock=True):
-        y_motor = Motor("")
+        y_motor = Motor("TEST:Y")
     return y_motor
 
 
 @pytest.fixture
 async def z_motor() -> Motor:
     async with init_devices(mock=True):
-        z_motor = Motor("")
+        z_motor = Motor("TEST:Z")
     return z_motor
 
 
@@ -110,9 +110,7 @@ async def test_compound_read(compound: PolynomCompoundMotors):
     )
 
 
-async def test_compound_move(
-    compound: PolynomCompoundMotors,
-):
+async def test_compound_move(compound: PolynomCompoundMotors):
     new_position = 10.0
     offset = 1.0
     step = 2.0

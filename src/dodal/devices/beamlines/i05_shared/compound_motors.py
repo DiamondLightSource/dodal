@@ -28,17 +28,21 @@ class PolyCompoundMotorMovableLogic(MovableLogic):
     step: SignalR[float]
     square: SignalR[float]
 
+    def _calc_slave_pos(
+        self, new_pos: float, offset: float, step: float, square: float
+    ) -> float:
+        return offset + step * new_pos + square * new_pos**2
+
     async def move(self, new_position: float, timeout: TimeoutCalculator) -> None:
         offset, step, square = await asyncio.gather(
             self.offset.get_value(),
             self.step.get_value(),
             self.square.get_value(),
         )
-        slave_position = offset + step * new_position + square * new_position**2
-
-        await asyncio.gather(
-            self.master.set(new_position), self.slave.set(slave_position)
+        slave_pos = self._calc_slave_pos(
+            new_pos=new_position, offset=offset, step=step, square=square
         )
+        await asyncio.gather(self.master.set(new_position), self.slave.set(slave_pos))
 
     async def stop(self) -> None:
         await asyncio.gather(self.master.stop(), self.slave.stop())
