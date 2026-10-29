@@ -79,7 +79,7 @@ class PolynomCompoundMovable(
             self.step = soft_signal_rw(float, initial_value=step)
             self.square = soft_signal_rw(float, initial_value=square)
 
-            # Allow user to see what the device is configured as.
+            # Allow user to see what the master and slaves devices are configured as.
             self.master_name = derived_signal_r(
                 self._read_master_name, dummy=self.offset
             )
