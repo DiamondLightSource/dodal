@@ -27,7 +27,7 @@ from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-"""AKA HR branch line."""
+"""AKA HR (High-Resolution) branch line."""
 
 BL = get_beamline_name("i05")
 PREFIX = BeamlinePrefix(BL)
