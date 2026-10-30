@@ -1,3 +1,5 @@
+from os import environ
+
 from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.epics.adsimdetector import SimDetector
 
@@ -9,7 +11,10 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
 BL = "adsim"
-PREFIX = BeamlinePrefix("t01")
+# $BEAMLINE is always "adsim" here (set by the dodal CLI), so it can't carry the
+# PV prefix too - use a dedicated var to point this module at a different rig,
+# e.g. ADSIM_PREFIX=t11 for BL11T instead of the default BL01T.
+PREFIX = BeamlinePrefix(environ.get("ADSIM_PREFIX", "t01"))
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
