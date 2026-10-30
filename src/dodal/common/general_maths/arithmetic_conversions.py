@@ -3,7 +3,7 @@
 from numpy.polynomial import polynomial
 from pydantic import StrictFloat, validate_call
 
-from dodal.common.general_maths.interval import FloatInterval
+from dodal.common.general_maths.interval import ClosedInterval, DirectedSegment
 
 
 @validate_call
@@ -127,29 +127,63 @@ def get_straight_line_y(
     _y = polynomial.polyval(x, _coefficients)
     return float(_y)
 
+INTERPOLATION_FRACTIONAL_RANGE = ClosedInterval(lower=0.0, upper=1.0)
 
 @validate_call
-def parametric_position(
-    interval: FloatInterval,
+def parametrised_value(
+    normalising_directed_segment: DirectedSegment,
     parametric_fraction: StrictFloat,
     strictly_interpolation=True,
 ) -> float:
-    if strictly_interpolation and (
-        parametric_fraction < 0.0 or parametric_fraction > 1.0
-    ):
+    """Select, using a parametric fraction, one point off a linear mapping, taking start and scale from an interval.
+
+    Args:
+        segment: Directed segment representing directional unit distance, with a defined start.
+        parametric_fraction: The governing parameter which selects where along (or outside) the interval to select.
+        strictly_interpolation: If True causes errors to be raised when the fraction is outside 0 to 1.
+
+    Returns:
+        A value interpolated / extrapolated away from the segment's start.
+
+    Note:
+        Results from negative input fractions can be counter-intuitive.
+
+    Example:
+        A directed segment from +10 to +12, using a fraction of +0.5 will result in +11.
+        The same directed segment (with strict set to False) converts fractions of 0, +1, -1 into +10, +12 and +8 respectively.
+    """
+    if strictly_interpolation and parametric_fraction not in INTERPOLATION_FRACTIONAL_RANGE:
         raise ValueError(
             "Cannot strictly interpolate for parameterised position outside interval"
         )
     return get_straight_line_y(
-        line_offset=interval.lower, line_gradient=interval.span, x=parametric_fraction
+        line_offset=normalising_directed_segment.start,
+        line_gradient=normalising_directed_segment.span,
+        x=parametric_fraction
     )
 
 
 @validate_call
-def parametric_fraction(interval: FloatInterval, value: StrictFloat) -> float:
-    reciprocal_of_span = 1.0 / interval.span
+def parametric_fraction(normalising_directed_segment: DirectedSegment, value: StrictFloat) -> float:
+    """Find the equivalent fractional (normalised) distance along an interval of any real value.
+
+    Args:
+        normalising_directed_segment: Directed unit displacement, from a defined start.
+        value: The real to convert.
+
+    Returns:
+        A fraction after reverse interpolating / extrapolating the fraction away from the interval's lower bound.
+
+    Note:
+        The results for values below the interval's lower endpoint can be counter-intuitive.
+
+    Example:
+        An interval from +10 to +12, a value of +11 corresponds to a fractional output of +0.5.
+        The same interval converts values of -6, +10, +20 into -8.0, 0.0 and +5.0 respectively.
+    """
+    reciprocal_of_span = 1.0 / normalising_directed_segment.span
     return get_straight_line_y(
-        line_offset=-reciprocal_of_span * interval.lower,
+        line_offset=-reciprocal_of_span * normalising_directed_segment.start,
         line_gradient=reciprocal_of_span,
         x=value,
     )

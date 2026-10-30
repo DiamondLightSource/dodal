@@ -16,9 +16,9 @@ from dodal.common.general_maths.arithmetic_conversions import (
     convert_percentage_to_factor,
     get_straight_line_y,
     parametric_fraction,
-    parametric_position,
+    parametrised_value,
 )
-from dodal.common.general_maths.interval import FloatInterval
+from dodal.common.general_maths.interval import DirectedSegment, FloatInterval
 from tests.common.general_maths.operator_inversion_pairing import (
     OperatorInversionPairing,
 )
@@ -156,25 +156,34 @@ def test_reciprocal_function_pairs_nest_consistent_with_identity(
     ALL_CONCRETE_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
-    "interpolation_fraction, lower, upper, expected_result",
+    "interpolation_fraction, start, end, expected_result",
     [
         (0.1, 10, 20, 11),
+        (0.2, 20, 10, 18),
+        (0.1, 20.0, 10.0, 19.0),
         (0.5, -8.4, 8.4, 0),
         (0.75, -20, 60, 40),
         (0.9, 10, 91, 82.9),
+        (0.3, 8.4, -8.4, 3.36),
         (0.2, -200.0, -100.0, -180.0),
+        (0.5, 8.1, -8.1, 0),
     ],
 )
 def test_all_interval_types_strictly_interpolate_correctly(
     interval_cls: type[FloatInterval],
     interpolation_fraction: float,
-    lower: float,
-    upper: float,
+    start: float,
+    end: float,
     expected_result: float,
 ) -> None:
-    interval = interval_cls(lower=lower, upper=upper)
-    assert parametric_position(
-        interval=interval, parametric_fraction=interpolation_fraction
+    segment = DirectedSegment.create(
+        start=start,
+        end=end,
+        interval_cls=interval_cls
+    )
+    assert parametrised_value(
+        normalising_directed_segment=segment,
+        parametric_fraction=interpolation_fraction,
     ) == pytest.approx(expected_result)
 
 
@@ -183,7 +192,7 @@ def test_all_interval_types_strictly_interpolate_correctly(
     ALL_CONCRETE_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
-    "lower, upper, expected_results",
+    "start, end, expected_results",
     [
         (10, 20, [-38, -10, 10, 12.5, 20, 35, 78, 1020]),
         (-8.4, 8.4, [-89.04, -42, -8.4, -4.2, 8.4, 33.6, 105.84, 1688.4]),
@@ -194,17 +203,21 @@ def test_all_interval_types_strictly_interpolate_correctly(
 )
 def test_all_interval_types_parametrically_convert_correctly(
     interval_cls: type[FloatInterval],
-    lower: float,
-    upper: float,
+    start: float,
+    end: float,
     expected_results: list[float],
 ) -> None:
     interpolation_fractions = (-4.8, -2, 0, 0.25, 1, 2.5, 6.8, 101)
-    interval = interval_cls(lower=lower, upper=upper)
+    segment = DirectedSegment.create(
+        start=start,
+        end=end,
+        interval_cls=interval_cls
+    )
     for expected, fraction in zip(
         expected_results, interpolation_fractions, strict=True
     ):
-        assert parametric_position(
-            interval=interval,
+        assert parametrised_value(
+            normalising_directed_segment=segment,
             parametric_fraction=fraction,
             strictly_interpolation=False,
         ) == pytest.approx(expected)
@@ -245,8 +258,8 @@ def test_all_interval_types_parametrically_convert_correctly(
 def test_that_reverse_parametrising_value_relative_to_interval_produces_correct_parametric_fraction(
     value: float, expected_interval_fraction: float, interval_cls: type[FloatInterval]
 ) -> None:
-    interval = interval_cls(lower=-50, upper=50)
-    f = parametric_fraction(interval=interval, value=value)
+    segment = DirectedSegment.create(start=-50, end=50, interval_cls=interval_cls)
+    f = parametric_fraction(normalising_directed_segment=segment, value=value)
     assert f == pytest.approx(expected_interval_fraction)
 
 
@@ -383,13 +396,27 @@ def test_straight_line_calculator_raises_error_with_bad_gradient(
     "interval_cls",
     ALL_CONCRETE_INTERVAL_TYPES,
 )
-@pytest.mark.parametrize("extraneous", [-48.9, -4, -0.001, 1.02, 58, 9012.723])
+@pytest.mark.parametrize("extraneous", [-48.9, -6, -0.001, 1.02, 58, 9012.723])
+@pytest.mark.parametrize("start,end", [
+    (-3.82, 59.52,),
+    ( -3, -4),
+    (99, 77,),
+    (-200.9423, -11.4,),
+    (-11.4, -256.12,),
+])
 def test_that_all_interval_types_refuse_to_extrapolate_when_strictly_interpolating(
-    interval_cls: type[FloatInterval], extraneous: float
+    interval_cls: type[FloatInterval], extraneous: float, start: float, end: float,
 ) -> None:
-    interval = interval_cls(lower=-3.82, upper=59.52)
+    segment = DirectedSegment.create(
+        start=start,
+        end=end,
+        interval_cls=interval_cls
+    )
     with pytest.raises(ValueError):
-        parametric_position(interval=interval, parametric_fraction=extraneous)
+        parametrised_value(
+            normalising_directed_segment=segment,
+            parametric_fraction=extraneous
+        )
 
 
 @pytest.mark.parametrize(
@@ -407,15 +434,27 @@ def test_that_all_interval_types_refuse_to_extrapolate_when_strictly_interpolati
     "interval_cls",
     ALL_CONCRETE_INTERVAL_TYPES,
 )
+@pytest.mark.parametrize(
+    "start,end",
+    [
+        (-3.82, 59.52,),
+        ( -3, -4),
+        (99, 77,),
+        (-200.9423, -11.4,),
+        (-11.4, -256.12,),
+    ]
+)
 def test_that_error_raised_when_parametrising_interval_with_non_numerical_fraction(
     non_numerical_input: Any,
     strictly_interpolation: bool,
     interval_cls: type[FloatInterval],
+    start: float,
+    end: float
 ) -> None:
-    interval = interval_cls(lower=-3.82, upper=59.52)
+    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
     with pytest.raises(ValueError):
-        parametric_position(
-            interval=interval,
+        parametrised_value(
+            normalising_directed_segment=segment,
             parametric_fraction=non_numerical_input,
             strictly_interpolation=strictly_interpolation,
         )
@@ -429,17 +468,33 @@ def test_that_error_raised_when_parametrising_interval_with_non_numerical_fracti
     "interval_cls",
     ALL_CONCRETE_INTERVAL_TYPES,
 )
+@pytest.mark.parametrize(
+    "start,end",
+    [
+        (-3.82, 59.52,),
+        ( -3, -4),
+        (99, 77,),
+        (-200.9423, -11.4,),
+        (-11.4, -256.12,),
+    ]
+)
 def test_that_error_raised_when_reverse_parametrising_non_numerical_value_relative_to_interval(
-    non_numerical_input: Any, interval_cls: type[FloatInterval]
+    non_numerical_input: Any,
+    interval_cls: type[FloatInterval],
+    start: float,
+    end: float
 ) -> None:
-    interval = interval_cls(lower=0, upper=40)
+    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
     with pytest.raises(ValueError):
-        parametric_fraction(interval=interval, value=non_numerical_input)
+        parametric_fraction(
+            normalising_directed_segment=segment,
+            value=non_numerical_input
+        )
 
 
 @pytest.mark.parametrize(
-    "non_interval_input",
-    NON_NUMERICAL_EXAMPLES,
+    "interval_cls",
+    ALL_CONCRETE_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "strictly_interpolation",
@@ -448,13 +503,39 @@ def test_that_error_raised_when_reverse_parametrising_non_numerical_value_relati
         False,
     ),
 )
-def test_that_error_raised_when_parametrising_non_valid_interval(
-    non_interval_input: Any,
+def test_that_error_raised_when_parametrising_intervals_instead_of_segments(
+    interval_cls: type[FloatInterval],
+    strictly_interpolation: bool,
+) -> None:
+    interval_rather_than_required_segment: Any = interval_cls(
+        lower=-45.2,
+        upper=23.6
+    )
+    with pytest.raises(ValueError):
+        parametrised_value(
+            normalising_directed_segment=interval_rather_than_required_segment,
+            parametric_fraction=0.435,
+            strictly_interpolation=strictly_interpolation,
+        )
+
+@pytest.mark.parametrize(
+    "non_segment_input",
+    NON_NUMERICAL_EXAMPLES
+)
+@pytest.mark.parametrize(
+    "strictly_interpolation",
+    (
+        True,
+        False,
+    ),
+)
+def test_that_error_raised_when_parametrising_non_valid_segment(
+    non_segment_input: Any,
     strictly_interpolation: bool,
 ) -> None:
     with pytest.raises(ValueError):
-        parametric_position(
-            interval=non_interval_input,
+        parametrised_value(
+            normalising_directed_segment=non_segment_input,
             parametric_fraction=0.435,
             strictly_interpolation=strictly_interpolation,
         )

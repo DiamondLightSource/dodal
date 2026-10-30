@@ -1,10 +1,12 @@
+from abc import ABC, abstractmethod
 from functools import cached_property
 from numbers import Real
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, StrictFloat, model_validator
 
 
-class FloatInterval(BaseModel):
+class FloatInterval(BaseModel, ABC):
     """Base class for immutable range of floating point values.
 
     N.B. Specific sub classes cover different end point types ( closed / open ).
@@ -86,3 +88,70 @@ class OpenClosedInterval(FloatInterval):
 
     def _includes(self, x: float) -> bool:
         return self.lower < x <= self.upper
+
+TInterval = TypeVar("TInterval",bound=FloatInterval)
+
+# class DirectedSegment[TInterval: FloatInterval](BaseModel, ABC): - after 3.11 drops
+class DirectedSegment(BaseModel, ABC, Generic[TInterval]):
+    """Abstract base for directed segments Generic against FloatInterval type.
+
+    Attributes:
+        interval_cls type of the backing FloatInterval
+        start: the begin of the directional segment
+        end: the end of the directional segment
+
+    Note:
+        Unlike intervals, the start can be less than the end
+    """
+    interval_cls: type[TInterval]
+
+    start: StrictFloat
+    end: StrictFloat
+
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
+
+    @cached_property
+    def _interval(self) -> TInterval:
+        """Backing interval decouples from the orientation of the Segment."""
+        return self.interval_cls(
+            lower=min(self.start, self.end),
+            upper=max(self.start, self.end)
+        )
+
+    @property
+    @abstractmethod
+    def span(self) -> float:
+        ...
+
+    def __contains__(self, item: object) -> bool:
+        return item in self._interval
+
+    @classmethod
+    def create(
+        cls,
+        start: float,
+        end: float,
+        interval_cls: type[TInterval] = ClosedInterval
+    ) -> "DirectedSegment[TInterval]":
+        if start == end:
+            raise ValueError("Cannot form a zero-length segment as the directionality is ambiguous.")
+        segment_cls = (
+            _InvertedSegment
+            if start > end
+            else _ForwardSegment
+        )
+        return segment_cls(start=start, end=end, interval_cls=interval_cls)
+
+
+class _ForwardSegment(DirectedSegment[TInterval], Generic[TInterval]):
+
+    @property
+    def span(self) -> float:
+        return self._interval.span
+
+
+class _InvertedSegment(DirectedSegment[TInterval], Generic[TInterval]):
+
+    @property
+    def span(self) -> float:
+        return -self._interval.span
