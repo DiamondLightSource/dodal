@@ -35,6 +35,21 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
+def m1() -> XYZPitchYawRollStage:
+    """Collimating mirror."""
+    return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+
+
+@devices.factory()
+def m3mj6() -> XYZPiezoSwitchingMirror:
+    """Switching mirror."""
+    return XYZPiezoSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
+        mirrors=M3MJ6Mirror,
+    )
+
+
+@devices.factory()
 def pgm() -> PlaneGratingMonochromator:
     return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
@@ -63,21 +78,6 @@ def id(
 ) -> Apple2[UndulatorLockedPhaseAxes]:
     """i05 insertion device."""
     return Apple2[UndulatorLockedPhaseAxes](id_gap=id_gap, id_phase=id_phase)
-
-
-@devices.factory()
-def m1() -> XYZPitchYawRollStage:
-    """Collimating mirror."""
-    return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
-
-
-@devices.factory()
-def m3mj6() -> XYZPiezoSwitchingMirror:
-    """Switching mirror."""
-    return XYZPiezoSwitchingMirror(
-        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
-        mirrors=M3MJ6Mirror,
-    )
 
 
 @devices.factory()
