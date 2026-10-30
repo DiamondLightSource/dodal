@@ -4,8 +4,13 @@ from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05 import I05Goniometer
-from dodal.devices.beamlines.i05_shared import LensMode, M4M5Mirror, PassEnergy
-from dodal.devices.common_mirror import XYZSwitchingMirror
+from dodal.devices.beamlines.i05_shared import (
+    LensMode,
+    M4M5Mirror,
+    PassEnergy,
+    PolynomialCompoundMovable,
+)
+from dodal.devices.common_mirror import XYZPiezoSwitchingMirror, XYZSwitchingMirror
 from dodal.devices.electron_analyser.base import (
     ElectronAnalyserTriggerLogic,
     RegionLogic,
@@ -16,10 +21,13 @@ from dodal.devices.electron_analyser.mbs import (
     MbsDetector,
 )
 from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
+
+"""AKA HR branch line."""
 
 BL = get_beamline_name("i05")
 PREFIX = BeamlinePrefix(BL)
@@ -30,12 +38,37 @@ devices = DeviceManager()
 devices.include(i05_shared_devices)
 
 
-# will connect after https://jira.diamond.ac.uk/browse/I05-731
-@devices.factory(skip=True)
+@devices.factory()
 def m4m5() -> XYZSwitchingMirror:
     return XYZSwitchingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
         mirrors=M4M5Mirror,
+    )
+
+
+# Same as i05-1, but with different configured values
+@devices.factory
+def m1m3_pitch(
+    m1: XYZPitchYawRollStage, m3mj6: XYZPiezoSwitchingMirror
+) -> PolynomialCompoundMovable:
+    """Moves m1 rotations and mj6 displacements in linear dependence to maintain the
+    beam on mj6 centre.
+    """
+    return PolynomialCompoundMovable(
+        master=m1.pitch, slave=m3mj6.x, offset=5.75, step=-0.0104762
+    )
+
+
+# Same as i05-1, but with different configured values
+@devices.factory
+def m1es_pitch(
+    m1mj6_pitch: PolynomialCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
+) -> PolynomialCompoundMovable:
+    """Moves m1 rotations, mj6 displacements and rotations in linear dependence on m1
+    to maintain the beam on the exit slit.
+    """
+    return PolynomialCompoundMovable(
+        master=m1mj6_pitch, slave=m3mj6.pitch, offset=4490, step=0.47
     )
 
 
