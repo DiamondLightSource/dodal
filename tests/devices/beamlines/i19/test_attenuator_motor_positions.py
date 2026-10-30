@@ -154,6 +154,206 @@ def test_that_distinct_attenuator_motor_positions_are_not_spuriously_considered_
 
 
 @pytest.mark.parametrize(
+    "wedge_positions, wheel_indexes",
+    [
+        ({"x": 2.3}, {},),
+        ({"y": 93.3}, {"w": 4}),
+        ({"x": 93.3, "y": 15.5}, {"w": 4}),
+    ],
+)
+def test_that_attenuator_motor_positions_equal_within_motor_tolerance_are_recognised_as_such(
+    wedge_positions: dict[str, float],
+    wheel_indexes: dict[str, int],
+)  -> None:
+    primary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+        discrete_indices=wheel_indexes,
+    )
+    example_motor_tolerances={
+        "x":2.0e-4,
+        "y":4.0e-3,
+    }
+    # prepare offset copy half a motor tolerance margin out
+    fractional_shift = 0.5
+    secondary_wedge_positions = {}
+    for axis in example_motor_tolerances:
+        if axis in wedge_positions:
+            offset = fractional_shift * example_motor_tolerances[axis]
+            secondary_wedge_positions[axis] = (
+                wedge_positions[axis] + offset
+            )
+    secondary = AttenuatorMotorPositions(
+        continuous_positions=secondary_wedge_positions,
+        discrete_indices=wheel_indexes
+    )
+    assert primary.is_practically_equal_to(
+        other=secondary,
+        motor_tolerances=example_motor_tolerances
+    )
+
+@pytest.mark.parametrize(
+    "wedge_positions",
+    [
+        ({"x": 2.3}),
+        ({"y": 93.3}),
+        ({"x": 93.3, "y": 15.5}),
+    ],
+)
+def test_that_attenuator_motor_positions_differing_in_wheel_indices_are_deemed_practically_equal_if_one_lacks_wheel_indices(
+    wedge_positions: dict[str, float],
+)  -> None:
+    primary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+    )
+    example_motor_tolerances={
+        "x":1.0e-5,
+        "y":1.0e-5,
+    }
+    # prepare offset copy half a motor tolerance margin out
+    secondary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+        discrete_indices={ "w": 2 }
+    )
+    assert primary.is_practically_equal_to(
+        other=secondary,
+        motor_tolerances=example_motor_tolerances
+    )
+
+
+@pytest.mark.parametrize(
+    "wedge_positions, wheel_indexes",
+    [
+        ({"x": 2.3}, {"w": 1},),
+        ({"y": 93.3}, {"w": 5}),
+        ({"x": 93.3, "y": 15.5}, {"w": 4}),
+    ],
+)
+def test_that_attenuator_motor_positions_differing_in_wheel_indices_are_not_deemed_practically_equal(
+    wedge_positions: dict[str, float],
+    wheel_indexes: dict[str, int],
+)  -> None:
+    primary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+        discrete_indices=wheel_indexes,
+    )
+    example_motor_tolerances={
+        "x":2.0e-4,
+        "y":4.0e-3,
+    }
+    # prepare offset copy half a motor tolerance margin out
+    secondary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+        discrete_indices={ "w": 2 }
+    )
+    assert not primary.is_practically_equal_to(
+        other=secondary,
+        motor_tolerances=example_motor_tolerances
+    )
+
+
+@pytest.mark.parametrize(
+    "wedge_positions, wheel_indexes",
+    [
+        ({"x": 2.3}, {},),
+        ({"y": 93.3}, {"w": 4}),
+        ({"x": 93.3, "y": 15.5}, {"w": 4}),
+    ],
+)
+def test_that_attenuator_motor_positions_distinct_beyond_motor_tolerance_are_recognised_as_such(
+    wedge_positions: dict[str, float],
+    wheel_indexes: dict[str, int],
+)  -> None:
+    primary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+        discrete_indices=wheel_indexes,
+    )
+    example_motor_tolerances={
+        "x":2.0e-4,
+        "y":4.0e-3,
+    }
+    # prepare offset copy outside margins of motor tolerance
+    fractional_shift = -1.2
+    secondary_wedge_positions = {}
+    for axis in example_motor_tolerances:
+        if axis in wedge_positions:
+            offset = fractional_shift * example_motor_tolerances[axis]
+            secondary_wedge_positions[axis] = (
+                wedge_positions[axis] + offset
+            )
+    secondary = AttenuatorMotorPositions(
+        continuous_positions=secondary_wedge_positions,
+        discrete_indices=wheel_indexes
+    )
+    assert not primary.is_practically_equal_to(
+        other=secondary,
+        motor_tolerances=example_motor_tolerances
+    )
+
+@pytest.mark.parametrize(
+    "wedge_positions, wheel_indexes",
+    [
+        ({"y": 10.0}, {},),
+        ({"x": -9.8}, {"w": 3}),
+        ({"x": 0.1, "y": 15.5}, {"w": 2}),
+    ],
+)
+def test_that_attenuator_motor_positions_equal_within_fallback_motor_tolerance_are_recognised_as_such(
+    wedge_positions: dict[str, float],
+    wheel_indexes: dict[str, int],
+)  -> None:
+    primary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+        discrete_indices=wheel_indexes,
+    )
+    secondary_wedge_positions = {}
+    for axis in ("x","y",):
+        if axis in wedge_positions:
+            offset = 5.0e-5  # 20 microns absolute shift
+            secondary_wedge_positions[axis] = (
+                wedge_positions[axis] + offset
+            )
+    secondary = AttenuatorMotorPositions(
+        continuous_positions=secondary_wedge_positions,
+        discrete_indices=wheel_indexes
+    )
+    assert primary.is_practically_equal_to(
+        other=secondary
+    )
+
+@pytest.mark.parametrize(
+    "wedge_positions, wheel_indexes",
+    [
+        ({"y": 10.0}, {},),
+        ({"x": -9.8}, {"w": 3}),
+        ({"x": 0.1, "y": 15.5}, {"w": 2}),
+    ],
+)
+def test_that_attenuator_motor_positions_equal_within_adjusted_fallback_motor_tolerance_are_recognised_as_such(
+    wedge_positions: dict[str, float],
+    wheel_indexes: dict[str, int],
+)  -> None:
+    primary = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions,
+        discrete_indices=wheel_indexes,
+    )
+    secondary_wedge_positions = {}
+    for axis in ("x","y",):
+        if axis in wedge_positions:
+            offset = 0.02  # 20 microns absolute shift
+            secondary_wedge_positions[axis] = (
+                wedge_positions[axis] + offset
+            )
+    secondary = AttenuatorMotorPositions(
+        continuous_positions=secondary_wedge_positions,
+        discrete_indices=wheel_indexes
+    )
+    assert primary.is_practically_equal_to(
+        other=secondary,
+        fallback_motor_tolerance=0.04
+    )
+
+
+@pytest.mark.parametrize(
     "wedge_positions1, wheel_indexes1, wedge_positions2, wheel_indexes2, expected_merged_positions",
     [
         ({"y": 93.3}, {"w": 4}, {"x": 72.1}, {}, {"w": 4, "x": 72.1, "y": 93.3}),
