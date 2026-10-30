@@ -60,7 +60,7 @@ async def poly_compound(x_motor: Motor, y_motor: Motor) -> PolynomialCompoundMov
     return poly_compound
 
 
-async def test_config_includes(poly_compound: PolynomialCompoundMovable):
+async def test_poly_compound_config_includes(poly_compound: PolynomialCompoundMovable):
     await assert_configuration(
         poly_compound,
         {
