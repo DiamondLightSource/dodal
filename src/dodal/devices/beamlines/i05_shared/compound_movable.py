@@ -13,6 +13,7 @@ from ophyd_async.core import (
     TimeoutCalculator,
     default_mock_class,
     derived_signal_r,
+    soft_signal_r_and_setter,
     soft_signal_rw,
 )
 
@@ -72,8 +73,8 @@ class PolynomCompoundMovable(
         square: float = 0.0,
         name: str = "",
     ) -> None:
-        self.master_ref = Reference(master)
-        self.slave_ref = Reference(slave)
+        self._master_ref = Reference(master)
+        self._slave_ref = Reference(slave)
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Writable soft signals for configuring the polynomial.
@@ -82,10 +83,8 @@ class PolynomCompoundMovable(
             self.square = soft_signal_rw(float, initial_value=square)
 
             # Allow user to see what the master and slaves devices are configured as.
-            self.master_name = derived_signal_r(
-                self._read_master_name, dummy=self.offset
-            )
-            self.slave_name = derived_signal_r(self._read_slave_name, dummy=self.offset)
+            self.master_name, _ = soft_signal_r_and_setter(str, master.name)
+            self.slave_name, _ = soft_signal_r_and_setter(str, slave.name)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # This is needed so that StandardMovable doesn't rename the master readback
@@ -104,25 +103,13 @@ class PolynomCompoundMovable(
     def _readback_read(self, readback: float) -> float:
         return readback
 
-    # https://github.com/bluesky/ophyd-async/issues/1471
-    # Providing dummy signal needed due to bug.
-    def _read_master_name(self, dummy: float) -> str:
-        """Sync configured master device name."""
-        return self.master_ref().name
-
-    # https://github.com/bluesky/ophyd-async/issues/1471
-    # Providing dummy signal needed due to bug.
-    def _read_slave_name(self, dummy: float) -> str:
-        """Sync configured slave device name."""
-        return self.slave_ref().name
-
     @cached_property
     def movable_logic(self) -> MovableLogic:
         return PolynomCompoundMovableLogic(
             readback=self.readback,
-            setpoint=self.master_ref().movable_logic.setpoint,
-            master=self.master_ref(),
-            slave=self.slave_ref(),
+            setpoint=self._master_ref().movable_logic.setpoint,
+            master=self._master_ref(),
+            slave=self._slave_ref(),
             offset=self.offset,
             step=self.step,
             square=self.square,
