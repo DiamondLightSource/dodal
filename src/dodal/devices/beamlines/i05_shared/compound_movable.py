@@ -19,7 +19,7 @@ from ophyd_async.core import (
 
 
 @dataclass
-class PolynomCompoundMovableLogic(MovableLogic[float]):
+class PolynomialCompoundMovableLogic(MovableLogic[float]):
     master: StandardMovable[float]
     slave: StandardMovable[float]
     offset: SignalR[float]
@@ -49,7 +49,7 @@ class PolynomCompoundMovableLogic(MovableLogic[float]):
 
 
 @default_mock_class(DeviceMock)
-class PolynomCompoundMovable(
+class PolynomialCompoundMovable(
     StandardMovable[float],
     StandardReadable,
 ):
@@ -73,9 +73,6 @@ class PolynomCompoundMovable(
         square: float = 0.0,
         name: str = "",
     ) -> None:
-        self._master_ref = Reference(master)
-        self._slave_ref = Reference(slave)
-
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Writable soft signals for configuring the polynomial.
             self.offset = soft_signal_rw(float, initial_value=offset)
@@ -92,12 +89,12 @@ class PolynomCompoundMovable(
             self.readback = derived_signal_r(
                 self._readback_read, readback=master.movable_logic.readback
             )
-
         # Expose readbacks as readables
         self.add_readables(
             [master.movable_logic.readback, slave.movable_logic.readback]
         )
-
+        self._master_ref = Reference(master)
+        self._slave_ref = Reference(slave)
         super().__init__(name=name)
 
     def _readback_read(self, readback: float) -> float:
@@ -105,7 +102,7 @@ class PolynomCompoundMovable(
 
     @cached_property
     def movable_logic(self) -> MovableLogic:
-        return PolynomCompoundMovableLogic(
+        return PolynomialCompoundMovableLogic(
             readback=self.readback,
             setpoint=self._master_ref().movable_logic.setpoint,
             master=self._master_ref(),

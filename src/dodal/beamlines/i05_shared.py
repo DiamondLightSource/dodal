@@ -3,7 +3,7 @@ from dodal.devices.beamlines.i05_shared import (
     APPLE_KNOT_EXCLUSION_ZONES,
     Grating,
     M3MJ6Mirror,
-    PolynomCompoundMovable,
+    PolynomialCompoundMovable,
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
@@ -53,17 +53,17 @@ def m3mj6() -> XYZPiezoSwitchingMirror:
 @devices.factory
 def m1mj6_pitch(
     m1: XYZPitchYawRollStage, m3mj6: XYZPiezoSwitchingMirror
-) -> PolynomCompoundMovable:
-    return PolynomCompoundMovable(
+) -> PolynomialCompoundMovable:
+    return PolynomialCompoundMovable(
         master=m1.pitch, slave=m3mj6.x, offset=6.75958, step=-0.0104762
     )
 
 
 @devices.factory
 def m1es_pitch(
-    m1mj6_pitch: PolynomCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
-) -> PolynomCompoundMovable:
-    return PolynomCompoundMovable(
+    m1mj6_pitch: PolynomialCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
+) -> PolynomialCompoundMovable:
+    return PolynomialCompoundMovable(
         master=m1mj6_pitch, slave=m3mj6.pitch, offset=5005, step=0.27
     )
 
