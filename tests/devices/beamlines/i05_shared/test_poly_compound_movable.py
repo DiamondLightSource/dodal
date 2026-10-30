@@ -23,13 +23,6 @@ async def y_motor() -> Motor:
     return y_motor
 
 
-@pytest.fixture
-async def z_motor() -> Motor:
-    async with init_devices(mock=True):
-        z_motor = Motor("TEST:Z")
-    return z_motor
-
-
 async def test_poly_compound_initial_values_are_set(x_motor: Motor, y_motor: Motor):
     expected_offset = 2
     expected_step = 1.5
