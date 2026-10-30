@@ -51,8 +51,8 @@ def m4m5() -> XYZSwitchingMirror:
 def m1m3_pitch(
     m1: XYZPitchYawRollStage, m3mj6: XYZPiezoSwitchingMirror
 ) -> PolynomialCompoundMovable:
-    """Moves m1 rotations and mj6 displacements in linear dependence to maintain the
-    beam on mj6 centre.
+    """Virtual mirror - moves m1 rotations and mj6 displacements in linear dependence
+    to maintain the beam on mj6 centre.
     """
     return PolynomialCompoundMovable(
         master=m1.pitch, slave=m3mj6.x, offset=5.75, step=-0.0104762
@@ -64,8 +64,8 @@ def m1m3_pitch(
 def m1es_pitch(
     m1mj6_pitch: PolynomialCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
 ) -> PolynomialCompoundMovable:
-    """Moves m1 rotations, mj6 displacements and rotations in linear dependence on m1
-    to maintain the beam on the exit slit.
+    """Virtual mirror - Moves m1 rotations, mj6 displacements and rotations in linear
+    dependence on m1 to maintain the beam on the exit slit.
     """
     return PolynomialCompoundMovable(
         master=m1mj6_pitch, slave=m3mj6.pitch, offset=4490, step=0.47
