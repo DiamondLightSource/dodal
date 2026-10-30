@@ -62,13 +62,13 @@ def m1m3_pitch(
 # Same as i05-1, but with different configured values
 @devices.factory
 def m1es_pitch(
-    m1mj6_pitch: PolynomialCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
+    m1m3_pitch: PolynomialCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
 ) -> PolynomialCompoundMovable:
     """Virtual mirror - Moves m1 rotations, mj6 displacements and rotations in linear
     dependence on m1 to maintain the beam on the exit slit.
     """
     return PolynomialCompoundMovable(
-        master=m1mj6_pitch, slave=m3mj6.pitch, offset=4490, step=0.47
+        master=m1m3_pitch, slave=m3mj6.pitch, offset=4490, step=0.47
     )
 
 
