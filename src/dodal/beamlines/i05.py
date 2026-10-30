@@ -64,7 +64,7 @@ def m1m3_pitch(
 def m1es_pitch(
     m1m3_pitch: PolynomialCompoundMovable, m3mj6: XYZPiezoSwitchingMirror
 ) -> PolynomialCompoundMovable:
-    """Virtual mirror - Moves m1 rotations, mj6 displacements and rotations in linear
+    """Virtual mirror - moves m1 rotations, m3 displacements and rotations in linear
     dependence on m1 to maintain the beam on the exit slit.
     """
     return PolynomialCompoundMovable(
