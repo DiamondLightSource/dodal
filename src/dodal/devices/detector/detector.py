@@ -2,7 +2,7 @@ from enum import Enum, auto
 from functools import cached_property
 from pathlib import Path
 
-from pydantic import BaseModel, Field, field_serializer, field_validator
+from pydantic import BaseModel, field_serializer, field_validator
 
 from dodal.common.beamlines.beamline_utils import get_config_client
 from dodal.devices.detector.det_dim_constants import (
@@ -15,7 +15,6 @@ from dodal.devices.detector.det_dist_to_beam_converter import (
     Axis,
     DetectorDistanceToBeamXYConverter,
 )
-from dodal.utils import get_run_number
 
 
 class TriggerMode(Enum):
@@ -46,25 +45,17 @@ class DetectorParams(BaseModel):
     num_triggers: int
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
-    override_run_number: int | None = Field(default=None, alias="run_number")
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
     enable_dev_shm: bool = (
         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
     )
+    run_number: int
 
     @cached_property
     def beam_xy_converter(self) -> DetectorDistanceToBeamXYConverter:
         return DetectorDistanceToBeamXYConverter(
             self.det_dist_to_beam_converter_path, get_config_client()
-        )
-
-    @property
-    def run_number(self) -> int:
-        return (
-            get_run_number(self.directory, self.prefix)
-            if self.override_run_number is None
-            else self.override_run_number
         )
 
     @field_serializer("detector_size_constants")
