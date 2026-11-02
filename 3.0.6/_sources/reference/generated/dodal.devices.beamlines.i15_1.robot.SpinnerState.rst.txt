@@ -1,0 +1,78 @@
+dodal.devices.beamlines.i15\_1.robot.SpinnerState
+=================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.robot
+
+.. autoclass:: SpinnerState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SpinnerState.ON
+      
+      
+      ~SpinnerState.OFF
+      
+   
+   

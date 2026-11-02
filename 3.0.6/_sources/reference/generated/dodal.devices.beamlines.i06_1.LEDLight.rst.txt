@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i06\_1.LEDLight
+=======================================
+
+.. currentmodule:: dodal.devices.beamlines.i06_1
+
+.. autoclass:: LEDLight
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

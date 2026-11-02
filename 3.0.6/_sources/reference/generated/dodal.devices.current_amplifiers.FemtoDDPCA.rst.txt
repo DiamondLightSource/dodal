@@ -1,0 +1,58 @@
+dodal.devices.current\_amplifiers.FemtoDDPCA
+============================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: FemtoDDPCA
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~FemtoDDPCA.decrease_gain
+      
+      
+      
+      
+      ~FemtoDDPCA.get_gain
+      
+      
+      ~FemtoDDPCA.get_lowerlimit
+      
+      
+      ~FemtoDDPCA.get_upperlimit
+      
+      
+      ~FemtoDDPCA.increase_gain
+      
+      
+      
+      
+      ~FemtoDDPCA.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

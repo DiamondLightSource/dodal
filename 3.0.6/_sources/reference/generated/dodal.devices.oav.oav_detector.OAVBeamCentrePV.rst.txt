@@ -1,0 +1,46 @@
+dodal.devices.oav.oav\_detector.OAVBeamCentrePV
+===============================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: OAVBeamCentrePV
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~OAVBeamCentrePV.beam_centre_i
+      
+      
+      ~OAVBeamCentrePV.beam_centre_j
+      
+   
+   

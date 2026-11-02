@@ -1,0 +1,52 @@
+dodal.devices.beamlines.i15\_1.robot.Robot
+==========================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.robot
+
+.. autoclass:: Robot
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Robot.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Robot.PROGRAM_COMPLETED_TIMEOUT
+      
+      
+      ~Robot.PROGRAM_LOADED_TIMEOUT
+      
+      
+      ~Robot.PROGRAM_STARTED_RUNNING_TIMEOUT
+      
+      
+      
+      
+      
+   
+   

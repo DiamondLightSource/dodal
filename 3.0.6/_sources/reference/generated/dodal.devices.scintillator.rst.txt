@@ -1,0 +1,37 @@
+dodal.devices.scintillator
+==========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~scintillator.InOut
+   ~scintillator.Scintillator
+
+
+
+
+.. automodule:: dodal.devices.scintillator
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

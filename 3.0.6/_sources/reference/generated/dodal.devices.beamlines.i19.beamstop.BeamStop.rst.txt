@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i19.beamstop.BeamStop
+=============================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.beamstop
+
+.. autoclass:: BeamStop
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BeamStop.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,66 @@
+dodal.devices.electron\_analyser.mbs.MbsSequence
+================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.mbs
+
+.. autoclass:: MbsSequence
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~MbsSequence.from_xml
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~MbsSequence.model_config
+      
+      
+      
+      
+      
+      ~MbsSequence.regions
+      
+   
+   

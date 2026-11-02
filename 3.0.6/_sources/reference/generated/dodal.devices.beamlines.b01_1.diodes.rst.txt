@@ -1,0 +1,36 @@
+dodal.devices.beamlines.b01\_1.diodes
+=====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.b01_1
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~diodes.RGBDiodes
+
+
+
+
+.. automodule:: dodal.devices.beamlines.b01_1.diodes
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

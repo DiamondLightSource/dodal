@@ -1,0 +1,46 @@
+dodal.devices.interlocks.EnumPLCInterlock
+=========================================
+
+.. currentmodule:: dodal.devices.interlocks
+
+.. autoclass:: EnumPLCInterlock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~EnumPLCInterlock.status
+      
+      
+      ~EnumPLCInterlock.bl_prefix
+      
+   
+   

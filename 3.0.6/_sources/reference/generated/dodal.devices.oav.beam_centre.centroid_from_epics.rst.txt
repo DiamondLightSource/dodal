@@ -1,0 +1,38 @@
+dodal.devices.oav.beam\_centre.centroid\_from\_epics
+====================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.oav.beam_centre
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~centroid_from_epics.CentroidFromEpics
+   ~centroid_from_epics.CentroidSettings
+   ~centroid_from_epics.ColourMode
+
+
+
+
+.. automodule:: dodal.devices.oav.beam_centre.centroid_from_epics
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

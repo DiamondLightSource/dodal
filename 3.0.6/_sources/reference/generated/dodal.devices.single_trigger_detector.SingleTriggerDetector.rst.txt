@@ -1,0 +1,45 @@
+dodal.devices.single\_trigger\_detector.SingleTriggerDetector
+=============================================================
+
+.. currentmodule:: dodal.devices.single_trigger_detector
+
+.. autoclass:: SingleTriggerDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SingleTriggerDetector.stage
+      
+      
+      ~SingleTriggerDetector.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

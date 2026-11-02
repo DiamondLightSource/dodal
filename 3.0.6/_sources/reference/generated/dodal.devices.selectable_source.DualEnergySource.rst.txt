@@ -1,0 +1,40 @@
+dodal.devices.selectable\_source.DualEnergySource
+=================================================
+
+.. currentmodule:: dodal.devices.selectable_source
+
+.. autoclass:: DualEnergySource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
