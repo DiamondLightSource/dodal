@@ -1,0 +1,35 @@
+dodal.devices.beamlines.i21.XYZTiltAzimuthMotorPositions
+========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i21
+
+.. autoclass:: XYZTiltAzimuthMotorPositions
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~XYZTiltAzimuthMotorPositions.x
+      
+      
+      ~XYZTiltAzimuthMotorPositions.y
+      
+      
+      ~XYZTiltAzimuthMotorPositions.z
+      
+      
+      ~XYZTiltAzimuthMotorPositions.tilt_deg
+      
+      
+      ~XYZTiltAzimuthMotorPositions.azimuth_deg
+      
+   
+   

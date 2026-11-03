@@ -1,0 +1,26 @@
+dodal.devices.zebra.zebra.ArmDemand
+===================================
+
+.. currentmodule:: dodal.devices.zebra.zebra
+
+.. autoclass:: ArmDemand
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ArmDemand.ARM
+      
+      
+      ~ArmDemand.DISARM
+      
+   
+   

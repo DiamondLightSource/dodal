@@ -1,0 +1,36 @@
+dodal.devices.fluorescence\_detector\_motion
+============================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~fluorescence_detector_motion.FluorescenceDetector
+
+
+
+
+.. automodule:: dodal.devices.fluorescence_detector_motion
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,84 @@
+dodal.devices.beamlines.i05\_shared.M4M5Mirror
+==============================================
+
+.. currentmodule:: dodal.devices.beamlines.i05_shared
+
+.. autoclass:: M4M5Mirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~M4M5Mirror.UNKNOWN
+      
+      
+      ~M4M5Mirror.M4
+      
+      
+      ~M4M5Mirror.M5
+      
+      
+      ~M4M5Mirror.REFERENCE
+      
+   
+   

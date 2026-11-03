@@ -1,0 +1,40 @@
+dodal.devices.motors.XYPitchStage
+=================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYPitchStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,47 @@
+dodal.devices.oav.beam\_centre.centroid\_from\_epics.CentroidFromEpics
+======================================================================
+
+.. currentmodule:: dodal.devices.oav.beam_centre.centroid_from_epics
+
+.. autoclass:: CentroidFromEpics
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~CentroidFromEpics.prepare
+      
+      
+      
+      
+      
+      ~CentroidFromEpics.stage
+      
+      
+      ~CentroidFromEpics.unstage
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

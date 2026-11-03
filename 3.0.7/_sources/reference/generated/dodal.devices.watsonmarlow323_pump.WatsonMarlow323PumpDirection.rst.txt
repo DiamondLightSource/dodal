@@ -1,0 +1,78 @@
+dodal.devices.watsonmarlow323\_pump.WatsonMarlow323PumpDirection
+================================================================
+
+.. currentmodule:: dodal.devices.watsonmarlow323_pump
+
+.. autoclass:: WatsonMarlow323PumpDirection
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~WatsonMarlow323PumpDirection.CLOCKWISE
+      
+      
+      ~WatsonMarlow323PumpDirection.COUNTER_CLOCKWISE
+      
+   
+   

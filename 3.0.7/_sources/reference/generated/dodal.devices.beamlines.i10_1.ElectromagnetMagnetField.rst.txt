@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i10\_1.ElectromagnetMagnetField
+=======================================================
+
+.. currentmodule:: dodal.devices.beamlines.i10_1
+
+.. autoclass:: ElectromagnetMagnetField
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

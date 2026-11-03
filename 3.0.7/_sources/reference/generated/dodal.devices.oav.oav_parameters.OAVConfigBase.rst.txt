@@ -1,0 +1,23 @@
+dodal.devices.oav.oav\_parameters.OAVConfigBase
+===============================================
+
+.. currentmodule:: dodal.devices.oav.oav_parameters
+
+.. autoclass:: OAVConfigBase
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~OAVConfigBase.get_parameters
+      
+   
+   
+
+   
+   
+   

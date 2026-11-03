@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i06\_1.DiffractionDichroism
+===================================================
+
+.. currentmodule:: dodal.devices.beamlines.i06_1
+
+.. autoclass:: DiffractionDichroism
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

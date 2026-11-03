@@ -1,0 +1,46 @@
+dodal.devices.beamlines.i15\_1.hexapod.Hexapod
+==============================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.hexapod
+
+.. autoclass:: Hexapod
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Hexapod.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Hexapod.DEFERRED_MOVE_SET_TIMEOUT
+      
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,53 @@
+dodal.devices.insertion\_device.UndulatorLockedPhaseAxes
+========================================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: UndulatorLockedPhaseAxes
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~UndulatorLockedPhaseAxes.check_value
+      
+      
+      
+      
+      
+      
+      ~UndulatorLockedPhaseAxes.get_timeout
+      
+      
+      
+      
+      
+      ~UndulatorLockedPhaseAxes.set_demand_positions
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~UndulatorLockedPhaseAxes.set_move
+      
+   
+   

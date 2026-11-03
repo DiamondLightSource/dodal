@@ -1,0 +1,81 @@
+dodal.devices.pressure\_jump\_cell.ValveControlRequest
+======================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: ValveControlRequest
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ValveControlRequest.OPEN
+      
+      
+      ~ValveControlRequest.CLOSE
+      
+      
+      ~ValveControlRequest.RESET
+      
+   
+   

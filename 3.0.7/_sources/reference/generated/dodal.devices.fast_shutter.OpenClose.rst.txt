@@ -1,0 +1,78 @@
+dodal.devices.fast\_shutter.OpenClose
+=====================================
+
+.. currentmodule:: dodal.devices.fast_shutter
+
+.. autoclass:: OpenClose
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~OpenClose.OPEN
+      
+      
+      ~OpenClose.CLOSE
+      
+   
+   
