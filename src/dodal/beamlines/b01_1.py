@@ -4,7 +4,6 @@ from pathlib import Path
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import ADWriterFactory, NDROIStatIO
-from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -12,7 +11,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import DRV_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.b01_1.diodes import RGBDiodes
-from dodal.devices.motors import XYZStage
+from dodal.devices.motors import XThetaStage, XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -122,11 +121,11 @@ def tomography_detector(path_provider: PathProvider) -> AravisDetector:
 
 
 @devices.factory()
-def sample_stage() -> XYZStage:
-    """An XYZ stage holding the sample.
+def spectroscopy_stage() -> XYZStage:
+    """An XYZ stage holding the spectroscopy sample.
 
     Returns:
-        XYZStage: The XYZ sample stage device.
+        XYZStage: The XYZ spectroscopy stage device.
     """
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-SPEC-01:",
@@ -134,12 +133,19 @@ def sample_stage() -> XYZStage:
 
 
 @devices.factory()
-def tomography_stage() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-TOMO-01:THETA")
+def tomography_stage() -> XThetaStage:
+    """An XTheta stage holding the tomography sample.
+
+    Returns:
+        XThetaStage: The XTheta tomography stage device.
+    """
+    return XThetaStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-TOMO-01:", x_infix="H", theta_infix="THETA"
+    )
 
 
 @devices.factory()
-def pmac(sample_stage: XYZStage, tomography_stage) -> PmacIO:
+def pmac(spectroscopy_stage: XYZStage, tomography_stage: XThetaStage) -> PmacIO:
     """A Power PMAC.
 
     Returns:
@@ -147,6 +153,11 @@ def pmac(sample_stage: XYZStage, tomography_stage) -> PmacIO:
     """
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
-        raw_motors=[sample_stage.y, sample_stage.x, tomography_stage],
+        raw_motors=[
+            spectroscopy_stage.y,
+            spectroscopy_stage.x,
+            tomography_stage.x,
+            tomography_stage.theta,
+        ],
         coord_nums=[1],
     )
