@@ -1,9 +1,15 @@
 from functools import cache
 from pathlib import Path
 
-from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.core import (
+    PathProvider,
+    SignalRW,
+    StaticPathProvider,
+    UUIDFilenameProvider,
+)
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import ADWriterFactory, NDROIStatIO
+from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -141,6 +147,20 @@ def tomography_stage() -> XThetaStage:
     """
     return XThetaStage(
         prefix=f"{PREFIX.beamline_prefix}-MO-TOMO-01:", x_infix="H", theta_infix="THETA"
+    )
+
+
+@devices.factory()
+def tomography_flip_mirror() -> SignalRW[bool]:
+    """The position of the tomography branch flip mirror.
+
+    Returns:
+        SignalRW[bool]: The flip mirror position signal.
+    """
+    return epics_signal_rw(
+        bool,
+        read_pv=f"{PREFIX.beamline_prefix}-EA-FLIP-03:Position_RBV",
+        write_pv=f"{PREFIX.beamline_prefix}-EA-FLIP-03:Position",
     )
 
 
