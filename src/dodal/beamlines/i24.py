@@ -29,6 +29,7 @@ from dodal.devices.interlocks import PSSInterlock
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.robot import BartRobot
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -169,13 +170,20 @@ def jungfrau(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
         AutoMaxIncrementingPathProvider(path_provider),
-        "CAM:",
+        # The commissioning IOC serves its FastCS PVs at the root prefix, with no
+        # CAM: sub-prefix as the Odin-backed jungfrau has.
+        "",
     )
 
 
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
+
+
+@devices.factory()
+def robot() -> BartRobot:
+    return BartRobot(f"{PREFIX.beamline_prefix}-MO-ROBOT-01:")
 
 
 @devices.factory()
