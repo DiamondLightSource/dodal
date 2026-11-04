@@ -4,6 +4,7 @@ from .apple_knot_constants import (
     energy_to_phase_converter,
 )
 from .compound_motors import PolynomCompoundMotors
+from .diagnostics import DiagnosticDet
 from .enums import Grating, LensMode, M3MJ6Mirror, M4M5Mirror, Mj7j8Mirror, PassEnergy
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "energy_to_phase_converter",
     "APPLE_KNOT_EXCLUSION_ZONES",
     "PassEnergy",
+    "DiagnosticDet",
 ]
