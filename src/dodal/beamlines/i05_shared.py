@@ -45,12 +45,12 @@ def pgm() -> PlaneGratingMonochromator:
 
 @devices.factory()
 def d7_current() -> DiagnosticDet:
-    return DiagnosticDet(prefix="BL05I-DI-PHDGN-03:DET:")
+    return DiagnosticDet(prefix="BL05I-DI-PHDGN-07:DET:")
 
 
 @devices.factory()
-def d3_curren() -> DiagnosticDet:
-    return DiagnosticDet(prefix="BL05I-DI-PHDGN-07:DET:")
+def d3_current() -> DiagnosticDet:
+    return DiagnosticDet(prefix="BL05I-DI-PHDGN-03:DET:")
 
 
 @devices.factory()
