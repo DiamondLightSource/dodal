@@ -1,9 +1,9 @@
-from bluesky.protocols import Movable
+from bluesky.protocols import Locatable, Location
 from ophyd_async.core import AsyncStatus, StandardReadable, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_rw
 
 
-class FlipMirror(StandardReadable, Movable[bool]):
+class FlipMirror(StandardReadable, Locatable[bool]):
     """A mirror mounted on a Thorlabs MFF two-position flip mount, controlled via FastCS.
 
     Attributes:
@@ -20,3 +20,6 @@ class FlipMirror(StandardReadable, Movable[bool]):
     @AsyncStatus.wrap
     async def set(self, value: bool):
         await self.position.set(value)
+
+    async def locate(self) -> Location[bool]:
+        return await self.position.locate()

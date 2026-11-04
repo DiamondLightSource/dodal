@@ -30,3 +30,9 @@ async def test_flip_mirror_can_be_moved(
     set_mock_value(flip_mirror.position, not value)
     run_engine(bps.mv(flip_mirror, value))
     assert await flip_mirror.position.get_value() is value
+
+
+@pytest.mark.parametrize("value", [True, False])
+async def test_flip_mirror_locates_position(flip_mirror: FlipMirror, value: bool):
+    await flip_mirror.set(value)
+    assert await flip_mirror.locate() == {"setpoint": value, "readback": value}
