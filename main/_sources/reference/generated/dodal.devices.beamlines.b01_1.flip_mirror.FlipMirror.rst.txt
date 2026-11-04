@@ -1,0 +1,46 @@
+dodal.devices.beamlines.b01\_1.flip\_mirror.FlipMirror
+======================================================
+
+.. currentmodule:: dodal.devices.beamlines.b01_1.flip_mirror
+
+.. autoclass:: FlipMirror
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~FlipMirror.locate
+      
+      
+      
+      
+      ~FlipMirror.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

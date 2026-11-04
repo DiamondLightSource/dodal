@@ -10,6 +10,7 @@ dodal.devices.beamlines.b01\_1
    :recursive:
 
    dodal.devices.beamlines.b01_1.diodes
+   dodal.devices.beamlines.b01_1.flip_mirror
 
 
 
