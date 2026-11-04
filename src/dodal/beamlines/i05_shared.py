@@ -50,7 +50,7 @@ def d7() -> DiagnosticDet:
 
 @devices.factory()
 def d3() -> DiagnosticDet:
-    return DiagnosticDet(prefix="BL05I-DI-PHDGN-03:DET:")
+    return DiagnosticDet(prefix="BL05I-DI-PHDGN-07:DET:")
 
 
 @devices.factory()
