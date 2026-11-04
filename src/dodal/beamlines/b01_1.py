@@ -11,6 +11,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import DRV_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.b01_1.diodes import RGBDiodes
+from dodal.devices.beamlines.b01_1.flip_mirror import FlipMirror
 from dodal.devices.motors import XThetaStage, XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -142,6 +143,36 @@ def tomography_stage() -> XThetaStage:
     return XThetaStage(
         prefix=f"{PREFIX.beamline_prefix}-MO-TOMO-01:", x_infix="H", theta_infix="THETA"
     )
+
+
+@devices.factory()
+def light_source_flip_mirror() -> FlipMirror:
+    """The light source flip mirror.
+
+    Returns:
+        FlipMirror: The light source flip mirror device.
+    """
+    return FlipMirror(f"{PREFIX.beamline_prefix}-EA-FLIP-01:")
+
+
+@devices.factory()
+def spectroscopy_flip_mirror() -> FlipMirror:
+    """The spectroscopy branch flip mirror.
+
+    Returns:
+        FlipMirror: The spectroscopy flip mirror device.
+    """
+    return FlipMirror(f"{PREFIX.beamline_prefix}-EA-FLIP-02:")
+
+
+@devices.factory()
+def tomography_flip_mirror() -> FlipMirror:
+    """The tomography branch flip mirror.
+
+    Returns:
+        FlipMirror: The tomography flip mirror device.
+    """
+    return FlipMirror(f"{PREFIX.beamline_prefix}-EA-FLIP-03:")
 
 
 @devices.factory()
