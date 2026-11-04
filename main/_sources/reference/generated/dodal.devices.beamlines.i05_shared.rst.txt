@@ -19,8 +19,8 @@ dodal.devices.beamlines.i05\_shared
    ~i05_shared.Mj7j8Mirror
    ~i05_shared.M3MJ6Mirror
    ~i05_shared.M4M5Mirror
-   ~i05_shared.PolynomCompoundMotors
    ~i05_shared.PassEnergy
+   ~i05_shared.PolynomialCompoundMovable
 
 
 
