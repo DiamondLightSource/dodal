@@ -186,6 +186,7 @@ class Robot(StandardReadable, Movable[SampleLocation]):
 
         if wait_for_program_running:
             # Can cause a race condition for very short programs
+            # See https://jira.diamond.ac.uk/browse/I15_1-1698
             await wait_for_value(
                 self.program_running,
                 ProgramRunning.PROGRAM_RUNNING,
