@@ -23,7 +23,7 @@ from ophyd_async.core import (
 
 from dodal.beamlines import adsim
 from dodal.devices.motors import XThetaStage
-from dodal.plans import count
+from dodal.plans.scans import count
 
 """System tests that can be run against the containerised IOCs from epics-containers:
 https://github.com/epics-containers/example-services

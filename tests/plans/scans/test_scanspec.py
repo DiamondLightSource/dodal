@@ -16,7 +16,7 @@ from ophyd_async.core import StandardDetector
 from ophyd_async.sim import SimMotor
 from scanspec.specs import Line
 
-from dodal.plans import spec_scan
+from dodal.plans.scans import spec_scan
 
 
 @pytest.fixture
@@ -37,7 +37,7 @@ def documents_from_expected_shape(
 
     docs: dict[str, list[Document]] = {}
     run_engine(
-        spec_scan({det}, spec),  # type: ignore
+        spec_scan([det], spec),
         lambda name, doc: docs.setdefault(name, []).append(doc),
     )
     return docs
