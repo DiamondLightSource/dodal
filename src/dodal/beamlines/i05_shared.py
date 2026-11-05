@@ -1,12 +1,12 @@
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05_shared import (
     APPLE_KNOT_EXCLUSION_ZONES,
-    DiagnosticDet,
     Grating,
     M3MJ6Mirror,
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
+from dodal.devices.beamlines.i05_shared.diagnostics import BekhoffADC
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.insertion_device import (
     Apple2,
@@ -58,14 +58,20 @@ def pgm() -> PlaneGratingMonochromator:
     )
 
 
-@devices.factory()
-def d7() -> DiagnosticDet:
-    return DiagnosticDet(prefix="BL05I-DI-PHDGN-07:DET:")
+# @devices.factory()
+# def d7() -> DiagnosticDet:
+#     return DiagnosticDet(prefix="BL05I-DI-PHDGN-07:DET:")
 
 
 @devices.factory()
-def d3() -> DiagnosticDet:
-    return DiagnosticDet(prefix="BL05I-DI-PHDGN-03:DET:")
+def d7() -> BekhoffADC:
+    # return DiagnosticDet(prefix="BL05I-DI-PHDGN-07:DET:")
+    return BekhoffADC(prefix=f"{PREFIX.beamline_prefix}-DI-PHDGN-07:DET:IAV:ADC1_")
+
+
+# @devices.factory()
+# def d3() -> DiagnosticDet:
+#     return DiagnosticDet(prefix="BL05I-DI-PHDGN-03:DET:")
 
 
 @devices.factory()
