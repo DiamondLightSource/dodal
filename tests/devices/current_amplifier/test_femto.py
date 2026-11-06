@@ -14,6 +14,7 @@ from ophyd_async.core import (
     init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.current_amplifiers import (
     CountState,
@@ -185,6 +186,21 @@ async def test_femto_decrease_gain_returns_false_when_not_successful(
     assert not await mock_femto.decrease_gain()
     assert await mock_femto.gain.get_value() == min_gain
     sleep.assert_any_await(mock_femto._raise_timetable["SEN_1"].value)
+
+
+async def test_femto_read(mock_femto: FemtoDDPCA):
+    # First value from Femto3xxGainTable is default.
+    await assert_reading(mock_femto, {"mock_femto-gain": partial_reading(10000)})
+
+
+async def test_femto_configutation(mock_femto: FemtoDDPCA):
+    await assert_configuration(
+        mock_femto,
+        {
+            "mock_femto-lowerlimit": partial_reading(0.68),
+            "mock_femto-upperlimit": partial_reading(8.8),
+        },
+    )
 
 
 @pytest.mark.parametrize(

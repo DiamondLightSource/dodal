@@ -8,6 +8,7 @@ from bluesky.plan_stubs import abs_set, prepare
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
+from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.current_amplifiers import (
     SR570,
@@ -206,6 +207,21 @@ async def test_sr570_decrease_gain_returns_false_when_not_successful(
 
     assert await mock_sr570.gain.get_value() == pytest.approx(min_gain)
     assert sleep.call_count == 2
+
+
+async def test_sr570_read(mock_sr570: SR570):
+    # First value from SR570_GAIN_CONFIGURATION is default.
+    await assert_reading(mock_sr570, {"mock_sr570-gain": partial_reading(1000)})
+
+
+async def test_sr570_configutation(mock_sr570: SR570):
+    await assert_configuration(
+        mock_sr570,
+        {
+            "mock_sr570-lowerlimit": partial_reading(0.4),
+            "mock_sr570-upperlimit": partial_reading(4.7),
+        },
+    )
 
 
 @pytest.mark.parametrize(

@@ -121,9 +121,8 @@ class SR570(CurrentAmp):
         self.timeout = timeout
         self._raise_timetable = raise_timetable
 
-        with self.add_children_as_readables():
-            self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
-            self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
+        self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
+        self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.gain = derived_signal_rw(
