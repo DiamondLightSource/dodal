@@ -1,28 +1,59 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 
-from bluesky.protocols import (
-    Movable,
-    Preparable,
+from bluesky.protocols import Movable, Preparable, Triggerable
+from ophyd_async.core import (
+    AsyncStatus,
+    SignalR,
+    SignalRW,
+    StandardReadable,
+    StandardReadableFormat,
+    soft_signal_rw,
 )
-from ophyd_async.core import AsyncStatus, StandardReadable
 
 
-class CurrentAmp(ABC, StandardReadable, Movable):
-    """Base class for current amplifier, it contains the minimal functionality
-    a current amplifier needs:
+class CurrentAmp(ABC, StandardReadable, Movable[float]):
+    """Abstract base class for current amplifier devices.
+
+    Provides a common interface for current amplifiers, including gain
+    adjustment and configurable output voltage thresholds for automatic
+    gain optimisation.
 
     Attributes:
-        gain_conversion_table (Enum): The conversion table between current
-            and gain setting.
-    """  # noqa D415
+        gain (SignalRW[float]): Current-to-voltage sensitivity in V/A.
+        upperlimit (SignalRW[float]): Upper output voltage threshold in V
+            used by automatic gain adjustment.
+        lowerlimit (SignalRW[float]): Lower output voltage threshold in V
+            used by automatic gain adjustment.
+    """
 
-    def __init__(self, gain_conversion_table: type[Enum], name: str = "") -> None:
-        self.gain_conversion_table = gain_conversion_table
+    gain: SignalRW[float]
+
+    def __init__(
+        self,
+        upperlimit: float,
+        lowerlimit: float,
+        name: str = "",
+    ) -> None:
+        """Configuration for the current amplifier.
+
+        Args:
+            upperlimit (float): Upper output voltage threshold in V for automatic
+                gain adjustment.
+            lowerlimit (float): Lower output voltage threshold in V for automatic
+                gain adjustment.
+            name (str): Name of the device (optional).
+        """
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.upperlimit = soft_signal_rw(float, initial_value=upperlimit)
+            self.lowerlimit = soft_signal_rw(float, initial_value=lowerlimit)
         super().__init__(name)
 
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        await self.gain.set(value)
+
     @abstractmethod
-    async def increase_gain(self, value: int = 1) -> None:
+    async def increase_gain(self, value: int = 1) -> bool:
         """Increase gain, increment by 1 by default.
 
         Returns:
@@ -30,31 +61,15 @@ class CurrentAmp(ABC, StandardReadable, Movable):
         """
 
     @abstractmethod
-    async def decrease_gain(self, value: int = 1) -> None:
+    async def decrease_gain(self, value: int = 1) -> bool:
         """Decrease gain, decrement by 1 by default.
 
         Returns:
             bool: True if success.
         """
 
-    @abstractmethod
-    async def get_gain(self) -> Enum:
-        """Get the current gain setting.
 
-        Returns:
-            Enum: The member name of the current gain setting in gain_conversion_table.
-        """
-
-    @abstractmethod
-    async def get_upperlimit(self) -> float:
-        """Get the upper limit of the current amplifier."""
-
-    @abstractmethod
-    async def get_lowerlimit(self) -> float:
-        """Get the lower limit of the current amplifier."""
-
-
-class CurrentAmpCounter(ABC, StandardReadable, Preparable):
+class CurrentAmpCounter(ABC, StandardReadable, Preparable, Triggerable):
     """Base class for current amplifier counter, it contain the minimal implementations
         required for a counter/detector to function with CurrentAmpDet.
 
@@ -62,35 +77,17 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
         count_per_volt (float): The conversion factor between counter output and voltage.
     """
 
-    def __init__(self, count_per_volt: float, name: str = ""):
-        self.count_per_volt = count_per_volt
-        super().__init__(name)
-
-    @abstractmethod
-    async def get_count(self) -> float:
-        """Get count.
-
-        Returns:
-            float: Current count.
-        """
-
-    @abstractmethod
-    async def get_count_per_sec(self) -> float:
-        """Get count per second.
-
-        Returns:
-            float: Current count per second.
-        """
-
-    @abstractmethod
-    async def get_voltage_per_sec(self) -> float:
-        """Get count per second in voltage.
-
-        Returns:
-            float: Current count in volt per second.
-        """
+    current_count: SignalR[float]
+    current_count_per_sec: SignalR[float]
+    current_count_per_volt: SignalR[float]
+    voltage_per_sec: SignalR[float]
 
     @abstractmethod
     @AsyncStatus.wrap
     async def prepare(self, value: float) -> None:
         """Prepare method for setting up the counter."""
+
+    @abstractmethod
+    @AsyncStatus.wrap
+    async def trigger(self) -> None:
+        """Trigger acquisition of detector."""

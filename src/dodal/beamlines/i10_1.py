@@ -10,14 +10,7 @@ from dodal.devices.beamlines.i10_1 import (
     I10JScalerCard,
 )
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
-from dodal.devices.current_amplifiers import (
-    SR570,
-    CurrentAmpDet,
-    Femto3xxGainTable,
-    Femto3xxGainToCurrentTable,
-    Femto3xxRaiseTime,
-    FemtoDDPCA,
-)
+from dodal.devices.current_amplifiers import SR570, CurrentAmpDet, FemtoDDPCA
 from dodal.devices.motors import XYPitchStage
 from dodal.devices.temperature_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
@@ -143,35 +136,17 @@ def em_temperature_controller() -> Lakeshore336:
 
 @devices.factory()
 def hfm_femto_1() -> FemtoDDPCA:
-    return FemtoDDPCA(
-        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-01:",
-        suffix="GAIN",
-        gain_table=Femto3xxGainTable,
-        gain_to_current_table=Femto3xxGainToCurrentTable,
-        raise_timetable=Femto3xxRaiseTime,
-    )
+    return FemtoDDPCA(prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-01:", suffix="GAIN")
 
 
 @devices.factory()
 def hfm_femto_2() -> FemtoDDPCA:
-    return FemtoDDPCA(
-        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-02:",
-        suffix="GAIN",
-        gain_table=Femto3xxGainTable,
-        gain_to_current_table=Femto3xxGainToCurrentTable,
-        raise_timetable=Femto3xxRaiseTime,
-    )
+    return FemtoDDPCA(prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-02:", suffix="GAIN")
 
 
 @devices.factory()
 def hfm_femto3() -> FemtoDDPCA:
-    return FemtoDDPCA(
-        prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-03:",
-        suffix="GAIN",
-        gain_table=Femto3xxGainTable,
-        gain_to_current_table=Femto3xxGainToCurrentTable,
-        raise_timetable=Femto3xxRaiseTime,
-    )
+    return FemtoDDPCA(prefix=f"{PREFIX.beamline_prefix}-EA-IAMP-03:", suffix="GAIN")
 
 
 @devices.factory()
