@@ -6,21 +6,15 @@ import pytest
 from bluesky.plan_stubs import abs_set, prepare
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    callback_on_mock_put,
-    init_devices,
-    set_mock_value,
-)
+from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
 
 from dodal.devices.current_amplifiers import (
     SR570,
     SR570_GAIN_CONFIGURATION,
+    CountState,
     CurrentAmpDet,
     SR570FineGainTable,
     SR570GainTable,
-)
-from dodal.devices.current_amplifiers.struck_scaler_counter import (
-    CountState,
     StruckScaler,
 )
 
