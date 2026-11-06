@@ -1,6 +1,6 @@
 import asyncio
 
-from bluesky.protocols import Preparable, Reading
+from bluesky.protocols import Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -17,7 +17,7 @@ from dodal.devices.current_amplifiers.current_amplifier import (
 from dodal.log import LOGGER
 
 
-class CurrentAmpDet(StandardReadable, Preparable):
+class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     """CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
     the option for automatically changing the CurrentAmp gain to within the optimal
     range. It also converts the currentAmp/counter output back into the detector
@@ -47,21 +47,6 @@ class CurrentAmpDet(StandardReadable, Preparable):
             self.auto_mode = soft_signal_rw(bool, initial_value=True)
         super().__init__(name)
 
-    async def read(self) -> dict[str, Reading]:
-        """Read is modified so that if auto_mode is true it will optimise gain before
-        taking the final reading.
-        """
-        if await self.auto_mode.get_value():
-            LOGGER.info(f"{self.name}-Attempting auto-gain")
-            await self.auto_gain()
-            LOGGER.info(
-                f"{self.name} new gain = {await self.current_amp().gain.get_value()}."
-            )
-
-        current = await self.get_corrected_current()
-        self._set_current(current)
-        return await super().read()
-
     @AsyncStatus.wrap
     async def auto_gain(self) -> None:
         upper_limit, lower_limit = await asyncio.gather(
@@ -81,9 +66,6 @@ class CurrentAmpDet(StandardReadable, Preparable):
                 return
 
             if not changed:
-                # Gain has just been moved to its limit. Acquire a measurement using
-                # the final gain.
-                await self.counter().trigger()
                 return
 
     async def get_corrected_current(self) -> float:
@@ -107,4 +89,16 @@ class CurrentAmpDet(StandardReadable, Preparable):
 
     @AsyncStatus.wrap
     async def prepare(self, value) -> None:
-        await self.counter().prepare(value=value)
+        await self.counter().prepare(value)
+
+    @AsyncStatus.wrap
+    async def trigger(self) -> None:
+        if await self.auto_mode.get_value():
+            LOGGER.info(f"{self.name}-Attempting auto-gain")
+            await self.auto_gain()
+            LOGGER.info(
+                f"{self.name} new gain = {await self.current_amp().gain.get_value()}."
+            )
+        await self.counter().trigger()
+        current = await self.get_corrected_current()
+        self._set_current(current)
