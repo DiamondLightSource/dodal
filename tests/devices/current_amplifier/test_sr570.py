@@ -13,7 +13,6 @@ from ophyd_async.testing import assert_configuration, assert_reading, partial_re
 from dodal.devices.current_amplifiers import (
     SR570,
     SR570_GAIN_CONFIGURATION,
-    CountState,
     CurrentAmpDet,
     SR570FineGainTable,
     SR570GainTable,
@@ -291,12 +290,10 @@ async def test_sr570_struck_scaler_read_with_autogain(
     rbv_mocks.get.side_effect = raw_count
 
     def set_mock_counter():
-        set_mock_value(mock_struck_scaler.trigger_start, CountState.DONE)
         set_mock_value(mock_struck_scaler.current_count, rbv_mocks.get())
 
     callback_on_mock_put(
-        mock_struck_scaler.trigger_start,
-        lambda *_, **__: set_mock_counter(),
+        mock_struck_scaler.trigger_start, lambda *_, **__: set_mock_counter()
     )
 
     run_engine(prepare(mock_sr570_struck_scaler_detector, 1))

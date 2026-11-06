@@ -1,9 +1,15 @@
+import asyncio
+
+from bluesky.protocols import Reading
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceMock,
     StandardReadableFormat,
     StrictEnum,
+    default_mock_class,
     derived_signal_r,
     set_and_wait_for_other_value,
+    set_mock_value,
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -34,6 +40,28 @@ def _voltage_per_sec(
     return current_count_per_sec / current_count_per_volt
 
 
+# ToDo - This should be more standard / easier.
+class MockStruckScaler(DeviceMock["StruckScaler"]):
+    def _on_value(self, value: dict[str, Reading[CountState]]):
+        async def _complete():
+            await asyncio.sleep(0.01)
+            set_mock_value(self._counting, CountState.DONE)
+
+        if value[self._counting.name]["value"]:
+            asyncio.create_task(_complete())
+
+    async def connect(self, device):
+        self._counting = device.trigger_start
+
+        set_mock_value(device.trigger_start, CountState.DONE)
+        # Can't use callback_on_mock_put as this is called before the mock put, we need
+        # to simulate after mock put update. subscribe_reading listeners are stored in
+        # a set, so repeatedly subscribing this bound method is harmless and does not
+        # create duplicate callbacks.
+        device.trigger_start.subscribe_reading(self._on_value)
+
+
+@default_mock_class(MockStruckScaler)
 class StruckScaler(CurrentAmpCounter):
     """StruckScaler is a counting card that records the output signal from a wide
     range of detectors. This class contains the basic control to run the struck scaler
@@ -50,7 +78,7 @@ class StruckScaler(CurrentAmpCounter):
         self,
         prefix: str,
         suffix: str,
-        current_count_per_volt=COUNT_PER_VOLTAGE,
+        current_count_per_volt=100000,
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -90,7 +118,7 @@ class StruckScaler(CurrentAmpCounter):
             set_signal=self.trigger_start,
             set_value=CountState.COUNT,
             match_signal=self.trigger_start,
-            match_value=CountState.COUNT,
+            match_value=CountState.DONE,
         )
 
     @AsyncStatus.wrap
