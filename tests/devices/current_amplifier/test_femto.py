@@ -1,5 +1,6 @@
 import re
 from collections.abc import Mapping
+from enum import Enum
 from unittest import mock
 from unittest.mock import AsyncMock
 
@@ -17,10 +18,24 @@ from ophyd_async.core import (
 from dodal.devices.current_amplifiers import (
     CountState,
     CurrentAmpDet,
-    Femto3xxRaiseTime,
     FemtoDDPCA,
     StruckScaler,
 )
+
+
+class MockFemto3xxRaiseTime(float, Enum):
+    """Mock zero raise time(s) for Femto 3xx current amplifier."""
+
+    SEN_1 = 0.0
+    SEN_2 = 0.0
+    SEN_3 = 0.0
+    SEN_4 = 0.0
+    SEN_5 = 0.0
+    SEN_6 = 0.0
+    SEN_7 = 0.0
+    SEN_8 = 0.0
+    SEN_9 = 0.0
+    SEN_10 = 0.0
 
 
 @pytest.fixture
@@ -28,7 +43,9 @@ async def mock_femto(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain"
 ) -> FemtoDDPCA:
     async with init_devices(mock=True):
-        mock_femto = FemtoDDPCA(prefix=prefix, suffix=suffix)
+        mock_femto = FemtoDDPCA(
+            prefix=prefix, suffix=suffix, raise_timetable=MockFemto3xxRaiseTime
+        )
     return mock_femto
 
 
@@ -100,11 +117,7 @@ async def test_femto_set_fail_out_of_range(
 
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
-    [
-        (1e4, 1, 1e5),
-        (1e6, 2, 1e8),
-        (1e8, 3, 1e11),
-    ],
+    [(1e4, 1, 1e5), (1e6, 2, 1e8), (1e8, 3, 1e11)],
 )
 @mock.patch("asyncio.sleep")
 async def test_femto_increase_gain(
@@ -133,21 +146,14 @@ async def test_femto_increase_gain_returns_false_when_not_successful(
 ):
     max_gain = 1e13
     await mock_femto.set(max_gain)
-
     assert not await mock_femto.increase_gain()
-
     assert await mock_femto.gain.get_value() == max_gain
-
-    sleep.assert_any_await(Femto3xxRaiseTime.SEN_10.value)
+    sleep.assert_any_await(mock_femto._raise_timetable["SEN_10"].value)
 
 
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
-    [
-        (1e9, 2, 1e7),
-        (1e11, 3, 1e8),
-        (1e13, 9, 1e4),
-    ],
+    [(1e9, 2, 1e7), (1e11, 3, 1e8), (1e13, 9, 1e4)],
 )
 @mock.patch("asyncio.sleep")
 async def test_femto_decrease_gain(
@@ -176,11 +182,9 @@ async def test_femto_decrease_gain_returns_false_when_not_successful(
 ):
     min_gain = 1e4
     await mock_femto.set(min_gain)
-
     assert not await mock_femto.decrease_gain()
-
     assert await mock_femto.gain.get_value() == min_gain
-    sleep.assert_any_await(Femto3xxRaiseTime.SEN_1.value)
+    sleep.assert_any_await(mock_femto._raise_timetable["SEN_1"].value)
 
 
 @pytest.mark.parametrize(

@@ -112,6 +112,7 @@ class SR570(CurrentAmp):
         self,
         prefix: str,
         suffix: str = "SENS:SEL",
+        raise_timetable: type[Enum] = SR570RaiseTimeTable,
         upperlimit: float = 4.8,
         lowerlimit: float = 0.4,
         timeout: float = 1,
@@ -122,7 +123,7 @@ class SR570(CurrentAmp):
             self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
 
         self.timeout = timeout
-        self.raise_timetable = SR570RaiseTimeTable
+        self._raise_timetable = raise_timetable
 
         self.gain = derived_signal_rw(
             _gain_to_sensitivity,
@@ -148,7 +149,6 @@ class SR570(CurrentAmp):
             ),
             None,
         )
-
         if configuration is None:
             available = [
                 f"{sensitivity:.0e}"
@@ -161,14 +161,13 @@ class SR570(CurrentAmp):
             )
 
         coarse_gain, fine_gain = configuration
-
         LOGGER.info("%s gain change to %s", self.name, value)
 
         await asyncio.gather(
             self.fine_gain.set(fine_gain, timeout=self.timeout),
             self.coarse_gain.set(coarse_gain, timeout=self.timeout),
         )
-        await asyncio.sleep(self.raise_timetable[coarse_gain.name].value)
+        await asyncio.sleep(self._raise_timetable[coarse_gain.name].value)
 
     async def increase_gain(self, value: int = 3) -> bool:
         current_gain = await self.gain.get_value()

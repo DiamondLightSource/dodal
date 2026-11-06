@@ -20,6 +20,15 @@ from dodal.devices.current_amplifiers import (
 )
 
 
+class MockSR570RaiseTimeTable(float, Enum):
+    """Mock raise time(s) for SR570 current amplifier to speed up test."""
+
+    SEN_1 = 0
+    SEN_2 = 0
+    SEN_3 = 0
+    SEN_4 = 0
+
+
 def sr570_setting_for_gain(
     gain: float,
 ) -> tuple[SR570GainTable, SR570FineGainTable]:
@@ -38,6 +47,7 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
         mock_sr570 = SR570(
             prefix,
             suffix=suffix,
+            raise_timetable=MockSR570RaiseTimeTable,
             upperlimit=4.7,
             lowerlimit=0.4,
         )
@@ -244,15 +254,6 @@ async def test_sr570_struck_scaler_read(
     ] == pytest.approx(expected_current)
 
 
-class MockSR570RaiseTimeTable(float, Enum):
-    """Mock raise time(s) for SR570 current amplifier to speed up test."""
-
-    SEN_1 = 0
-    SEN_2 = 0
-    SEN_3 = 0
-    SEN_4 = 0
-
-
 @pytest.mark.parametrize(
     "gain, raw_count, expected_current",
     [
@@ -274,9 +275,6 @@ async def test_sr570_struck_scaler_read_with_autogain(
     raw_count: list[float],
     expected_current: float,
 ):
-    mock_sr570_struck_scaler_detector.current_amp().raise_timetable = (
-        MockSR570RaiseTimeTable
-    )
     current_amp = mock_sr570_struck_scaler_detector.current_amp()
     await current_amp.set(gain)
 

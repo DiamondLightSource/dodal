@@ -9,7 +9,7 @@ from dodal.log import LOGGER
 
 
 class Femto3xxGainTable(StrictEnum):
-    """These are the sensitivity setting for Femto 3xx current amplifier."""
+    """Sensitivity setting for Femto 3xx current amplifier."""
 
     SEN_1 = "10^4"
     SEN_2 = "10^5"
@@ -24,7 +24,7 @@ class Femto3xxGainTable(StrictEnum):
 
 
 class Femto3xxRaiseTime(float, Enum):
-    """These are the gain dependent raise time(s) for Femto 3xx current amplifier."""
+    """Gain dependent raise time(s) for Femto 3xx current amplifier."""
 
     SEN_1 = 0.8e-3
     SEN_2 = 0.8e-3
@@ -66,6 +66,7 @@ class FemtoDDPCA(CurrentAmp):
         self,
         prefix: str,
         suffix: str,
+        raise_timetable: type[Enum] = Femto3xxRaiseTime,
         upperlimit: float = 8.8,
         lowerlimit: float = 0.68,
         timeout: float = 1,
@@ -73,7 +74,7 @@ class FemtoDDPCA(CurrentAmp):
     ) -> None:
         self.timeout = timeout
         self.gain_configuration = FEMTO3XX_GAIN_CONFIGURATION
-        self.raise_timetable = Femto3xxRaiseTime
+        self._raise_timetable = raise_timetable
 
         self.gain_setting = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
 
@@ -94,7 +95,6 @@ class FemtoDDPCA(CurrentAmp):
             ),
             None,
         )
-
         if gain_setting is None:
             available = [
                 f"{sensitivity:.0e}" for sensitivity in self.gain_configuration.values()
@@ -106,7 +106,7 @@ class FemtoDDPCA(CurrentAmp):
 
         LOGGER.info("%s gain change to %s:%s", self.name, gain_setting.name, value)
         await self.gain_setting.set(gain_setting, timeout=self.timeout)
-        await asyncio.sleep(self.raise_timetable[gain_setting.name].value)
+        await asyncio.sleep(self._raise_timetable[gain_setting.name].value)
 
     async def increase_gain(self, value: int = 1) -> bool:
         current_gain = await self.gain.get_value()
