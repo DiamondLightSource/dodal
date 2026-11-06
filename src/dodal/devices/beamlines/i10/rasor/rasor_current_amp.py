@@ -16,6 +16,6 @@ class RasorSR570(StandardReadable):
     def __init__(self, prefix: str, suffix: str = "SENS:SEL", name: str = ""):
         with self.add_children_as_readables():
             self.ca1 = SR570(prefix + "-04:", suffix=suffix)
-            self.ca2 = SR570(prefix + "-05:")
-            self.ca3 = SR570(prefix + "-06:")
+            self.ca2 = SR570(prefix + "-05:", suffix=suffix)
+            self.ca3 = SR570(prefix + "-06:", suffix=suffix)
         super().__init__(name)
