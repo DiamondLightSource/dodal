@@ -208,15 +208,6 @@ async def test_sr570_decrease_gain_returns_false_when_not_successful(
     assert sleep.call_count == 2
 
 
-# class MockSR570RaiseTimeTable(float, Enum):
-#     """Mock raise time(s) for SR570 current amplifier to speed up test."""
-
-#     SEN_1 = 0
-#     SEN_2 = 0
-#     SEN_3 = 0
-#     SEN_4 = 0
-
-
 @pytest.mark.parametrize(
     "gain, raw_count, expected_current",
     [
