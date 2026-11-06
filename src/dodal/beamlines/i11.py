@@ -27,6 +27,7 @@ from dodal.devices.eurotherm import (
 )
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperature_controller.mercury_itc import MercuryITC
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -157,3 +158,8 @@ def panda(path_provider: PathProvider) -> HDFPanda:
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=path_provider,
     )
+
+
+@devices.factory()
+def mercury_itc() -> MercuryITC:
+    return MercuryITC(f"{PREFIX.beamline_prefix}-EA-TEMPC-03:MERC:")
