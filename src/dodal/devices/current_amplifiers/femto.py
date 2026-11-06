@@ -72,9 +72,9 @@ class FemtoDDPCA(CurrentAmp):
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        self.timeout = timeout
-        self.gain_configuration = FEMTO3XX_GAIN_CONFIGURATION
+        self._gain_configuration = FEMTO3XX_GAIN_CONFIGURATION
         self._raise_timetable = raise_timetable
+        self._timeout = timeout
 
         self.gain_setting = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
 
@@ -90,14 +90,15 @@ class FemtoDDPCA(CurrentAmp):
         gain_setting = next(
             (
                 setting
-                for setting, sensitivity in self.gain_configuration.items()
+                for setting, sensitivity in self._gain_configuration.items()
                 if sensitivity == value
             ),
             None,
         )
         if gain_setting is None:
             available = [
-                f"{sensitivity:.0e}" for sensitivity in self.gain_configuration.values()
+                f"{sensitivity:.0e}"
+                for sensitivity in self._gain_configuration.values()
             ]
             raise ValueError(
                 f"Gain value {value} is not within {self.name} range.\n"
@@ -105,12 +106,12 @@ class FemtoDDPCA(CurrentAmp):
             )
 
         LOGGER.info("%s gain change to %s:%s", self.name, gain_setting.name, value)
-        await self.gain_setting.set(gain_setting, timeout=self.timeout)
+        await self.gain_setting.set(gain_setting, timeout=self._timeout)
         await asyncio.sleep(self._raise_timetable[gain_setting.name].value)
 
     async def increase_gain(self, value: int = 1) -> bool:
         current_gain = await self.gain.get_value()
-        gains = sorted(self.gain_configuration.values())
+        gains = sorted(self._gain_configuration.values())
         target_index = gains.index(current_gain) + value
 
         if target_index >= len(gains):
@@ -121,7 +122,7 @@ class FemtoDDPCA(CurrentAmp):
 
     async def decrease_gain(self, value: int = 1) -> bool:
         current_gain = await self.gain.get_value()
-        gains = sorted(self.gain_configuration.values())
+        gains = sorted(self._gain_configuration.values())
         target_index = gains.index(current_gain) - value
 
         if target_index < 0:
