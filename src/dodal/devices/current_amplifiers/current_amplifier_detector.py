@@ -6,7 +6,7 @@ from ophyd_async.core import (
     Reference,
     StandardReadable,
     StandardReadableFormat,
-    soft_signal_r_and_setter,
+    derived_signal_r,
     soft_signal_rw,
 )
 
@@ -15,6 +15,13 @@ from dodal.devices.current_amplifiers.current_amplifier import (
     CurrentAmpCounter,
 )
 from dodal.log import LOGGER
+
+
+def get_corrected_current(voltage_per_sec: float, gain: float) -> float:
+    """Convert the output (count and gain) back into the read detector output in
+    Amp.
+    """
+    return voltage_per_sec / gain
 
 
 class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
@@ -40,8 +47,10 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         self.current_amp = Reference(current_amp)
         self.counter = Reference(counter)
         with self.add_children_as_readables():
-            self.current, self._set_current = soft_signal_r_and_setter(
-                float, initial_value=None, units="Amp"
+            self.current = derived_signal_r(
+                get_corrected_current,
+                voltage_per_sec=counter.voltage_per_sec,
+                gain=current_amp.gain,
             )
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.auto_mode = soft_signal_rw(bool, initial_value=True)
@@ -68,17 +77,6 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
             if not changed:
                 return
 
-    async def get_corrected_current(self) -> float:
-        """Convert the output (count and gain) back into the read detector output in
-        Amp.
-        """
-        current_gain, voltage_per_sec = await asyncio.gather(
-            self.current_amp().gain.get_value(),
-            self.counter().voltage_per_sec.get_value(),
-        )
-        corrected_current = voltage_per_sec / current_gain
-        return corrected_current
-
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await self.counter().stage()
@@ -100,5 +98,3 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
                 f"{self.name} new gain = {await self.current_amp().gain.get_value()}."
             )
         await self.counter().trigger()
-        current = await self.get_corrected_current()
-        self._set_current(current)
