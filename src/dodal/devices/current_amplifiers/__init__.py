@@ -21,7 +21,7 @@ from .sr570 import (
     SR570GainTable,
     SR570RaiseTimeTable,
 )
-from .struck_scaler_counter import StruckScaler
+from .struck_scaler_counter import CountState, StruckScaler
 
 __all__ = [
     "EnzLocum",
@@ -42,5 +42,6 @@ __all__ = [
     "SR570GainTable",
     "SR570FineGainTable",
     "SR570RaiseTimeTable",
+    "CountState",
     "StruckScaler",
 ]

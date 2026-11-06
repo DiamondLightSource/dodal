@@ -15,12 +15,10 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.current_amplifiers import (
+    CountState,
     CurrentAmpDet,
     Femto3xxRaiseTime,
     FemtoDDPCA,
-)
-from dodal.devices.current_amplifiers.struck_scaler_counter import (
-    CountState,
     StruckScaler,
 )
 
@@ -57,13 +55,7 @@ async def mock_femto_struck_scaler_detector(
 
 @pytest.mark.parametrize(
     "expected_gain, wait_time",
-    [
-        (1e4, 0.8e-3),
-        (1e6, 0.8e-3),
-        (1e8, 2.3e-3),
-        (1e10, 17e-3),
-        (1e13, 350e-3),
-    ],
+    [(1e4, 0.8e-3), (1e6, 0.8e-3), (1e8, 2.3e-3), (1e10, 17e-3), (1e13, 350e-3)],
 )
 @mock.patch("asyncio.sleep")
 async def test_femto_set(
@@ -93,10 +85,12 @@ async def test_femto_set_fail_out_of_range(
 ):
     with pytest.raises(
         ValueError,
-        match=f"Gain value {gain} is not within "
-        f"{mock_femto.name} range."
-        f"\nAvailable gains: ",
-        # "['1e+04', '1e+05', '1e+06', '1e+07', '1e+08', '1e+09', '1e+10', '1e+11', '1e+12', '1e+13']",
+        match=re.escape(
+            f"Gain value {gain} is not within "
+            f"{mock_femto.name} range."
+            f"\nAvailable gains: "
+            "['1e+04', '1e+05', '1e+06', '1e+07', '1e+08', '1e+09', '1e+10', '1e+11', '1e+12', '1e+13']"
+        ),
     ):
         await mock_femto.set(gain)
 
