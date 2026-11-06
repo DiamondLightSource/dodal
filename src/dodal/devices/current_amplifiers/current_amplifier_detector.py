@@ -17,24 +17,23 @@ from dodal.devices.current_amplifiers.current_amplifier import (
 from dodal.log import LOGGER
 
 
-def get_corrected_current(voltage_per_sec: float, gain: float) -> float:
-    """Convert the output (count and gain) back into the read detector output in
-    Amp.
-    """
+def _corrected_current(voltage_per_sec: float, gain: float) -> float:
+    """Convert the output (count and gain) back into the read detector output in Amp."""
     return voltage_per_sec / gain
 
 
 class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     """CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
     the option for automatically changing the CurrentAmp gain to within the optimal
-    range. It also converts the currentAmp/counter output back into the detector
+    range. It also converts the CurrentAmp / counter output back into the detector
     current output in Amp.
 
     Attributes:
-        current_amp (currentAmp): Current amplifier type device.
-        counter (CurrentAmpCounter): Counter that capture the current amplifier output.
-        current (SignalRW([float]): Soft signal to store the corrected current.
-        auto_mode (signalR([bool])): Soft signal to store the flag for auto gain.
+        current_amp_ref (Reference[CurrentAmp]): Current amplifier type device.
+        counter_ref (Reference[CurrentAmpCounter]): Counter that capture the current
+            amplifier output.
+        current (SignalRW([float]): Derived signal that calculates the corrected current.
+        auto_mode (SignalR([bool])): Soft signal to store the flag for auto gain.
         name (str): Name of the device.
     """
 
@@ -42,18 +41,20 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         self,
         current_amp: CurrentAmp,
         counter: CurrentAmpCounter,
+        auto_mode: bool = True,
         name: str = "",
     ) -> None:
         self.current_amp_ref = Reference(current_amp)
         self.counter_ref = Reference(counter)
         with self.add_children_as_readables():
             self.current = derived_signal_r(
-                get_corrected_current,
+                _corrected_current,
+                derived_units="I",
                 voltage_per_sec=counter.voltage_per_sec,
                 gain=current_amp.gain,
             )
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.auto_mode = soft_signal_rw(bool, initial_value=True)
+            self.auto_mode = soft_signal_rw(bool, initial_value=auto_mode)
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -82,10 +83,6 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         await self.counter_ref().stage()
 
     @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        await self.counter_ref().unstage()
-
-    @AsyncStatus.wrap
     async def prepare(self, value) -> None:
         await self.counter_ref().prepare(value)
 
@@ -98,3 +95,7 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
                 f"{self.name} new gain = {await self.current_amp_ref().gain.get_value()}."
             )
         await self.counter_ref().trigger()
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        await self.counter_ref().unstage()
