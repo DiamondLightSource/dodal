@@ -12,12 +12,21 @@ from ophyd_async.core import (
 
 
 class CurrentAmp(ABC, StandardReadable, Movable[float]):
-    """Base class for current amplifier, it contains the minimal functionality
-    a current amplifier needs.
+    """Abstract base class for current amplifier devices.
+
+    Provides a common interface for current amplifiers, including gain
+    adjustment and configurable output voltage thresholds for automatic
+    gain optimisation.
+
+    Attributes:
+        gain (SignalRW[float]): Current-to-voltage sensitivity in V/A.
+        upperlimit (SignalRW[float]): Upper output voltage threshold in V
+            used by automatic gain adjustment.
+        lowerlimit (SignalRW[float]): Lower output voltage threshold in V
+            used by automatic gain adjustment.
     """
 
     gain: SignalRW[float]
-    """Sensitivity in V/A."""
 
     def __init__(
         self,
@@ -25,6 +34,15 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
         lowerlimit: float,
         name: str = "",
     ) -> None:
+        """Configuration for the current amplifier.
+
+        Args:
+            upperlimit (float): Upper output voltage threshold in V for automatic
+                gain adjustment.
+            lowerlimit (float): Lower output voltage threshold in V for automatic
+                gain adjustment.
+            name (str): Name of the device (optional).
+        """
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.upperlimit = soft_signal_rw(float, initial_value=upperlimit)
             self.lowerlimit = soft_signal_rw(float, initial_value=lowerlimit)

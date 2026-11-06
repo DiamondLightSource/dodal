@@ -89,9 +89,9 @@ def _gain_to_sensitivity(
 
 
 class SR570(CurrentAmp):
-    """The SR570 has two gain settings: coarse and fine. These are combined into
-    a single derived gain signal of gain representing the overall current-to-voltage
-    sensitivity.
+    """The SR570 current amplifier has two gain settings: coarse and fine. These are
+    combined into a single derived gain signal of gain representing the overall
+    current-to-voltage sensitivity.
 
     Attributes:
         gain (SignalRW[float]): Derived current-to-voltage sensitivity in V/A,
@@ -147,7 +147,6 @@ class SR570(CurrentAmp):
         super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
 
     async def _set_gain(self, value: float) -> None:
-        """Set sensitivity in V/A."""
         configuration = next(
             (
                 (coarse_gain, fine_gain)
