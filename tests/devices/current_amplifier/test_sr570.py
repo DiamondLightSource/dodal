@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+from enum import Enum
 from unittest import mock
 from unittest.mock import AsyncMock, Mock
 
@@ -37,8 +38,6 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
         mock_sr570 = SR570(
             prefix,
             suffix=suffix,
-            fine_gain_table=SR570FineGainTable,
-            coarse_gain_table=SR570GainTable,
             upperlimit=4.7,
             lowerlimit=0.4,
         )
@@ -246,6 +245,15 @@ async def test_sr570_struck_scaler_read(
     ] == pytest.approx(expected_current)
 
 
+class MockSR570RaiseTimeTable(float, Enum):
+    """Mock raise time(s) for SR570 current amplifier to speed up test."""
+
+    SEN_1 = 0
+    SEN_2 = 0
+    SEN_3 = 0
+    SEN_4 = 0
+
+
 @pytest.mark.parametrize(
     "gain, raw_count, expected_current",
     [
@@ -261,11 +269,15 @@ async def test_sr570_struck_scaler_read(
 async def test_sr570_struck_scaler_read_with_autogain(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
-    mock_sr570_struck_scaler_detector,
+    mock_sr570_struck_scaler_detector: CurrentAmpDet,
+    mock_struck_scaler: StruckScaler,
     gain: float,
     raw_count: list[float],
     expected_current: float,
 ):
+    mock_sr570_struck_scaler_detector.current_amp().raise_timetable = (
+        MockSR570RaiseTimeTable
+    )
     current_amp = mock_sr570_struck_scaler_detector.current_amp()
     await current_amp.set(gain)
 
@@ -275,15 +287,11 @@ async def test_sr570_struck_scaler_read_with_autogain(
     rbv_mocks.get.side_effect = raw_count
 
     def set_mock_counter():
-        set_mock_value(
-            mock_sr570_struck_scaler_detector.counter().trigger_start, CountState.DONE
-        )
-        set_mock_value(
-            mock_sr570_struck_scaler_detector.counter().readout, rbv_mocks.get()
-        )
+        set_mock_value(mock_struck_scaler.trigger_start, CountState.DONE)
+        set_mock_value(mock_struck_scaler.readout, rbv_mocks.get())
 
     callback_on_mock_put(
-        mock_sr570_struck_scaler_detector.counter().trigger_start,
+        mock_struck_scaler.trigger_start,
         lambda *_, **__: set_mock_counter(),
     )
 

@@ -2,10 +2,9 @@ import asyncio
 from enum import Enum
 
 from ophyd_async.core import (
-    AsyncStatus,
     StandardReadableFormat,
     StrictEnum,
-    derived_signal_r,
+    derived_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -84,14 +83,13 @@ class FemtoDDPCA(CurrentAmp):
             self.gain_setting = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.gain = derived_signal_r(
-                _gain_to_sensitivity, gain_setting=self.gain_setting
+            self.gain = derived_signal_rw(
+                _gain_to_sensitivity, self._set_gain, gain_setting=self.gain_setting
             )
 
         super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
 
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def _set_gain(self, value: float) -> None:
         """Set sensitivity in V/A."""
         gain_setting = next(
             (

@@ -1,12 +1,7 @@
 import asyncio
 from enum import Enum
 
-from ophyd_async.core import (
-    AsyncStatus,
-    StandardReadableFormat,
-    StrictEnum,
-    derived_signal_r,
-)
+from ophyd_async.core import StandardReadableFormat, StrictEnum, derived_signal_rw
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.current_amplifiers.current_amplifier import CurrentAmp
@@ -85,7 +80,7 @@ SR570_GAIN_CONFIGURATION: dict[SR570GainTable, dict[SR570FineGainTable, float]] 
 }
 
 
-def _sr570_gain_to_sensitivity(
+def _gain_to_sensitivity(
     coarse_gain: SR570GainTable,
     fine_gain: SR570FineGainTable,
 ) -> float:
@@ -117,22 +112,21 @@ class SR570(CurrentAmp):
         self,
         prefix: str,
         suffix: str = "SENS:SEL",
-        fine_gain_table: type[StrictEnum] = SR570FineGainTable,
-        coarse_gain_table: type[StrictEnum] = SR570GainTable,
         upperlimit: float = 4.8,
         lowerlimit: float = 0.4,
         timeout: float = 1,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.fine_gain = epics_signal_rw(fine_gain_table, prefix + suffix + "1")
-            self.coarse_gain = epics_signal_rw(coarse_gain_table, prefix + suffix + "2")
+            self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
+            self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
 
         self.timeout = timeout
         self.raise_timetable = SR570RaiseTimeTable
 
-        self.gain = derived_signal_r(
-            _sr570_gain_to_sensitivity,
+        self.gain = derived_signal_rw(
+            _gain_to_sensitivity,
+            self._set_gain,
             coarse_gain=self.coarse_gain,
             fine_gain=self.fine_gain,
         )
@@ -143,8 +137,7 @@ class SR570(CurrentAmp):
             name=name,
         )
 
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def _set_gain(self, value: float) -> None:
         """Set sensitivity in V/A."""
         configuration = next(
             (

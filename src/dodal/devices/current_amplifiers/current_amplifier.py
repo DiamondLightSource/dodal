@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from bluesky.protocols import Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
-    SignalR,
+    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_rw,
@@ -15,7 +15,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
     a current amplifier needs:
     """  # noqa D415
 
-    gain: SignalR[float]
+    gain: SignalRW[float]
     """Sensitivity in V/A."""
 
     def __init__(
@@ -28,6 +28,10 @@ class CurrentAmp(ABC, StandardReadable, Movable):
             self.upperlimit = soft_signal_rw(float, initial_value=upperlimit)
             self.lowerlimit = soft_signal_rw(float, initial_value=lowerlimit)
         super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        await self.gain.set(value)
 
     @abstractmethod
     async def increase_gain(self, value: int = 1) -> None:
