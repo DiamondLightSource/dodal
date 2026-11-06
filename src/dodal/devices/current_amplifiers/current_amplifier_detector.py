@@ -57,7 +57,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
             try:
                 await status
                 LOGGER.info(
-                    f"{self.name} new gain = {await self.current_amp().get_gain()}."
+                    f"{self.name} new gain = {await self.current_amp().gain.get_value()}."
                 )
             except ValueError as ex:
                 LOGGER.warning(f"{self.name} gain went outside limits")
@@ -69,30 +69,28 @@ class CurrentAmpDet(StandardReadable, Preparable):
 
     @AsyncStatus.wrap
     async def auto_gain(self) -> None:
-        within_limits = False
-        while not within_limits:
-            reading = abs(await self.counter().get_voltage_per_sec())
-            upper_limit, lower_limit = await asyncio.gather(
-                self.current_amp().upperlimit.get_value(),
-                self.current_amp().lowerlimit.get_value(),
-            )
-            if reading > upper_limit:
+        upper_limit, lower_limit = await asyncio.gather(
+            self.current_amp().upperlimit.get_value(),
+            self.current_amp().lowerlimit.get_value(),
+        )
+        while True:
+            voltage_per_sec = abs(await self.counter().get_voltage_per_sec())
+            if voltage_per_sec > upper_limit:
                 await self.current_amp().decrease_gain()
-            elif reading < lower_limit:
+            elif voltage_per_sec < lower_limit:
                 await self.current_amp().increase_gain()
             else:
-                within_limits = True
+                return
 
     async def get_corrected_current(self) -> float:
         """Convert the output (count and gain) back into the read detector output in
         Amp.
         """
         current_gain, voltage_per_sec = await asyncio.gather(
-            self.current_amp().get_gain(),
+            self.current_amp().gain.get_value(),
             self.counter().get_voltage_per_sec(),
         )
-        assert isinstance(current_gain.value, float)
-        corrected_current = voltage_per_sec / current_gain.value
+        corrected_current = voltage_per_sec / current_gain
         return corrected_current
 
     @AsyncStatus.wrap

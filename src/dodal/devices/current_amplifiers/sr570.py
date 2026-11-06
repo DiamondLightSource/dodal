@@ -5,6 +5,7 @@ from ophyd_async.core import (
     AsyncStatus,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -36,7 +37,7 @@ class SR570FineGainTable(StrictEnum):
 
 
 class SR570RaiseTimeTable(float, Enum):
-    """These are the gain dependent raise time(s) for SR570 current amplifier."""
+    """Gain-dependent raise time(s) for SR570 current amplifier."""
 
     SEN_1 = 1e-4
     SEN_2 = 1e-2
@@ -44,72 +45,52 @@ class SR570RaiseTimeTable(float, Enum):
     SEN_4 = 0.2
 
 
-class SR570FullGainTable(Enum):
-    """Combined gain table, as each gain step is a combination of both coarse gain and
-    fine gain setting.
-    """
+SR570_GAIN_CONFIGURATION: dict[SR570GainTable, dict[SR570FineGainTable, float]] = {
+    SR570GainTable.SEN_1: {
+        SR570FineGainTable.SEN_1: 1e3,
+    },
+    SR570GainTable.SEN_2: {
+        SR570FineGainTable.SEN_9: 2e3,
+        SR570FineGainTable.SEN_8: 5e3,
+        SR570FineGainTable.SEN_7: 1e4,
+        SR570FineGainTable.SEN_6: 2e4,
+        SR570FineGainTable.SEN_5: 5e4,
+        SR570FineGainTable.SEN_4: 1e5,
+        SR570FineGainTable.SEN_3: 2e5,
+        SR570FineGainTable.SEN_2: 5e5,
+        SR570FineGainTable.SEN_1: 1e6,
+    },
+    SR570GainTable.SEN_3: {
+        SR570FineGainTable.SEN_9: 2e6,
+        SR570FineGainTable.SEN_8: 5e6,
+        SR570FineGainTable.SEN_7: 1e7,
+        SR570FineGainTable.SEN_6: 2e7,
+        SR570FineGainTable.SEN_5: 5e7,
+        SR570FineGainTable.SEN_4: 1e8,
+        SR570FineGainTable.SEN_3: 2e8,
+        SR570FineGainTable.SEN_2: 5e8,
+        SR570FineGainTable.SEN_1: 1e9,
+    },
+    SR570GainTable.SEN_4: {
+        SR570FineGainTable.SEN_9: 2e9,
+        SR570FineGainTable.SEN_8: 5e9,
+        SR570FineGainTable.SEN_7: 1e10,
+        SR570FineGainTable.SEN_6: 2e10,
+        SR570FineGainTable.SEN_5: 5e10,
+        SR570FineGainTable.SEN_4: 1e11,
+        SR570FineGainTable.SEN_3: 2e11,
+        SR570FineGainTable.SEN_2: 5e11,
+        SR570FineGainTable.SEN_1: 1e12,
+    },
+}
 
-    SEN_1 = [SR570GainTable.SEN_1, SR570FineGainTable.SEN_1]
-    SEN_2 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_9]
-    SEN_3 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_8]
-    SEN_4 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_7]
-    SEN_5 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_6]
-    SEN_6 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_5]
-    SEN_7 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_4]
-    SEN_8 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_3]
-    SEN_9 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_2]
-    SEN_10 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_1]
-    SEN_11 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_9]
-    SEN_12 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_8]
-    SEN_13 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_7]
-    SEN_14 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_6]
-    SEN_15 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_5]
-    SEN_16 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_4]
-    SEN_17 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_3]
-    SEN_18 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_2]
-    SEN_19 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_1]
-    SEN_20 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_9]
-    SEN_21 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_8]
-    SEN_22 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_7]
-    SEN_23 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_6]
-    SEN_24 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_5]
-    SEN_25 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_4]
-    SEN_26 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_3]
-    SEN_27 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_2]
-    SEN_28 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_1]
 
-
-class SR570GainToCurrentTable(float, Enum):
-    """Conversion table for gain (sensitivity) to current."""
-
-    SEN_1 = 1e3
-    SEN_2 = 2e3
-    SEN_3 = 5e3
-    SEN_4 = 1e4
-    SEN_5 = 2e4
-    SEN_6 = 5e4
-    SEN_7 = 1e5
-    SEN_8 = 2e5
-    SEN_9 = 5e5
-    SEN_10 = 1e6
-    SEN_11 = 2e6
-    SEN_12 = 5e6
-    SEN_13 = 1e7
-    SEN_14 = 2e7
-    SEN_15 = 5e7
-    SEN_16 = 1e8
-    SEN_17 = 2e8
-    SEN_18 = 5e8
-    SEN_19 = 1e9
-    SEN_20 = 2e9
-    SEN_21 = 5e9
-    SEN_22 = 1e10
-    SEN_23 = 2e10
-    SEN_24 = 5e10
-    SEN_25 = 1e11
-    SEN_26 = 2e11
-    SEN_27 = 5e11
-    SEN_28 = 1e12
+def _sr570_gain_to_sensitivity(
+    coarse_gain: SR570GainTable,
+    fine_gain: SR570FineGainTable,
+) -> float:
+    """Calculate the SR570 sensitivity from its coarse and fine settings."""
+    return SR570_GAIN_CONFIGURATION[coarse_gain][fine_gain]
 
 
 class SR570(CurrentAmp):
@@ -122,7 +103,6 @@ class SR570(CurrentAmp):
         coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.
         fine_gain_table (strictEnum): The table that fine_gain use to set gain.
         coarse_gain_table (strictEnum): The table that coarse_gain use to set gain.
-        timeout (float): Maximum waiting time in second for setting gain.
         raise_timetable (Enum): Table contain the amount of time to wait after
             setting gain.
         combined_table (Enum): Table that combine fine and coarse table into one.
@@ -130,6 +110,7 @@ class SR570(CurrentAmp):
             setting in gain_conversion_table.
         upperlimit (float): upperlimit of the current amplifier
         lowerlimit (float): lowerlimit of the current amplifier
+        timeout (float): Maximum waiting time in second for setting gain.
     """
 
     def __init__(
@@ -138,9 +119,6 @@ class SR570(CurrentAmp):
         suffix: str = "SENS:SEL",
         fine_gain_table: type[StrictEnum] = SR570FineGainTable,
         coarse_gain_table: type[StrictEnum] = SR570GainTable,
-        combined_table: type[Enum] = SR570FullGainTable,
-        gain_to_current_table: type[Enum] = SR570GainToCurrentTable,
-        raise_timetable: type[Enum] = SR570RaiseTimeTable,
         upperlimit: float = 4.8,
         lowerlimit: float = 0.4,
         timeout: float = 1,
@@ -150,57 +128,83 @@ class SR570(CurrentAmp):
             self.fine_gain = epics_signal_rw(fine_gain_table, prefix + suffix + "1")
             self.coarse_gain = epics_signal_rw(coarse_gain_table, prefix + suffix + "2")
 
-        self.fine_gain_table = fine_gain_table
-        self.coarse_gain_table = coarse_gain_table
         self.timeout = timeout
-        self.raise_timetable = raise_timetable
-        self.combined_table = combined_table
+        self.raise_timetable = SR570RaiseTimeTable
+
+        self.gain = derived_signal_r(
+            _sr570_gain_to_sensitivity,
+            coarse_gain=self.coarse_gain,
+            fine_gain=self.fine_gain,
+        )
 
         super().__init__(
-            gain_conversion_table=gain_to_current_table,
             upperlimit=upperlimit,
             lowerlimit=lowerlimit,
             name=name,
         )
 
     @AsyncStatus.wrap
-    async def set(self, value) -> None:
-        if value not in [item.value for item in self.gain_conversion_table]:
-            raise ValueError(
-                f"Gain value {value} is not within {self.name} range."
-                + "\n Available gain:"
-                + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}"
-            )
-        sensitivity_setting = self.gain_conversion_table(value).name
-        LOGGER.info(f"{self.name} gain change to {value}")
+    async def set(self, value: float) -> None:
+        """Set sensitivity in V/A."""
+        configuration = next(
+            (
+                (coarse_gain, fine_gain)
+                for coarse_gain, fine_gains in SR570_GAIN_CONFIGURATION.items()
+                for fine_gain, sensitivity in fine_gains.items()
+                if sensitivity == value
+            ),
+            None,
+        )
 
-        coarse_gain, fine_gain = self.combined_table[sensitivity_setting].value
+        if configuration is None:
+            available = [
+                f"{sensitivity:.0e}"
+                for fine_gains in SR570_GAIN_CONFIGURATION.values()
+                for sensitivity in fine_gains.values()
+            ]
+            raise ValueError(
+                f"Gain value {value} is not within {self.name} range.\n"
+                f"Available gains: {available}"
+            )
+
+        coarse_gain, fine_gain = configuration
+
+        LOGGER.info("%s gain change to %s", self.name, value)
+
         await asyncio.gather(
-            self.fine_gain.set(value=fine_gain, timeout=self.timeout),
-            self.coarse_gain.set(value=coarse_gain, timeout=self.timeout),
+            self.fine_gain.set(fine_gain, timeout=self.timeout),
+            self.coarse_gain.set(coarse_gain, timeout=self.timeout),
         )
         await asyncio.sleep(self.raise_timetable[coarse_gain.name].value)
 
-    async def increase_gain(self, value=3) -> None:
-        current_gain = int((await self.get_gain()).name.split("_")[-1])
-        current_gain += value
-        if current_gain > len(self.combined_table):
-            await self.set(
-                self.gain_conversion_table[f"SEN_{len(self.combined_table)}"]
-            )
-            raise ValueError("Gain at max value")
-        await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
-
-    async def decrease_gain(self, value=3) -> None:
-        current_gain = int((await self.get_gain()).name.split("_")[-1])
-        current_gain -= value
-        if current_gain < 1:
-            await self.set(self.gain_conversion_table["SEN_1"])
-            raise ValueError("Gain at min value")
-        await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
-
-    async def get_gain(self) -> Enum:
-        result = await asyncio.gather(
-            self.coarse_gain.get_value(), self.fine_gain.get_value()
+    async def increase_gain(self, value: int = 3) -> None:
+        current_gain = await self.gain.get_value()
+        gains = sorted(
+            sensitivity
+            for fine_gains in SR570_GAIN_CONFIGURATION.values()
+            for sensitivity in fine_gains.values()
         )
-        return self.gain_conversion_table[self.combined_table(result).name]
+        current_index = gains.index(current_gain)
+        target_index = current_index + value
+
+        if target_index >= len(gains):
+            await self.set(gains[-1])
+            raise ValueError("Gain at max value")
+
+        await self.set(gains[target_index])
+
+    async def decrease_gain(self, value: int = 3) -> None:
+        current_gain = await self.gain.get_value()
+        gains = sorted(
+            sensitivity
+            for fine_gains in SR570_GAIN_CONFIGURATION.values()
+            for sensitivity in fine_gains.values()
+        )
+        current_index = gains.index(current_gain)
+        target_index = current_index - value
+
+        if target_index < 0:
+            await self.set(gains[0])
+            raise ValueError("Gain at min value")
+
+        await self.set(gains[target_index])

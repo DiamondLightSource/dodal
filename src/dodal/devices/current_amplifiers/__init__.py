@@ -9,17 +9,16 @@ from .enz_locum import (
     EnzLocumRangeReadback,
 )
 from .femto import (
+    FEMTO3XX_GAIN_CONFIGURATION,
     Femto3xxGainTable,
-    Femto3xxGainToCurrentTable,
     Femto3xxRaiseTime,
     FemtoDDPCA,
 )
 from .sr570 import (
     SR570,
+    SR570_GAIN_CONFIGURATION,
     SR570FineGainTable,
-    SR570FullGainTable,
     SR570GainTable,
-    SR570GainToCurrentTable,
     SR570RaiseTimeTable,
 )
 from .struck_scaler_counter import StruckScaler
@@ -31,18 +30,17 @@ __all__ = [
     "EnzLocumIntegrationWindow",
     "EnzLocumRange",
     "EnzLocumRangeReadback",
-    "FemtoDDPCA",
+    "FEMTO3XX_GAIN_CONFIGURATION",
     "Femto3xxGainTable",
     "Femto3xxRaiseTime",
+    "FemtoDDPCA",
     "CurrentAmp",
-    "Femto3xxGainToCurrentTable",
     "CurrentAmpCounter",
     "CurrentAmpDet",
     "SR570",
+    "SR570_GAIN_CONFIGURATION",
     "SR570GainTable",
     "SR570FineGainTable",
-    "SR570FullGainTable",
-    "SR570GainToCurrentTable",
     "SR570RaiseTimeTable",
     "StruckScaler",
 ]

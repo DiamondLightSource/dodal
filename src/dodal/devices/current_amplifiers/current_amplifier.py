@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 
 from bluesky.protocols import Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
+    SignalR,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_rw,
@@ -13,20 +13,17 @@ from ophyd_async.core import (
 class CurrentAmp(ABC, StandardReadable, Movable):
     """Base class for current amplifier, it contains the minimal functionality
     a current amplifier needs:
-
-    Attributes:
-        gain_conversion_table (Enum): The conversion table between current
-            and gain setting.
     """  # noqa D415
+
+    gain: SignalR[float]
+    """Sensitivity in V/A."""
 
     def __init__(
         self,
-        gain_conversion_table: type[Enum],
         upperlimit: float,
         lowerlimit: float,
         name: str = "",
     ) -> None:
-        self.gain_conversion_table = gain_conversion_table
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.upperlimit = soft_signal_rw(float, initial_value=upperlimit)
             self.lowerlimit = soft_signal_rw(float, initial_value=lowerlimit)
@@ -46,14 +43,6 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
         Returns:
             bool: True if success.
-        """
-
-    @abstractmethod
-    async def get_gain(self) -> Enum:
-        """Get the current gain setting.
-
-        Returns:
-            Enum: The member name of the current gain setting in gain_conversion_table.
         """
 
 
