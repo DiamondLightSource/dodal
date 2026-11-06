@@ -35,8 +35,8 @@ def _voltage_per_sec(
 
 
 class StruckScaler(CurrentAmpCounter):
-    """StruckScaler is a counting card that record the output signal from a wide
-    range of detectors. This class contains the basic control to run the struckscaler
+    """StruckScaler is a counting card that records the output signal from a wide
+    range of detectors. This class contains the basic control to run the struck scaler
     card together with a current amplifier. It has functions that provide conversion
     between count and voltage.
 
@@ -55,15 +55,15 @@ class StruckScaler(CurrentAmpCounter):
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.current_count = epics_signal_r(float, prefix + suffix)
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.count_mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
             self.current_count_time = epics_signal_rw(float, prefix + ".TP")
-        self.trigger_start = epics_signal_rw(CountState, prefix + ".CNT")
 
+        self.trigger_start = epics_signal_rw(CountState, prefix + ".CNT")
         self.current_count_per_volt, _ = soft_signal_r_and_setter(
             float, initial_value=current_count_per_volt
         )
-
         self.current_count_per_sec = derived_signal_r(
             _current_count_per_sec,
             current_count=self.current_count,
@@ -74,7 +74,6 @@ class StruckScaler(CurrentAmpCounter):
             current_count_per_sec=self.current_count_per_sec,
             current_count_per_volt=self.current_count_per_volt,
         )
-
         super().__init__(name=name)
 
     @AsyncStatus.wrap

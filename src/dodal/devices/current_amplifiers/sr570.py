@@ -89,23 +89,21 @@ def _gain_to_sensitivity(
 
 
 class SR570(CurrentAmp):
-    """SR570 current amplifier device. This is similar to Femto with the only different
-    is SR570 has two gain setting fine and coarse, therefore it requires extra
-    gain tables.
+    """The SR570 has two gain settings: coarse and fine. These are combined into
+    a single derived gain signal of gain representing the overall current-to-voltage
+    sensitivity.
 
     Attributes:
-        fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
-        coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.
-        fine_gain_table (strictEnum): The table that fine_gain use to set gain.
-        coarse_gain_table (strictEnum): The table that coarse_gain use to set gain.
-        raise_timetable (Enum): Table contain the amount of time to wait after
-            setting gain.
-        combined_table (Enum): Table that combine fine and coarse table into one.
-        gain (SignalRW([str]): Soft signal to store the member name of the current gain
-            setting in gain_conversion_table.
-        upperlimit (float): upperlimit of the current amplifier
-        lowerlimit (float): lowerlimit of the current amplifier
-        timeout (float): Maximum waiting time in second for setting gain.
+        gain (SignalRW[float]): Derived current-to-voltage sensitivity in V/A,
+            calculated from the coarse and fine gain settings. Is the hinted signal.
+        fine_gain (SignalRW[SR570FineGainTable]): EPICS signal controlling the fine gain
+            setting via enum.
+        coarse_gain (SignalRW[SR570GainTable]): EPICS signal controlling the coarse gain
+            setting via enum.
+        upperlimit (SignalRW[float]): Upper threshold for the amplifier output
+            voltage used by automatic gain adjustment.
+        lowerlimit (SignalRW[float]): Lower threshold for the amplifier output
+            voltage used by automatic gain adjustment.
     """
 
     def __init__(
@@ -118,7 +116,21 @@ class SR570(CurrentAmp):
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        self.timeout = timeout
+        """Configuration for SR570 current amplifier.
+
+        Args:
+            prefix: EPICS PV prefix for the current amplifier.
+            suffix: PV suffix preceding the coarse and fine gain settings.
+            raise_timetable: Table defining the settling time associated with
+                each gain setting.
+            upperlimit: Upper threshold for the amplifier output voltage used
+                by automatic gain adjustment, in V.
+            lowerlimit: Lower threshold for the amplifier output voltage used
+                by automatic gain adjustment, in V.
+            timeout: Maximum waiting time in seconds when setting gain.
+            name: Name of the device.
+        """
+        self._timeout = timeout
         self._raise_timetable = raise_timetable
 
         self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
@@ -160,8 +172,8 @@ class SR570(CurrentAmp):
         LOGGER.info("%s gain changed to %s", self.name, value)
 
         await asyncio.gather(
-            self.fine_gain.set(fine_gain, timeout=self.timeout),
-            self.coarse_gain.set(coarse_gain, timeout=self.timeout),
+            self.fine_gain.set(fine_gain, timeout=self._timeout),
+            self.coarse_gain.set(coarse_gain, timeout=self._timeout),
         )
         await asyncio.sleep(self._raise_timetable[coarse_gain.name].value)
 
