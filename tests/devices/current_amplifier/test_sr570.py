@@ -282,7 +282,7 @@ async def test_sr570_struck_scaler_read_with_autogain(
     raw_count: list[float],
     expected_current: float,
 ):
-    current_amp = mock_sr570_struck_scaler_detector.current_amp()
+    current_amp = mock_sr570_struck_scaler_detector.current_amp_ref()
     await current_amp.set(gain)
 
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, True)

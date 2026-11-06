@@ -44,8 +44,8 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         counter: CurrentAmpCounter,
         name: str = "",
     ) -> None:
-        self.current_amp = Reference(current_amp)
-        self.counter = Reference(counter)
+        self.current_amp_ref = Reference(current_amp)
+        self.counter_ref = Reference(counter)
         with self.add_children_as_readables():
             self.current = derived_signal_r(
                 get_corrected_current,
@@ -59,18 +59,18 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     @AsyncStatus.wrap
     async def auto_gain(self) -> None:
         upper_limit, lower_limit = await asyncio.gather(
-            self.current_amp().upperlimit.get_value(),
-            self.current_amp().lowerlimit.get_value(),
+            self.current_amp_ref().upperlimit.get_value(),
+            self.current_amp_ref().lowerlimit.get_value(),
         )
         while True:
             # Acquire a fresh measurement at the new gain.
-            await self.counter().trigger()
+            await self.counter_ref().trigger()
 
-            voltage_per_sec = abs(await self.counter().voltage_per_sec.get_value())
+            voltage_per_sec = abs(await self.counter_ref().voltage_per_sec.get_value())
             if voltage_per_sec > upper_limit:
-                changed = await self.current_amp().decrease_gain()
+                changed = await self.current_amp_ref().decrease_gain()
             elif voltage_per_sec < lower_limit:
-                changed = await self.current_amp().increase_gain()
+                changed = await self.current_amp_ref().increase_gain()
             else:
                 return
 
@@ -79,15 +79,15 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        await self.counter().stage()
+        await self.counter_ref().stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        await self.counter().unstage()
+        await self.counter_ref().unstage()
 
     @AsyncStatus.wrap
     async def prepare(self, value) -> None:
-        await self.counter().prepare(value)
+        await self.counter_ref().prepare(value)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
@@ -95,6 +95,6 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
             LOGGER.info(f"{self.name}-Attempting auto-gain")
             await self.auto_gain()
             LOGGER.info(
-                f"{self.name} new gain = {await self.current_amp().gain.get_value()}."
+                f"{self.name} new gain = {await self.current_amp_ref().gain.get_value()}."
             )
-        await self.counter().trigger()
+        await self.counter_ref().trigger()
