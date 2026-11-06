@@ -2,7 +2,9 @@ from ophyd_async.core import (
     AsyncStatus,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
     set_and_wait_for_other_value,
+    soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -22,8 +24,14 @@ class CountState(StrictEnum):
 COUNT_PER_VOLTAGE = 100000
 
 
-def _count_per_sec_read():
-    pass
+def _current_count_per_sec(current_count: float, current_count_time: float) -> float:
+    return current_count / current_count_time
+
+
+def _voltage_per_sec(
+    current_count_per_sec: float, current_count_per_volt: float
+) -> float:
+    return current_count_per_sec / current_count_per_volt
 
 
 class StruckScaler(CurrentAmpCounter):
@@ -39,26 +47,43 @@ class StruckScaler(CurrentAmpCounter):
     """
 
     def __init__(
-        self, prefix: str, suffix: str, count_per_volt=COUNT_PER_VOLTAGE, name: str = ""
+        self,
+        prefix: str,
+        suffix: str,
+        current_count_per_volt=COUNT_PER_VOLTAGE,
+        name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.readout = epics_signal_r(float, prefix + suffix)
+            self.current_count = epics_signal_r(float, prefix + suffix)
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.count_mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
-            self.count_time = epics_signal_rw(float, prefix + ".TP")
+            self.current_count_time = epics_signal_rw(float, prefix + ".TP")
         self.trigger_start = epics_signal_rw(CountState, prefix + ".CNT")
 
-        # self.count_per_sec = derived_signal_r()
+        self.current_count_per_volt, _ = soft_signal_r_and_setter(
+            float, initial_value=current_count_per_volt
+        )
 
-        super().__init__(count_per_volt=count_per_volt, name=name)
+        self.current_count_per_sec = derived_signal_r(
+            _current_count_per_sec,
+            current_count=self.current_count,
+            current_count_time=self.current_count_time,
+        )
+        self.voltage_per_sec = derived_signal_r(
+            _voltage_per_sec,
+            current_count_per_sec=self.current_count_per_sec,
+            current_count_per_volt=self.current_count_per_volt,
+        )
+
+        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await self.count_mode.set(CountMode.ONE_SHOT)
 
     @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        await self.count_mode.set(CountMode.AUTO)
+    async def prepare(self, value) -> None:
+        await self.current_count_time.set(value)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
@@ -70,15 +95,5 @@ class StruckScaler(CurrentAmpCounter):
         )
 
     @AsyncStatus.wrap
-    async def prepare(self, value) -> None:
-        await self.count_time.set(value)
-
-    async def get_count(self) -> float:
-        # await self.trigger()
-        return await self.readout.get_value()
-
-    async def get_count_per_sec(self) -> float:
-        return await self.get_count() / await self.count_time.get_value()
-
-    async def get_voltage_per_sec(self) -> float:
-        return await self.get_count_per_sec() / self.count_per_volt
+    async def unstage(self) -> None:
+        await self.count_mode.set(CountMode.AUTO)

@@ -223,19 +223,20 @@ async def test_sr570_decrease_gain_bottom_out_fail(
 async def test_sr570_struck_scaler_read(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
-    mock_sr570_struck_scaler_detector,
+    mock_sr570_struck_scaler_detector: CurrentAmpDet,
+    mock_struck_scaler: StruckScaler,
+    mock_sr570: SR570,
     gain: float,
     raw_count: float,
     expected_current: float,
 ):
     coarse_gain, fine_gain = sr570_setting_for_gain(gain)
 
-    current_amp = mock_sr570_struck_scaler_detector.current_amp()
-    set_mock_value(current_amp.coarse_gain, coarse_gain)
-    set_mock_value(current_amp.fine_gain, fine_gain)
+    set_mock_value(mock_sr570.coarse_gain, coarse_gain)
+    set_mock_value(mock_sr570.fine_gain, fine_gain)
 
-    set_mock_value(mock_sr570_struck_scaler_detector.counter().readout, raw_count)
-    set_mock_value(mock_sr570_struck_scaler_detector.counter().count_time, 1)
+    set_mock_value(mock_struck_scaler.current_count, raw_count)
+    set_mock_value(mock_struck_scaler.current_count_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, False)
 
     run_engine(count([mock_sr570_struck_scaler_detector]))
@@ -288,7 +289,7 @@ async def test_sr570_struck_scaler_read_with_autogain(
 
     def set_mock_counter():
         set_mock_value(mock_struck_scaler.trigger_start, CountState.DONE)
-        set_mock_value(mock_struck_scaler.readout, rbv_mocks.get())
+        set_mock_value(mock_struck_scaler.current_count, rbv_mocks.get())
 
     callback_on_mock_put(
         mock_struck_scaler.trigger_start,

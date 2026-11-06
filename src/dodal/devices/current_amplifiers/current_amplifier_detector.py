@@ -72,7 +72,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
             # Acquire a fresh measurement at the new gain.
             await self.counter().trigger()
 
-            voltage_per_sec = abs(await self.counter().get_voltage_per_sec())
+            voltage_per_sec = abs(await self.counter().voltage_per_sec.get_value())
             if voltage_per_sec > upper_limit:
                 changed = await self.current_amp().decrease_gain()
             elif voltage_per_sec < lower_limit:
@@ -92,7 +92,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
         """
         current_gain, voltage_per_sec = await asyncio.gather(
             self.current_amp().gain.get_value(),
-            self.counter().get_voltage_per_sec(),
+            self.counter().voltage_per_sec.get_value(),
         )
         corrected_current = voltage_per_sec / current_gain
         return corrected_current

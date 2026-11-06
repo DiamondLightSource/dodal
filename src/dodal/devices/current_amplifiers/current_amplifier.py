@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from bluesky.protocols import Movable, Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
+    SignalR,
     SignalRW,
     StandardReadable,
     StandardReadableFormat,
@@ -50,37 +51,10 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable, Triggerable):
         count_per_volt (float): The conversion factor between counter output and voltage.
     """
 
-    # count: SignalR[float]
-    # count_per_sec: SignalR[float]
-    # voltage_per_sec: SignalR[float]
-
-    def __init__(self, count_per_volt: float, name: str = ""):
-        self.count_per_volt = count_per_volt
-        super().__init__(name)
-
-    @abstractmethod
-    async def get_count(self) -> float:
-        """Get count.
-
-        Returns:
-            float: Current count.
-        """
-
-    @abstractmethod
-    async def get_count_per_sec(self) -> float:
-        """Get count per second.
-
-        Returns:
-            float: Current count per second.
-        """
-
-    @abstractmethod
-    async def get_voltage_per_sec(self) -> float:
-        """Get count per second in voltage.
-
-        Returns:
-            float: Current count in volt per second.
-        """
+    current_count: SignalR[float]
+    current_count_per_sec: SignalR[float]
+    current_count_per_volt: SignalR[float]
+    voltage_per_sec: SignalR[float]
 
     @abstractmethod
     @AsyncStatus.wrap

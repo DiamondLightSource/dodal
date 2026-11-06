@@ -105,9 +105,7 @@ class FemtoDDPCA(CurrentAmp):
             )
 
         LOGGER.info("%s gain change to %s:%s", self.name, gain_setting.name, value)
-
         await self.gain_setting.set(gain_setting, timeout=self.timeout)
-
         await asyncio.sleep(self.raise_timetable[gain_setting.name].value)
 
     async def increase_gain(self, value: int = 1) -> bool:
