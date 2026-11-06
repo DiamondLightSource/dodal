@@ -60,7 +60,21 @@ def _gain_to_sensitivity(
 
 
 class FemtoDDPCA(CurrentAmp):
-    """Femto current amplifier with derived numerical sensitivity."""
+    """Femto current amplifier with derived numerical sensitivity.
+
+    The Femto amplifier exposes its gain as an EPICS enumeration via gain_setting. This
+    device provides a derived numerical gain signal representing the current-to-voltage
+    sensitivity in V/A, using the Femto gain configuration table.
+
+    Attributes:
+        gain (SignalRW[float]): Derived current-to-voltage sensitivity in V/A.
+        gain_setting (SignalRW[Femto3xxGainTable]): EPICS signal controlling the
+            amplifier gain setting via enum.
+        upperlimit (SignalRW[float]): Upper output voltage threshold in V used by
+            automatic gain adjustment.
+        lowerlimit (SignalRW[float]): Lower output voltage threshold in V used by
+            automatic gain adjustment.
+    """
 
     def __init__(
         self,
@@ -72,6 +86,20 @@ class FemtoDDPCA(CurrentAmp):
         timeout: float = 1,
         name: str = "",
     ) -> None:
+        """Configure the Femto current amplifier.
+
+        Args:
+            prefix: EPICS PV prefix for the amplifier.
+            suffix: EPICS PV suffix for the gain setting.
+            raise_timetable: Table defining the settling time associated with each gain
+                setting.
+            upperlimit: Upper output voltage threshold in V for automatic gain
+                adjustment.
+            lowerlimit: Lower output voltage threshold in V for automatic gain
+                adjustment.
+            timeout: Maximum waiting time in seconds when setting gain.
+            name: Name of the device.
+        """
         self._gain_configuration = FEMTO3XX_GAIN_CONFIGURATION
         self._raise_timetable = raise_timetable
         self._timeout = timeout
@@ -82,7 +110,6 @@ class FemtoDDPCA(CurrentAmp):
             self.gain = derived_signal_rw(
                 _gain_to_sensitivity, self._set_gain, gain_setting=self.gain_setting
             )
-
         super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
 
     async def _set_gain(self, value: float) -> None:
