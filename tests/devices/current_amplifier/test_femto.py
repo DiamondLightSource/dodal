@@ -127,15 +127,14 @@ async def test_femto_increase_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_femto_increase_gain_fail_at_max_gain(
+async def test_femto_increase_gain_returns_false_when_not_successful(
     sleep: AsyncMock,
     mock_femto: FemtoDDPCA,
 ):
     max_gain = 1e13
     await mock_femto.set(max_gain)
 
-    with pytest.raises(ValueError, match=re.escape("Gain at max value of 1e+13.")):
-        await mock_femto.increase_gain()
+    assert not await mock_femto.increase_gain()
 
     assert await mock_femto.gain.get_value() == max_gain
 
@@ -171,15 +170,14 @@ async def test_femto_decrease_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_femto_decrease_gain_fail_at_min_gain(
+async def test_femto_decrease_gain_returns_false_when_not_successful(
     sleep: AsyncMock,
     mock_femto: FemtoDDPCA,
 ):
     min_gain = 1e4
     await mock_femto.set(min_gain)
 
-    with pytest.raises(ValueError, match=re.escape("Gain at min value of 1e+04")):
-        await mock_femto.decrease_gain()
+    assert not await mock_femto.decrease_gain()
 
     assert await mock_femto.gain.get_value() == min_gain
     sleep.assert_any_await(Femto3xxRaiseTime.SEN_1.value)

@@ -144,15 +144,14 @@ async def test_sr570_increase_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_sr570_increase_gain_top_out_fail(
+async def test_sr570_increase_gain_returns_false_when_not_successful(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
     max_gain = 1e12
     await mock_sr570.set(max_gain)
 
-    with pytest.raises(ValueError):
-        await mock_sr570.increase_gain()
+    assert not await mock_sr570.increase_gain()
 
     assert await mock_sr570.gain.get_value() == pytest.approx(max_gain)
     assert sleep.call_count == 2
@@ -185,7 +184,7 @@ async def test_sr570_decrease_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_sr570_decrease_gain_bottom_out_fail(
+async def test_sr570_decrease_gain_returns_false_when_not_successful(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
@@ -193,8 +192,7 @@ async def test_sr570_decrease_gain_bottom_out_fail(
 
     await mock_sr570.set(min_gain)
 
-    with pytest.raises(ValueError):
-        await mock_sr570.decrease_gain()
+    assert not await mock_sr570.decrease_gain()
 
     assert await mock_sr570.gain.get_value() == pytest.approx(min_gain)
     assert sleep.call_count == 2
