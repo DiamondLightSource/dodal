@@ -124,7 +124,6 @@ class FemtoDDPCA(CurrentAmp):
 
         if target_index >= len(gains):
             max_val = gains[-1]
-            await self.set(max_val)
             raise ValueError(f"Gain at max value of {max_val:.0e}.")
 
         await self.set(gains[target_index])
@@ -136,7 +135,6 @@ class FemtoDDPCA(CurrentAmp):
 
         if target_index < 0:
             min_val = gains[0]
-            await self.set(min_val)
             raise ValueError(f"Gain at min value of {min_val:.0e}.")
 
         await self.set(gains[target_index])

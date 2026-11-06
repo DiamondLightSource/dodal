@@ -1,6 +1,5 @@
 import re
 from collections.abc import Mapping
-from enum import Enum
 from unittest import mock
 from unittest.mock import AsyncMock
 
@@ -122,11 +121,15 @@ async def test_femto_increase_gain(
     final_gain: float,
 ):
     await mock_femto.set(starting_gain)
+    sleep.reset_mock()
 
     for _ in range(gain_change_count):
         await mock_femto.increase_gain()
 
     assert await mock_femto.gain.get_value() == final_gain
+
+    # Each increase should wait for the settling time of the resulting gain.
+    assert sleep.await_count == gain_change_count
 
 
 @mock.patch("asyncio.sleep")
@@ -141,6 +144,7 @@ async def test_femto_increase_gain_fail_at_max_gain(
         await mock_femto.increase_gain()
 
     assert await mock_femto.gain.get_value() == max_gain
+
     sleep.assert_any_await(Femto3xxRaiseTime.SEN_10.value)
 
 
@@ -161,6 +165,7 @@ async def test_femto_decrease_gain(
     final_gain: float,
 ):
     await mock_femto.set(starting_gain)
+    sleep.reset_mock()
 
     for _ in range(gain_change_count):
         await mock_femto.decrease_gain()
@@ -184,21 +189,6 @@ async def test_femto_decrease_gain_fail_at_min_gain(
 
     assert await mock_femto.gain.get_value() == min_gain
     sleep.assert_any_await(Femto3xxRaiseTime.SEN_1.value)
-
-
-class MockFemto3xxRaiseTime(float, Enum):
-    """Mock zero raise time(s) for Femto 3xx current amplifier."""
-
-    SEN_1 = 0.0
-    SEN_2 = 0.0
-    SEN_3 = 0.0
-    SEN_4 = 0.0
-    SEN_5 = 0.0
-    SEN_6 = 0.0
-    SEN_7 = 0.0
-    SEN_8 = 0.0
-    SEN_9 = 0.0
-    SEN_10 = 0.0
 
 
 @pytest.mark.parametrize(
