@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from bluesky.protocols import (
-    Movable,
-    Preparable,
+from bluesky.protocols import Movable, Preparable
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    StandardReadableFormat,
+    soft_signal_rw,
 )
-from ophyd_async.core import AsyncStatus, StandardReadable
 
 
 class CurrentAmp(ABC, StandardReadable, Movable):
@@ -17,8 +19,17 @@ class CurrentAmp(ABC, StandardReadable, Movable):
             and gain setting.
     """  # noqa D415
 
-    def __init__(self, gain_conversion_table: type[Enum], name: str = "") -> None:
+    def __init__(
+        self,
+        gain_conversion_table: type[Enum],
+        upperlimit: float,
+        lowerlimit: float,
+        name: str = "",
+    ) -> None:
         self.gain_conversion_table = gain_conversion_table
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.upperlimit = soft_signal_rw(float, initial_value=upperlimit)
+            self.lowerlimit = soft_signal_rw(float, initial_value=lowerlimit)
         super().__init__(name)
 
     @abstractmethod
@@ -44,14 +55,6 @@ class CurrentAmp(ABC, StandardReadable, Movable):
         Returns:
             Enum: The member name of the current gain setting in gain_conversion_table.
         """
-
-    @abstractmethod
-    async def get_upperlimit(self) -> float:
-        """Get the upper limit of the current amplifier."""
-
-    @abstractmethod
-    async def get_lowerlimit(self) -> float:
-        """Get the lower limit of the current amplifier."""
 
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable):

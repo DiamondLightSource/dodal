@@ -73,8 +73,8 @@ class CurrentAmpDet(StandardReadable, Preparable):
         while not within_limits:
             reading = abs(await self.counter().get_voltage_per_sec())
             upper_limit, lower_limit = await asyncio.gather(
-                self.current_amp().get_upperlimit(),
-                self.current_amp().get_lowerlimit(),
+                self.current_amp().upperlimit.get_value(),
+                self.current_amp().lowerlimit.get_value(),
             )
             if reading > upper_limit:
                 await self.current_amp().decrease_gain()

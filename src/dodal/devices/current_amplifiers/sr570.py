@@ -146,8 +146,6 @@ class SR570(CurrentAmp):
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        super().__init__(name=name, gain_conversion_table=gain_to_current_table)
-
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.fine_gain = epics_signal_rw(fine_gain_table, prefix + suffix + "1")
             self.coarse_gain = epics_signal_rw(coarse_gain_table, prefix + suffix + "2")
@@ -157,8 +155,13 @@ class SR570(CurrentAmp):
         self.timeout = timeout
         self.raise_timetable = raise_timetable
         self.combined_table = combined_table
-        self.upperlimit = upperlimit
-        self.lowerlimit = lowerlimit
+
+        super().__init__(
+            gain_conversion_table=gain_to_current_table,
+            upperlimit=upperlimit,
+            lowerlimit=lowerlimit,
+            name=name,
+        )
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
@@ -201,9 +204,3 @@ class SR570(CurrentAmp):
             self.coarse_gain.get_value(), self.fine_gain.get_value()
         )
         return self.gain_conversion_table[self.combined_table(result).name]
-
-    async def get_upperlimit(self) -> float:
-        return self.upperlimit
-
-    async def get_lowerlimit(self) -> float:
-        return self.lowerlimit

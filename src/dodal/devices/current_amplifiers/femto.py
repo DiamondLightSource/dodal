@@ -91,9 +91,13 @@ class FemtoDDPCA(CurrentAmp):
             self.gain_table = gain_table
             self.timeout = timeout
             self.raise_timetable = raise_timetable
-        self.upperlimit = upperlimit
-        self.lowerlimit = lowerlimit
-        super().__init__(name=name, gain_conversion_table=gain_to_current_table)
+
+        super().__init__(
+            name=name,
+            gain_conversion_table=gain_to_current_table,
+            upperlimit=upperlimit,
+            lowerlimit=lowerlimit,
+        )
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
@@ -129,9 +133,3 @@ class FemtoDDPCA(CurrentAmp):
 
     async def get_gain(self) -> Enum:
         return self.gain_conversion_table[(await self.gain.get_value()).name]
-
-    async def get_upperlimit(self) -> float:
-        return self.upperlimit
-
-    async def get_lowerlimit(self) -> float:
-        return self.lowerlimit
