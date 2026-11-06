@@ -13,8 +13,8 @@ from ophyd_async.core import (
 
 class CurrentAmp(ABC, StandardReadable, Movable[float]):
     """Base class for current amplifier, it contains the minimal functionality
-    a current amplifier needs:
-    """  # noqa D415
+    a current amplifier needs.
+    """
 
     gain: SignalRW[float]
     """Sensitivity in V/A."""

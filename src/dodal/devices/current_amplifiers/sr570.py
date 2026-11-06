@@ -118,25 +118,22 @@ class SR570(CurrentAmp):
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
-            self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
-
         self.timeout = timeout
         self._raise_timetable = raise_timetable
 
-        self.gain = derived_signal_rw(
-            _gain_to_sensitivity,
-            self._set_gain,
-            coarse_gain=self.coarse_gain,
-            fine_gain=self.fine_gain,
-        )
+        with self.add_children_as_readables():
+            self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
+            self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
 
-        super().__init__(
-            upperlimit=upperlimit,
-            lowerlimit=lowerlimit,
-            name=name,
-        )
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.gain = derived_signal_rw(
+                _gain_to_sensitivity,
+                self._set_gain,
+                coarse_gain=self.coarse_gain,
+                fine_gain=self.fine_gain,
+            )
+
+        super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
 
     async def _set_gain(self, value: float) -> None:
         """Set sensitivity in V/A."""
@@ -161,7 +158,7 @@ class SR570(CurrentAmp):
             )
 
         coarse_gain, fine_gain = configuration
-        LOGGER.info("%s gain change to %s", self.name, value)
+        LOGGER.info("%s gain changed to %s", self.name, value)
 
         await asyncio.gather(
             self.fine_gain.set(fine_gain, timeout=self.timeout),
