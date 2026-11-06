@@ -53,16 +53,11 @@ class CurrentAmpDet(StandardReadable, Preparable):
         """
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")
-            status = self.auto_gain()
-            try:
-                await status
-                LOGGER.info(
-                    f"{self.name} new gain = {await self.current_amp().gain.get_value()}."
-                )
-            except ValueError as ex:
-                LOGGER.warning(f"{self.name} gain went outside limits")
-                # Further details are provided to the user in the logged exception
-                LOGGER.exception(ex)
+            await self.auto_gain()
+            LOGGER.info(
+                f"{self.name} new gain = {await self.current_amp().gain.get_value()}."
+            )
+
         current = await self.get_corrected_current()
         self._set_current(current)
         return await super().read()
@@ -74,12 +69,21 @@ class CurrentAmpDet(StandardReadable, Preparable):
             self.current_amp().lowerlimit.get_value(),
         )
         while True:
+            # Acquire a fresh measurement at the new gain.
+            await self.counter().trigger()
+
             voltage_per_sec = abs(await self.counter().get_voltage_per_sec())
             if voltage_per_sec > upper_limit:
-                await self.current_amp().decrease_gain()
+                changed = await self.current_amp().decrease_gain()
             elif voltage_per_sec < lower_limit:
-                await self.current_amp().increase_gain()
+                changed = await self.current_amp().increase_gain()
             else:
+                return
+
+            if not changed:
+                # Gain has just been moved to its limit. Acquire a measurement using
+                # the final gain.
+                await self.counter().trigger()
                 return
 
     async def get_corrected_current(self) -> float:

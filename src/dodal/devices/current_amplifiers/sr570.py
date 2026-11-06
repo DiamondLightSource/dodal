@@ -170,7 +170,7 @@ class SR570(CurrentAmp):
         )
         await asyncio.sleep(self.raise_timetable[coarse_gain.name].value)
 
-    async def increase_gain(self, value: int = 3) -> None:
+    async def increase_gain(self, value: int = 3) -> bool:
         current_gain = await self.gain.get_value()
         gains = sorted(
             sensitivity
@@ -182,11 +182,12 @@ class SR570(CurrentAmp):
 
         if target_index >= len(gains):
             await self.set(gains[-1])
-            raise ValueError("Gain at max value")
+            return False
 
         await self.set(gains[target_index])
+        return True
 
-    async def decrease_gain(self, value: int = 3) -> None:
+    async def decrease_gain(self, value: int = 3) -> bool:
         current_gain = await self.gain.get_value()
         gains = sorted(
             sensitivity
@@ -198,6 +199,7 @@ class SR570(CurrentAmp):
 
         if target_index < 0:
             await self.set(gains[0])
-            raise ValueError("Gain at min value")
+            return False
 
         await self.set(gains[target_index])
+        return True

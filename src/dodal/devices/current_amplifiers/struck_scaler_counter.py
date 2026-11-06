@@ -6,9 +6,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.current_amplifiers import (
-    CurrentAmpCounter,
-)
+from dodal.devices.current_amplifiers import CurrentAmpCounter
 
 
 class CountMode(StrictEnum):
@@ -22,6 +20,10 @@ class CountState(StrictEnum):
 
 
 COUNT_PER_VOLTAGE = 100000
+
+
+def _count_per_sec_read():
+    pass
 
 
 class StruckScaler(CurrentAmpCounter):
@@ -45,6 +47,9 @@ class StruckScaler(CurrentAmpCounter):
             self.count_mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
             self.count_time = epics_signal_rw(float, prefix + ".TP")
         self.trigger_start = epics_signal_rw(CountState, prefix + ".CNT")
+
+        # self.count_per_sec = derived_signal_r()
+
         super().__init__(count_per_volt=count_per_volt, name=name)
 
     @AsyncStatus.wrap
@@ -69,7 +74,7 @@ class StruckScaler(CurrentAmpCounter):
         await self.count_time.set(value)
 
     async def get_count(self) -> float:
-        await self.trigger()
+        # await self.trigger()
         return await self.readout.get_value()
 
     async def get_count_per_sec(self) -> float:

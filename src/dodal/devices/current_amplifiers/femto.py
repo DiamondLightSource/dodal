@@ -1,11 +1,7 @@
 import asyncio
 from enum import Enum
 
-from ophyd_async.core import (
-    StandardReadableFormat,
-    StrictEnum,
-    derived_signal_rw,
-)
+from ophyd_async.core import StandardReadableFormat, StrictEnum, derived_signal_rw
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.current_amplifiers import CurrentAmp
@@ -79,8 +75,7 @@ class FemtoDDPCA(CurrentAmp):
         self.gain_configuration = FEMTO3XX_GAIN_CONFIGURATION
         self.raise_timetable = Femto3xxRaiseTime
 
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.gain_setting = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
+        self.gain_setting = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.gain = derived_signal_rw(
@@ -115,24 +110,24 @@ class FemtoDDPCA(CurrentAmp):
 
         await asyncio.sleep(self.raise_timetable[gain_setting.name].value)
 
-    async def increase_gain(self, value: int = 1) -> None:
+    async def increase_gain(self, value: int = 1) -> bool:
         current_gain = await self.gain.get_value()
         gains = sorted(self.gain_configuration.values())
         target_index = gains.index(current_gain) + value
 
         if target_index >= len(gains):
-            max_val = gains[-1]
-            raise ValueError(f"Gain at max value of {max_val:.0e}.")
+            return False
 
         await self.set(gains[target_index])
+        return True
 
-    async def decrease_gain(self, value: int = 1) -> None:
+    async def decrease_gain(self, value: int = 1) -> bool:
         current_gain = await self.gain.get_value()
         gains = sorted(self.gain_configuration.values())
         target_index = gains.index(current_gain) - value
 
         if target_index < 0:
-            min_val = gains[0]
-            raise ValueError(f"Gain at min value of {min_val:.0e}.")
+            return False
 
         await self.set(gains[target_index])
+        return True
