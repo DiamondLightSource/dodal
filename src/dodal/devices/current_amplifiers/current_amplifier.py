@@ -36,11 +36,19 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     async def increase_gain(self, value: int = 1) -> bool:
-        """Increase gain, increment by 1 by default."""
+        """Increase gain, increment by 1 by default.
+
+        Returns:
+            bool: True if success.
+        """
 
     @abstractmethod
     async def decrease_gain(self, value: int = 1) -> bool:
-        """Decrease gain, decrement by 1 by default."""
+        """Decrease gain, decrement by 1 by default.
+
+        Returns:
+            bool: True if success.
+        """
 
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable, Triggerable):
