@@ -29,12 +29,11 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     current output in Amp.
 
     Attributes:
-        current_amp_ref (Reference[CurrentAmp]): Current amplifier type device.
-        counter_ref (Reference[CurrentAmpCounter]): Counter that capture the current
-            amplifier output.
-        current (SignalRW([float]): Derived signal that calculates the corrected current.
-        auto_mode (SignalR([bool])): Soft signal to store the flag for auto gain.
-        name (str): Name of the device.
+        current_amp_ref (Reference[CurrentAmp]): Reference to current amplifier device.
+        counter_ref (Reference[CurrentAmpCounter]): Reference to counter device that
+            captures the current amplifier output.
+        current (SignalRW[float]): Derived signal that calculates the corrected current.
+        auto_mode (SignalR[bool]): Soft signal to store the flag for auto gain.
     """
 
     def __init__(
