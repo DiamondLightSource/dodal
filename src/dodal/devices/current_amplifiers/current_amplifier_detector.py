@@ -23,17 +23,22 @@ def _corrected_current(voltage_per_sec: float, gain: float) -> float:
 
 
 class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
-    """CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
-    the option for automatically changing the CurrentAmp gain to within the optimal
-    range. It also converts the CurrentAmp / counter output back into the detector
-    current output in Amp.
+    """Current amplifier detector composed of references to a current amplifier device
+    and counter device.
+
+    Provides automatic gain optimisation to keep the amplifier output withi a configured
+    voltage range and converts the counter output into the corresponding detector
+    current in Amps.
+
+    Automatic gain adjustment can be enabled or disabled via ``auto_mode`` signal.
+    When enabled, the amplifier gain is optimised before the final counter
+    acquisition.
 
     Attributes:
-        current_amp_ref (Reference[CurrentAmp]): Reference to current amplifier device.
-        counter_ref (Reference[CurrentAmpCounter]): Reference to counter device that
-            captures the current amplifier output.
-        current (SignalRW[float]): Derived signal that calculates the corrected current.
-        auto_mode (SignalR[bool]): Soft signal to store the flag for auto gain.
+        current (SignalR[float]): Derived detector current in Amps, calculated from the
+            counter output and amplifier sensitivity.
+        auto_mode (SignalRW[bool]): Configuration signal controlling whether automatic
+            gain optimisation is performed before acquisition.
     """
 
     def __init__(
@@ -43,8 +48,18 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         auto_mode: bool = True,
         name: str = "",
     ) -> None:
-        self.current_amp_ref = Reference(current_amp)
-        self.counter_ref = Reference(counter)
+        """Configure the current amplifier detector.
+
+        Args:
+            current_amp: Current amplifier providing the sensitivity and output voltage
+                limits for gain optimisation.
+            counter: Counter acquiring the current amplifier output.
+            auto_mode: Whether to automatically optimise the amplifier gain before each
+                acquisition.
+            name: Name of the device.
+        """
+        self._current_amp_ref = Reference(current_amp)
+        self._counter_ref = Reference(counter)
         with self.add_children_as_readables():
             self.current = derived_signal_r(
                 _corrected_current,
@@ -58,19 +73,26 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
 
     @AsyncStatus.wrap
     async def auto_gain(self) -> None:
+        """Automatically optimise the current amplifier gain.
+
+        Repeatedly trigger the counter and adjust the amplifier sensitivity
+        until its output voltage is within the configured lower and upper
+        limits. If the amplifier reaches its gain limit, return without
+        further adjustment.
+        """
         upper_limit, lower_limit = await asyncio.gather(
-            self.current_amp_ref().upperlimit.get_value(),
-            self.current_amp_ref().lowerlimit.get_value(),
+            self._current_amp_ref().upperlimit.get_value(),
+            self._current_amp_ref().lowerlimit.get_value(),
         )
         while True:
             # Acquire a fresh measurement at the new gain.
-            await self.counter_ref().trigger()
+            await self._counter_ref().trigger()
 
-            voltage_per_sec = abs(await self.counter_ref().voltage_per_sec.get_value())
+            voltage_per_sec = abs(await self._counter_ref().voltage_per_sec.get_value())
             if voltage_per_sec > upper_limit:
-                changed = await self.current_amp_ref().decrease_gain()
+                changed = await self._current_amp_ref().decrease_gain()
             elif voltage_per_sec < lower_limit:
-                changed = await self.current_amp_ref().increase_gain()
+                changed = await self._current_amp_ref().increase_gain()
             else:
                 return
 
@@ -79,22 +101,28 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        await self.counter_ref().stage()
+        await self._counter_ref().stage()
 
     @AsyncStatus.wrap
     async def prepare(self, value) -> None:
-        await self.counter_ref().prepare(value)
+        await self._counter_ref().prepare(value)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
+        """Trigger a detector acquisition.
+
+        If automatic gain adjustment is enabled, optimise the amplifier gain
+        before triggering the counter for the final acquisition. Otherwise,
+        trigger the counter directly using the current amplifier gain.
+        """
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")
             await self.auto_gain()
             LOGGER.info(
-                f"{self.name} new gain = {await self.current_amp_ref().gain.get_value()}."
+                f"{self.name} new gain = {await self._current_amp_ref().gain.get_value()}."
             )
-        await self.counter_ref().trigger()
+        await self._counter_ref().trigger()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        await self.counter_ref().unstage()
+        await self._counter_ref().unstage()
