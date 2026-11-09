@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.scaler_card &#8212; dodal 3.0.8.dev2+gc7369b0cf documentation</title>
+    <title>dodal.devices.scaler_card &#8212; dodal 3.0.9.dev1+g5089bdf9d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=60979c44"></script>
+    <script src="../../../_static/documentation_options.js?v=3997001d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -885,52 +885,28 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.scaler_card</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableMapping</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableMapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Reading</span><span class="p">,</span> <span class="n">Triggerable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Triggerable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
-    <span class="n">DeviceMock</span><span class="p">,</span>
     <span class="n">Reference</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">default_mock_class</span><span class="p">,</span>
-    <span class="n">set_mock_value</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
 
-
-<div class="viewcode-block" id="MockScalerCardController">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.scaler_card.MockScalerCardController.html#dodal.devices.scaler_card.MockScalerCardController">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">MockScalerCardController</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">&quot;ScalerCardController&quot;</span><span class="p">]):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_on_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reading</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]):</span>
-        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_complete</span><span class="p">():</span>
-            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-            <span class="n">set_mock_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_counting</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_counting</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]:</span>
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">_complete</span><span class="p">())</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_counting</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">start_count</span>
-
-        <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">start_count</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="c1"># Can&#39;t use callback_on_mock_put as this is called before the mock put, we need</span>
-        <span class="c1"># to simulate after mock put update. subscribe_reading listeners are stored in</span>
-        <span class="c1"># a set, so repeatedly subscribing this bound method is harmless and does not</span>
-        <span class="c1"># create duplicate callbacks.</span>
-        <span class="n">device</span><span class="o">.</span><span class="n">start_count</span><span class="o">.</span><span class="n">subscribe_reading</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_value</span><span class="p">)</span></div>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.util.mock_behaviour</span><span class="w"> </span><span class="kn">import</span> <span class="n">reset_signal_on_update_mock_factory</span>
 
 
 <div class="viewcode-block" id="ScalerCardController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.scaler_card.ScalerCardController.html#dodal.devices.scaler_card.ScalerCardController">[docs]</a>
-<span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">MockScalerCardController</span><span class="p">)</span>
+<span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">reset_signal_on_update_mock_factory</span><span class="p">(</span><span class="s2">&quot;start_count&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScalerCardController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Triggerable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Control a scaler card and its readable channels.</span>
 

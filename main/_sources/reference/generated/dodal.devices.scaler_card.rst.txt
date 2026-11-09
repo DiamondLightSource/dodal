@@ -14,7 +14,6 @@ dodal.devices.scaler\_card
    :toctree:
    :recursive:
 
-   ~scaler_card.MockScalerCardController
    ~scaler_card.ScalerCard
    ~scaler_card.ScalerCardController
 
