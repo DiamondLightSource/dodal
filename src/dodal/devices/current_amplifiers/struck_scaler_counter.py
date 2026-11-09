@@ -47,7 +47,7 @@ class MockStruckScaler(DeviceMock["StruckScaler"]):
             await asyncio.sleep(0.01)
             set_mock_value(self._counting, CountState.DONE)
 
-        if value[self._counting.name]["value"]:
+        if value[self._counting.name]["value"] == CountState.COUNT:
             asyncio.create_task(_complete())
 
     async def connect(self, device):
