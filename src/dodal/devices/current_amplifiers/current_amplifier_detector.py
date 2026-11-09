@@ -26,7 +26,7 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     """Current amplifier detector composed of references to a current amplifier device
     and counter device.
 
-    Provides automatic gain optimisation to keep the amplifier output withi a configured
+    Provides automatic gain optimisation to keep the amplifier output within a configured
     voltage range and converts the counter output into the corresponding detector
     current in Amps.
 
