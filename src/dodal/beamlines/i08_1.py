@@ -1,13 +1,18 @@
 from functools import cache
 from pathlib import Path
 
-from ophyd_async.core import PathProvider
+from ophyd_async.core import (
+    PathProvider,
+    StaticPathProvider,
+    UUIDFilenameProvider,
+)
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.motors import XYStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -20,10 +25,6 @@ PATH = "/dls/tmp/"
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-from ophyd_async.core import (
-    StaticPathProvider,
-    UUIDFilenameProvider,
-)
 
 devices = DeviceManager()
 
@@ -35,15 +36,11 @@ def path_provider() -> PathProvider:
 
 
 @devices.factory()
-def scanning_fine_x() -> Motor:
-    """Y fine motor."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-TABLE-01:XF")
-
-
-@devices.factory()
-def scanning_fine_y() -> Motor:
-    """X fine motor."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-TABLE-01:YF")
+def scanning_fine() -> XYStage:
+    """Fine X and Y stages."""
+    return XYStage(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01)", x_infix="XF", y_infix="YF"
+    )
 
 
 @devices.factory()
@@ -63,7 +60,7 @@ def scanning_pmac() -> PmacIO:
     """PMac controller using running fly scans with trajectory."""
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-STEP-01:",
-        raw_motors=[scanning_fine_x()],
+        raw_motors=[scanning_fine().x, scanning_fine().y],
         coord_nums=[2],
         name="pmac",
     )
