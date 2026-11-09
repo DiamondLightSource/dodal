@@ -1,0 +1,99 @@
+dodal.devices.current\_amplifiers.EnzLocumRange
+===============================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: EnzLocumRange
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnzLocumRange.RANGE_100PA
+      
+      
+      ~EnzLocumRange.RANGE_1NA
+      
+      
+      ~EnzLocumRange.RANGE_10NA
+      
+      
+      ~EnzLocumRange.RANGE_100NA
+      
+      
+      ~EnzLocumRange.RANGE_1UA
+      
+      
+      ~EnzLocumRange.RANGE_10UA
+      
+      
+      ~EnzLocumRange.RANGE_100UA
+      
+      
+      ~EnzLocumRange.RANGE_1MA
+      
+      
+      ~EnzLocumRange.AUTO
+      
+   
+   

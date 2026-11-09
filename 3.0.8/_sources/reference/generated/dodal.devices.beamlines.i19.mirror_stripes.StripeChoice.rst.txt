@@ -1,0 +1,90 @@
+dodal.devices.beamlines.i19.mirror\_stripes.StripeChoice
+========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.mirror_stripes
+
+.. autoclass:: StripeChoice
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~StripeChoice.EH1_RH
+      
+      
+      ~StripeChoice.EH1_SI
+      
+      
+      ~StripeChoice.EH1_PT
+      
+      
+      ~StripeChoice.EH2_RH
+      
+      
+      ~StripeChoice.EH2_SI
+      
+      
+      ~StripeChoice.EH2_PT
+      
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.electron\_analyser.specs
+======================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~specs.SpecsDetector
+   ~specs.SpecsAnalyserDriverIO
+   ~specs.AcquisitionMode
+   ~specs.SpecsRegion
+   ~specs.SpecsSequence
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.specs
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

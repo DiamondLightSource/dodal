@@ -1,0 +1,87 @@
+dodal.devices.current\_amplifiers.EnzLocumIntegrationWindow
+===========================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: EnzLocumIntegrationWindow
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnzLocumIntegrationWindow.WINDOW_4
+      
+      
+      ~EnzLocumIntegrationWindow.WINDOW_8
+      
+      
+      ~EnzLocumIntegrationWindow.WINDOW_16
+      
+      
+      ~EnzLocumIntegrationWindow.WINDOW_32
+      
+      
+      ~EnzLocumIntegrationWindow.WINDOW_64
+      
+   
+   

@@ -1,0 +1,37 @@
+dodal.devices.beamlines.i15\_1.hexapod
+======================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i15_1
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~hexapod.CombinedMove
+   ~hexapod.Hexapod
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i15_1.hexapod
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

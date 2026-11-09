@@ -1,0 +1,62 @@
+dodal.devices.current\_amplifiers.Femto3xxRaiseTime
+===================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: Femto3xxRaiseTime
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Femto3xxRaiseTime.SEN_1
+      
+      
+      ~Femto3xxRaiseTime.SEN_2
+      
+      
+      ~Femto3xxRaiseTime.SEN_3
+      
+      
+      ~Femto3xxRaiseTime.SEN_4
+      
+      
+      ~Femto3xxRaiseTime.SEN_5
+      
+      
+      ~Femto3xxRaiseTime.SEN_6
+      
+      
+      ~Femto3xxRaiseTime.SEN_7
+      
+      
+      ~Femto3xxRaiseTime.SEN_8
+      
+      
+      ~Femto3xxRaiseTime.SEN_9
+      
+      
+      ~Femto3xxRaiseTime.SEN_10
+      
+   
+   

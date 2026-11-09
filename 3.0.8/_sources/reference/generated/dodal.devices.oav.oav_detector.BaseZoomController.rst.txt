@@ -1,0 +1,47 @@
+dodal.devices.oav.oav\_detector.BaseZoomController
+==================================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: BaseZoomController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BaseZoomController.level
+      
+      
+      ~BaseZoomController.percentage
+      
+   
+   

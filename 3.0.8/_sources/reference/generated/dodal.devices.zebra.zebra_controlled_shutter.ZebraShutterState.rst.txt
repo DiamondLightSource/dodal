@@ -1,0 +1,78 @@
+dodal.devices.zebra.zebra\_controlled\_shutter.ZebraShutterState
+================================================================
+
+.. currentmodule:: dodal.devices.zebra.zebra_controlled_shutter
+
+.. autoclass:: ZebraShutterState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ZebraShutterState.CLOSE
+      
+      
+      ~ZebraShutterState.OPEN
+      
+   
+   

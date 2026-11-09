@@ -1,0 +1,41 @@
+dodal.devices.oav.oav\_detector.Coords
+======================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: Coords
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~Coords.X
+      
+      
+      ~Coords.Y
+      
+   
+   

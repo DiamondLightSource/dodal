@@ -1,0 +1,50 @@
+dodal.devices.beamlines.i05\_shared.PolynomialCompoundMovable
+=============================================================
+
+.. currentmodule:: dodal.devices.beamlines.i05_shared
+
+.. autoclass:: PolynomialCompoundMovable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~PolynomialCompoundMovable.movable_logic
+      
+      
+      
+   
+   

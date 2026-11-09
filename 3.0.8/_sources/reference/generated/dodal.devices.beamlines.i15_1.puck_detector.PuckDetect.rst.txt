@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i15\_1.puck\_detector.PuckDetect
+========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.puck_detector
+
+.. autoclass:: PuckDetect
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~PuckDetect.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

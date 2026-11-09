@@ -1,0 +1,81 @@
+dodal.devices.beamlines.i19.access\_controlled.energy\_device.Stripes
+=====================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.access_controlled.energy_device
+
+.. autoclass:: Stripes
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Stripes.RH
+      
+      
+      ~Stripes.SI
+      
+      
+      ~Stripes.PT
+      
+   
+   

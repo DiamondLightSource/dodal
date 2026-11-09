@@ -1,0 +1,43 @@
+dodal.devices.beamlines.i19.access\_controlled.piezo\_control.AccessControlledPiezoActuator
+===========================================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i19.access_controlled.piezo_control
+
+.. autoclass:: AccessControlledPiezoActuator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AccessControlledPiezoActuator.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

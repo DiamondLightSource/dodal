@@ -1,0 +1,27 @@
+dodal.beamlines.i05\_shared
+===========================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i05_shared
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

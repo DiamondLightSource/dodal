@@ -1,0 +1,34 @@
+dodal.beamlines.p38
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.p38
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      config_client
+      path_provider
+   
+   
+
+   
+   
+   
