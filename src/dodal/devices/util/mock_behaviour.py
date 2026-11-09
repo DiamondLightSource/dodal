@@ -35,15 +35,15 @@ def reset_signal_on_update_mock_factory(
     class ReadingUpdateResetMock(DeviceMock):
         """Mock that automatically updates a signal following a reading."""
 
-        def _on_value(self, value: dict[str, Reading[SignalDatatype]]):
+        def _on_value_update(self, value: dict[str, Reading[SignalDatatype]]):
             """Schedule a signal reset when the trigger value is observed."""
 
-            async def _complete():
+            async def _reset_value():
                 await asyncio.sleep(reset_delay)
                 set_mock_value(self._mock_trigger_signal, reset_value)
 
             if value[self._mock_trigger_signal.name]["value"] == trigger_value:
-                asyncio.create_task(_complete())
+                asyncio.create_task(_reset_value())
 
         async def connect(self, device: DeviceMock):
             """Connect the mock to the device signal and initialise its value."""
@@ -55,6 +55,6 @@ def reset_signal_on_update_mock_factory(
             # need to simulate after mock put update. subscribe_reading listeners are
             # stored in a set, so repeatedly subscribing this bound method is harmless
             # and does not create duplicate callbacks.
-            signal.subscribe_reading(self._on_value)
+            signal.subscribe_reading(self._on_value_update)
 
     return ReadingUpdateResetMock
