@@ -2,13 +2,13 @@ from ophyd_async.core import (
     AsyncStatus,
     StandardReadableFormat,
     StrictEnum,
+    default_mock_class,
     set_and_wait_for_other_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.current_amplifiers import (
-    CurrentAmpCounter,
-)
+from dodal.devices.current_amplifiers import CurrentAmpCounter
+from dodal.devices.util.mock_behaviour import reset_signal_on_update_mock_factory
 
 
 class CountMode(StrictEnum):
@@ -24,6 +24,11 @@ class CountState(StrictEnum):
 COUNT_PER_VOLTAGE = 100000
 
 
+@default_mock_class(
+    reset_signal_on_update_mock_factory(
+        "trigger_start", CountState.COUNT, CountState.DONE
+    )
+)
 class StruckScaler(CurrentAmpCounter):
     """StruckScaler is a counting card that record the output signal from a wide
     range of detectors. This class contains the basic control to run the struckscaler
@@ -61,7 +66,7 @@ class StruckScaler(CurrentAmpCounter):
             set_signal=self.trigger_start,
             set_value=CountState.COUNT,
             match_signal=self.trigger_start,
-            match_value=CountState.COUNT,
+            match_value=CountState.DONE,
         )
 
     @AsyncStatus.wrap
