@@ -44,8 +44,8 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
             name (str): Name of the device (optional).
         """
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.upperlimit = soft_signal_rw(float, initial_value=upperlimit)
-            self.lowerlimit = soft_signal_rw(float, initial_value=lowerlimit)
+            self.upperlimit = soft_signal_rw(float, initial_value=upperlimit, units="V")
+            self.lowerlimit = soft_signal_rw(float, initial_value=lowerlimit, units="V")
         super().__init__(name)
 
     @AsyncStatus.wrap
