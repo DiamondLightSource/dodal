@@ -1,44 +1,23 @@
-import asyncio
 from collections.abc import MutableMapping
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable, Reading, Triggerable
+from bluesky.protocols import Movable, Triggerable
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     Device,
-    DeviceMock,
     Reference,
     StandardReadable,
     StandardReadableFormat,
     default_mock_class,
-    set_mock_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
-
-class MockScalerCardController(DeviceMock["ScalerCardController"]):
-    def _on_value(self, value: dict[str, Reading[bool]]):
-        async def _complete():
-            await asyncio.sleep(0.01)
-            set_mock_value(self._counting, False)
-
-        if value[self._counting.name]["value"]:
-            asyncio.create_task(_complete())
-
-    async def connect(self, device):
-        self._counting = device.start_count
-
-        set_mock_value(device.start_count, False)
-        # Can't use callback_on_mock_put as this is called before the mock put, we need
-        # to simulate after mock put update. subscribe_reading listeners are stored in
-        # a set, so repeatedly subscribing this bound method is harmless and does not
-        # create duplicate callbacks.
-        device.start_count.subscribe_reading(self._on_value)
+from dodal.devices.util.mock_behaviour import reset_signal_on_update_mock_factory
 
 
-@default_mock_class(MockScalerCardController)
+@default_mock_class(reset_signal_on_update_mock_factory("start_count", True, False))
 class ScalerCardController(StandardReadable, Triggerable, Movable[float]):
     """Control a scaler card and its readable channels.
 

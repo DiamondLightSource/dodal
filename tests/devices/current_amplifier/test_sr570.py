@@ -18,6 +18,8 @@ from dodal.devices.current_amplifiers import (
     SR570GainTable,
     StruckScaler,
 )
+from dodal.devices.current_amplifiers.current_amplifier_detector import CurrentAmpDet
+from dodal.devices.current_amplifiers.struck_scaler_counter import StruckScaler
 
 
 class MockSR570RaiseTimeTable(float, Enum):

@@ -1,20 +1,16 @@
-import asyncio
-
-from bluesky.protocols import Reading
 from ophyd_async.core import (
     AsyncStatus,
-    DeviceMock,
     StandardReadableFormat,
     StrictEnum,
     default_mock_class,
     derived_signal_r,
     set_and_wait_for_other_value,
-    set_mock_value,
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.current_amplifiers import CurrentAmpCounter
+from dodal.devices.util.mock_behaviour import reset_signal_on_update_mock_factory
 
 
 class CountMode(StrictEnum):
@@ -40,28 +36,11 @@ def _voltage_per_sec(
     return current_count_per_sec / current_count_per_volt
 
 
-# ToDo - This should be more standard / easier.
-class MockStruckScaler(DeviceMock["StruckScaler"]):
-    def _on_value(self, value: dict[str, Reading[CountState]]):
-        async def _complete():
-            await asyncio.sleep(0.01)
-            set_mock_value(self._counting, CountState.DONE)
-
-        if value[self._counting.name]["value"] == CountState.COUNT:
-            asyncio.create_task(_complete())
-
-    async def connect(self, device):
-        self._counting = device.trigger_start
-
-        set_mock_value(device.trigger_start, CountState.DONE)
-        # Can't use callback_on_mock_put as this is called before the mock put, we need
-        # to simulate after mock put update. subscribe_reading listeners are stored in
-        # a set, so repeatedly subscribing this bound method is harmless and does not
-        # create duplicate callbacks.
-        device.trigger_start.subscribe_reading(self._on_value)
-
-
-@default_mock_class(MockStruckScaler)
+@default_mock_class(
+    reset_signal_on_update_mock_factory(
+        "trigger_start", CountState.COUNT, CountState.DONE
+    )
+)
 class StruckScaler(CurrentAmpCounter):
     """StruckScaler is a counting card that records the output signal from a wide
     range of detectors. This class contains the basic control to run the struck scaler
