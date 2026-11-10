@@ -12,7 +12,6 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.current_amplifiers import CurrentAmp
-from dodal.log import LOGGER
 
 
 class Femto3xxGainTable(StrictEnum):
@@ -144,7 +143,7 @@ class FemtoDDPCA(CurrentAmp, Generic[EnumTypesT]):
                 f"Available gains: {available}"
             ) from None
 
-        LOGGER.info("%s gain change to %s:%s", self.name, gain_enum.name, value)
+        self.log.info(f"Gain change to enum {gain_enum.name} and value {value}.")
         await self.gain_enum.set(gain_enum, timeout=self._timeout)
         await asyncio.sleep(self._raise_timetable[gain_enum.name].value)
 

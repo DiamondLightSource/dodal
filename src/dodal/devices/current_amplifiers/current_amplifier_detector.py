@@ -90,14 +90,29 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
 
             voltage_per_sec = abs(await self._counter_ref().voltage_per_sec.get_value())
             if voltage_per_sec > upper_limit:
+                self.log.debug(
+                    f"Voltage is {voltage_per_sec} is above limit {upper_limit}. "
+                    "Decreasing gain..."
+                )
                 changed = await self._current_amp_ref().decrease_gain()
             elif voltage_per_sec < lower_limit:
+                self.log.debug(
+                    f"Voltage {voltage_per_sec} is below limit {lower_limit}. "
+                    "Increasing gain..."
+                )
                 changed = await self._current_amp_ref().increase_gain()
             else:
-                return
+                self.log.debug("Don't need to adjust gain", self.name)
+                break
 
             if not changed:
-                return
+                direction = "decrease" if voltage_per_sec > upper_limit else "increase"
+                self.log.warning(
+                    f"Couldn't {direction} gain further. Input current might be out of range."
+                )
+                break
+
+        LOGGER.debug("Finished optimising gain.")
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
