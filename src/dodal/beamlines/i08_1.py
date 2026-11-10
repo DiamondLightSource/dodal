@@ -6,7 +6,6 @@ from ophyd_async.core import (
     StaticPathProvider,
     UUIDFilenameProvider,
 )
-from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -19,14 +18,19 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i08-1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
-# PATH = "/dls/i08/data/2026/cm44148-5/tmp"
-# Writing to /dls/tmp while we correct data folder issues
-PATH = "/dls/tmp/"
+PATH = "/dls/i08-1/data/2026/cm44149-5/tmp/"
+
+
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
 devices = DeviceManager()
+
+
+@devices.factory()
+def synchrotron() -> Synchrotron:
+    return Synchrotron()
 
 
 @devices.fixture
@@ -39,20 +43,13 @@ def path_provider() -> PathProvider:
 def scanning_fine() -> XYStage:
     """Fine X and Y stages."""
     return XYStage(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01)", x_infix="XF", y_infix="YF"
+        prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01:", x_infix="XF", y_infix="YF"
     )
 
 
 @devices.factory()
-def combined_x() -> Motor:
-    """X motor combined."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-TABLE-01:X")
-
-
-@devices.factory()
-def combined_y() -> Motor:
-    """Y motor combined."""
-    return Motor(f"{PREFIX.beamline_prefix}-EA-TABLE-01:Y")
+def scanning_combined() -> XYStage:
+    return XYStage(prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01:")
 
 
 @devices.factory()
@@ -72,8 +69,3 @@ def panda1(path_provider: PathProvider) -> HDFPanda:
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=path_provider,
     )
-
-
-@devices.factory()
-def synchrotron() -> Synchrotron:
-    return Synchrotron()
