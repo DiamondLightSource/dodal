@@ -112,7 +112,7 @@ async def test_femto_set_fail_out_of_range(
     ):
         await mock_femto.set(gain)
 
-    get_mock_put(mock_femto.gain_setting).assert_not_called()
+    get_mock_put(mock_femto.gain_enum).assert_not_called()
     sleep.assert_not_called()
 
 

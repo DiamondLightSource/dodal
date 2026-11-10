@@ -52,11 +52,11 @@ FEMTO3XX_GAIN_CONFIGURATION: dict[Femto3xxGainTable, float] = {
 }
 
 
-def _gain_to_sensitivity(
-    gain_setting: Femto3xxGainTable,
+def _gain_enum_to_value(
+    gain_enum: Femto3xxGainTable,
 ) -> float:
-    """Convert Femto gain setting to sensitivity in V/A."""
-    return FEMTO3XX_GAIN_CONFIGURATION[gain_setting]
+    """Convert Femto gain enum to numerical value V/A."""
+    return FEMTO3XX_GAIN_CONFIGURATION[gain_enum]
 
 
 class FemtoDDPCA(CurrentAmp):
@@ -100,45 +100,44 @@ class FemtoDDPCA(CurrentAmp):
             timeout: Maximum waiting time in seconds when setting gain.
             name: Name of the device.
         """
-        self._gain_configuration = FEMTO3XX_GAIN_CONFIGURATION
+        self._gain_to_value_config = FEMTO3XX_GAIN_CONFIGURATION
+        # Create the inverse lookup table for _set_gain method.
+        self._value_to_gain_config = {
+            sensitivity: setting
+            for setting, sensitivity in self._gain_to_value_config.items()
+        }
         self._raise_timetable = raise_timetable
         self._timeout = timeout
 
-        self.gain_setting = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
+        self.gain_enum = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.gain = derived_signal_rw(
-                _gain_to_sensitivity, self._set_gain, gain_setting=self.gain_setting
+                _gain_enum_to_value, self._set_gain, gain_enum=self.gain_enum
             )
         super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
 
     async def _set_gain(self, value: float) -> None:
         """Set sensitivity in V/A."""
-        gain_setting = next(
-            (
-                setting
-                for setting, sensitivity in self._gain_configuration.items()
-                if sensitivity == value
-            ),
-            None,
-        )
-        if gain_setting is None:
+        try:
+            gain_enum = self._value_to_gain_config[value]
+        except KeyError:
             available = [
                 f"{sensitivity:.0e}"
-                for sensitivity in self._gain_configuration.values()
+                for sensitivity in self._value_to_gain_config.keys()
             ]
             raise ValueError(
                 f"Gain value {value} is not within {self.name} range.\n"
                 f"Available gains: {available}"
-            )
+            ) from None
 
-        LOGGER.info("%s gain change to %s:%s", self.name, gain_setting.name, value)
-        await self.gain_setting.set(gain_setting, timeout=self._timeout)
-        await asyncio.sleep(self._raise_timetable[gain_setting.name].value)
+        LOGGER.info("%s gain change to %s:%s", self.name, gain_enum.name, value)
+        await self.gain_enum.set(gain_enum, timeout=self._timeout)
+        await asyncio.sleep(self._raise_timetable[gain_enum.name].value)
 
     async def increase_gain(self, value: int = 1) -> bool:
         current_gain = await self.gain.get_value()
-        gains = sorted(self._gain_configuration.values())
+        gains = sorted(self._gain_to_value_config.values())
         target_index = gains.index(current_gain) + value
 
         if target_index >= len(gains):
@@ -149,7 +148,7 @@ class FemtoDDPCA(CurrentAmp):
 
     async def decrease_gain(self, value: int = 1) -> bool:
         current_gain = await self.gain.get_value()
-        gains = sorted(self._gain_configuration.values())
+        gains = sorted(self._gain_to_value_config.values())
         target_index = gains.index(current_gain) - value
 
         if target_index < 0:
