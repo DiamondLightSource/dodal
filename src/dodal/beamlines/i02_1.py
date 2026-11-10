@@ -18,7 +18,6 @@ from dodal.devices.attenuator.filter_selections import (
 from dodal.devices.beamlines.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
 from dodal.devices.beamlines.i02_1.flux import Flux
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase, StationaryCrystal
-from dodal.devices.eiger import EigerDetector
 from dodal.devices.motors import XYZWrappedOmegaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -55,14 +54,6 @@ def config_client() -> ConfigClient:
     client = ConfigClient.from_url(config_server_url)
     set_config_client(client)
     return client
-
-
-@devices.v1_init(
-    EigerDetector, prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", wait=False
-)
-def eiger(eiger: EigerDetector) -> EigerDetector:
-    eiger.detector_id = 101
-    return eiger
 
 
 @devices.factory()

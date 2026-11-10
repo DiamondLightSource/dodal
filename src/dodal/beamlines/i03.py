@@ -33,7 +33,6 @@ from dodal.devices.cryostream import (
 )
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
-from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThreeD
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
@@ -180,14 +179,6 @@ def detector_motion() -> DetectorMotion:
         device_prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
         pmac_prefix=f"{PREFIX.beamline_prefix}-MO-PMAC-02:",
     )
-
-
-@devices.v1_init(
-    EigerDetector, prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", wait=False
-)
-def eiger(eiger: EigerDetector) -> EigerDetector:
-    eiger.detector_id = 78
-    return eiger
 
 
 # ophyd-async no longer works with a mixed ADOdin and fastCS Eiger. Need to update the

@@ -5,7 +5,6 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from graypy import GELFTCPHandler
-from ophyd import log as ophyd_log
 from ophyd_async.core import Device, soft_signal_rw
 
 from dodal import log
@@ -188,10 +187,6 @@ def test_various_messages_to_graylog_get_beamline_filter(
     LOGGER.info("test")
     assert isinstance(mock_gelf_tcp_handler.emit, MagicMock)
     mock_gelf_tcp_handler.emit.assert_called()
-    assert mock_gelf_tcp_handler.emit.call_args.args[0].beamline == "dev"
-
-    ophyd_log.logger.info("Ophyd log message")
-    assert mock_gelf_tcp_handler.emit.call_args.args[0].name == "ophyd"
     assert mock_gelf_tcp_handler.emit.call_args.args[0].beamline == "dev"
 
     run_engine.log.logger.info("RunEngine log message")

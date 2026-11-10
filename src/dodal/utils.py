@@ -6,7 +6,6 @@ import string
 from dataclasses import dataclass
 from os import environ
 from types import ModuleType
-from typing import TypeAlias
 
 from bluesky.protocols import (
     Checkable,
@@ -24,8 +23,6 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
-from ophyd.device import Device as OphydV1Device
-from ophyd_async.core import Device as OphydV2Device
 
 import dodal.log
 
@@ -46,8 +43,6 @@ BLUESKY_PROTOCOLS = [
     Configurable,
     Triggerable,
 ]
-
-AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
 
 
 def get_beamline_name(default: str | None = None) -> str:

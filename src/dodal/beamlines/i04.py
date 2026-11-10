@@ -22,7 +22,6 @@ from dodal.devices.beamlines.i04.murko_results import MurkoResultsDevice
 from dodal.devices.beamlines.i04.transfocator import Transfocator
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
-from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
 from dodal.devices.ipin import IPin
@@ -171,12 +170,6 @@ def aperture_scatterguard(config_client: ConfigClient) -> ApertureScatterguard:
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
-
-
-@devices.v1_init(EigerDetector, prefix="BL04I-EA-EIGER-01:", wait=False)
-def eiger(eiger: EigerDetector) -> EigerDetector:
-    eiger.detector_id = 78
-    return eiger
 
 
 @devices.factory()
