@@ -63,7 +63,7 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         with self.add_children_as_readables():
             self.current = derived_signal_r(
                 _corrected_current,
-                derived_units="I",
+                derived_units="A",
                 voltage_per_sec=counter.voltage_per_sec,
                 gain=current_amp.gain,
             )
