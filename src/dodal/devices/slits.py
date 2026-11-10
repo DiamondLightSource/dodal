@@ -59,7 +59,7 @@ class SlitsWithIndividualBlades(Slits):
         with self.add_children_as_readables():
             self.x_minus = Motor(prefix + x_minus)
             self.x_plus = Motor(prefix + x_plus)
-            self.y_minus =  Motor(prefix + y_minus)
+            self.y_minus = Motor(prefix + y_minus)
             self.y_plus = Motor(prefix + y_plus)
 
         super().__init__(
