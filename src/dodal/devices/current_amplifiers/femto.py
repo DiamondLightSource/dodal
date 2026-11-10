@@ -1,7 +1,14 @@
 import asyncio
+from collections.abc import Mapping
 from enum import Enum
+from typing import Generic, TypeVar
 
-from ophyd_async.core import StandardReadableFormat, StrictEnum, derived_signal_rw
+from ophyd_async.core import (
+    EnumTypes,
+    StandardReadableFormat,
+    StrictEnum,
+    derived_signal_rw,
+)
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.current_amplifiers import CurrentAmp
@@ -38,7 +45,7 @@ class Femto3xxRaiseTime(float, Enum):
     SEN_10 = 350e-3
 
 
-FEMTO3XX_GAIN_CONFIGURATION: dict[Femto3xxGainTable, float] = {
+DEFAULT_FEMTO3XX_GAIN_TO_VALUE: dict[Femto3xxGainTable, float] = {
     Femto3xxGainTable.SEN_1: 1e4,
     Femto3xxGainTable.SEN_2: 1e5,
     Femto3xxGainTable.SEN_3: 1e6,
@@ -52,14 +59,10 @@ FEMTO3XX_GAIN_CONFIGURATION: dict[Femto3xxGainTable, float] = {
 }
 
 
-def _gain_enum_to_value(
-    gain_enum: Femto3xxGainTable,
-) -> float:
-    """Convert Femto gain enum to numerical value V/A."""
-    return FEMTO3XX_GAIN_CONFIGURATION[gain_enum]
+EnumTypesT = TypeVar("EnumTypesT", bound=EnumTypes)
 
 
-class FemtoDDPCA(CurrentAmp):
+class FemtoDDPCA(CurrentAmp, Generic[EnumTypesT]):
     """Femto current amplifier with derived numerical sensitivity.
 
     The Femto amplifier exposes its gain as an EPICS enumeration via gain_setting. This
@@ -68,8 +71,8 @@ class FemtoDDPCA(CurrentAmp):
 
     Attributes:
         gain (SignalRW[float]): Derived current-to-voltage sensitivity in V/A.
-        gain_setting (SignalRW[Femto3xxGainTable]): EPICS signal controlling the
-            amplifier gain setting via enum.
+        gain_enum (SignalRW[Femto3xxGainTable]): EPICS signal controlling the amplifier
+            gain setting via enum.
         upperlimit (SignalRW[float]): Upper output voltage threshold in V used by
             automatic gain adjustment.
         lowerlimit (SignalRW[float]): Lower output voltage threshold in V used by
@@ -80,6 +83,10 @@ class FemtoDDPCA(CurrentAmp):
         self,
         prefix: str,
         suffix: str,
+        gain_enum_type: type[EnumTypesT] = Femto3xxGainTable,
+        gain_to_value_config: Mapping[
+            EnumTypesT, float
+        ] = DEFAULT_FEMTO3XX_GAIN_TO_VALUE,
         raise_timetable: type[Enum] = Femto3xxRaiseTime,
         upperlimit: float = 8.8,
         lowerlimit: float = 0.68,
@@ -91,6 +98,8 @@ class FemtoDDPCA(CurrentAmp):
         Args:
             prefix: EPICS PV prefix for the amplifier.
             suffix: EPICS PV suffix for the gain setting.
+            gain_enum_type: Enum type used for the amplifier's gain settings.
+            gain_to_value_config: Mapping of gain enum members to sensitivity values in V/A.
             raise_timetable: Table defining the settling time associated with each gain
                 setting.
             upperlimit: Upper output voltage threshold in V for automatic gain
@@ -100,7 +109,7 @@ class FemtoDDPCA(CurrentAmp):
             timeout: Maximum waiting time in seconds when setting gain.
             name: Name of the device.
         """
-        self._gain_to_value_config = FEMTO3XX_GAIN_CONFIGURATION
+        self._gain_to_value_config = gain_to_value_config
         # Create the inverse lookup table for _set_gain method.
         self._value_to_gain_config = {
             sensitivity: setting
@@ -109,13 +118,17 @@ class FemtoDDPCA(CurrentAmp):
         self._raise_timetable = raise_timetable
         self._timeout = timeout
 
-        self.gain_enum = epics_signal_rw(Femto3xxGainTable, prefix + suffix)
+        self.gain_enum = epics_signal_rw(gain_enum_type, prefix + suffix)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.gain = derived_signal_rw(
-                _gain_enum_to_value, self._set_gain, gain_enum=self.gain_enum
+                self._gain_enum_to_value, self._set_gain, gain_enum=self.gain_enum
             )
         super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
+
+    def _gain_enum_to_value(self, gain_enum: EnumTypesT) -> float:
+        """Convert Femto gain enum to numerical value V/A."""
+        return self._gain_to_value_config[gain_enum]
 
     async def _set_gain(self, value: float) -> None:
         """Set sensitivity in V/A."""

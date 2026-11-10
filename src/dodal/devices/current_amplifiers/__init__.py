@@ -9,7 +9,7 @@ from .enz_locum import (
     EnzLocumRangeReadback,
 )
 from .femto import (
-    FEMTO3XX_GAIN_CONFIGURATION,
+    DEFAULT_FEMTO3XX_GAIN_TO_VALUE,
     Femto3xxGainTable,
     Femto3xxRaiseTime,
     FemtoDDPCA,
@@ -30,7 +30,7 @@ __all__ = [
     "EnzLocumIntegrationWindow",
     "EnzLocumRange",
     "EnzLocumRangeReadback",
-    "FEMTO3XX_GAIN_CONFIGURATION",
+    "DEFAULT_FEMTO3XX_GAIN_TO_VALUE",
     "Femto3xxGainTable",
     "Femto3xxRaiseTime",
     "FemtoDDPCA",

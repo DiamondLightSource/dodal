@@ -80,18 +80,10 @@ SR570_GAIN_CONFIGURATION: dict[SR570GainTable, dict[SR570FineGainTable, float]] 
 }
 
 
-def _gain_to_sensitivity(
-    coarse_gain: SR570GainTable,
-    fine_gain: SR570FineGainTable,
-) -> float:
-    """Calculate the SR570 sensitivity from its coarse and fine settings."""
-    return SR570_GAIN_CONFIGURATION[coarse_gain][fine_gain]
-
-
 class SR570(CurrentAmp):
-    """The SR570 current amplifier has two gain settings: coarse and fine. These are
-    combined into a single derived gain signal of gain representing the overall
-    current-to-voltage sensitivity.
+    """Standford Research Systems current amplifier has two gain settings: coarse and
+    fine. These are combined into a single derived gain signal of gain representing the
+    overall current-to-voltage sensitivity.
 
     Attributes:
         gain (SignalRW[float]): Derived current-to-voltage sensitivity in V/A,
@@ -138,13 +130,19 @@ class SR570(CurrentAmp):
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.gain = derived_signal_rw(
-                _gain_to_sensitivity,
+                self._gain_enum_to_value,
                 self._set_gain,
                 coarse_gain=self.coarse_gain,
                 fine_gain=self.fine_gain,
             )
 
         super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
+
+    def _gain_enum_to_value(
+        self, coarse_gain: SR570GainTable, fine_gain: SR570FineGainTable
+    ) -> float:
+        """Calculate the SR570 sensitivity from its coarse and fine settings."""
+        return SR570_GAIN_CONFIGURATION[coarse_gain][fine_gain]
 
     async def _set_gain(self, value: float) -> None:
         configuration = next(
