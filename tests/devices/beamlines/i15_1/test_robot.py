@@ -159,12 +159,13 @@ async def test_given_loaded_from_a_position_then_unload_moves_to_position(
     assert await robot.pos_sel.get_value() == 2
 
 
-async def test_given_spinner_started_then_can_read_spinner_state(
-    robot: Robot,
+@pytest.mark.parametrize("spinner_state", [SpinnerState.ON, SpinnerState.OFF])
+async def test_given_spinner_started_or_stopped_then_can_read_spinner_state(
+    robot: Robot, spinner_state: SpinnerState
 ):
-    await robot.spinner.set(SpinnerState.ON)
+    await robot.spinner.set(spinner_state)
 
-    assert await robot.spinner.get_value() == SpinnerState.ON
+    assert await robot.spinner.get_value() == spinner_state
 
 
 async def test_when_unloaded_then_spinner_stops_before_beam_program_loaded(
