@@ -168,6 +168,15 @@ async def test_given_spinner_started_or_stopped_then_can_read_spinner_state(
     assert await robot.spinner.get_value() == spinner_state
 
 
+@pytest.mark.parametrize("spinner_state", [SpinnerState.ON, SpinnerState.OFF])
+async def test_given_spinner_state_changed_then_program_running_not_waited_for(
+    robot: Robot, spinner_state: SpinnerState
+):
+    await robot.spinner.set(spinner_state)
+
+    get_mock_put(robot.program_running).assert_not_called()
+
+
 async def test_when_unloaded_then_spinner_stops_before_beam_program_loaded(
     robot: Robot,
 ) -> None:
