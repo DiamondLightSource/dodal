@@ -7,11 +7,7 @@ import pytest
 from bluesky.plan_stubs import abs_set, prepare
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    callback_on_mock_put,
-    init_devices,
-    set_mock_value,
-)
+from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
 
 from dodal.devices.current_amplifiers import (
     SR570,
@@ -21,13 +17,8 @@ from dodal.devices.current_amplifiers import (
     SR570GainToCurrentTable,
     SR570RaiseTimeTable,
 )
-from dodal.devices.current_amplifiers.current_amplifier_detector import (
-    CurrentAmpDet,
-)
-from dodal.devices.current_amplifiers.struck_scaler_counter import (
-    CountState,
-    StruckScaler,
-)
+from dodal.devices.current_amplifiers.current_amplifier_detector import CurrentAmpDet
+from dodal.devices.current_amplifiers.struck_scaler_counter import StruckScaler
 
 
 @pytest.fixture
@@ -288,9 +279,6 @@ async def test_sr570_struck_scaler_read_with_autogain(
     rbv_mocks.get.side_effect = raw_count
 
     def set_mock_counter():
-        set_mock_value(
-            mock_sr570_struck_scaler_detector.counter().trigger_start, CountState.DONE
-        )
         set_mock_value(
             mock_sr570_struck_scaler_detector.counter().readout, rbv_mocks.get()
         )

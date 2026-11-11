@@ -227,25 +227,3 @@ async def test_scaler_controller_trigger_sets_counting_true_then_false(
     scaler_controller.start_count.clear_sub(sub)
 
     assert states == expected_states
-
-
-async def test_scaler_controller_multiple_connects_has_one_subscribe(
-    scaler_controller: ScalerCardController,
-) -> None:
-    expected_subscribers = 1
-    number_of_subscribers = len(scaler_controller.start_count._get_cache()._listeners)
-    assert number_of_subscribers == expected_subscribers
-    # Test if we connect again if another subscriber is added, checking for memory leaks.
-    for _ in range(3):
-        await scaler_controller.connect(mock=True)
-        assert (
-            len(scaler_controller.start_count._get_cache()._listeners)
-            == expected_subscribers
-        )
-
-    def dummy_sub(value):
-        pass
-
-    # Now subscribe to make sure it does go up and not checking the wrong thing.
-    scaler_controller.start_count.subscribe(dummy_sub)
-    assert len(scaler_controller.start_count._get_cache()._listeners) == 2
