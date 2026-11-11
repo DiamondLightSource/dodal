@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 3.0.9.dev1+g5089bdf9d documentation</title>
+    <title>dodal.devices.beamlines.i15_1.robot &#8212; dodal 3.0.9.dev3+g76aaff4cd documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=3997001d"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8a53e766"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1004,6 +1004,15 @@ window.runMermaid = runMermaid;</script>
             <span class="n">partial</span><span class="p">(</span><span class="n">set_program</span><span class="p">,</span> <span class="n">ProgramNames</span><span class="o">.</span><span class="n">SPINNER</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
         <span class="p">)</span>
 
+        <span class="n">callback_on_mock_put</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">_spinner_on</span><span class="p">,</span>  <span class="c1"># noqa: SLF001</span>
+            <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">:</span> <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">_spinner_rbv</span><span class="p">,</span> <span class="n">SpinnerState</span><span class="o">.</span><span class="n">ON</span><span class="p">),</span>  <span class="c1"># noqa: SLF001</span>
+        <span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">_spinner_off</span><span class="p">,</span>  <span class="c1"># noqa: SLF001</span>
+            <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">:</span> <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">_spinner_rbv</span><span class="p">,</span> <span class="n">SpinnerState</span><span class="o">.</span><span class="n">OFF</span><span class="p">),</span>  <span class="c1"># noqa: SLF001</span>
+        <span class="p">)</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">program_running</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
             <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_program_running</span><span class="p">():</span>
                 <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span> <span class="n">ProgramRunning</span><span class="o">.</span><span class="n">PROGRAM_RUNNING</span><span class="p">)</span>
@@ -1018,11 +1027,12 @@ window.runMermaid = runMermaid;</script>
         <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">puck_place</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
 
         <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">beam_place</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
-        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">beam_pick</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">beam_pick</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span></div>
 
-        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">_spinner_off</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>  <span class="c1"># noqa: SLF001</span>
-        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">_spinner_on</span><span class="p">,</span> <span class="n">program_running</span><span class="p">)</span>  <span class="c1"># noqa: SLF001</span></div>
 
+        <span class="c1"># Re-add once https://jira.diamond.ac.uk/browse/I15_1-1698 is done</span>
+        <span class="c1"># callback_on_mock_put(device._spinner_off, program_running)  # noqa: SLF001</span>
+        <span class="c1"># callback_on_mock_put(device._spinner_on, program_running)  # noqa: SLF001</span>
 
 
 <div class="viewcode-block" id="Robot">
@@ -1097,6 +1107,7 @@ window.runMermaid = runMermaid;</script>
             <span class="n">ProgramRunning</span><span class="o">.</span><span class="n">PROGRAM_RUNNING</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">PROGRAM_STARTED_RUNNING_TIMEOUT</span><span class="p">,</span>
         <span class="p">)</span>
+
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span>
             <span class="n">ProgramRunning</span><span class="o">.</span><span class="n">NO_PROGRAM_RUNNING</span><span class="p">,</span>
@@ -1194,7 +1205,13 @@ window.runMermaid = runMermaid;</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_off</span> <span class="k">if</span> <span class="n">new_state</span> <span class="o">==</span> <span class="n">SpinnerState</span><span class="o">.</span><span class="n">OFF</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_on</span>
         <span class="p">)</span>
 
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_program_and_wait_for_complete</span><span class="p">(</span><span class="n">signal_to_set</span><span class="p">)</span>
+        <span class="c1"># Can&#39;t wait for program_on PV as the spinner program is too quick.</span>
+        <span class="c1"># See https://jira.diamond.ac.uk/browse/I15_1-1698</span>
+        <span class="k">await</span> <span class="n">signal_to_set</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
+
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spinner_rbv</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROGRAM_COMPLETED_TIMEOUT</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_spinner_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rbv</span><span class="p">:</span> <span class="n">SpinnerState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpinnerState</span><span class="p">:</span>
         <span class="c1"># This function is needed so that the derived signal picks up the type hints</span>
