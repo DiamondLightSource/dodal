@@ -75,13 +75,13 @@ dodal.devices.beamlines.i15\_1.attenuators.FastAttenuatorState
       ~FastAttenuatorState.OUT
       
       
-      ~FastAttenuatorState.OPENING
+      ~FastAttenuatorState.MOVING_OUT
       
       
       ~FastAttenuatorState.IN
       
       
-      ~FastAttenuatorState.CLOSING
+      ~FastAttenuatorState.MOVING_IN
       
    
    
