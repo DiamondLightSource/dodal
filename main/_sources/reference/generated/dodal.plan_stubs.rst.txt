@@ -24,6 +24,7 @@
 
    .. autosummary::
    
+      state
       move
       move_relative
       rd
