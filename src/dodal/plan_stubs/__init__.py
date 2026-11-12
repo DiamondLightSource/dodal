@@ -1,3 +1,4 @@
+from .utils import state
 from .wrapped import (
     move,
     move_relative,
@@ -10,6 +11,7 @@ from .wrapped import (
 )
 
 __all__ = [
+    "state",
     "move",
     "move_relative",
     "rd",
