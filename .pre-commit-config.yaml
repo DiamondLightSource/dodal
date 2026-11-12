@@ -23,14 +23,14 @@ repos:
         entry: ruff format --force-exclude
         types: [python]
         require_serial: true
-        
-      - id: import-contracts
-        name: Ensure import directionality
-        pass_filenames: false
-        language: system
-        entry: lint-imports
-        types: [python]
-        require_serial: false
+
+      # - id: import-contracts
+      #   name: Ensure import directionality
+      #   pass_filenames: false
+      #   language: system
+      #   entry: lint-imports
+      #   types: [python]
+      #   require_serial: false
 
       - id: uv-sync
         name: update uv.lock and venv

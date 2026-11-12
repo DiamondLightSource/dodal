@@ -5,6 +5,7 @@ from ophyd_async.core import PathProvider
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
+from spectroscopy_bluesky.common.devices.dataproc_detector import DataProcessingDetector
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
@@ -96,4 +97,13 @@ def xspress3() -> Xspress3:
     return Xspress3(
         f"{PREFIX.beamline_prefix}-EA-DET-03:",
         num_channels=16,
+    )
+
+
+@devices.factory()
+def dataproc_detector(path_provider: PathProvider) -> DataProcessingDetector:
+    return DataProcessingDetector(
+        processing_service_url="https://p51-processing-service.diamond.ac.uk/",
+        path_provider=path_provider,
+        name="dataproc_detector",
     )
