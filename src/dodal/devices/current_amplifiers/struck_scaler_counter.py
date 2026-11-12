@@ -23,9 +23,6 @@ class CountState(StrictEnum):
     COUNT = "Count"
 
 
-COUNT_PER_VOLTAGE = 100000
-
-
 def _current_count_per_sec(current_count: float, current_count_time: float) -> float:
     return current_count / current_count_time
 
