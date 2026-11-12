@@ -16,7 +16,7 @@ def state(*devices: Device) -> MsgGenerator[Mapping[str, Any | None]]:
     Non-readable devices are included with a value of None.
 
     Args:
-        devices: The root device to retrieve the state of.
+        devices: The root devices to retrieve the state of.
 
     Returns:
         A mapping of device names to their readings, or None if the device
