@@ -22,17 +22,11 @@ async def test_waittime_waits_for_set_time_on_set(waittime: WaitTime, sleep: Asy
     sleep.assert_awaited_once_with(test_time)
 
 
-@pytest.mark.timeout(5)
-@pytest.mark.parametrize(
-    "test_time",
-    [1, 0.2],
-)
-async def test_waittime_waits_for_set_time_on_trigger(test_time: int):
-    under_test = WaitTime()
-    await under_test.set(test_time)
+from unittest.mock import call
 
-    start_time = time.time()
-    await under_test.trigger()
-    time_taken = time.time() - start_time
-
-    assert math.isclose(time_taken, test_time, abs_tol=0.01)
+@patch("asyncio.sleep")
+@pytest.mark.parametrize("time", [1, 0.2])
+async def test_waittime_waits_for_set_time_on_trigger(waittime: WaitTime, sleep: AsyncMock, time: float):
+    await waittime.set(time)
+    await waittime.trigger()
+    sleep.assert_has_awaits([call(time), call(time)])
