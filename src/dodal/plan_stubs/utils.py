@@ -24,7 +24,7 @@ def state(*devices: Device) -> MsgGenerator[Mapping[str, Any | None]]:
     """
     states = {}
     for device in devices:
-        for _, dev in walk_devices(device).items():
+        for dev in walk_devices(device).values():
             val = None
             if isinstance(dev, Readable):
                 val = yield from rd(dev)
