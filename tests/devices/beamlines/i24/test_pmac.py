@@ -101,14 +101,19 @@ async def update_counter(sleep_time: float, fake_pmac: PMAC):
 
 
 async def test_counter_refresh(fake_pmac: PMAC):
-    callback_on_mock_put(
-        fake_pmac.pmac_string,
-        lambda *args, **kwargs: asyncio.create_task(update_counter(0.05, fake_pmac)),  # type: ignore
-    )
+    counting_tasks: list[asyncio.Task] = []
+
+    def start_counting(*args, **kwargs):
+        counting_tasks.append(asyncio.create_task(update_counter(0.05, fake_pmac)))
+
+    callback_on_mock_put(fake_pmac.pmac_string, start_counting)
 
     set_mock_value(fake_pmac.counter_time, 0.1)
+
     await fake_pmac.run_program.kickoff()
     await fake_pmac.run_program.complete()
+
+    await asyncio.gather(*counting_tasks)
 
     assert await fake_pmac.counter.get_value() == 3
 

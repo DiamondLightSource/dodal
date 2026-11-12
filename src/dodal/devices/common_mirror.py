@@ -67,7 +67,7 @@ class XYZSwitchingMirror(
         location = await self.mirror.locate()
         return location
 
-    async def stop(self, success=True) -> None:
+    async def stop(self, *, success: bool = True) -> None:
         await self.mirror_abort.trigger()
 
 

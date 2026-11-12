@@ -104,17 +104,10 @@ async def test_femto_set(
         assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "gain,",
-    [
-        ("SEN_0"),
-        ("SEN_24"),
-        ("ssdfsden_212341"),
-    ],
-)
+@pytest.mark.parametrize("gain", ["SEN_0", "SEN_24", "ssdfsden_212341"])
 @mock.patch("asyncio.sleep")
 async def test_femto_set_fail_out_of_range(
-    sleep: AsyncMock, mock_femto: FemtoDDPCA, gain
+    sleep: AsyncMock, mock_femto: FemtoDDPCA, gain: str
 ):
     with pytest.raises(ValueError) as e:
         await mock_femto.set(gain)
