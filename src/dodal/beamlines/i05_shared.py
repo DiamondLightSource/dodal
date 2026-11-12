@@ -20,6 +20,7 @@ from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEne
 from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.slits import SlitsWithIndividualBlades
 from dodal.devices.synchrotron import Synchrotron
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -111,3 +112,48 @@ def energy(
     id_energy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     return BeamEnergy(id_energy=id_energy, mono=pgm.energy)
+
+
+@devices.factory()
+def s1() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
+        x_gap="XSIZE",
+        y_gap="YSIZE",
+        x_centre="XCENTRE",
+        y_centre="YCENTRE",
+        x_minus="XRING",
+        x_plus="XHALL",
+        y_minus="YMINUS",
+        y_plus="YPLUS",
+    )
+
+
+@devices.factory()
+def s2() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
+        x_gap="XSIZE",
+        y_gap="YSIZE",
+        x_centre="XCENTRE",
+        y_centre="YCENTRE",
+        x_minus="XRING",
+        x_plus="XHALL",
+        y_minus="YMINUS",
+        y_plus="YPLUS",
+    )
+
+
+@devices.factory()
+def s3() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
+        x_gap="XSIZE",
+        y_gap="YSIZE",
+        x_centre="XCENTRE",
+        y_centre="YCENTRE",
+        x_minus="XRING",
+        x_plus="XHALL",
+        y_minus="YMINUS",
+        y_plus="YPLUS",
+    )
