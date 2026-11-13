@@ -3,9 +3,6 @@ from typing import Any
 
 import pytest
 
-from dodal.common.general_maths.transmission_interconversion import (
-    CANONICAL_NON_ABSORPTION,
-)
 from dodal.devices.beamlines.i19.transmission.energy_specific_attenuation import (
     EnergySpecificAttenuation,
 )
@@ -40,11 +37,10 @@ def test_that_energy_specific_attenuation_can_be_instantiated_with_integer_energ
 def test_that_energy_specific_attenuation_can_be_instantiated_at_full_transmission() -> (
     None
 ):
-    an_attenuation_bn = CANONICAL_NON_ABSORPTION
     an_energy_kev: float = 19.678
     assert (
-        EnergySpecificAttenuation(
-            attenuation_bn=an_attenuation_bn, energy_kev=an_energy_kev
+        EnergySpecificAttenuation.transparently_not_attenuating(
+            energy_kev=an_energy_kev
         )
         is not None
     )
