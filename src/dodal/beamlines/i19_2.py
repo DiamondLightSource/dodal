@@ -33,6 +33,7 @@ from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.motors import XYZPhiStage
+from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -110,6 +111,11 @@ def beamstop(config_client: ConfigClient) -> BeamStop:
         beamline_parameters=BEAMLINE_PARAMETERS_PATH,
         config_client=config_client,
     )
+
+
+@devices.factory()
+def beam_centre_from_epics() -> CentroidFromEpics:
+    return CentroidFromEpics(f"{PREFIX.beamline_prefix}-EA-CAM-01:")
 
 
 @devices.factory()
