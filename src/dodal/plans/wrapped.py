@@ -5,7 +5,6 @@ from typing import Annotated, Any
 import bluesky.plans as bp
 import numpy as np
 from bluesky.protocols import Movable, Readable
-from ophyd_async.core import AsyncReadable
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
@@ -28,7 +27,7 @@ We may also need other adjustments for UI purposes, e.g.
 @validate_call(config={"arbitrary_types_allowed": True})
 def count(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -90,7 +89,7 @@ def _make_num_scan_args(
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_scan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -122,7 +121,7 @@ def num_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_grid_scan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -155,7 +154,7 @@ def num_grid_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_rscan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -187,7 +186,7 @@ def num_rscan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def num_grid_rscan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -238,7 +237,7 @@ def _make_list_scan_args(params: list[tuple[Movable, list[float | int]]], grid: 
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_scan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -269,7 +268,7 @@ def list_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_grid_scan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -303,7 +302,7 @@ def list_grid_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_rscan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -334,7 +333,7 @@ def list_rscan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def list_grid_rscan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -446,7 +445,7 @@ def _make_step_scan_args(
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_scan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -477,7 +476,7 @@ def step_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_grid_scan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -512,7 +511,7 @@ def step_grid_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_rscan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
@@ -543,7 +542,7 @@ def step_rscan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def step_grid_rscan(
     detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
+        Sequence[Readable],
         Field(
             description="Set of readable devices, will take a reading at each point",
         ),
