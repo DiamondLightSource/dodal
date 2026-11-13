@@ -1,3 +1,4 @@
+import numbers
 from collections.abc import Callable
 from functools import cached_property
 from typing import Annotated, Literal, Protocol, runtime_checkable
@@ -44,6 +45,8 @@ class TaperedGeometryProvider(Protocol):
 
     Used here to make WedgeAbsorber easier to test.
     """
+
+    def motor_position_mm_for_thickness_cm(self, *, thickness_cm: float) -> float: ...
 
     def thickness_cm_at_motor_position_mm(
         self, *, motor_position_mm: StrictFloat
@@ -116,18 +119,24 @@ class WedgeGeometry(BaseModel):
     def _taper_gradient(self) -> float:
         return 1.0 / self.taper_cotangent
 
-    def motor_position_mm_for_thickness_cm(
-        self, *, thickness_cm: Annotated[StrictFloat, Field(ge=0.0)]
-    ) -> float:
+    def motor_position_mm_for_thickness_cm(self, *, thickness_cm: float) -> float:
         """Hypothetical motor position at which the wedge thickness would take on the requested value.
         N.B. absorber thickness are best worked out in cm (science), motor positions prefer mm (controls).
 
         Args:
-            thickness_cm: (StrictFloat) non-negative float, zero permitted - the required target thickness in cm
+            thickness_cm: non-negative float, zero permitted - the required target thickness in cm
 
         Returns:
             motor position in mm where a mathematical model wedge puts the target thickness in the x-ray beam
         """
+        if not isinstance(thickness_cm, numbers.Real):
+            raise TypeError(
+                "Wedge attenuator thickness must be a real number (and greater than zero)."
+            )
+        if not thickness_cm > 0.0:
+            raise ValueError(
+                "Requested attenuator thickness can neither be zero nor negative"
+            )
         _line_offset = (
             self.tip_mm
         )  # Given that thickness (line x) is zero at this motor position (line y)
@@ -137,9 +146,7 @@ class WedgeGeometry(BaseModel):
         _x = convert_cm_to_mm(thickness_cm)  # do the line calculations in mm
         return get_straight_line_y(_line_offset, _line_gradient, _x)
 
-    def thickness_cm_at_motor_position_mm(
-        self, *, motor_position_mm: StrictFloat
-    ) -> float:
+    def thickness_cm_at_motor_position_mm(self, *, motor_position_mm: float) -> float:
         """Thickness of modelled wedge a given motor position in most useful units.
         N.B. The wedge geometry is not bounded by lateral position limits, but does reject,
         negative thickness,
@@ -151,6 +158,8 @@ class WedgeGeometry(BaseModel):
         Returns:
             position in mm on the motor axis scale where a mathematical wedge would have the target thickness
         """
+        if not isinstance(motor_position_mm, numbers.Real):
+            raise TypeError("Motor position must be real number.")
         _line_offset = (
             -self.tip_mm * self._taper_gradient
         )  # not immediately obvious - but after some algebra

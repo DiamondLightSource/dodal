@@ -369,7 +369,7 @@ def test_that_attenuator_motor_keys_accepts_leading_underscores_or_upper_case_le
 # Unhappy path tests below
 
 
-def test_that_attenuator_motor_positions_raises_error_when_discrete_and_continuouss_overload_axis_label() -> (
+def test_that_attenuator_motor_positions_raises_error_when_discrete_and_continuous_overload_axis_label() -> (
     None
 ):
     wedge_positions = {"x": 0.1, "v": 90.1}
