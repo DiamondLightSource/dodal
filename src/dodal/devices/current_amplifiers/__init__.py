@@ -1,5 +1,13 @@
 from .current_amplifier import CurrentAmp
 from .current_amplifier_detector import CurrentAmpCounter, CurrentAmpDet
+from .enz_locum import (
+    EnzLocum,
+    EnzLocumBiasSource,
+    EnzLocumBiasSourceReadback,
+    EnzLocumIntegrationWindow,
+    EnzLocumRange,
+    EnzLocumRangeReadback,
+)
 from .femto import (
     Femto3xxGainTable,
     Femto3xxGainToCurrentTable,
@@ -17,6 +25,12 @@ from .sr570 import (
 from .struck_scaler_counter import StruckScaler
 
 __all__ = [
+    "EnzLocum",
+    "EnzLocumBiasSource",
+    "EnzLocumBiasSourceReadback",
+    "EnzLocumIntegrationWindow",
+    "EnzLocumRange",
+    "EnzLocumRangeReadback",
     "FemtoDDPCA",
     "Femto3xxGainTable",
     "Femto3xxRaiseTime",

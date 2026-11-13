@@ -8,6 +8,7 @@ from .blueapi_wrapped import (
     stop,
     wait,
 )
+from .utils import state
 
 __all__ = [
     "move",
@@ -18,4 +19,5 @@ __all__ = [
     "sleep",
     "stop",
     "wait",
+    "state",
 ]

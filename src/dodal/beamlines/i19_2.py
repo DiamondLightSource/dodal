@@ -31,6 +31,7 @@ from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.motors import XYZPhiStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -59,6 +60,9 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 
 SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
 MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
+
+DAQ_CONFIGURATION_PATH = "/dls_sw/i19-2/software/daq_configuration"
+BEAMLINE_PARAMETERS_PATH = f"{DAQ_CONFIGURATION_PATH}/domain/beamline.parameters"
 
 
 devices = DeviceManager()
@@ -99,13 +103,23 @@ def backlight() -> BacklightPosition:
 
 
 @devices.factory()
-def beamstop() -> BeamStop:
-    return BeamStop(prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:")
+def beamstop(config_client: ConfigClient) -> BeamStop:
+    return BeamStop(
+        prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:",
+        hutch=HutchState.EH2,
+        beamline_parameters=BEAMLINE_PARAMETERS_PATH,
+        config_client=config_client,
+    )
 
 
 @devices.factory()
 def diffractometer() -> FourCircleDiffractometer:
     return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
+
+
+@devices.factory()
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
 
 
 @devices.factory()

@@ -20,6 +20,7 @@ from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEne
 from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.slits import SlitsWithIndividualBlades
 from dodal.devices.synchrotron import Synchrotron
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -32,6 +33,21 @@ devices = DeviceManager()
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
+
+
+@devices.factory()
+def m1() -> XYZPitchYawRollStage:
+    """Collimating mirror."""
+    return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+
+
+@devices.factory()
+def m3mj6() -> XYZPiezoSwitchingMirror:
+    """Switching mirror."""
+    return XYZPiezoSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
+        mirrors=M3MJ6Mirror,
+    )
 
 
 @devices.factory()
@@ -66,20 +82,6 @@ def id(
 
 
 @devices.factory()
-def m1_collimating_mirror() -> XYZPitchYawRollStage:
-    return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
-
-
-# will connect after https://jira.diamond.ac.uk/browse/I05-731
-@devices.factory(skip=True)
-def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
-    return XYZPiezoSwitchingMirror(
-        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
-        mirrors=M3MJ6Mirror,
-    )
-
-
-@devices.factory()
 def id_controller(
     id: Apple2[UndulatorLockedPhaseAxes],
 ) -> AppleKnotController[UndulatorLockedPhaseAxes]:
@@ -110,3 +112,48 @@ def energy(
     id_energy: InsertionDeviceEnergy, pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     return BeamEnergy(id_energy=id_energy, mono=pgm.energy)
+
+
+@devices.factory()
+def s1() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
+        x_gap="XSIZE",
+        y_gap="YSIZE",
+        x_centre="XCENTRE",
+        y_centre="YCENTRE",
+        x_minus="XRING",
+        x_plus="XHALL",
+        y_minus="YMINUS",
+        y_plus="YPLUS",
+    )
+
+
+@devices.factory()
+def s2() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
+        x_gap="XSIZE",
+        y_gap="YSIZE",
+        x_centre="XCENTRE",
+        y_centre="YCENTRE",
+        x_minus="XRING",
+        x_plus="XHALL",
+        y_minus="YMINUS",
+        y_plus="YPLUS",
+    )
+
+
+@devices.factory()
+def s3() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
+        x_gap="XSIZE",
+        y_gap="YSIZE",
+        x_centre="XCENTRE",
+        y_centre="YCENTRE",
+        x_minus="XRING",
+        x_plus="XHALL",
+        y_minus="YMINUS",
+        y_plus="YPLUS",
+    )

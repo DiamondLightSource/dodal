@@ -8,9 +8,11 @@ from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.common.beamlines.device_helpers import DRV_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
-from dodal.devices.motors import XYZStage
+from dodal.devices.beamlines.b01_1.diodes import RGBDiodes
+from dodal.devices.beamlines.b01_1.flip_mirror import FlipMirror
+from dodal.devices.motors import XThetaStage, XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -21,17 +23,6 @@ BL = "b01-1"
 PREFIX = BeamlinePrefix(BL, suffix="C")
 set_log_beamline(BL)
 set_utils_beamline(BL)
-
-"""
-NOTE: Due to ArgoCD and the k8s cluster configuration those PVs are not available remotely.
-You need to be on the beamline-local network to access them.
-The simplest way to do this is to `ssh b01-1-ws001` and run `dodal connect b01_1` from there.
-remember about the underscore in the beamline name.
-
-See the IOC status here:
-https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSync=&health=&namespace=&cluster=&labels=
-"""
-
 devices = DeviceManager()
 
 
@@ -88,7 +79,7 @@ def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
     return AravisDetector(
         pv_prefix,
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
-        driver_suffix=CAM_SUFFIX,
+        driver_suffix=DRV_SUFFIX,
         plugins={
             "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
         },
@@ -96,35 +87,96 @@ def spectroscopy_detector(path_provider: PathProvider) -> AravisDetector:
 
 
 @devices.factory()
-def imaging_detector(path_provider: PathProvider) -> AravisDetector:
-    """The Mako camera for the imaging experiment.
+def spectroscopy_diodes() -> RGBDiodes:
+    """The diodes for the spectroscopy experiment.
 
-    Looks at the on-axis viewing screen.
+    An alternative to the spectroscopy detector, using 3 RGB diodes running
+    through the Enz Locum4 low current amplifier into the pandabox. This gives
+    the live values and amplifier settings, the triggered values are captured by
+    the pandabox.
 
     Returns:
-        AravisDetector: The imaging camera device.
+        RGBDiodes: The diodes device.
+    """
+    return RGBDiodes(
+        # The pandabox serves its PVs over PVA rather than CA
+        panda_prefix=f"pva://{PREFIX.beamline_prefix}-EA-PANDA-01:FmcIn:Val",
+        amplifier_prefix=f"{PREFIX.beamline_prefix}-DI-LOCUM-01:",
+    )
+
+
+@devices.factory()
+def tomography_detector(path_provider: PathProvider) -> AravisDetector:
+    """The Mako camera for the tomography experiment.
+
+    Looks at the sample position of the tomography theta stage.
+
+    Returns:
+        AravisDetector: The tomography camera device.
     """
     return AravisDetector(
-        f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
+        f"{PREFIX.beamline_prefix}-DI-DCAM-05:",
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
-        driver_suffix=CAM_SUFFIX,
+        driver_suffix=DRV_SUFFIX,
     )
 
 
 @devices.factory()
-def sample_stage() -> XYZStage:
-    """An XYZ stage holding the sample.
+def spectroscopy_stage() -> XYZStage:
+    """An XYZ stage holding the spectroscopy sample.
 
     Returns:
-        XYZStage: The XYZ sample stage device.
+        XYZStage: The XYZ spectroscopy stage device.
     """
     return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+        f"{PREFIX.beamline_prefix}-MO-SPEC-01:",
     )
 
 
 @devices.factory()
-def pmac(sample_stage: XYZStage) -> PmacIO:
+def tomography_stage() -> XThetaStage:
+    """An XTheta stage holding the tomography sample.
+
+    Returns:
+        XThetaStage: The XTheta tomography stage device.
+    """
+    return XThetaStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-TOMO-01:", x_infix="H", theta_infix="THETA"
+    )
+
+
+@devices.factory()
+def light_source_flip_mirror() -> FlipMirror:
+    """The light source flip mirror.
+
+    Returns:
+        FlipMirror: The light source flip mirror device.
+    """
+    return FlipMirror(f"{PREFIX.beamline_prefix}-EA-FLIP-01:")
+
+
+@devices.factory()
+def spectroscopy_flip_mirror() -> FlipMirror:
+    """The spectroscopy branch flip mirror.
+
+    Returns:
+        FlipMirror: The spectroscopy flip mirror device.
+    """
+    return FlipMirror(f"{PREFIX.beamline_prefix}-EA-FLIP-02:")
+
+
+@devices.factory()
+def tomography_flip_mirror() -> FlipMirror:
+    """The tomography branch flip mirror.
+
+    Returns:
+        FlipMirror: The tomography flip mirror device.
+    """
+    return FlipMirror(f"{PREFIX.beamline_prefix}-EA-FLIP-03:")
+
+
+@devices.factory()
+def pmac(spectroscopy_stage: XYZStage, tomography_stage: XThetaStage) -> PmacIO:
     """A Power PMAC.
 
     Returns:
@@ -132,6 +184,11 @@ def pmac(sample_stage: XYZStage) -> PmacIO:
     """
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
-        raw_motors=[sample_stage.y, sample_stage.x],
+        raw_motors=[
+            spectroscopy_stage.y,
+            spectroscopy_stage.x,
+            tomography_stage.x,
+            tomography_stage.theta,
+        ],
         coord_nums=[1],
     )

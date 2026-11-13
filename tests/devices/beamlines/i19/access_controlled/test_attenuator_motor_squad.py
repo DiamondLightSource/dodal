@@ -6,16 +6,18 @@ from aiohttp.client import ClientConnectionError
 from bluesky.run_engine import RunEngine
 
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
-    AttenuatorMotorPositions,
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.beamlines.i19.attenuator_motor_positions import (
+    AttenuatorMotorPositions,
+)
 
 
 def given_position_demands() -> AttenuatorMotorPositions:
     position_demand = MagicMock(spec=AttenuatorMotorPositions)
     restful_payload = {"x": 54.3, "y": 72.1, "w": 4}
-    position_demand.validated_and_complete = MagicMock(return_value=restful_payload)
+    position_demand.validated_and_complete = restful_payload
     return position_demand
 
 
