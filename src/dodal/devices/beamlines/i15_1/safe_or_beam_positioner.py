@@ -40,7 +40,7 @@ class SafeOrBeamPositioner(StandardReadable, Movable[SafeOrBeamPosition]):
         elif value == SafeOrBeamPosition.BEAM:
             await self.motor.set(self._beam_position)
 
-    def get_full_config(self):
+    def get_full_config(self) -> TemperatureControllersConfig:
         return self.config_client.get_file_contents(
             self.xpdf_parameters_path, desired_return_type=TemperatureControllersConfig
         )
