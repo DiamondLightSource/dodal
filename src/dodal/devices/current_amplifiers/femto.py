@@ -1,19 +1,21 @@
 import asyncio
+from collections.abc import Mapping
 from enum import Enum
+from typing import Generic, TypeVar
 
 from ophyd_async.core import (
-    AsyncStatus,
+    EnumTypes,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.current_amplifiers import CurrentAmp
-from dodal.log import LOGGER
 
 
 class Femto3xxGainTable(StrictEnum):
-    """These are the sensitivity setting for Femto 3xx current amplifier."""
+    """Sensitivity setting for Femto 3xx current amplifier."""
 
     SEN_1 = "10^4"
     SEN_2 = "10^5"
@@ -27,23 +29,8 @@ class Femto3xxGainTable(StrictEnum):
     SEN_10 = "10^13"
 
 
-class Femto3xxGainToCurrentTable(float, Enum):
-    """These are the voltage to current setting for Femto 3xx current amplifier."""
-
-    SEN_1 = 1e4
-    SEN_2 = 1e5
-    SEN_3 = 1e6
-    SEN_4 = 1e7
-    SEN_5 = 1e8
-    SEN_6 = 1e9
-    SEN_7 = 1e10
-    SEN_8 = 1e11
-    SEN_9 = 1e12
-    SEN_10 = 1e13
-
-
 class Femto3xxRaiseTime(float, Enum):
-    """These are the gain dependent raise time(s) for Femto 3xx current amplifier."""
+    """Gain dependent raise time(s) for Femto 3xx current amplifier."""
 
     SEN_1 = 0.8e-3
     SEN_2 = 0.8e-3
@@ -57,81 +44,127 @@ class Femto3xxRaiseTime(float, Enum):
     SEN_10 = 350e-3
 
 
-class FemtoDDPCA(CurrentAmp):
-    """Femto current amplifier device, this class should cover all DDPCA Femto current
-    amplifiers, As the main different between all the DDPCA Femto is their gain table
-    and response time table.
+DEFAULT_FEMTO3XX_GAIN_TO_VALUE: dict[Femto3xxGainTable, float] = {
+    Femto3xxGainTable.SEN_1: 1e4,
+    Femto3xxGainTable.SEN_2: 1e5,
+    Femto3xxGainTable.SEN_3: 1e6,
+    Femto3xxGainTable.SEN_4: 1e7,
+    Femto3xxGainTable.SEN_5: 1e8,
+    Femto3xxGainTable.SEN_6: 1e9,
+    Femto3xxGainTable.SEN_7: 1e10,
+    Femto3xxGainTable.SEN_8: 1e11,
+    Femto3xxGainTable.SEN_9: 1e12,
+    Femto3xxGainTable.SEN_10: 1e13,
+}
+
+
+EnumTypesT = TypeVar("EnumTypesT", bound=EnumTypes)
+
+
+class FemtoDDPCA(CurrentAmp, Generic[EnumTypesT]):
+    """Femto current amplifier with derived numerical sensitivity.
+
+    The Femto amplifier exposes its gain as an EPICS enumeration via gain_setting. This
+    device provides a derived numerical gain signal representing the current-to-voltage
+    sensitivity in V/A, using the Femto gain configuration table.
 
     Attributes:
-        gain (SignalRW): This is the epic signal that control current amplifier gain.
-        gain_table (strictEnum): The table epic use to set gain.
-        upperlimit (float): upperlimit of the current amplifier
-        lowerlimit (float): lowerlimit of the current amplifier
-        timeout (float): Maximum waiting time in second for setting gain.
-        raise_timetable (Enum): Table contain the minimum amount of time to wait after
-            changing gain.
+        gain (SignalRW[float]): Derived current-to-voltage sensitivity in V/A.
+        gain_enum (SignalRW[Femto3xxGainTable]): EPICS signal controlling the amplifier
+            gain setting via enum.
+        upperlimit (SignalRW[float]): Upper output voltage threshold in V used by
+            automatic gain adjustment.
+        lowerlimit (SignalRW[float]): Lower output voltage threshold in V used by
+            automatic gain adjustment.
     """
 
     def __init__(
         self,
         prefix: str,
         suffix: str,
-        gain_table: type[StrictEnum],
-        gain_to_current_table: type[Enum],
-        raise_timetable: type[Enum],
+        gain_enum_type: type[EnumTypesT] = Femto3xxGainTable,
+        gain_to_value_config: Mapping[
+            EnumTypesT, float
+        ] = DEFAULT_FEMTO3XX_GAIN_TO_VALUE,
+        raise_timetable: type[Enum] = Femto3xxRaiseTime,
         upperlimit: float = 8.8,
         lowerlimit: float = 0.68,
         timeout: float = 1,
         name: str = "",
     ) -> None:
+        """Configure the Femto current amplifier.
+
+        Args:
+            prefix: EPICS PV prefix for the amplifier.
+            suffix: EPICS PV suffix for the gain setting.
+            gain_enum_type: Enum type used for the amplifier's gain settings.
+            gain_to_value_config: Mapping of gain enum members to sensitivity values in V/A.
+            raise_timetable: Table defining the settling time associated with each gain
+                setting.
+            upperlimit: Upper output voltage threshold in V for automatic gain
+                adjustment.
+            lowerlimit: Lower output voltage threshold in V for automatic gain
+                adjustment.
+            timeout: Maximum waiting time in seconds when setting gain.
+            name: Name of the device.
+        """
+        self._gain_to_value_config = gain_to_value_config
+        # Create the inverse lookup table for _set_gain method.
+        self._value_to_gain_config = {
+            sensitivity: setting
+            for setting, sensitivity in self._gain_to_value_config.items()
+        }
+        self._raise_timetable = raise_timetable
+        self._timeout = timeout
+
+        self.gain_enum = epics_signal_rw(gain_enum_type, prefix + suffix)
+
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.gain = epics_signal_rw(gain_table, prefix + suffix)
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.gain_table = gain_table
-            self.timeout = timeout
-            self.raise_timetable = raise_timetable
-        self.upperlimit = upperlimit
-        self.lowerlimit = lowerlimit
-        super().__init__(name=name, gain_conversion_table=gain_to_current_table)
-
-    @AsyncStatus.wrap
-    async def set(self, value) -> None:
-        if value not in [item.value for item in self.gain_conversion_table]:
-            raise ValueError(
-                f"Gain value {value} is not within {self.name} range."
-                + "\n Available gain:"
-                + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}"
+            self.gain = derived_signal_rw(
+                self._gain_enum_to_value, self._set_gain, gain_enum=self.gain_enum
             )
-        sensitivity_setting = self.gain_conversion_table(value).name
-        LOGGER.info(f"{self.name} gain change to {sensitivity_setting}:{value}")
+        super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
 
-        await self.gain.set(
-            value=self.gain_table[sensitivity_setting],
-            timeout=self.timeout,
-        )
-        # wait for current amplifier's bandpass filter to settle.
-        await asyncio.sleep(self.raise_timetable[sensitivity_setting].value)
+    def _gain_enum_to_value(self, gain_enum: EnumTypesT) -> float:
+        """Convert Femto gain enum to numerical value V/A."""
+        return self._gain_to_value_config[gain_enum]
 
-    async def increase_gain(self, value: int = 1) -> None:
-        current_gain = int((await self.get_gain()).name.split("_")[-1])
-        current_gain += value
-        if current_gain > len(self.gain_table):
-            raise ValueError("Gain at max value")
-        await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
+    async def _set_gain(self, value: float) -> None:
+        """Set sensitivity in V/A."""
+        try:
+            gain_enum = self._value_to_gain_config[value]
+        except KeyError:
+            available = [
+                f"{sensitivity:.0e}"
+                for sensitivity in self._value_to_gain_config.keys()
+            ]
+            raise ValueError(
+                f"Gain value {value} is not within {self.name} range.\n"
+                f"Available gains: {available}"
+            ) from None
 
-    async def decrease_gain(self, value: int = 1) -> None:
-        current_gain = int((await self.get_gain()).name.split("_")[-1])
-        current_gain -= value
-        if current_gain < 1:
-            raise ValueError("Gain at min value")
-        await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
+        self.log.info(f"Gain change to enum {gain_enum.name} and value {value}.")
+        await self.gain_enum.set(gain_enum, timeout=self._timeout)
+        await asyncio.sleep(self._raise_timetable[gain_enum.name].value)
 
-    async def get_gain(self) -> Enum:
-        return self.gain_conversion_table[(await self.gain.get_value()).name]
+    async def increase_gain(self, value: int = 1) -> bool:
+        current_gain = await self.gain.get_value()
+        gains = sorted(self._gain_to_value_config.values())
+        target_index = gains.index(current_gain) + value
 
-    async def get_upperlimit(self) -> float:
-        return self.upperlimit
+        if target_index >= len(gains):
+            return False
 
-    async def get_lowerlimit(self) -> float:
-        return self.lowerlimit
+        await self.set(gains[target_index])
+        return True
+
+    async def decrease_gain(self, value: int = 1) -> bool:
+        current_gain = await self.gain.get_value()
+        gains = sorted(self._gain_to_value_config.values())
+        target_index = gains.index(current_gain) - value
+
+        if target_index < 0:
+            return False
+
+        await self.set(gains[target_index])
+        return True

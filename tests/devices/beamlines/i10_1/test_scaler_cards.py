@@ -16,9 +16,9 @@ async def test_i10j_scalercard_read(mock_i10j_scalercard: I10JScalerCard):
     await assert_reading(
         mock_i10j_scalercard,
         {
-            "mock_i10j_scalercard-mon-readout": partial_reading(0.0),
-            "mock_i10j_scalercard-tey-readout": partial_reading(0.0),
-            "mock_i10j_scalercard-fy-readout": partial_reading(0.0),
-            "mock_i10j_scalercard-fy2-readout": partial_reading(0.0),
+            "mock_i10j_scalercard-mon-current_count": partial_reading(0.0),
+            "mock_i10j_scalercard-tey-current_count": partial_reading(0.0),
+            "mock_i10j_scalercard-fy-current_count": partial_reading(0.0),
+            "mock_i10j_scalercard-fy2-current_count": partial_reading(0.0),
         },
     )
