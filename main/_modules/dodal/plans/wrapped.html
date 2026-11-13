@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plans.wrapped &#8212; dodal 3.0.9.dev5+g8c8d6614f documentation</title>
+    <title>dodal.plans.wrapped &#8212; dodal 3.0.9.dev6+g5da0183e4 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=6e87c78d"></script>
+    <script src="../../../_static/documentation_options.js?v=7dcd8bdc"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -892,7 +892,6 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plans</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Readable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncReadable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">NonNegativeFloat</span><span class="p">,</span> <span class="n">validate_call</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span>
@@ -917,7 +916,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
             <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -982,7 +981,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">num_scan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1017,7 +1016,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">num_grid_scan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1053,7 +1052,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">num_rscan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1088,7 +1087,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">num_grid_rscan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1142,7 +1141,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">list_scan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1176,7 +1175,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">list_grid_scan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1213,7 +1212,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">list_rscan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1247,7 +1246,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">list_grid_rscan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1362,7 +1361,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">step_scan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1396,7 +1395,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">step_grid_scan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1434,7 +1433,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">step_rscan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
@@ -1468,7 +1467,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@validate_call</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">step_grid_rscan</span><span class="p">(</span>
     <span class="n">detectors</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span> <span class="o">|</span> <span class="n">AsyncReadable</span><span class="p">],</span>
+        <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span>
         <span class="n">Field</span><span class="p">(</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Set of readable devices, will take a reading at each point&quot;</span><span class="p">,</span>
         <span class="p">),</span>
