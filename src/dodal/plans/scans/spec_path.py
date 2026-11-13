@@ -1,30 +1,26 @@
 import operator
 from functools import reduce
-from typing import Annotated, Any
+from typing import Annotated as A
 
 import bluesky.plans as bp
-from bluesky.protocols import Movable, Readable
+from bluesky.protocols import Movable
+from bluesky.utils import CustomPlanMetadata, plan
 from cycler import Cycler, cycler
 from pydantic import Field, validate_call
 from scanspec.specs import Spec
 
 from dodal.common import MsgGenerator
+from dodal.plans.scans.annotations import DetectorsA
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@plan
 def spec_scan(
-    detectors: Annotated[
-        set[Readable],
-        Field(
-            description="Set of readable devices, will take a reading at each point, \
-            in addition to any Movables in the Spec",
-        ),
+    detectors: DetectorsA,
+    spec: A[
+        Spec[Movable], Field(description="ScanSpec modelling the path of the scan")
     ],
-    spec: Annotated[
-        Spec[Movable],
-        Field(description="ScanSpec modelling the path of the scan"),
-    ],
-    metadata: dict[str, Any] | None = None,
+    metadata: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
     """Generic plan for reading `detectors` at every point of a ScanSpec `Spec`.
     A `Spec` is an N-dimensional path.
@@ -42,7 +38,7 @@ def spec_scan(
         **(metadata or {}),
     }
 
-    yield from bp.scan_nd(tuple(detectors), _as_cycler(spec), md=_md)
+    yield from bp.scan_nd(detectors, _as_cycler(spec), md=_md)
 
 
 def _as_cycler(spec: Spec[Movable]) -> Cycler:

@@ -7,7 +7,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.sim import SimMotor
 
-from dodal.plan_stubs.wrapped import (
+from dodal.plan_stubs import (
     move,
     move_relative,
     rd,
