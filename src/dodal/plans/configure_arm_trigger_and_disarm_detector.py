@@ -15,6 +15,7 @@ from ophyd_async.fastcs.eiger import EigerDetector
 from dodal.beamlines.i03 import fastcs_eiger
 from dodal.devices.detector import DetectorParams
 from dodal.log import LOGGER, do_default_logging_setup
+from dodal.utils import get_run_number
 
 
 @bpp.run_decorator()
@@ -167,13 +168,14 @@ if __name__ == "__main__":
     )
 
     eiger = fastcs_eiger.build(connect_immediately=True, path_provider=path_provider)
+    storage_directory = "/dls/i03/data/2025/cm40607-2/test_new_eiger/"
     run_engine(
         configure_arm_trigger_and_disarm_detector(
             eiger=eiger,
             detector_params=DetectorParams(
                 expected_energy_ev=12800,
                 exposure_time_s=0.01,
-                directory="/dls/i03/data/2025/cm40607-2/test_new_eiger/",
+                directory=storage_directory,
                 prefix="",
                 detector_distance=255,
                 omega_start=0,
@@ -182,6 +184,7 @@ if __name__ == "__main__":
                 num_triggers=1,
                 use_roi_mode=False,
                 det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
+                run_number=get_run_number(storage_directory, ""),
             ),
             trigger_info=TriggerInfo(
                 number_of_events=1,
