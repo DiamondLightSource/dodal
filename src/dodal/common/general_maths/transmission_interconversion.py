@@ -8,6 +8,14 @@ CANONICAL_NON_ABSORPTION = 0  # Absorption (Bn) when absorber is absent
 _CANONICAL_BARNETT_CONVERSION = -1.0e3
 _REVERSE_BARNETT_CONVERSION = -1.0e-3
 
+class UnphysicalAttenuationError(ValueError):
+    """Raised when a requested, reported or demand attenuation ( in logarithmic units ) is negative.
+
+    This is unphysical as our systems do not have optical gain at x-ray wavelengths,
+    in the absence of an x-ray lasing medium, pumped into a population inversion.
+    """
+    ...
+
 
 @validate_call
 def attenuation_from_natural_log_of_transmission(ln_t: StrictFloat) -> float:

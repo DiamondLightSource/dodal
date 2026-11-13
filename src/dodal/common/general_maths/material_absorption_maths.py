@@ -17,6 +17,16 @@ from dodal.common.general_maths.transmission_interconversion import (
 )
 
 
+class UnphysicalPhotonEnergyError(ValueError):
+    """Raised when an x-ray photon energy is zero or negative."""
+    ...
+
+
+class IneligibleEnergyError(ValueError):
+    """Raised when a calculation is requested at an x-ray energy not modelled in the calculator for an absorber material."""
+    ...
+
+
 @runtime_checkable
 class AbsorptionCalculator(Protocol):
     """Interface for calculating absorption (due to mass attenuation) per cm as a function of x-ray energy in keV.
@@ -135,6 +145,9 @@ class AbsorptionSpectrumSegment(BaseModel):
     kev_energy_interval: ClosedInterval
     absorption_calculator: AbsorptionCalculator
 
+    def __contains__(self, item: object) -> bool:
+        return item in self.kev_energy_interval
+
 
 class MaterialAbsorptionSpectrum(BaseModel):
     """Mapping across N x-ray energy intervals, of interval specific absorption calculator(s).
@@ -195,13 +208,22 @@ class MaterialAbsorptionSpectrum(BaseModel):
         """
         # Iterate sequentially through our modelled energy intervals
         for absorption_model in self.intervals:
-            if energy_kev in absorption_model.kev_energy_interval:
+            if energy_kev in absorption_model:
                 absorption_coeff = (
                     absorption_model.absorption_calculator.absorption_coefficient_per_cm
                 )
                 return absorption_coeff(energy_kev=energy_kev)
-        _msg = f"Absorption of x-ray energy at {energy_kev} keV is outside the valid interval of any calculator in this modelled spectrum."
-        raise ValueError(_msg)
+        raise IneligibleEnergyError(
+            f"Absorption of x-ray energy at {energy_kev} keV is outside the valid interval of any calculator in this modelled spectrum."
+        )
+
+    def __contains__(self, item: object) -> bool:
+        return any(
+            item in segment
+            for segment in self.intervals
+        )
+
+
 
 
 @validate_call
