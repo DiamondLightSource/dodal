@@ -97,7 +97,7 @@ def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, s
         dcgid = 1000
         prefix = ""
         print(f"Using dcgid = {dcgid} and leaving the prefix empty as defaults")
-    return dcgid, prefix
+    return dcgid, prefix  # type: ignore
 
 
 def make_result(payload):

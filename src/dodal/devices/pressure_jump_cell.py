@@ -260,7 +260,7 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
         await wait_for_value(self.busy, False, timeout)  # Change complete
 
     @AsyncStatus.wrap
-    async def stop(self, success=True):
+    async def stop(self, *, success: bool = True):
         await self._stop.set(True)
 
 

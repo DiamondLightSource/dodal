@@ -26,7 +26,6 @@ from dodal.devices.baton import Baton
 from dodal.devices.beamlines.i03.dcm import DCM
 from dodal.devices.beamlines.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, UndulatorInKeV
-from dodal.log import LOGGER
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
@@ -41,17 +40,6 @@ def patch_beamline_parameter_paths():
         {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
     ):
         yield
-
-
-@pytest.fixture(autouse=True)
-def flush_event_loop_on_finish():
-    event_loop = asyncio.get_event_loop()
-    # wait for the test function to complete
-    yield None
-
-    if pending_tasks := asyncio.all_tasks(event_loop):
-        LOGGER.warning(f"Waiting for pending tasks to complete {pending_tasks}")
-        event_loop.run_until_complete(asyncio.gather(*pending_tasks))
 
 
 @pytest.fixture(autouse=True)
