@@ -226,8 +226,8 @@ async def test_femto_struck_scaler_read(
 ):
     await mock_femto.set(gain)
 
-    set_mock_value(mock_struck_scaler.current_count_time, 1)
-    set_mock_value(mock_struck_scaler.current_count, raw_voltage)
+    set_mock_value(mock_struck_scaler.count_time, 1)
+    set_mock_value(mock_struck_scaler.count, raw_voltage)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
 
     run_engine(count([mock_femto_struck_scaler_detector]))
@@ -262,13 +262,13 @@ async def test_femto_struck_scaler_read_with_auto_gain(
 ):
     await mock_femto.set(gain)
 
-    set_mock_value(mock_struck_scaler.current_count_time, 1)
+    set_mock_value(mock_struck_scaler.count_time, 1)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, True)
 
     raw_counts = iter(raw_voltage)
 
     def set_mock_counter():
-        set_mock_value(mock_struck_scaler.current_count, next(raw_counts))
+        set_mock_value(mock_struck_scaler.count, next(raw_counts))
         set_mock_value(mock_struck_scaler.trigger_start, CountState.DONE)
 
     callback_on_mock_put(

@@ -74,10 +74,11 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable, Triggerable):
         required for a counter/detector to function with CurrentAmpDet.
 
     Attributes:
-        count_per_volt (float): The conversion factor between counter output and voltage.
+        current_count_per_volt (float): The conversion factor between counter output and
+            voltage.
     """
 
-    current_count: SignalR[float]
+    count: SignalR[float]
     current_count_per_sec: SignalR[float]
     current_count_per_volt: SignalR[float]
     voltage_per_sec: SignalR[float]
