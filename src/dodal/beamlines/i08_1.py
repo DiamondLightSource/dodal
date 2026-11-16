@@ -2,6 +2,7 @@ from functools import cache
 from pathlib import Path
 
 from ophyd_async.core import (
+    AutoIncrementFilenameProvider,
     PathProvider,
     StaticPathProvider,
     UUIDFilenameProvider,
@@ -37,6 +38,22 @@ def synchrotron() -> Synchrotron:
 @cache
 def path_provider() -> PathProvider:
     return StaticPathProvider(UUIDFilenameProvider(), Path(PATH))
+
+
+@devices.fixture
+@cache
+def panda_path_provider() -> PathProvider:
+    return StaticPathProvider(
+        AutoIncrementFilenameProvider(base_filename="panda"), Path(PATH)
+    )
+
+
+@devices.fixture
+@cache
+def detector_path_provider() -> PathProvider:
+    return StaticPathProvider(
+        AutoIncrementFilenameProvider(base_filename="detector"), Path(PATH)
+    )
 
 
 @devices.factory()
