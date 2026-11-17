@@ -7,6 +7,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
+from dodal.common.enums import OpenCloseUpper
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i11.cyberstar_blower import (
     AutotunedCyberstarBlower,
@@ -25,6 +26,7 @@ from dodal.devices.eurotherm import (
     EurothermGeneral,
     UpdatingEurothermGeneral,
 )
+from dodal.devices.fast_shutter import FastShutter
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperature_controller.mercury_itc import MercuryITC
@@ -163,3 +165,12 @@ def panda(path_provider: PathProvider) -> HDFPanda:
 @devices.factory()
 def mercury_itc() -> MercuryITC:
     return MercuryITC(f"{PREFIX.beamline_prefix}-EA-MERC-01:")
+
+
+@devices.factory()
+def fast_shutter() -> FastShutter[OpenCloseUpper]:
+    return FastShutter[OpenCloseUpper](
+        f"{PREFIX.beamline_prefix}-EA-SHTR-01:SHUTTER",
+        open_state=OpenCloseUpper.OPEN,
+        close_state=OpenCloseUpper.CLOSE,
+    )
