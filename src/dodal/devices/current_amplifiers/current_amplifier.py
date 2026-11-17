@@ -71,16 +71,12 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable, Triggerable):
     """Base class for current amplifier counter, it contain the minimal implementations
-        required for a counter/detector to function with CurrentAmpDet.
-
-    Attributes:
-        current_count_per_volt (float): The conversion factor between counter output and
-            voltage.
+    required for a counter/detector to function with CurrentAmpDet.
     """
 
     count: SignalR[float]
-    current_count_per_sec: SignalR[float]
-    current_count_per_volt: SignalR[float]
+    count_per_sec: SignalR[float]
+    count_per_volt: SignalR[float]
     voltage_per_sec: SignalR[float]
 
     @abstractmethod
