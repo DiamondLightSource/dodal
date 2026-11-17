@@ -1,8 +1,14 @@
 from functools import cache
 from pathlib import Path
 
-from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.core import (
+    DeviceMap,
+    PathProvider,
+    StaticPathProvider,
+    UUIDFilenameProvider,
+)
 from ophyd_async.epics.adcore import ADWriterFactory
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -29,6 +35,7 @@ from dodal.devices.eurotherm import (
     UpdatingEurothermGeneral,
 )
 from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.scaler_card import ScalerCard, ScalerCardController
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperature_controller.mercury_itc import MercuryITC
@@ -190,3 +197,26 @@ def fast_shutter() -> FastShutter[OpenCloseUpper]:
 @devices.factory()
 def simple_panda() -> SimplePanda:
     return SimplePanda(f"{PREFIX.beamline_prefix}-EA-PANDA-01:")
+
+
+@devices.factory()
+def scaler2_controller() -> ScalerCardController:
+    return ScalerCardController(
+        f"{PREFIX.beamline_prefix}-EA-COUNT-02",
+        start_count_suffix=".CNT",
+        count_suffix=".TP",
+    )
+
+
+@devices.factory()
+def scaler2(scaler2_controller: ScalerCardController) -> ScalerCard:
+    prefix = f"{PREFIX.beamline_prefix}-EA-COUNT-02"
+    return ScalerCard(
+        channels=DeviceMap(
+            {
+                "i0": epics_signal_r(float, prefix + ".S17"),
+                "ie": epics_signal_r(float, prefix + ".S18"),
+            }
+        ),
+        controller=scaler2_controller,
+    )
