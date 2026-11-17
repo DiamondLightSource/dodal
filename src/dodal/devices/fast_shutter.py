@@ -87,6 +87,14 @@ class GenericFastShutter(StandardReadable, Movable[EnumTypesT], Generic[EnumType
     async def set(self, state: EnumTypesT):
         await self.shutter_state.set(state)
 
+    @AsyncStatus.wrap
+    async def stage(self):
+        await self.set(self.open_state)
+
+    @AsyncStatus.wrap
+    async def unstage(self):
+        await self.set(self.close_state)
+
 
 class FastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
     """Implementation of fast shutter that connects to an epics pv. This pv is an enum that
