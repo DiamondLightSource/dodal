@@ -23,14 +23,12 @@ class CountState(StrictEnum):
     COUNT = "Count"
 
 
-def _current_count_per_sec(count: float, count_time: float) -> float:
+def _count_per_sec(count: float, count_time: float) -> float:
     return count / count_time
 
 
-def _voltage_per_sec(
-    current_count_per_sec: float, current_count_per_volt: float
-) -> float:
-    return current_count_per_sec / current_count_per_volt
+def _voltage_per_sec(count_per_sec: float, count_per_volt: float) -> float:
+    return count_per_sec / count_per_volt
 
 
 @default_mock_class(
@@ -42,7 +40,7 @@ class StruckScaler(CurrentAmpCounter):
     """StruckScaler is a counting card that records the output signal from a wide
     range of detectors. This class contains the basic control to run the struck scaler
     card together with a current amplifier. It has additional signals that provide
-    conversion between count, current and voltage.
+    conversion between count and voltage.
 
     Attributes:
         count(SignalR): Scaler card output.
@@ -54,28 +52,28 @@ class StruckScaler(CurrentAmpCounter):
         self,
         prefix: str,
         suffix: str,
-        current_count_per_volt=100000,
+        count_per_volt=100000,
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.count = epics_signal_r(float, prefix + suffix)
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.count_mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
+            self.mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
             self.count_time = epics_signal_rw(float, prefix + ".TP")
 
-        self.current_count_per_volt, _ = soft_signal_r_and_setter(
-            float, initial_value=current_count_per_volt
+        self.count_per_volt, _ = soft_signal_r_and_setter(
+            float, initial_value=count_per_volt
         )
-        self.current_count_per_sec = derived_signal_r(
-            _current_count_per_sec,
+        self.count_per_sec = derived_signal_r(
+            _count_per_sec,
             count=self.count,
             count_time=self.count_time,
         )
         self.voltage_per_sec = derived_signal_r(
             _voltage_per_sec,
-            current_count_per_sec=self.current_count_per_sec,
-            current_count_per_volt=self.current_count_per_volt,
+            count_per_sec=self.count_per_sec,
+            count_per_volt=self.count_per_volt,
         )
         self.trigger_start = epics_signal_rw(CountState, prefix + ".CNT")
 
@@ -83,7 +81,7 @@ class StruckScaler(CurrentAmpCounter):
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        await self.count_mode.set(CountMode.ONE_SHOT)
+        await self.mode.set(CountMode.ONE_SHOT)
         await super().stage()
 
     @AsyncStatus.wrap
@@ -101,5 +99,5 @@ class StruckScaler(CurrentAmpCounter):
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        await self.count_mode.set(CountMode.AUTO)
+        await self.mode.set(CountMode.AUTO)
         await super().unstage()
