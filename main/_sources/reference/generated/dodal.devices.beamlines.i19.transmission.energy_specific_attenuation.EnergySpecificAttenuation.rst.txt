@@ -21,6 +21,9 @@ dodal.devices.beamlines.i19.transmission.energy\_specific\_attenuation.EnergySpe
       
       ~EnergySpecificAttenuation.reduce_attenuation_by
       
+      
+      ~EnergySpecificAttenuation.transparently_not_attenuating
+      
    
    
 

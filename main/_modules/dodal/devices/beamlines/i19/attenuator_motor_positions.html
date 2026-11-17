@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i19.attenuator_motor_positions &#8212; dodal 3.0.9.dev6+g5da0183e4 documentation</title>
+    <title>dodal.devices.beamlines.i19.attenuator_motor_positions &#8212; dodal 3.0.9.dev7+gf556fea9f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../_static/documentation_options.js?v=7dcd8bdc"></script>
+    <script src="../../../../../_static/documentation_options.js?v=196c82a9"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -944,8 +944,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">common_key_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">common_keys</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">common_key_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">ks</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;key&quot;</span> <span class="k">if</span> <span class="n">common_key_count</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;keys&quot;</span>
-            <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Common </span><span class="si">{</span><span class="n">ks</span><span class="si">}</span><span class="s2"> found in motor positions: </span><span class="si">{</span><span class="n">common_keys</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Common </span><span class="si">{</span><span class="n">ks</span><span class="si">}</span><span class="s2"> found in motor positions: </span><span class="si">{</span><span class="n">common_keys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">no_keys_clash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamlines.i19.transmission.energy_specific_attenuation &#8212; dodal 3.0.9.dev6+g5da0183e4 documentation</title>
+    <title>dodal.devices.beamlines.i19.transmission.energy_specific_attenuation &#8212; dodal 3.0.9.dev7+gf556fea9f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../../../_static/documentation_options.js?v=7dcd8bdc"></script>
+    <script src="../../../../../../_static/documentation_options.js?v=196c82a9"></script>
     <script src="../../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -994,7 +994,17 @@ window.runMermaid = runMermaid;</script>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Reduction would exceed attenuation of original demand - leading to an invalid negative residual&quot;</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="EnergySpecificAttenuation.transparently_not_attenuating">
+<a class="viewcode-back" href="../../../../../../reference/generated/dodal.devices.beamlines.i19.transmission.energy_specific_attenuation.EnergySpecificAttenuation.html#dodal.devices.beamlines.i19.transmission.energy_specific_attenuation.EnergySpecificAttenuation.transparently_not_attenuating">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transparently_not_attenuating</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EnergySpecificAttenuation&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Factory method for a fully transparent (non-attenuating) state at a given energy.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">attenuation_bn</span><span class="o">=</span><span class="n">CANONICAL_NON_ABSORPTION</span><span class="p">,</span> <span class="n">energy_kev</span><span class="o">=</span><span class="n">energy_kev</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 
