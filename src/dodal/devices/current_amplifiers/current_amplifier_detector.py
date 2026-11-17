@@ -84,33 +84,42 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
             self._current_amp_ref().upperlimit.get_value(),
             self._current_amp_ref().lowerlimit.get_value(),
         )
-        while True:
-            # Acquire a fresh measurement at the new gain.
+        max_attempts = len(self._current_amp_ref().sorted_gain_values)
+        for _ in range(max_attempts):
+            # Acquire a fresh measurement at the current gain.
             await self._counter_ref().trigger()
 
             voltage = abs(await self._counter_ref().voltage.get_value())
+
+            if lower_limit <= voltage <= upper_limit:
+                self.log.debug("Don't need to adjust gain")
+                break
+
             if voltage > upper_limit:
+                direction = "decrease"
                 self.log.debug(
-                    f"Voltage is {voltage} is above limit {upper_limit}. "
+                    f"Voltage {voltage} is above limit {upper_limit}. "
                     "Decreasing gain..."
                 )
                 changed = await self._current_amp_ref().decrease_gain()
-            elif voltage < lower_limit:
+            else:
+                direction = "increase"
                 self.log.debug(
                     f"Voltage {voltage} is below limit {lower_limit}. "
                     "Increasing gain..."
                 )
                 changed = await self._current_amp_ref().increase_gain()
-            else:
-                self.log.debug("Don't need to adjust gain", self.name)
-                break
 
             if not changed:
-                direction = "decrease" if voltage > upper_limit else "increase"
                 self.log.warning(
-                    f"Couldn't {direction} gain further. Input current might be out of range."
+                    f"Couldn't {direction} gain further. "
+                    "Input current might be out of range."
                 )
                 break
+        else:
+            self.log.warning(
+                f"Reached maximum gain optimisation attempts of {max_attempts}."
+            )
 
         LOGGER.debug("Finished optimising gain.")
 

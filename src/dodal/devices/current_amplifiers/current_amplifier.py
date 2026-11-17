@@ -27,7 +27,7 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
     """
 
     gain: SignalRW[float]
-    _sorted_gain_values: list[float]
+    sorted_gain_values: list[float]
 
     def __init__(
         self,
@@ -63,7 +63,8 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
         await self.gain.set(value)
 
     async def increase_gain(self, value: int | None = None) -> bool:
-        """Increase gain, increment by 1 by default.
+        """Increase gain, increment by an optional amount. If not provided, then use a
+        cofigured default.
 
         Returns:
             bool: True if success.
@@ -71,18 +72,19 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
         if value is None:
             value = self._default_increase_gain
         current_gain = await self.gain.get_value()
-        current_index = self._sorted_gain_values.index(current_gain)
+        current_index = self.sorted_gain_values.index(current_gain)
         target_index = current_index + value
 
-        if target_index >= len(self._sorted_gain_values):
-            await self.set(self._sorted_gain_values[-1])
+        if target_index >= len(self.sorted_gain_values):
+            await self.set(self.sorted_gain_values[-1])
             return False
 
-        await self.set(self._sorted_gain_values[target_index])
+        await self.set(self.sorted_gain_values[target_index])
         return True
 
     async def decrease_gain(self, value: int | None = None) -> bool:
-        """Decrease gain, decrement by 1 by default.
+        """Decrease gain, increment by an optional amount. If not provided, then use a
+        cofigured default.
 
         Returns:
             bool: True if success.
@@ -90,14 +92,14 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
         if value is None:
             value = self._default_decrease_gain
         current_gain = await self.gain.get_value()
-        current_index = self._sorted_gain_values.index(current_gain)
+        current_index = self.sorted_gain_values.index(current_gain)
         target_index = current_index - value
 
         if target_index < 0:
-            await self.set(self._sorted_gain_values[0])
+            await self.set(self.sorted_gain_values[0])
             return False
 
-        await self.set(self._sorted_gain_values[target_index])
+        await self.set(self.sorted_gain_values[target_index])
         return True
 
 

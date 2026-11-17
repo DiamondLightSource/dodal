@@ -113,7 +113,7 @@ class FemtoDDPCA(CurrentAmp, Generic[EnumTypesT]):
             name: Name of the device.
         """
         self._gain_to_value_config = gain_to_value_config
-        self._sorted_gain_values = sorted(self._gain_to_value_config.values())
+        self.sorted_gain_values = sorted(self._gain_to_value_config.values())
         # Create the inverse lookup table for _set_gain method.
         self._value_to_gain_config = {
             sensitivity: setting

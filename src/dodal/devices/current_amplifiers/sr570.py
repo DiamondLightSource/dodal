@@ -127,12 +127,11 @@ class SR570(CurrentAmp):
             name: Name of the device.
         """
         self._raise_timetable = raise_timetable
-        self._sorted_gain_values = sorted(
+        self.sorted_gain_values = sorted(
             sensitivity
             for fine_gains in SR570_GAIN_CONFIGURATION.values()
             for sensitivity in fine_gains.values()
         )
-
         self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
         self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
 
