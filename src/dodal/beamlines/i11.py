@@ -162,4 +162,4 @@ def panda(path_provider: PathProvider) -> HDFPanda:
 
 @devices.factory()
 def mercury_itc() -> MercuryITC:
-    return MercuryITC(f"{PREFIX.beamline_prefix}-EA-TEMPC-03:MERC:")
+    return MercuryITC(f"{PREFIX.beamline_prefix}-EA-MERC-01:")
