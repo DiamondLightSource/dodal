@@ -119,7 +119,7 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         await self._counter_ref().stage()
 
     @AsyncStatus.wrap
-    async def prepare(self, value) -> None:
+    async def prepare(self, value: float) -> None:
         await self._counter_ref().prepare(value)
 
     @AsyncStatus.wrap
