@@ -18,7 +18,7 @@ from dodal.log import LOGGER
 
 
 def _current_in(voltage: float, gain: float) -> float:
-    """Convert output voltage back into the read detector output in Amp."""
+    """Convert voltage output back into the current input in Amp."""
     return voltage / gain
 
 
@@ -126,6 +126,7 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await self._counter_ref().stage()
+        await self.stage()
 
     @AsyncStatus.wrap
     async def prepare(self, value: float) -> None:
@@ -150,3 +151,4 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         await self._counter_ref().unstage()
+        await self.unstage()
