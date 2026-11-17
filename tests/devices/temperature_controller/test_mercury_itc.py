@@ -13,11 +13,18 @@ async def mock_mercury():
 
 
 async def test_mercury_can_be_read(mock_mercury: MercuryITC):
-    set_mock_value(mock_mercury.sensors[0].readback, 75.6)
+    set_mock_value(mock_mercury.sensors[1].readback, 75.6)
+    set_mock_value(mock_mercury.sensors[2].readback, 102.5)
+    set_mock_value(mock_mercury.sensors[3].readback, 653)
 
     await assert_reading(
         mock_mercury,
-        {"mock_mercury-sensors-1-readback": partial_reading(75.6)},
+        {
+            "mock_mercury-sensors-1-readback": partial_reading(75.6),
+            "mock_mercury-sensors-2-readback": partial_reading(102.5),
+            "mock_mercury-sensors-3-readback": partial_reading(653),
+        },
+        False,
     )
 
 
