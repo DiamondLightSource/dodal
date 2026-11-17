@@ -46,6 +46,10 @@ class StruckScaler(CurrentAmpCounter):
         count(SignalR): Scaler card output.
         count_mode (SignalR[CountMode]): Counting card setting.
         count_time (SignalRW([float]): Count time.
+        count_per_sec (SignalR[float]): Derived signal from the count and count_time.
+        count_per_volt (SignalR[float]): Conversion factor between counter output and voltage.
+        voltage: (SignalR[float]): The calculated voltage output from the count and
+            count_per_volt.
     """
 
     def __init__(
