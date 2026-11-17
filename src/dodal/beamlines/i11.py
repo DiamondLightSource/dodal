@@ -18,6 +18,7 @@ from dodal.devices.beamlines.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
 )
+from dodal.devices.beamlines.i11.fastcs_mythen import FastCSMythen3
 from dodal.devices.beamlines.i11.mythen import Mythen3
 from dodal.devices.beamlines.i11.nx100robot import NX100Robot
 from dodal.devices.beamlines.i11.simple_panda import SimplePanda
@@ -59,6 +60,15 @@ def mythen3(path_provider: PathProvider) -> Mythen3:
             path_provider=path_provider, writer_suffix="HDF:"
         ),
         drv_suffix=DET_SUFFIX,
+    )
+
+
+@devices.factory()
+def fastcs_mythen3(path_provider: PathProvider) -> FastCSMythen3:
+    """FastCS Mythen3 Detector."""
+    return FastCSMythen3(
+        prefix=f"{PREFIX.beamline_prefix}-MYTHEN:",
+        path_provider=path_provider,
     )
 
 
