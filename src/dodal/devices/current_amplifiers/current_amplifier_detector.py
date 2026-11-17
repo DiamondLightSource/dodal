@@ -125,8 +125,7 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        await self._counter_ref().stage()
-        await self.stage()
+        await asyncio.gather(self._counter_ref().stage(), super().stage())
 
     @AsyncStatus.wrap
     async def prepare(self, value: float) -> None:
@@ -150,5 +149,4 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        await self._counter_ref().unstage()
-        await self.unstage()
+        await asyncio.gather(self._counter_ref().unstage(), super().unstage())
