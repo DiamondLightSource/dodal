@@ -1,3 +1,5 @@
+from ophyd_async.epics.motor import Motor
+
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05_shared import (
     APPLE_KNOT_EXCLUSION_ZONES,
@@ -20,7 +22,7 @@ from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEne
 from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.slits import SlitsWithIndividualBlades
+from dodal.devices.slits import ExitSlits, SlitsWithIndividualBlades
 from dodal.devices.synchrotron import Synchrotron
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -157,3 +159,17 @@ def s3() -> SlitsWithIndividualBlades:
         y_minus="YMINUS",
         y_plus="YPLUS",
     )
+
+
+@devices.factory()
+def s6() -> ExitSlits:
+    return ExitSlits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
+
+
+@devices.factory()
+def exit_slit() -> Motor:
+    """It's a requirement of i05 to have 'exit_slit' as the name for the exit slits Y
+    size value to match other ARPES instruments.  Thus we have added this as a duplicate
+    of one motor of s6 so that their data files can match the standard.
+    """
+    return Motor(f"{PREFIX.beamline_prefix}-AL-SLITS-06:YSIZE")

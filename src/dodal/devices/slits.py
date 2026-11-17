@@ -38,8 +38,35 @@ class Slits(MinimalSlits):
         super().__init__(prefix=prefix, x_gap=x_gap, y_gap=y_gap, name=name)
 
 
+class ExitSlits(Slits):
+    """Representation of a 4-blade set of slits with an additional motor to allow
+    movement in z direction (i.e. along the beam).
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        x_gap: str = "XSIZE",
+        y_gap: str = "YSIZE",
+        x_centre: str = "XGAP",
+        y_centre: str = "YGAP",
+        z_pos: str = "Z",
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.z_pos = Motor(prefix + z_pos)
+        super().__init__(
+            prefix=prefix,
+            x_gap=x_gap,
+            y_gap=y_gap,
+            x_centre=x_centre,
+            y_centre=y_centre,
+            name=name,
+        )
+
+
 class SlitsWithIndividualBlades(Slits):
-    """Representation of a 4-blade set of slits. Where each X/Y slit can be controlled
+    """Representation of a 4-blade set of slits where each X/Y slit can be controlled
     via the individial blade or by the gap and centres.
     """
 
