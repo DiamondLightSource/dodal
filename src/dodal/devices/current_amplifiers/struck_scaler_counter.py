@@ -84,6 +84,7 @@ class StruckScaler(CurrentAmpCounter):
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await self.count_mode.set(CountMode.ONE_SHOT)
+        await super().stage()
 
     @AsyncStatus.wrap
     async def prepare(self, value) -> None:
@@ -101,3 +102,4 @@ class StruckScaler(CurrentAmpCounter):
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         await self.count_mode.set(CountMode.AUTO)
+        await super().unstage()
