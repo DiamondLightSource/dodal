@@ -14,16 +14,23 @@ async def mock_simple_panda() -> SimplePanda:
 async def test_simple_panda_describe_and_read_timestamps(
     mock_simple_panda: SimplePanda,
 ) -> None:
-    signal = mock_simple_panda.signal_to_timestamp
+    signal = mock_simple_panda._trigger
     set_mock_value(signal, True)
-    signal_name = signal.name
-    timestamp_name = f"{signal_name}-timestamp"
 
     description = await mock_simple_panda.describe()
-    expected_timestamp_description = dict(description[signal_name])
+    expected_timestamp_description = dict(description["mock_simple_panda-_trigger"])
     expected_timestamp_description["dtype"] = "number"
-    assert description[timestamp_name] == expected_timestamp_description
+    assert (
+        description["mock_simple_panda-_trigger-timestamp"]
+        == expected_timestamp_description
+    )
 
     reading = await mock_simple_panda.read()
-    assert reading[timestamp_name]["value"] == reading[signal_name]["timestamp"]
-    assert reading[timestamp_name]["timestamp"] == reading[signal_name]["timestamp"]
+    assert (
+        reading["mock_simple_panda-_trigger-timestamp"]["value"]
+        == reading["mock_simple_panda-_trigger"]["timestamp"]
+    )
+    assert (
+        reading["mock_simple_panda-_trigger-timestamp"]["timestamp"]
+        == reading["mock_simple_panda-_trigger"]["timestamp"]
+    )

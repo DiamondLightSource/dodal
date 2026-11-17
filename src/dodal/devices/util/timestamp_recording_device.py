@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from bluesky.protocols import Reading
 from event_model import DataKey
-from ophyd_async.core import SignalR, StandardReadable
+from ophyd_async.core import Reference, SignalR, StandardReadable
 from ophyd_async.core._utils import merge_gathered_dicts
 
 
@@ -13,7 +13,7 @@ class TimestampRecordingDevice(StandardReadable):
     they are new individual signals.
     """
 
-    def __init__(self, signal_to_timestamp: SignalR, name: str = "") -> None:
+    def __init__(self, signal_to_timestamp: Reference[SignalR], name: str = "") -> None:
         self.signal_to_timestamp = signal_to_timestamp
         super().__init__(name=name)
 
@@ -26,10 +26,10 @@ class TimestampRecordingDevice(StandardReadable):
         descriptions = await merge_gathered_dicts(
             [func() for func in self._describe_funcs]
         )
-        descriptions[f"{self.signal_to_timestamp.name}-timestamp"] = deepcopy(
-            descriptions[self.signal_to_timestamp.name]
+        descriptions[f"{self.signal_to_timestamp().name}-timestamp"] = deepcopy(
+            descriptions[self.signal_to_timestamp().name]
         )
-        descriptions[f"{self.signal_to_timestamp.name}-timestamp"]["dtype"] = "number"
+        descriptions[f"{self.signal_to_timestamp().name}-timestamp"]["dtype"] = "number"
         return descriptions
 
     async def read(self) -> dict[str, Reading]:
@@ -39,10 +39,10 @@ class TimestampRecordingDevice(StandardReadable):
         This is a workaround so that the nexus writer will actually record the timestamp.
         """
         readings = await merge_gathered_dicts([func() for func in self._read_funcs])
-        readings[f"{self.signal_to_timestamp.name}-timestamp"] = deepcopy(
-            readings[self.signal_to_timestamp.name]
+        readings[f"{self.signal_to_timestamp().name}-timestamp"] = deepcopy(
+            readings[self.signal_to_timestamp().name]
         )
-        readings[f"{self.signal_to_timestamp.name}-timestamp"]["value"] = readings[
-            f"{self.signal_to_timestamp.name}-timestamp"
+        readings[f"{self.signal_to_timestamp().name}-timestamp"]["value"] = readings[
+            f"{self.signal_to_timestamp().name}-timestamp"
         ]["timestamp"]
         return readings
