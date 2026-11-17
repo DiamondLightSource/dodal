@@ -1,4 +1,4 @@
-from ophyd_async.core import StandardReadable, StandardReadableFormat
+from ophyd_async.core import Reference, StandardReadable, StandardReadableFormat
 from ophyd_async.core._device import DeviceVector
 from ophyd_async.epics.core import epics_signal_r
 
@@ -13,7 +13,7 @@ class TempSensorChannel(TimestampRecordingDevice):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, read_pv=f"{prefix}READ_TEMP_SIG_TEMP")
 
-        super().__init__(signal_to_timestamp=self.readback, name=name)
+        super().__init__(signal_to_timestamp=Reference(self.readback), name=name)
 
 
 class MercuryITC(StandardReadable):
