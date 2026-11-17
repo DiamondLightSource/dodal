@@ -105,7 +105,8 @@ class SR570(CurrentAmp):
         raise_timetable: type[Enum] = SR570RaiseTimeTable,
         upperlimit: float = 4.8,
         lowerlimit: float = 0.4,
-        timeout: float = 1,
+        default_increase_gain: int = 3,
+        default_decrease_gain: int = 3,
         name: str = "",
     ) -> None:
         """Configuration for SR570 current amplifier.
@@ -119,11 +120,18 @@ class SR570(CurrentAmp):
                 by automatic gain adjustment, in V.
             lowerlimit: Lower threshold for the amplifier output voltage used
                 by automatic gain adjustment, in V.
-            timeout: Maximum waiting time in seconds when setting gain.
+            default_increase_gain: When calling increase_gain method with no args, what
+                default value to use.
+            default_decrease_gain: When calling decrease_gain method with no args, what
+                default value to use.
             name: Name of the device.
         """
-        self._timeout = timeout
         self._raise_timetable = raise_timetable
+        self._sorted_gain_values = sorted(
+            sensitivity
+            for fine_gains in SR570_GAIN_CONFIGURATION.values()
+            for sensitivity in fine_gains.values()
+        )
 
         self.fine_gain = epics_signal_rw(SR570FineGainTable, prefix + suffix + "1")
         self.coarse_gain = epics_signal_rw(SR570GainTable, prefix + suffix + "2")
@@ -132,11 +140,18 @@ class SR570(CurrentAmp):
             self.gain = derived_signal_rw(
                 self._gain_enum_to_value,
                 self._set_gain,
+                derived_units="V/A",
                 coarse_gain=self.coarse_gain,
                 fine_gain=self.fine_gain,
             )
 
-        super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
+        super().__init__(
+            upperlimit=upperlimit,
+            lowerlimit=lowerlimit,
+            default_increase_gain=default_increase_gain,
+            default_decrease_gain=default_decrease_gain,
+            name=name,
+        )
 
     def _gain_enum_to_value(
         self, coarse_gain: SR570GainTable, fine_gain: SR570FineGainTable
@@ -169,41 +184,6 @@ class SR570(CurrentAmp):
         LOGGER.info("%s gain changed to %s", self.name, value)
 
         await asyncio.gather(
-            self.fine_gain.set(fine_gain, timeout=self._timeout),
-            self.coarse_gain.set(coarse_gain, timeout=self._timeout),
+            self.fine_gain.set(fine_gain), self.coarse_gain.set(coarse_gain)
         )
         await asyncio.sleep(self._raise_timetable[coarse_gain.name].value)
-
-    async def increase_gain(self, value: int = 3) -> bool:
-        current_gain = await self.gain.get_value()
-        gains = sorted(
-            sensitivity
-            for fine_gains in SR570_GAIN_CONFIGURATION.values()
-            for sensitivity in fine_gains.values()
-        )
-        current_index = gains.index(current_gain)
-        target_index = current_index + value
-
-        if target_index >= len(gains):
-            await self.set(gains[-1])
-            return False
-
-        await self.set(gains[target_index])
-        return True
-
-    async def decrease_gain(self, value: int = 3) -> bool:
-        current_gain = await self.gain.get_value()
-        gains = sorted(
-            sensitivity
-            for fine_gains in SR570_GAIN_CONFIGURATION.values()
-            for sensitivity in fine_gains.values()
-        )
-        current_index = gains.index(current_gain)
-        target_index = current_index - value
-
-        if target_index < 0:
-            await self.set(gains[0])
-            return False
-
-        await self.set(gains[target_index])
-        return True

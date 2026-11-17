@@ -70,7 +70,7 @@ class StruckScaler(CurrentAmpCounter):
             count=self.count,
             count_time=self.count_time,
         )
-        self.voltage_per_sec = derived_signal_r(
+        self.voltage = derived_signal_r(
             _voltage_per_sec,
             count_per_sec=self.count_per_sec,
             count_per_volt=self.count_per_volt,

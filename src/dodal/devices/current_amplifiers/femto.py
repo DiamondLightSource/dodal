@@ -89,7 +89,8 @@ class FemtoDDPCA(CurrentAmp, Generic[EnumTypesT]):
         raise_timetable: type[Enum] = Femto3xxRaiseTime,
         upperlimit: float = 8.8,
         lowerlimit: float = 0.68,
-        timeout: float = 1,
+        default_increase_gain: int = 1,
+        default_decrease_gain: int = 1,
         name: str = "",
     ) -> None:
         """Configure the Femto current amplifier.
@@ -105,25 +106,37 @@ class FemtoDDPCA(CurrentAmp, Generic[EnumTypesT]):
                 adjustment.
             lowerlimit: Lower output voltage threshold in V for automatic gain
                 adjustment.
-            timeout: Maximum waiting time in seconds when setting gain.
+            default_increase_gain: When calling increase_gain method with no args, what
+                default value to use.
+            default_decrease_gain: When calling decrease_gain method with no args, what
+                default value to use.
             name: Name of the device.
         """
         self._gain_to_value_config = gain_to_value_config
+        self._sorted_gain_values = sorted(self._gain_to_value_config.values())
         # Create the inverse lookup table for _set_gain method.
         self._value_to_gain_config = {
             sensitivity: setting
             for setting, sensitivity in self._gain_to_value_config.items()
         }
         self._raise_timetable = raise_timetable
-        self._timeout = timeout
 
         self.gain_enum = epics_signal_rw(gain_enum_type, prefix + suffix)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.gain = derived_signal_rw(
-                self._gain_enum_to_value, self._set_gain, gain_enum=self.gain_enum
+                self._gain_enum_to_value,
+                self._set_gain,
+                derived_units="V/A",
+                gain_enum=self.gain_enum,
             )
-        super().__init__(upperlimit=upperlimit, lowerlimit=lowerlimit, name=name)
+        super().__init__(
+            upperlimit=upperlimit,
+            lowerlimit=lowerlimit,
+            default_increase_gain=default_increase_gain,
+            default_decrease_gain=default_decrease_gain,
+            name=name,
+        )
 
     def _gain_enum_to_value(self, gain_enum: EnumTypesT) -> float:
         """Convert Femto gain enum to numerical value V/A."""
@@ -144,27 +157,5 @@ class FemtoDDPCA(CurrentAmp, Generic[EnumTypesT]):
             ) from None
 
         self.log.info(f"Gain change to enum {gain_enum.name} and value {value}.")
-        await self.gain_enum.set(gain_enum, timeout=self._timeout)
+        await self.gain_enum.set(gain_enum)
         await asyncio.sleep(self._raise_timetable[gain_enum.name].value)
-
-    async def increase_gain(self, value: int = 1) -> bool:
-        current_gain = await self.gain.get_value()
-        gains = sorted(self._gain_to_value_config.values())
-        target_index = gains.index(current_gain) + value
-
-        if target_index >= len(gains):
-            return False
-
-        await self.set(gains[target_index])
-        return True
-
-    async def decrease_gain(self, value: int = 1) -> bool:
-        current_gain = await self.gain.get_value()
-        gains = sorted(self._gain_to_value_config.values())
-        target_index = gains.index(current_gain) - value
-
-        if target_index < 0:
-            return False
-
-        await self.set(gains[target_index])
-        return True
