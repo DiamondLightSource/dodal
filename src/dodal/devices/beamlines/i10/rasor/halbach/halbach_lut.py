@@ -14,7 +14,7 @@ class HalbachLookupTable:
     """2D bilinear interpolation over
     (H_mT, Field_Angle_Z_deg) -> (m1_unwrapped_deg, m2_unwrapped_deg, m3_unwrapped_deg, m4_unwrapped_deg).
 
-    Strictly restricts setpoints to lie within the calibrated LUT data bounds.
+    Restricts setpoints to lie within the calibrated LUT.
     """
 
     def __init__(
@@ -38,7 +38,7 @@ class HalbachLookupTable:
     def from_csv_contents(
         cls,
         csv_contents: str,
-        source: str = "<string>",
+        source: str = "",
     ) -> HalbachLookupTable:
         rows = []
         for row in csv.DictReader(io.StringIO(csv_contents, newline="")):
