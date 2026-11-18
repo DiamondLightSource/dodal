@@ -1,5 +1,4 @@
 from functools import cache
-from pathlib import Path
 
 from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider
@@ -9,8 +8,11 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.common.beamlines.beamline_utils import set_config_client
-from dodal.common.visit import StaticVisitPathProvider
+from dodal.common.beamlines.beamline_utils import (
+    set_config_client,
+    set_path_provider,
+)
+from dodal.common.subdirectory_provider import SubdirectoryPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
@@ -80,10 +82,9 @@ def config_client() -> ConfigClient:
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return StaticVisitPathProvider(
-        BL,
-        Path("/dls/i19-2/data/2026/cm44169-1/"),
-    )
+    provider = SubdirectoryPathProvider(BL)
+    set_path_provider(provider)
+    return provider
 
 
 @devices.factory()
