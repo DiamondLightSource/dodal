@@ -403,7 +403,8 @@ def test_attenuation_at_depth_raises_error_with_invalid_attenuation(
 @pytest.mark.parametrize(
     "_out_of_band_kev",
     [
-        (2.1, 96.3),
+        2.1,
+        96.3,
     ],
 )
 @pytest.mark.parametrize(
@@ -428,14 +429,15 @@ def test_single_band_material_absorption_spectrum_rejects_out_of_band_calculatio
 @pytest.mark.parametrize(
     "_out_of_band_kev",
     [
-        (3.1, 22.83),
+        3.1,
+        22.83,
     ],
 )
 @pytest.mark.parametrize(
     "_lower,_upper", [(12.1, 15.9), (4.8, 19.67), (10.1, 20.01), (5, 11)]
 )
 def test_multi_band_material_absorption_spectrum_rejects_out_of_band_calculation(
-    _out_of_band_kev, _lower: float, _upper: float
+    _out_of_band_kev: float, _lower: float, _upper: float
 ) -> None:
     _energy_interval1: ClosedInterval = ClosedInterval(lower=_lower, upper=_upper)
     _calculator1: AbsorptionCalculator = SingleRollOffAbsorptionCalculator(
