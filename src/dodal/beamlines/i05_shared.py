@@ -168,8 +168,9 @@ def s6() -> SlitsWithZ:
 
 @devices.factory()
 def exit_slit() -> Motor:
-    """It's a requirement of i05 to have 'exit_slit' as the name for the exit slits Y
-    size value to match other ARPES instruments.  Thus we have added this as a duplicate
-    of one motor of s6 so that their data files can match the standard.
+    """ARPES instruments across facilities have a device called `exit_slit`. This
+    corresponds to motor `s6.ygap` for i05. If we try to reuse s6.ygap directly, it will
+    cause name conflicts with blueapi as it use the device name. We don't want to rename
+    the s6.ygap motor either via the factory, so have opted for duplication.
     """
     return Motor(f"{PREFIX.beamline_prefix}-AL-SLITS-06:YSIZE")
