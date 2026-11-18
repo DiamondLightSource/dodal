@@ -20,10 +20,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.maths import AngleWithPhase
-from dodal.devices.beamlines.i10.rasor.halbach.halbach_lut import (
-    DEFAULT_LUT_PATH,
-    HalbachLookupTable,
-)
+from dodal.devices.beamlines.i10.rasor.halbach.halbach_lut import HalbachLookupTable
 
 
 @dataclass(frozen=True)
@@ -45,7 +42,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         self,
         prefix: str = "",
         lut: HalbachLookupTable | None = None,
-        lut_path: Path | str = DEFAULT_LUT_PATH,
+        lut_path: Path | str | None = None,
         m1_suffix: str = "MAG1:THETA",
         m2_suffix: str = "MAG2:THETA",
         m3_suffix: str = "MAG3:THETA",
@@ -54,7 +51,12 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         waypoint_step_deg: float = 5.0,
         name: str = "",
     ) -> None:
-        self.lut = lut if lut is not None else HalbachLookupTable.from_csv(lut_path)
+        if lut is not None:
+            self.lut = lut
+        elif lut_path is not None:
+            self.lut = HalbachLookupTable.from_csv(lut_path)
+        else:
+            raise ValueError("Either 'lut' or 'lut_path' must be provided.")
 
         self._h_setpoint = soft_signal_rw(float, initial_value=0.0, units="mT")
         self._angle_setpoint = soft_signal_rw(float, initial_value=0.0, units="deg")
@@ -86,6 +88,9 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
                 angle_deg=self._angle_setpoint,
                 derived_units="deg",
             )
+            # https://github.com/bluesky/ophyd-async/issues/1231
+            self.field_strength._timeout = None  # noqa: SLF001
+            self.field_angle._timeout = None  # noqa: SLF001
 
         super().__init__(name=name)
 
@@ -205,12 +210,11 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
                     for motor, pos in zip(self.motors, target_deg, strict=True)
                 )
             )
+            await asyncio.gather(
+                self._h_setpoint.set(wp_h),
+                self._angle_setpoint.set(wp_angle),
+            )
             ref_deg = target_deg
-
-        await asyncio.gather(
-            self._h_setpoint.set(target_h_mt),
-            self._angle_setpoint.set(target_angle_deg),
-        )
 
 
 class HalbachField(StandardReadable, Movable[float]):
@@ -229,8 +233,8 @@ class HalbachField(StandardReadable, Movable[float]):
         )
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        await self.field_strength().set(float(value))
+    async def set(self, value: float, timeout: float | None = None) -> None:
+        await self.field_strength().set(float(value), timeout=timeout)
 
 
 class HalbachAngle(StandardReadable, Movable[float]):
@@ -247,5 +251,5 @@ class HalbachAngle(StandardReadable, Movable[float]):
         self.add_readables([self.field_angle()], StandardReadableFormat.HINTED_SIGNAL)
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        await self.field_angle().set(float(value))
+    async def set(self, value: float, timeout: float | None = None) -> None:
+        await self.field_angle().set(float(value), timeout=timeout)

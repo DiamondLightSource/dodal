@@ -22,10 +22,10 @@ from dodal.common.visit import (
     StaticVisitPathProvider,
 )
 from dodal.device_manager import DeviceManager
-from dodal.devices.beamlines.i10.rasor.halbach import DEFAULT_LUT_PATH
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
+from tests.devices.beamlines.i10.test_data import HALBACH_LUT_CSV
 from tests.devices.oav.test_data import TEST_DISPLAY_CONFIG, TEST_OAV_ZOOM_LEVELS
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_data import TEST_LUT_TXT
@@ -45,7 +45,7 @@ MOCK_ATTRIBUTES_TABLE: dict[str, dict[str, str]] = {
         "DISPLAY_CONFIG": TEST_DISPLAY_CONFIG,
     },
     "i10": {
-        "HALBACH_LUT_PATH": str(DEFAULT_LUT_PATH),
+        "HALBACH_LUT_PATH": HALBACH_LUT_CSV,
     },
     "i19_1": {
         "SHARED_CONFIG_PATH": MOCK_DAQ_CONFIG_PATH,

@@ -9,8 +9,6 @@ from pathlib import Path
 import numpy as np
 from daq_config_server.client import ConfigClient
 
-DEFAULT_LUT_PATH = Path(__file__).resolve().parent / "halbach_lut.csv"
-
 
 class HalbachLookupTable:
     """2D bilinear interpolation over
@@ -78,7 +76,7 @@ class HalbachLookupTable:
     @classmethod
     def from_csv(
         cls,
-        csv_path: Path | str = DEFAULT_LUT_PATH,
+        csv_path: Path | str,
     ) -> HalbachLookupTable:
         return cls.from_csv_contents(
             Path(csv_path).read_text(encoding="utf-8"),

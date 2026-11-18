@@ -20,11 +20,12 @@ from dodal.devices.beamlines.i10.rasor.halbach import (
     HalbachMagnetArrayController,
     HalbachSetpoint,
 )
+from tests.devices.beamlines.i10.test_data import HALBACH_LUT_CSV
 
 
 @pytest.fixture
 def halbach_lut() -> HalbachLookupTable:
-    return HalbachLookupTable.from_csv()
+    return HalbachLookupTable.from_csv(HALBACH_LUT_CSV)
 
 
 @pytest.fixture
@@ -308,6 +309,43 @@ async def test_waypoint_trajectory_executes_steps(
     for motor in halbach_controller.motors:
         calls = get_mock_put(motor.user_setpoint).call_args_list
         assert len(calls) == expected_calls
+
+
+def test_controller_requires_lut_or_lut_path() -> None:
+    with pytest.raises(ValueError, match="Either 'lut' or 'lut_path' must be provided"):
+        HalbachMagnetArrayController(prefix="anythinggoes:")
+
+
+def test_derived_signals_have_no_default_timeout(
+    halbach_controller: HalbachMagnetArrayController,
+) -> None:
+    assert halbach_controller.field_strength._timeout is None
+    assert halbach_controller.field_angle._timeout is None
+
+
+async def test_failed_waypoint_keeps_last_completed_setpoint(
+    halbach_controller: HalbachMagnetArrayController,
+) -> None:
+    await halbach_controller.waypoint_step_mt.set(50.0)
+    await halbach_controller.waypoint_step_deg.set(0.0)
+
+    put_count = 0
+
+    def fail_on_second_waypoint(pos: float, *_, **__) -> None:
+        nonlocal put_count
+        put_count += 1
+        if put_count >= 2:
+            raise RuntimeError("motor move aborted")
+        set_mock_value(halbach_controller.m1.user_readback, float(pos))
+
+    callback_on_mock_put(halbach_controller.m1.user_setpoint, fail_on_second_waypoint)
+
+    with pytest.raises(RuntimeError, match="motor move aborted"):
+        await halbach_controller.set(HalbachSetpoint(h_mt=150.0, field_angle_z_deg=0.0))
+
+    assert await halbach_controller.get_current_field_and_angle() == pytest.approx(
+        (50.0, 0.0)
+    )
 
 
 @pytest.mark.parametrize("fixed_angle_deg", [-90.0, -45.0, 0.0, 45.0, 90.0])
