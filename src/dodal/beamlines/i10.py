@@ -8,6 +8,11 @@ from dodal.devices.beamlines.i10 import (
     I10SlitsDrainCurrent,
 )
 from dodal.devices.beamlines.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
+from dodal.devices.beamlines.i10.rasor.halbach import (
+    HalbachAngle,
+    HalbachField,
+    HalbachMagnetArrayController,
+)
 from dodal.devices.beamlines.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
 from dodal.devices.beamlines.i10.rasor.rasor_motors import (
     DetSlits,
@@ -82,6 +87,21 @@ def det_slits() -> DetSlits:
 @devices.factory()
 def diffractometer() -> Diffractometer:
     return Diffractometer(prefix="ME01D-MO-DIFF-01:")
+
+
+@devices.factory()
+def halbach() -> HalbachMagnetArrayController:
+    return HalbachMagnetArrayController(prefix="ME01D-EA-RHMA-01:")
+
+
+@devices.factory()
+def hb_field(halbach: HalbachMagnetArrayController) -> HalbachField:
+    return HalbachField(controller=halbach)
+
+
+@devices.factory()
+def hb_angle(halbach: HalbachMagnetArrayController) -> HalbachAngle:
+    return HalbachAngle(controller=halbach)
 
 
 @devices.factory()
