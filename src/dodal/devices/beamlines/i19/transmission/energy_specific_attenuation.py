@@ -106,3 +106,10 @@ class EnergySpecificAttenuation:
             raise ValueError(
                 "Reduction would exceed attenuation of original demand - leading to an invalid negative residual"
             )
+
+    @classmethod
+    def transparently_not_attenuating(
+        cls, *, energy_kev: float
+    ) -> "EnergySpecificAttenuation":
+        """Factory method for a fully transparent (non-attenuating) state at a given energy."""
+        return cls(attenuation_bn=CANONICAL_NON_ABSORPTION, energy_kev=energy_kev)
