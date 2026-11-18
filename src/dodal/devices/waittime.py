@@ -16,7 +16,7 @@ class WaitTime(StandardReadable, Movable[float], Triggerable):
         super().__init__(name)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.time_to_wait = soft_signal_rw(float, initial_value)
+            self.time_to_wait = soft_signal_rw(float, initial_value, units="s")
 
     @AsyncStatus.wrap
     async def set(self, time: float):
