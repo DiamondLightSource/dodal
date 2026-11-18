@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import csv
+import io
 from pathlib import Path
 
 import numpy as np
+from daq_config_server.client import ConfigClient
 
 DEFAULT_LUT_PATH = Path(__file__).resolve().parent / "halbach_lut.csv"
 
@@ -35,23 +37,23 @@ class HalbachLookupTable:
             )
 
     @classmethod
-    def from_csv(
+    def from_csv_contents(
         cls,
-        csv_path: Path | str = DEFAULT_LUT_PATH,
+        csv_contents: str,
+        source: str = "<string>",
     ) -> HalbachLookupTable:
         rows = []
-        with open(csv_path, newline="") as f:
-            for row in csv.DictReader(f):
-                rows.append(
-                    (
-                        float(row["H_mT"]),
-                        float(row["Field_Angle_Z_deg"]),
-                        float(row["m1_unwrapped_deg"]),
-                        float(row["m2_unwrapped_deg"]),
-                        float(row["m3_unwrapped_deg"]),
-                        float(row["m4_unwrapped_deg"]),
-                    )
+        for row in csv.DictReader(io.StringIO(csv_contents, newline="")):
+            rows.append(
+                (
+                    float(row["H_mT"]),
+                    float(row["Field_Angle_Z_deg"]),
+                    float(row["m1_unwrapped_deg"]),
+                    float(row["m2_unwrapped_deg"]),
+                    float(row["m3_unwrapped_deg"]),
+                    float(row["m4_unwrapped_deg"]),
                 )
+            )
 
         data = np.asarray(rows, dtype=float)
         h_vals = np.unique(data[:, 0])
@@ -60,7 +62,7 @@ class HalbachLookupTable:
 
         if len(data) != nh * na:
             raise ValueError(
-                f"CSV at {csv_path} does not form a complete regular 2D grid "
+                f"CSV at {source} does not form a complete regular 2D grid "
                 f"({len(data)} rows vs {nh}x{na}={nh * na})."
             )
 
@@ -72,6 +74,29 @@ class HalbachLookupTable:
             angle_grid=ang_vals,
             motor_grid=motor_grid,
         )
+
+    @classmethod
+    def from_csv(
+        cls,
+        csv_path: Path | str = DEFAULT_LUT_PATH,
+    ) -> HalbachLookupTable:
+        return cls.from_csv_contents(
+            Path(csv_path).read_text(encoding="utf-8"),
+            source=str(csv_path),
+        )
+
+    @classmethod
+    def from_config_server(
+        cls,
+        config_client: ConfigClient,
+        lut_path: Path | str,
+        reset_cached_result: bool = False,
+    ) -> HalbachLookupTable:
+        csv_contents = config_client.get_file_contents(
+            lut_path,
+            reset_cached_result=reset_cached_result,
+        )
+        return cls.from_csv_contents(csv_contents, source=str(lut_path))
 
     @property
     def h_limits(self) -> tuple[float, float]:

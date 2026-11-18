@@ -1,3 +1,6 @@
+from daq_config_server.client import ConfigClient
+
+from dodal.beamlines.i10_shared import LOOK_UPTABLE_DIR
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -11,6 +14,7 @@ from dodal.devices.beamlines.i10.diagnostics import I10Diagnostic, I10Diagnostic
 from dodal.devices.beamlines.i10.rasor.halbach import (
     HalbachAngle,
     HalbachField,
+    HalbachLookupTable,
     HalbachMagnetArrayController,
 )
 from dodal.devices.beamlines.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
@@ -89,9 +93,18 @@ def diffractometer() -> Diffractometer:
     return Diffractometer(prefix="ME01D-MO-DIFF-01:")
 
 
+HALBACH_LUT_PATH = f"{LOOK_UPTABLE_DIR}halbach_lut.csv"
+
+
 @devices.factory()
-def halbach() -> HalbachMagnetArrayController:
-    return HalbachMagnetArrayController(prefix="ME01D-EA-RHMA-01:")
+def halbach(config_client: ConfigClient) -> HalbachMagnetArrayController:
+    return HalbachMagnetArrayController(
+        prefix="ME01D-EA-RHMA-01:",
+        lut=HalbachLookupTable.from_config_server(
+            config_client=config_client,
+            lut_path=HALBACH_LUT_PATH,
+        ),
+    )
 
 
 @devices.factory()

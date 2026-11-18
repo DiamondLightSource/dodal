@@ -2,8 +2,12 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from daq_config_server.client import ConfigClient
 
-from dodal.devices.beamlines.i10.rasor.halbach import HalbachLookupTable
+from dodal.devices.beamlines.i10.rasor.halbach import (
+    DEFAULT_LUT_PATH,
+    HalbachLookupTable,
+)
 
 
 @pytest.fixture
@@ -127,6 +131,14 @@ def test_from_csv_on_incomplete_grid(tmp_path: Path) -> None:
 
 def test_from_csv_loads_default_lut_file() -> None:
     lut = HalbachLookupTable.from_csv()
+    assert lut.h_limits == (-170.0, 170.0)
+    assert lut.angle_limits == (-110.0, 110.0)
+    assert lut.motor_grid.shape == (69, 45, 4)
+
+
+def test_from_config_server_parses_lut(mock_config_client: ConfigClient) -> None:
+    lut = HalbachLookupTable.from_config_server(mock_config_client, DEFAULT_LUT_PATH)
+
     assert lut.h_limits == (-170.0, 170.0)
     assert lut.angle_limits == (-110.0, 110.0)
     assert lut.motor_grid.shape == (69, 45, 4)
