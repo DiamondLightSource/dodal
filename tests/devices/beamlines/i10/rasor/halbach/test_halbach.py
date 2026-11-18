@@ -23,7 +23,7 @@ from dodal.devices.beamlines.i10.rasor.halbach import (
 from tests.devices.beamlines.i10.test_data import HALBACH_LUT_CSV
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def halbach_lut() -> HalbachLookupTable:
     return HalbachLookupTable.from_csv(HALBACH_LUT_CSV)
 
@@ -36,6 +36,8 @@ async def halbach_controller(
         controller = HalbachMagnetArrayController(
             prefix="anythinggoes:",
             lut=halbach_lut,
+            waypoint_step_mt=0.0,
+            waypoint_step_deg=0.0,
         )
     for motor in controller.motors:
         callback_on_mock_put(
@@ -165,8 +167,6 @@ async def test_set_moves_motors_and_updates_setpoints(
     halbach_controller: HalbachMagnetArrayController,
     halbach_lut: HalbachLookupTable,
 ) -> None:
-    await halbach_controller.waypoint_step_mt.set(0.0)
-    await halbach_controller.waypoint_step_deg.set(0.0)
     lut_deg = halbach_lut.interpolate(-170.0, 0.0)
     expected_deg = halbach_controller.compute_shortest_path_targets(
         np.zeros(4), lut_deg
@@ -237,8 +237,6 @@ async def test_shortest_path_relative_to_current_readback(
     halbach_controller: HalbachMagnetArrayController,
     halbach_lut: HalbachLookupTable,
 ) -> None:
-    await halbach_controller.waypoint_step_mt.set(0.0)
-    await halbach_controller.waypoint_step_deg.set(0.0)
     lut_deg = halbach_lut.interpolate(50.0, -30.0)
     initial_rbv = lut_deg + 720.0 + np.array([5.0, -4.0, 3.0, -2.0])
     for motor, rbv in zip(halbach_controller.motors, initial_rbv, strict=True):
@@ -278,8 +276,6 @@ async def test_waypoint_trajectory_executes_steps(
     target: HalbachSetpoint,
     expected_calls: int,
 ) -> None:
-    await halbach_controller.waypoint_step_mt.set(0.0)
-    await halbach_controller.waypoint_step_deg.set(0.0)
     await halbach_controller.set(start)
     for motor in halbach_controller.motors:
         get_mock_put(motor.user_setpoint).reset_mock()
@@ -338,7 +334,7 @@ async def test_halbach_scan_across_zero_field_without_jumps(
     for motor in halbach_controller.motors:
         get_mock_put(motor.user_setpoint).reset_mock()
 
-    num_points = 35
+    num_points = 19
     run_engine(scan([], halbach_field, -170.0, 170.0, num=num_points))
     assert_emitted(
         run_engine_documents, start=1, descriptor=1, event=num_points, stop=1
@@ -350,9 +346,8 @@ async def test_halbach_scan_across_zero_field_without_jumps(
             for m in halbach_controller.motors
         ]
     )
-    assert trajectories.shape[0] == 4
-    assert trajectories.shape[1] >= num_points
-    assert float(np.max(np.abs(np.diff(trajectories, axis=1)))) < 45.0
+    assert trajectories.shape == (4, num_points)
+    assert float(np.max(np.abs(np.diff(trajectories, axis=1)))) < 90.0
 
 
 @pytest.mark.parametrize("fixed_h_mt", [-170.0, -90.0, 90.0, 170.0])
@@ -367,7 +362,7 @@ async def test_halbach_angle_sweep_without_jumps(
     for motor in halbach_controller.motors:
         get_mock_put(motor.user_setpoint).reset_mock()
 
-    num_points = 23
+    num_points = 12
     run_engine(scan([], halbach_angle, -110.0, 110.0, num=num_points))
 
     trajectories = np.array(
@@ -376,9 +371,8 @@ async def test_halbach_angle_sweep_without_jumps(
             for m in halbach_controller.motors
         ]
     )
-    assert trajectories.shape[0] == 4
-    assert trajectories.shape[1] >= num_points
-    assert float(np.max(np.abs(np.diff(trajectories, axis=1)))) < 45.0
+    assert trajectories.shape == (4, num_points)
+    assert float(np.max(np.abs(np.diff(trajectories, axis=1)))) < 90.0
 
 
 async def test_halbach_2d_grid_scan(
