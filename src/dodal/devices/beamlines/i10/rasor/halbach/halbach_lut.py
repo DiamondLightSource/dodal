@@ -23,13 +23,7 @@ class HalbachLookupTable:
         angle_grid: np.ndarray,
         motor_grid: np.ndarray,
     ) -> None:
-        """Initialize the 2D Halbach lookup table.
 
-        Args:
-            h_grid: 1D ordered ascending array of signed field setpoints in mT, shape (Nh,).
-            angle_grid: 1D ordered ascending array of field angles relative to z in deg, shape (Na,).
-            motor_grid: 3D array of unwrapped motor positions in deg, shape (Nh, Na, 4).
-        """
         self.h_grid = np.asarray(h_grid, dtype=float)
         self.angle_grid = np.asarray(angle_grid, dtype=float)
         self.motor_grid = np.asarray(motor_grid, dtype=float)
@@ -45,7 +39,6 @@ class HalbachLookupTable:
         cls,
         csv_path: Path | str = DEFAULT_LUT_PATH,
     ) -> HalbachLookupTable:
-        """Load the regular 2D Halbach LUT from a CSV file."""
         rows = []
         with open(csv_path, newline="") as f:
             for row in csv.DictReader(f):
