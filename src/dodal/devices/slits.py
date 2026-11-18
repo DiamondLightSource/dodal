@@ -38,7 +38,7 @@ class Slits(MinimalSlits):
         super().__init__(prefix=prefix, x_gap=x_gap, y_gap=y_gap, name=name)
 
 
-class ExitSlits(Slits):
+class SlitsWithZ(Slits):
     """Representation of a 4-blade set of slits with an additional motor to allow
     movement in z direction (i.e. along the beam).
     """

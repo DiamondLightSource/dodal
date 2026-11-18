@@ -22,7 +22,7 @@ from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEne
 from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.slits import ExitSlits, SlitsWithIndividualBlades
+from dodal.devices.slits import SlitsWithIndividualBlades, SlitsWithZ
 from dodal.devices.synchrotron import Synchrotron
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -162,8 +162,8 @@ def s3() -> SlitsWithIndividualBlades:
 
 
 @devices.factory()
-def s6() -> ExitSlits:
-    return ExitSlits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
+def s6() -> SlitsWithZ:
+    return SlitsWithZ(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
 @devices.factory()
