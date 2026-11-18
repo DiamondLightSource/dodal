@@ -67,21 +67,13 @@ async def halbach_angle(
     return angle
 
 
-@pytest.mark.parametrize(
-    "empty_setpoint",
-    [
-        HalbachSetpoint(),
-        (None, None),
-    ],
-)
 async def test_set_raises_on_empty_setpoint(
     halbach_controller: HalbachMagnetArrayController,
-    empty_setpoint: HalbachSetpoint | tuple[None, None],
 ) -> None:
     with pytest.raises(
         ValueError, match="At least one of h_mt or field_angle_z_deg must be provided"
     ):
-        await halbach_controller.set(empty_setpoint)
+        await halbach_controller.set(HalbachSetpoint())
 
 
 @pytest.mark.parametrize(
@@ -90,12 +82,12 @@ async def test_set_raises_on_empty_setpoint(
         HalbachSetpoint(h_mt=180.0, field_angle_z_deg=0.0),
         HalbachSetpoint(h_mt=-171.0, field_angle_z_deg=0.0),
         HalbachSetpoint(h_mt=0.0, field_angle_z_deg=115.0),
-        (0.0, -115.0),
+        HalbachSetpoint(h_mt=0.0, field_angle_z_deg=-115.0),
     ],
 )
 async def test_set_rejects_fields_outside_calibrated_lut(
     halbach_controller: HalbachMagnetArrayController,
-    invalid_setpoint: HalbachSetpoint | tuple[float, float],
+    invalid_setpoint: HalbachSetpoint,
 ) -> None:
     with pytest.raises(ValueError, match="outside calibrated LUT bounds"):
         await halbach_controller.set(invalid_setpoint)
@@ -169,17 +161,9 @@ async def test_calculate_waypoints(
     assert waypoints == pytest.approx(expected_waypoints)
 
 
-@pytest.mark.parametrize(
-    "setpoint",
-    [
-        HalbachSetpoint(h_mt=-170.0, field_angle_z_deg=0.0),
-        (-170.0, 0.0),
-    ],
-)
 async def test_set_moves_motors_and_updates_setpoints(
     halbach_controller: HalbachMagnetArrayController,
     halbach_lut: HalbachLookupTable,
-    setpoint: HalbachSetpoint | tuple[float, float],
 ) -> None:
     await halbach_controller.waypoint_step_mt.set(0.0)
     await halbach_controller.waypoint_step_deg.set(0.0)
@@ -188,7 +172,7 @@ async def test_set_moves_motors_and_updates_setpoints(
         np.zeros(4), lut_deg
     )
 
-    await halbach_controller.set(setpoint)
+    await halbach_controller.set(HalbachSetpoint(h_mt=-170.0, field_angle_z_deg=0.0))
 
     for motor, exp_pos in zip(halbach_controller.motors, expected_deg, strict=True):
         get_mock_put(motor.user_setpoint).assert_called_once_with(
@@ -204,13 +188,11 @@ async def test_set_moves_motors_and_updates_setpoints(
     [
         (HalbachSetpoint(h_mt=-60.0), -60.0, 20.0),
         (HalbachSetpoint(field_angle_z_deg=-15.0), 120.0, -15.0),
-        ((-60.0, None), -60.0, 20.0),
-        ((None, -15.0), 120.0, -15.0),
     ],
 )
 async def test_partial_setpoint(
     halbach_controller: HalbachMagnetArrayController,
-    partial_setpoint: HalbachSetpoint | tuple[float | None, float | None],
+    partial_setpoint: HalbachSetpoint,
     expected_h: float,
     expected_angle: float,
 ) -> None:
@@ -309,11 +291,6 @@ async def test_waypoint_trajectory_executes_steps(
     for motor in halbach_controller.motors:
         calls = get_mock_put(motor.user_setpoint).call_args_list
         assert len(calls) == expected_calls
-
-
-def test_controller_requires_lut_or_lut_path() -> None:
-    with pytest.raises(ValueError, match="Either 'lut' or 'lut_path' must be provided"):
-        HalbachMagnetArrayController(prefix="anythinggoes:")
 
 
 def test_derived_signals_have_no_default_timeout(

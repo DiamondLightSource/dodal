@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from daq_config_server.client import ConfigClient
 
 from dodal.beamlines.i10_shared import LOOK_UPTABLE_DIR
@@ -93,7 +95,7 @@ def diffractometer() -> Diffractometer:
     return Diffractometer(prefix="ME01D-MO-DIFF-01:")
 
 
-HALBACH_LUT_PATH = f"{LOOK_UPTABLE_DIR}halbach_lut.csv"
+HALBACH_LUT_PATH: Path | str = Path(LOOK_UPTABLE_DIR, "halbach_lut.csv")
 
 
 @devices.factory()

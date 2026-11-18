@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import math
 from dataclasses import dataclass
-from pathlib import Path
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -40,9 +39,8 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
 
     def __init__(
         self,
-        prefix: str = "",
-        lut: HalbachLookupTable | None = None,
-        lut_path: Path | str | None = None,
+        prefix: str,
+        lut: HalbachLookupTable,
         m1_suffix: str = "MAG1:THETA",
         m2_suffix: str = "MAG2:THETA",
         m3_suffix: str = "MAG3:THETA",
@@ -51,12 +49,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         waypoint_step_deg: float = 5.0,
         name: str = "",
     ) -> None:
-        if lut is not None:
-            self.lut = lut
-        elif lut_path is not None:
-            self.lut = HalbachLookupTable.from_csv(lut_path)
-        else:
-            raise ValueError("Either 'lut' or 'lut_path' must be provided.")
+        self.lut = lut
 
         self._h_setpoint = soft_signal_rw(float, initial_value=0.0, units="mT")
         self._angle_setpoint = soft_signal_rw(float, initial_value=0.0, units="deg")
@@ -122,18 +115,13 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         await self._move_to_field(current_h_mt, float(angle_deg))
 
     @AsyncStatus.wrap
-    async def set(
-        self, value: HalbachSetpoint | tuple[float | None, float | None]
-    ) -> None:
+    async def set(self, value: HalbachSetpoint) -> None:
         """Move all 4 Halbach motors to achieve the target `(H_mT, Field_Angle_Z_deg)`.
 
         If either `h_mt` or `field_angle_z_deg` is `None`, the current value of that
         coordinate is preserved.
         """
-        if isinstance(value, tuple):
-            req_h, req_angle = value[0], value[1]
-        else:
-            req_h, req_angle = value.h_mt, value.field_angle_z_deg
+        req_h, req_angle = value.h_mt, value.field_angle_z_deg
 
         if req_h is None and req_angle is None:
             raise ValueError(
