@@ -135,6 +135,7 @@ filterwarnings = [
     # Ignore deprecation warnings about TriggerableCommand until https://github.com/bluesky/ophyd-async/issues/1292
     # addressed
     "ignore:epics_signal_x is deprecated, use epics_triggerable_command instead:DeprecationWarning",
+    "ignore:Setting the shape on a NumPy array:DeprecationWarning:epicscorelibs.ca.dbr", # https://github.com/epics-base/epicscorelibs/issues/57
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests system_tests"
