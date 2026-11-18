@@ -50,19 +50,22 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         m2_suffix: str = "MAG2:THETA",
         m3_suffix: str = "MAG3:THETA",
         m4_suffix: str = "MAG4:THETA",
-        waypoint_step_mt: float = 5,
-        waypoint_step_deg: float = 5,
+        waypoint_step_mt: float = 5.0,
+        waypoint_step_deg: float = 5.0,
         name: str = "",
     ) -> None:
         self.lut = lut if lut is not None else HalbachLookupTable.from_csv(lut_path)
-        self.waypoint_step_mt = waypoint_step_mt
-        self.waypoint_step_deg = waypoint_step_deg
 
         self._h_setpoint = soft_signal_rw(float, initial_value=0.0, units="mT")
         self._angle_setpoint = soft_signal_rw(float, initial_value=0.0, units="deg")
 
-        self._last_commanded_deg: np.ndarray | None = None
-        self._last_seen_rbv_deg: np.ndarray | None = None
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.waypoint_step_mt = soft_signal_rw(
+                float, initial_value=float(waypoint_step_mt), units="mT"
+            )
+            self.waypoint_step_deg = soft_signal_rw(
+                float, initial_value=float(waypoint_step_deg), units="deg"
+            )
 
         with self.add_children_as_readables():
             self.m1 = Motor(prefix + m1_suffix)
@@ -137,26 +140,6 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         target_angle = float(req_angle) if req_angle is not None else cur_angle
         await self._move_to_field(target_h, target_angle)
 
-    async def _get_reference_motor_positions(self) -> np.ndarray:
-        """Read current motor positions for shortest-path unwrapping.
-
-        If motor readback has changed since the last move, anchor to the user_readback.
-        If user_readback is unchanged anchor to the previous commanded positions
-         so multi-step scans stay continuous.
-        """
-        rbvs = np.array(
-            await asyncio.gather(*(m.user_readback.get_value() for m in self.motors)),
-            dtype=float,
-        )
-        if (
-            self._last_commanded_deg is not None
-            and self._last_seen_rbv_deg is not None
-            and np.allclose(rbvs, self._last_seen_rbv_deg)
-        ):
-            return self._last_commanded_deg
-        self._last_seen_rbv_deg = rbvs
-        return rbvs
-
     @staticmethod
     def compute_shortest_path_targets(
         current_deg: np.ndarray, lut_target_deg: np.ndarray
@@ -170,7 +153,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
             ).unwrap()
         return targets
 
-    def calculate_waypoints(
+    async def calculate_waypoints(
         self,
         start_h_mt: float,
         start_angle_deg: float,
@@ -178,14 +161,16 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         target_angle_deg: float,
     ) -> list[tuple[float, float]]:
         """Divide a field move into h_mt, angle_deg waypoints if configured."""
+        step_mt, step_deg = await asyncio.gather(
+            self.waypoint_step_mt.get_value(),
+            self.waypoint_step_deg.get_value(),
+        )
         n_steps = 1
-        if self.waypoint_step_mt > 0:
-            n_h = math.ceil(abs(target_h_mt - start_h_mt) / self.waypoint_step_mt)
+        if step_mt > 0:
+            n_h = math.ceil(abs(target_h_mt - start_h_mt) / step_mt)
             n_steps = max(n_steps, n_h)
-        if self.waypoint_step_deg > 0:
-            n_a = math.ceil(
-                abs(target_angle_deg - start_angle_deg) / self.waypoint_step_deg
-            )
+        if step_deg > 0:
+            n_a = math.ceil(abs(target_angle_deg - start_angle_deg) / step_deg)
             n_steps = max(n_steps, n_a)
 
         if n_steps <= 1:
@@ -198,16 +183,18 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
     async def _move_to_field(self, target_h_mt: float, target_angle_deg: float) -> None:
         self.lut.interpolate(target_h_mt, target_angle_deg)
 
-        start_h = await self._h_setpoint.get_value()
-        start_angle = await self._angle_setpoint.get_value()
-        waypoints = self.calculate_waypoints(
+        start_h, start_angle = await self.get_current_field_and_angle()
+        waypoints = await self.calculate_waypoints(
             start_h_mt=start_h,
             start_angle_deg=start_angle,
             target_h_mt=target_h_mt,
             target_angle_deg=target_angle_deg,
         )
 
-        ref_deg = await self._get_reference_motor_positions()
+        ref_deg = np.array(
+            await asyncio.gather(*(m.user_readback.get_value() for m in self.motors)),
+            dtype=float,
+        )
 
         for wp_h, wp_angle in waypoints:
             lut_deg = self.lut.interpolate(wp_h, wp_angle)
@@ -220,7 +207,6 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
             )
             ref_deg = target_deg
 
-        self._last_commanded_deg = ref_deg
         await asyncio.gather(
             self._h_setpoint.set(target_h_mt),
             self._angle_setpoint.set(target_angle_deg),
