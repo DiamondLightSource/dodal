@@ -1176,7 +1176,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "ophyd" },
-    { name = "ophyd-async", extras = ["ca", "pva"], specifier = ">=0.21.3" },
+    { name = "ophyd-async", extras = ["ca", "pva"], git = "https://github.com/bluesky/ophyd-async.git?rev=main" },
     { name = "pillow" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyepics" },
@@ -2905,8 +2905,8 @@ wheels = [
 
 [[package]]
 name = "ophyd-async"
-version = "0.21.4"
-source = { registry = "https://pypi.org/simple" }
+version = "0.21.5.dev2+g93620fbb2"
+source = { git = "https://github.com/bluesky/ophyd-async.git?rev=main#93620fbb289a1857a8203b78b5ba3b15e122d888" }
 dependencies = [
     { name = "bluesky" },
     { name = "colorlog" },
@@ -2919,10 +2919,6 @@ dependencies = [
     { name = "scanspec" },
     { name = "stamina" },
     { name = "velocity-profile" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/7c/3d/2e82aaf2ba9ada463d6ae8cd947dca0cdd1d4130e2a98bb8842b92c29cf1/ophyd_async-0.21.4.tar.gz", hash = "sha256:158d3751c0f40b6e9a3788e38bdd8f7a3e7d084ace4fdd15ebf03e6856f95949", size = 699568, upload-time = "2026-11-10T16:43:39.338Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b9/84/bfd9f61643bc2ccfc4a90686353ac786496bb146027aced54d5d47fb363c/ophyd_async-0.21.4-py3-none-any.whl", hash = "sha256:817bdab1f5ec6044a7ce7496148a3e1aed0b23df72c8c161728525490773a0e4", size = 271474, upload-time = "2026-11-10T16:43:38.138Z" },
 ]
 
 [package.optional-dependencies]
