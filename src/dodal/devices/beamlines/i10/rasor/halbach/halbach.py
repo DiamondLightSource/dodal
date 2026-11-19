@@ -63,7 +63,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         waypoint_step_deg: float = 5.0,
         name: str = "",
     ) -> None:
-        self.lut = lut
+        self._lut = lut
 
         self._h_setpoint = soft_signal_rw(float, initial_value=0.0, units="mT")
         self._angle_setpoint = soft_signal_rw(float, initial_value=0.0, units="deg")
@@ -195,7 +195,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
 
     async def _move_to_field(self, target_h_mt: float, target_angle_deg: float) -> None:
         """Check request is within range, perform path finding, then move through waypoints."""
-        self.lut.interpolate(target_h_mt, target_angle_deg)
+        self._lut.interpolate(target_h_mt, target_angle_deg)
 
         start_h, start_angle = await self.get_current_field_and_angle()
         waypoints = await self.calculate_waypoints(
@@ -211,7 +211,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         )
 
         for wp_h, wp_angle in waypoints:
-            lut_deg = self.lut.interpolate(wp_h, wp_angle)
+            lut_deg = self._lut.interpolate(wp_h, wp_angle)
             target_deg = self.compute_shortest_path_targets(ref_deg, lut_deg)
             await asyncio.gather(
                 *(
