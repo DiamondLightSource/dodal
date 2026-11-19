@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from bluesky.protocols import Movable
+from numpy.typing import NDArray
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -135,10 +136,10 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
 
     @staticmethod
     def compute_shortest_path_targets(
-        current_deg: np.ndarray, lut_target_deg: np.ndarray
-    ) -> np.ndarray:
+        current_deg: NDArray[np.float64], lut_target_deg: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         """Map LUT target angles to the nearest angles relative to current_deg."""
-        targets = np.empty(4, dtype=float)
+        targets = np.empty(4, dtype=np.float64)
         for k in range(4):
             current_angle = AngleWithPhase.wrap(float(current_deg[k]))
             targets[k] = current_angle.nearest_with_phase(
@@ -186,7 +187,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
 
         ref_deg = np.array(
             await asyncio.gather(*(m.user_readback.get_value() for m in self.motors)),
-            dtype=float,
+            dtype=np.float64,
         )
 
         for wp_h, wp_angle in waypoints:

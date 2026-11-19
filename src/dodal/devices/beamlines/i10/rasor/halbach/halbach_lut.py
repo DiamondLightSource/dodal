@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 from daq_config_server.client import ConfigClient
+from numpy.typing import NDArray
 
 
 class HalbachLookupTable:
@@ -19,14 +20,13 @@ class HalbachLookupTable:
 
     def __init__(
         self,
-        h_grid: np.ndarray,
-        angle_grid: np.ndarray,
-        motor_grid: np.ndarray,
+        h_grid: NDArray[np.float64],
+        angle_grid: NDArray[np.float64],
+        motor_grid: NDArray[np.float64],
     ) -> None:
-
-        self.h_grid = np.asarray(h_grid, dtype=float)
-        self.angle_grid = np.asarray(angle_grid, dtype=float)
-        self.motor_grid = np.asarray(motor_grid, dtype=float)
+        self.h_grid: NDArray[np.float64] = np.asarray(h_grid, dtype=np.float64)
+        self.angle_grid: NDArray[np.float64] = np.asarray(angle_grid, dtype=np.float64)
+        self.motor_grid: NDArray[np.float64] = np.asarray(motor_grid, dtype=np.float64)
 
         if self.motor_grid.shape != (len(self.h_grid), len(self.angle_grid), 4):
             raise ValueError(
@@ -53,7 +53,7 @@ class HalbachLookupTable:
                 )
             )
 
-        data = np.asarray(rows, dtype=float)
+        data = np.asarray(rows, dtype=np.float64)
         h_vals = np.unique(data[:, 0])
         ang_vals = np.unique(data[:, 1])
         nh, na = len(h_vals), len(ang_vals)
@@ -105,7 +105,7 @@ class HalbachLookupTable:
         return float(self.angle_grid[0]), float(self.angle_grid[-1])
 
     @staticmethod
-    def _index_and_weight(grid: np.ndarray, val: float) -> tuple[int, float]:
+    def _index_and_weight(grid: NDArray[np.float64], val: float) -> tuple[int, float]:
         """Return cell lower index i in [0, len(grid)-2] and weight w between 0 and 1."""
         idx = int(np.searchsorted(grid, val, side="right")) - 1
         idx = max(0, min(idx, len(grid) - 2))
@@ -114,7 +114,7 @@ class HalbachLookupTable:
         w = (val - g0) / (g1 - g0) if g1 != g0 else 0.0
         return idx, w
 
-    def interpolate(self, h_mt: float, field_angle_z_deg: float) -> np.ndarray:
+    def interpolate(self, h_mt: float, field_angle_z_deg: float) -> NDArray[np.float64]:
         """Compute (m1, m2, m3, m4) in degrees via 2D interpolation.
 
         Args:
