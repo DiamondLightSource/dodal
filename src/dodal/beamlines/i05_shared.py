@@ -22,6 +22,7 @@ from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.slits import SlitsWithIndividualBlades
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.waittime import WaitTime
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i05-shared")
@@ -33,6 +34,11 @@ devices = DeviceManager()
 @devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
+
+
+@devices.factory()
+def waittime() -> WaitTime:
+    return WaitTime()
 
 
 @devices.factory()

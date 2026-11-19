@@ -132,7 +132,7 @@ class Robot(StandardReadable, Movable[SampleLocation]):
     """The sample changing robot."""
 
     # How long to wait for the robot
-    PROGRAM_LOADED_TIMEOUT = 1.0
+    PROGRAM_LOADED_TIMEOUT = 5.0
     PROGRAM_STARTED_RUNNING_TIMEOUT = 10.0
     PROGRAM_COMPLETED_TIMEOUT = 60.0
 
