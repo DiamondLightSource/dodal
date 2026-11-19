@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Mapping
 
 import bluesky.plan_stubs as bps
@@ -21,7 +22,7 @@ from dodal.devices.beamlines.i10.rasor.halbach import (
 from tests.devices.beamlines.i10.test_data import HALBACH_LUT_CSV
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def halbach_lut() -> HalbachLookupTable:
     return HalbachLookupTable.from_csv(HALBACH_LUT_CSV)
 
@@ -37,11 +38,7 @@ async def halbach_controller(
             waypoint_step_mt=0.0,
             waypoint_step_deg=0.0,
         )
-    for motor in controller.motors:
-        callback_on_mock_put(
-            motor.user_setpoint,
-            lambda pos, *_, m=motor, **__: set_mock_value(m.user_readback, float(pos)),
-        )
+
     return controller
 
 
@@ -137,8 +134,10 @@ async def test_calculate_waypoints(
     target: tuple[float, float],
     expected_waypoints: list[tuple[float, float]],
 ) -> None:
-    await halbach_controller.waypoint_step_mt.set(step_mt)
-    await halbach_controller.waypoint_step_deg.set(step_deg)
+    await asyncio.gather(
+        halbach_controller.waypoint_step_mt.set(step_mt),
+        halbach_controller.waypoint_step_deg.set(step_deg),
+    )
     waypoints = await halbach_controller.calculate_waypoints(
         start_h_mt=start[0],
         start_angle_deg=start[1],
@@ -172,8 +171,12 @@ async def test_set_moves_motors_and_updates_setpoints(
             pytest.approx(exp_pos, abs=1e-4)
         )
 
-    assert await halbach_controller.field.get_value() == -170.0
-    assert await halbach_controller.angle.get_value() == 0.0
+    field, angle = await asyncio.gather(
+        halbach_controller.field.get_value(),
+        halbach_controller.angle.get_value(),
+    )
+    assert field == -170.0
+    assert angle == 0.0
 
 
 @pytest.mark.parametrize(
@@ -194,8 +197,12 @@ async def test_partial_setpoint(
     await halbach_controller.set(HalbachSetpoint(h_mt=120.0, field_angle_z_deg=20.0))
     await halbach_controller.set(partial_setpoint)
 
-    assert await halbach_controller.field.get_value() == pytest.approx(expected_h)
-    assert await halbach_controller.angle.get_value() == pytest.approx(expected_angle)
+    field, angle = await asyncio.gather(
+        halbach_controller.field.get_value(),
+        halbach_controller.angle.get_value(),
+    )
+    assert field == pytest.approx(expected_h)
+    assert angle == pytest.approx(expected_angle)
 
 
 async def test_field_move_keeps_angle(
@@ -205,8 +212,12 @@ async def test_field_move_keeps_angle(
     run_engine(bps.mv(halbach_controller.angle, -35.0))
     run_engine(bps.mv(halbach_controller.field, 120.0))
 
-    assert await halbach_controller.field.get_value() == pytest.approx(120.0)
-    assert await halbach_controller.angle.get_value() == pytest.approx(-35.0)
+    field, angle = await asyncio.gather(
+        halbach_controller.field.get_value(),
+        halbach_controller.angle.get_value(),
+    )
+    assert field == pytest.approx(120.0)
+    assert angle == pytest.approx(-35.0)
 
 
 async def test_angle_move_leave_field(
@@ -216,8 +227,12 @@ async def test_angle_move_leave_field(
     run_engine(bps.mv(halbach_controller.field, 120.0))
     run_engine(bps.mv(halbach_controller.angle, 20.0))
 
-    assert await halbach_controller.field.get_value() == pytest.approx(120.0)
-    assert await halbach_controller.angle.get_value() == pytest.approx(20.0)
+    field, angle = await asyncio.gather(
+        halbach_controller.field.get_value(),
+        halbach_controller.angle.get_value(),
+    )
+    assert field == pytest.approx(120.0)
+    assert angle == pytest.approx(20.0)
 
 
 async def test_shortest_path_relative_to_current_readback(
@@ -267,8 +282,10 @@ async def test_waypoint_trajectory_executes_steps(
     for motor in halbach_controller.motors:
         get_mock_put(motor.user_setpoint).reset_mock()
 
-    await halbach_controller.waypoint_step_mt.set(step_mt)
-    await halbach_controller.waypoint_step_deg.set(step_deg)
+    await asyncio.gather(
+        halbach_controller.waypoint_step_mt.set(step_mt),
+        halbach_controller.waypoint_step_deg.set(step_deg),
+    )
     await halbach_controller.set(target)
 
     for motor in halbach_controller.motors:
@@ -286,8 +303,10 @@ def test_derived_signals_have_no_default_timeout(
 async def test_failed_waypoint_keeps_last_completed_setpoint(
     halbach_controller: HalbachMagnetArrayController,
 ) -> None:
-    await halbach_controller.waypoint_step_mt.set(50.0)
-    await halbach_controller.waypoint_step_deg.set(0.0)
+    await asyncio.gather(
+        halbach_controller.waypoint_step_mt.set(50.0),
+        halbach_controller.waypoint_step_deg.set(0.0),
+    )
 
     put_count = 0
 
