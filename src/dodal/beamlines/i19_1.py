@@ -1,6 +1,6 @@
 from functools import cache
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
@@ -13,15 +13,24 @@ from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
+)
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
+from dodal.devices.beamlines.i19.access_controlled.read_only_dcm import ReadOnlyDCM
 from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
+from dodal.devices.cryostream import OxfordCryoStream
+from dodal.devices.oav.beam_centre.beam_centre import CentreEllipseMethod
+from dodal.devices.oav.beam_centre.centroid_from_epics import (
+    CentroidFromEpics,
+)
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -29,8 +38,8 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -42,19 +51,22 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
-I19_1_COMMISSIONING_INSTR_SESSION: str = "cm40638-5"
+I19_1_COMMISSIONING_INSTR_SESSION: str = "cm44168-3"
 
 I19_1_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_PILATUS=1),
+    outputs=ZebraOutputs(TTL_PILATUS=1),
     sources=ZebraSources(),
 )
 
 DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/daq_configuration"
-
+BEAMLINE_PARAMETERS_PATH = f"{DAQ_CONFIGURATION_PATH}/domain/beamline.parameters"
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
-DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/display.configuration"
+DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/domain/display.configuration"
+
+SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
+MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
 
 devices = DeviceManager()
 
@@ -62,9 +74,14 @@ devices = DeviceManager()
 @devices.fixture
 @cache
 def config_client() -> ConfigClient:
-    client = ConfigClient()
+    client = ConfigClient.from_url()
     set_config_client(client)
     return client
+
+
+@devices.factory()
+def dcm_ro() -> ReadOnlyDCM:
+    return ReadOnlyDCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @devices.factory()
@@ -75,8 +92,38 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 
 @devices.factory()
-def beamstop() -> BeamStop:
-    return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
+def beamstop(config_client: ConfigClient) -> BeamStop:
+    return BeamStop(
+        prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:",
+        hutch=HutchState.EH1,
+        beamline_parameters=BEAMLINE_PARAMETERS_PATH,
+        config_client=config_client,
+    )
+
+
+@devices.factory()
+def beam_centre() -> CentreEllipseMethod:
+    return CentreEllipseMethod(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
+        overlay_channel=7,
+    )
+
+
+@devices.factory()
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
+
+
+@devices.factory()
+def energy_device(config_client: ConfigClient) -> AccessControlledEnergyComposite:
+    """Access controlled composite device to enable changing the energy from EH1."""
+    return AccessControlledEnergyComposite(
+        dcm_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        hutch=HutchState.EH1,
+        mirror_energy_config=MIRROR_ENERGY_FILE_PATH,
+        config_client=config_client,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
+    )
 
 
 @devices.fixture
@@ -158,10 +205,12 @@ def zebra() -> Zebra:
 
 
 @devices.factory()
+def beam_centre_from_epics() -> CentroidFromEpics:
+    return CentroidFromEpics(f"{PREFIX.beamline_prefix}-EA-OAV-01:")
+
+
+@devices.factory()
 def hfm_piezo() -> AccessControlledPiezoActuator:
-    """Get the i19-1 access controlled hfm piezo device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
         mirror_type=FocusingMirrorName.HFM,
@@ -172,9 +221,6 @@ def hfm_piezo() -> AccessControlledPiezoActuator:
 
 @devices.factory()
 def vfm_piezo() -> AccessControlledPiezoActuator:
-    """Get the i19-1 access controlled vfm piezo device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
         mirror_type=FocusingMirrorName.VFM,

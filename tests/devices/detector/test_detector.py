@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pydantic import ValidationError
 
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from tests.devices.test_data import TEST_LUT_TXT
@@ -45,15 +46,15 @@ def test_if_path_provided_check_is_dir(tmp_path: Path):
         create_det_params_with_dir_and_prefix(file_path)
 
 
-@patch(
-    "dodal.devices.detector.detector.get_config_client",
-)
+@pytest.fixture(autouse=True)
+def always_set_config_client():
+    set_config_client(MagicMock())
+
+
 @patch(
     "dodal.devices.detector.det_dist_to_beam_converter.linear_extrapolation_lut",
 )
-def test_correct_det_dist_to_beam_converter_path_passed_in(
-    mock_lut, mock_get_config_client, tmp_path
-):
+def test_correct_det_dist_to_beam_converter_path_passed_in(mock_lut, tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
         exposure_time_s=1.0,

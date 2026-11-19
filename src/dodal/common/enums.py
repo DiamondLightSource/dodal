@@ -17,3 +17,11 @@ class EnabledDisabledUpper(StrictEnum):
 class InOutUpper(StrictEnum):
     IN = "IN"
     OUT = "OUT"
+
+
+class ValveState(StrictEnum):
+    FAULT = "Fault"
+    OPEN = "Open"
+    OPENING = "Opening"
+    CLOSED = "Closed"
+    CLOSING = "Closing"

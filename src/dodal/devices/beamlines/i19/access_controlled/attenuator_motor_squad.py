@@ -1,8 +1,4 @@
-from typing import Annotated, Any, Self
-
 from ophyd_async.core import AsyncStatus
-from pydantic import BaseModel, model_validator
-from pydantic.types import PositiveInt, StringConstraints
 
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import (
     OpticsBlueAPIDevice,
@@ -10,27 +6,9 @@ from dodal.devices.beamlines.i19.access_controlled.blueapi_device import (
 from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
 )
-
-PermittedKeyStr = Annotated[str, StringConstraints(pattern="^[A-Za-z0-9-_]*$")]
-
-
-class AttenuatorMotorPositionDemands(BaseModel):
-    continuous_demands: dict[PermittedKeyStr, float] = {}
-    indexed_demands: dict[PermittedKeyStr, PositiveInt] = {}
-
-    @model_validator(mode="after")
-    def no_keys_clash(self) -> Self:
-        common_keys = set(self.continuous_demands).intersection(self.indexed_demands)
-        common_key_count = sum(1 for _ in common_keys)
-        if common_key_count < 1:
-            return self
-        else:
-            ks: str = "key" if common_key_count == 1 else "keys"
-            error_msg = f"Common {ks} found in distinct motor demands: {common_keys}"
-            raise ValueError(error_msg)
-
-    def validated_complete_demand(self) -> dict[PermittedKeyStr, Any]:
-        return self.continuous_demands | self.indexed_demands
+from dodal.devices.beamlines.i19.attenuator_motor_positions import (
+    AttenuatorMotorPositions,
+)
 
 
 class AttenuatorMotorSquad(OpticsBlueAPIDevice):
@@ -52,13 +30,13 @@ class AttenuatorMotorSquad(OpticsBlueAPIDevice):
     """
 
     @AsyncStatus.wrap
-    async def set(self, value: AttenuatorMotorPositionDemands):
+    async def set(self, value: AttenuatorMotorPositions):
         request_params = {
             "name": "operate_motor_squad_plan",
             "params": {
                 "experiment_hutch": self._invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,
-                "attenuator_demands": value.validated_complete_demand(),
+                "attenuator_demands": value.validated_and_complete,
             },
             "instrument_session": self.instrument_session,
         }

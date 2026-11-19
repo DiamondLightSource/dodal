@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 import numpy as np
 import pytest
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import init_devices, set_mock_attr, set_mock_value
 from ophyd_async.epics.motor import MotorLimitsError
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -191,40 +191,33 @@ async def test_uvw_set(uvw: ToolPointMotion) -> None:
         },
         full_match=False,
     )
-
     assert await uvw.smp_ref().azimuth.user_readback.get_value() == pos.azimuth_deg
     assert await uvw.smp_ref().tilt.user_readback.get_value() == pos.tilt_deg
 
 
-async def test_uvw_check_motor_limits_calls_all_motors(
+async def test_uvw_check_value_calls_all_motors(
     uvw: ToolPointMotion,
 ) -> None:
     smp = uvw.smp_ref()
-    smp.x.check_motor_limit = AsyncMock()
-    smp.y.check_motor_limit = AsyncMock()
-    smp.z.check_motor_limit = AsyncMock()
-    smp.tilt.check_motor_limit = AsyncMock()
-    smp.azimuth.check_motor_limit = AsyncMock()
+    mock_check_x = set_mock_attr(smp.x, "check_value", AsyncMock())
+    mock_check_y = set_mock_attr(smp.y, "check_value", AsyncMock())
+    mock_check_z = set_mock_attr(smp.z, "check_value", AsyncMock())
+    mock_check_tilt = set_mock_attr(smp.tilt, "check_value", AsyncMock())
+    mock_check_azimuth = set_mock_attr(smp.azimuth, "check_value", AsyncMock())
 
-    start = XYZTiltAzimuthMotorPositions(
+    values = XYZTiltAzimuthMotorPositions(
         x=1.0, y=2.0, z=3.0, tilt_deg=10.0, azimuth_deg=20.0
     )
-    end = XYZTiltAzimuthMotorPositions(
-        x=4.0, y=5.0, z=6.0, tilt_deg=30.0, azimuth_deg=40.0
-    )
+    await uvw.check_value(values)
 
-    await uvw.check_motor_limits(start, end)
-
-    smp.x.check_motor_limit.assert_awaited_once_with(start.x, end.x)
-    smp.y.check_motor_limit.assert_awaited_once_with(start.y, end.y)
-    smp.z.check_motor_limit.assert_awaited_once_with(start.z, end.z)
-    smp.tilt.check_motor_limit.assert_awaited_once_with(start.tilt_deg, end.tilt_deg)
-    smp.azimuth.check_motor_limit.assert_awaited_once_with(
-        start.azimuth_deg, end.azimuth_deg
-    )
+    mock_check_x.assert_awaited_once_with(values.x)
+    mock_check_y.assert_awaited_once_with(values.y)
+    mock_check_z.assert_awaited_once_with(values.z)
+    mock_check_tilt.assert_awaited_once_with(values.tilt_deg)
+    mock_check_azimuth.assert_awaited_once_with(values.azimuth_deg)
 
 
-async def test_check_motor_limits_raises_on_failure(
+async def test_check_values_raises_on_failure(
     uvw: ToolPointMotion,
 ) -> None:
     set_mock_value(uvw.smp_ref().z.high_limit_travel, 500)
@@ -238,4 +231,5 @@ async def test_check_motor_limits_raises_on_failure(
     )
 
     with pytest.raises(MotorLimitsError):
-        await uvw.check_motor_limits(start, end)
+        await uvw.check_value(start)
+        await uvw.check_value(end)

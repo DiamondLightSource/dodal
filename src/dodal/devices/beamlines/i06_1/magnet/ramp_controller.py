@@ -1,0 +1,60 @@
+from dataclasses import dataclass
+from functools import cached_property
+
+from ophyd_async.core import (
+    InstantMovableMock,
+    MovableLogic,
+    SignalR,
+    StandardMovable,
+    StandardReadable,
+    StandardReadableFormat,
+    TimeoutCalculator,
+    default_mock_class,
+    set_mock_value,
+)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+
+
+@dataclass
+class RampRateMovableLogic(MovableLogic[float]):
+    limit: SignalR[float]
+
+    async def check_move(self, new_position: float) -> None:
+        limit = await self.limit.get_value()
+        if new_position > limit:
+            raise ValueError(
+                f"Requested ramp rate {new_position} exceeds the maximum limit of "
+                f"{limit} for device {self.readback.name}."
+            )
+
+    async def move(self, new_position: float, timeout: TimeoutCalculator):
+        await self.setpoint.set(new_position, timeout=timeout())
+
+
+class MockMagnetAxisRampRateController(InstantMovableMock):
+    async def connect(self, device: StandardMovable):
+        await super().connect(device)
+        # Extend to set a sensible default value for the ramp limit.
+        set_mock_value(device.ramp_limit, 2)  # type: ignore
+
+
+@default_mock_class(MockMagnetAxisRampRateController)
+class MagnetAxisRampRateController(StandardMovable[float], StandardReadable):
+    """Controls the ramp rate of a single superconducting magnet axis.
+
+    Exposes the readback ramp rate, demand ramp rate and the maximum
+    permitted ramp rate for one magnet axis.
+    """
+
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.readback = epics_signal_r(float, prefix + "STS:RAMPRATE:TPM")
+        self.demand = epics_signal_rw(float, prefix + "SET:DMD:RAMPRATE:TPM")
+        self.ramp_limit = epics_signal_r(float, prefix + "LIM:RAMPRATE:TPM")
+        super().__init__(name)
+
+    @cached_property
+    def movable_logic(self) -> RampRateMovableLogic:
+        return RampRateMovableLogic(
+            readback=self.readback, setpoint=self.demand, limit=self.ramp_limit
+        )

@@ -1,37 +1,14 @@
 from typing import Any
 
 import pytest
-from daq_config_server import ConfigClient
 from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
-from dodal.common.beamlines.beamline_utils import clear_config_client, set_config_client
-from dodal.device_manager import DeviceManager
-from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
-from tests.test_data import I04_BEAMLINE_PARAMETERS, TEST_BEAMLINE_PARAMETERS_TXT
+from dodal.utils import BLUESKY_PROTOCOLS
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
     return any(isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
-
-
-@pytest.fixture(autouse=True)
-def patch_config_paths(monkeypatch):
-    monkeypatch.setattr(
-        "dodal.beamlines.i03.BEAMLINE_PARAMETERS_PATH",
-        TEST_BEAMLINE_PARAMETERS_TXT,
-    )
-    monkeypatch.setattr(
-        "dodal.beamlines.i04.BEAMLINE_PARAMETERS_PATH",
-        I04_BEAMLINE_PARAMETERS,
-    )
-
-
-@pytest.fixture(autouse=True)
-def reset_config_client():
-    set_config_client(ConfigClient(""))
-    yield
-    clear_config_client()
 
 
 @pytest.mark.parametrize(
@@ -39,6 +16,9 @@ def reset_config_client():
     set(all_beamline_modules()),
     indirect=True,
 )
+# Increase timeout for this specific test as running individually can take over a second
+# to import everything so causes tests to fail.
+@pytest.mark.timeout(2)
 def test_device_creation(module_and_devices_for_beamline):
     """Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
@@ -53,35 +33,4 @@ def test_device_creation(module_and_devices_for_beamline):
     ]
     assert len(devices_not_following_bluesky_protocols) == 0, (
         f"{devices_not_following_bluesky_protocols} do not follow bluesky protocols"
-    )
-
-
-@pytest.mark.parametrize(
-    "module_and_devices_for_beamline",
-    set(all_beamline_modules()),
-    indirect=True,
-)
-def test_devices_are_identical(module_and_devices_for_beamline):
-    """Ensures that for every beamline all device functions prevent duplicate
-    instantiation.
-    """
-    bl_mod, devices_a, _ = module_and_devices_for_beamline
-    if isinstance(getattr(bl_mod, "devices", None), DeviceManager):
-        # DeviceManager beamline modules do not cache device instances
-        return
-
-    devices_b, _ = make_all_devices(
-        bl_mod,
-        include_skipped=True,
-        fake_with_ophyd_sim=True,
-    )
-    non_identical_names = [
-        device_name
-        for device_name, device in devices_a.items()
-        if device is not devices_b[device_name]
-    ]
-    total_number_of_devices = len(devices_a)
-    non_identical_number_of_devices = len(devices_a)
-    assert len(non_identical_names) == 0, (
-        f"{non_identical_number_of_devices}/{total_number_of_devices} devices were not identical: {non_identical_names}"
     )

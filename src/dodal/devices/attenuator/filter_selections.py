@@ -72,13 +72,16 @@ class I02_1FilterFourSelections(SubsetEnum):  # noqa: N801
     TI500 = "Ti500"
 
 
+# Enum maps names of positions in epics ( controls software ) onto wheel slot locations
+# Other mappings from these locations to specific details of foil absorber etc is handled
+# elsewhere in I19 transmission code
 class I19FilterOneSelections(StrictEnum):
-    AIR1 = "1 - "
-    AL = "2 - Al"
-    AIR3 = "3 - "
-    AU = "4 - Au"
-    AIR5 = "5 - "
-    FE = "6 - Fe"
+    W1S1 = "1 - "
+    W1S2 = "2 - Al"
+    W1S3 = "3 - "
+    W1S4 = "4 - Au"
+    W1S5 = "5 - "
+    W1S6 = "6 - Fe"
 
 
 class I24FilterOneSelections(SubsetEnum):

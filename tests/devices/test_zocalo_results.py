@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import AsyncStatus
+from ophyd_async.core import AsyncStatus, set_mock_attr
 
 from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 from dodal.devices.zocalo.zocalo_results import (
@@ -96,7 +96,11 @@ async def mocked_zocalo_device(zocalo_results: ZocaloResults):
         async def mock_trigger(results):
             await zocalo_results._put_results(results, test_recipe_parameters)
 
-        zocalo_results.trigger = MagicMock(side_effect=partial(mock_trigger, results))  # type: ignore
+        set_mock_attr(
+            zocalo_results,
+            "trigger",
+            MagicMock(side_effect=partial(mock_trigger, results)),
+        )
         await zocalo_results.connect()
         return zocalo_results
 

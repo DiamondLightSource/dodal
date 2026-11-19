@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from bluesky import RunEngine
 
-from dodal.plans.save_panda import _save_panda, main
+from dodal.plans.save_panda import _save_panda, build_and_connect_device, main
 
 
 @pytest.fixture(autouse=True)
@@ -19,7 +19,8 @@ def test_save_panda(sim_run_engine):
     filename = "file.yml"
     with (
         patch(
-            "dodal.plans.save_panda.make_device", return_value={"panda": panda}
+            "dodal.plans.save_panda.build_and_connect_device",
+            return_value=panda,
         ) as mock_make_device,
         patch(
             "dodal.plans.save_panda.RunEngine",
@@ -30,14 +31,17 @@ def test_save_panda(sim_run_engine):
     ):
         _save_panda("i03", "panda", directory, filename)
 
-        mock_make_device.assert_called_with(
-            "dodal.beamlines.i03", "panda", connect_immediately=True
-        )
+        mock_make_device.assert_called_with("dodal.beamlines.i03", "panda")
         mock_store_settings.assert_called_with(
             mock_settings_provider(),
             "file.yml",
             panda,
         )
+
+
+def test_build_and_connect_raises_error_if_no_panda_found_in_module():
+    with pytest.raises(ValueError):
+        build_and_connect_device("dodal.beamlines.i19_1")
 
 
 @patch(
@@ -46,8 +50,8 @@ def test_save_panda(sim_run_engine):
 )
 def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit, tmpdir):
     with patch(
-        "dodal.plans.save_panda.make_device",
-        side_effect=ValueError("device does not exist"),
+        "dodal.plans.save_panda.build_and_connect_device",
+        side_effect=ValueError("No panda device found in dodal.beamlines.i03"),
     ):
         with pytest.raises(AssertionError):
             _save_panda("i03", "panda", tmpdir, "filename")

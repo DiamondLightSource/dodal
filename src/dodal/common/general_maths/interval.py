@@ -1,0 +1,157 @@
+from abc import ABC, abstractmethod
+from functools import cached_property
+from numbers import Real
+from typing import Generic, TypeVar
+
+from pydantic import BaseModel, ConfigDict, StrictFloat, model_validator
+
+
+class FloatInterval(BaseModel, ABC):
+    """Base class for immutable range of floating point values.
+
+    N.B. Specific sub classes cover different end point types ( closed / open ).
+
+    Attributes:
+        lower: The lower endpoint defining the interval.
+        upper: The upper endpoint defining the interval.
+    """
+
+    lower: StrictFloat
+    upper: StrictFloat
+
+    model_config = ConfigDict(frozen=True)
+
+    @cached_property
+    def span(self) -> float:
+        return self.upper - self.lower
+
+    @model_validator(mode="after")
+    def _ensure_order(self) -> "FloatInterval":
+        if self.lower > self.upper:
+            _msg = f"Interval is inverted! Lower endpoint {self.lower} cannot be greater than the upper {self.upper}."
+            raise ValueError(_msg)
+        return self
+
+    def _includes(self, x: float) -> bool:
+        """Internal method to impose the specific interval type definition, endpoints are closed or open.
+
+        Args:
+            x: the value to be checked against the interval endpoints.
+
+        Returns:
+            True if the interval includes the input value.
+        """
+        ...
+
+    def __contains__(self, item: object) -> bool:
+        if isinstance(item, bool):
+            raise TypeError("Booleans cannot be found inside a FloatInterval")
+        if isinstance(item, Real):
+            return self._includes(float(item))
+        if isinstance(item, FloatInterval):
+            return item.lower in self and item.upper in self
+        raise TypeError(
+            f"Objects of type {type(item)} cannot be found inside a FloatInterval."
+        )
+
+    def __hash__(self) -> int:
+        # Generate a stable hash based on the interval boundaries and class type
+        # (ensuring ClosedInterval vs OpenInterval with same numbers hash differently)
+        _hashable_innards = (type(self), self.lower, self.upper)
+        return hash(_hashable_innards)
+
+
+class ClosedInterval(FloatInterval):
+    """Interval with inclusive end points."""
+
+    def _includes(self, x: float) -> bool:
+        return self.lower <= x <= self.upper
+
+
+class ClosedOpenInterval(FloatInterval):
+    """Interval with inclusive lower endpoint and exclusive upper endpoint."""
+
+    def _includes(self, x: float) -> bool:
+        return self.lower <= x < self.upper
+
+
+class OpenInterval(FloatInterval):
+    """Interval with exclusive end points."""
+
+    def _includes(self, x: float) -> bool:
+        return self.lower < x < self.upper
+
+
+class OpenClosedInterval(FloatInterval):
+    """Interval with exclusive lower endpoint and inclusive upper endpoint."""
+
+    def _includes(self, x: float) -> bool:
+        return self.lower < x <= self.upper
+
+
+TInterval = TypeVar("TInterval", bound=FloatInterval)
+
+
+# class DirectedSegment[TInterval: FloatInterval](BaseModel, ABC): - after 3.11 drops
+class DirectedSegment(BaseModel, ABC, Generic[TInterval]):
+    """Abstract base for directed segments Generic against FloatInterval type.
+
+    Attributes:
+        interval_cls type of the backing FloatInterval
+        start: the begin of the directional segment
+        end: the end of the directional segment
+
+    Note:
+        Unlike intervals, the start can be less than the end
+    """
+
+    interval_cls: type[TInterval]
+
+    start: StrictFloat
+    end: StrictFloat
+
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
+
+    @cached_property
+    def _interval(self) -> TInterval:
+        """Backing interval decouples from the orientation of the Segment."""
+        return self.interval_cls(
+            lower=min(self.start, self.end), upper=max(self.start, self.end)
+        )
+
+    @property
+    @abstractmethod
+    def span(self) -> float: ...
+
+    def __contains__(self, item: object) -> bool:
+        return item in self._interval
+
+    def __eq__(self, item: object) -> bool:
+        return (
+            isinstance(item, DirectedSegment)
+            and self.start == item.start
+            and self.end == item.end
+        )
+
+    @classmethod
+    def create(
+        cls, start: float, end: float, interval_cls: type[TInterval] = ClosedInterval
+    ) -> "DirectedSegment[TInterval]":
+        if start == end:
+            raise ValueError(
+                "Cannot form a zero-length segment as the directionality is ambiguous."
+            )
+        segment_cls = _InvertedSegment if start > end else _ForwardSegment
+        return segment_cls(start=start, end=end, interval_cls=interval_cls)
+
+
+class _ForwardSegment(DirectedSegment[TInterval], Generic[TInterval]):
+    @property
+    def span(self) -> float:
+        return self._interval.span
+
+
+class _InvertedSegment(DirectedSegment[TInterval], Generic[TInterval]):
+    @property
+    def span(self) -> float:
+        return -self._interval.span

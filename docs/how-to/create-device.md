@@ -48,6 +48,45 @@ To develop a new device, get an initial, working version of your code into the m
 - **Make use of type annotations** so that pyright will validate that you are passing around values that ophyd-async will accept.
 - Use `dodal connect <beamline>` to check device connectivity and `cainfo <PV address>` to confirm PVs and datatypes. You can check a PV's datatype by using the `cainfo <PV address>` command. If the datatype is an enum, `caget -d 31 <PV address>` will also display the available enums that the PV takes. Common enums are defined in `ophyd-async.core` for devices to use, but you can define custom ones when suitable (inheriting from `ophyd_async.core` `StrictEnum`, `SupersetEnum` or `SubsetEnum`). The values should be capitalised e.g `ON = "On"`. If the PV expects upper case for the enum (e.g `ON = "ON"`), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit [here](https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html).
 
+
+Using the daq-config-server service for configuration
+=====================================================
+
+Beamlines and devices may depend on the daq-config-server `ConfigClient` to retrieve configuration files. These files are often stored on the DLS filesystem and contain configuration data that determines device behaviour.
+
+For example, an insertion device may use a calibration file containing polynomial coefficients that convert photon energy into insertion device gap for different polarisation modes. A device may retrieve this information using a `ConfigClient`:
+
+```python
+from pathlib import Path
+
+from daq_config_server.client import ConfigClient
+
+from dodal.device_manager import DeviceManager
+from dodal.devices.my_device import MyDevice
+
+LOOKUPTABLE_DIR = (
+    "/dls_sw/iXX/software/gda/workspace_git/"
+    "gda-diamond.git/configurations/iXX/lookupTables"
+)
+LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
+
+devices = DeviceManager()
+
+
+@devices.fixture
+def config_client() -> ConfigClient:
+    return ConfigClient.from_url()
+
+
+@devices.factory()
+def my_device(config_client: ConfigClient) -> MyDevice:
+    return MyDevice(
+        config_client=config_client,
+        path=Path(LOOKUPTABLE_DIR, LOOKUP_FILE_NAME),
+    )
+```
+Please checkout the daq-config-server documentation for more information: https://diamondlightsource.github.io/daq-config-server/main/index.html.
+
 Device best practices for Bluesky plans
 =======================================
 

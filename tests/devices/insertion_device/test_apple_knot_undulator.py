@@ -1,23 +1,19 @@
 import pytest
-from ophyd_async.core import (
-    set_mock_value,
-)
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.beamlines.i05_shared import (
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
 from dodal.devices.insertion_device import (
+    Apple2,
     AppleKnotController,
     AppleKnotPathFinder,
     Pol,
-)
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2,
     UndulatorLockedPhaseAxes,
 )
 
-# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+# mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = [
     "dodal.testing.fixtures.devices.apple2",
     "dodal.testing.fixtures.devices.apple_knot",
@@ -29,12 +25,13 @@ async def mock_apple_knot_i05_controller(
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     apple_knot_i05_path_finder: AppleKnotPathFinder,
 ) -> AppleKnotController[UndulatorLockedPhaseAxes]:
-    mock_apple_knot_controller = AppleKnotController[UndulatorLockedPhaseAxes](
-        apple=mock_locked_apple2,
-        gap_energy_motor_converter=energy_to_gap_converter,
-        phase_energy_motor_converter=energy_to_phase_converter,
-        path_finder=apple_knot_i05_path_finder,
-    )
+    async with init_devices(mock=True):
+        mock_apple_knot_controller = AppleKnotController[UndulatorLockedPhaseAxes](
+            apple=mock_locked_apple2,
+            gap_energy_motor_converter=energy_to_gap_converter,
+            phase_energy_motor_converter=energy_to_phase_converter,
+            path_finder=apple_knot_i05_path_finder,
+        )
     return mock_apple_knot_controller
 
 
@@ -57,13 +54,10 @@ async def test_id_set_energy_const_pol(
     initial_phase_top_outer: float,
     expected_pol: Pol,
 ):
-    set_mock_value(
-        mock_locked_apple2.phase().top_outer.user_readback, initial_phase_top_outer
-    )
-    set_mock_value(
-        mock_locked_apple2.phase().btm_inner.user_readback, initial_phase_top_outer
-    )
-    set_mock_value(mock_locked_apple2.gap().user_readback, initial_gap)
+    phase = mock_locked_apple2.phase_ref()
+    set_mock_value(phase.top_outer.user_readback, initial_phase_top_outer)
+    set_mock_value(phase.btm_inner.user_readback, initial_phase_top_outer)
+    set_mock_value(mock_locked_apple2.gap_ref().user_readback, initial_gap)
     assert await mock_apple_knot_i05_controller.polarisation.get_value() == expected_pol
     await mock_apple_knot_i05_controller.energy.set(target_energy)
     assert await mock_apple_knot_i05_controller.polarisation.get_value() == expected_pol
@@ -86,17 +80,17 @@ async def test_id_set_pol(
     initial_energy: float,
     target_pol: Pol,
 ):
-    mock_apple_knot_i05_controller._energy_set(initial_energy)
+    set_mock_value(mock_apple_knot_i05_controller._energy, initial_energy)
     set_mock_value(
-        mock_locked_apple2.gap().user_readback,
+        mock_locked_apple2.gap_ref().user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),
     )
     set_mock_value(
-        mock_locked_apple2.phase().top_outer.user_readback,
+        mock_locked_apple2.phase_ref().top_outer.user_readback,
         energy_to_phase_converter(initial_energy, initial_pol),
     )
     set_mock_value(
-        mock_locked_apple2.phase().btm_inner.user_readback,
+        mock_locked_apple2.phase_ref().btm_inner.user_readback,
         energy_to_phase_converter(initial_energy, initial_pol),
     )
     assert await mock_apple_knot_i05_controller.polarisation.get_value() == initial_pol
@@ -120,17 +114,17 @@ async def test_id_set_pol_fails(
     initial_energy: float,
     target_pol: Pol,
 ):
-    mock_apple_knot_i05_controller._energy_set(initial_energy)
+    set_mock_value(mock_apple_knot_i05_controller._energy, initial_energy)
     set_mock_value(
-        mock_locked_apple2.gap().user_readback,
+        mock_locked_apple2.gap_ref().user_readback,
         energy_to_gap_converter(initial_energy, initial_pol),
     )
     set_mock_value(
-        mock_locked_apple2.phase().top_outer.user_readback,
+        mock_locked_apple2.phase_ref().top_outer.user_readback,
         energy_to_phase_converter(initial_energy, initial_pol),
     )
     set_mock_value(
-        mock_locked_apple2.phase().btm_inner.user_readback,
+        mock_locked_apple2.phase_ref().btm_inner.user_readback,
         energy_to_phase_converter(initial_energy, initial_pol),
     )
     assert await mock_apple_knot_i05_controller.polarisation.get_value() == initial_pol
@@ -156,13 +150,10 @@ async def test_id_set_fails_exclusion_zone(
     initial_gap: float,
     initial_phase_top_outer: float,
 ):
-    set_mock_value(
-        mock_locked_apple2.phase().top_outer.user_readback, initial_phase_top_outer
-    )
-    set_mock_value(
-        mock_locked_apple2.phase().btm_inner.user_readback, initial_phase_top_outer
-    )
-    set_mock_value(mock_locked_apple2.gap().user_readback, initial_gap)
+    phase = mock_locked_apple2.phase_ref()
+    set_mock_value(phase.top_outer.user_readback, initial_phase_top_outer)
+    set_mock_value(phase.btm_inner.user_readback, initial_phase_top_outer)
+    set_mock_value(mock_locked_apple2.gap_ref().user_readback, initial_gap)
     with pytest.raises(
         RuntimeError,
         match="No valid path found for move avoiding exclusion zones.",
@@ -182,13 +173,10 @@ async def test_id_set_fails_top_bottom_phase_mismatch(
     initial_phase_top_outer: float,
     initial_phase_bottom_inner: float,
 ):
-    set_mock_value(
-        mock_locked_apple2.phase().top_outer.user_readback, initial_phase_top_outer
-    )
-    set_mock_value(
-        mock_locked_apple2.phase().btm_inner.user_readback, initial_phase_bottom_inner
-    )
-    set_mock_value(mock_locked_apple2.gap().user_readback, 50.0)
+    phase = mock_locked_apple2.phase_ref()
+    set_mock_value(phase.top_outer.user_readback, initial_phase_top_outer)
+    set_mock_value(phase.btm_inner.user_readback, initial_phase_bottom_inner)
+    set_mock_value(mock_locked_apple2.gap_ref().user_readback, 50.0)
     with pytest.raises(
         RuntimeError,
         match=f"Upper phase {initial_phase_top_outer} and lower phase {initial_phase_bottom_inner} values are not close enough.",

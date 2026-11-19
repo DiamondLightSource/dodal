@@ -1,13 +1,18 @@
+from ophyd_async.epics.adcore import ADAcquireLogic
+
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i09_1 import LensMode, PsuMode
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
-from dodal.devices.electron_analyser.base import EnergySource
-from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.electron_analyser.base import (
+    ElectronAnalyserTriggerLogic,
+    RegionLogic,
+)
+from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsDetector
 from dodal.devices.motors import XYZAzimuthTiltPolarStage
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import Lakeshore336
+from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -26,19 +31,17 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def energy_source(dcm: DoubleCrystalMonochromatorWithDSpacing) -> EnergySource:
-    return EnergySource(dcm.energy_in_eV)
-
-
-# CAM:IMAGE will fail to connect outside the beamline network,
-# see https://github.com/DiamondLightSource/dodal/issues/1852
-@devices.factory()
-def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
+def analyser(
+    dcm: DoubleCrystalMonochromatorWithDSpacing,
+) -> SpecsDetector[LensMode, PsuMode]:
+    prefix = f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:"
+    driver = SpecsAnalyserDriverIO(prefix, LensMode, PsuMode)
     return SpecsDetector[LensMode, PsuMode](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        energy_source=energy_source,
+        prefix,
+        driver,
+        acquire_logic=ADAcquireLogic(driver),
+        trigger_logic=ElectronAnalyserTriggerLogic(driver),
+        region_logic=RegionLogic(driver, dcm.energy_in_eV),
     )
 
 

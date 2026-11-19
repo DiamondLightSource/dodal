@@ -1,6 +1,7 @@
 from functools import cache
 from pathlib import Path
 
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
@@ -8,16 +9,21 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.common.visit import StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
 from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.beamlines.i19.access_controlled.energy_device import (
+    AccessControlledEnergyComposite,
+)
 from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     AccessControlledPiezoActuator,
     FocusingMirrorName,
 )
+from dodal.devices.beamlines.i19.access_controlled.read_only_dcm import ReadOnlyDCM
 from dodal.devices.beamlines.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
@@ -25,13 +31,15 @@ from dodal.devices.beamlines.i19.backlight import BacklightPosition
 from dodal.devices.beamlines.i19.beamstop import BeamStop
 from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.motors import XYZPhiStage
+from dodal.devices.oav.beam_centre.centroid_from_epics import CentroidFromEpics
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
+    ZebraOutputs,
     ZebraSources,
-    ZebraTTLOutputs,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -47,11 +55,26 @@ set_utils_beamline(BL)
 I19_2_COMMISSIONING_INSTR_SESSION: str = "cm40639-5"
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(),
+    outputs=ZebraOutputs(),
     sources=ZebraSources(),
 )
 
+SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
+MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
+
+DAQ_CONFIGURATION_PATH = "/dls_sw/i19-2/software/daq_configuration"
+BEAMLINE_PARAMETERS_PATH = f"{DAQ_CONFIGURATION_PATH}/domain/beamline.parameters"
+
+
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient.from_url()
+    set_config_client(client)
+    return client
 
 
 @devices.fixture
@@ -64,6 +87,11 @@ def path_provider() -> PathProvider:
 
 
 @devices.factory()
+def dcm_ro() -> ReadOnlyDCM:
+    return ReadOnlyDCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+
+
+@devices.factory()
 def attenuator_motor_squad() -> AttenuatorMotorSquad:
     return AttenuatorMotorSquad(
         hutch=HutchState.EH2, instrument_session=I19_2_COMMISSIONING_INSTR_SESSION
@@ -72,12 +100,22 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 @devices.factory()
 def backlight() -> BacklightPosition:
-    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
+    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-BL-02:")
 
 
 @devices.factory()
-def beamstop() -> BeamStop:
-    return BeamStop(prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:")
+def beamstop(config_client: ConfigClient) -> BeamStop:
+    return BeamStop(
+        prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:",
+        hutch=HutchState.EH2,
+        beamline_parameters=BEAMLINE_PARAMETERS_PATH,
+        config_client=config_client,
+    )
+
+
+@devices.factory()
+def beam_centre_from_epics() -> CentroidFromEpics:
+    return CentroidFromEpics(f"{PREFIX.beamline_prefix}-EA-CAM-01:")
 
 
 @devices.factory()
@@ -86,12 +124,27 @@ def diffractometer() -> FourCircleDiffractometer:
 
 
 @devices.factory()
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
+
+
+@devices.factory()
 def eiger(path_provider: PathProvider) -> EigerDetector:
     return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:",
         path_provider=path_provider,
-        drv_suffix="-EA-EIGER-01:",
-        hdf_suffix="-EA-EIGER-01:OD:",
+    )
+
+
+@devices.factory()
+def energy_device(config_client: ConfigClient) -> AccessControlledEnergyComposite:
+    """Access controlled composite device to enable changing the energy from EH2."""
+    return AccessControlledEnergyComposite(
+        dcm_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        hutch=HutchState.EH2,
+        mirror_energy_config=MIRROR_ENERGY_FILE_PATH,
+        config_client=config_client,
+        instrument_session=I19_2_COMMISSIONING_INSTR_SESSION,
     )
 
 
@@ -138,9 +191,6 @@ def zebra() -> Zebra:
 
 @devices.factory()
 def hfm_piezo() -> AccessControlledPiezoActuator:
-    """Get the i19-2 access controlled hfm piezo device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
         mirror_type=FocusingMirrorName.HFM,
@@ -151,9 +201,6 @@ def hfm_piezo() -> AccessControlledPiezoActuator:
 
 @devices.factory()
 def vfm_piezo() -> AccessControlledPiezoActuator:
-    """Get the i19-2 access controlled vfm piezo device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
         mirror_type=FocusingMirrorName.VFM,

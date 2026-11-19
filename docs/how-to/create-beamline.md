@@ -15,7 +15,7 @@ beamline are instantiated. The file should be named after the colloquial name fo
 Beamline modules (in ``dodal.beamlines``) are code-as-configuration. They define the set of devices and common device
 settings needed for a particular beamline or group of similar beamlines (e.g. a beamline and its digital twin). Some
 of our tooling depends on the convention of *only* beamline modules going in this package. Common utilities should
-go somewhere else e.g. ``dodal.utils`` or ``dodal.beamlines.common``.
+go somewhere else e.g. ``dodal.utils`` or ``dodal.common.beamlines``.
 
 The following example creates a fictitious beamline ``w41``, with a simulated twin ``s41``.
 ``w41`` needs to monitor the status of the Synchrotron and has an AdAravisDetector.

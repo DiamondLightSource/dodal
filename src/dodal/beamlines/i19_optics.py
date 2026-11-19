@@ -1,7 +1,13 @@
+from functools import cache
+
+from daq_config_server.client import ConfigClient
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
+)
+from dodal.common.beamlines.beamline_utils import (
+    set_config_client,
 )
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.filter import FilterWheel
@@ -10,8 +16,16 @@ from dodal.devices.beamlines.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
     HutchAccessControl,
 )
+from dodal.devices.beamlines.i19.mirror_stripes import MirrorStripes
+from dodal.devices.common_dcm import (
+    DoubleCrystalMonochromatorWithDSpacing,
+    PitchAndRollCrystal,
+    StationaryCrystal,
+)
 from dodal.devices.focusing_mirror import FocusingMirrorWithPiezo
-from dodal.devices.hutch_shutter import HutchInterlock, InterlockedHutchShutter
+from dodal.devices.hutch_shutter import InterlockedHutchShutter
+from dodal.devices.interlocks import PSSInterlock
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -20,7 +34,18 @@ PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+DAQ_CONFIGURATION_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
+ID_GAP_LOOKUP = f"{DAQ_CONFIGURATION_PATH}/lookup/energy_to_id_gap_look_up_table.txt"
+
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def config_client() -> ConfigClient:
+    client = ConfigClient.from_url()
+    set_config_client(client)
+    return client
 
 
 @devices.factory()
@@ -74,6 +99,16 @@ def attenuator_y_motor() -> Motor:
 
 
 @devices.factory()
+def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
+    return DoubleCrystalMonochromatorWithDSpacing(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_1=StationaryCrystal,
+        xtal_2=PitchAndRollCrystal,
+    )
+
+
+# Temporarily skipping as the IOC is being worked on and not in use
+@devices.factory(skip=True)
 def filter_wheel() -> FilterWheel:
     """Device factory for the I19 EH-1 filter wheel indexing motor.
 
@@ -112,18 +147,32 @@ def hfm() -> FocusingMirrorWithPiezo:
 
 
 @devices.factory()
+def mirror_stripes() -> MirrorStripes:
+    return MirrorStripes(f"{PREFIX.beamline_prefix}-MO-IOC-01:")
+
+
+@devices.factory()
 def shutter() -> InterlockedHutchShutter:
     """Device factory for the I19 optics hutch shutter device.
 
     Uses:
         I19 beamline prefix extended with an infix specific to the optics hutch shutter.
-        HutchInterlock device (itself using I19 beamline prefix)
+        PSSInterlock device (itself using I19 beamline prefix)
 
     Returns:
         I19 optics hutch shutter device.
     """
     return InterlockedHutchShutter(
-        PREFIX.beamline_prefix, HutchInterlock(PREFIX.beamline_prefix)
+        PREFIX.beamline_prefix, PSSInterlock(PREFIX.beamline_prefix)
+    )
+
+
+@devices.factory()
+def undulator(config_client: ConfigClient) -> UndulatorInKeV:
+    return UndulatorInKeV(
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        config_client=config_client,
+        id_gap_lookup_table_path=ID_GAP_LOOKUP,
     )
 
 

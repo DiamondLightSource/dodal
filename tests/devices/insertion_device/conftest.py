@@ -140,5 +140,4 @@ async def mock_id_energy(
         mock_id_energy = InsertionDeviceEnergy(
             id_controller=mock_id_controller,
         )
-
     return mock_id_energy

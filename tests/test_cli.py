@@ -192,30 +192,47 @@ def test_cli_connect_when_devices_error(
 
 
 @patch("dodal.cli.importlib")
-@patch("dodal.cli.make_all_devices")
-@patch("dodal.cli._connect_devices")
 @patch.dict(os.environ, clear=True)
-def test_missing_device_manager(connect, make, imp, runner: CliRunner):
-    # If the device manager cannot be found, it should fall back to the
-    # make_all_devices + _connect_devices approach.
-    make.return_value = ({}, {})
-    runner.invoke(main, ["connect", "-n", "devices", "i22"])
-    make.assert_called_once()
-    connect.assert_called_once()
+def test_missing_device_manager(imp, runner: CliRunner):
+    res = runner.invoke(main, ["connect", "-n", "devices", "i22"])
+    assert res.exit_code > 0
+    assert "No device manager named 'devices' found in " in res.output
 
 
 @patch.dict(os.environ, clear=True)
-@pytest.mark.parametrize("mock", [True, False], ids=["live", "sim"].__getitem__)
-def test_device_manager_init(runner: CliRunner, mock: bool):
+@pytest.mark.parametrize(
+    "mock, timeout",
+    [
+        (True, 5.0),  # default
+        (False, 5.0),  # default
+        (True, 3.0),
+        (False, 3.0),
+    ],
+    ids=lambda x: (
+        f"{x} second timeout" if isinstance(x, float) else ("sim" if x else "live")
+    ),
+)
+def test_device_manager_init(runner: CliRunner, mock: bool, timeout: float):
     with patch("dodal.cli.importlib") as mock_import:
         dm = mock_import.import_module("dodal.beamlines.i22")
         dm.devices = Mock(spec=DeviceManager)
         mock_import.reset_mock()
-        runner.invoke(
-            main, ["connect", "-n", "devices", "i22"] + (["-s"] if mock else [])
-        )
+
+        args = ["connect", "-n", "devices", "i22"]
+        if mock:
+            args.append("-s")
+
+        if timeout != 5.0:
+            args += ["-t", str(timeout)]
+
+        runner.invoke(main, args)
+
         mock_import.import_module.assert_called_once_with("dodal.beamlines.i22")
-        dm.devices.build_and_connect.assert_called_once_with(mock=mock)
+
+        dm.devices.build_and_connect.assert_called_once_with(
+            mock=mock,
+            timeout=timeout,
+        )
 
 
 def _mock_connect(

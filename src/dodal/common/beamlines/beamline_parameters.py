@@ -8,6 +8,9 @@ BEAMLINE_PARAMETER_PATHS = {
 }
 
 
+CONFIG_SERVER_URL_ENV_VAR = "CONFIG_SERVER_URL"
+
+
 def get_beamline_parameters(beamline: str) -> dict[str, Any]:
     """Loads the beamline parameters for a specified beamline from the config server.
 

@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 from functools import partial
 
 from bluesky.protocols import Movable
@@ -13,6 +13,7 @@ from ophyd_async.core import (
     StrictEnum,
     callback_on_mock_put,
     default_mock_class,
+    derived_signal_rw,
     set_and_wait_for_value,
     set_mock_value,
     wait_for_value,
@@ -29,8 +30,22 @@ from dodal.log import LOGGER
 
 @dataclass
 class SampleLocation:
+    MAX_PUCK = 20
+    MAX_POSITION = 22
+
     puck: int
     position: int
+
+    def __post_init__(self):
+        if not (1 <= self.puck <= self.MAX_PUCK or self.puck == -1):
+            raise ValueError(
+                f"Puck must be between 1 and {self.MAX_PUCK}, got {self.puck}"
+            )
+
+        if not (1 <= self.position <= self.MAX_POSITION or self.position == -1):
+            raise ValueError(
+                f"position must be between 1 and {self.MAX_POSITION}, got {self.position}"
+            )
 
 
 SAMPLE_LOCATION_EMPTY = SampleLocation(-1, -1)
@@ -42,9 +57,19 @@ class ProgramNames(StrEnum):
     SPINNER = "MOTOR.MB6"
 
 
+class ErrorCodes(IntEnum):
+    NO_SAMPLE = 9030
+    OK = 0
+
+
 class ProgramRunning(StrictEnum):
     NO_PROGRAM_RUNNING = "No Program Running"
     PROGRAM_RUNNING = "Program Running"
+
+
+class SpinnerState(StrictEnum):
+    ON = "Spinner On"
+    OFF = "Spinner Off"
 
 
 class CurrentSample(StandardReadable):
@@ -68,8 +93,17 @@ class MockRobot(DeviceMock["Robot"]):
         )
 
         callback_on_mock_put(
-            device.spinner_load_program,
+            device._spinner_load_program,  # noqa: SLF001
             partial(set_program, ProgramNames.SPINNER.value),
+        )
+
+        callback_on_mock_put(
+            device._spinner_on,  # noqa: SLF001
+            lambda *_, **__: set_mock_value(device._spinner_rbv, SpinnerState.ON),  # noqa: SLF001
+        )
+        callback_on_mock_put(
+            device._spinner_off,  # noqa: SLF001
+            lambda *_, **__: set_mock_value(device._spinner_rbv, SpinnerState.OFF),  # noqa: SLF001
         )
 
         def program_running(*_, **__):
@@ -88,8 +122,9 @@ class MockRobot(DeviceMock["Robot"]):
         callback_on_mock_put(device.beam_place, program_running)
         callback_on_mock_put(device.beam_pick, program_running)
 
-        callback_on_mock_put(device.spinner_off, program_running)
-        callback_on_mock_put(device.spinner_on, program_running)
+        # Re-add once https://jira.diamond.ac.uk/browse/I15_1-1698 is done
+        # callback_on_mock_put(device._spinner_off, program_running)  # noqa: SLF001
+        # callback_on_mock_put(device._spinner_on, program_running)  # noqa: SLF001
 
 
 @default_mock_class(MockRobot)
@@ -97,15 +132,24 @@ class Robot(StandardReadable, Movable[SampleLocation]):
     """The sample changing robot."""
 
     # How long to wait for the robot
-    PROGRAM_LOADED_TIMEOUT = 1.0
+    PROGRAM_LOADED_TIMEOUT = 5.0
     PROGRAM_STARTED_RUNNING_TIMEOUT = 10.0
     PROGRAM_COMPLETED_TIMEOUT = 60.0
 
     def __init__(self, robot_prefix: str, current_sample_prefix: str, name: str = ""):
+
+        self._spinner_rbv = epics_signal_r(SpinnerState, f"{robot_prefix}SPINNER_STATE")
+        self._spinner_off = epics_signal_x(f"{robot_prefix}MOTOR:ACTION0.PROC")
+        self._spinner_on = epics_signal_x(f"{robot_prefix}MOTOR:ACTION1.PROC")
+        self._spinner_load_program = epics_signal_x(f"{robot_prefix}MOTOR:LOAD.PROC")
+
         with self.add_children_as_readables():
-            # Any signals that should be read at every point in the scan
             self.puck_sel = epics_signal_rw_rbv(float, f"{robot_prefix}PUCK:PUCK_SEL")
             self.pos_sel = epics_signal_rw_rbv(float, f"{robot_prefix}PUCK:POS_SEL")
+
+            self.spinner = derived_signal_rw(
+                self._get_spinner_state, self._set_spinner_state, rbv=self._spinner_rbv
+            )
 
         self.current_sample = CurrentSample(current_sample_prefix)
 
@@ -136,10 +180,6 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         self.beam_place = epics_signal_x(f"{robot_prefix}BEAM:ACTION1.PROC")
         self.beam_load_program = epics_signal_x(f"{robot_prefix}BEAM:LOAD.PROC")
 
-        self.spinner_off = epics_signal_x(f"{robot_prefix}MOTOR:ACTION0.PROC")
-        self.spinner_on = epics_signal_x(f"{robot_prefix}MOTOR:ACTION1.PROC")
-        self.spinner_load_program = epics_signal_x(f"{robot_prefix}MOTOR:LOAD.PROC")
-
         self.servo_off = epics_signal_x(f"{robot_prefix}SOFF.PROC")
         self.servo_on = epics_signal_x(f"{robot_prefix}SON.PROC")
 
@@ -157,6 +197,7 @@ class Robot(StandardReadable, Movable[SampleLocation]):
             ProgramRunning.PROGRAM_RUNNING,
             timeout=self.PROGRAM_STARTED_RUNNING_TIMEOUT,
         )
+
         await wait_for_value(
             self.program_running,
             ProgramRunning.NO_PROGRAM_RUNNING,
@@ -173,6 +214,15 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
     async def _load(self, location: SampleLocation):
+        await self._set_spinner_state(SpinnerState.OFF)
+
+        if (
+            int(await self.controller_err_code.get_value())
+            == ErrorCodes.NO_SAMPLE.value
+        ):
+            LOGGER.warning("Resetting robot as controller is in NO_SAMPLE error")
+            await self.reset.trigger()
+
         await self._load_program_and_wait_for_loaded(
             self.puck_load_program, ProgramNames.PUCK
         )
@@ -183,6 +233,14 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
         await self._trigger_program_and_wait_for_complete(self.puck_pick)
+
+        if (
+            int(await self.controller_err_code.get_value())
+            == ErrorCodes.NO_SAMPLE.value
+        ):
+            raise ValueError(
+                f"Robot load failed, no sample found at puck {location.puck}, position {location.position}"
+            )
 
         await self._load_program_and_wait_for_loaded(
             self.beam_load_program, ProgramNames.BEAM
@@ -196,18 +254,7 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         )
 
     async def _unload(self):
-        await self._load_program_and_wait_for_loaded(
-            self.spinner_load_program, ProgramNames.SPINNER
-        )
-
-        # Can remove try except once we have feedback on whether the spinner is running or not.
-        # https://jira.diamond.ac.uk/browse/I15_1-1540
-        try:
-            await self._trigger_program_and_wait_for_complete(self.spinner_off)
-        except TimeoutError as e:
-            # Assume spinner is already off.
-            LOGGER.warning(f"Assuming spinner is off, ignoring TimeoutError: {e}")
-            pass
+        await self._set_spinner_state(SpinnerState.OFF)
 
         await self._load_program_and_wait_for_loaded(
             self.beam_load_program, ProgramNames.BEAM
@@ -234,10 +281,39 @@ class Robot(StandardReadable, Movable[SampleLocation]):
             self.current_sample.position.set(0),
         )
 
+    async def _set_spinner_state(self, new_state: SpinnerState) -> None:
+        current_spinner_state = await self._spinner_rbv.get_value()
+        if new_state == current_spinner_state:
+            LOGGER.info(f"Spinner is already {new_state}, doing nothing")
+            return
+
+        await self._load_program_and_wait_for_loaded(
+            self._spinner_load_program, ProgramNames.SPINNER
+        )
+
+        signal_to_set = (
+            self._spinner_off if new_state == SpinnerState.OFF else self._spinner_on
+        )
+
+        # Can't wait for program_on PV as the spinner program is too quick.
+        # See https://jira.diamond.ac.uk/browse/I15_1-1698
+        await signal_to_set.trigger()
+
+        await wait_for_value(
+            self._spinner_rbv, new_state, self.PROGRAM_COMPLETED_TIMEOUT
+        )
+
+    def _get_spinner_state(self, rbv: SpinnerState) -> SpinnerState:
+        # This function is needed so that the derived signal picks up the type hints
+        return rbv
+
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
         """Perform a sample load from the specified sample location or a sample unload
         if SAMPLE_LOCATION_EMPTY is specified.
+
+        If the a sample load is requested and there is already a sample loaded then
+        perform an unload first.
 
         Args:
             value (SampleLocation): the sample location to load to or
@@ -246,4 +322,15 @@ class Robot(StandardReadable, Movable[SampleLocation]):
         if value == SAMPLE_LOCATION_EMPTY:
             await self._unload()
         else:
+            current_puck = await self.current_sample.puck.get_value()
+            current_position = await self.current_sample.position.get_value()
+            if current_position != 0 and current_puck != 0:
+                LOGGER.info(
+                    f"Position {current_position} from puck {current_puck} already loaded, unloading first."
+                )
+                await self._unload()
+            elif (current_position == 0) != (current_puck == 0):
+                raise ValueError(
+                    f"Robot state is invalid with a current puck/position of {current_puck}/{current_position}"
+                )
             await self._load(value)

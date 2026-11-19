@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 from xml.etree.ElementTree import Element
 
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models import DisplayConfig
 
 # GDA currently assumes this aspect ratio for the OAV window size.
@@ -99,6 +99,8 @@ class OAVParameters:
         self.open_ksize: int = update("open_ksize", int, default=0)
         self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
+        # NOTE Keeping the direction as int as different beamlines may have different
+        # orientation, and we currently don't have the full picture
         self.direction: int = update("direction", int)
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
@@ -178,6 +180,7 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
         config = {}
         um_xy = self._read_zoom_params()
         bc_xy = self._read_display_config()
+        um_xy = {str(float(k)): v for k, v in um_xy.items()}
         for zoom_key in list(bc_xy.keys()):
             config[zoom_key] = ZoomParamsCrosshair(
                 microns_per_pixel=um_xy[zoom_key], crosshair=bc_xy[zoom_key]

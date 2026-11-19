@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.common.beamlines.beamline_utils import set_config_client
@@ -20,8 +20,8 @@ from tests.test_data import TEST_BEAMLINE_PARAMETERS_TXT
 
 
 @pytest.fixture(autouse=True)
-def always_set_config_client():
-    set_config_client(ConfigClient("test"))
+def always_set_config_client(mock_config_client: ConfigClient):
+    set_config_client(mock_config_client)
 
 
 @pytest.fixture

@@ -2,7 +2,7 @@ from math import inf
 from unittest.mock import AsyncMock
 
 import pytest
-from ophyd_async.core import set_mock_value
+from ophyd_async.core import set_mock_attr, set_mock_value
 
 from dodal.devices.aperturescatterguard import (
     ApertureScatterguard,
@@ -26,14 +26,18 @@ async def test_beamsize_gives_min_of_aperture_and_beam_width_and_height(
 ):
     set_mock_value(ap_sg.aperture.medium, 1)
 
-    ap_sg.diameter.read = AsyncMock(
-        return_value={
-            "test_ap_sg-diameter": {
-                "value": aperture_diameter,
-                "timestamp": 1763051436.7372239,
-                "alarm_severity": 0,
+    set_mock_attr(
+        ap_sg.diameter,
+        "read",
+        AsyncMock(
+            return_value={
+                "test_ap_sg-diameter": {
+                    "value": aperture_diameter,
+                    "timestamp": 1763051436.7372239,
+                    "alarm_severity": 0,
+                }
             }
-        }
+        ),
     )  # see https://github.com/bluesky/ophyd-async/issues/1132
 
     beamsize = Beamsize(aperture_scatterguard=ap_sg)

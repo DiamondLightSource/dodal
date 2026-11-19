@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
-from daq_config_server import ConfigClient
+from daq_config_server.client import ConfigClient
 from daq_config_server.models.lookup_tables.insertion_device import (
     UndulatorEnergyGapLookupTable,
 )

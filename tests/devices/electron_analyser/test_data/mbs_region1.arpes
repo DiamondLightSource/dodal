@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ARPESScanBean>
+    <lensMode>L4Ang0d8</lensMode>
+    <acquisitionMode>Swept</acquisitionMode>
+    <passEnergy>5</passEnergy>
+    <startEnergy>72.386</startEnergy>
+    <endEnergy>73.814</endEnergy>
+    <stepEnergy>0.405</stepEnergy>
+    <timePerStep>1.0</timePerStep>
+    <iterations>3</iterations>
+    <deflectorX>0.0</deflectorX>
+    <configureOnly>true</configureOnly>
+</ARPESScanBean>

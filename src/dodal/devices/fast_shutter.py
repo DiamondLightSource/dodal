@@ -9,6 +9,7 @@ from ophyd_async.core import (
     SignalRW,
     StandardReadable,
     StandardReadableFormat,
+    StrictEnum,
     derived_signal_rw,
     soft_signal_r_and_setter,
 )
@@ -17,6 +18,11 @@ from ophyd_async.epics.core import epics_signal_rw
 from dodal.devices.selectable_source import SelectedSource, get_obj_from_selected_source
 
 EnumTypesT = TypeVar("EnumTypesT", bound=EnumTypes)
+
+
+class OpenClose(StrictEnum):
+    OPEN = "Open"
+    CLOSE = "Close"
 
 
 class GenericFastShutter(StandardReadable, Movable[EnumTypesT], Generic[EnumTypesT]):
@@ -111,15 +117,15 @@ class FastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
 
 class DualFastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
     """A fast shutter device that handles the positions of two other fast shutters. The
-    "active" shutter is the one that corrosponds to the selected_shutter signal. For
+    "active" shutter is the one that corresponds to the selected_shutter signal. For
     example, active shutter is shutter1 if selected_source is at SelectedSource.SOURCE1
     and vise versa for shutter2 and SelectedSource.SOURCE2. Whenever a move is done on
     this device, the inactive shutter is always set to the close_state.
 
     Args:
-        shutter1 (GenericFastShutter): Active shutter that corrosponds to
+        shutter1 (GenericFastShutter): Active shutter that corresponds to
             SelectedSource.SOURCE1.
-        shutter2 (GenericFastShutter): Active shutter that corrosponds to
+        shutter2 (GenericFastShutter): Active shutter that corresponds to
             SelectedSource.SOURCE2.
         selected_source (SignalRW): Signal that decides the active shutter.
         name (str, optional): Name of this device.
@@ -155,6 +161,7 @@ class DualFastShutter(GenericFastShutter[EnumTypesT], Generic[EnumTypesT]):
         return derived_signal_rw(
             self._read_shutter_state,
             self._set_shutter_state,
+            derived_datatype=type(self._shutter1_ref().open_state),
             selected_shutter=self._selected_shutter_ref(),
             shutter1=self._shutter1_ref().shutter_state,
             shutter2=self._shutter2_ref().shutter_state,

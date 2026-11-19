@@ -1,17 +1,16 @@
+import asyncio
 from math import isclose
 from typing import Generic
 
 from numpy import sign
 
 from dodal.common import Rectangle2D
-from dodal.devices.insertion_device import (
+from dodal.devices.insertion_device.apple2_controller import (
     Apple2,
     Apple2Controller,
+    Apple2LockedPhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
-)
-from dodal.devices.insertion_device.apple2_undulator import (
-    Apple2LockedPhasesVal,
     PhaseAxesType,
 )
 from dodal.devices.insertion_device.enum import Pol
@@ -168,35 +167,35 @@ class AppleKnotController(
         await self.check_top_bottom_phase_match()
         pol = await self._check_and_get_pol_setpoint()
         await self._combined_move(energy, pol)
-        self._energy_set(energy)
+        await self._energy.set(energy)
 
     async def check_top_bottom_phase_match(self) -> None:
         """Check that the top and bottom phase motors are in sync.
         Raise an error if they are not within tolerance.
         """
-        current_phase_top = float(
-            await self.apple2().phase().top_outer.user_readback.get_value()
-        )
-        current_phase_bottom = float(
-            await self.apple2().phase().btm_inner.user_readback.get_value()
+        phase = self.apple2_ref().phase_ref()
+        current_phase_top, current_phase_bottom = await asyncio.gather(
+            phase.top_outer.user_readback.get_value(),
+            phase.btm_inner.user_readback.get_value(),
         )
         if not isclose(current_phase_top, current_phase_bottom, abs_tol=5e-2):
             raise RuntimeError(
-                f"Upper phase {current_phase_top} and lower phase {current_phase_bottom} values are not close enough."
+                f"Upper phase {current_phase_top} and lower phase {current_phase_bottom} "
+                "values are not close enough."
             )
 
     async def _combined_move(self, energy: float, pol: Pol) -> None:
         # get current apple2 value
-        current_phase_top = float(
-            await self.apple2().phase().top_outer.user_readback.get_value()
+        current_phase_top, current_gap = await asyncio.gather(
+            self.apple2_ref().phase_ref().top_outer.user_readback.get_value(),
+            self.apple2_ref().gap_ref().user_readback.get_value(),
         )
-        current_gap = float(await self.apple2().gap().user_readback.get_value())
         current_apple2_val = self._get_apple2_value(
             current_gap, current_phase_top, Pol.NONE
         )
         # get target apple2 value
-        target_gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
-        target_phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        target_gap = self.gap_energy_motor_converter(value=energy, pol=pol)
+        target_phase = self.phase_energy_motor_converter(value=energy, pol=pol)
         target_apple2_val = self._get_apple2_value(target_gap, target_phase, pol)
         # get path avoiding exclusion zone
         manhattan_path = self.path_finder.get_apple_knot_val_path(
@@ -207,7 +206,7 @@ class AppleKnotController(
         # execute the moves along the path
         for apple2_val in manhattan_path:
             LOGGER.info(f"Moving to apple2 values: {apple2_val}")
-            await self.apple2().set(id_motor_values=apple2_val)
+            await self.apple2_ref().set(id_motor_values=apple2_val)
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         apple2_val = Apple2Val(

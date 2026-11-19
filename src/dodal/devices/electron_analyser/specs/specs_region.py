@@ -3,8 +3,8 @@ from typing import Generic
 from pydantic import Field
 
 from dodal.devices.electron_analyser.base.base_region import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
+    BaseRegion,
+    BaseSequence,
     TLensMode,
     TPsuMode,
 )
@@ -12,7 +12,7 @@ from dodal.devices.electron_analyser.specs.specs_enums import AcquisitionMode
 
 
 class SpecsRegion(
-    AbstractBaseRegion[AcquisitionMode, TLensMode, float],
+    BaseRegion[AcquisitionMode, TLensMode, float],
     Generic[TLensMode, TPsuMode],
 ):
     # Override base class with defaults
@@ -26,12 +26,13 @@ class SpecsRegion(
     energy_step: float = Field(default=0.1, alias="step_energy")
 
     # Specific to this class
+    slices: int = 1
     values: int = 1
     psu_mode: TPsuMode
     estimated_time_in_ms: float = 0
 
 
 class SpecsSequence(
-    AbstractBaseSequence[SpecsRegion[TLensMode, TPsuMode]], Generic[TLensMode, TPsuMode]
+    BaseSequence[SpecsRegion[TLensMode, TPsuMode]], Generic[TLensMode, TPsuMode]
 ):
-    regions: list[SpecsRegion[TLensMode, TPsuMode]] = Field(default_factory=lambda: [])
+    pass
