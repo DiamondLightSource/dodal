@@ -591,11 +591,8 @@ def test_that_inverted_segment_has_opposite_orientation(
     segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
     inverted = ~segment
 
-    def assert_ends_swapped(a: DirectedSegment, b: DirectedSegment) -> bool:
-        return bool(a.start == b.end)
-
-    assert assert_ends_swapped(segment, inverted)
-    assert assert_ends_swapped(inverted, segment)
+    assert inverted.start == segment.end
+    assert inverted.end == segment.start
 
 
 @pytest.mark.parametrize(
@@ -648,36 +645,11 @@ def test_that_inverted_segment_has_negated_span(
         (19.379, -15.44),
     ],
 )
-def test_that_segment_backed_by_any_interval_type_is_not_equal_to_a_different_segment(
-    interval_cls: type[FloatInterval], start: float, end: float
-) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
-    swapped = DirectedSegment.create(start=end, end=start, interval_cls=interval_cls)
-    assert segment != swapped
-
-
-@pytest.mark.parametrize(
-    "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
-)
-@pytest.mark.parametrize(
-    "start, end",
-    [
-        (1.5, -2.1),
-        (67.2, 1.2),
-        (11.09, 14.2),
-        (12.309, -5.44),
-        (7.5, -12.1),
-        (17.2, 9.2),
-        (1.045, 28.2),
-        (19.379, -15.44),
-    ],
-)
 def test_that_segment_backed_by_any_interval_type_is_not_equal_to_another_with_swapped_ends(
     interval_cls: type[FloatInterval], start: float, end: float
 ) -> None:
     segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
-    swapped = DirectedSegment.create(start=end, end=start, interval_cls=interval_cls)
+    swapped = ~segment
     assert segment != swapped
 
 
@@ -759,7 +731,7 @@ def test_that_linear_interpolation_converts_parametric_fraction_to_expected_valu
 ) -> None:
     segment = DirectedSegment.create(start=a, end=b, interval_cls=interval_cls)
     x = segment.linear_interpolation_of_fraction(fractional_parameter=f)
-    assert x == pytest.approx(x)
+    assert x == pytest.approx(expected_x)
 
 
 @pytest.mark.parametrize(
