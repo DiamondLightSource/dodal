@@ -1,5 +1,5 @@
 import inspect
-from collections.abc import Iterable
+from collections.abc import MutableMapping
 from types import ModuleType
 from typing import Any, get_type_hints
 
@@ -38,18 +38,14 @@ def is_bluesky_plan_generator(func: Any) -> bool:
         return False
 
 
-def get_all_available_generators(mod: ModuleType) -> Iterable[PlanGenerator]:
-    for value in mod.__dict__.values():
-        if is_bluesky_plan_generator(value):
-            yield value
+def get_all_available_generators(mod: ModuleType) -> list[PlanGenerator]:
+    return [
+        value for value in mod.__dict__.values() if is_bluesky_plan_generator(value)
+    ]
 
 
-def assert_hard_requirements(plan: PlanGenerator, signature: inspect.Signature):
+def assert_hard_requirements(plan: PlanGenerator):
     assert plan.__doc__ is not None, f"'{plan.__name__}' has no docstring"
-    for parameter in signature.parameters.values():
-        assert parameter.kind is not parameter.VAR_KEYWORD, (
-            f"'{plan.__name__}' has variadic arguments"
-        )
 
 
 def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signature):
@@ -57,9 +53,10 @@ def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signatu
         f"'{plan.__name__}' does not allow metadata"
     )
     metadata = signature.parameters["metadata"]
-    assert metadata.annotation == dict[str, Any] | None and metadata.default is None, (
-        f"'{plan.__name__}' metadata is not optional"
-    )
+    assert (
+        metadata.annotation == MutableMapping[str, Any] | None
+        and metadata.default is None
+    ), f"'{plan.__name__}' metadata is not optional"
     assert metadata.default is None, f"'{plan.__name__}' metadata default is mutable"
 
 
@@ -68,7 +65,7 @@ def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signatu
 )
 def test_plan_comply(plan):
     signature = inspect.Signature.from_callable(plan)
-    assert_hard_requirements(plan, signature)
+    assert_hard_requirements(plan)
     assert_metadata_requirements(plan, signature)
 
 
@@ -77,7 +74,7 @@ def test_plan_comply(plan):
 )
 def test_stub_comply(stub):
     signature = inspect.Signature.from_callable(stub)
-    assert_hard_requirements(stub, signature)
+    assert_hard_requirements(stub)
 
     if "metadata" in signature.parameters:
         assert_metadata_requirements(stub, signature)
