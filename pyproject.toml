@@ -1,12 +1,11 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm[toml]>=8"]
+requires = ["setuptools>=77.0.3", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "dls-dodal"
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "License :: OSI Approved :: Apache Software License",
+    "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -36,12 +35,14 @@ dependencies = [
 ]
 
 dynamic = ["version"]
-license.file = "LICENSE"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11"
 
 [dependency-groups]
 dev = [
+<<<<<<< before updating
     "black",
     "diff-cover",
     "import-linter",
@@ -49,6 +50,8 @@ dev = [
     "mypy",
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
+=======
+>>>>>>> after updating
     "myst-parser",
     "ophyd_async[sim]>=0.21.5",
     "pre-commit",
@@ -67,9 +70,13 @@ dev = [
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
     "sphinx-design",
+<<<<<<< before updating
     "sphinx-autodoc-typehints",
     "tox-uv",
     "types-requests",
+=======
+    "tox-uv-bare",
+>>>>>>> after updating
     "types-mock",
     "types-PyYAML",
     "types-aiofiles",
@@ -86,6 +93,7 @@ GitHub = "https://github.com/DiamondLightSource/dodal"
 email = "dominic.oram@diamond.ac.uk"
 name = "Dominic Oram"
 
+<<<<<<< before updating
 [[project.authors]]
 email = "joseph.ware@diamond.ac.uk"
 name = "Joseph Ware"
@@ -103,6 +111,11 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 dodal = ["*.txt"]
+=======
+[tool.uv]
+# Minimum uv to fix eMudhra CA cert incident (see discuss.python.org/t/109576)
+required-version = ">=0.13.5"
+>>>>>>> after updating
 
 [tool.setuptools_scm]
 version_file = "src/dodal/_version.py"
@@ -163,6 +176,13 @@ env_list = ["pre-commit", "type-checking", "tests", "docs"]
 [tool.tox.env_run_base]
 # Pass all environment variables to the test environments
 passenv = ["*"]
+allowlist_externals = [
+    "pyright",
+    "pytest",
+    "pre-commit",
+    "sphinx-build",
+    "sphinx-autobuild",
+]
 
 [tool.tox.env.pre-commit]
 description = "Run pre-commit on all files"
