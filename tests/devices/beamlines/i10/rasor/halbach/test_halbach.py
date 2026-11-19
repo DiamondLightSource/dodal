@@ -45,13 +45,22 @@ async def halbach_controller(
     return controller
 
 
+@pytest.mark.parametrize("empty_setpoint", [HalbachSetpoint(), {}])
 async def test_set_raises_on_empty_setpoint(
     halbach_controller: HalbachMagnetArrayController,
+    empty_setpoint: HalbachSetpoint | dict[str, float | None],
 ) -> None:
     with pytest.raises(
         ValueError, match="At least one of h_mt or field_angle_z_deg must be provided"
     ):
-        await halbach_controller.set(HalbachSetpoint())
+        await halbach_controller.set(empty_setpoint)
+
+
+async def test_set_rejects_unknown_dict_keys(
+    halbach_controller: HalbachMagnetArrayController,
+) -> None:
+    with pytest.raises(ValueError, match="Extra inputs are not permitted"):
+        await halbach_controller.set({"unknown": 1.0})
 
 
 @pytest.mark.parametrize(
@@ -139,16 +148,24 @@ async def test_calculate_waypoints(
     assert waypoints == [pytest.approx(wp) for wp in expected_waypoints]
 
 
+@pytest.mark.parametrize(
+    "setpoint",
+    [
+        HalbachSetpoint(h_mt=-170.0, field_angle_z_deg=0.0),
+        {"h_mt": -170.0, "field_angle_z_deg": 0.0},
+    ],
+)
 async def test_set_moves_motors_and_updates_setpoints(
     halbach_controller: HalbachMagnetArrayController,
     halbach_lut: HalbachLookupTable,
+    setpoint: HalbachSetpoint | dict[str, float | None],
 ) -> None:
     lut_deg = halbach_lut.interpolate(-170.0, 0.0)
     expected_deg = halbach_controller.compute_shortest_path_targets(
         np.zeros(4), lut_deg
     )
 
-    await halbach_controller.set(HalbachSetpoint(h_mt=-170.0, field_angle_z_deg=0.0))
+    await halbach_controller.set(setpoint)
 
     for motor, exp_pos in zip(halbach_controller.motors, expected_deg, strict=True):
         get_mock_put(motor.user_setpoint).assert_called_once_with(
@@ -164,11 +181,13 @@ async def test_set_moves_motors_and_updates_setpoints(
     [
         (HalbachSetpoint(h_mt=-60.0), -60.0, 20.0),
         (HalbachSetpoint(field_angle_z_deg=-15.0), 120.0, -15.0),
+        ({"h_mt": -60.0}, -60.0, 20.0),
+        ({"field_angle_z_deg": -15.0}, 120.0, -15.0),
     ],
 )
 async def test_partial_setpoint(
     halbach_controller: HalbachMagnetArrayController,
-    partial_setpoint: HalbachSetpoint,
+    partial_setpoint: HalbachSetpoint | dict[str, float | None],
     expected_h: float,
     expected_angle: float,
 ) -> None:
@@ -223,15 +242,15 @@ async def test_shortest_path_relative_to_current_readback(
         (
             60.0,
             30.0,
-            HalbachSetpoint(-170.0, 0.0),
-            HalbachSetpoint(170.0, 0.0),
+            HalbachSetpoint(h_mt=-170.0, field_angle_z_deg=0.0),
+            HalbachSetpoint(h_mt=170.0, field_angle_z_deg=0.0),
             6,
         ),
         (
             50.0,
             15.0,
-            HalbachSetpoint(0.0, -45.0),
-            HalbachSetpoint(0.0, 67.0),
+            HalbachSetpoint(h_mt=0.0, field_angle_z_deg=-45.0),
+            HalbachSetpoint(h_mt=0.0, field_angle_z_deg=67.0),
             8,
         ),
     ],

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import math
-from dataclasses import dataclass
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -17,18 +16,20 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
+from pydantic import BaseModel, ConfigDict
 
 from dodal.common.maths import AngleWithPhase
 from dodal.devices.beamlines.i10.rasor.halbach.halbach_lut import HalbachLookupTable
 
 
-@dataclass(frozen=True)
-class HalbachSetpoint:
+class HalbachSetpoint(BaseModel):
     """Target magnetic field strength and/or angle relative to the z-axis.
 
     If either `h_mt` or `field_angle_z_deg` is `None`, the controller preserves the
     current value of that coordinate.
     """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     h_mt: float | None = None
     field_angle_z_deg: float | None = None
@@ -118,12 +119,19 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         await self._move_to_field(current_h_mt, float(angle_deg))
 
     @AsyncStatus.wrap
-    async def set(self, value: HalbachSetpoint) -> None:
+    async def set(self, value: HalbachSetpoint | dict[str, float | None]) -> None:
         """Move all 4 Halbach motors to achieve the target `(H_mT, Field_Angle_Z_deg)`.
 
         If either `h_mt` or `field_angle_z_deg` is `None`, the current value of that
         coordinate is preserved.
+
+        Note: `dict` workaround for a blueapi restriction
+        until https://github.com/DiamondLightSource/blueapi/issues/1458.
+
         """
+        if isinstance(value, dict):
+            value = HalbachSetpoint.model_validate(value)
+
         req_h, req_angle = value.h_mt, value.field_angle_z_deg
 
         if req_h is None and req_angle is None:
