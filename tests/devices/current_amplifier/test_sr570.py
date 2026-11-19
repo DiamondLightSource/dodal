@@ -99,16 +99,11 @@ async def test_sr570_set(
         assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "gain,",
-    [
-        (1e-2),
-        (1),
-        ("ssdfsden_212341"),
-    ],
-)
+@pytest.mark.parametrize("gain", [1e-2, 1, "ssdfsden_212341"])
 @mock.patch("asyncio.sleep")
-async def test_sr570_set_fail_out_of_range(sleep: AsyncMock, mock_sr570: SR570, gain):
+async def test_sr570_set_fail_out_of_range(
+    sleep: AsyncMock, mock_sr570: SR570, gain: str
+):
     with pytest.raises(ValueError) as e:
         await mock_sr570.set(gain)
 
