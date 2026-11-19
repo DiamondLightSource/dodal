@@ -136,7 +136,7 @@ async def test_calculate_waypoints(
         target_h_mt=target[0],
         target_angle_deg=target[1],
     )
-    assert waypoints == pytest.approx(expected_waypoints)
+    assert waypoints == [pytest.approx(wp) for wp in expected_waypoints]
 
 
 async def test_set_moves_motors_and_updates_setpoints(
