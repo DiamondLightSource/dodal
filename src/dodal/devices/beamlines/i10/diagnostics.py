@@ -1,25 +1,9 @@
-from ophyd_async.core import (
-    Device,
-    StandardReadable,
-    StrictEnum,
-)
+from ophyd_async.core import Device, StandardReadable, StrictEnum
 from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.epics.adaravis import (
-    AravisDriverIO,
-)
-from ophyd_async.epics.core import (
-    epics_signal_r,
-    epics_signal_rw,
-)
+from ophyd_async.epics.adaravis import AravisDriverIO
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.current_amplifiers import (
-    CurrentAmpDet,
-    Femto3xxGainTable,
-    Femto3xxGainToCurrentTable,
-    Femto3xxRaiseTime,
-    FemtoDDPCA,
-    StruckScaler,
-)
+from dodal.devices.current_amplifiers import CurrentAmpDet, FemtoDDPCA, StruckScaler
 from dodal.devices.positioner import create_positioner
 from dodal.devices.single_trigger_detector import SingleTriggerDetector
 
@@ -143,15 +127,8 @@ class FullDiagnostic(Device):
         cam_infix: str = "DCAM:",
         name: str = "",
     ) -> None:
-        self.positioner = create_positioner(
-            positioner_enum,
-            prefix + positioner_suffix,
-        )
-        self.screen = ScreenCam(
-            prefix,
-            cam_infix,
-            name,
-        )
+        self.positioner = create_positioner(positioner_enum, prefix + positioner_suffix)
+        self.screen = ScreenCam(prefix, cam_infix, name)
         super().__init__(name)
 
 
@@ -196,32 +173,18 @@ class I10Diagnostic5ADet(Device):
     """Diagnostic 5a detection with drain current and photo diode."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.drain_current_amp = FemtoDDPCA(
-            prefix=prefix + "IAMP-06:",
-            suffix="GAIN",
-            gain_table=Femto3xxGainTable,
-            gain_to_current_table=Femto3xxGainToCurrentTable,
-            raise_timetable=Femto3xxRaiseTime,
-        )
+        self.drain_current_amp = FemtoDDPCA(prefix=prefix + "IAMP-06:", suffix="GAIN")
         self.drain_counter = StruckScaler(
             prefix=prefix + "SCLR-02:SCALER2", suffix=".S17"
         )
         self.drain_current = CurrentAmpDet(
-            current_amp=self.drain_current_amp,
-            counter=self.drain_counter,
+            current_amp=self.drain_current_amp, counter=self.drain_counter
         )
-        self.diode_current_amp = FemtoDDPCA(
-            prefix=prefix + "IAMP-05:",
-            suffix="GAIN",
-            gain_table=Femto3xxGainTable,
-            gain_to_current_table=Femto3xxGainToCurrentTable,
-            raise_timetable=Femto3xxRaiseTime,
-        )
+        self.diode_current_amp = FemtoDDPCA(prefix=prefix + "IAMP-05:", suffix="GAIN")
         self.diode_current = StruckScaler(
             prefix=prefix + "SCLR-02:SCALER2", suffix=".S18"
         )
         self.diode = CurrentAmpDet(
-            current_amp=self.diode_current_amp,
-            counter=self.diode_current,
+            current_amp=self.diode_current_amp, counter=self.diode_current
         )
         super().__init__(name=name)
