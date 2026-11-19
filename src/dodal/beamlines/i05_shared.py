@@ -1,3 +1,5 @@
+from ophyd_async.epics.motor import Motor
+
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i05_shared import (
     APPLE_KNOT_EXCLUSION_ZONES,
@@ -20,7 +22,7 @@ from dodal.devices.insertion_device.energy import BeamEnergy, InsertionDeviceEne
 from dodal.devices.insertion_device.polarisation import InsertionDevicePolarisation
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.slits import SlitsWithIndividualBlades
+from dodal.devices.slits import SlitsWithIndividualBlades, SlitsWithZ
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.waittime import WaitTime
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -163,3 +165,18 @@ def s3() -> SlitsWithIndividualBlades:
         y_minus="YMINUS",
         y_plus="YPLUS",
     )
+
+
+@devices.factory()
+def s6() -> SlitsWithZ:
+    return SlitsWithZ(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
+
+
+@devices.factory()
+def exit_slit() -> Motor:
+    """ARPES instruments across facilities have a device called `exit_slit`. This
+    corresponds to motor `s6.ygap` for i05. If we try to reuse s6.ygap directly, it will
+    cause name conflicts with blueapi as it use the device name. We don't want to rename
+    the s6.ygap motor either via the factory, so have opted for duplication.
+    """
+    return Motor(f"{PREFIX.beamline_prefix}-AL-SLITS-06:YSIZE")
