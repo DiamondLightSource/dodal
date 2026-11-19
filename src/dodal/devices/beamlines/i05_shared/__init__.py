@@ -3,6 +3,7 @@ from .apple_knot_constants import (
     energy_to_gap_converter,
     energy_to_phase_converter,
 )
+from .diagnostics import DiagnosticDet
 from .enums import Grating, LensMode, M3MJ6Mirror, M4M5Mirror, Mj7j8Mirror, PassEnergy
 from .poly_compound_movable import PolynomialCompoundMovable
 
@@ -17,4 +18,5 @@ __all__ = [
     "APPLE_KNOT_EXCLUSION_ZONES",
     "PassEnergy",
     "PolynomialCompoundMovable",
+    "DiagnosticDet",
 ]
