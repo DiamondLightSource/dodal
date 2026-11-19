@@ -26,6 +26,7 @@ class _LogOnPercentageProgressWatcher(Watcher[NumberT], Generic[NumberT]):
 
     def __call__(
         self,
+        *,
         current: NumberT | None = None,
         initial: NumberT | None = None,
         target: NumberT | None = None,
