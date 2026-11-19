@@ -1,5 +1,5 @@
 from os.path import basename, splitext
-from typing import Generic, Self
+from typing import Generic, Self, cast, get_args
 
 import xmltodict
 from ophyd_async.core import StrictEnum
@@ -65,6 +65,6 @@ class MbsSequence(
         # manually doing MbsRegion[TLensMode, TPassEnergy].from_xml(file) will not work.
         annotation = cls.model_fields["regions"].annotation
         assert annotation is not None
-        region_type = annotation.__args__[0]
+        region_type = cast(type[MbsRegion], get_args(annotation)[0])
         regions = [region_type.from_xml(file)]
         return cls.model_validate({"regions": regions})
