@@ -11,7 +11,6 @@ from bluesky.protocols import Movable
 from numpy.typing import NDArray
 from ophyd_async.core import (
     AsyncStatus,
-    Reference,
     StandardReadable,
     StandardReadableFormat,
     derived_signal_rw,
@@ -73,21 +72,21 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
             self.m3 = Motor(prefix + m3_suffix)
             self.m4 = Motor(prefix + m4_suffix)
 
-            self.field_strength = derived_signal_rw(
-                raw_to_derived=self._get_field_strength,
-                set_derived=self._set_field_strength,
+            self.field = derived_signal_rw(
+                raw_to_derived=self._get_field,
+                set_derived=self._set_field,
                 h_mt=self._h_setpoint,
                 derived_units="mT",
             )
-            self.field_angle = derived_signal_rw(
-                raw_to_derived=self._get_field_angle,
-                set_derived=self._set_field_angle,
+            self.angle = derived_signal_rw(
+                raw_to_derived=self._get_angle,
+                set_derived=self._set_angle,
                 angle_deg=self._angle_setpoint,
                 derived_units="deg",
             )
             # https://github.com/bluesky/ophyd-async/issues/1231
-            self.field_strength._timeout = None  # noqa: SLF001
-            self.field_angle._timeout = None  # noqa: SLF001
+            self.field._timeout = None  # noqa: SLF001
+            self.angle._timeout = None  # noqa: SLF001
 
         super().__init__(name=name)
 
@@ -96,10 +95,10 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         """Return the 4 underlying rotational motors in order (m1, m2, m3, m4)."""
         return (self.m1, self.m2, self.m3, self.m4)
 
-    def _get_field_strength(self, h_mt: float) -> float:
+    def _get_field(self, h_mt: float) -> float:
         return h_mt
 
-    def _get_field_angle(self, angle_deg: float) -> float:
+    def _get_angle(self, angle_deg: float) -> float:
         return angle_deg
 
     async def get_current_field_and_angle(self) -> tuple[float, float]:
@@ -110,11 +109,11 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         )
         return float(h_cur), float(a_cur)
 
-    async def _set_field_strength(self, h_mt: float) -> None:
+    async def _set_field(self, h_mt: float) -> None:
         _, current_angle_deg = await self.get_current_field_and_angle()
         await self._move_to_field(float(h_mt), current_angle_deg)
 
-    async def _set_field_angle(self, angle_deg: float) -> None:
+    async def _set_angle(self, angle_deg: float) -> None:
         current_h_mt, _ = await self.get_current_field_and_angle()
         await self._move_to_field(current_h_mt, float(angle_deg))
 
@@ -208,41 +207,3 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
                 self._angle_setpoint.set(wp_angle),
             )
             ref_deg = target_deg
-
-
-class HalbachField(StandardReadable, Movable[float]):
-    """Device for magnetic field strength (`H` in mT).
-
-    Moving HalbachField keeps angle unchanged.
-    """
-
-    def __init__(
-        self, controller: HalbachMagnetArrayController, name: str = ""
-    ) -> None:
-        self.field_strength = Reference(controller.field_strength)
-        super().__init__(name=name)
-        self.add_readables(
-            [self.field_strength()], StandardReadableFormat.HINTED_SIGNAL
-        )
-
-    @AsyncStatus.wrap
-    async def set(self, value: float, timeout: float | None = None) -> None:
-        await self.field_strength().set(float(value), timeout=timeout)
-
-
-class HalbachAngle(StandardReadable, Movable[float]):
-    """Device for magnetic field angle .
-
-    Moving HalbachAngle keeps field unchanged.
-    """
-
-    def __init__(
-        self, controller: HalbachMagnetArrayController, name: str = ""
-    ) -> None:
-        self.field_angle = Reference(controller.field_angle)
-        super().__init__(name=name)
-        self.add_readables([self.field_angle()], StandardReadableFormat.HINTED_SIGNAL)
-
-    @AsyncStatus.wrap
-    async def set(self, value: float, timeout: float | None = None) -> None:
-        await self.field_angle().set(float(value), timeout=timeout)

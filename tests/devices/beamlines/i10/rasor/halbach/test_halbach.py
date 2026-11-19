@@ -14,8 +14,6 @@ from ophyd_async.core import (
 from ophyd_async.testing import assert_emitted
 
 from dodal.devices.beamlines.i10.rasor.halbach import (
-    HalbachAngle,
-    HalbachField,
     HalbachLookupTable,
     HalbachMagnetArrayController,
     HalbachSetpoint,
@@ -45,28 +43,6 @@ async def halbach_controller(
             lambda pos, *_, m=motor, **__: set_mock_value(m.user_readback, float(pos)),
         )
     return controller
-
-
-@pytest.fixture
-async def halbach_field(
-    halbach_controller: HalbachMagnetArrayController,
-) -> HalbachField:
-    async with init_devices(mock=True):
-        field = HalbachField(
-            controller=halbach_controller,
-        )
-    return field
-
-
-@pytest.fixture
-async def halbach_angle(
-    halbach_controller: HalbachMagnetArrayController,
-) -> HalbachAngle:
-    async with init_devices(mock=True):
-        angle = HalbachAngle(
-            controller=halbach_controller,
-        )
-    return angle
 
 
 async def test_set_raises_on_empty_setpoint(
@@ -179,8 +155,8 @@ async def test_set_moves_motors_and_updates_setpoints(
             pytest.approx(exp_pos, abs=1e-4)
         )
 
-    assert await halbach_controller.field_strength.get_value() == -170.0
-    assert await halbach_controller.field_angle.get_value() == 0.0
+    assert await halbach_controller.field.get_value() == -170.0
+    assert await halbach_controller.angle.get_value() == 0.0
 
 
 @pytest.mark.parametrize(
@@ -199,38 +175,30 @@ async def test_partial_setpoint(
     await halbach_controller.set(HalbachSetpoint(h_mt=120.0, field_angle_z_deg=20.0))
     await halbach_controller.set(partial_setpoint)
 
-    assert await halbach_controller.field_strength.get_value() == pytest.approx(
-        expected_h
-    )
-    assert await halbach_controller.field_angle.get_value() == pytest.approx(
-        expected_angle
-    )
+    assert await halbach_controller.field.get_value() == pytest.approx(expected_h)
+    assert await halbach_controller.angle.get_value() == pytest.approx(expected_angle)
 
 
 async def test_field_move_keeps_angle(
     run_engine: RunEngine,
     halbach_controller: HalbachMagnetArrayController,
-    halbach_field: HalbachField,
-    halbach_angle: HalbachAngle,
 ) -> None:
-    run_engine(bps.mv(halbach_angle, -35.0))
-    run_engine(bps.mv(halbach_field, 120.0))
+    run_engine(bps.mv(halbach_controller.angle, -35.0))
+    run_engine(bps.mv(halbach_controller.field, 120.0))
 
-    assert await halbach_controller.field_strength.get_value() == pytest.approx(120.0)
-    assert await halbach_controller.field_angle.get_value() == pytest.approx(-35.0)
+    assert await halbach_controller.field.get_value() == pytest.approx(120.0)
+    assert await halbach_controller.angle.get_value() == pytest.approx(-35.0)
 
 
 async def test_angle_move_leave_field(
     run_engine: RunEngine,
     halbach_controller: HalbachMagnetArrayController,
-    halbach_field: HalbachField,
-    halbach_angle: HalbachAngle,
 ) -> None:
-    run_engine(bps.mv(halbach_field, 120.0))
-    run_engine(bps.mv(halbach_angle, 20.0))
+    run_engine(bps.mv(halbach_controller.field, 120.0))
+    run_engine(bps.mv(halbach_controller.angle, 20.0))
 
-    assert await halbach_controller.field_strength.get_value() == pytest.approx(120.0)
-    assert await halbach_controller.field_angle.get_value() == pytest.approx(20.0)
+    assert await halbach_controller.field.get_value() == pytest.approx(120.0)
+    assert await halbach_controller.angle.get_value() == pytest.approx(20.0)
 
 
 async def test_shortest_path_relative_to_current_readback(
@@ -292,8 +260,8 @@ async def test_waypoint_trajectory_executes_steps(
 def test_derived_signals_have_no_default_timeout(
     halbach_controller: HalbachMagnetArrayController,
 ) -> None:
-    assert halbach_controller.field_strength._timeout is None
-    assert halbach_controller.field_angle._timeout is None
+    assert halbach_controller.field._timeout is None
+    assert halbach_controller.angle._timeout is None
 
 
 async def test_failed_waypoint_keeps_last_completed_setpoint(
@@ -326,16 +294,14 @@ async def test_halbach_scan_across_zero_field_without_jumps(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     halbach_controller: HalbachMagnetArrayController,
-    halbach_field: HalbachField,
-    halbach_angle: HalbachAngle,
     fixed_angle_deg: float,
 ) -> None:
-    await halbach_angle.set(fixed_angle_deg)
+    await halbach_controller.angle.set(fixed_angle_deg)
     for motor in halbach_controller.motors:
         get_mock_put(motor.user_setpoint).reset_mock()
 
     num_points = 19
-    run_engine(scan([], halbach_field, -170.0, 170.0, num=num_points))
+    run_engine(scan([], halbach_controller.field, -170.0, 170.0, num=num_points))
     assert_emitted(
         run_engine_documents, start=1, descriptor=1, event=num_points, stop=1
     )
@@ -354,16 +320,14 @@ async def test_halbach_scan_across_zero_field_without_jumps(
 async def test_halbach_angle_sweep_without_jumps(
     run_engine: RunEngine,
     halbach_controller: HalbachMagnetArrayController,
-    halbach_field: HalbachField,
-    halbach_angle: HalbachAngle,
     fixed_h_mt: float,
 ) -> None:
-    await halbach_field.set(fixed_h_mt)
+    await halbach_controller.field.set(fixed_h_mt)
     for motor in halbach_controller.motors:
         get_mock_put(motor.user_setpoint).reset_mock()
 
     num_points = 12
-    run_engine(scan([], halbach_angle, -110.0, 110.0, num=num_points))
+    run_engine(scan([], halbach_controller.angle, -110.0, 110.0, num=num_points))
 
     trajectories = np.array(
         [
@@ -378,10 +342,19 @@ async def test_halbach_angle_sweep_without_jumps(
 async def test_halbach_2d_grid_scan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
-    halbach_field: HalbachField,
-    halbach_angle: HalbachAngle,
+    halbach_controller: HalbachMagnetArrayController,
 ) -> None:
     run_engine(
-        grid_scan([], halbach_field, -100.0, 100.0, 3, halbach_angle, -45.0, 45.0, 3)
+        grid_scan(
+            [],
+            halbach_controller.field,
+            -100.0,
+            100.0,
+            3,
+            halbach_controller.angle,
+            -45.0,
+            45.0,
+            3,
+        )
     )
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=9, stop=1)

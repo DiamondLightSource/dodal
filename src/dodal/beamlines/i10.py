@@ -14,8 +14,6 @@ from dodal.devices.beamlines.i10 import (
 )
 from dodal.devices.beamlines.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
 from dodal.devices.beamlines.i10.rasor.halbach import (
-    HalbachAngle,
-    HalbachField,
     HalbachLookupTable,
     HalbachMagnetArrayController,
 )
@@ -107,16 +105,6 @@ def halbach(config_client: ConfigClient) -> HalbachMagnetArrayController:
             lut_path=HALBACH_LUT_PATH,
         ),
     )
-
-
-@devices.factory()
-def hb_field(halbach: HalbachMagnetArrayController) -> HalbachField:
-    return HalbachField(controller=halbach)
-
-
-@devices.factory()
-def hb_angle(halbach: HalbachMagnetArrayController) -> HalbachAngle:
-    return HalbachAngle(controller=halbach)
 
 
 @devices.factory()
