@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new beamline &#8212; dodal 3.0.9.dev10+gf7afd50d0 documentation</title>
+    <title>Creating a new beamline &#8212; dodal 3.0.9.dev11+g5dd9369a9 documentation</title>
   
   
   
@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -41,12 +41,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ac76d6ca"></script>
+    <script src="../_static/documentation_options.js?v=7946c521"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/create-beamline';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
@@ -531,7 +531,7 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
     <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span>
 
-    <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;s41&quot;</span><span class="p">)</span>  <span class="c1"># Default used when not on a live beamline</span>
+    <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">"s41"</span><span class="p">)</span>  <span class="c1"># Default used when not on a live beamline</span>
     <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
     <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>  <span class="c1"># Configure logging and util functions</span>
     <span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
@@ -545,20 +545,20 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
         <span class="k">return</span> <span class="n">StaticVisitPathProvider</span><span class="p">(</span>
             <span class="n">BL</span><span class="p">,</span>
             <span class="c1"># Root directory for all detectors</span>
-            <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/dls/w41/data/YYYY/cm12345-1&quot;</span><span class="p">),</span>
+            <span class="n">Path</span><span class="p">(</span><span class="s2">"/dls/w41/data/YYYY/cm12345-1"</span><span class="p">),</span>
             <span class="c1"># Uses an existing GDA server to ensure filename uniqueness</span>
-            <span class="n">client</span><span class="o">=</span><span class="n">RemoteDirectoryServiceClient</span><span class="p">(</span><span class="s2">&quot;http://s41-control:8088/api&quot;</span><span class="p">),</span>
+            <span class="n">client</span><span class="o">=</span><span class="n">RemoteDirectoryServiceClient</span><span class="p">(</span><span class="s2">"http://s41-control:8088/api"</span><span class="p">),</span>
             <span class="c1"># Else if no GDA server use a LocalDirectoryServiceClient(),</span>
         <span class="p">)</span>
 
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Define device factory functions below this point.</span>
 <span class="sd">    A device factory function is any function that has a return type which conforms</span>
 <span class="sd">    to one or more Bluesky Protocols.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This decorator gives extra desirable behaviour to this factory function:</span>
 <span class="sd">    - it may be instantiated automatically, selectively on live beamline</span>
 <span class="sd">    - it automatically names the device if no name is explicitly set</span>
@@ -566,8 +566,8 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
 <span class="sd">    - it must be explicitly connected (which may be automated by tools)</span>
 <span class="sd">        - when connected it may connect to a simulated backend</span>
 <span class="sd">        - it may be connected concurrently (when automated by tools)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span> <span class="o">=</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s41&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span> <span class="o">=</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">"s41"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">synchrotron</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Synchrotron</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Synchrotron</span><span class="p">()</span>
 
@@ -575,7 +575,7 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
     <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">d11</span><span class="p">(</span><span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AravisDetector</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">AravisDetector</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-DCAM-01:&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-DCAM-01:"</span><span class="p">,</span>
             <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
             <span class="n">drv_suffix</span><span class="o">=</span><span class="n">CAM_SUFFIX</span><span class="p">,</span>
             <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">,</span>
@@ -591,11 +591,11 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
 
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
 
-<span class="sd">&quot;&quot;&quot;Device that is shared between multiple endstations, i05 and i05-1.&quot;&quot;&quot;</span>
+<span class="sd">"""Device that is shared between multiple endstations, i05 and i05-1."""</span>
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">pgm</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PlaneGratingMonochromator</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PlaneGratingMonochromator</span><span class="p">(</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-PGM-01:&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-PGM-01:"</span><span class="p">,</span>
         <span class="n">grating</span><span class="o">=</span><span class="n">Grating</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
@@ -607,15 +607,15 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
 
 <span class="o">...</span>
 
-<span class="sd">&quot;&quot;&quot;Include all the i05 shared beamline devices which should be avaliable for every end station.</span>
-<span class="sd">In this example, the pgm device will be included in this beamline.&quot;&quot;&quot;</span>
+<span class="sd">"""Include all the i05 shared beamline devices which should be avaliable for every end station.</span>
+<span class="sd">In this example, the pgm device will be included in this beamline."""</span>
 <span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
 <span class="n">devices</span><span class="o">.</span><span class="n">include</span><span class="p">(</span><span class="n">i05_shared_devices</span><span class="p">)</span>
 
-<span class="sd">&quot;&quot;&quot;Beamline specific device for i05 only.&quot;&quot;&quot;</span>
+<span class="sd">"""Beamline specific device for i05 only."""</span>
 <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">sample_temperature_controller</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Lakeshore336</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">Lakeshore336</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-TCTRL-02:&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Lakeshore336</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-TCTRL-02:"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

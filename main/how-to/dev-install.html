@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Setup Developer Environment &#8212; dodal 3.0.9.dev10+gf7afd50d0 documentation</title>
+    <title>Setup Developer Environment &#8212; dodal 3.0.9.dev11+g5dd9369a9 documentation</title>
   
   
   
@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -41,12 +41,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ac76d6ca"></script>
+    <script src="../_static/documentation_options.js?v=7946c521"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/dev-install';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
@@ -511,8 +511,8 @@ in a container under <a class="reference external" href="https://code.visualstud
 <!-- https://sphinx-design.readthedocs.io/en/latest/tabs.html# -->
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-0">
-Local virtualenv</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-0-content" class="sd-tab-label" for="sd-tab-item-0">
+Local virtualenv</label><div class="sd-tab-content docutils" id="sd-tab-item-0-content">
 <p>If on a DLS machine make sure you have python &gt;3.11 running by doing <code class="docutils literal notranslate"><span class="pre">module</span> <span class="pre">load</span> <span class="pre">python/3.11</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="n">load</span> <span class="n">uv</span>
 <span class="n">uv</span> <span class="n">sync</span> <span class="o">--</span><span class="n">group</span> <span class="n">dev</span>
@@ -526,11 +526,11 @@ Local virtualenv</label><div class="sd-tab-content docutils">
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" for="sd-tab-item-1">
-VSCode devcontainer</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-1-content" class="sd-tab-label" for="sd-tab-item-1">
+VSCode devcontainer</label><div class="sd-tab-content docutils" id="sd-tab-item-1-content">
 <p>If you are at DLS, then first <a class="reference external" href="https://dev-portal.diamond.ac.uk/guide/containers/tutorials/podman/#enable-use-of-vscode-features">setup podman and its fix for devcontainer features</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">code</span> <span class="o">.</span>
-<span class="c1"># Click on &#39;Reopen in Container&#39; when prompted</span>
+<span class="c1"># Click on 'Reopen in Container' when prompted</span>
 <span class="c1"># Open a new terminal</span>
 </pre></div>
 </div>

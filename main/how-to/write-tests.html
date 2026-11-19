@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Writing Tests in This Python Project &#8212; dodal 3.0.9.dev10+gf7afd50d0 documentation</title>
+    <title>Writing Tests in This Python Project &#8212; dodal 3.0.9.dev11+g5dd9369a9 documentation</title>
   
   
   
@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -41,12 +41,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ac76d6ca"></script>
+    <script src="../_static/documentation_options.js?v=7946c521"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/write-tests';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
@@ -519,36 +519,36 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Stageable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Example device demostrating how to test stage, unstage and read methods.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Constructor for setting up instance of device.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prefix (str): Base PV used for connecting signals.</span>
 <span class="sd">            name (str): Name of the device.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">signal_a</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;A&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">signal_b</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">OnOff</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signal_a</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"A"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signal_b</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">OnOff</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"B"</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Setup device by moving signal_a to ON.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">))</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Once device is finished, set signal_b back to OFF.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">OFF</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -570,7 +570,7 @@
 <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sim_my_device</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">init_devices</span><span class="p">(</span><span class="n">mock</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">sim_my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;TEST:&quot;</span><span class="p">)</span>
+        <span class="n">sim_my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">"TEST:"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sim_my_device</span>
 
 
@@ -590,8 +590,8 @@
     <span class="k">await</span> <span class="n">assert_reading</span><span class="p">(</span>
         <span class="n">sim_my_device</span><span class="p">,</span>
         <span class="p">{</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a&quot;</span><span class="p">:</span> <span class="n">partial_reading</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">),</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b&quot;</span><span class="p">:</span> <span class="n">partial_reading</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a"</span><span class="p">:</span> <span class="n">partial_reading</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b"</span><span class="p">:</span> <span class="n">partial_reading</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
         <span class="p">},</span>
     <span class="p">)</span>
 </pre></div>
@@ -601,8 +601,8 @@
 <span class="k">await</span> <span class="n">assert_reading</span><span class="p">(</span>
     <span class="n">sim_my_device</span><span class="p">,</span>
     <span class="p">{</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">},</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"value"</span><span class="p">:</span> <span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">},</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"value"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
     <span class="p">},</span>
 <span class="p">)</span>
 </pre></div>
@@ -626,7 +626,7 @@
     <span class="k">with</span> <span class="n">init_devices</span><span class="p">(</span><span class="n">mock</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MyDevice</span><span class="p">(</span>
             <span class="n">config_client</span><span class="o">=</span><span class="n">mock_config_client</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;tests/test_data/example_lookup_table.json&quot;</span><span class="p">),</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"tests/test_data/example_lookup_table.json"</span><span class="p">),</span>
         <span class="p">)</span>
 </pre></div>
 </div>
@@ -671,7 +671,7 @@
 </ul>
 <p>For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">BEAMLINE_PARAMETERS_PATH</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;/dls_sw/i03/software/daq_configuration/json/beamlineParameters.json&quot;</span>
+    <span class="s2">"/dls_sw/i03/software/daq_configuration/json/beamlineParameters.json"</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -686,17 +686,17 @@
 <p>Some beamlines contain module-level constants that directly reference files on the DLS filesystem. These constants are replaced after module import using the <code class="docutils literal notranslate"><span class="pre">MOCK_ATTRIBUTES_TABLE</span></code>.</p>
 <p>For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MOCK_ATTRIBUTES_TABLE</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;i03&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;BEAMLINE_PARAMETERS_PATH&quot;</span><span class="p">:</span> <span class="n">TEST_BEAMLINE_PARAMETERS_TXT</span><span class="p">,</span>
-        <span class="s2">&quot;DAQ_CONFIGURATION_PATH&quot;</span><span class="p">:</span> <span class="n">MOCK_DAQ_CONFIG_PATH</span><span class="p">,</span>
-        <span class="s2">&quot;ZOOM_PARAMS_FILE&quot;</span><span class="p">:</span> <span class="n">TEST_OAV_ZOOM_LEVELS</span><span class="p">,</span>
-        <span class="s2">&quot;DISPLAY_CONFIG&quot;</span><span class="p">:</span> <span class="n">TEST_DISPLAY_CONFIG</span><span class="p">,</span>
+    <span class="s2">"i03"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"BEAMLINE_PARAMETERS_PATH"</span><span class="p">:</span> <span class="n">TEST_BEAMLINE_PARAMETERS_TXT</span><span class="p">,</span>
+        <span class="s2">"DAQ_CONFIGURATION_PATH"</span><span class="p">:</span> <span class="n">MOCK_DAQ_CONFIG_PATH</span><span class="p">,</span>
+        <span class="s2">"ZOOM_PARAMS_FILE"</span><span class="p">:</span> <span class="n">TEST_OAV_ZOOM_LEVELS</span><span class="p">,</span>
+        <span class="s2">"DISPLAY_CONFIG"</span><span class="p">:</span> <span class="n">TEST_DISPLAY_CONFIG</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>When the <code class="docutils literal notranslate"><span class="pre">i03</span></code> beamline is tested, these attributes are overwritten with paths to local test files:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mock_beamline_module_filepaths</span><span class="p">(</span><span class="s2">&quot;i03&quot;</span><span class="p">,</span> <span class="n">beamline_module</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mock_beamline_module_filepaths</span><span class="p">(</span><span class="s2">"i03"</span><span class="p">,</span> <span class="n">beamline_module</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This allows device factories to load representative configuration data without accessing the real DLS filesystem.</p>
@@ -707,8 +707,8 @@
 <p>For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MOCK_ATTRIBUTES_TABLE</span> <span class="o">=</span> <span class="p">{</span> 
     <span class="o">...</span>
-    <span class="s2">&quot;iXX: {</span>
-        <span class="s2">&quot;MY_CONFIGURATION_FILE&quot;</span><span class="p">:</span> <span class="n">TEST_MY_CONFIGURATION_FILE</span>
+    <span class="s2">"iXX: {</span>
+        <span class="s2">"MY_CONFIGURATION_FILE"</span><span class="p">:</span> <span class="n">TEST_MY_CONFIGURATION_FILE</span>
     <span class="p">},</span>
     <span class="o">...</span>
 <span class="p">}</span>
@@ -743,7 +743,7 @@ introduce a good number of iterations in order to ensure the problem has a good 
 remove the parametrization afterwards.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span>    <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
     <span class="c1"># repeat the test a number of times</span>
-    <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"i"</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">my_unreliable_test</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">event_loop_fuzzing</span><span class="p">):</span>
         <span class="c1"># Do some stuff in here</span>
 </pre></div>

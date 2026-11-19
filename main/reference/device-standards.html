@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 3.0.9.dev10+gf7afd50d0 documentation</title>
+    <title>Device Standards &#8212; dodal 3.0.9.dev11+g5dd9369a9 documentation</title>
   
   
   
@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -41,12 +41,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ac76d6ca"></script>
+    <script src="../_static/documentation_options.js?v=7946c521"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/device-standards';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
@@ -1100,17 +1100,17 @@ this allows the device to be named on connection from the name of its factory fu
 the device_factory decorator.</p>
 <p>When a device is named in this way, all of its child devices are named appropriately.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"X"</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;FOO:&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">"FOO:"</span><span class="p">)</span>
 
     <span class="n">f</span> <span class="o">=</span> <span class="n">foo</span><span class="p">()</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;foo&quot;</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;foo-x&quot;</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"foo"</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"foo-x"</span>
 </pre></div>
 </div>
 </section>
@@ -1119,21 +1119,21 @@ the device_factory decorator.</p>
 <p>Devices should only contain only the PV suffixes that are generic for any instance of the device e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
     <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BRAGG&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"BRAGG"</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;BLXXI-MO-DCM-01:&quot;</span><span class="p">)</span>
+    <span class="n">MyDevice</span><span class="p">(</span><span class="s2">"BLXXI-MO-DCM-01:"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>is preferred over</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
     <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:BRAGG&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"-MO-DCM-01:BRAGG"</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;BLXXI&quot;</span><span class="p">)</span>
+    <span class="n">MyDevice</span><span class="p">(</span><span class="s2">"BLXXI"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This is so that a new device on say <code class="docutils literal notranslate"><span class="pre">-MO-DCM-02</span></code> can be easily created. By convention the prefixes passed
@@ -1147,11 +1147,11 @@ connect to EPICS. If it does not connect to EPICS it should be a soft signal.</p
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
     <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
         <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-             <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="s2">&quot;blah&quot;</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="s2">"blah"</span>
 
     <span class="n">my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">my_plan</span><span class="p">():</span>
-        <span class="n">my_device</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="s2">&quot;new_value&quot;</span>
+        <span class="n">my_device</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="s2">"new_value"</span>
 </pre></div>
 </div>
 <p>this has potential negative side effects:</p>
@@ -1168,7 +1168,7 @@ lost</p></li>
 
     <span class="n">my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">my_plan</span><span class="p">():</span>
-        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">my_device</span><span class="o">.</span><span class="n">param</span><span class="p">,</span> <span class="s2">&quot;new_value&quot;</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">my_device</span><span class="o">.</span><span class="n">param</span><span class="p">,</span> <span class="s2">"new_value"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -1189,7 +1189,7 @@ lost</p></li>
 
     <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
         <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">"MOTOR"</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_in_out_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">InOut</span><span class="p">)</span>
 
@@ -1212,7 +1212,7 @@ based on this and so this has the issues listed above. Instead you should make s
 
     <span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
         <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">"MOTOR"</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_in_out_from_hardware</span><span class="p">,</span> <span class="n">current_position</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="p">)</span>
 

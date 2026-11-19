@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Moving code from another repo &#8212; dodal 3.0.9.dev10+gf7afd50d0 documentation</title>
+    <title>Moving code from another repo &#8212; dodal 3.0.9.dev11+g5dd9369a9 documentation</title>
   
   
   
@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -41,12 +41,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ac76d6ca"></script>
+    <script src="../_static/documentation_options.js?v=7946c521"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/move-code';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
@@ -532,14 +532,14 @@
 <ul class="simple">
 <li><p>Add a note to every commit message to mention it’s been moved::</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>filter-branch<span class="w"> </span>--msg-filter<span class="w"> </span><span class="s1">&#39;sed &quot;$ a \</span>
-<span class="s1">    NOTE: Commit originally came from https://github.com/DiamondLightSource/hyperion&quot;&#39;</span><span class="w"> </span>-f<span class="w"> </span>--<span class="w"> </span>--all
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>filter-branch<span class="w"> </span>--msg-filter<span class="w"> </span><span class="s1">'sed "$ a \</span>
+<span class="s1">    NOTE: Commit originally came from https://github.com/DiamondLightSource/hyperion"'</span><span class="w"> </span>-f<span class="w"> </span>--<span class="w"> </span>--all
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>If you have been using Github <a class="reference external" href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/autolinked-references-and-urls#issues-and-pull-requests">issue references</a> in the old repository modify these to point to be more explicit (Note that this assumes the old repo uses <code class="docutils literal notranslate"><span class="pre">#123</span></code> notation and only ever references issues from it’s own repo)::</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>filter-branch<span class="w"> </span>-f<span class="w"> </span>--msg-filter<span class="w"> </span><span class="s1">&#39;sed &quot;s|#[0-9]\+|DiamondLightSource/hyperion&amp;|g&quot;&#39;</span><span class="w"> </span>--<span class="w"> </span>--all
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>filter-branch<span class="w"> </span>-f<span class="w"> </span>--msg-filter<span class="w"> </span><span class="s1">'sed "s|#[0-9]\+|DiamondLightSource/hyperion&amp;|g"'</span><span class="w"> </span>--<span class="w"> </span>--all
 </pre></div>
 </div>
 <ul class="simple">
@@ -554,7 +554,7 @@
 <li><p>Add and commit this (locally)::</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>add<span class="w"> </span>.
-<span class="w">    </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Prepare for import into dodal&quot;</span>
+<span class="w">    </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Prepare for import into dodal"</span>
 </pre></div>
 </div>
 <ul class="simple">

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pressure_jump_cell &#8212; dodal 3.0.9.dev10+gf7afd50d0 documentation</title>
+    <title>dodal.devices.pressure_jump_cell &#8212; dodal 3.0.9.dev11+g5dd9369a9 documentation</title>
   
   
   
@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -40,13 +40,12 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=ac76d6ca"></script>
+    <script src="../../../_static/documentation_options.js?v=7946c521"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=30646c52"></script>
-    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../_static/design-tabs.js?v=fcb327ea"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
 
@@ -55,173 +54,11 @@
 
 const initStyles = () => {
     const defaultStyle = document.createElement('style');
-    defaultStyle.textContent = `pre.mermaid {
-    /* Same as .mermaid-container > pre */
-    display: block;
-    width: 100%;
-}
-
-pre.mermaid > svg {
-    /* Same as .mermaid-container > pre > svg */
-    height: 500px;
-    width: 100%;
-    max-width: 100% !important;
-}`;
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
     document.head.appendChild(defaultStyle);
 
     const fullscreenStyle = document.createElement('style');
-    fullscreenStyle.textContent = `.mermaid-container {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-}
-
-.mermaid-container > pre {
-    display: block;
-    width: 100%;
-}
-
-.mermaid-container > pre > svg {
-    height: 500px;
-    width: 100%;
-    max-width: 100% !important;
-}
-
-.mermaid-fullscreen-btn {
-    width: 28px;
-    height: 28px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    font-size: 14px;
-    line-height: 1;
-    padding: 0;
-    color: #333;
-}
-
-.mermaid-fullscreen-btn:hover {
-    opacity: 100% !important;
-    background: rgba(255, 255, 255, 1);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-    transform: scale(1.1);
-}
-
-.mermaid-fullscreen-btn.dark-theme {
-    background: rgba(50, 50, 50, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #e0e0e0;
-}
-
-.mermaid-fullscreen-btn.dark-theme:hover {
-    background: rgba(60, 60, 60, 1);
-    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
-}
-
-.mermaid-fullscreen-modal {
-    display: none;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 95vw;
-    height: 100vh;
-    background: rgba(255, 255, 255, 0.98);
-    z-index: 9999;
-    padding: 20px;
-    overflow: auto;
-}
-
-.mermaid-fullscreen-modal.dark-theme {
-    background: rgba(0, 0, 0, 0.98);
-}
-
-.mermaid-fullscreen-modal.active {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.mermaid-container-fullscreen {
-    position: relative;
-    width: 95vw;
-    height: 90vh;
-    max-width: 95vw;
-    max-height: 90vh;
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    overflow: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.mermaid-container-fullscreen.dark-theme {
-    background: #1a1a1a;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-}
-
-.mermaid-container-fullscreen pre.mermaid {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.mermaid-container-fullscreen .mermaid svg {
-    height: 100% !important;
-    width: 100% !important;
-    cursor: grab;
-}
-
-.mermaid-fullscreen-close {
-    position: fixed !important;
-    top: 20px !important;
-    right: 20px !important;
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s;
-    font-size: 24px;
-    line-height: 1;
-    color: #333;
-}
-
-.mermaid-fullscreen-close:hover {
-    background: white;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-    transform: scale(1.1);
-}
-
-.mermaid-fullscreen-close.dark-theme {
-    background: rgba(50, 50, 50, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #e0e0e0;
-}
-
-.mermaid-fullscreen-close.dark-theme:hover {
-    background: rgba(60, 60, 60, 1);
-    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
-}
-
-.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
-    display: none !important;
-}`;
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
     document.head.appendChild(fullscreenStyle);
 }
 
@@ -266,6 +103,32 @@ let darkTheme = isDarkTheme();
 let modal = null;
 let modalContent = null;
 let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
 
 const runMermaid = async (rerun) => {
     console.log("Running mermaid diagrams, rerun =", rerun);
@@ -273,7 +136,15 @@ const runMermaid = async (rerun) => {
     let all_mermaids = document.querySelectorAll(".mermaid");
 
     if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
         all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
             if(!el.hasAttribute("data-original-code")) {
                 // store original code
                 // console.log(`Storing original code for first run: `, el.innerHTML);
@@ -290,42 +161,100 @@ const runMermaid = async (rerun) => {
                 el.setAttribute('data-original-code', el.innerHTML);
             }
         });
-        await mermaid.run();
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
     }
 
     all_mermaids = document.querySelectorAll(".mermaid");
-    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
 
-    if ("False" === "True") {
-        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
         if(mermaids_to_add_zoom > 0) {
-            var svgs = d3.selectAll("");
-            if(all_mermaids.length !== mermaids_processed.length) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
                 setTimeout(() => runMermaid(false), 200);
                 return;
-            } else if(svgs.size() !== mermaids_to_add_zoom) {
-                setTimeout(() => runMermaid(false), 200);
-                return;
-            } else {
-                svgs.each(function() {
-                    var svg = d3.select(this);
-                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
-                    var inner = svg.select("g");
-                    var zoom = d3.zoom().on("zoom", function(event) {
-                        inner.attr("transform", event.transform);
-                    });
-                    svg.call(zoom);
-                });
             }
+            addZoomToSvgs(svgs);
         }
-    } else if(all_mermaids.length !== mermaids_processed.length) {
+    } else if(mermaids_active.length !== mermaids_processed.length) {
         // Wait for mermaid to process all diagrams
         setTimeout(() => runMermaid(false), 200);
         return;
     }
 
     // Stop here if not adding fullscreen capability
-    if ("True" !== "True") return;
+    if (!true) return;
 
     if (modal !== null ) {
         // Destroy existing modal
@@ -348,7 +277,7 @@ const runMermaid = async (rerun) => {
     modalContent = modal.querySelector('.mermaid-container-fullscreen');
     const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
 
-    const closeModal = () => {
+    closeModal = () => {
         modal.classList.remove('active');
         modalContent.innerHTML = '';
         document.body.style.overflow = ''
@@ -359,12 +288,6 @@ const runMermaid = async (rerun) => {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-            closeModal();
-        }
-    });
-
     document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
         if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
             mermaidDiv.closest('.mermaid-fullscreen-modal')) {
@@ -384,8 +307,8 @@ const runMermaid = async (rerun) => {
         const fullscreenBtn = document.createElement('button');
         fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
         fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
-        fullscreenBtn.textContent = '⛶';
-        fullscreenBtn.style.opacity = '50%';
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
 
         // Calculate dynamic position based on diagram's margin and padding
         const diagramStyle = window.getComputedStyle(mermaidDiv);
@@ -397,7 +320,7 @@ const runMermaid = async (rerun) => {
         fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
 
         fullscreenBtn.addEventListener('click', () => {
-            previousScrollOffset = [window.scroll, window.scrollY];
+            previousScrollOffset = [window.scrollX, window.scrollY];
             const clone = mermaidDiv.cloneNode(true);
             modalContent.innerHTML = '';
             modalContent.appendChild(clone);
@@ -409,9 +332,9 @@ const runMermaid = async (rerun) => {
                 svg.style.width = '100%';
                 svg.style.height = 'auto';
                 svg.style.maxWidth = '100%';
-                svg.style.sdisplay = 'block';
+                svg.style.display = 'block';
 
-                if ("False" === "True") {
+                if (false) {
                     setTimeout(() => {
                         const g = svg.querySelector('g');
                         if (g) {
@@ -434,8 +357,11 @@ const runMermaid = async (rerun) => {
     });
 };
 
+
+
 const load = async () => {
     initStyles();
+
 
     await runMermaid(true);
 
@@ -445,10 +371,8 @@ const load = async () => {
             darkTheme = newDarkTheme;
             console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
             await mermaid.initialize(
-                {...JSON.parse(
-                    `{"startOnLoad": false}`
-                ),
-                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
                 }
             );
             await runMermaid(true);
@@ -473,10 +397,8 @@ const load = async () => {
 
 console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
 mermaid.initialize(
-    {...JSON.parse(
-        `{"startOnLoad": false}`
-    ),
-    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
     }
 );
 
@@ -915,18 +837,18 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="PumpState">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PumpState.html#dodal.devices.pressure_jump_cell.PumpState">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PumpState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">MANUAL</span> <span class="o">=</span> <span class="s2">&quot;Manual&quot;</span>
-    <span class="n">AUTO_PRESSURE</span> <span class="o">=</span> <span class="s2">&quot;Auto Pressure&quot;</span>
-    <span class="n">AUTO_POSITION</span> <span class="o">=</span> <span class="s2">&quot;Auto Position&quot;</span></div>
+    <span class="n">MANUAL</span> <span class="o">=</span> <span class="s2">"Manual"</span>
+    <span class="n">AUTO_PRESSURE</span> <span class="o">=</span> <span class="s2">"Auto Pressure"</span>
+    <span class="n">AUTO_POSITION</span> <span class="o">=</span> <span class="s2">"Auto Position"</span></div>
 
 
 
 <div class="viewcode-block" id="ValveControlRequest">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.ValveControlRequest.html#dodal.devices.pressure_jump_cell.ValveControlRequest">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ValveControlRequest</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span>
-    <span class="n">CLOSE</span> <span class="o">=</span> <span class="s2">&quot;Close&quot;</span>
-    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;Reset&quot;</span></div>
+    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">"Open"</span>
+    <span class="n">CLOSE</span> <span class="o">=</span> <span class="s2">"Close"</span>
+    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">"Reset"</span></div>
 
 
 
@@ -936,8 +858,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">OPEN</span> <span class="o">=</span> <span class="n">ValveControlRequest</span><span class="o">.</span><span class="n">OPEN</span><span class="o">.</span><span class="n">value</span>
     <span class="n">CLOSE</span> <span class="o">=</span> <span class="n">ValveControlRequest</span><span class="o">.</span><span class="n">CLOSE</span><span class="o">.</span><span class="n">value</span>
     <span class="n">RESET</span> <span class="o">=</span> <span class="n">ValveControlRequest</span><span class="o">.</span><span class="n">RESET</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">ARM</span> <span class="o">=</span> <span class="s2">&quot;Arm&quot;</span>
-    <span class="n">DISARM</span> <span class="o">=</span> <span class="s2">&quot;Disarm&quot;</span></div>
+    <span class="n">ARM</span> <span class="o">=</span> <span class="s2">"Arm"</span>
+    <span class="n">DISARM</span> <span class="o">=</span> <span class="s2">"Disarm"</span></div>
 
 
 
@@ -952,9 +874,9 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="PumpMotorDirectionState">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PumpMotorDirectionState.html#dodal.devices.pressure_jump_cell.PumpMotorDirectionState">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PumpMotorDirectionState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">EMPTY</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">FORWARD</span> <span class="o">=</span> <span class="s2">&quot;Forward&quot;</span>
-    <span class="n">REVERSE</span> <span class="o">=</span> <span class="s2">&quot;Reverse&quot;</span></div>
+    <span class="n">EMPTY</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">FORWARD</span> <span class="o">=</span> <span class="s2">"Forward"</span>
+    <span class="n">REVERSE</span> <span class="o">=</span> <span class="s2">"Reverse"</span></div>
 
 
 
@@ -963,15 +885,15 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">FastValveState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">FAULT</span> <span class="o">=</span> <span class="n">ValveState</span><span class="o">.</span><span class="n">FAULT</span><span class="o">.</span><span class="n">value</span>
     <span class="n">OPEN</span> <span class="o">=</span> <span class="n">ValveState</span><span class="o">.</span><span class="n">OPEN</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">OPEN_ARMED</span> <span class="o">=</span> <span class="s2">&quot;Open Armed&quot;</span>
+    <span class="n">OPEN_ARMED</span> <span class="o">=</span> <span class="s2">"Open Armed"</span>
     <span class="n">CLOSED</span> <span class="o">=</span> <span class="n">ValveState</span><span class="o">.</span><span class="n">CLOSED</span><span class="o">.</span><span class="n">value</span>
-    <span class="n">CLOSED_ARMED</span> <span class="o">=</span> <span class="s2">&quot;Closed Armed&quot;</span>
-    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;Unused&quot;</span></div>
+    <span class="n">CLOSED_ARMED</span> <span class="o">=</span> <span class="s2">"Closed Armed"</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">"Unused"</span></div>
 
 
 
 <span class="n">TValveControlRequest</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span>
-    <span class="s2">&quot;TValveControlRequest&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">ValveControlRequest</span> <span class="o">|</span> <span class="n">FastValveControlRequest</span>
+    <span class="s2">"TValveControlRequest"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">ValveControlRequest</span> <span class="o">|</span> <span class="n">FastValveControlRequest</span>
 <span class="p">)</span>
 
 
@@ -984,16 +906,16 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">valve_control_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TValveControlRequest</span><span class="p">],</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">valve_control_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:CON&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:OPENSEQ&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">valve_control_type</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">":CON"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">":OPENSEQ"</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">TValveControlRequest</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;Open&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">"Open"</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ValveOpenSeqRequest</span><span class="o">.</span><span class="n">OPEN_SEQ</span><span class="p">)</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">OPENSEQ_PULSE_LENGTH</span><span class="p">)</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ValveOpenSeqRequest</span><span class="o">.</span><span class="n">INACTIVE</span><span class="p">)</span>
@@ -1005,40 +927,40 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AllValvesControl">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.AllValvesControl.html#dodal.devices.pressure_jump_cell.AllValvesControl">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AllValvesControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The default IOC for this device only controls specific valves. Other valves are</span>
+<span class="w">    </span><span class="sd">"""The default IOC for this device only controls specific valves. Other valves are</span>
 <span class="sd">    under manual control.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">fast_valves_numbers</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
         <span class="n">slow_valves_numbers</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valve_states</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="n">ValveState</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ValveState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:STA&quot;</span><span class="p">)</span>
+                    <span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ValveState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:STA"</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">slow_valves_numbers</span>
                 <span class="p">}</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fast_valve_states</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="n">FastValveState</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">DeviceVector</span><span class="p">(</span>
                     <span class="p">{</span>
-                        <span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">FastValveState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:STA&quot;</span><span class="p">)</span>
+                        <span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">FastValveState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:STA"</span><span class="p">)</span>
                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fast_valves_numbers</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fast_valve_control</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">i</span><span class="p">:</span> <span class="n">ValveControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">FastValveControlRequest</span><span class="p">)</span>
+            <span class="n">i</span><span class="p">:</span> <span class="n">ValveControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">FastValveControlRequest</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fast_valves_numbers</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">slow_valve_control</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">i</span><span class="p">:</span> <span class="n">ValveControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ValveControlRequest</span><span class="p">)</span>
+            <span class="n">i</span><span class="p">:</span> <span class="n">ValveControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">ValveControlRequest</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">slow_valves_numbers</span>
         <span class="p">}</span>
 
@@ -1053,18 +975,18 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="Pump">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.Pump.html#dodal.devices.pressure_jump_cell.Pump">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Pump</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pump_position</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;POS&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_position</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"POS"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pump_motor_direction</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="n">PumpMotorDirectionState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MTRDIR&quot;</span>
+                <span class="n">PumpMotorDirectionState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"MTRDIR"</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pump_speed</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="n">write_pv</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MSPEED&quot;</span><span class="p">,</span> <span class="n">read_pv</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MSPEED_RBV&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="n">write_pv</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"MSPEED"</span><span class="p">,</span> <span class="n">read_pv</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">"MSPEED_RBV"</span>
             <span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pump_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">PumpState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SP:AUTO&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">PumpState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">"SP:AUTO"</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
@@ -1073,11 +995,11 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="PressureTransducer">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureTransducer.html#dodal.devices.pressure_jump_cell.PressureTransducer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PressureTransducer</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pressure transducer for a high pressure X-ray cell.</span>
+<span class="w">    </span><span class="sd">"""Pressure transducer for a high pressure X-ray cell.</span>
 <span class="sd">    This is the chamber and there are three of them.</span>
 <span class="sd">    1 is the start, 3 is where the sample is.</span>
 <span class="sd">    NOTE: the distinction between the adc prefix and the cell prefix is kept here.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1085,25 +1007,25 @@ window.runMermaid = runMermaid;</script>
         <span class="n">cell_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">transducer_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">ethercat_channel_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">full_different_prefix_adc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">full_different_prefix_adc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">final_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">final_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">omron_pressure</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:PRES&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:PRES"</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">omron_voltage</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:RAW&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:RAW"</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">beckhoff_pressure</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">STATP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:MeanValue_RBV&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">STATP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:MeanValue_RBV"</span>
             <span class="p">)</span>
             <span class="c1"># P1 beckhoff voltage = BL38P-EA-ADC-02:CH1</span>
             <span class="c1"># P2 beckhoff voltage = BL38P-EA-ADC-01:CH2</span>
             <span class="c1"># P3 beckhoff voltage = BL38P-EA-ADC-01:CH1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slow_beckhoff_voltage_readout</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_different_prefix_adc</span><span class="si">}</span><span class="s2">CH</span><span class="si">{</span><span class="n">ethercat_channel_number</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">full_different_prefix_adc</span><span class="si">}</span><span class="s2">CH</span><span class="si">{</span><span class="n">ethercat_channel_number</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
@@ -1118,13 +1040,13 @@ window.runMermaid = runMermaid;</script>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">busy_signal</span><span class="p">:</span> <span class="n">Reference</span><span class="p">,</span>
         <span class="n">timeout_signal</span><span class="p">:</span> <span class="n">Reference</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_busy_signal</span> <span class="o">=</span> <span class="n">busy_signal</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeout_signal</span> <span class="o">=</span> <span class="n">timeout_signal</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_jump</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SETJUMP&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_jump</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SETJUMP"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -1143,28 +1065,28 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="PressureJumpCellController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellController.html#dodal.devices.pressure_jump_cell.PressureJumpCellController">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PressureJumpCellController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Top-level control for a fixed pressure or pressure jumps.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Top-level control for a fixed pressure or pressure jumps."""</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="c1"># Common</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">busy</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">GOTOBUSY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RESULT&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">TIMER.HIGH&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">busy</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">GOTOBUSY"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RESULT"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">TIMER.HIGH"</span><span class="p">)</span>
 
             <span class="c1"># Constant pressure</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">TARGET&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">GO&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">TARGET"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">GO"</span><span class="p">)</span>
 
             <span class="c1"># Pressure jump</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">from_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPF&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">to_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPT&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPF"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPT"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">do_jump</span> <span class="o">=</span> <span class="n">DoJump</span><span class="p">(</span>
                 <span class="n">prefix</span><span class="p">,</span> <span class="n">Reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">busy</span><span class="p">),</span> <span class="n">Reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">),</span> <span class="n">name</span>
             <span class="p">)</span>
 
             <span class="c1"># Internal</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STOP&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STOP"</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -1173,9 +1095,9 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellController.html#dodal.devices.pressure_jump_cell.PressureJumpCellController.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the desired pressure waiting for the device to complete the</span>
+<span class="w">        </span><span class="sd">"""Sets the desired pressure waiting for the device to complete the</span>
 <span class="sd">        operation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">timeout</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
 
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_pressure</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -1185,14 +1107,14 @@ window.runMermaid = runMermaid;</script>
 
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="BusyMock">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.BusyMock.html#dodal.devices.pressure_jump_cell.BusyMock">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BusyMock</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">&quot;PressureJumpCell&quot;</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BusyMock</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">"PressureJumpCell"</span><span class="p">]):</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">busy</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
             <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">busy_idle</span><span class="p">():</span>
@@ -1212,24 +1134,24 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCell.html#dodal.devices.pressure_jump_cell.PressureJumpCell">[docs]</a>
 <span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">BusyMock</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PressureJumpCell</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.</span>
+<span class="w">    </span><span class="sd">"""High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        prefix (str): The prefix of beamline - SPECIAL - unusual that the cell prefix is</span>
 <span class="sd">            computed separately.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">cell_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-HPXC-01:&quot;</span><span class="p">,</span>
-        <span class="n">adc_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-ADC&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">cell_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"-HPXC-01:"</span><span class="p">,</span>
+        <span class="n">adc_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"-ADC"</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">all_valves_control</span> <span class="o">=</span> <span class="n">AllValvesControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pump</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_valves_control</span> <span class="o">=</span> <span class="n">AllValvesControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pump</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">PressureJumpCellController</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">CTRL:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">PressureJumpCellController</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">CTRL:"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pressure_transducers</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">PressureTransducer</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
@@ -1238,27 +1160,27 @@ window.runMermaid = runMermaid;</script>
                         <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
                         <span class="n">cell_prefix</span><span class="o">=</span><span class="n">cell_prefix</span><span class="p">,</span>
                         <span class="n">transducer_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-02:&quot;</span><span class="p">,</span>
+                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-02:"</span><span class="p">,</span>
                         <span class="n">ethercat_channel_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                     <span class="p">),</span>
                     <span class="mi">2</span><span class="p">:</span> <span class="n">PressureTransducer</span><span class="p">(</span>
                         <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
                         <span class="n">cell_prefix</span><span class="o">=</span><span class="n">cell_prefix</span><span class="p">,</span>
                         <span class="n">transducer_number</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-01:&quot;</span><span class="p">,</span>
+                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-01:"</span><span class="p">,</span>
                         <span class="n">ethercat_channel_number</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                     <span class="p">),</span>
                     <span class="mi">3</span><span class="p">:</span> <span class="n">PressureTransducer</span><span class="p">(</span>
                         <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
                         <span class="n">cell_prefix</span><span class="o">=</span><span class="n">cell_prefix</span><span class="p">,</span>
                         <span class="n">transducer_number</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-01:&quot;</span><span class="p">,</span>
+                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-01:"</span><span class="p">,</span>
                         <span class="n">ethercat_channel_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                     <span class="p">),</span>
                 <span class="p">}</span>
             <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">cell_temperature</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">TEMP&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cell_temperature</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">TEMP"</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 

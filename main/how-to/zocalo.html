@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Zocalo Interaction &#8212; dodal 3.0.9.dev10+gf7afd50d0 documentation</title>
+    <title>Zocalo Interaction &#8212; dodal 3.0.9.dev11+g5dd9369a9 documentation</title>
   
   
   
@@ -33,7 +33,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -41,12 +41,12 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ac76d6ca"></script>
+    <script src="../_static/documentation_options.js?v=7946c521"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
-    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/zocalo';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
@@ -516,26 +516,26 @@ steps. You can see <a class="reference external" href="https://gitlab.diamond.ac
 <h2>Gridscans<a class="headerlink" href="#gridscans" title="Link to this heading">#</a></h2>
 <p>The Zocalo Service receives messages of the following form for both the xy and xz gridscans:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="p">{</span>
-        <span class="s1">&#39;recipes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mimas&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;ispyb_dcid&#39;</span><span class="p">:</span> <span class="mi">16085800</span><span class="p">,</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;ins_10_31&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;start_frame_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s1">&#39;number_of_frames&#39;</span><span class="p">:</span> <span class="mi">1140</span><span class="p">,</span>
-            <span class="s1">&#39;message_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;guid&#39;</span><span class="p">:</span> <span class="s1">&#39;d6f117bb-c856-4df8-b9bc-2d3c625e9fd5&#39;</span>
+        <span class="s1">'recipes'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'mimas'</span><span class="p">],</span>
+        <span class="s1">'parameters'</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">'ispyb_dcid'</span><span class="p">:</span> <span class="mi">16085800</span><span class="p">,</span>
+            <span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'ins_10_31'</span><span class="p">,</span>
+            <span class="s1">'start_frame_index'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">'number_of_frames'</span><span class="p">:</span> <span class="mi">1140</span><span class="p">,</span>
+            <span class="s1">'message_index'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">'event'</span><span class="p">:</span> <span class="s1">'start'</span><span class="p">,</span>
+            <span class="s1">'guid'</span><span class="p">:</span> <span class="s1">'d6f117bb-c856-4df8-b9bc-2d3c625e9fd5'</span>
         <span class="p">}</span>
     <span class="p">}</span>
 </pre></div>
 </div>
 <p>Zocalo is then sent stop messages:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="p">{</span>
-        <span class="s1">&#39;recipes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mimas&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="s1">&#39;end&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;ispyb_dcid&#39;</span><span class="p">:</span> <span class="mi">16085800</span><span class="p">,</span>
-            <span class="s1">&#39;guid&#39;</span><span class="p">:</span> <span class="s1">&#39;9a96e59c-da30-494c-8380-c7a5c828c2c9&#39;</span>
+        <span class="s1">'recipes'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'mimas'</span><span class="p">],</span>
+        <span class="s1">'parameters'</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">'event'</span><span class="p">:</span> <span class="s1">'end'</span><span class="p">,</span>
+            <span class="s1">'ispyb_dcid'</span><span class="p">:</span> <span class="mi">16085800</span><span class="p">,</span>
+            <span class="s1">'guid'</span><span class="p">:</span> <span class="s1">'9a96e59c-da30-494c-8380-c7a5c828c2c9'</span>
         <span class="p">},</span>
    <span class="p">}</span>
 </pre></div>
@@ -547,7 +547,7 @@ the recipe processing using the path to the logbook that comes from messages lik
 Message saved in logbook at /dls/tmp/zocalo/dispatcher/2024-12/cb/62d35b-7cc9-4f1b-868b-712e82aa0271</p>
 <p>From the zocalo graylog you can also see that once the gridscan nexus file is picked up (for the CPU gridscan) it
 starts a recipe:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="p">{</span><span class="s1">&#39;recipes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;per-image-analysis-gridscan-i03-no-really&#39;</span><span class="p">],</span> <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ispyb_dcid&#39;</span><span class="p">:</span> <span class="mi">16085803</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{filename}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;start_frame_index&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{start_frame_index}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;number_of_frames&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{number_of_frames}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;message_index&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{message_index}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;guid&#39;</span><span class="p">:</span> <span class="s1">&#39;d10f8b8c-57a5-4dc4-acaf-a22f8d2bbf60&#39;</span><span class="p">},</span> <span class="s1">&#39;recipe&#39;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">workflows</span><span class="o">.</span><span class="n">recipe</span><span class="o">.</span><span class="n">recipe</span><span class="o">.</span><span class="n">Recipe</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x7f0587f13110</span><span class="o">&gt;</span><span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="p">{</span><span class="s1">'recipes'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'per-image-analysis-gridscan-i03-no-really'</span><span class="p">],</span> <span class="s1">'parameters'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'ispyb_dcid'</span><span class="p">:</span> <span class="mi">16085803</span><span class="p">,</span> <span class="s1">'filename'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{filename}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'start_frame_index'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{start_frame_index}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'number_of_frames'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{number_of_frames}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'message_index'</span><span class="p">:</span> <span class="s1">'</span><span class="si">{message_index}</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'guid'</span><span class="p">:</span> <span class="s1">'d10f8b8c-57a5-4dc4-acaf-a22f8d2bbf60'</span><span class="p">},</span> <span class="s1">'recipe'</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">workflows</span><span class="o">.</span><span class="n">recipe</span><span class="o">.</span><span class="n">recipe</span><span class="o">.</span><span class="n">Recipe</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x7f0587f13110</span><span class="o">&gt;</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>If you look at the recipe json, Zocalo then runs Per-Image-Analysis on each frame and then assembles the results in
