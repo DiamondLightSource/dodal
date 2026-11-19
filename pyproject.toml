@@ -16,7 +16,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async[ca,pva]>=0.21.3",
+    "ophyd-async[ca,pva]>=0.21.5",
     "bluesky>=1.14.5",
     "pyepics",
     "pillow",
@@ -51,7 +51,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd_async[sim]>=0.20.1",
+    "ophyd_async[sim]>=0.21.5",
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
@@ -135,9 +135,11 @@ filterwarnings = [
     # Ignore deprecation warnings about TriggerableCommand until https://github.com/bluesky/ophyd-async/issues/1292
     # addressed
     "ignore:epics_signal_x is deprecated, use epics_triggerable_command instead:DeprecationWarning",
+    "ignore:Setting the shape on a NumPy array:DeprecationWarning:epicscorelibs.ca.dbr", # https://github.com/epics-base/epicscorelibs/issues/57
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests system_tests"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.report]
 exclude_also = [
