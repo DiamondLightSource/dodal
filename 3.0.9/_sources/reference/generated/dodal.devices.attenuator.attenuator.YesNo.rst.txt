@@ -1,0 +1,78 @@
+dodal.devices.attenuator.attenuator.YesNo
+=========================================
+
+.. currentmodule:: dodal.devices.attenuator.attenuator
+
+.. autoclass:: YesNo
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~YesNo.YES
+      
+      
+      ~YesNo.NO
+      
+   
+   

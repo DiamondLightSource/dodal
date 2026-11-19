@@ -1,0 +1,40 @@
+dodal.devices.beamlines.p60
+===========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~p60.LensMode
+   ~p60.PsuMode
+   ~p60.PassEnergy
+   ~p60.LabXraySource
+   ~p60.LabXraySourceReadable
+
+
+
+
+.. automodule:: dodal.devices.beamlines.p60
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

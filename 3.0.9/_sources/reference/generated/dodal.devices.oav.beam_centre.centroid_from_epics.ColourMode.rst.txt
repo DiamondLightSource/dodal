@@ -1,0 +1,96 @@
+dodal.devices.oav.beam\_centre.centroid\_from\_epics.ColourMode
+===============================================================
+
+.. currentmodule:: dodal.devices.oav.beam_centre.centroid_from_epics
+
+.. autoclass:: ColourMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ColourMode.MONO
+      
+      
+      ~ColourMode.BAYER
+      
+      
+      ~ColourMode.RGB1
+      
+      
+      ~ColourMode.RGB2
+      
+      
+      ~ColourMode.RGB3
+      
+      
+      ~ColourMode.YUV444
+      
+      
+      ~ColourMode.YUV422
+      
+      
+      ~ColourMode.YUV421
+      
+   
+   

@@ -1,0 +1,102 @@
+dodal.devices.attenuator.filter\_selections.I02\_1FilterFourSelections
+======================================================================
+
+.. currentmodule:: dodal.devices.attenuator.filter_selections
+
+.. autoclass:: I02_1FilterFourSelections
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I02_1FilterFourSelections.EMPTY
+      
+      
+      ~I02_1FilterFourSelections.AL15
+      
+      
+      ~I02_1FilterFourSelections.AL25
+      
+      
+      ~I02_1FilterFourSelections.AL50
+      
+      
+      ~I02_1FilterFourSelections.AL100
+      
+      
+      ~I02_1FilterFourSelections.AL250
+      
+      
+      ~I02_1FilterFourSelections.AL500
+      
+      
+      ~I02_1FilterFourSelections.TI300
+      
+      
+      ~I02_1FilterFourSelections.TI400
+      
+      
+      ~I02_1FilterFourSelections.TI500
+      
+   
+   

@@ -1,0 +1,52 @@
+dodal.devices.current\_amplifiers.CurrentAmpCounter
+===================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: CurrentAmpCounter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~CurrentAmpCounter.get_count
+      
+      
+      ~CurrentAmpCounter.get_count_per_sec
+      
+      
+      ~CurrentAmpCounter.get_voltage_per_sec
+      
+      
+      ~CurrentAmpCounter.prepare
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,102 @@
+dodal.devices.eurotherm.EurothermUpdate
+=======================================
+
+.. currentmodule:: dodal.devices.eurotherm
+
+.. autoclass:: EurothermUpdate
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EurothermUpdate.PASSIVE
+      
+      
+      ~EurothermUpdate.EVENT
+      
+      
+      ~EurothermUpdate.IO
+      
+      
+      ~EurothermUpdate.S10
+      
+      
+      ~EurothermUpdate.S5
+      
+      
+      ~EurothermUpdate.S2
+      
+      
+      ~EurothermUpdate.S1
+      
+      
+      ~EurothermUpdate.S0_5
+      
+      
+      ~EurothermUpdate.S0_2
+      
+      
+      ~EurothermUpdate.S0_1
+      
+   
+   

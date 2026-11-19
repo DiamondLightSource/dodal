@@ -1,0 +1,78 @@
+dodal.common.InOutUpper
+=======================
+
+.. currentmodule:: dodal.common
+
+.. autoclass:: InOutUpper
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~InOutUpper.IN
+      
+      
+      ~InOutUpper.OUT
+      
+   
+   

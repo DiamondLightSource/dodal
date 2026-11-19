@@ -1,0 +1,78 @@
+dodal.devices.beamlines.i11.mythen.Mythen3TriggerMode
+=====================================================
+
+.. currentmodule:: dodal.devices.beamlines.i11.mythen
+
+.. autoclass:: Mythen3TriggerMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Mythen3TriggerMode.INTERNAL
+      
+      
+      ~Mythen3TriggerMode.EXTERNAL
+      
+   
+   

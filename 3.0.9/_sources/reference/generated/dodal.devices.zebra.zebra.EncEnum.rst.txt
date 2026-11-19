@@ -1,0 +1,87 @@
+dodal.devices.zebra.zebra.EncEnum
+=================================
+
+.. currentmodule:: dodal.devices.zebra.zebra
+
+.. autoclass:: EncEnum
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EncEnum.ENC1
+      
+      
+      ~EncEnum.ENC2
+      
+      
+      ~EncEnum.ENC3
+      
+      
+      ~EncEnum.ENC4
+      
+      
+      ~EncEnum.ENC1_4AV
+      
+   
+   

@@ -1,0 +1,49 @@
+dodal.devices.beamlines.i15\_1.safe\_or\_beam\_positioner.SafeOrBeamPositioner
+==============================================================================
+
+.. currentmodule:: dodal.devices.beamlines.i15_1.safe_or_beam_positioner
+
+.. autoclass:: SafeOrBeamPositioner
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~SafeOrBeamPositioner.get_config
+      
+      
+      ~SafeOrBeamPositioner.get_full_config
+      
+      
+      
+      
+      ~SafeOrBeamPositioner.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

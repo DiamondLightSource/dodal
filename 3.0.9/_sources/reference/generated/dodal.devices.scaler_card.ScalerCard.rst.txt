@@ -1,0 +1,46 @@
+dodal.devices.scaler\_card.ScalerCard
+=====================================
+
+.. currentmodule:: dodal.devices.scaler_card
+
+.. autoclass:: ScalerCard
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ScalerCard.set
+      
+      
+      
+      
+      ~ScalerCard.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,38 @@
+dodal.devices.beamlines.i18.diode
+=================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i18
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~diode.Diode
+   ~diode.FilterAValues
+   ~diode.FilterBValues
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i18.diode
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

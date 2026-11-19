@@ -1,0 +1,40 @@
+dodal.devices.beamlines.i10.I10PneumaticStage
+=============================================
+
+.. currentmodule:: dodal.devices.beamlines.i10
+
+.. autoclass:: I10PneumaticStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

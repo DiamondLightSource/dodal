@@ -1,0 +1,81 @@
+dodal.devices.pressure\_jump\_cell.PumpState
+============================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PumpState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PumpState.MANUAL
+      
+      
+      ~PumpState.AUTO_PRESSURE
+      
+      
+      ~PumpState.AUTO_POSITION
+      
+   
+   

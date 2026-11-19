@@ -1,0 +1,40 @@
+dodal.devices.v2f.QDV2F
+=======================
+
+.. currentmodule:: dodal.devices.v2f
+
+.. autoclass:: QDV2F
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

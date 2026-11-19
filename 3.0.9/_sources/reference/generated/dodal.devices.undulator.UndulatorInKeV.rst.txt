@@ -1,0 +1,44 @@
+dodal.devices.undulator.UndulatorInKeV
+======================================
+
+.. currentmodule:: dodal.devices.undulator
+
+.. autoclass:: UndulatorInKeV
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~UndulatorInKeV.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

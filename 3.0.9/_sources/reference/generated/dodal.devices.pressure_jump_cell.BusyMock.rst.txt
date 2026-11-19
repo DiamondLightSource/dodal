@@ -1,0 +1,23 @@
+dodal.devices.pressure\_jump\_cell.BusyMock
+===========================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: BusyMock
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~BusyMock.connect
+      
+   
+   
+
+   
+   
+   
