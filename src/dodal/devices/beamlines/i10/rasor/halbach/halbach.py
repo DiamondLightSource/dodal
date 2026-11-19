@@ -73,7 +73,6 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
             self.m3 = Motor(prefix + m3_suffix)
             self.m4 = Motor(prefix + m4_suffix)
 
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.field_strength = derived_signal_rw(
                 raw_to_derived=self._get_field_strength,
                 set_derived=self._set_field_strength,
@@ -179,6 +178,7 @@ class HalbachMagnetArrayController(StandardReadable, Movable[HalbachSetpoint]):
         return [(float(h), float(a)) for h, a in zip(h_pts, a_pts, strict=True)]
 
     async def _move_to_field(self, target_h_mt: float, target_angle_deg: float) -> None:
+        """Check request is within range, perform path finding, then move through waypoints."""
         self.lut.interpolate(target_h_mt, target_angle_deg)
 
         start_h, start_angle = await self.get_current_field_and_angle()
