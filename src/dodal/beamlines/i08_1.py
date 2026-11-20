@@ -8,8 +8,11 @@ from ophyd_async.core import (
     UUIDFilenameProvider,
 )
 from ophyd_async.epics.pmac import PmacIO
+from ophyd_async.epics.adandor3 import Andor3Detector
+from ophyd_async.epics.adcore import ADWriterFactory
 from ophyd_async.fastcs.panda import HDFPanda
 
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XYStage
@@ -85,4 +88,15 @@ def panda1(path_provider: PathProvider) -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=path_provider,
+    )
+
+@devices.factory()
+def andor_detector() -> Andor3Detector:
+    return Andor3Detector(
+        f"{PREFIX.beamline_prefix}-EA-DET-08:",
+        ADWriterFactory.hdf(
+            path_provider= detector_path_provider(), writer_suffix=HDF5_SUFFIX
+        ),
+        driver_suffix=CAM_SUFFIX,
+        name="AndorMarana",
     )
