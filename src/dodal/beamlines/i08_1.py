@@ -40,24 +40,9 @@ def synchrotron() -> Synchrotron:
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
-    return StaticPathProvider(UUIDFilenameProvider(), Path(PATH))
-
-
-@devices.fixture
-@cache
-def panda_path_provider() -> PathProvider:
     return StaticPathProvider(
         AutoIncrementFilenameProvider(base_filename="panda"), Path(PATH)
     )
-
-
-@devices.fixture
-@cache
-def detector_path_provider() -> PathProvider:
-    return StaticPathProvider(
-        AutoIncrementFilenameProvider(base_filename="detector"), Path(PATH)
-    )
-
 
 @devices.factory()
 def scanning_fine() -> XYStage:
@@ -70,7 +55,7 @@ def scanning_fine() -> XYStage:
 @devices.factory()
 def scanning_combined() -> XYStage:
     return XYStage(prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01:")
-
+#t1j_advanced
 
 @devices.factory()
 def scanning_pmac() -> PmacIO:
@@ -91,11 +76,12 @@ def panda1(path_provider: PathProvider) -> HDFPanda:
     )
 
 @devices.factory()
-def andor_detector() -> Andor3Detector:
+def andor_detector(path_provider:PathProvider) -> Andor3Detector:
     return Andor3Detector(
         f"{PREFIX.beamline_prefix}-EA-DET-08:",
+        
         ADWriterFactory.hdf(
-            path_provider= detector_path_provider(), writer_suffix=HDF5_SUFFIX
+            path_provider= path_provider, writer_suffix=HDF5_SUFFIX
         ),
         driver_suffix=CAM_SUFFIX,
         name="AndorMarana",
