@@ -51,6 +51,7 @@ class FloatInterval(BaseModel, ABC):
         if isinstance(item, Real):
             return self._includes(float(item))
         if isinstance(item, FloatInterval):
+            # Test endpoint inclusions using this interval's boundary semantics.
             return item.lower in self and item.upper in self
         raise TypeError(
             f"Objects of type {type(item)} cannot be found inside a FloatInterval."
@@ -61,6 +62,9 @@ class FloatInterval(BaseModel, ABC):
         # (ensuring ClosedInterval vs OpenInterval with same numbers hash differently)
         _hashable_innards = (type(self), self.lower, self.upper)
         return hash(_hashable_innards)
+
+
+TInterval = TypeVar("TInterval", bound=FloatInterval)
 
 
 class ClosedInterval(FloatInterval):
@@ -91,11 +95,12 @@ class OpenClosedInterval(FloatInterval):
         return self.lower < x <= self.upper
 
 
-TInterval = TypeVar("TInterval", bound=FloatInterval)
+# heterogeneous OpenClosed and ClosedOpen types would be confusion in the context of _InvertedSegments
+TDirectedSegment = TypeVar("TDirectedSegment", ClosedInterval, OpenInterval)
 
 
 # class DirectedSegment[TInterval: FloatInterval](BaseModel, ABC): - after 3.11 drops
-class DirectedSegment(BaseModel, ABC, Generic[TInterval]):
+class DirectedSegment(BaseModel, ABC, Generic[TDirectedSegment]):
     """Abstract base for directed segments Generic against FloatInterval type.
 
     Attributes:
@@ -107,15 +112,23 @@ class DirectedSegment(BaseModel, ABC, Generic[TInterval]):
         Unlike intervals, the start can be less than the end
     """
 
-    interval_cls: type[TInterval]
+    interval_cls: type[TDirectedSegment]
 
     start: StrictFloat
     end: StrictFloat
 
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
+    @model_validator(mode="after")
+    def _ensure_symmetric_endpoint_semantics(self) -> "DirectedSegment":
+        if self.interval_cls not in (ClosedInterval, OpenInterval):
+            raise ValueError(
+                "DirectedSegment requires an homogeneous interval type, ie either ClosedInterval or OpenInterval."
+            )
+        return self
+
     @cached_property
-    def _interval(self) -> TInterval:
+    def _interval(self) -> TDirectedSegment:
         """Backing interval decouples from the orientation of the Segment."""
         return self.interval_cls(
             lower=min(self.start, self.end), upper=max(self.start, self.end)
@@ -158,17 +171,25 @@ class DirectedSegment(BaseModel, ABC, Generic[TInterval]):
 
     @classmethod
     def create(
-        cls, start: float, end: float, interval_cls: type[TInterval] = ClosedInterval
-    ) -> "DirectedSegment[TInterval]":
+        cls,
+        start: float,
+        end: float,
+        homogeneous_interval_cls: type[TDirectedSegment] = ClosedInterval,
+    ) -> "DirectedSegment[TDirectedSegment]":
+        if homogeneous_interval_cls not in (ClosedInterval, OpenInterval):
+            raise ValueError(
+                f"DirectedSegment only supports use of homogeneous intervals "
+                f"Closed and Open, rather than {homogeneous_interval_cls}."
+            )
         if start == end:
             raise ValueError(
                 "Cannot form a zero-length segment as the directionality is ambiguous."
             )
         segment_cls = _InvertedSegment if start > end else _ForwardSegment
-        return segment_cls(start=start, end=end, interval_cls=interval_cls)
+        return segment_cls(start=start, end=end, interval_cls=homogeneous_interval_cls)
 
 
-class _ForwardSegment(DirectedSegment[TInterval], Generic[TInterval]):
+class _ForwardSegment(DirectedSegment[TDirectedSegment], Generic[TDirectedSegment]):
     @property
     def span(self) -> float:
         return self._interval.span
@@ -181,7 +202,7 @@ class _ForwardSegment(DirectedSegment[TInterval], Generic[TInterval]):
         )
 
 
-class _InvertedSegment(DirectedSegment[TInterval], Generic[TInterval]):
+class _InvertedSegment(DirectedSegment[TDirectedSegment], Generic[TDirectedSegment]):
     @property
     def span(self) -> float:
         return -self._interval.span
