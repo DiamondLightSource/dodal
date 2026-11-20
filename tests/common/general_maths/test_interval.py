@@ -19,6 +19,18 @@ ALL_CONCRETE_INTERVAL_TYPES: tuple[type[FloatInterval], ...] = (
     OpenInterval,
 )
 
+# DirectedSegment does not support backing by intervals of these types - as the orientation would be ambiguous
+HETEROGENEOUS_INTERVAL_TYPES: tuple[type[FloatInterval], ...] = (
+    OpenClosedInterval,
+    ClosedOpenInterval,
+)
+
+# DirectedSegment supports backing with intervals of these types
+HOMOGENEOUS_INTERVAL_TYPES: tuple[type[FloatInterval], ...] = (
+    ClosedInterval,
+    OpenInterval,
+)
+
 # Happy path
 
 
@@ -54,8 +66,108 @@ def test_all_interval_types_recognise_point_when_unambiguously_within(
 
 
 @pytest.mark.parametrize(
-    "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    "_lower, _upper",
+    [
+        (-1, 1),
+        (0, 1),
+        (6, 8),
+        (-3, 0),
+        (-12, -10),
+    ],
+)
+# using int here to reduce test brittleness
+def test_closed_interval_includes_its_endpoints(_lower: int, _upper: int):
+    closed_interval = ClosedInterval(lower=_lower, upper=_upper)
+
+    for bound in (_lower, _upper):
+        assert bound in closed_interval
+
+
+@pytest.mark.parametrize(
+    "_lower, _upper",
+    [
+        (-1, 1),
+        (0, 1),
+        (6, 8),
+        (-3, 0),
+        (-12, -10),
+    ],
+)
+# using int here to reduce test brittleness
+def test_closed_open_interval_excludes_its_upper_boundary(_lower: int, _upper: int):
+    closed_open_interval = ClosedOpenInterval(lower=_lower, upper=_upper)
+    assert _upper not in closed_open_interval
+
+
+@pytest.mark.parametrize(
+    "_lower, _upper",
+    [
+        (-1, 1),
+        (0, 1),
+        (6, 8),
+        (-3, 0),
+        (-12, -10),
+    ],
+)
+# using int here to reduce test brittleness
+def test_closed_open_interval_includes_its_lower_boundary(_lower: int, _upper: int):
+    closed_open_interval = ClosedOpenInterval(lower=_lower, upper=_upper)
+    assert _lower in closed_open_interval
+
+
+@pytest.mark.parametrize(
+    "_lower, _upper",
+    [
+        (-1, 1),
+        (0, 1),
+        (6, 8),
+        (-3, 0),
+        (-12, -10),
+    ],
+)
+# using int here to reduce test brittleness
+def test_open_closed_interval_excludes_its_lower_boundary(_lower: int, _upper: int):
+    open_closed_interval = OpenClosedInterval(lower=_lower, upper=_upper)
+    assert _lower not in open_closed_interval
+
+
+@pytest.mark.parametrize(
+    "_lower, _upper",
+    [
+        (-1, 1),
+        (0, 1),
+        (6, 8),
+        (-3, 0),
+        (-12, -10),
+    ],
+)
+# using int here to reduce test brittleness
+def test_open_closed_interval_includes_its_upper_boundary(_lower: int, _upper: int):
+    open_closed_interval = OpenClosedInterval(lower=_lower, upper=_upper)
+    assert _upper in open_closed_interval
+
+
+@pytest.mark.parametrize(
+    "_lower, _upper",
+    [
+        (-1, 1),
+        (0, 1),
+        (6, 8),
+        (-3, 0),
+        (-12, -10),
+    ],
+)
+# using int here to reduce test brittleness
+def test_open_interval_excludes_its_endpoints(_lower: int, _upper: int):
+    open_interval = OpenInterval(lower=_lower, upper=_upper)
+
+    for bound in (_lower, _upper):
+        assert bound not in open_interval
+
+
+@pytest.mark.parametrize(
+    "homogeneous_interval_cls",
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -70,12 +182,16 @@ def test_all_interval_types_recognise_point_when_unambiguously_within(
         (-41.2, -140.83),
     ],
 )
-def test_directed_segment_can_be_created_when_backed_by_any_interval_type(
-    interval_cls: type[FloatInterval],
+def test_directed_segment_can_be_created_when_backed_by_any_homogeneous_interval_type(
+    homogeneous_interval_cls: type[FloatInterval],
     start: float,
     end: float,
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start,
+        end=end,
+        homogeneous_interval_cls=homogeneous_interval_cls,
+    )
     assert isinstance(segment, DirectedSegment)
 
 
@@ -122,7 +238,7 @@ def test_all_interval_types_report_correct_span(
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "expected_span, start, end",
@@ -157,11 +273,13 @@ def test_all_interval_types_report_correct_span(
 def test_directed_segments_report_correct_span(
     interval_cls: type[FloatInterval], expected_span: float, start: float, end: float
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     assert segment.span == pytest.approx(expected_span)
 
 
-@pytest.mark.parametrize("interval_cls", ALL_CONCRETE_INTERVAL_TYPES)
+@pytest.mark.parametrize("interval_cls", HOMOGENEOUS_INTERVAL_TYPES)
 @pytest.mark.parametrize(
     "probed_x, lower, upper",
     [
@@ -189,7 +307,7 @@ def test_all_interval_types_recognise_point_when_unambiguously_without(
     assert probed_x not in interval
 
 
-@pytest.mark.parametrize("interval_cls", ALL_CONCRETE_INTERVAL_TYPES)
+@pytest.mark.parametrize("interval_cls", HOMOGENEOUS_INTERVAL_TYPES)
 @pytest.mark.parametrize(
     "probed_x, start, end",
     [
@@ -213,11 +331,13 @@ def test_all_interval_types_recognise_point_when_unambiguously_without(
 def test_segments_recognise_point_when_unambiguously_without(
     interval_cls: type[FloatInterval], probed_x: float, start: float, end: float
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     assert probed_x not in segment
 
 
-@pytest.mark.parametrize("interval_cls", ALL_CONCRETE_INTERVAL_TYPES)
+@pytest.mark.parametrize("interval_cls", HOMOGENEOUS_INTERVAL_TYPES)
 @pytest.mark.parametrize(
     "probed_x, start, end",
     [
@@ -241,51 +361,51 @@ def test_segments_recognise_point_when_unambiguously_without(
 def test_segments_recognise_point_when_unambiguously_within(
     interval_cls: type[FloatInterval], probed_x: float, start: float, end: float
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     assert probed_x in segment
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    [
-        ClosedOpenInterval,
-        OpenClosedInterval,
-        OpenInterval,
-    ],
+    ALL_CONCRETE_INTERVAL_TYPES,
 )
-def test_other_interval_types_avoid_hash_collisions_with_closed_interval(
-    interval_cls,
-) -> None:
-    a: int = 4
-    b: int = 5
-    benchmark = ClosedInterval(lower=a, upper=b)
-    other = interval_cls(lower=a, upper=b)
-    assert hash(benchmark) != hash(other)
-
-
 @pytest.mark.parametrize(
-    "interval_cls",
+    "lower, upper",
     [
-        OpenClosedInterval,
-        OpenInterval,
+        (
+            1.2,
+            16.8,
+        ),
+        (
+            -16.8,
+            -1.2,
+        ),
+        (
+            -2.1,
+            4.7,
+        ),
+        (
+            0,
+            4.08,
+        ),
+        (
+            12,
+            45,
+        ),
+        (
+            -112,
+            -45,
+        ),
     ],
 )
-def test_other_interval_types_avoid_hash_collisions_with_closed_open_interval(
-    interval_cls,
+def test_that_equal_intervals_hash_to_identical_values(
+    interval_cls: type[FloatInterval], lower: float, upper: float
 ) -> None:
-    a: int = 4
-    b: int = 5
-    benchmark = ClosedOpenInterval(lower=a, upper=b)
-    other = interval_cls(lower=a, upper=b)
-    assert hash(benchmark) != hash(other)
-
-
-def test_open_closed_and_open_intervals_do_not_suffer_hash_collisions() -> None:
-    a: int = 4
-    b: int = 5
-    benchmark = OpenClosedInterval(lower=a, upper=b)
-    other = OpenInterval(lower=a, upper=b)
-    assert hash(benchmark) != hash(other)
+    a = interval_cls(lower=lower, upper=upper)
+    b = interval_cls(lower=lower, upper=upper)
+    assert hash(a) == hash(b)
 
 
 @pytest.mark.parametrize("interval_cls", ALL_CONCRETE_INTERVAL_TYPES)
@@ -407,7 +527,7 @@ def test_that_interval_upper_end_points_are_not_modifiable(
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -429,7 +549,9 @@ def test_that_interval_upper_end_points_are_not_modifiable(
 def test_that_segment_start_points_are_not_modifiable(
     interval_cls: type[FloatInterval], start: float, end: float
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     initial_span = segment.span
     with pytest.raises(ValueError):
         segment.start = start + 1.38 * initial_span
@@ -438,7 +560,7 @@ def test_that_segment_start_points_are_not_modifiable(
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -460,7 +582,9 @@ def test_that_segment_start_points_are_not_modifiable(
 def test_that_segment_end_points_are_not_modifiable(
     interval_cls: type[FloatInterval], start: float, end: float
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     initial_span = segment.span
     with pytest.raises(ValueError):
         segment.end = start - 5.91 * initial_span
@@ -469,7 +593,7 @@ def test_that_segment_end_points_are_not_modifiable(
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -484,7 +608,9 @@ def test_that_segment_is_equal_to_itself(
     start: float,
     end: float,
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     assert segment == segment
 
 
@@ -509,7 +635,7 @@ OTHER_TYPES: Final[tuple[Any, ...]] = (
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "other",
@@ -529,17 +655,19 @@ def test_that_segment_is_not_equal_to_any_other_type(
     start: float,
     end: float,
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     assert segment != other
 
 
 @pytest.mark.parametrize(
     "interval_cls1",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "interval_cls2",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -555,14 +683,18 @@ def test_that_segment_is_equal_to_another_with_same_ends_independent_of_interval
     start: float,
     end: float,
 ) -> None:
-    segment1 = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls1)
-    segment2 = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls2)
+    segment1 = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls1
+    )
+    segment2 = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls2
+    )
     assert segment1 == segment2
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -588,19 +720,54 @@ def test_that_inverted_segment_has_opposite_orientation(
     start: float,
     end: float,
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     inverted = ~segment
 
-    def assert_ends_swapped(a: DirectedSegment, b: DirectedSegment) -> bool:
-        return bool(a.start == b.end)
-
-    assert assert_ends_swapped(segment, inverted)
-    assert assert_ends_swapped(inverted, segment)
+    assert inverted.start == segment.end
+    assert inverted.end == segment.start
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
+)
+@pytest.mark.parametrize(
+    "start, end",
+    [
+        (0, 1),
+        (2, 1),
+        (-5, -44),
+        (44, -9),
+        (-127, 11),
+        (-5, 0),
+        (5, 0),
+        (0, -35),
+        (16.5, 85.4),
+        (-67.2, 115.2),
+        (18.301, -92.44),
+        (1.05, -2.1),
+        (67.2, 1.2),
+        (19.379, -15.44),
+    ],
+)
+def test_that_double_inverted_segment_matches_original(
+    interval_cls: type[FloatInterval],
+    start: float,
+    end: float,
+) -> None:
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
+    doubly_inverted = ~(~segment)
+
+    assert doubly_inverted == segment
+
+
+@pytest.mark.parametrize(
+    "interval_cls",
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -626,14 +793,16 @@ def test_that_inverted_segment_has_negated_span(
     start: float,
     end: float,
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
     inverted = ~segment
     assert inverted.span == -(segment.span)
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "start, end",
@@ -648,42 +817,19 @@ def test_that_inverted_segment_has_negated_span(
         (19.379, -15.44),
     ],
 )
-def test_that_segment_backed_by_any_interval_type_is_not_equal_to_a_different_segment(
+def test_that_segment_backed_by_homogenous_interval_type_is_not_equal_to_another_with_swapped_ends(
     interval_cls: type[FloatInterval], start: float, end: float
 ) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
-    swapped = DirectedSegment.create(start=end, end=start, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=start, end=end, homogeneous_interval_cls=interval_cls
+    )
+    swapped = ~segment
     assert segment != swapped
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
-)
-@pytest.mark.parametrize(
-    "start, end",
-    [
-        (1.5, -2.1),
-        (67.2, 1.2),
-        (11.09, 14.2),
-        (12.309, -5.44),
-        (7.5, -12.1),
-        (17.2, 9.2),
-        (1.045, 28.2),
-        (19.379, -15.44),
-    ],
-)
-def test_that_segment_backed_by_any_interval_type_is_not_equal_to_another_with_swapped_ends(
-    interval_cls: type[FloatInterval], start: float, end: float
-) -> None:
-    segment = DirectedSegment.create(start=start, end=end, interval_cls=interval_cls)
-    swapped = DirectedSegment.create(start=end, end=start, interval_cls=interval_cls)
-    assert segment != swapped
-
-
-@pytest.mark.parametrize(
-    "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "c, d",
@@ -703,14 +849,18 @@ def test_that_segment_backed_by_any_interval_type_is_not_equal_to_another_with_d
 ) -> None:
     a = 5.1
     b = 23.458
-    segment1 = DirectedSegment.create(start=a, end=b, interval_cls=interval_cls)
-    segment2 = DirectedSegment.create(start=a + c, end=b + d, interval_cls=interval_cls)
+    segment1 = DirectedSegment.create(
+        start=a, end=b, homogeneous_interval_cls=interval_cls
+    )
+    segment2 = DirectedSegment.create(
+        start=a + c, end=b + d, homogeneous_interval_cls=interval_cls
+    )
     assert segment1 != segment2
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "a, b, x, expected_f",
@@ -723,21 +873,23 @@ def test_that_segment_backed_by_any_interval_type_is_not_equal_to_another_with_d
         (100, 0, 48, 0.52),
     ],
 )
-def test_that_inverse_linear_interpolation_gives_expected_fraction(
+def test_that_inverse_linear_interpolation_against_directed_segment_gives_expected_fraction(
     interval_cls: type[FloatInterval],
     a: float,
     b: float,
     x: float,
     expected_f: float,
 ) -> None:
-    segment = DirectedSegment.create(start=a, end=b, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=a, end=b, homogeneous_interval_cls=interval_cls
+    )
     fraction = segment.inverse_linear_interpolated_value(value=x)
     assert fraction == pytest.approx(expected_f)
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "a, b, expected_x, f",
@@ -750,21 +902,23 @@ def test_that_inverse_linear_interpolation_gives_expected_fraction(
         (100, 0, 48, 0.52),
     ],
 )
-def test_that_linear_interpolation_converts_parametric_fraction_to_expected_value(
+def test_that_directed_segment_linear_interpolation_converts_parametric_fraction_to_expected_value(
     interval_cls: type[FloatInterval],
     a: float,
     b: float,
     expected_x: float,
     f: float,
 ) -> None:
-    segment = DirectedSegment.create(start=a, end=b, interval_cls=interval_cls)
+    segment = DirectedSegment.create(
+        start=a, end=b, homogeneous_interval_cls=interval_cls
+    )
     x = segment.linear_interpolation_of_fraction(fractional_parameter=f)
-    assert x == pytest.approx(x)
+    assert x == pytest.approx(expected_x)
 
 
 @pytest.mark.parametrize(
     "interval_cls",
-    ALL_CONCRETE_INTERVAL_TYPES,
+    HOMOGENEOUS_INTERVAL_TYPES,
 )
 @pytest.mark.parametrize(
     "x",
@@ -783,7 +937,9 @@ def test_that_zero_length_segment_refuses_to_be_instantiated(
     interval_cls: type[FloatInterval], x: float
 ) -> None:
     with pytest.raises(ValueError):
-        _segment = DirectedSegment.create(start=x, end=x, interval_cls=interval_cls)
+        _segment = DirectedSegment.create(
+            start=x, end=x, homogeneous_interval_cls=interval_cls
+        )
 
 
 # Not sharply testing end points as these tests will be brittle to machine epsilon
@@ -807,6 +963,36 @@ NON_NUMERICAL_TYPES: Final[tuple[Any, ...]] = (
 
 
 @pytest.mark.parametrize(
+    "heterogeneous_interval_cls",
+    HETEROGENEOUS_INTERVAL_TYPES,
+)
+@pytest.mark.parametrize(
+    "start, end",
+    [
+        (4, 7),
+        (-5, 8),
+        (8, 3),
+        (-1, -100),
+        (2.3, 4.5),
+        (6.2, -7.89),
+        (10, -3.51),
+        (-41.2, -140.83),
+    ],
+)
+def test_directed_segment_cannot_be_created_when_backed_by_any_heterogeneous_interval_type(
+    heterogeneous_interval_cls: type[FloatInterval],
+    start: float,
+    end: float,
+) -> None:
+    with pytest.raises(ValueError):
+        _segment = DirectedSegment.create(
+            start=start,
+            end=end,
+            homogeneous_interval_cls=heterogeneous_interval_cls,
+        )
+
+
+@pytest.mark.parametrize(
     "interval_cls",
     ALL_CONCRETE_INTERVAL_TYPES,
 )
@@ -814,7 +1000,7 @@ NON_NUMERICAL_TYPES: Final[tuple[Any, ...]] = (
     "invalid_type",
     NON_NUMERICAL_TYPES,
 )
-def test_that_any_interval_asked_if_invalid_type_lies_within_raises_type_error(
+def test_that_any_interval_asked_if_non_numerical_instance_lies_within_raises_type_error(
     interval_cls: type[FloatInterval], invalid_type: Any
 ) -> None:
     interval = interval_cls(lower=-81.4, upper=127.6543)
