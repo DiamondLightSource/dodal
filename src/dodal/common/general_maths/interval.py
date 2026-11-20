@@ -5,6 +5,8 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, StrictFloat, model_validator
 
+from dodal.common.general_maths.arithmetic_conversions import get_straight_line_y
+
 
 class FloatInterval(BaseModel, ABC):
     """Base class for immutable range of floating point values.
@@ -119,9 +121,30 @@ class DirectedSegment(BaseModel, ABC, Generic[TInterval]):
             lower=min(self.start, self.end), upper=max(self.start, self.end)
         )
 
+    @cached_property
+    def _reciprocal_of_span(self) -> float:
+        return 1.0 / self.span
+
     @property
     @abstractmethod
     def span(self) -> float: ...
+
+    def linear_interpolation_of_fraction(self, *, fractional_parameter: float) -> float:
+        """Linear interpolation of fraction of span away from start, to general float."""
+        return get_straight_line_y(
+            line_offset=self.start, line_gradient=self.span, x=fractional_parameter
+        )
+
+    def inverse_linear_interpolated_value(self, *, value: float) -> float:
+        """Inverse linear interpolation converts value to fractions of span away from start."""
+        return get_straight_line_y(
+            line_offset=-self.start * self._reciprocal_of_span,
+            line_gradient=self._reciprocal_of_span,
+            x=value,
+        )
+
+    @abstractmethod
+    def __invert__(self) -> "DirectedSegment": ...
 
     def __contains__(self, item: object) -> bool:
         return item in self._interval
@@ -150,8 +173,22 @@ class _ForwardSegment(DirectedSegment[TInterval], Generic[TInterval]):
     def span(self) -> float:
         return self._interval.span
 
+    def __invert__(self) -> "DirectedSegment":
+        return _InvertedSegment(
+            start=self.end,
+            end=self.start,
+            interval_cls=self.interval_cls,
+        )
+
 
 class _InvertedSegment(DirectedSegment[TInterval], Generic[TInterval]):
     @property
     def span(self) -> float:
         return -self._interval.span
+
+    def __invert__(self) -> "DirectedSegment":
+        return _ForwardSegment(
+            start=self.end,
+            end=self.start,
+            interval_cls=self.interval_cls,
+        )
