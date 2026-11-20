@@ -1,0 +1,43 @@
+dodal.devices.attenuator.attenuator.EnumFilterAttenuator
+========================================================
+
+.. currentmodule:: dodal.devices.attenuator.attenuator
+
+.. autoclass:: EnumFilterAttenuator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EnumFilterAttenuator.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

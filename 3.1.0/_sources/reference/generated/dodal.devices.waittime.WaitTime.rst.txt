@@ -1,0 +1,46 @@
+dodal.devices.waittime.WaitTime
+===============================
+
+.. currentmodule:: dodal.devices.waittime
+
+.. autoclass:: WaitTime
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~WaitTime.set
+      
+      
+      
+      
+      ~WaitTime.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

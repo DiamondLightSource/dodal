@@ -1,0 +1,35 @@
+dodal.devices.beamlines.i21.UVWTiltAzimuthMotorPositions
+========================================================
+
+.. currentmodule:: dodal.devices.beamlines.i21
+
+.. autoclass:: UVWTiltAzimuthMotorPositions
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~UVWTiltAzimuthMotorPositions.u
+      
+      
+      ~UVWTiltAzimuthMotorPositions.v
+      
+      
+      ~UVWTiltAzimuthMotorPositions.w
+      
+      
+      ~UVWTiltAzimuthMotorPositions.tilt_deg
+      
+      
+      ~UVWTiltAzimuthMotorPositions.azimuth_deg
+      
+   
+   

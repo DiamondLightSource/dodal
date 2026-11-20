@@ -1,0 +1,43 @@
+dodal.devices.pressure\_jump\_cell.ValveControl
+===============================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: ValveControl
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ValveControl.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

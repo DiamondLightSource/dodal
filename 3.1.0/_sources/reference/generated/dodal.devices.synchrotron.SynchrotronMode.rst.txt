@@ -1,0 +1,96 @@
+dodal.devices.synchrotron.SynchrotronMode
+=========================================
+
+.. currentmodule:: dodal.devices.synchrotron
+
+.. autoclass:: SynchrotronMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SynchrotronMode.SHUTDOWN
+      
+      
+      ~SynchrotronMode.INJECTION
+      
+      
+      ~SynchrotronMode.NOBEAM
+      
+      
+      ~SynchrotronMode.DEV
+      
+      
+      ~SynchrotronMode.USER
+      
+      
+      ~SynchrotronMode.SPECIAL
+      
+      
+      ~SynchrotronMode.STARTUP
+      
+      
+      ~SynchrotronMode.UNKNOWN
+      
+   
+   

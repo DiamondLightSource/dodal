@@ -1,0 +1,90 @@
+dodal.devices.beamlines.b21.vici\_valves.Valve1Positions
+========================================================
+
+.. currentmodule:: dodal.devices.beamlines.b21.vici_valves
+
+.. autoclass:: Valve1Positions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Valve1Positions.SEP_300
+      
+      
+      ~Valve1Positions.KW_402_5
+      
+      
+      ~Valve1Positions.S_200
+      
+      
+      ~Valve1Positions.SUP_6
+      
+      
+      ~Valve1Positions.GUEST_1
+      
+      
+      ~Valve1Positions.BYPASS_1
+      
+   
+   

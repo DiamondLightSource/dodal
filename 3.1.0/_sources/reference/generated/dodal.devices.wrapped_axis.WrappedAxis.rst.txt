@@ -1,0 +1,40 @@
+dodal.devices.wrapped\_axis.WrappedAxis
+=======================================
+
+.. currentmodule:: dodal.devices.wrapped_axis
+
+.. autoclass:: WrappedAxis
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

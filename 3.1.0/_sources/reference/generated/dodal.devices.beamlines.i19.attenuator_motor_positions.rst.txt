@@ -1,0 +1,36 @@
+dodal.devices.beamlines.i19.attenuator\_motor\_positions
+========================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.beamlines.i19
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~attenuator_motor_positions.AttenuatorMotorPositions
+
+
+
+
+.. automodule:: dodal.devices.beamlines.i19.attenuator_motor_positions
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

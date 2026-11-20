@@ -1,0 +1,78 @@
+dodal.devices.beamlines.i09.IntensityProtection
+===============================================
+
+.. currentmodule:: dodal.devices.beamlines.i09
+
+.. autoclass:: IntensityProtection
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~IntensityProtection.CLEAR
+      
+      
+      ~IntensityProtection.TRIPPED
+      
+   
+   

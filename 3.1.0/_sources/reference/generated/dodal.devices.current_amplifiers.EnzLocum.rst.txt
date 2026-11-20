@@ -1,0 +1,40 @@
+dodal.devices.current\_amplifiers.EnzLocum
+==========================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: EnzLocum
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

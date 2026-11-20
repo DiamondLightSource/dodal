@@ -1,0 +1,23 @@
+dodal.devices.oav.oav\_parameters.OAVConfigBeamCentre
+=====================================================
+
+.. currentmodule:: dodal.devices.oav.oav_parameters
+
+.. autoclass:: OAVConfigBeamCentre
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~OAVConfigBeamCentre.get_parameters
+      
+   
+   
+
+   
+   
+   

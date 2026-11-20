@@ -1,0 +1,36 @@
+dodal.devices.waittime
+======================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~waittime.WaitTime
+
+
+
+
+.. automodule:: dodal.devices.waittime
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

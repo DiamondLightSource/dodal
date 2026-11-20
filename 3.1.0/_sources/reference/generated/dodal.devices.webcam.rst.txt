@@ -1,0 +1,42 @@
+dodal.devices.webcam
+====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~webcam.Webcam
+
+
+
+
+.. automodule:: dodal.devices.webcam
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_placeholder_image
+   
+   
+
+   
+   
+   

@@ -1,0 +1,41 @@
+dodal.devices.beamlines.p99.andor2\_point.Andor2Point
+=====================================================
+
+.. currentmodule:: dodal.devices.beamlines.p99.andor2_point
+
+.. autoclass:: Andor2Point
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

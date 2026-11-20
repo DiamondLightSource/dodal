@@ -4,8 +4,8 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "3.0.9",
-    "url": "https://DiamondLightSource.github.io/dodal/3.0.9/"
+    "version": "3.1.0",
+    "url": "https://DiamondLightSource.github.io/dodal/3.1.0/"
   },
   {
     "version": "3.0.8",
@@ -522,6 +522,10 @@
   {
     "version": "270_update_pydantic",
     "url": "https://DiamondLightSource.github.io/dodal/270_update_pydantic/"
+  },
+  {
+    "version": "3.0.9",
+    "url": "https://DiamondLightSource.github.io/dodal/3.0.9/"
   },
   {
     "version": "341-add-setup-for-the-j20-beamline",

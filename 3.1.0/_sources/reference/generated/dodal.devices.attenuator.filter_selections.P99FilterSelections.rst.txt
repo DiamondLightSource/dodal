@@ -1,0 +1,120 @@
+dodal.devices.attenuator.filter\_selections.P99FilterSelections
+===============================================================
+
+.. currentmodule:: dodal.devices.attenuator.filter_selections
+
+.. autoclass:: P99FilterSelections
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~P99FilterSelections.EMPTY
+      
+      
+      ~P99FilterSelections.MN5UM
+      
+      
+      ~P99FilterSelections.FE
+      
+      
+      ~P99FilterSelections.CO5UM
+      
+      
+      ~P99FilterSelections.NI5UM
+      
+      
+      ~P99FilterSelections.CU5UM
+      
+      
+      ~P99FilterSelections.ZN5UM
+      
+      
+      ~P99FilterSelections.ZR
+      
+      
+      ~P99FilterSelections.MO
+      
+      
+      ~P99FilterSelections.RH
+      
+      
+      ~P99FilterSelections.PD
+      
+      
+      ~P99FilterSelections.AG
+      
+      
+      ~P99FilterSelections.CD25UM
+      
+      
+      ~P99FilterSelections.W
+      
+      
+      ~P99FilterSelections.PT
+      
+      
+      ~P99FilterSelections.USER
+      
+   
+   
