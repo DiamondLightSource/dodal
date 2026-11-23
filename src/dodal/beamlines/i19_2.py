@@ -9,7 +9,12 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.common.beamlines.beamline_utils import set_config_client
+from dodal.common.beamlines.beamline_utils import (
+    set_config_client,  # , set_path_provider
+)
+
+# from dodal.common.udc_directory_provider import PandASubpathProvider
+# from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
@@ -75,12 +80,17 @@ def config_client() -> ConfigClient:
 @devices.fixture
 @cache
 def path_provider() -> PathProvider:
+    # provider = PandASubpathProvider()
+    # set_path_provider(provider)
+    # return provider
     return StaticPathProvider(
-        UUIDFilenameProvider(), Path("/dls/i19-2/data/2026/cm44169-5/20261026_serial")
+        UUIDFilenameProvider(),
+        Path("/dls/i19-2/data/2026/cm44169-5/20261027_serial_2"),
     )
     # return StaticVisitPathProvider(
     #     BL,
     #     Path("/dls/i19-2/data/2026/cm44169-5/20261026_serial"),
+    #     client=LocalDirectoryServiceClient(),
     # )
 
 
