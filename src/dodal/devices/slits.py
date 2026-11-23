@@ -50,11 +50,11 @@ class SlitsWithZ(Slits):
         y_gap: str = "YSIZE",
         x_centre: str = "XGAP",
         y_centre: str = "YGAP",
-        z_pos: str = "Z",
+        z: str = "Z",
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
-            self.z_pos = Motor(prefix + z_pos)
+            self.z = Motor(prefix + z)
         super().__init__(
             prefix=prefix,
             x_gap=x_gap,

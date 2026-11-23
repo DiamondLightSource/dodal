@@ -41,7 +41,7 @@ async def test_reading_exit_slits_reads_gaps_and_centres_and_z(exit_slits: Slits
     set_mock_value(exit_slits.x_gap.user_readback, 0.5)
     set_mock_value(exit_slits.y_centre.user_readback, 1.0)
     set_mock_value(exit_slits.y_gap.user_readback, 1.5)
-    set_mock_value(exit_slits.z_pos.user_readback, 22)
+    set_mock_value(exit_slits.z.user_readback, 22)
 
     await assert_reading(
         exit_slits,
@@ -50,6 +50,6 @@ async def test_reading_exit_slits_reads_gaps_and_centres_and_z(exit_slits: Slits
             "exit_slits-x_gap": partial_reading(0.5),
             "exit_slits-y_centre": partial_reading(1.0),
             "exit_slits-y_gap": partial_reading(1.5),
-            "exit_slits-z_pos": partial_reading(22),
+            "exit_slits-z": partial_reading(22),
         },
     )
