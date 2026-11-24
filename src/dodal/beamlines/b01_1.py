@@ -190,5 +190,5 @@ def pmac(spectroscopy_stage: XYZStage, tomography_stage: XThetaStage) -> PmacIO:
             tomography_stage.x,
             tomography_stage.theta,
         ],
-        coord_nums=[1],
+        coord_nums=[1, 2],
     )
