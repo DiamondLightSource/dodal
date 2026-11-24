@@ -5,15 +5,14 @@ from ophyd_async.core import (
     AutoIncrementFilenameProvider,
     PathProvider,
     StaticPathProvider,
-    UUIDFilenameProvider,
 )
-from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.epics.adandor3 import Andor3Detector
 from ophyd_async.epics.adcore import ADWriterFactory
+from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XYStage
 from dodal.devices.synchrotron import Synchrotron
@@ -44,6 +43,7 @@ def path_provider() -> PathProvider:
         AutoIncrementFilenameProvider(base_filename="panda"), Path(PATH)
     )
 
+
 @devices.factory()
 def scanning_fine() -> XYStage:
     """Fine X and Y stages."""
@@ -55,7 +55,10 @@ def scanning_fine() -> XYStage:
 @devices.factory()
 def scanning_combined() -> XYStage:
     return XYStage(prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01:")
-#t1j_advanced
+
+
+# t1j_advanced
+
 
 @devices.factory()
 def scanning_pmac() -> PmacIO:
@@ -75,14 +78,12 @@ def panda1(path_provider: PathProvider) -> HDFPanda:
         path_provider=path_provider,
     )
 
+
 @devices.factory()
-def andor_detector(path_provider:PathProvider) -> Andor3Detector:
+def andor_detector(path_provider: PathProvider) -> Andor3Detector:
     return Andor3Detector(
         f"{PREFIX.beamline_prefix}-EA-DET-08:",
-        
-        ADWriterFactory.hdf(
-            path_provider= path_provider, writer_suffix=HDF5_SUFFIX
-        ),
+        ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix=CAM_SUFFIX,
         name="AndorMarana",
     )
