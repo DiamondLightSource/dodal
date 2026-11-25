@@ -216,7 +216,9 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 gap=self.apple2_ref().gap_ref().user_readback,
                 derived_units=units,
             )
-
+        # https://github.com/bluesky/ophyd-async/issues/1231
+        self.polarisation._timeout = None  # noqa: SLF001
+        self.energy._timeout = None  # noqa: SLF001
         super().__init__(name)
 
     @abc.abstractmethod
