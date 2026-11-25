@@ -222,7 +222,7 @@ def test_correct_lut_columns_returned_for_vfm(
 ):
     expected_columns = [[0.01, 0.02], [0.035, -0.009]]
 
-    assert eh1_vfm_piezo.voltage_nudge_vs_pixels_table == expected_columns
+    assert eh1_vfm_piezo.get_voltage_nudge_vs_pixels_table() == expected_columns
 
 
 def test_correct_lut_columns_returned_for_hfm(
@@ -230,4 +230,4 @@ def test_correct_lut_columns_returned_for_hfm(
 ):
     expected_columns = [[0.01, 0.02], [8.361, 16.769]]
 
-    assert eh2_hfm_piezo.voltage_nudge_vs_pixels_table == expected_columns
+    assert eh2_hfm_piezo.get_voltage_nudge_vs_pixels_table() == expected_columns

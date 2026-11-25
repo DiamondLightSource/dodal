@@ -65,7 +65,6 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
             self.setpoint = epics_signal_r(float, f"{prefix}AOFPITCH")
             self.readback = epics_signal_r(float, f"{prefix}AOFPITCH:RBV")
         self.mirror = mirror_type
-        self.voltage_nudge_vs_pixels_table = self._get_nudge_vs_pixels_nudge_columns()
         super().__init__(hutch=hutch, instrument_session=instrument_session, name=name)
 
     def _read_lut(self) -> list[list[float]]:
@@ -75,7 +74,7 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
         )
         return lut.columns
 
-    def _get_nudge_vs_pixels_nudge_columns(self) -> list[list[float]]:
+    def get_voltage_nudge_vs_pixels_table(self) -> list[list[float]]:
         _pixel_column_idx = 1 if self.mirror == FocusingMirrorName.HFM else 2
         full_lut = self._read_lut()
         return [full_lut[0], full_lut[_pixel_column_idx]]
