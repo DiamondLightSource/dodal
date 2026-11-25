@@ -2,6 +2,8 @@ import json
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from daq_config_server.client import ConfigClient
+from daq_config_server.testing import PathToMockDataDict
 from ophyd_async.core import SignalR, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
@@ -14,14 +16,28 @@ from dodal.devices.beamlines.i19.access_controlled.piezo_control import (
     FocusingMirrorName,
 )
 
+VOLTAGE_TO_POSITION_LUT = """
+# Columns: nudge size, delta x, delta y
+Units: V pixels pixels
+0.01 8.361 0.035
+0.02 16.769 -0.009
+"""
+
 
 @pytest.fixture
-def eh1_vfm_piezo() -> AccessControlledPiezoActuator:
+def path_to_mock_data() -> PathToMockDataDict:
+    return {"/path/to/config": VOLTAGE_TO_POSITION_LUT}
+
+
+@pytest.fixture
+def eh1_vfm_piezo(mock_config_client: ConfigClient) -> AccessControlledPiezoActuator:
     with init_devices(mock=True):
         v_piezo = AccessControlledPiezoActuator(
             "",
             FocusingMirrorName.VFM,
             HutchState.EH1,
+            "/path/to/config",
+            mock_config_client,
             "cm12345-1",
             name="mock_vfm_piezo",
         )
@@ -32,12 +48,14 @@ def eh1_vfm_piezo() -> AccessControlledPiezoActuator:
 
 
 @pytest.fixture
-def eh2_hfm_piezo() -> AccessControlledPiezoActuator:
+def eh2_hfm_piezo(mock_config_client: ConfigClient) -> AccessControlledPiezoActuator:
     with init_devices(mock=True):
         h_piezo = AccessControlledPiezoActuator(
             "",
             FocusingMirrorName.HFM,
             HutchState.EH2,
+            "/path/to/config",
+            mock_config_client,
             "cm12345-1",
             name="mock_hfm_piezo",
         )
@@ -55,10 +73,18 @@ def eh2_hfm_piezo() -> AccessControlledPiezoActuator:
     ],
 )
 def test_device_created_without_errors(
-    hutch_name: HutchState, mirror_type: FocusingMirrorName
+    hutch_name: HutchState,
+    mirror_type: FocusingMirrorName,
+    mock_config_client: ConfigClient,
 ):
     test_device = AccessControlledPiezoActuator(
-        "", mirror_type, hutch_name, "cm12345-1", "fake_piezo"
+        "",
+        mirror_type,
+        hutch_name,
+        "/path/to/config",
+        mock_config_client,
+        "cm12345-1",
+        "fake_piezo",
     )
     assert isinstance(test_device, AccessControlledPiezoActuator)
     assert isinstance(test_device.readback, SignalR)
@@ -182,3 +208,26 @@ async def test_hfm_piezo_makes_the_correct_rest_call(
         mock_put.assert_called_with(
             "/worker/task", data='{"task_id": "abc0-3fg8"}', headers=HEADERS
         )
+
+
+def test_read_lut_columns(eh1_vfm_piezo: AccessControlledPiezoActuator):
+    expected_columns = [[0.01, 0.02], [8.361, 16.769], [0.035, -0.009]]
+
+    columns = eh1_vfm_piezo._read_lut()
+    assert columns == expected_columns
+
+
+def test_correct_lut_columns_returned_for_vfm(
+    eh1_vfm_piezo: AccessControlledPiezoActuator,
+):
+    expected_columns = [[0.01, 0.02], [0.035, -0.009]]
+
+    assert eh1_vfm_piezo.voltage_nudge_vs_pixels_table == expected_columns
+
+
+def test_correct_lut_columns_returned_for_hfm(
+    eh2_hfm_piezo: AccessControlledPiezoActuator,
+):
+    expected_columns = [[0.01, 0.02], [8.361, 16.769]]
+
+    assert eh2_hfm_piezo.voltage_nudge_vs_pixels_table == expected_columns

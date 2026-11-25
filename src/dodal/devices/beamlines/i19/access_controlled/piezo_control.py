@@ -1,5 +1,7 @@
 from enum import StrEnum
 
+from daq_config_server.client import ConfigClient
+from daq_config_server.models.lookup_tables import GenericLookupTable
 from ophyd_async.core import AsyncStatus, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_r
 
@@ -49,9 +51,13 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
         prefix: str,
         mirror_type: FocusingMirrorName,
         hutch: HutchState,
+        voltage_to_position_lut: str,
+        config_client: ConfigClient,
         instrument_session: str = "",
         name: str = "",
     ):
+        self._config_client = config_client
+        self._lut_path = voltage_to_position_lut
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # The readback value is always slightly drifting so we also need to be able
             # to read the setpoint in order to know the exact value and calculate by how
@@ -59,7 +65,20 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
             self.setpoint = epics_signal_r(float, f"{prefix}AOFPITCH")
             self.readback = epics_signal_r(float, f"{prefix}AOFPITCH:RBV")
         self.mirror = mirror_type
+        self.voltage_nudge_vs_pixels_table = self._get_nudge_vs_pixels_nudge_columns()
         super().__init__(hutch=hutch, instrument_session=instrument_session, name=name)
+
+    def _read_lut(self) -> list[list[float]]:
+        lut_contents = self._config_client.get_file_contents(self._lut_path)
+        lut = GenericLookupTable.from_contents(
+            lut_contents, ("nudge", float), ("delta_x", float), ("delta_y", float)
+        )
+        return lut.columns
+
+    def _get_nudge_vs_pixels_nudge_columns(self) -> list[list[float]]:
+        _pixel_column_idx = 1 if self.mirror == FocusingMirrorName.HFM else 2
+        full_lut = self._read_lut()
+        return [full_lut[0], full_lut[_pixel_column_idx]]
 
     @AsyncStatus.wrap
     async def set(self, value: float):
