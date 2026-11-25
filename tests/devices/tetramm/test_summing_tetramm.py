@@ -76,7 +76,7 @@ async def test_describe_uses_summing_shape(
             "source": expected_path,
             "shape": [1, 1],
             "dtype_numpy": "<f8",
-            "dtype": "number",
+            "dtype": "array",
             "external": "STREAM:",
         }
     }

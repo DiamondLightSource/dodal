@@ -169,7 +169,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         await self.stop()
 
     @AsyncStatus.wrap
-    async def stop(self, success=True):
+    async def stop(self, *, success: bool = True):
         if self.forwarding_task:
             LOGGER.info(
                 f"Stopping forwarding for source id {await self.selected_source.get_value()}"

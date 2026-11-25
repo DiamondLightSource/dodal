@@ -28,9 +28,9 @@ from ophyd_async.epics.motor import Motor
 class FastAttenuatorState(StrictEnum):
     FAULT = "Fault"
     OUT = "Out"
-    OPENING = "Opening"
+    MOVING_OUT = "Moving Out"
     IN = "In"
-    CLOSING = "Closing"
+    MOVING_IN = "Moving In"
 
 
 class FastAttenuatorDemand(SubsetEnum):

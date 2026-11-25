@@ -133,7 +133,7 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     async def resume(self):
         await set_and_wait_for_value(self.hold, False)
 
-    async def stop(self, success: bool = True):
+    async def stop(self, *, success: bool = True):
         await set_and_wait_for_value(self.hold, True)
         if not success:
             await set_and_wait_for_value(self.hold, False)

@@ -6,6 +6,7 @@ from typing import Any, TypedDict
 
 import bluesky.plan_stubs as bps
 import numpy as np
+import numpy.typing as npt
 import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Triggerable
@@ -139,13 +140,13 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.results_source = results_source
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
-            Array1D[np.float64], name="centre_of_mass"
+            npt.NDArray[np.float64], name="centre_of_mass"
         )
         self.bounding_box, self._bounding_box_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="bounding_box"
+            npt.NDArray[np.uint64], name="bounding_box"
         )
         self.max_voxel, self._max_voxel_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="max_voxel"
+            npt.NDArray[np.uint64], name="max_voxel"
         )
         self.max_count, self._max_count_setter = soft_signal_r_and_setter(
             Array1D[np.uint64], name="max_count"
