@@ -218,6 +218,61 @@ def test_step_scans_add_shape_and_metadata_to_start_document(
     assert metadata == {"sample": "test"}
 
 
+@pytest.mark.parametrize(
+    "plan, grid",
+    (
+        [step_scan, False],
+        [step_rscan, False],
+        [step_grid_scan, True],
+        [step_grid_rscan, True],
+    ),
+)
+def test_step_scans_add_plan_name_and_plan_args_to_start_document(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    plan,
+    grid: bool,
+):
+    y_args = [0, 1, 0.25] if grid else [0, 0.25]
+    run_engine(plan([det], x_axis, 0, 1, 0.5, y_axis, *y_args))
+    start = run_engine_documents["start"][0]
+
+    expected_plan_args = {
+        "detectors": [repr(det)],
+        "args": [repr(x_axis), 0, 1, 0.5, repr(y_axis), *y_args],
+    }
+    if grid:
+        expected_plan_args["snake_axes"] = True
+    assert start["plan_name"] == plan.__name__
+    assert start["plan_args"] == expected_plan_args
+    assert list(start["motors"]) == [x_axis.name, y_axis.name]
+    assert start["detectors"] == [det.name]
+
+
+def test_step_scan_records_snake_axes_in_plan_args(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    run_engine(
+        step_grid_scan([], x_axis, 0, 1, 0.5, y_axis, 0, 1, 0.5, snake_axes=False)
+    )
+    assert run_engine_documents["start"][0]["plan_args"]["snake_axes"] is False
+
+
+def test_step_scan_user_metadata_takes_priority(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    x_axis: Motor,
+):
+    run_engine(step_scan([], x_axis, 0, 1, 0.5, metadata={"plan_name": "custom"}))
+    assert run_engine_documents["start"][0]["plan_name"] == "custom"
+
+
 @pytest.fixture(params=[0, 1], ids=["0 detector(s)", "1 detector(s)"])
 def detectors(
     request: pytest.FixtureRequest, det: StandardDetector
