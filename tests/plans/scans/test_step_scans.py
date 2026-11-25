@@ -4,12 +4,12 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import StandardDetector
 from ophyd_async.testing import assert_emitted
-from pydantic import ValidationError
 
 from dodal.devices.motors import Motor
 from dodal.plans.scans.step_scans import (
     _group_args_by_movable,
     _make_step_scan_args,
+    _make_step_scan_md,
     _make_stepped_list_num,
     _make_stepped_list_step,
     _round_list_elements,
@@ -184,11 +184,59 @@ def test_make_step_scan_args_grid_positions(x_axis: Motor, y_axis: Motor):
     assert shape == [3, 3]
 
 
-def test_step_scan_fails_when_given_non_numeric_parameter(
-    run_engine: RunEngine, det: StandardDetector, x_axis: Motor
+def test_group_args_by_movable_fails_when_given_non_numeric_parameter(
+    x_axis: Motor,
 ):
-    with pytest.raises(ValidationError):
-        run_engine(step_scan([det], x_axis, 0, "ten", 1))  # type: ignore
+    with pytest.raises(TypeError, match="Expected a movable or a number, got 'ten'"):
+        _group_args_by_movable([x_axis, 0, "ten", 1])  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "plan", [step_scan, step_rscan, step_grid_scan, step_grid_rscan]
+)
+def test_step_scans_fail_when_given_non_numeric_parameter(
+    run_engine: RunEngine, det: StandardDetector, x_axis: Motor, plan
+):
+    with pytest.raises(TypeError, match="Expected a movable or a number"):
+        run_engine(plan([det], x_axis, 0, "ten", 1))
+
+
+def test_make_step_scan_md(det: StandardDetector, x_axis: Motor, y_axis: Motor):
+    md = _make_step_scan_md(
+        "step_grid_scan",
+        [det],
+        [x_axis, 0, 1, 0.5, y_axis, 0, 2, 1],
+        [3, 3],
+        None,
+        snake_axes=True,
+    )
+    assert md == {
+        "plan_name": "step_grid_scan",
+        "plan_args": {
+            "detectors": [repr(det)],
+            "args": [repr(x_axis), 0, 1, 0.5, repr(y_axis), 0, 2, 1],
+            "snake_axes": True,
+        },
+        "detectors": [det.name],
+        "shape": [3, 3],
+    }
+
+
+def test_make_step_scan_md_with_no_detectors(x_axis: Motor):
+    md = _make_step_scan_md("step_scan", [], [x_axis, 0, 1, 0.5], [3], None)
+    assert md["detectors"] == []
+    assert md["plan_args"]["detectors"] == []
+
+
+def test_make_step_scan_md_user_metadata_takes_priority(
+    det: StandardDetector, x_axis: Motor
+):
+    metadata = {"detectors": ["custom"], "shape": [1], "sample": "test"}
+    md = _make_step_scan_md("step_scan", [det], [x_axis, 0, 1, 0.5], [3], metadata)
+    assert md["detectors"] == ["custom"]
+    assert md["shape"] == [1]
+    assert md["sample"] == "test"
+    assert md["plan_name"] == "step_scan"
 
 
 @pytest.mark.parametrize(
@@ -214,6 +262,7 @@ def test_step_scans_add_shape_and_metadata_to_start_document(
     run_engine(plan([], x_axis, *args, metadata=metadata))
     start = run_engine_documents["start"][0]
     assert start["shape"] == expected_shape
+    assert start["detectors"] == []
     assert start["sample"] == "test"
     assert metadata == {"sample": "test"}
 

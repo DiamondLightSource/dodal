@@ -1,27 +1,3 @@
-"""Step scans: scans defined by a start, stop and step size rather than a number of
-points.
-
-Bluesky's own plans (`bluesky.plans.scan`, `bluesky.plans.grid_scan`, ...) define a
-trajectory by its start, stop and *number of points*. The plans in this module instead
-take a *step size*, compute the list of positions for each axis and then delegate to the
-corresponding bluesky list plan:
-
-- `step_scan`: concurrent trajectories, uses `bluesky.plans.list_scan`.
-- `step_rscan`: as `step_scan`, relative to the current positions, uses
-  `bluesky.plans.rel_list_scan`.
-- `step_grid_scan`: independent trajectories (a grid), uses
-  `bluesky.plans.list_grid_scan`.
-- `step_grid_rscan`: as `step_grid_scan`, relative to the current positions, uses
-  `bluesky.plans.rel_list_grid_scan`.
-
-All plans take their axes as a flat sequence of positional arguments, in the same
-style as the bluesky plans, e.g.::
-
-    step_scan([det], x, 0, 10, 1)
-    step_scan([det], x, 0, 10, 1, y, 5, 0.5)
-    step_grid_scan([det], x, 0, 10, 1, y, 0, 5, 0.5)
-"""
-
 from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any
@@ -34,7 +10,6 @@ from bluesky.utils import CustomPlanMetadata
 from dodal.common import MsgGenerator
 
 StepScanArg = NamedMovable | float | int
-"""A single positional argument to a step scan: either a movable or a number."""
 
 
 def _round_list_elements(stepped_list, params) -> list[float]:
@@ -89,6 +64,11 @@ def _group_args_by_movable(
         elif not groups:
             raise ValueError(
                 f"Expected a movable as the first argument after detectors, got {arg!r}."
+            )
+        elif not isinstance(arg, int | float):
+            raise TypeError(
+                f"Expected a movable or a number, got {arg!r} of type "
+                f"{type(arg).__name__}."
             )
         else:
             groups[-1][1].append(arg)
@@ -149,16 +129,6 @@ def _make_step_scan_md(
 ) -> CustomPlanMetadata:
     """Create the run start metadata for a step scan.
 
-    The bluesky plans that the step scans delegate to record their own `plan_name` and
-    `plan_args`, which would describe the `list_scan` call (with the calculated
-    position lists) rather than the step scan the user requested. These are
-    overridden here so the start document records the step scan and the arguments it
-    was called with, in the same format bluesky uses: detectors and movables are
-    stored by `repr`, numbers as given. Bluesky's `plan_pattern` and
-    `plan_pattern_args` are left untouched, as they describe the actual trajectory.
-
-    As with bluesky, any user supplied `metadata` takes priority.
-
     Args:
         plan_name: Name of the step scan plan.
         detectors: Detectors passed to the plan.
@@ -217,6 +187,8 @@ def step_scan(
         ValueError: If no movable is given, the first argument after `detectors` is
             not a movable, the wrong number of parameters are given for a movable or
             the start and stop of the first movable are equal.
+        TypeError: If an argument after `detectors` is neither a movable nor a
+            number.
     """
     list_scan_args, shape = _make_step_scan_args(args, grid=False)
     yield from bp.list_scan(
@@ -260,8 +232,9 @@ def step_rscan(
         ValueError: If no movable is given, the first argument after `detectors` is
             not a movable, the wrong number of parameters are given for a movable or
             the start and stop of the first movable are equal.
+        TypeError: If an argument after `detectors` is neither a movable nor a
+            number.
     """
-    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     list_scan_args, shape = _make_step_scan_args(args, grid=False)
     yield from bp.rel_list_scan(
         detectors,
@@ -306,8 +279,9 @@ def step_grid_scan(
         ValueError: If no movable is given, the first argument after `detectors` is
             not a movable, any movable is not given exactly 3 parameters or any
             start and stop are equal.
+        TypeError: If an argument after `detectors` is neither a movable nor a
+            number.
     """
-    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     list_scan_args, shape = _make_step_scan_args(args, grid=True)
     yield from bp.list_grid_scan(
         detectors,
@@ -358,8 +332,9 @@ def step_grid_rscan(
         ValueError: If no movable is given, the first argument after `detectors` is
             not a movable, any movable is not given exactly 3 parameters or any
             start and stop are equal.
+        TypeError: If an argument after `detectors` is neither a movable nor a
+            number.
     """
-    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     list_scan_args, shape = _make_step_scan_args(args, grid=True)
     yield from bp.rel_list_grid_scan(
         detectors,
