@@ -56,6 +56,14 @@ def scanning_fine() -> XYStage:
 
 
 @devices.factory()
+def scanning_coarse() -> XYStage:
+    """Coarse X and Y stages."""
+    return XYStage(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01:", x_infix="XC", y_infix="YC"
+    )
+
+
+@devices.factory()
 def scanning_combined() -> XYStage:
     return XYStage(prefix=f"{PREFIX.beamline_prefix}-EA-TABLE-01:")
 
