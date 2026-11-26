@@ -32,37 +32,35 @@ def path_to_mock_data() -> PathToMockDataDict:
 @pytest.fixture
 def eh1_vfm_piezo(mock_config_client: ConfigClient) -> AccessControlledPiezoActuator:
     with init_devices(mock=True):
-        v_piezo = AccessControlledPiezoActuator(
+        eh1_vfm_piezo = AccessControlledPiezoActuator(
             "",
             FocusingMirrorName.VFM,
             HutchState.EH1,
             "/path/to/config",
             mock_config_client,
             "cm12345-1",
-            name="mock_vfm_piezo",
         )
-    v_piezo.url = "http://test.url"
-    set_mock_value(v_piezo.setpoint, 0.7)
-    set_mock_value(v_piezo.readback, 1.0)
-    return v_piezo
+    eh1_vfm_piezo.url = "http://test.url"
+    set_mock_value(eh1_vfm_piezo.setpoint, 0.7)
+    set_mock_value(eh1_vfm_piezo.readback, 1.0)
+    return eh1_vfm_piezo
 
 
 @pytest.fixture
 def eh2_hfm_piezo(mock_config_client: ConfigClient) -> AccessControlledPiezoActuator:
     with init_devices(mock=True):
-        h_piezo = AccessControlledPiezoActuator(
+        eh2_hfm_piezo = AccessControlledPiezoActuator(
             "",
             FocusingMirrorName.HFM,
             HutchState.EH2,
             "/path/to/config",
             mock_config_client,
             "cm12345-1",
-            name="mock_hfm_piezo",
         )
-    h_piezo.url = "http://test.url"
-    set_mock_value(h_piezo.setpoint, 0.99)
-    set_mock_value(h_piezo.readback, 1.0)
-    return h_piezo
+    eh2_hfm_piezo.url = "http://test.url"
+    set_mock_value(eh2_hfm_piezo.setpoint, 0.99)
+    set_mock_value(eh2_hfm_piezo.readback, 1.0)
+    return eh2_hfm_piezo
 
 
 @pytest.mark.parametrize(
@@ -96,8 +94,8 @@ async def test_vfm_piezo_rbv_value_can_be_read(
     await assert_reading(
         eh1_vfm_piezo,
         {
-            "mock_vfm_piezo-setpoint": partial_reading(0.7),
-            "mock_vfm_piezo-readback": partial_reading(1.0),
+            "eh1_vfm_piezo-setpoint": partial_reading(0.7),
+            "eh1_vfm_piezo-readback": partial_reading(1.0),
         },
     )
 
@@ -108,8 +106,8 @@ async def test_hfm_piezo_rbv_value_can_be_read(
     await assert_reading(
         eh2_hfm_piezo,
         {
-            "mock_hfm_piezo-setpoint": partial_reading(0.99),
-            "mock_hfm_piezo-readback": partial_reading(1.0),
+            "eh2_hfm_piezo-setpoint": partial_reading(0.99),
+            "eh2_hfm_piezo-readback": partial_reading(1.0),
         },
     )
 

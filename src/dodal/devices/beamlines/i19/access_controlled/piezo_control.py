@@ -75,6 +75,14 @@ class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
         return lut.columns
 
     def get_voltage_nudge_vs_pixels_table(self) -> list[list[float]]:
+        """Read the LUT to get a table of nudge sizes vs position change for beam
+        alignment.
+
+        Returns:
+            lut_columns (list[list[float]]): a list of voltage nudges vs position.
+            The first element is a list of nudge sizes, the second will be either the x
+            position shift (for the hfm) or y (for the vfm) in pixels.
+        """
         _pixel_column_idx = 1 if self.mirror == FocusingMirrorName.HFM else 2
         full_lut = self._read_lut()
         return [full_lut[0], full_lut[_pixel_column_idx]]
