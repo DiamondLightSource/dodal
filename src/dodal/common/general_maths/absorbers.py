@@ -146,7 +146,7 @@ class FoilAbsorber(Absorber):
 
 
 class WedgeAbsorber(Absorber):
-    """System level representation of an foil absorbing filter, typically wheel mounted.
+    """System level representation of a tapered wedge absorber, typically mounted on a lateral motor axis.
 
     Attributes:
         geometry_model: Shape model implementing the TaperedGeometryProvider protocol.
