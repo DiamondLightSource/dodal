@@ -104,6 +104,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
             pol_angle=self._linear_arbitrary_angle,
             pol=self.polarisation,
         )
+        # https://github.com/bluesky/ophyd-async/issues/1231
+        self.linear_arbitrary_angle._timeout = None  # noqa: SLF001
 
     def _read_linear_arbitrary_angle(self, pol_angle: float, pol: Pol) -> float:
         self._raise_if_not_la(pol)
