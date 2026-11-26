@@ -14,13 +14,16 @@ from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.device_manager import DeviceManager
+from dodal.devices.beamlines.i08_1 import Grating
 from dodal.devices.motors import XYStage
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i08-1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
+I_PREFIX = PREFIX = BeamlinePrefix(BL, suffix="I")
 PATH = "/dls/i08-1/data/2026/cm44149-5/tmp/"
 
 
@@ -68,6 +71,14 @@ def scanning_pmac() -> PmacIO:
         raw_motors=[scanning_fine().x, scanning_fine().y],
         coord_nums=[2],
         name="pmac",
+    )
+
+
+@devices.factory()
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{I_PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=Grating,
     )
 
 
