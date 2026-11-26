@@ -421,8 +421,8 @@ wheels = [
 
 [[package]]
 name = "bluesky"
-version = "1.16.0"
-source = { registry = "https://pypi.org/simple" }
+version = "1.16.1.dev21+g9fbd11032"
+source = { git = "https://github.com/bluesky/bluesky.git?rev=refs%2Fpull%2F2124%2Fhead#9fbd110326e3bb93699b16dd6a6ab53ecd2b66c7" }
 dependencies = [
     { name = "cycler" },
     { name = "event-model" },
@@ -435,10 +435,6 @@ dependencies = [
     { name = "toolz" },
     { name = "tqdm" },
     { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/24/fb/9d72f62bb19fa10fad013a6039e51162ebaac84713a06a167083c4b68775/bluesky-1.16.0.tar.gz", hash = "sha256:e89884e5eb4e4e502d4f1e929f6862ed6827ad48272a928583bf67d2f1745261", size = 516370, upload-time = "2026-10-29T17:13:07.145Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/ca/ad113309c25d01d2166a0ed17fcdcfa453dbf267147d9e9530928dda82a6/bluesky-1.16.0-py3-none-any.whl", hash = "sha256:674b6547bcab7f4dcaf5d403ce2225d52711cbfa363853ce5e2cf5119b802d60", size = 369254, upload-time = "2026-10-29T17:13:05.466Z" },
 ]
 
 [[package]]
@@ -1166,7 +1162,7 @@ dev = [
 requires-dist = [
     { name = "aiofiles" },
     { name = "aiohttp" },
-    { name = "bluesky", specifier = ">=1.14.5" },
+    { name = "bluesky", git = "https://github.com/bluesky/bluesky.git?rev=refs%2Fpull%2F2124%2Fhead" },
     { name = "click" },
     { name = "daq-config-server", specifier = ">=1.5.2" },
     { name = "deepdiff" },

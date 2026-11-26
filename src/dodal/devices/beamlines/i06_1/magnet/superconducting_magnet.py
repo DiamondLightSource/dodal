@@ -33,7 +33,6 @@ from pydantic import BaseModel, Field
 from dodal.devices.beamlines.i06_1.magnet.coordinates import (
     MagnetPosition,
     MagnetRequest,
-    MagnetSphericalPosition,
     MagnetSphericalRequest,
 )
 from dodal.devices.beamlines.i06_1.magnet.enums import (
@@ -139,7 +138,7 @@ class MagnetAxis(StandardReadable, StandardMovable[float], Flyable, Preparable):
         return fly_status
 
 
-class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
+class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetRequest]):
     """Cartesian interface to the superconducting magnet.
 
     Exposes the physical X, Y and Z magnet axes as individual movable signals,
@@ -184,7 +183,7 @@ class MagnetCartesianCoordinates(StandardReadable, Movable[MagnetPosition]):
         return MagnetPosition(x=x0, y=y0, z=z0)
 
 
-class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalPosition]):
+class MagnetSphericalCoordinates(StandardReadable, Movable[MagnetSphericalRequest]):
     """Spherical coordinate interface to the superconducting magnet.
 
     Exposes the magnet field in spherical coordinates using the derived signals

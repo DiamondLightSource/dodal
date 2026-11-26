@@ -1,5 +1,3 @@
-from typing import SupportsFloat
-
 import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -157,7 +155,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
             )
 
 
-class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
+class LinearArbitraryAngle(StandardReadable, Movable[float]):
     """Device to set the polarisation angle of the Apple2 undulator in Linear Arbitrary
     (LA) mode.
 
