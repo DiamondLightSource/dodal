@@ -74,7 +74,7 @@ class PinColConfiguration(StandardReadable):
         super().__init__(name)
 
 
-class PinholeCollimatorControl(StandardReadable, Movable[str]):
+class PinholeCollimatorControl(StandardReadable, Movable[PinColRequest]):
     """Device to control the Pinhole and Collimator stages moves on I19-2, using the
     MAPT configuration table to look up the positions.
     """
