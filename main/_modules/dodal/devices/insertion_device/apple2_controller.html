@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 3.1.1.dev1+g97037c5f5 documentation</title>
+    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 3.1.1.dev2+gbe2f3082e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=69101582"></script>
+    <script src="../../../../_static/documentation_options.js?v=33772749"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1039,7 +1039,9 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">gap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2_ref</span><span class="p">()</span><span class="o">.</span><span class="n">gap_ref</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
                 <span class="n">derived_units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
             <span class="p">)</span>
-
+        <span class="c1"># https://github.com/bluesky/ophyd-async/issues/1231</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># noqa: SLF001</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># noqa: SLF001</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
