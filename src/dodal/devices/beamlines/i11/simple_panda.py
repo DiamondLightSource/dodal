@@ -19,4 +19,5 @@ class SimplePanda(TimestampRecordingDevice):
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self._trigger = epics_signal_rw(bool, read_pv=f"{prefix}BITS:A")
+            self.pulse_width = epics_signal_rw(float, read_pv=f"{prefix}PULSE1:WIDTH")
         super().__init__(Reference(self._trigger), name=name)
