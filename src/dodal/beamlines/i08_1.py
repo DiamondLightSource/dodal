@@ -7,7 +7,7 @@ from ophyd_async.core import (
     StaticPathProvider,
 )
 from ophyd_async.epics.adandor3 import Andor3Detector
-from ophyd_async.epics.adcore import ADWriterFactory
+from ophyd_async.epics.adcore import ADWriterFactory, NDStatsIO
 from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -105,4 +105,7 @@ def andor_detector(path_provider: PathProvider) -> Andor3Detector:
         ADWriterFactory.hdf(path_provider=path_provider, writer_suffix=HDF5_SUFFIX),
         driver_suffix=CAM_SUFFIX,
         name="AndorMarana",
+        plugins={
+            "stats": NDStatsIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-08:STAT:")
+        },
     )
