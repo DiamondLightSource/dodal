@@ -105,22 +105,21 @@ class FastCSMythen3TriggerLogic(DetectorTriggerLogic):
         return _DEADTIMES[_BIT_DEPTH]
 
     async def prepare_internal(self, num: int, livetime: float, deadtime: float):
+        # This is actually running in the external start mode as in
+        # https://github.com/bluesky/ophyd-async/issues/1527. Once this is it's own mode
+        # we can use that instead.
         if livetime:
             await self._driver.exposure_time.set(livetime)
-            await self._driver.period.set(deadtime + livetime)
-        await self._driver.trigger_mode.set(Mythen3TriggerMode.AUTO)
+        await self._driver.trigger_mode.set(Mythen3TriggerMode.TRIGGER)
         await self._driver.frames.set(num)
+        await self._driver.triggers.set(1)
 
     async def prepare_edge(self, num: int, livetime: float):
         if livetime:
             await self._driver.exposure_time.set(livetime)
-        # This should really be setting number of triggers, not frames and use a 1-to-1
-        # Mapping of frames to triggers but the detector does not accept multiple triggers
-        # Ultimately this should be solved by fixing the detector or with an external
-        # start mode
-        # (See https://github.com/bluesky/ophyd-async/pull/1496#issuecomment-6923580990)
         await self._driver.trigger_mode.set(Mythen3TriggerMode.TRIGGER)
-        await self._driver.frames.set(num)
+        await self._driver.frames.set(1)
+        await self._driver.triggers.set(num)
 
     async def prepare_level(self, num: int):
         await self._driver.trigger_mode.set(Mythen3TriggerMode.TRIGGER_GATING)
