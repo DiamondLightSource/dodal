@@ -1,4 +1,5 @@
-from collections.abc import Sequence
+import math
+from collections.abc import Callable, Sequence
 from decimal import Decimal
 from typing import Any
 
@@ -11,38 +12,46 @@ from dodal.common import MsgGenerator
 
 StepScanArg = NamedMovable | float | int
 
-
-def _round_list_elements(stepped_list, params) -> list[float]:
-    decimals = [Decimal(str(param)) for param in params]
-    exponents = [d.as_tuple().exponent for d in decimals]
-    decimal_places = [-exponent for exponent in exponents]  # type: ignore
-    max_decimal_places = max(decimal_places)
-    return np.round(stepped_list, decimals=max_decimal_places).tolist()
+# Include a final point that overshoots stop by up to this fraction of a step.
+_STOP_TOLERANCE = 0.05
 
 
-def _make_stepped_list_step(start: float, stop: float, step: float) -> list:
+def _decimal_places(*values: float) -> int:
+    """Return the most decimal places of any of the values e.g. (1, 0.5, 0.25) -> 2."""
+    return max(0, *(-int(Decimal(str(v)).as_tuple().exponent) for v in values))
+
+
+def _positions(start: float, step: float, num: int, decimal_places: int) -> list[float]:
+    """Return `num` positions from `start` in increments of `step`, rounded to remove
+    floating point error, e.g. 0.30000000000000004 -> 0.3.
+    """
+    return np.round(start + step * np.arange(num), decimal_places).tolist()
+
+
+def _make_stepped_list_step(start: float, stop: float, step: float) -> list[float]:
+    """Return positions from `start` to `stop` in increments of `step`.
+
+    The sign of `step` is ignored, it always moves from `start` towards `stop`. A step
+    larger than the range gives just `start` and `stop`. `stop` is only included if it
+    is reached by a whole number of steps, to within 5% of a step.
+    """
     if start == stop:
         raise ValueError(
             f"Start ({start}) and stop ({stop}) values cannot be the same."
         )
-    if abs(step) > abs(stop - start):
-        step = stop - start
-    step = abs(step) * np.sign(stop - start)
-    stepped_list = np.arange(start, stop, step).tolist()
-    if abs((stepped_list[-1] + step) - stop) <= abs(step * 0.05):
-        stepped_list.append(stepped_list[-1] + step)
-    rounded_stepped_list = _round_list_elements(
-        stepped_list=stepped_list, params=[start, stop, step]
-    )
-    return rounded_stepped_list
+    if step == 0:
+        raise ValueError("Step cannot be zero.")
+    decimal_places = _decimal_places(start, stop, step)
+    span = stop - start
+    step = math.copysign(min(abs(step), abs(span)), span)
+    # Round away floating point error so the tolerance boundary is deterministic.
+    num = math.floor(round(span / step + _STOP_TOLERANCE, 9)) + 1
+    return _positions(start, step, num, decimal_places)
 
 
-def _make_stepped_list_num(start, step, num) -> list:
-    stepped_list = [start + (n * step) for n in range(num)]
-    rounded_stepped_list = _round_list_elements(
-        stepped_list=stepped_list, params=[start, step]
-    )
-    return rounded_stepped_list
+def _make_stepped_list_num(start: float, step: float, num: int) -> list[float]:
+    """Return `num` positions from `start` in increments of `step`."""
+    return _positions(start, step, num, _decimal_places(start, step))
 
 
 def _group_args_by_movable(
@@ -92,29 +101,22 @@ def _make_step_scan_args(
         `[movable1, positions1, movable2, positions2, ...]`, and the shape of the
         scan).
     """
-    groups = _group_args_by_movable(args)
-
     list_scan_args: list[Any] = []
     shape: list[int] = []
-    num_points = 0
-    for i, (movable, params) in enumerate(groups):
-        if i == 0 or grid:
-            if len(params) != 3:
-                raise ValueError(
-                    f"You provided {len(params)} parameters for {movable}, "
-                    "rather than 3 (start, stop, step)."
-                )
+    for i, (movable, params) in enumerate(_group_args_by_movable(args)):
+        sets_num_points = grid or i == 0
+        expected = ("start", "stop", "step") if sets_num_points else ("start", "step")
+        if len(params) != len(expected):
+            raise ValueError(
+                f"You provided {len(params)} parameters for {movable.name}, rather "
+                f"than {len(expected)} ({', '.join(expected)})."
+            )
+        if sets_num_points:
             positions = _make_stepped_list_step(*params)
-            num_points = len(positions)
-            shape.append(num_points)
+            shape.append(len(positions))
         else:
-            if len(params) != 2:
-                raise ValueError(
-                    f"You provided {len(params)} parameters for {movable}, "
-                    "rather than 2 (start, step)."
-                )
-            positions = _make_stepped_list_num(*params, num=num_points)
-        list_scan_args.extend([movable, positions])
+            positions = _make_stepped_list_num(*params, num=shape[0])
+        list_scan_args += [movable, positions]
 
     return list_scan_args, shape
 
@@ -151,6 +153,26 @@ def _make_step_scan_md(
         "shape": shape,
         **(metadata or {}),
     }
+
+
+def _run_step_scan(
+    plan: Callable[..., MsgGenerator],
+    plan_name: str,
+    detectors: Sequence[Readable],
+    args: Sequence[StepScanArg],
+    metadata: CustomPlanMetadata | None,
+    *,
+    grid: bool,
+    **plan_kwargs: Any,
+) -> MsgGenerator:
+    """Calculate the positions for a step scan and run it with a bluesky list plan.
+
+    `plan_kwargs` (e.g. `snake_axes`) are passed to `plan` and recorded in the
+    `plan_args` metadata.
+    """
+    list_scan_args, shape = _make_step_scan_args(args, grid=grid)
+    md = _make_step_scan_md(plan_name, detectors, args, shape, metadata, **plan_kwargs)
+    yield from plan(detectors, *list_scan_args, md=md, **plan_kwargs)
 
 
 def step_scan(
@@ -190,11 +212,8 @@ def step_scan(
         TypeError: If an argument after `detectors` is neither a movable nor a
             number.
     """
-    list_scan_args, shape = _make_step_scan_args(args, grid=False)
-    yield from bp.list_scan(
-        detectors,
-        *list_scan_args,
-        md=_make_step_scan_md("step_scan", detectors, args, shape, metadata),
+    yield from _run_step_scan(
+        bp.list_scan, "step_scan", detectors, args, metadata, grid=False
     )
 
 
@@ -235,11 +254,8 @@ def step_rscan(
         TypeError: If an argument after `detectors` is neither a movable nor a
             number.
     """
-    list_scan_args, shape = _make_step_scan_args(args, grid=False)
-    yield from bp.rel_list_scan(
-        detectors,
-        *list_scan_args,
-        md=_make_step_scan_md("step_rscan", detectors, args, shape, metadata),
+    yield from _run_step_scan(
+        bp.rel_list_scan, "step_rscan", detectors, args, metadata, grid=False
     )
 
 
@@ -282,19 +298,14 @@ def step_grid_scan(
         TypeError: If an argument after `detectors` is neither a movable nor a
             number.
     """
-    list_scan_args, shape = _make_step_scan_args(args, grid=True)
-    yield from bp.list_grid_scan(
+    yield from _run_step_scan(
+        bp.list_grid_scan,
+        "step_grid_scan",
         detectors,
-        *list_scan_args,
+        args,
+        metadata,
+        grid=True,
         snake_axes=snake_axes,
-        md=_make_step_scan_md(
-            "step_grid_scan",
-            detectors,
-            args,
-            shape,
-            metadata,
-            snake_axes=snake_axes,
-        ),
     )
 
 
@@ -335,17 +346,12 @@ def step_grid_rscan(
         TypeError: If an argument after `detectors` is neither a movable nor a
             number.
     """
-    list_scan_args, shape = _make_step_scan_args(args, grid=True)
-    yield from bp.rel_list_grid_scan(
+    yield from _run_step_scan(
+        bp.rel_list_grid_scan,
+        "step_grid_rscan",
         detectors,
-        *list_scan_args,
+        args,
+        metadata,
+        grid=True,
         snake_axes=snake_axes,
-        md=_make_step_scan_md(
-            "step_grid_rscan",
-            detectors,
-            args,
-            shape,
-            metadata,
-            snake_axes=snake_axes,
-        ),
     )

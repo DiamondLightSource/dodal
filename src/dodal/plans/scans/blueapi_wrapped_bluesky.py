@@ -1,11 +1,3 @@
-import re
-from collections.abc import Callable
-from functools import wraps
-from inspect import signature
-from typing import ParamSpec, TypeVar
-
-import bluesky.plans as bp
-
 """This module wraps plan(s) from bluesky.plans for blueapi. These plans expose
 per_step/per_shot arguments which are callable. A callable is a python method and are
 not serialisable, therefore it is impossible for the user to override this argument. It
@@ -13,6 +5,13 @@ will be confusing to leave this in for a user, so the parameter and doc string
 referencing it is removed https://github.com/DiamondLightSource/blueapi/issues/711.
 """
 
+import re
+from collections.abc import Callable
+from functools import wraps
+from inspect import signature
+from typing import ParamSpec, TypeVar
+
+import bluesky.plans as bp
 
 P = ParamSpec("P")
 R = TypeVar("R")
