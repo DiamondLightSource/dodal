@@ -40,11 +40,11 @@ async def test_fastcs_mythen_prepare_internal(fastcs_mythen: FastCSMythen3) -> N
     await trigger_logic.prepare_internal(num=5, livetime=0.1, deadtime=0.02)
 
     get_mock_put(fastcs_mythen.driver.trigger_mode).assert_called_once_with(
-        Mythen3TriggerMode.AUTO
+        Mythen3TriggerMode.TRIGGER
     )
     assert await fastcs_mythen.driver.frames.get_value() == 5
     assert await fastcs_mythen.driver.exposure_time.get_value() == 0.1
-    assert await fastcs_mythen.driver.period.get_value() == pytest.approx(0.12)
+    assert await fastcs_mythen.driver.period.get_value() == pytest.approx(0)
 
 
 async def test_fastcs_mythen_prepare_edge(fastcs_mythen: FastCSMythen3) -> None:
@@ -55,7 +55,8 @@ async def test_fastcs_mythen_prepare_edge(fastcs_mythen: FastCSMythen3) -> None:
     get_mock_put(fastcs_mythen.driver.trigger_mode).assert_called_once_with(
         Mythen3TriggerMode.TRIGGER
     )
-    assert await fastcs_mythen.driver.frames.get_value() == 3
+    assert await fastcs_mythen.driver.frames.get_value() == 1
+    assert await fastcs_mythen.driver.triggers.get_value() == 3
     assert await fastcs_mythen.driver.exposure_time.get_value() == 0.1
 
 
