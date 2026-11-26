@@ -20,6 +20,7 @@ from dodal.devices.beamlines.i11.diff_stages import (
 )
 from dodal.devices.beamlines.i11.mythen import Mythen3
 from dodal.devices.beamlines.i11.nx100robot import NX100Robot
+from dodal.devices.beamlines.i11.simple_panda import SimplePanda
 from dodal.devices.beamlines.i11.spinner import Spinner
 from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.eurotherm import (
@@ -174,3 +175,8 @@ def fast_shutter() -> FastShutter[OpenCloseUpper]:
         open_state=OpenCloseUpper.OPEN,
         close_state=OpenCloseUpper.CLOSE,
     )
+
+
+@devices.factory()
+def simple_panda() -> SimplePanda:
+    return SimplePanda(f"{PREFIX.beamline_prefix}-EA-PANDA-01:")

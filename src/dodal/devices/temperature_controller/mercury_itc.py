@@ -1,52 +1,29 @@
-from copy import deepcopy
+from functools import cached_property
 
-from bluesky.protocols import Reading
-from event_model import DataKey
-from ophyd_async.core import StandardReadable, StandardReadableFormat
+from ophyd_async.core import (
+    SignalR,
+    StandardReadable,
+    StandardReadableFormat,
+)
 from ophyd_async.core._device import DeviceVector
-from ophyd_async.core._utils import merge_gathered_dicts
 from ophyd_async.epics.core import epics_signal_r
 
+from dodal.devices.util.timestamp_recording_device import TimestampRecordingDevice
 
-class TempSensorChannel(StandardReadable):
+
+class TempSensorChannel(TimestampRecordingDevice):
     """A single temperature sensor channel on the mercury."""
+
+    @cached_property
+    def _signal_to_timestamp(self) -> SignalR:
+        return self.readback
 
     def __init__(self, prefix: str, name: str = "") -> None:
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, read_pv=f"{prefix}READ_TEMP_SIG_TEMP")
 
-        super().__init__(name=name)
-
-    async def describe(self) -> dict[str, DataKey]:
-        """Adds a new signal on a device that is just the timestamp of readings from an
-        existing signal.
-
-        This is a workaround so that the nexus writer will actually record the timestamp.
-        """
-        descriptions = await merge_gathered_dicts(
-            [func() for func in self._describe_funcs]
-        )
-        descriptions[f"{self.readback.name}-timestamp"] = deepcopy(
-            descriptions[self.readback.name]
-        )
-        descriptions[f"{self.readback.name}-timestamp"]["dtype"] = "number"
-        return descriptions
-
-    async def read(self) -> dict[str, Reading]:
-        """Reads the values from the device, adding a new signal for the timestamp of
-        the readback.
-
-        This is a workaround so that the nexus writer will actually record the timestamp.
-        """
-        readings = await merge_gathered_dicts([func() for func in self._read_funcs])
-        readings[f"{self.readback.name}-timestamp"] = deepcopy(
-            readings[self.readback.name]
-        )
-        readings[f"{self.readback.name}-timestamp"]["value"] = readings[
-            f"{self.readback.name}-timestamp"
-        ]["timestamp"]
-        return readings
+        super().__init__(name)
 
 
 class MercuryITC(StandardReadable):
