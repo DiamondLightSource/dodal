@@ -30,8 +30,19 @@ def test_strip_parameter_removes_parameter_from_signature_hints_and_docstring():
 
     assert list(inspect.signature(wrapped).parameters) == ["a", "b", "md"]
     assert "per_step" not in get_type_hints(wrapped)
-    assert wrapped.__doc__ == _plan.__doc__.replace(  # type: ignore
-        "    per_step : callable\n        Hook for each step.\n", ""
+    # Python 3.13+ strips docstring indentation at compile time, so compare cleaned
+    # docstrings to be independent of the Python version.
+    assert wrapped.__doc__ is not None
+    assert inspect.cleandoc(wrapped.__doc__) == inspect.cleandoc(
+        """A test plan.
+
+        Parameters
+        ----------
+        a : int
+            First argument.
+        md : dict
+            Metadata.
+        """
     )
 
 
