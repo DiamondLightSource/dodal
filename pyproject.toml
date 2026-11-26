@@ -17,7 +17,9 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async[ca,pva]>=0.21.5",
-    "bluesky>=1.14.5",
+    # TODO: revert to a bluesky release once https://github.com/bluesky/bluesky/pull/2124
+    # is released. A git dependency prevents publishing dodal to PyPI.
+    "bluesky @ git+https://github.com/bluesky/bluesky.git@refs/pull/2124/head",
     "pyepics",
     "pillow",
     "zocalo>=1.0.0",
