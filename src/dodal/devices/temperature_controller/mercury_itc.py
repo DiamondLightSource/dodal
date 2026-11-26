@@ -1,7 +1,6 @@
 from functools import cached_property
 
 from ophyd_async.core import (
-    Reference,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
@@ -16,8 +15,8 @@ class TempSensorChannel(TimestampRecordingDevice):
     """A single temperature sensor channel on the mercury."""
 
     @cached_property
-    def signal_to_timestamp(self) -> Reference[SignalR]:
-        return Reference(self.readback)
+    def signal_to_timestamp(self) -> SignalR:
+        return self.readback
 
     def __init__(self, prefix: str, name: str = "") -> None:
 

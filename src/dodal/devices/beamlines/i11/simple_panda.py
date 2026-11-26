@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from ophyd_async.core import Reference, SignalR, StandardReadableFormat
+from ophyd_async.core import SignalR, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.util.timestamp_recording_device import TimestampRecordingDevice
@@ -15,8 +15,8 @@ class SimplePanda(TimestampRecordingDevice):
     """
 
     @cached_property
-    def signal_to_timestamp(self) -> Reference[SignalR]:
-        return Reference(self._trigger)
+    def signal_to_timestamp(self) -> SignalR:
+        return self._trigger
 
     def __init__(
         self,
