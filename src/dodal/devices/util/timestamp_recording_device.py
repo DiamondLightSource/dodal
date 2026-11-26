@@ -1,4 +1,6 @@
+from abc import abstractmethod
 from copy import deepcopy
+from functools import cached_property
 
 from bluesky.protocols import Reading
 from event_model import DataKey
@@ -13,9 +15,10 @@ class TimestampRecordingDevice(StandardReadable):
     they are new individual signals.
     """
 
-    def __init__(self, signal_to_timestamp: Reference[SignalR], name: str = "") -> None:
-        self.signal_to_timestamp = signal_to_timestamp
-        super().__init__(name=name)
+    @cached_property
+    @abstractmethod
+    def signal_to_timestamp(self) -> Reference[SignalR]:
+        """Reference to the signal whose timestamp should be recorded."""
 
     async def describe(self) -> dict[str, DataKey]:
         """Adds a new signal on a device that is just the timestamp of readings from an

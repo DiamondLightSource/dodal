@@ -1,4 +1,11 @@
-from ophyd_async.core import Reference, StandardReadable, StandardReadableFormat
+from functools import cached_property
+
+from ophyd_async.core import (
+    Reference,
+    SignalR,
+    StandardReadable,
+    StandardReadableFormat,
+)
 from ophyd_async.core._device import DeviceVector
 from ophyd_async.epics.core import epics_signal_r
 
@@ -8,12 +15,16 @@ from dodal.devices.util.timestamp_recording_device import TimestampRecordingDevi
 class TempSensorChannel(TimestampRecordingDevice):
     """A single temperature sensor channel on the mercury."""
 
+    @cached_property
+    def signal_to_timestamp(self) -> Reference[SignalR]:
+        return Reference(self.readback)
+
     def __init__(self, prefix: str, name: str = "") -> None:
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readback = epics_signal_r(float, read_pv=f"{prefix}READ_TEMP_SIG_TEMP")
 
-        super().__init__(signal_to_timestamp=Reference(self.readback), name=name)
+        super().__init__(name)
 
 
 class MercuryITC(StandardReadable):

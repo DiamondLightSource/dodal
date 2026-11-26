@@ -1,4 +1,6 @@
-from ophyd_async.core import Reference, StandardReadableFormat
+from functools import cached_property
+
+from ophyd_async.core import Reference, SignalR, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.util.timestamp_recording_device import TimestampRecordingDevice
@@ -12,6 +14,10 @@ class SimplePanda(TimestampRecordingDevice):
     see https://github.com/DiamondLightSource/crystallography-bluesky/issues/218
     """
 
+    @cached_property
+    def signal_to_timestamp(self) -> Reference[SignalR]:
+        return Reference(self._trigger)
+
     def __init__(
         self,
         prefix: str,
@@ -20,4 +26,4 @@ class SimplePanda(TimestampRecordingDevice):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self._trigger = epics_signal_rw(bool, read_pv=f"{prefix}BITS:A")
             self.pulse_width = epics_signal_rw(float, read_pv=f"{prefix}PULSE1:WIDTH")
-        super().__init__(Reference(self._trigger), name=name)
+        super().__init__(name)
