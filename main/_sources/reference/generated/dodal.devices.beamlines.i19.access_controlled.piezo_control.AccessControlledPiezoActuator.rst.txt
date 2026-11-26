@@ -19,6 +19,9 @@ dodal.devices.beamlines.i19.access\_controlled.piezo\_control.AccessControlledPi
       
       
       
+      ~AccessControlledPiezoActuator.get_voltage_nudge_vs_pixels_table
+      
+      
       
       
       ~AccessControlledPiezoActuator.set
