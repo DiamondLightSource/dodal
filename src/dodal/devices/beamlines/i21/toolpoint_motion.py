@@ -86,7 +86,7 @@ def xyz_to_uvw(
 
 class ToolPointMotion(
     StandardReadable,
-    Movable[XYZTiltAzimuthMotorPositions],
+    Movable[UVWTiltAzimuthMotorPositions],
     Checkable[XYZTiltAzimuthMotorPositions],
 ):
     """Virtual manipulator translations of the sample stage. It is mounted on top
