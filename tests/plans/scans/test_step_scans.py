@@ -253,7 +253,7 @@ def test_step_scans_write_start_metadata(
     y_args = [0, 1, 0.25] if grid else [0, 0.25]
     metadata = {"sample": "test"}
 
-    run_engine(plan([det], x_axis, 0, 1, 0.5, y_axis, *y_args, metadata=metadata))
+    run_engine(plan([det], x_axis, 0, 1, 0.5, y_axis, *y_args, md=metadata))
 
     start = run_engine_documents["start"][0]
     assert start["plan_name"] == plan.__name__
