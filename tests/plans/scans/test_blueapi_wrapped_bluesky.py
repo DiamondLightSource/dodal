@@ -146,12 +146,12 @@ def test_strip_parameter_from_docstring_only_removes_parameter(doc: str, expecte
     [
         bw.count,
         bw.scan,
-        # bw.rel_scan,
-        # bw.log_scan,
+        bw.rel_scan,
+        bw.log_scan,
         bw.rel_log_scan,
         bw.list_scan,
         bw.rel_list_scan,
-        # grid_scan
+        bw.grid_scan,
         bw.rel_grid_scan,
         bw.list_grid_scan,
         bw.rel_list_grid_scan,

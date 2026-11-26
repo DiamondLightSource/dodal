@@ -84,9 +84,7 @@ def _group_args_by_movable(
     return groups
 
 
-def _make_step_scan_args(
-    args: Sequence[StepScanArg], grid: bool
-) -> tuple[list[Any], list[int]]:
+def _make_step_scan_args(args: Sequence[StepScanArg], grid: bool) -> list[Any]:
     """Convert flat step scan arguments into bluesky list scan arguments.
 
     Args:
@@ -97,12 +95,11 @@ def _make_step_scan_args(
             and moves concurrently with it, taking the same number of points.
 
     Returns:
-        A tuple of (args for `bluesky.plans.list_scan`-style plans, i.e.
-        `[movable1, positions1, movable2, positions2, ...]`, and the shape of the
-        scan).
+        Args for `bluesky.plans.list_scan`-style plans, i.e.
+        `[movable1, positions1, movable2, positions2, ...]`.
     """
     list_scan_args: list[Any] = []
-    shape: list[int] = []
+    num_points = 0
     for i, (movable, params) in enumerate(_group_args_by_movable(args)):
         sets_num_points = grid or i == 0
         expected = ("start", "stop", "step") if sets_num_points else ("start", "step")
@@ -113,29 +110,31 @@ def _make_step_scan_args(
             )
         if sets_num_points:
             positions = _make_stepped_list_step(*params)
-            shape.append(len(positions))
+            num_points = len(positions)
         else:
-            positions = _make_stepped_list_num(*params, num=shape[0])
+            positions = _make_stepped_list_num(*params, num=num_points)
         list_scan_args += [movable, positions]
 
-    return list_scan_args, shape
+    return list_scan_args
 
 
 def _make_step_scan_md(
     plan_name: str,
     detectors: Sequence[Readable],
     args: Sequence[StepScanArg],
-    shape: list[int],
     metadata: CustomPlanMetadata | None,
     **plan_args: Any,
 ) -> CustomPlanMetadata:
     """Create the run start metadata for a step scan.
 
+    The bluesky plan being wrapped records its own `plan_name` and `plan_args`, which
+    describe the calculated position lists, so these are overridden to record the step
+    scan as called. Everything else, including `shape`, comes from the bluesky plan.
+
     Args:
         plan_name: Name of the step scan plan.
         detectors: Detectors passed to the plan.
         args: Flat movable and number arguments passed to the plan.
-        shape: Number of points along each dimension of the scan.
         metadata: User supplied metadata, merged in last.
         **plan_args: Any further plan arguments to record e.g. `snake_axes`.
 
@@ -150,7 +149,6 @@ def _make_step_scan_md(
             **plan_args,
         },
         "detectors": [det.name for det in detectors],
-        "shape": shape,
         **(metadata or {}),
     }
 
@@ -170,8 +168,8 @@ def _run_step_scan(
     `plan_kwargs` (e.g. `snake_axes`) are passed to `plan` and recorded in the
     `plan_args` metadata.
     """
-    list_scan_args, shape = _make_step_scan_args(args, grid=grid)
-    md = _make_step_scan_md(plan_name, detectors, args, shape, metadata, **plan_kwargs)
+    list_scan_args = _make_step_scan_args(args, grid=grid)
+    md = _make_step_scan_md(plan_name, detectors, args, metadata, **plan_kwargs)
     yield from plan(detectors, *list_scan_args, md=md, **plan_kwargs)
 
 

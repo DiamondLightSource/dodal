@@ -93,18 +93,16 @@ def strip_parameter(func: Callable[P, R], parameter: str) -> Callable[P, R]:
     return wrapper
 
 
-# Commented out ones won't work until bluesky version has
-# https://github.com/bluesky/bluesky/pull/2125 fixed due to missing typing.
 count = strip_parameter(bp.count, "per_shot")
 scan = strip_parameter(bp.scan, "per_step")
-# rel_scan = strip_parameter(bp.rel_scan, "per_step")
-# log_scan = strip_parameter(bp.log_scan, "per_step")
+rel_scan = strip_parameter(bp.rel_scan, "per_step")
+log_scan = strip_parameter(bp.log_scan, "per_step")
 rel_log_scan = strip_parameter(bp.rel_log_scan, "per_step")
 
 list_scan = strip_parameter(bp.list_scan, "per_step")
 rel_list_scan = strip_parameter(bp.rel_list_scan, "per_step")
 
-# grid_scan = strip_parameter(bp.grid_scan, "per_step")
+grid_scan = strip_parameter(bp.grid_scan, "per_step")
 rel_grid_scan = strip_parameter(bp.rel_grid_scan, "per_step")
 list_grid_scan = strip_parameter(bp.list_grid_scan, "per_step")
 rel_list_grid_scan = strip_parameter(bp.rel_list_grid_scan, "per_step")

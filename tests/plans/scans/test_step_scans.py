@@ -140,25 +140,15 @@ def test_group_args_by_movable_fails_with_invalid_args(
 
 
 @pytest.mark.parametrize(
-    "args, grid, expected_args, expected_shape",
+    "args, grid, expected",
     [
-        ([X, 0, 2, 1, Y, 5, 0.5], False, [X, [0, 1, 2], Y, [5, 5.5, 6]], [3]),
-        (
-            [X, 0, -1, 0.5, Y, 0, -0.1],
-            False,
-            [X, [0, -0.5, -1], Y, [0, -0.1, -0.2]],
-            [3],
-        ),
-        ([X, 0, 2, 1, Y, 0, 1, 0.5], True, [X, [0, 1, 2], Y, [0, 0.5, 1]], [3, 3]),
+        ([X, 0, 2, 1, Y, 5, 0.5], False, [X, [0, 1, 2], Y, [5, 5.5, 6]]),
+        ([X, 0, -1, 0.5, Y, 0, -0.1], False, [X, [0, -0.5, -1], Y, [0, -0.1, -0.2]]),
+        ([X, 0, 2, 1, Y, 0, 1, 0.5], True, [X, [0, 1, 2], Y, [0, 0.5, 1]]),
     ],
 )
-def test_make_step_scan_args(
-    resolve, args: list, grid: bool, expected_args: list, expected_shape: list[int]
-):
-    assert _make_step_scan_args(resolve(args), grid=grid) == (
-        resolve(expected_args),
-        expected_shape,
-    )
+def test_make_step_scan_args(resolve, args: list, grid: bool, expected: list):
+    assert _make_step_scan_args(resolve(args), grid=grid) == resolve(expected)
 
 
 @pytest.mark.parametrize(
@@ -182,7 +172,6 @@ def test_make_step_scan_md(det: StandardDetector, x_axis: Motor, y_axis: Motor):
         "step_grid_scan",
         [det],
         [x_axis, 0, 1, 0.5, y_axis, 0, 2, 1],
-        [3, 3],
         None,
         snake_axes=True,
     )
@@ -194,7 +183,6 @@ def test_make_step_scan_md(det: StandardDetector, x_axis: Motor, y_axis: Motor):
             "snake_axes": True,
         },
         "detectors": [det.name],
-        "shape": [3, 3],
     }
 
 
@@ -202,11 +190,10 @@ def test_make_step_scan_md_user_metadata_takes_priority(
     det: StandardDetector, x_axis: Motor
 ):
     metadata = {"plan_name": "custom", "detectors": ["custom"], "sample": "test"}
-    md = _make_step_scan_md("step_scan", [det], [x_axis, 0, 1, 0.5], [3], metadata)
+    md = _make_step_scan_md("step_scan", [det], [x_axis, 0, 1, 0.5], metadata)
     assert md["plan_name"] == "custom"
     assert md["detectors"] == ["custom"]
     assert md["sample"] == "test"
-    assert md["shape"] == [3]
 
 
 @pytest.mark.parametrize("plan", CONCURRENT_PLANS)
@@ -275,7 +262,8 @@ def test_step_scans_write_start_metadata(
         "args": [repr(x_axis), 0, 1, 0.5, repr(y_axis), *y_args],
         **({"snake_axes": True} if grid else {}),
     }
-    assert start["shape"] == ([3, 5] if grid else [3])
+    # shape is provided by the bluesky plan.
+    assert start["shape"] == ((3, 5) if grid else (3,))
     assert start["detectors"] == [det.name]
     assert list(start["motors"]) == [x_axis.name, y_axis.name]
     assert start["sample"] == "test"
