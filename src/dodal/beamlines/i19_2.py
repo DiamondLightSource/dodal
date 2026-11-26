@@ -66,7 +66,8 @@ MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
 
 DAQ_CONFIGURATION_PATH = "/dls_sw/i19-2/software/daq_configuration"
 BEAMLINE_PARAMETERS_PATH = f"{DAQ_CONFIGURATION_PATH}/domain/beamline.parameters"
-
+HFM_LUT = f"{DAQ_CONFIGURATION_PATH}/lookup/hfm_nudge_to_position.txt"
+VFM_LUT = f"{DAQ_CONFIGURATION_PATH}/lookup/vfm_nudge_to_position.txt"
 
 devices = DeviceManager()
 
@@ -191,20 +192,24 @@ def zebra() -> Zebra:
 
 
 @devices.factory()
-def hfm_piezo() -> AccessControlledPiezoActuator:
+def hfm_piezo(config_client: ConfigClient) -> AccessControlledPiezoActuator:
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
         mirror_type=FocusingMirrorName.HFM,
         hutch=HutchState.EH2,
+        voltage_to_position_lut=HFM_LUT,
+        config_client=config_client,
         instrument_session=I19_2_COMMISSIONING_INSTR_SESSION,
     )
 
 
 @devices.factory()
-def vfm_piezo() -> AccessControlledPiezoActuator:
+def vfm_piezo(config_client: ConfigClient) -> AccessControlledPiezoActuator:
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
         mirror_type=FocusingMirrorName.VFM,
         hutch=HutchState.EH2,
+        voltage_to_position_lut=VFM_LUT,
+        config_client=config_client,
         instrument_session=I19_2_COMMISSIONING_INSTR_SESSION,
     )
