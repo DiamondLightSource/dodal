@@ -35,6 +35,21 @@ async def test_shutter_set_open_close_without_knowing_enum_values(
     assert await shutter1.shutter_state.get_value() == InOut.IN
 
 
+async def test_shutter_opens_on_stage_and_closes_on_unstage(
+    shutter1: FastShutter, run_engine: RunEngine
+) -> None:
+    await shutter1.set(shutter1.close_state)
+
+    def my_plan():
+        assert (yield from bps.rd(shutter1.shutter_state)) == InOut.IN
+        yield from bps.stage(shutter1, wait=True)
+        assert (yield from bps.rd(shutter1.shutter_state)) == InOut.OUT
+        yield from bps.unstage(shutter1, wait=True)
+        assert (yield from bps.rd(shutter1.shutter_state)) == InOut.IN
+
+    run_engine(my_plan(), wait=True)
+
+
 async def test_shutter_read(shutter1: FastShutter) -> None:
     await shutter1.set(shutter1.open_state)
     await assert_reading(
