@@ -64,6 +64,8 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = f"{DAQ_CONFIGURATION_PATH}/domain/display.configuration"
+HFM_LUT = f"{DAQ_CONFIGURATION_PATH}/lookup/hfm_nudge_to_position.txt"
+VFM_LUT = f"{DAQ_CONFIGURATION_PATH}/lookup/vfm_nudge_to_position.txt"
 
 SHARED_CONFIG_PATH = "/dls_sw/i19-1/software/i19-acquisition/i19-shared"
 MIRROR_ENERGY_FILE_PATH = f"{SHARED_CONFIG_PATH}/json/MirrorEnergyRanges.json"
@@ -210,20 +212,24 @@ def beam_centre_from_epics() -> CentroidFromEpics:
 
 
 @devices.factory()
-def hfm_piezo() -> AccessControlledPiezoActuator:
+def hfm_piezo(config_client: ConfigClient) -> AccessControlledPiezoActuator:
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
         mirror_type=FocusingMirrorName.HFM,
         hutch=HutchState.EH1,
+        voltage_to_position_lut=HFM_LUT,
+        config_client=config_client,
         instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )
 
 
 @devices.factory()
-def vfm_piezo() -> AccessControlledPiezoActuator:
+def vfm_piezo(config_client: ConfigClient) -> AccessControlledPiezoActuator:
     return AccessControlledPiezoActuator(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
         mirror_type=FocusingMirrorName.VFM,
         hutch=HutchState.EH1,
+        voltage_to_position_lut=VFM_LUT,
+        config_client=config_client,
         instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )
