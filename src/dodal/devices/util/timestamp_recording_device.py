@@ -16,7 +16,7 @@ class TimestampRecordingDevice(StandardReadable):
 
     @cached_property
     @abstractmethod
-    def signal_to_timestamp(self) -> SignalR:
+    def _signal_to_timestamp(self) -> SignalR:
         """Reference to the signal whose timestamp should be recorded."""
 
     async def describe(self) -> dict[str, DataKey]:
@@ -26,10 +26,10 @@ class TimestampRecordingDevice(StandardReadable):
         This is a workaround so that the nexus writer will actually record the timestamp.
         """
         descriptions = await super().describe()
-        descriptions[f"{self.signal_to_timestamp.name}-timestamp"] = deepcopy(
-            descriptions[self.signal_to_timestamp.name]
+        descriptions[f"{self._signal_to_timestamp.name}-timestamp"] = deepcopy(
+            descriptions[self._signal_to_timestamp.name]
         )
-        descriptions[f"{self.signal_to_timestamp.name}-timestamp"]["dtype"] = "number"
+        descriptions[f"{self._signal_to_timestamp.name}-timestamp"]["dtype"] = "number"
         return descriptions
 
     async def read(self) -> dict[str, Reading]:
@@ -39,10 +39,10 @@ class TimestampRecordingDevice(StandardReadable):
         This is a workaround so that the nexus writer will actually record the timestamp.
         """
         readings = await super().read()
-        readings[f"{self.signal_to_timestamp.name}-timestamp"] = deepcopy(
-            readings[self.signal_to_timestamp.name]
+        readings[f"{self._signal_to_timestamp.name}-timestamp"] = deepcopy(
+            readings[self._signal_to_timestamp.name]
         )
-        readings[f"{self.signal_to_timestamp.name}-timestamp"]["value"] = readings[
-            f"{self.signal_to_timestamp.name}-timestamp"
+        readings[f"{self._signal_to_timestamp.name}-timestamp"]["value"] = readings[
+            f"{self._signal_to_timestamp.name}-timestamp"
         ]["timestamp"]
         return readings

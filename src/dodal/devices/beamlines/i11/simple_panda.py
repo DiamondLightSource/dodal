@@ -15,14 +15,10 @@ class SimplePanda(TimestampRecordingDevice):
     """
 
     @cached_property
-    def signal_to_timestamp(self) -> SignalR:
+    def _signal_to_timestamp(self) -> SignalR:
         return self._trigger
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self._trigger = epics_signal_rw(bool, read_pv=f"{prefix}BITS:A")
             self.pulse_width = epics_signal_rw(float, read_pv=f"{prefix}PULSE1:WIDTH")
