@@ -1,5 +1,5 @@
 import math
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any
 
@@ -17,23 +17,20 @@ _STOP_TOLERANCE = 0.05
 
 
 def _decimal_places(*values: float) -> int:
-    """Return the most decimal places of any of the values e.g. (1, 0.5, 0.25) -> 2."""
+    """Most decimal places of any of the values, e.g. (1, 0.5, 0.25) -> 2."""
     return max(0, *(-int(Decimal(str(v)).as_tuple().exponent) for v in values))
 
 
 def _positions(start: float, step: float, num: int, decimal_places: int) -> list[float]:
-    """Return `num` positions from `start` in increments of `step`, rounded to remove
-    floating point error, e.g. 0.30000000000000004 -> 0.3.
+    """`num` positions from `start` in increments of `step`, rounded to remove float
+    error.
     """
     return np.round(start + step * np.arange(num), decimal_places).tolist()
 
 
 def _make_stepped_list_step(start: float, stop: float, step: float) -> list[float]:
-    """Return positions from `start` to `stop` in increments of `step`.
-
-    The sign of `step` is ignored, it always moves from `start` towards `stop`. A step
-    larger than the range gives just `start` and `stop`. `stop` is only included if it
-    is reached by a whole number of steps, to within 5% of a step.
+    """Positions from `start` towards `stop`, ignoring the sign of `step`. `stop` is
+    included if reached to within 5% of a step.
     """
     if start == stop:
         raise ValueError(
@@ -50,17 +47,14 @@ def _make_stepped_list_step(start: float, stop: float, step: float) -> list[floa
 
 
 def _make_stepped_list_num(start: float, step: float, num: int) -> list[float]:
-    """Return `num` positions from `start` in increments of `step`."""
+    """`num` positions from `start` in increments of `step`."""
     return _positions(start, step, num, _decimal_places(start, step))
 
 
 def _group_args_by_movable(
     args: Sequence[StepScanArg],
 ) -> list[tuple[NamedMovable, list[float | int]]]:
-    """Split a flat sequence of arguments into (movable, [numbers...]) groups.
-
-    A new group is started every time a movable is encountered; all numbers that follow
-    it, up to the next movable, belong to that group. e.g.
+    """Split flat args into (movable, [numbers]) groups, e.g.
     `(x, 0, 10, 1, y, 5, 0.5)` -> `[(x, [0, 10, 1]), (y, [5, 0.5])]`.
     """
     if not args:
@@ -85,18 +79,10 @@ def _group_args_by_movable(
 
 
 def _make_step_scan_args(args: Sequence[StepScanArg], grid: bool) -> list[Any]:
-    """Convert flat step scan arguments into bluesky list scan arguments.
+    """Convert step scan args to list scan args, `[movable1, positions1, ...]`.
 
-    Args:
-        args: Flat sequence of movables and numbers, as passed to a step scan.
-        grid: If True, every movable must be given `start, stop, step` and moves
-            independently (grid). If False, only the first movable is given
-            `start, stop, step` and every following movable is given `start, step`
-            and moves concurrently with it, taking the same number of points.
-
-    Returns:
-        Args for `bluesky.plans.list_scan`-style plans, i.e.
-        `[movable1, positions1, movable2, positions2, ...]`.
+    Grid axes each take `start, stop, step`. Otherwise only the first axis does and
+    the rest take `start, step`, with the same number of points as the first.
     """
     list_scan_args: list[Any] = []
     num_points = 0
@@ -122,24 +108,11 @@ def _make_step_scan_md(
     plan_name: str,
     detectors: Sequence[Readable],
     args: Sequence[StepScanArg],
-    metadata: CustomPlanMetadata | None,
+    md: CustomPlanMetadata | None,
     **plan_args: Any,
 ) -> CustomPlanMetadata:
-    """Create the run start metadata for a step scan.
-
-    The bluesky plan being wrapped records its own `plan_name` and `plan_args`, which
-    describe the calculated position lists, so these are overridden to record the step
-    scan as called. Everything else, including `shape`, comes from the bluesky plan.
-
-    Args:
-        plan_name: Name of the step scan plan.
-        detectors: Detectors passed to the plan.
-        args: Flat movable and number arguments passed to the plan.
-        metadata: User supplied metadata, merged in last.
-        **plan_args: Any further plan arguments to record e.g. `snake_axes`.
-
-    Returns:
-        Metadata to pass as `md` to the bluesky plan.
+    """Start document metadata recording the step scan as called, rather than the
+    list scan it runs. User `metadata` takes priority.
     """
     return {
         "plan_name": plan_name,
@@ -149,161 +122,85 @@ def _make_step_scan_md(
             **plan_args,
         },
         "detectors": [det.name for det in detectors],
-        **(metadata or {}),
+        **(md or {}),
     }
-
-
-def _run_step_scan(
-    plan: Callable[..., MsgGenerator],
-    plan_name: str,
-    detectors: Sequence[Readable],
-    args: Sequence[StepScanArg],
-    metadata: CustomPlanMetadata | None,
-    *,
-    grid: bool,
-    **plan_kwargs: Any,
-) -> MsgGenerator:
-    """Calculate the positions for a step scan and run it with a bluesky list plan.
-
-    `plan_kwargs` (e.g. `snake_axes`) are passed to `plan` and recorded in the
-    `plan_args` metadata.
-    """
-    list_scan_args = _make_step_scan_args(args, grid=grid)
-    md = _make_step_scan_md(plan_name, detectors, args, metadata, **plan_kwargs)
-    yield from plan(detectors, *list_scan_args, md=md, **plan_kwargs)
 
 
 def step_scan(
     detectors: Sequence[Readable],
     *args: StepScanArg,
-    metadata: CustomPlanMetadata | None = None,
+    md: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
-    """Scan one or more movables concurrently, defined by a step size.
+    """Scan movables concurrently, using a step size rather than number of points.
 
-    The first movable is given a start, stop and step, which defines the number of
-    points in the scan. Any further movables are given a start and step only, and move
-    concurrently with the first, taking the same number of points. The positions for
-    every movable are calculated up front and passed to `bluesky.plans.list_scan`.
+    The first movable takes `start, stop, step`, which sets the number of points.
+    Further movables take `start, step` and move with it.
 
     Args:
-        detectors: Readable devices, a reading is taken of each at every point.
-        *args: A flat sequence describing each axis, in the form
-            `movable1, start1, stop1, step1, movable2, start2, step2, ...,
-            movableN, startN, stepN`.
-        metadata: Additional metadata to add to the run start document. This takes
-            priority over the metadata generated by the plan.
+        detectors: Devices to read at every point.
+        *args: `movable1, start1, stop1, step1, movable2, start2, step2, ...`
+        md: Extra start document metadata, overriding the plan's own.
 
     Examples:
-        Move `x` from 0 to 10 in steps of 1 (11 points), reading `det` at each::
-
-            step_scan([det], x, 0, 10, 1)
-
-        Move `x` from 0 to 10 in steps of 1 and, at the same time, `y` from 5 in
-        steps of 0.5 (11 points, `y` ending at 10)::
+        11 points, `x` from 0 to 10 and `y` from 5 to 10::
 
             step_scan([det], x, 0, 10, 1, y, 5, 0.5)
-
-    Raises:
-        ValueError: If no movable is given, the first argument after `detectors` is
-            not a movable, the wrong number of parameters are given for a movable or
-            the start and stop of the first movable are equal.
-        TypeError: If an argument after `detectors` is neither a movable nor a
-            number.
     """
-    yield from _run_step_scan(
-        bp.list_scan, "step_scan", detectors, args, metadata, grid=False
-    )
+    list_scan_args = _make_step_scan_args(args, grid=False)
+    md = _make_step_scan_md("step_scan", detectors, args, md)
+    yield from bp.list_scan(detectors, *list_scan_args, md=md)
 
 
 def step_rscan(
     detectors: Sequence[Readable],
     *args: StepScanArg,
-    metadata: CustomPlanMetadata | None = None,
+    md: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
-    """Scan one or more movables concurrently, defined by a step size, relative to
-    their current positions.
-
-    Identical to `step_scan`, except every start and stop is relative to the
-    movable's position at the start of the scan, and every movable is returned to that
-    position once the scan finishes. Uses `bluesky.plans.rel_list_scan`.
+    """As `step_scan`, but relative to the current positions, returning to them at the
+    end.
 
     Args:
-        detectors: Readable devices, a reading is taken of each at every point.
-        *args: A flat sequence describing each axis, in the form
-            `movable1, start1, stop1, step1, movable2, start2, step2, ...,
-            movableN, startN, stepN`, all relative to the current positions.
-        metadata: Additional metadata to add to the run start document. This takes
-            priority over the metadata generated by the plan.
+        detectors: Devices to read at every point.
+        *args: `movable1, start1, stop1, step1, movable2, start2, step2, ...`
+        md: Extra start document metadata, overriding the plan's own.
 
     Examples:
-        Move `x` from 1 below to 1 above its current position in steps of 0.1
-        (21 points)::
+        21 points, `x` from 1 below to 1 above its current position::
 
             step_rscan([det], x, -1, 1, 0.1)
-
-        As above, while also moving `y` from its current position in steps of 0.05::
-
-            step_rscan([det], x, -1, 1, 0.1, y, 0, 0.05)
-
-    Raises:
-        ValueError: If no movable is given, the first argument after `detectors` is
-            not a movable, the wrong number of parameters are given for a movable or
-            the start and stop of the first movable are equal.
-        TypeError: If an argument after `detectors` is neither a movable nor a
-            number.
     """
-    yield from _run_step_scan(
-        bp.rel_list_scan, "step_rscan", detectors, args, metadata, grid=False
-    )
+    list_scan_args = _make_step_scan_args(args, grid=False)
+    md = _make_step_scan_md("step_rscan", detectors, args, md)
+    yield from bp.rel_list_scan(detectors, *list_scan_args, md=md)
 
 
 def step_grid_scan(
     detectors: Sequence[Readable],
     *args: StepScanArg,
     snake_axes: bool = True,
-    metadata: CustomPlanMetadata | None = None,
+    md: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
-    """Scan a grid of movables moving independently, each defined by a step size.
+    """Scan a grid of movables, using a step size rather than number of points.
 
-    Every movable is given a start, stop and step. The first movable is the slowest
-    (outermost) axis and the last is the fastest (innermost). The positions for every
-    movable are calculated up front and passed to `bluesky.plans.list_grid_scan`.
+    Every movable takes `start, stop, step`. The first is the slowest axis.
 
     Args:
-        detectors: Readable devices, a reading is taken of each at every point.
-        *args: A flat sequence describing each axis, in the form
-            `movable1, start1, stop1, step1, ..., movableN, startN, stopN, stepN`.
-        snake_axes: If True (default), every axis except the first (slowest) axis
-            reverses direction on alternate passes rather than returning to its
-            start. Snaking individual axes is not currently supported.
-        metadata: Additional metadata to add to the run start document. This takes
-            priority over the metadata generated by the plan.
+        detectors: Devices to read at every point.
+        *args: `movable1, start1, stop1, step1, movable2, start2, stop2, step2, ...`
+        snake_axes: Reverse every axis but the first on alternate passes.
+        md: Extra start document metadata, overriding the plan's own.
 
     Examples:
-        A 2D grid, `y` from 0 to 2 in steps of 0.5 (5 rows) and `x` from 0 to 1 in
-        steps of 0.25 (5 columns), 25 points in total::
+        25 points, 5 rows of `y` from 0 to 2 by 5 columns of `x` from 0 to 1::
 
             step_grid_scan([det], y, 0, 2, 0.5, x, 0, 1, 0.25)
-
-        The same grid without snaking, so `x` always moves from 0 to 1::
-
-            step_grid_scan([det], y, 0, 2, 0.5, x, 0, 1, 0.25, snake_axes=False)
-
-    Raises:
-        ValueError: If no movable is given, the first argument after `detectors` is
-            not a movable, any movable is not given exactly 3 parameters or any
-            start and stop are equal.
-        TypeError: If an argument after `detectors` is neither a movable nor a
-            number.
     """
-    yield from _run_step_scan(
-        bp.list_grid_scan,
-        "step_grid_scan",
-        detectors,
-        args,
-        metadata,
-        grid=True,
-        snake_axes=snake_axes,
+    list_scan_args = _make_step_scan_args(args, grid=True)
+    md = _make_step_scan_md(
+        "step_grid_scan", detectors, args, md, snake_axes=snake_axes
+    )
+    yield from bp.list_grid_scan(
+        detectors, *list_scan_args, snake_axes=snake_axes, md=md
     )
 
 
@@ -311,45 +208,26 @@ def step_grid_rscan(
     detectors: Sequence[Readable],
     *args: StepScanArg,
     snake_axes: bool = True,
-    metadata: CustomPlanMetadata | None = None,
+    md: CustomPlanMetadata | None = None,
 ) -> MsgGenerator:
-    """Scan a grid of movables moving independently, each defined by a step size,
-    relative to their current positions.
-
-    Identical to `step_grid_scan`, except every start and stop is relative to the
-    movable's position at the start of the scan, and every movable is returned to that
-    position once the scan finishes. Uses `bluesky.plans.rel_list_grid_scan`.
+    """As `step_grid_scan`, but relative to the current positions, returning to them
+    at the end.
 
     Args:
-        detectors: Readable devices, a reading is taken of each at every point.
-        *args: A flat sequence describing each axis, in the form
-            `movable1, start1, stop1, step1, ..., movableN, startN, stopN, stepN`,
-            all relative to the current positions.
-        snake_axes: If True (default), every axis except the first (slowest) axis
-            reverses direction on alternate passes rather than returning to its
-            start. Snaking individual axes is not currently supported.
-        metadata: Additional metadata to add to the run start document. This takes
-            priority over the metadata generated by the plan.
+        detectors: Devices to read at every point.
+        *args: `movable1, start1, stop1, step1, movable2, start2, stop2, step2, ...`
+        snake_axes: Reverse every axis but the first on alternate passes.
+        md: Extra start document metadata, overriding the plan's own.
 
     Examples:
-        A 2D grid of 1 either side of the current `y` and `x` positions, in steps
-        of 0.5 (5 x 5 = 25 points)::
+        25 points, 1 either side of the current `y` and `x` positions::
 
             step_grid_rscan([det], y, -1, 1, 0.5, x, -1, 1, 0.5)
-
-    Raises:
-        ValueError: If no movable is given, the first argument after `detectors` is
-            not a movable, any movable is not given exactly 3 parameters or any
-            start and stop are equal.
-        TypeError: If an argument after `detectors` is neither a movable nor a
-            number.
     """
-    yield from _run_step_scan(
-        bp.rel_list_grid_scan,
-        "step_grid_rscan",
-        detectors,
-        args,
-        metadata,
-        grid=True,
-        snake_axes=snake_axes,
+    list_scan_args = _make_step_scan_args(args, grid=True)
+    md = _make_step_scan_md(
+        "step_grid_rscan", detectors, args, md, snake_axes=snake_axes
+    )
+    yield from bp.rel_list_grid_scan(
+        detectors, *list_scan_args, snake_axes=snake_axes, md=md
     )

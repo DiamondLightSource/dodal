@@ -1,8 +1,7 @@
-"""This module wraps plan(s) from bluesky.plans for blueapi. These plans expose
-per_step/per_shot arguments which are callable. A callable is a python method and are
-not serialisable, therefore it is impossible for the user to override this argument. It
-will be confusing to leave this in for a user, so the parameter and doc string
-referencing it is removed https://github.com/DiamondLightSource/blueapi/issues/711.
+"""bluesky.plans for blueapi, without their per_step/per_shot callable arguments.
+
+Callables are not serialisable, so blueapi users can never set them. See
+https://github.com/DiamondLightSource/blueapi/issues/711.
 """
 
 import re
@@ -18,12 +17,8 @@ R = TypeVar("R")
 
 
 def _strip_parameter_from_docstring(doc: str, parameter: str) -> str:
-    """Remove a parameter's entry from a numpydoc style "Parameters" section.
-
-    Removes the line `<parameter> : <type>` (with or without a space before the colon)
-    along with its description, i.e. every following line that is indented further
-    than the parameter name. Blank lines are only removed if they are followed by more
-    of the description, so the next parameter or section is never touched.
+    """Remove `parameter` and its more-indented description from a numpydoc
+    docstring, leaving the rest untouched.
     """
     pattern = (
         rf"^([ \t]*){re.escape(parameter)}[ \t]*:.*"  # "per_step : callable" line
@@ -34,23 +29,17 @@ def _strip_parameter_from_docstring(doc: str, parameter: str) -> str:
 
 
 def strip_parameter(func: Callable[P, R], parameter: str) -> Callable[P, R]:
-    """Remove a keyword-only argument from a function's signature and docstring.
+    """Wrap `func` without `parameter` in its signature, annotations or docstring.
 
-    Used for removing arguments from plans that are not serialisable (such as the
-    `per_step` callable) so the plans don't have this option with blueapi. The returned
-    wrapper calls `func` unchanged, so the removed argument always takes its default value.
+    Used to hide non-serialisable plan arguments from blueapi. The removed argument
+    always takes its default.
 
     Args:
         func: The function to wrap.
-        parameter: Name of the keyword-only argument, with a default, to remove.
-
-    Returns:
-        A wrapper around `func` whose signature, annotations and docstring no longer
-        include `parameter`.
+        parameter: A keyword-only argument with a default.
 
     Raises:
-        ValueError: If `parameter` is not in the signature of `func`, is not
-            keyword-only or has no default value.
+        ValueError: If `parameter` is missing, not keyword-only or has no default.
     """
     func_signature = signature(func)
     param = func_signature.parameters.get(parameter)
@@ -58,9 +47,8 @@ def strip_parameter(func: Callable[P, R], parameter: str) -> Callable[P, R]:
         raise ValueError(
             f"Parameter {parameter!r} not found in {func.__name__!r} signature"
         )
-    # Removing a positional parameter from the signature would make callers' positional
-    # arguments bind to the wrong parameters, and removing a parameter without a
-    # default would make the function impossible to call.
+    # Removing a positional arg would misbind callers' args, and one without a
+    # default would make func uncallable.
     if param.kind is not param.KEYWORD_ONLY:
         raise ValueError(
             f"Parameter {parameter!r} of {func.__name__!r} must be keyword-only to be "
