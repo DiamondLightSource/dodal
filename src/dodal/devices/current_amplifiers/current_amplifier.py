@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from bluesky.protocols import (
-    Movable,
-    Preparable,
-)
+from bluesky.protocols import Movable, Preparable
 from ophyd_async.core import AsyncStatus, StandardReadable
 
 
