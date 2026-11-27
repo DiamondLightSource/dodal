@@ -19,8 +19,9 @@ from ophyd_async.testing import assert_configuration, assert_reading, partial_re
 from dodal.devices.current_amplifiers import (
     CurrentAmpDet,
     FemtoDDPCA,
-    StruckScaler,
+    StruckScalerChannel,
 )
+from dodal.devices.scaler_card import Struck32ChannelScaler
 
 
 class MockFemto3xxRaiseTime(float, Enum):
@@ -52,15 +53,16 @@ async def mock_femto(
 @pytest.fixture
 async def mock_struck_scaler(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
-) -> StruckScaler:
+) -> StruckScalerChannel:
     async with init_devices(mock=True):
-        mock_struck_scaler = StruckScaler(prefix=prefix, suffix=suffix)
+        controller = Struck32ChannelScaler(prefix=prefix)
+        mock_struck_scaler = StruckScalerChannel(controller, suffix=suffix)
     return mock_struck_scaler
 
 
 @pytest.fixture
 async def mock_femto_struck_scaler_detector(
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
     mock_femto: FemtoDDPCA,
 ) -> CurrentAmpDet:
     async with init_devices(mock=True):
@@ -217,7 +219,7 @@ async def test_femto_struck_scaler_read(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     mock_femto: FemtoDDPCA,
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
     mock_femto_struck_scaler_detector: CurrentAmpDet,
     gain: float,
     raw_voltage: float,
@@ -225,7 +227,7 @@ async def test_femto_struck_scaler_read(
 ):
     await mock_femto.set(gain)
 
-    set_mock_value(mock_struck_scaler.integration_time, 1)
+    set_mock_value(mock_struck_scaler.controller.integration_time, 1)
     set_mock_value(mock_struck_scaler.count, raw_voltage)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
 
@@ -253,7 +255,7 @@ async def test_femto_struck_scaler_read_with_auto_gain(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     mock_femto: FemtoDDPCA,
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
     mock_femto_struck_scaler_detector: CurrentAmpDet,
     gain: float,
     raw_voltage: list[float],
@@ -261,17 +263,17 @@ async def test_femto_struck_scaler_read_with_auto_gain(
 ):
     await mock_femto.set(gain)
 
-    set_mock_value(mock_struck_scaler.integration_time, 1)
+    set_mock_value(mock_struck_scaler.controller.integration_time, 1)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, True)
 
     raw_counts = iter(raw_voltage)
 
     def set_mock_counter():
         set_mock_value(mock_struck_scaler.count, next(raw_counts))
-        set_mock_value(mock_struck_scaler.start_count, False)
+        set_mock_value(mock_struck_scaler.controller.start_count, False)
 
     callback_on_mock_put(
-        mock_struck_scaler.start_count,
+        mock_struck_scaler.controller.start_count,
         lambda *_, **__: set_mock_counter(),
     )
 

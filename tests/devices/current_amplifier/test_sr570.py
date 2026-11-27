@@ -21,10 +21,10 @@ from dodal.devices.current_amplifiers import (
     CurrentAmpDet,
     SR570FineGainTable,
     SR570GainTable,
-    StruckScaler,
+    StruckScalerChannel,
 )
 from dodal.devices.current_amplifiers.current_amplifier_detector import CurrentAmpDet
-from dodal.devices.current_amplifiers.struck_scaler_counter import StruckScaler
+from dodal.devices.scaler_card import Struck32ChannelScaler
 
 
 class MockSR570RaiseTimeTable(float, Enum):
@@ -64,18 +64,16 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
 @pytest.fixture
 async def mock_struck_scaler(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
-) -> StruckScaler:
+) -> StruckScalerChannel:
     async with init_devices(mock=True):
-        mock_struck_scaler = StruckScaler(
-            prefix=prefix,
-            suffix=suffix,
-        )
+        controller = Struck32ChannelScaler(prefix=prefix)
+        mock_struck_scaler = StruckScalerChannel(controller, suffix=suffix)
     return mock_struck_scaler
 
 
 @pytest.fixture
 async def mock_sr570_struck_scaler_detector(
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
     mock_sr570: SR570,
 ) -> CurrentAmpDet:
     async with init_devices(mock=True):
@@ -245,7 +243,7 @@ async def test_sr570_struck_scaler_read(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     mock_sr570_struck_scaler_detector: CurrentAmpDet,
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
     mock_sr570: SR570,
     gain: float,
     raw_count: float,
@@ -257,7 +255,7 @@ async def test_sr570_struck_scaler_read(
     set_mock_value(mock_sr570.fine_gain, fine_gain)
 
     set_mock_value(mock_struck_scaler.count, raw_count)
-    set_mock_value(mock_struck_scaler.integration_time, 1)
+    set_mock_value(mock_struck_scaler.controller.integration_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, False)
 
     run_engine(count([mock_sr570_struck_scaler_detector]))
@@ -283,7 +281,7 @@ async def test_sr570_struck_scaler_read_with_autogain(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
     mock_sr570_struck_scaler_detector: CurrentAmpDet,
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
     gain: float,
     raw_count: list[float],
     expected_current: float,
@@ -300,7 +298,7 @@ async def test_sr570_struck_scaler_read_with_autogain(
         set_mock_value(mock_struck_scaler.count, rbv_mocks.get())
 
     callback_on_mock_put(
-        mock_struck_scaler.start_count, lambda *_, **__: set_mock_counter()
+        mock_struck_scaler.controller.start_count, lambda *_, **__: set_mock_counter()
     )
 
     run_engine(mv(mock_sr570_struck_scaler_detector, 1))
@@ -322,7 +320,7 @@ async def test_sr570_struck_scaler_read_with_autogain(
 async def test_sr570_struck_scaler_trigger_does_not_double_count(
     run_engine: RunEngine,
     mock_sr570_struck_scaler_detector: CurrentAmpDet,
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
     auto_mode: bool,
     raw_count: list[float],
     expected_triggers: int,
@@ -338,7 +336,7 @@ async def test_sr570_struck_scaler_trigger_does_not_double_count(
         set_mock_value(mock_struck_scaler.count, rbv_mocks.get())
 
     callback_on_mock_put(
-        mock_struck_scaler.start_count, lambda *_, **__: set_mock_counter()
+        mock_struck_scaler.controller.start_count, lambda *_, **__: set_mock_counter()
     )
 
     run_engine(mv(mock_sr570_struck_scaler_detector, 1))
@@ -350,7 +348,9 @@ async def test_sr570_struck_scaler_trigger_does_not_double_count(
 def test_sr570_struck_scaler_detector_set_sets_counter_integration_time(
     run_engine: RunEngine,
     mock_sr570_struck_scaler_detector: CurrentAmpDet,
-    mock_struck_scaler: StruckScaler,
+    mock_struck_scaler: StruckScalerChannel,
 ):
     run_engine(mv(mock_sr570_struck_scaler_detector, 0.5))
-    get_mock_put(mock_struck_scaler.integration_time).assert_awaited_once_with(0.5)
+    get_mock_put(
+        mock_struck_scaler.controller.integration_time
+    ).assert_awaited_once_with(0.5)

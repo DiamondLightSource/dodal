@@ -13,7 +13,7 @@ from dodal.devices.beamlines.i06_1.magnet.temperature_controller import (
     SuperConductingMagnetTemperatureController,
 )
 from dodal.devices.motors import XYThetaStage
-from dodal.devices.scaler_card import ScalerCard, ScalerCardController
+from dodal.devices.scaler_card import Hytec8512Scaler, ScalerCard
 from dodal.devices.temperature_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -70,16 +70,12 @@ def scmc(
 
 
 @devices.factory()
-def scaler2_controller() -> ScalerCardController:
-    return ScalerCardController(
-        f"{I_PREFIX.beamline_prefix}-DI-8512-02:",
-        start_count_suffix="STARTCOUNT",
-        count_suffix="PRESET",
-    )
+def scaler2_controller() -> Hytec8512Scaler:
+    return Hytec8512Scaler(f"{I_PREFIX.beamline_prefix}-DI-8512-02:")
 
 
 @devices.factory()
-def scaler2_mag(scaler2_controller: ScalerCardController):
+def scaler2_mag(scaler2_controller: Hytec8512Scaler):
     """Magnet scaler card channels for scaler2_controller."""
     mag_prefix = f"{J_PREFIX.beamline_prefix}-EA-MAG-01:"
     current_amp_pv = f"{I_PREFIX.beamline_prefix}-DI-IAMP-04:I1C-RAW"
@@ -99,7 +95,7 @@ def scaler2_mag(scaler2_controller: ScalerCardController):
 
 
 @devices.factory()
-def scaler2_ppj(scaler2_controller: ScalerCardController):
+def scaler2_ppj(scaler2_controller: Hytec8512Scaler):
     """Patch Panel J channels for scaler2_controller."""
     prefix = f"{J_PREFIX.beamline_prefix}-EA-USER-01:"
     return ScalerCard(
