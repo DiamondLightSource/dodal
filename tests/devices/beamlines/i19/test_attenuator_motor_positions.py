@@ -181,15 +181,40 @@ def test_that_attenuator_motor_positions_can_be_merged(
     assert equivalent_dict == expected_merged_positions
 
 
-@pytest.mark.parametrize("thing", [object(), 5.5, "Hello", KeyError(), False, True, -9])
-def test_that_attenuator_motor_positions_ignore_merge_with_other_types(
+@pytest.mark.parametrize(
+    "wedge_positions, wheel_indexes",
+    [
+        ({"y": 93.3}, {"w": 4}),
+        ({"x": 72.1}, {}),
+        ({}, {"v": 5}),
+        ({"x": 50.01, "y": 67.1}, {"w": 2}),
+        ({}, {}),
+    ],
+)
+def test_that_merging_attenuator_motor_positions_with_itself_produces_itself(
+    wedge_positions: dict[str, float],
+    wheel_indexes: dict[str, int],
+) -> None:
+    amp = AttenuatorMotorPositions(
+        continuous_positions=wedge_positions, discrete_indices=wheel_indexes
+    )
+    merged_self = amp | amp
+    assert merged_self is amp
+
+
+@pytest.mark.parametrize(
+    "thing", [object(), 5.5, "Hello", KeyError(), False, True, -9, math.sin]
+)
+def test_that_attenuator_motor_positions_merge_with_other_types_raises_error(
     thing: Any,
 ) -> None:
     amp = AttenuatorMotorPositions(
         continuous_positions={"x": 27.5, "y": 12.6}, discrete_indices={"w": 3}
     )
-    amp2 = amp | thing
-    assert amp2 is amp
+    with pytest.raises(TypeError):
+        _ = amp | thing
+    with pytest.raises(TypeError):
+        _ = thing | amp
 
 
 TRIAL_WHEEL_INDICES = [
