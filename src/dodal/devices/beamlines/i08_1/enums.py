@@ -1,7 +1,7 @@
-from ophyd_async.core import SupersetEnum
+from ophyd_async.core import SubsetEnum
 
 
-class Grating(SupersetEnum):
+class Grating(SubsetEnum):
     PGM_600 = "600 lines/mm"
     PGM_400 = "400 lines/mm"
     PGM_300 = "300 lines/mm"
