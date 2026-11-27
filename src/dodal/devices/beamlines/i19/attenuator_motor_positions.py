@@ -62,12 +62,13 @@ class AttenuatorMotorPositions(BaseModel):
         self._confirm_no_keys_clash(self.continuous_positions, self.discrete_indices)
         return self
 
-    def _confirm_merge_compatibility(self, other: object) -> None:
-        if isinstance(other, AttenuatorMotorPositions):
-            self._confirm_no_keys_clash(self.discrete_indices, other.discrete_indices)
-            self._confirm_no_keys_clash(
-                self.continuous_positions, other.continuous_positions
-            )
+    def _confirm_merge_compatibility(
+        self, other_amp: "AttenuatorMotorPositions"
+    ) -> None:
+        self._confirm_no_keys_clash(self.discrete_indices, other_amp.discrete_indices)
+        self._confirm_no_keys_clash(
+            self.continuous_positions, other_amp.continuous_positions
+        )
 
     @cached_property
     def validated_and_complete(
@@ -91,16 +92,17 @@ class AttenuatorMotorPositions(BaseModel):
 
     def __or__(self, other: object) -> "AttenuatorMotorPositions":
         if not isinstance(other, AttenuatorMotorPositions):
+            return NotImplemented
+        if self is other:
             return self
-        elif self.is_empty():
+        if self.is_empty():
             return other
-        else:
-            self._confirm_merge_compatibility(other)
-            return AttenuatorMotorPositions(
-                continuous_positions=self.continuous_positions
-                | other.continuous_positions,
-                discrete_indices=self.discrete_indices | other.discrete_indices,
-            )
+
+        self._confirm_merge_compatibility(other)
+        return AttenuatorMotorPositions(
+            continuous_positions=self.continuous_positions | other.continuous_positions,
+            discrete_indices=self.discrete_indices | other.discrete_indices,
+        )
 
     def __repr__(self) -> str:
         return f"{self.validated_and_complete}"

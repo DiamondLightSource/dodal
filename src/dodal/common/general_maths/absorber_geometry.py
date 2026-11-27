@@ -18,10 +18,7 @@ from dodal.common.general_maths.arithmetic_conversions import (
     convert_mm_to_cm,
     get_straight_line_y,
 )
-from dodal.common.general_maths.interval import (
-    FloatInterval,
-    OpenInterval,
-)
+from dodal.common.general_maths.interval import OpenInterval
 
 SupportedThicknessUnits = Annotated[
     Literal["cm", "mm", "um", "micron"], "Supported thickness units"
@@ -108,7 +105,7 @@ class WedgeGeometry(BaseModel):
     @field_validator("taper_cotangent")
     @classmethod
     def validate_taper_is_thin(cls, value: float, _magnitude=5) -> float:
-        _invalid_taper_range: FloatInterval = OpenInterval(
+        _invalid_taper_range: OpenInterval = OpenInterval(
             lower=-_magnitude, upper=_magnitude
         )  # round number cotangent limit for thin wedge
         if value in _invalid_taper_range:
