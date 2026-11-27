@@ -252,7 +252,7 @@ async def test_sr570_struck_scaler_read(
     set_mock_value(mock_sr570.fine_gain, fine_gain)
 
     set_mock_value(mock_struck_scaler.count, raw_count)
-    set_mock_value(mock_struck_scaler.count_time, 1)
+    set_mock_value(mock_struck_scaler.integration_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, False)
 
     run_engine(count([mock_sr570_struck_scaler_detector]))
@@ -295,7 +295,7 @@ async def test_sr570_struck_scaler_read_with_autogain(
         set_mock_value(mock_struck_scaler.count, rbv_mocks.get())
 
     callback_on_mock_put(
-        mock_struck_scaler.trigger_start, lambda *_, **__: set_mock_counter()
+        mock_struck_scaler.start_count, lambda *_, **__: set_mock_counter()
     )
 
     run_engine(prepare(mock_sr570_struck_scaler_detector, 1))
@@ -333,7 +333,7 @@ async def test_sr570_struck_scaler_trigger_does_not_double_count(
         set_mock_value(mock_struck_scaler.count, rbv_mocks.get())
 
     callback_on_mock_put(
-        mock_struck_scaler.trigger_start, lambda *_, **__: set_mock_counter()
+        mock_struck_scaler.start_count, lambda *_, **__: set_mock_counter()
     )
 
     run_engine(prepare(mock_sr570_struck_scaler_detector, 1))

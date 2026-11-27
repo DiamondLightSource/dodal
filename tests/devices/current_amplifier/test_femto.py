@@ -17,7 +17,6 @@ from ophyd_async.core import (
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.current_amplifiers import (
-    CountState,
     CurrentAmpDet,
     FemtoDDPCA,
     StruckScaler,
@@ -226,7 +225,7 @@ async def test_femto_struck_scaler_read(
 ):
     await mock_femto.set(gain)
 
-    set_mock_value(mock_struck_scaler.count_time, 1)
+    set_mock_value(mock_struck_scaler.integration_time, 1)
     set_mock_value(mock_struck_scaler.count, raw_voltage)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
 
@@ -262,17 +261,17 @@ async def test_femto_struck_scaler_read_with_auto_gain(
 ):
     await mock_femto.set(gain)
 
-    set_mock_value(mock_struck_scaler.count_time, 1)
+    set_mock_value(mock_struck_scaler.integration_time, 1)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, True)
 
     raw_counts = iter(raw_voltage)
 
     def set_mock_counter():
         set_mock_value(mock_struck_scaler.count, next(raw_counts))
-        set_mock_value(mock_struck_scaler.trigger_start, CountState.DONE)
+        set_mock_value(mock_struck_scaler.start_count, False)
 
     callback_on_mock_put(
-        mock_struck_scaler.trigger_start,
+        mock_struck_scaler.start_count,
         lambda *_, **__: set_mock_counter(),
     )
 
