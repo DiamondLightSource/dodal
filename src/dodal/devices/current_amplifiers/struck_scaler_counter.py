@@ -1,5 +1,3 @@
-import asyncio
-
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -27,13 +25,15 @@ class StruckScalerChannel(CurrentAmpCounter):
     """A single channel of a :class:`Struck32ChannelScaler` card, for use with a current
     amplifier via :class:`CurrentAmpDet`.
 
-    Setting, triggering and staging are delegated to the shared card controller, so
-    every channel on a card uses the same integration time and count. The channel's
-    count is also added as a readable on the controller, so reading the controller
-    gives all of its channels. Card level configuration (integration time, mode) is
-    not repeated on each channel, as several channels of the same card are often
-    read together; it is reported once by the controller. It has additional signals
-    that provide conversion between count and voltage.
+    Setting and triggering are delegated to the shared card controller, so every
+    channel on a card uses the same integration time and count. Staging is not
+    delegated, as the controller stages its registered channels; the card's mode is
+    set when the :class:`ScalerCard` (or controller) is staged. Channels are
+    normally grouped in a custom device and given to a :class:`ScalerCard` with the
+    controller, which registers them with the controller. Card level configuration
+    (integration time, mode) is not repeated on each channel, as several channels of
+    the same card are often read together. It has additional signals that provide
+    conversion between count and voltage.
 
     Attributes:
         count (SignalR[float]): Scaler channel output.
@@ -54,7 +54,6 @@ class StruckScalerChannel(CurrentAmpCounter):
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.count = epics_signal_r(float, controller.prefix + suffix)
-        controller.add_readables([self.count], StandardReadableFormat.HINTED_SIGNAL)
 
         self.count_per_volt, _ = soft_signal_r_and_setter(
             float, initial_value=count_per_volt
@@ -85,11 +84,3 @@ class StruckScalerChannel(CurrentAmpCounter):
     async def trigger(self) -> None:
         """Start a count on the card controller and wait for it to complete."""
         await self.controller.trigger()
-
-    @AsyncStatus.wrap
-    async def stage(self) -> None:
-        await asyncio.gather(self.controller.stage(), super().stage())
-
-    @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        await asyncio.gather(self.controller.unstage(), super().unstage())

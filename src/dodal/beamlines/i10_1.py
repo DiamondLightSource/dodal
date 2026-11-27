@@ -7,11 +7,12 @@ from dodal.devices.beamlines.i10_1 import (
     ElectromagnetStage,
     HighFieldMagnet,
     HighFieldMagnetTemperatureController,
-    I10JScalerCard,
+    I10JScalerChannels,
 )
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import SR570, CurrentAmpDet, FemtoDDPCA
 from dodal.devices.motors import XYPitchStage
+from dodal.devices.scaler_card import CountMode, ScalerCard, Struck32ChannelScaler
 from dodal.devices.temperature_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -34,10 +35,10 @@ def mirror6_sr570() -> SR570:
 @devices.factory()
 def i10j_sr570_scaler_monitor(
     mirror6_sr570: SR570,
-    electromagnet_scaler_card: I10JScalerCard,
+    electromagnet_scaler_card: ScalerCard[I10JScalerChannels],
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
-        current_amp=mirror6_sr570, counter=electromagnet_scaler_card.mon
+        current_amp=mirror6_sr570, counter=electromagnet_scaler_card.channel.mon
     )
 
 
@@ -79,9 +80,21 @@ def electromagnet_stage() -> ElectromagnetStage:
 
 
 @devices.factory()
-def electromagnet_scaler_card() -> I10JScalerCard:
-    return I10JScalerCard(
+def electromagnet_scaler_card_controller() -> Struck32ChannelScaler:
+    return Struck32ChannelScaler(
         prefix=f"{PREFIX.beamline_prefix}-EA-SCLR-02:SCALERJ3",
+        stage_mode=CountMode.ONE_SHOT,
+        unstage_mode=CountMode.AUTO,
+    )
+
+
+@devices.factory()
+def electromagnet_scaler_card(
+    electromagnet_scaler_card_controller: Struck32ChannelScaler,
+) -> ScalerCard[I10JScalerChannels]:
+    return ScalerCard(
+        channels=I10JScalerChannels(electromagnet_scaler_card_controller),
+        controller=electromagnet_scaler_card_controller,
     )
 
 
@@ -102,22 +115,22 @@ def em_sr570_fy() -> SR570:
 @devices.factory()
 def electromagnet_sr570_scaler_tey(
     em_sr570_tey: SR570,
-    electromagnet_scaler_card: I10JScalerCard,
+    electromagnet_scaler_card: ScalerCard[I10JScalerChannels],
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=em_sr570_tey,
-        counter=electromagnet_scaler_card.tey,
+        counter=electromagnet_scaler_card.channel.tey,
     )
 
 
 @devices.factory()
 def electromagnet_sr570_scaler_fy(
     em_sr570_fy: SR570,
-    electromagnet_scaler_card: I10JScalerCard,
+    electromagnet_scaler_card: ScalerCard[I10JScalerChannels],
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=em_sr570_fy,
-        counter=electromagnet_scaler_card.fy,
+        counter=electromagnet_scaler_card.channel.fy,
     )
 
 
@@ -172,9 +185,21 @@ def hfm_sr570_diode_2() -> SR570:
 
 # Scaler Cards
 @devices.factory()
-def hfm_scaler_card() -> I10JScalerCard:
-    return I10JScalerCard(
+def hfm_scaler_card_controller() -> Struck32ChannelScaler:
+    return Struck32ChannelScaler(
         prefix=f"{PREFIX.beamline_prefix}-EA-SCLR-01:SCALERJ2",
+        stage_mode=CountMode.ONE_SHOT,
+        unstage_mode=CountMode.AUTO,
+    )
+
+
+@devices.factory()
+def hfm_scaler_card(
+    hfm_scaler_card_controller: Struck32ChannelScaler,
+) -> ScalerCard[I10JScalerChannels]:
+    return ScalerCard(
+        channels=I10JScalerChannels(hfm_scaler_card_controller),
+        controller=hfm_scaler_card_controller,
     )
 
 
@@ -182,33 +207,33 @@ def hfm_scaler_card() -> I10JScalerCard:
 @devices.factory()
 def hfm_sr570_scaler_tey(
     hfm_sr570_tey: SR570,
-    hfm_scaler_card: I10JScalerCard,
+    hfm_scaler_card: ScalerCard[I10JScalerChannels],
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=hfm_sr570_tey,
-        counter=hfm_scaler_card.tey,
+        counter=hfm_scaler_card.channel.tey,
     )
 
 
 @devices.factory()
 def hfm_sr570_scaler_diode_1(
     hfm_sr570_diode_1: SR570,
-    hfm_scaler_card: I10JScalerCard,
+    hfm_scaler_card: ScalerCard[I10JScalerChannels],
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=hfm_sr570_diode_1,
-        counter=hfm_scaler_card.fy,
+        counter=hfm_scaler_card.channel.fy,
     )
 
 
 @devices.factory()
 def hfm_sr570_scaler_diode_2(
     hfm_sr570_diode_2: SR570,
-    hfm_scaler_card: I10JScalerCard,
+    hfm_scaler_card: ScalerCard[I10JScalerChannels],
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=hfm_sr570_diode_2,
-        counter=hfm_scaler_card.fy2,
+        counter=hfm_scaler_card.channel.fy2,
     )
 
 

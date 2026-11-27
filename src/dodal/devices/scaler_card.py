@@ -17,12 +17,12 @@ from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.util.mock_behaviour import reset_signal_on_update_mock_factory
 
-CountModeT = TypeVar("CountModeT", bound=StrictEnum)
+ModeT = TypeVar("ModeT", bound=StrictEnum)
 
 
 @default_mock_class(reset_signal_on_update_mock_factory("start_count", True, False))
 class ScalerCardController(
-    StandardReadable, Triggerable, Movable[float], Generic[CountModeT]
+    StandardReadable, Triggerable, Movable[float], Generic[ModeT]
 ):
     """Control a scaler card and its readable channels.
 
@@ -41,10 +41,10 @@ class ScalerCardController(
         prefix: str,
         start_count_suffix: str,
         count_suffix: str,
-        count_mode_suffix: str,
-        count_mode_type: type[CountModeT],
-        stage_mode: CountModeT | None = None,
-        unstage_mode: CountModeT | None = None,
+        mode_suffix: str,
+        mode_type: type[ModeT],
+        stage_mode: ModeT | None = None,
+        unstage_mode: ModeT | None = None,
         name: str = "",
     ):
         """Configure the scaler card controller.
@@ -53,8 +53,8 @@ class ScalerCardController(
             prefix: PV prefix of the scaler card.
             start_count_suffix: PV suffix to start a count.
             count_suffix: PV suffix of the integration time.
-            count_mode_suffix: PV suffix of the count mode.
-            count_mode_type: Enum of the count mode options for this card model.
+            mode_suffix: PV suffix of the count mode.
+            mode_type: Enum of the count mode options for this card model.
             stage_mode: Count mode to set on stage. If None, the mode is not changed.
             unstage_mode: Count mode to set on unstage. If None, the mode is not
                 changed.
@@ -64,26 +64,24 @@ class ScalerCardController(
         self._unstage_mode = unstage_mode
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.integration_time = epics_signal_rw(float, prefix + count_suffix)
-            self.count_mode = epics_signal_rw(
-                count_mode_type, prefix + count_mode_suffix
-            )
+            self.mode = epics_signal_rw(mode_type, prefix + mode_suffix)
 
         self.start_count = epics_signal_rw(bool, prefix + start_count_suffix)
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        """Set the configured stage count mode, if any."""
+        """Set the configured stage mode, if any, and stage the readables."""
         if self._stage_mode is not None:
-            await self.count_mode.set(self._stage_mode)
+            await self.mode.set(self._stage_mode)
         await super().stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        """Set the configured unstage count mode, if any."""
-        if self._unstage_mode is not None:
-            await self.count_mode.set(self._unstage_mode)
+        """Unstage the readables and set the configured unstage mode, if any."""
         await super().unstage()
+        if self._unstage_mode is not None:
+            await self.mode.set(self._unstage_mode)
 
     @AsyncStatus.wrap
     async def set(self, value: float):
@@ -116,7 +114,7 @@ class Struck32ChannelScaler(ScalerCardController[CountMode]):
 
     Attributes:
         prefix (str): PV prefix of the card, used to build channel PVs.
-        count_mode (SignalRW[CountMode]): Counting card setting.
+        mode (SignalRW[CountMode]): Counting card setting.
         integration_time (SignalRW[float]): Count time.
         delay_time (SignalRW[float]): Delay before counting starts.
         start_count (SignalRW[bool]): Start a count, returns to False when done.
@@ -145,8 +143,8 @@ class Struck32ChannelScaler(ScalerCardController[CountMode]):
             prefix=prefix,
             start_count_suffix=".CNT",
             count_suffix=".TP",
-            count_mode_suffix=":AutoCount",
-            count_mode_type=CountMode,
+            mode_suffix=":AutoCount",
+            mode_type=CountMode,
             stage_mode=stage_mode,
             unstage_mode=unstage_mode,
             name=name,
@@ -167,7 +165,7 @@ class Hytec8512Scaler(ScalerCardController[ScanMode]):
     has no delay time.
 
     Attributes:
-        count_mode (SignalRW[ScanMode]): Scan mode of the card.
+        mode (SignalRW[ScanMode]): Scan mode of the card.
         integration_time (SignalRW[float]): Count time.
         start_count (SignalRW[bool]): Start a count, returns to False when done.
     """
@@ -192,8 +190,8 @@ class Hytec8512Scaler(ScalerCardController[ScanMode]):
             prefix=prefix,
             start_count_suffix="STARTCOUNT",
             count_suffix="PRESET",
-            count_mode_suffix="Mode",
-            count_mode_type=ScanMode,
+            mode_suffix="Mode",
+            mode_type=ScanMode,
             stage_mode=stage_mode,
             unstage_mode=unstage_mode,
             name=name,
@@ -216,6 +214,11 @@ class ScalerCard(StandardReadable, Triggerable, Movable[float], Generic[DeviceT]
     each  :class:`ScalerCard` instance provides access to only its associated
     group. Calling :meth:`set` sets the scaler integration time via the controller,
     while :meth:`trigger` starts the controller count and waits for it to complete.
+    Staging and unstaging also stage and unstage the controller, applying any count
+    mode configured for it.
+
+    The channels can be a DeviceMap/DeviceVector of signals, or a custom device (e.g.
+    one exposing named channels as attributes).
     """
 
     def __init__(
@@ -245,3 +248,15 @@ class ScalerCard(StandardReadable, Triggerable, Movable[float], Generic[DeviceT]
     async def trigger(self):
         """Start a scaler count on the controller and wait for it to complete."""
         await self.controller_ref().trigger()
+
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        """Stage the controller, then this device."""
+        await self.controller_ref().stage()
+        await super().stage()
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        """Unstage this device, then the controller."""
+        await super().unstage()
+        await self.controller_ref().unstage()

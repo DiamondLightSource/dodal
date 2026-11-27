@@ -1,18 +1,20 @@
-from ophyd_async.core import Device
+from ophyd_async.core import StandardReadable
 
 from dodal.devices.current_amplifiers import StruckScalerChannel
-from dodal.devices.scaler_card import CountMode, Struck32ChannelScaler
+from dodal.devices.scaler_card import Struck32ChannelScaler
 
 
-class RasorScalerCard1(Device):
-    def __init__(self, prefix, name: str = "") -> None:
-        self.controller = Struck32ChannelScaler(
-            prefix=prefix,
-            stage_mode=CountMode.ONE_SHOT,
-            unstage_mode=CountMode.AUTO,
-        )
-        self.mon = StruckScalerChannel(self.controller, suffix=".S17")
-        self.det = StruckScalerChannel(self.controller, suffix=".S18")
-        self.fluo = StruckScalerChannel(self.controller, suffix=".S19")
-        self.drain = StruckScalerChannel(self.controller, suffix=".S20")
+class RasorScalerChannels(StandardReadable):
+    """Channels of the RASOR scaler card used with current amplifiers.
+
+    To be used as the channels of a :class:`dodal.devices.scaler_card.ScalerCard`
+    with the same controller.
+    """
+
+    def __init__(self, controller: Struck32ChannelScaler, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.mon = StruckScalerChannel(controller, suffix=".S17")
+            self.det = StruckScalerChannel(controller, suffix=".S18")
+            self.fluo = StruckScalerChannel(controller, suffix=".S19")
+            self.drain = StruckScalerChannel(controller, suffix=".S20")
         super().__init__(name)

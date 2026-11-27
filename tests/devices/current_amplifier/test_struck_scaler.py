@@ -46,7 +46,7 @@ def test_struck_scaler_pv_names(
 ):
     assert struck_scaler.start_count.source.endswith("BLXX-EA-SCLR-01.CNT")
     assert struck_scaler.integration_time.source.endswith("BLXX-EA-SCLR-01.TP")
-    assert struck_scaler.count_mode.source.endswith("BLXX-EA-SCLR-01:AutoCount")
+    assert struck_scaler.mode.source.endswith("BLXX-EA-SCLR-01:AutoCount")
     assert struck_scaler.delay_time.source.endswith("BLXX-EA-SCLR-01.DLY")
     assert channel_1.count.source.endswith("BLXX-EA-SCLR-01.S17")
 
@@ -60,28 +60,21 @@ def test_channels_share_the_card_controller(
     assert channel_2.controller is struck_scaler
 
 
-async def test_struck_scaler_reads_all_channels(
-    struck_scaler: Struck32ChannelScaler,
-    channel_1: StruckScalerChannel,
-    channel_2: StruckScalerChannel,
-):
-    set_mock_value(channel_1.count, 1.0)
-    set_mock_value(channel_2.count, 2.0)
-    await assert_reading(
-        struck_scaler,
-        {
-            "channel_1-count": partial_reading(1.0),
-            "channel_2-count": partial_reading(2.0),
-        },
-    )
+async def test_struck_scaler_configuration(struck_scaler: Struck32ChannelScaler):
     await assert_configuration(
         struck_scaler,
         {
             "struck_scaler-integration_time": partial_reading(0.0),
-            "struck_scaler-count_mode": partial_reading(CountMode.AUTO),
+            "struck_scaler-mode": partial_reading(CountMode.AUTO),
             "struck_scaler-delay_time": partial_reading(0.0),
         },
     )
+
+
+async def test_channel_does_not_register_itself_on_controller(
+    struck_scaler: Struck32ChannelScaler, channel_1: StruckScalerChannel
+):
+    await assert_reading(struck_scaler, {})
 
 
 async def test_channel_read_and_configuration(channel_1: StruckScalerChannel):
@@ -107,13 +100,21 @@ async def test_channel_trigger_starts_a_single_card_count(
     assert await struck_scaler.start_count.get_value() is False
 
 
-async def test_channel_stage_and_unstage_set_card_count_mode(
+async def test_channel_stage_and_unstage_do_not_change_card_mode(
     struck_scaler: Struck32ChannelScaler, channel_1: StruckScalerChannel
 ):
     await channel_1.stage()
-    assert await struck_scaler.count_mode.get_value() == CountMode.ONE_SHOT
     await channel_1.unstage()
-    assert await struck_scaler.count_mode.get_value() == CountMode.AUTO
+    get_mock_put(struck_scaler.mode).assert_not_called()
+
+
+async def test_struck_scaler_stage_and_unstage_set_configured_modes(
+    struck_scaler: Struck32ChannelScaler,
+):
+    await struck_scaler.stage()
+    assert await struck_scaler.mode.get_value() == CountMode.ONE_SHOT
+    await struck_scaler.unstage()
+    assert await struck_scaler.mode.get_value() == CountMode.AUTO
 
 
 async def test_channel_voltage_uses_card_integration_time(

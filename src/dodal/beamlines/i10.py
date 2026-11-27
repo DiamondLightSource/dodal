@@ -23,10 +23,11 @@ from dodal.devices.beamlines.i10.rasor.rasor_motors import (
     Diffractometer,
     PaStage,
 )
-from dodal.devices.beamlines.i10.rasor.rasor_scaler_cards import RasorScalerCard1
+from dodal.devices.beamlines.i10.rasor.rasor_scaler_cards import RasorScalerChannels
 from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.motors import XYStage, XYZStage
+from dodal.devices.scaler_card import CountMode, ScalerCard, Struck32ChannelScaler
 from dodal.devices.temperature_controller import (
     Lakeshore340,
 )
@@ -132,8 +133,22 @@ def rasor_femto() -> RasorFemto:
 
 
 @devices.factory()
-def rasor_det_scalers() -> RasorScalerCard1:
-    return RasorScalerCard1(prefix="ME01D-EA-SCLR-01:SCALER1")
+def rasor_scaler_controller() -> Struck32ChannelScaler:
+    return Struck32ChannelScaler(
+        prefix="ME01D-EA-SCLR-01:SCALER1",
+        stage_mode=CountMode.ONE_SHOT,
+        unstage_mode=CountMode.AUTO,
+    )
+
+
+@devices.factory()
+def rasor_det_scalers(
+    rasor_scaler_controller: Struck32ChannelScaler,
+) -> ScalerCard[RasorScalerChannels]:
+    return ScalerCard(
+        channels=RasorScalerChannels(rasor_scaler_controller),
+        controller=rasor_scaler_controller,
+    )
 
 
 @devices.factory()
@@ -145,59 +160,59 @@ def rasor_sr570() -> RasorSR570:
 
 @devices.factory()
 def rasor_sr570_pa_scaler_det(
-    rasor_sr570: RasorSR570, rasor_det_scalers: RasorScalerCard1
+    rasor_sr570: RasorSR570, rasor_det_scalers: ScalerCard[RasorScalerChannels]
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_sr570.ca1,
-        counter=rasor_det_scalers.det,
+        counter=rasor_det_scalers.channel.det,
     )
 
 
 @devices.factory()
 def rasor_femto_pa_scaler_det(
-    rasor_femto: RasorFemto, rasor_det_scalers: RasorScalerCard1
+    rasor_femto: RasorFemto, rasor_det_scalers: ScalerCard[RasorScalerChannels]
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto.ca1,
-        counter=rasor_det_scalers.det,
+        counter=rasor_det_scalers.channel.det,
     )
 
 
 @devices.factory()
 def rasor_sr570_fluo_scaler_det(
-    rasor_sr570: RasorSR570, rasor_det_scalers: RasorScalerCard1
+    rasor_sr570: RasorSR570, rasor_det_scalers: ScalerCard[RasorScalerChannels]
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_sr570.ca2,
-        counter=rasor_det_scalers.fluo,
+        counter=rasor_det_scalers.channel.fluo,
     )
 
 
 @devices.factory()
 def rasor_femto_fluo_scaler_det(
-    rasor_femto: RasorFemto, rasor_det_scalers: RasorScalerCard1
+    rasor_femto: RasorFemto, rasor_det_scalers: ScalerCard[RasorScalerChannels]
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto.ca2,
-        counter=rasor_det_scalers.fluo,
+        counter=rasor_det_scalers.channel.fluo,
     )
 
 
 @devices.factory()
 def rasor_sr570_drain_scaler_det(
-    rasor_sr570: RasorSR570, rasor_det_scalers: RasorScalerCard1
+    rasor_sr570: RasorSR570, rasor_det_scalers: ScalerCard[RasorScalerChannels]
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_sr570.ca3,
-        counter=rasor_det_scalers.drain,
+        counter=rasor_det_scalers.channel.drain,
     )
 
 
 @devices.factory()
 def rasor_femto_drain_scaler_det(
-    rasor_femto: RasorFemto, rasor_det_scalers: RasorScalerCard1
+    rasor_femto: RasorFemto, rasor_det_scalers: ScalerCard[RasorScalerChannels]
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto.ca3,
-        counter=rasor_det_scalers.drain,
+        counter=rasor_det_scalers.channel.drain,
     )

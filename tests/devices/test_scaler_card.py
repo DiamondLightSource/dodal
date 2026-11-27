@@ -167,7 +167,7 @@ async def test_scaler_controller_read_configuration(
         scaler_controller,
         {
             "scaler_controller-integration_time": partial_reading(0.0),
-            "scaler_controller-count_mode": partial_reading(CountMode.AUTO),
+            "scaler_controller-mode": partial_reading(CountMode.AUTO),
         },
     )
 
@@ -256,18 +256,18 @@ def scaler_controller_with_stage_modes() -> ScalerCardController:
     return scaler_controller_with_stage_modes
 
 
-def test_scaler_controller_count_mode_pv(
+def test_scaler_controller_mode_pv(
     scaler_controller: ScalerCardController,
 ) -> None:
-    assert scaler_controller.count_mode.source.endswith("TEST:MODE")
+    assert scaler_controller.mode.source.endswith("TEST:MODE")
 
 
-async def test_scaler_controller_without_stage_modes_does_not_change_count_mode(
+async def test_scaler_controller_without_stage_modes_does_not_change_mode(
     scaler_controller: ScalerCardController,
 ) -> None:
     await scaler_controller.stage()
     await scaler_controller.unstage()
-    get_mock_put(scaler_controller.count_mode).assert_not_called()
+    get_mock_put(scaler_controller.mode).assert_not_called()
 
 
 async def test_scaler_controller_sets_stage_and_unstage_modes(
@@ -275,9 +275,9 @@ async def test_scaler_controller_sets_stage_and_unstage_modes(
 ) -> None:
     controller = scaler_controller_with_stage_modes
     await controller.stage()
-    assert await controller.count_mode.get_value() == CountMode.ONE_SHOT
+    assert await controller.mode.get_value() == CountMode.ONE_SHOT
     await controller.unstage()
-    assert await controller.count_mode.get_value() == CountMode.AUTO
+    assert await controller.mode.get_value() == CountMode.AUTO
 
 
 async def test_scaler_controller_only_unstage_mode_set() -> None:
@@ -286,9 +286,9 @@ async def test_scaler_controller_only_unstage_mode_set() -> None:
             "TEST:", "CNT", "VAL", "MODE", CountMode, unstage_mode=CountMode.AUTO
         )
     await controller.stage()
-    get_mock_put(controller.count_mode).assert_not_called()
+    get_mock_put(controller.mode).assert_not_called()
     await controller.unstage()
-    get_mock_put(controller.count_mode).assert_called_once_with(CountMode.AUTO)
+    get_mock_put(controller.mode).assert_called_once_with(CountMode.AUTO)
 
 
 @pytest.fixture
@@ -301,7 +301,7 @@ async def hytec_scaler() -> Hytec8512Scaler:
 def test_hytec_scaler_pv_names(hytec_scaler: Hytec8512Scaler):
     assert hytec_scaler.start_count.source.endswith("TEST:STARTCOUNT")
     assert hytec_scaler.integration_time.source.endswith("TEST:PRESET")
-    assert hytec_scaler.count_mode.source.endswith("TEST:Mode")
+    assert hytec_scaler.mode.source.endswith("TEST:Mode")
 
 
 def test_hytec_scaler_has_no_delay_time(hytec_scaler: Hytec8512Scaler):
@@ -313,7 +313,7 @@ async def test_hytec_scaler_configuration(hytec_scaler: Hytec8512Scaler):
         hytec_scaler,
         {
             "hytec_scaler-integration_time": partial_reading(0.0),
-            "hytec_scaler-count_mode": partial_reading(ScanMode.FAST),
+            "hytec_scaler-mode": partial_reading(ScanMode.FAST),
         },
     )
 
@@ -323,7 +323,7 @@ async def test_hytec_scaler_does_not_change_mode_on_stage_by_default(
 ):
     await hytec_scaler.stage()
     await hytec_scaler.unstage()
-    get_mock_put(hytec_scaler.count_mode).assert_not_called()
+    get_mock_put(hytec_scaler.mode).assert_not_called()
 
 
 async def test_hytec_scaler_sets_configured_stage_modes():
@@ -332,6 +332,24 @@ async def test_hytec_scaler_sets_configured_stage_modes():
             "TEST:", stage_mode=ScanMode.NORMAL, unstage_mode=ScanMode.FAST
         )
     await hytec_scaler.stage()
-    assert await hytec_scaler.count_mode.get_value() == ScanMode.NORMAL
+    assert await hytec_scaler.mode.get_value() == ScanMode.NORMAL
     await hytec_scaler.unstage()
-    assert await hytec_scaler.count_mode.get_value() == ScanMode.FAST
+    assert await hytec_scaler.mode.get_value() == ScanMode.FAST
+
+
+async def test_scaler_card_stage_and_unstage_stage_the_controller() -> None:
+    with init_devices(mock=True):
+        controller = ScalerCardController(
+            "TEST:",
+            "CNT",
+            "VAL",
+            "MODE",
+            CountMode,
+            stage_mode=CountMode.ONE_SHOT,
+            unstage_mode=CountMode.AUTO,
+        )
+        card = ScalerCard(channels=soft_signal_rw(float), controller=controller)
+    await card.stage()
+    assert await controller.mode.get_value() == CountMode.ONE_SHOT
+    await card.unstage()
+    assert await controller.mode.get_value() == CountMode.AUTO
