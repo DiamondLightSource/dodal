@@ -80,11 +80,6 @@ class StruckScaler(ScalerCardController, CurrentAmpCounter):
         await super().stage()
 
     @AsyncStatus.wrap
-    async def prepare(self, value: float) -> None:
-        """Set the integration time."""
-        await self.set(value)
-
-    @AsyncStatus.wrap
     async def unstage(self) -> None:
         await self.mode.set(CountMode.AUTO)
         await super().unstage()

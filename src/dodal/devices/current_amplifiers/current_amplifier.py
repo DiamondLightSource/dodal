@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from bluesky.protocols import Movable, Preparable, Triggerable
+from bluesky.protocols import Movable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     SignalR,
@@ -103,7 +103,7 @@ class CurrentAmp(ABC, StandardReadable, Movable[float]):
         return True
 
 
-class CurrentAmpCounter(ABC, StandardReadable, Preparable, Triggerable):
+class CurrentAmpCounter(ABC, StandardReadable, Triggerable, Movable[float]):
     """Base class for current amplifier counter, it contain the minimal implementations
     required for a counter/detector to function with CurrentAmpDet.
     """
@@ -112,8 +112,8 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable, Triggerable):
 
     @abstractmethod
     @AsyncStatus.wrap
-    async def prepare(self, value: float) -> None:
-        """Prepare method for setting up the counter."""
+    async def set(self, value: float) -> None:
+        """Set the counter integration time."""
 
     @abstractmethod
     @AsyncStatus.wrap

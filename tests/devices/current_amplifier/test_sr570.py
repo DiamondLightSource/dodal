@@ -4,10 +4,15 @@ from unittest import mock
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from bluesky.plan_stubs import abs_set, prepare
+from bluesky.plan_stubs import abs_set, mv
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
+from ophyd_async.core import (
+    callback_on_mock_put,
+    get_mock_put,
+    init_devices,
+    set_mock_value,
+)
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.current_amplifiers import (
@@ -298,7 +303,7 @@ async def test_sr570_struck_scaler_read_with_autogain(
         mock_struck_scaler.start_count, lambda *_, **__: set_mock_counter()
     )
 
-    run_engine(prepare(mock_sr570_struck_scaler_detector, 1))
+    run_engine(mv(mock_sr570_struck_scaler_detector, 1))
     run_engine(count([mock_sr570_struck_scaler_detector]))
 
     assert run_engine_documents["event"][0]["data"][
@@ -336,7 +341,16 @@ async def test_sr570_struck_scaler_trigger_does_not_double_count(
         mock_struck_scaler.start_count, lambda *_, **__: set_mock_counter()
     )
 
-    run_engine(prepare(mock_sr570_struck_scaler_detector, 1))
+    run_engine(mv(mock_sr570_struck_scaler_detector, 1))
     run_engine(count([mock_sr570_struck_scaler_detector]))
 
     assert rbv_mocks.get.call_count == expected_triggers
+
+
+def test_sr570_struck_scaler_detector_set_sets_counter_integration_time(
+    run_engine: RunEngine,
+    mock_sr570_struck_scaler_detector: CurrentAmpDet,
+    mock_struck_scaler: StruckScaler,
+):
+    run_engine(mv(mock_sr570_struck_scaler_detector, 0.5))
+    get_mock_put(mock_struck_scaler.integration_time).assert_awaited_once_with(0.5)

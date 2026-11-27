@@ -35,10 +35,10 @@ async def test_struck_scaler_read_and_configuration(struck_scaler: StruckScaler)
     )
 
 
-async def test_struck_scaler_prepare_sets_integration_time(
+async def test_struck_scaler_set_sets_integration_time(
     struck_scaler: StruckScaler,
 ):
-    await struck_scaler.prepare(2.5)
+    await struck_scaler.set(2.5)
     get_mock_put(struck_scaler.integration_time).assert_awaited_once_with(2.5)
 
 
