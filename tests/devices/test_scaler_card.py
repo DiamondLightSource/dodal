@@ -15,13 +15,21 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
-from dodal.devices.scaler_card import ScalerCard, ScalerCardController
+from dodal.devices.scaler_card import (
+    CountMode,
+    Hytec8512Scaler,
+    ScalerCard,
+    ScalerCardController,
+    ScanMode,
+)
 
 
 @pytest.fixture
 def scaler_controller() -> ScalerCardController:
     with init_devices(mock=True):
-        scaler_controller = ScalerCardController("TEST:", "CNT", "VAL")
+        scaler_controller = ScalerCardController(
+            "TEST:", "CNT", "VAL", "MODE", CountMode
+        )
     return scaler_controller
 
 
@@ -156,7 +164,11 @@ async def test_scaler_controller_read_configuration(
     scaler_controller: ScalerCardController,
 ) -> None:
     await assert_configuration(
-        scaler_controller, {"scaler_controller-integration_time": partial_reading(0.0)}
+        scaler_controller,
+        {
+            "scaler_controller-integration_time": partial_reading(0.0),
+            "scaler_controller-mode": partial_reading(CountMode.AUTO),
+        },
     )
 
 
@@ -227,3 +239,117 @@ async def test_scaler_controller_trigger_sets_counting_true_then_false(
     scaler_controller.start_count.clear_sub(sub)
 
     assert states == expected_states
+
+
+@pytest.fixture
+def scaler_controller_with_stage_modes() -> ScalerCardController:
+    with init_devices(mock=True):
+        scaler_controller_with_stage_modes = ScalerCardController(
+            "TEST:",
+            "CNT",
+            "VAL",
+            "MODE",
+            CountMode,
+            stage_mode=CountMode.ONE_SHOT,
+            unstage_mode=CountMode.AUTO,
+        )
+    return scaler_controller_with_stage_modes
+
+
+def test_scaler_controller_mode_pv(
+    scaler_controller: ScalerCardController,
+) -> None:
+    assert scaler_controller.mode.source.endswith("TEST:MODE")
+
+
+async def test_scaler_controller_without_stage_modes_does_not_change_mode(
+    scaler_controller: ScalerCardController,
+) -> None:
+    await scaler_controller.stage()
+    await scaler_controller.unstage()
+    get_mock_put(scaler_controller.mode).assert_not_called()
+
+
+async def test_scaler_controller_sets_stage_and_unstage_modes(
+    scaler_controller_with_stage_modes: ScalerCardController,
+) -> None:
+    controller = scaler_controller_with_stage_modes
+    await controller.stage()
+    assert await controller.mode.get_value() == CountMode.ONE_SHOT
+    await controller.unstage()
+    assert await controller.mode.get_value() == CountMode.AUTO
+
+
+async def test_scaler_controller_only_unstage_mode_set() -> None:
+    with init_devices(mock=True):
+        controller = ScalerCardController(
+            "TEST:", "CNT", "VAL", "MODE", CountMode, unstage_mode=CountMode.AUTO
+        )
+    await controller.stage()
+    get_mock_put(controller.mode).assert_not_called()
+    await controller.unstage()
+    get_mock_put(controller.mode).assert_called_once_with(CountMode.AUTO)
+
+
+@pytest.fixture
+async def hytec_scaler() -> Hytec8512Scaler:
+    async with init_devices(mock=True):
+        hytec_scaler = Hytec8512Scaler("TEST:")
+    return hytec_scaler
+
+
+def test_hytec_scaler_pv_names(hytec_scaler: Hytec8512Scaler):
+    assert hytec_scaler.start_count.source.endswith("TEST:STARTCOUNT")
+    assert hytec_scaler.integration_time.source.endswith("TEST:PRESET")
+    assert hytec_scaler.mode.source.endswith("TEST:Mode")
+
+
+def test_hytec_scaler_has_no_delay_time(hytec_scaler: Hytec8512Scaler):
+    assert not hasattr(hytec_scaler, "delay_time")
+
+
+async def test_hytec_scaler_configuration(hytec_scaler: Hytec8512Scaler):
+    await assert_configuration(
+        hytec_scaler,
+        {
+            "hytec_scaler-integration_time": partial_reading(0.0),
+            "hytec_scaler-mode": partial_reading(ScanMode.FAST),
+        },
+    )
+
+
+async def test_hytec_scaler_does_not_change_mode_on_stage_by_default(
+    hytec_scaler: Hytec8512Scaler,
+):
+    await hytec_scaler.stage()
+    await hytec_scaler.unstage()
+    get_mock_put(hytec_scaler.mode).assert_not_called()
+
+
+async def test_hytec_scaler_sets_configured_stage_modes():
+    async with init_devices(mock=True):
+        hytec_scaler = Hytec8512Scaler(
+            "TEST:", stage_mode=ScanMode.NORMAL, unstage_mode=ScanMode.FAST
+        )
+    await hytec_scaler.stage()
+    assert await hytec_scaler.mode.get_value() == ScanMode.NORMAL
+    await hytec_scaler.unstage()
+    assert await hytec_scaler.mode.get_value() == ScanMode.FAST
+
+
+async def test_scaler_card_stage_and_unstage_stage_the_controller() -> None:
+    with init_devices(mock=True):
+        controller = ScalerCardController(
+            "TEST:",
+            "CNT",
+            "VAL",
+            "MODE",
+            CountMode,
+            stage_mode=CountMode.ONE_SHOT,
+            unstage_mode=CountMode.AUTO,
+        )
+        card = ScalerCard(channels=soft_signal_rw(float), controller=controller)
+    await card.stage()
+    assert await controller.mode.get_value() == CountMode.ONE_SHOT
+    await card.unstage()
+    assert await controller.mode.get_value() == CountMode.AUTO

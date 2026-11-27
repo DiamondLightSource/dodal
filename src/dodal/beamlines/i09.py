@@ -25,7 +25,7 @@ from dodal.devices.fast_shutter import DualFastShutter, FastShutter
 from dodal.devices.hutch_shutter import EXP_SHUTTER_2_INFIX, HutchShutter
 from dodal.devices.motors import XYZAzimuthPolarStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.scaler_card import ScalerCard, ScalerCardController
+from dodal.devices.scaler_card import ScalerCard, Struck32ChannelScaler
 from dodal.devices.selectable_source import DualEnergySource, SelectedSource
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperature_controller import Lakeshore336
@@ -143,16 +143,12 @@ def intensity_protection() -> SignalRW[IntensityProtection]:
 
 
 @devices.factory()
-def scaler1_controller() -> ScalerCardController:
-    return ScalerCardController(
-        f"{I_PREFIX.beamline_prefix}-EA-SCLR-01",
-        start_count_suffix=".CNT",
-        count_suffix=".TP",
-    )
+def scaler1_controller() -> Struck32ChannelScaler:
+    return Struck32ChannelScaler(f"{I_PREFIX.beamline_prefix}-EA-SCLR-01")
 
 
 @devices.factory()
-def scaler1(scaler1_controller: ScalerCardController):
+def scaler1(scaler1_controller: Struck32ChannelScaler):
     prefix = f"{I_PREFIX.beamline_prefix}-EA-SCLR-01"
     return ScalerCard(
         channels=DeviceMap(
@@ -168,16 +164,12 @@ def scaler1(scaler1_controller: ScalerCardController):
 
 
 @devices.factory()
-def scaler2_controller() -> ScalerCardController:
-    return ScalerCardController(
-        f"{I_PREFIX.beamline_prefix}-EA-SCLR-01",
-        start_count_suffix=".CNT",
-        count_suffix=".TP",
-    )
+def scaler2_controller() -> Struck32ChannelScaler:
+    return Struck32ChannelScaler(f"{L_PREFIX.beamline_prefix}-VA-SCLR-01")
 
 
 @devices.factory()
-def scaler2(scaler2_controller: ScalerCardController):
+def scaler2(scaler2_controller: Struck32ChannelScaler):
     prefix = f"{L_PREFIX.beamline_prefix}-VA-SCLR-01"
     return ScalerCard(
         channels=DeviceMap(

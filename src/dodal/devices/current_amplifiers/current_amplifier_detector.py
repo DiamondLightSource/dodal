@@ -1,6 +1,6 @@
 import asyncio
 
-from bluesky.protocols import Preparable, Triggerable
+from bluesky.protocols import Movable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -22,7 +22,7 @@ def _current_in(voltage: float, gain: float) -> float:
     return voltage / gain
 
 
-class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
+class CurrentAmpDet(StandardReadable, Triggerable, Movable[float]):
     """Current amplifier detector composed of references to a current amplifier device
     and counter device.
 
@@ -132,8 +132,9 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         await asyncio.gather(self._counter_ref().stage(), super().stage())
 
     @AsyncStatus.wrap
-    async def prepare(self, value: float) -> None:
-        await self._counter_ref().prepare(value)
+    async def set(self, value: float) -> None:
+        """Set the counter integration time."""
+        await self._counter_ref().set(value)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:

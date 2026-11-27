@@ -1,70 +1,59 @@
 from ophyd_async.core import (
     AsyncStatus,
+    Reference,
     StandardReadableFormat,
-    StrictEnum,
-    default_mock_class,
     derived_signal_r,
-    set_and_wait_for_other_value,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r
 
-from dodal.devices.current_amplifiers import CurrentAmpCounter
-from dodal.devices.util.mock_behaviour import reset_signal_on_update_mock_factory
+from dodal.devices.current_amplifiers.current_amplifier import CurrentAmpCounter
+from dodal.devices.scaler_card import Struck32ChannelScaler
 
-
-class CountMode(StrictEnum):
-    AUTO = "AutoCount"
-    ONE_SHOT = "OneShot"
+COUNT_PER_VOLTAGE = 100000
 
 
-class CountState(StrictEnum):
-    DONE = "Done"
-    COUNT = "Count"
-
-
-def _count_per_sec(count: float, count_time: float) -> float:
-    return count / count_time
+def _count_per_sec(count: float, integration_time: float) -> float:
+    return count / integration_time
 
 
 def _voltage_per_sec(count_per_sec: float, count_per_volt: float) -> float:
     return count_per_sec / count_per_volt
 
 
-@default_mock_class(
-    reset_signal_on_update_mock_factory(
-        "trigger_start", CountState.COUNT, CountState.DONE
-    )
-)
-class StruckScaler(CurrentAmpCounter):
-    """StruckScaler is a counting card that records the output signal from a wide
-    range of detectors. This class contains the basic control to run the struck scaler
-    card together with a current amplifier. It has additional signals that provide
+class StruckScalerChannel(CurrentAmpCounter):
+    """A single channel of a :class:`Struck32ChannelScaler` card, for use with a current
+    amplifier via :class:`CurrentAmpDet`.
+
+    Setting and triggering are delegated to the shared card controller, so every
+    channel on a card uses the same integration time and count. Staging is not
+    delegated, as the controller stages its registered channels; the card's mode is
+    set when the :class:`ScalerCard` (or controller) is staged. Channels are
+    normally grouped in a custom device and given to a :class:`ScalerCard` with the
+    controller, which registers them with the controller. Card level configuration
+    (integration time, mode) is not repeated on each channel, as several channels of
+    the same card are often read together. It has additional signals that provide
     conversion between count and voltage.
 
     Attributes:
-        count(SignalR): Scaler card output.
-        count_mode (SignalR[CountMode]): Counting card setting.
-        count_time (SignalRW([float]): Count time.
-        count_per_sec (SignalR[float]): Derived signal from the count and count_time.
-        count_per_volt (SignalR[float]): Conversion factor between counter output and voltage.
-        voltage: (SignalR[float]): The calculated voltage output from the count and
+        count (SignalR[float]): Scaler channel output.
+        count_per_sec (SignalR[float]): Derived signal from the count and the
+            controller integration_time.
+        count_per_volt (SignalR[float]): Conversion factor between counter output and
+            voltage.
+        voltage (SignalR[float]): The calculated voltage output from the count and
             count_per_volt.
     """
 
     def __init__(
         self,
-        prefix: str,
+        controller: Struck32ChannelScaler,
         suffix: str,
-        count_per_volt=100000,
+        count_per_volt: float = COUNT_PER_VOLTAGE,
         name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.count = epics_signal_r(float, prefix + suffix)
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
-            self.count_time = epics_signal_rw(float, prefix + ".TP")
+            self.count = epics_signal_r(float, controller.prefix + suffix)
 
         self.count_per_volt, _ = soft_signal_r_and_setter(
             float, initial_value=count_per_volt
@@ -72,36 +61,26 @@ class StruckScaler(CurrentAmpCounter):
         self.count_per_sec = derived_signal_r(
             _count_per_sec,
             count=self.count,
-            count_time=self.count_time,
+            integration_time=controller.integration_time,
         )
         self.voltage = derived_signal_r(
             _voltage_per_sec,
             count_per_sec=self.count_per_sec,
             count_per_volt=self.count_per_volt,
         )
-        self.trigger_start = epics_signal_rw(CountState, prefix + ".CNT")
-
+        self._controller_ref = Reference(controller)
         super().__init__(name=name)
 
-    @AsyncStatus.wrap
-    async def stage(self) -> None:
-        await self.mode.set(CountMode.ONE_SHOT)
-        await super().stage()
+    @property
+    def controller(self) -> Struck32ChannelScaler:
+        return self._controller_ref()
 
     @AsyncStatus.wrap
-    async def prepare(self, value) -> None:
-        await self.count_time.set(value)
+    async def set(self, value: float) -> None:
+        """Set the integration time on the card controller."""
+        await self.controller.set(value)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
-        await set_and_wait_for_other_value(
-            set_signal=self.trigger_start,
-            set_value=CountState.COUNT,
-            match_signal=self.trigger_start,
-            match_value=CountState.DONE,
-        )
-
-    @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        await self.mode.set(CountMode.AUTO)
-        await super().unstage()
+        """Start a count on the card controller and wait for it to complete."""
+        await self.controller.trigger()
