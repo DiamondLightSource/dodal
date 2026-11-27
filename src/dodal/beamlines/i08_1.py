@@ -23,7 +23,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i08-1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
-I_PREFIX = PREFIX = BeamlinePrefix(BL, suffix="I")
+I_PREFIX = BeamlinePrefix(BL, suffix="I")
 PATH = "/dls/i08-1/data/2026/cm44149-5/tmp/"
 
 
