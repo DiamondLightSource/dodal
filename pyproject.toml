@@ -75,6 +75,7 @@ dev = [
     "types-mock",
     "types-PyYAML",
     "types-aiofiles",
+    "blueapi>=1.22.0",
 ]
 
 [project.scripts]

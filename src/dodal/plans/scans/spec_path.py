@@ -31,7 +31,6 @@ def spec_scan(
     """
     # TODO: https://github.com/bluesky/scanspec/issues/154
     # support Static.duration: Spec[Literal["DURATION"]]
-
     _md = {
         "plan_args": {
             "detectors": {det.name for det in detectors},
@@ -41,7 +40,6 @@ def spec_scan(
         "shape": spec.shape(),
         **(metadata or {}),
     }
-
     yield from bp.scan_nd(tuple(detectors), _as_cycler(spec), md=_md)
 
 

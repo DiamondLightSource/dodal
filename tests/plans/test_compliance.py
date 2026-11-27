@@ -22,7 +22,6 @@ running a procedure will create data documents, we have adopted this standard.
 We further impose other requirements on both plans and stubs exported from these modules
 to enable them to be exposed in UIs in a consistent way:
 - They must have a docstring
-- They must not use variadic arguments (*args, **kwargs)
 - Plans must and Stubs may have an optional argument for metadata, named "metadata"
 - The metadata argument, where present, must be optional with a default of None
 """
