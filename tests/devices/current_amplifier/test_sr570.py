@@ -270,7 +270,7 @@ async def test_sr570_struck_scaler_read(
         (1e6, [520e5, 52e5, 5.2e5, 5.2e4, 5.2e4], 5.2e-4),
         (1e9, [22.2e5, 2.22e5, 2.22e5], 2.22e-8),
         (2e4, [0.0] * (30 - 5), 0.0),
-        (2e4, [-200.0e5, -20.0e5, -10.0e5, -10.0e5], -0.01),
+        (2e4, [-200.0e5, -10.0e5, -10.0e5], -0.01),
         (1e11, [0.002e5, 0.004e5, 0.01e5, 0.02e5, 0.02e5], 2e-14),
     ],
 )
@@ -304,3 +304,39 @@ async def test_sr570_struck_scaler_read_with_autogain(
     assert run_engine_documents["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"
     ] == pytest.approx(expected_current, rel=1e-14)
+
+
+@pytest.mark.parametrize(
+    "auto_mode, raw_count, expected_triggers",
+    [
+        (False, [1e5], 1),
+        (True, [1e5], 1),
+        (True, [1e2, 1e3, 1e4, 1e5], 4),
+    ],
+)
+async def test_sr570_struck_scaler_trigger_does_not_double_count(
+    run_engine: RunEngine,
+    mock_sr570_struck_scaler_detector: CurrentAmpDet,
+    mock_struck_scaler: StruckScaler,
+    auto_mode: bool,
+    raw_count: list[float],
+    expected_triggers: int,
+):
+    current_amp = mock_sr570_struck_scaler_detector._current_amp_ref()
+    await current_amp.set(1e6)
+    set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, auto_mode)
+
+    rbv_mocks = Mock()
+    rbv_mocks.get.side_effect = raw_count
+
+    def set_mock_counter():
+        set_mock_value(mock_struck_scaler.count, rbv_mocks.get())
+
+    callback_on_mock_put(
+        mock_struck_scaler.trigger_start, lambda *_, **__: set_mock_counter()
+    )
+
+    run_engine(prepare(mock_sr570_struck_scaler_detector, 1))
+    run_engine(count([mock_sr570_struck_scaler_detector]))
+
+    assert rbv_mocks.get.call_count == expected_triggers

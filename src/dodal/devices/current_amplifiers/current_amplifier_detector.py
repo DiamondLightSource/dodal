@@ -78,7 +78,8 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
         Repeatedly trigger the counter and adjust the amplifier sensitivity
         until its output voltage is within the configured lower and upper
         limits. If the amplifier reaches its gain limit, return without
-        further adjustment.
+        further adjustment. On return, the counter holds a measurement taken
+        at the final gain.
         """
         upper_limit, lower_limit = await asyncio.gather(
             self._current_amp_ref().upperlimit.get_value(),
@@ -120,6 +121,9 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
             self.log.warning(
                 f"Reached maximum gain optimisation attempts of {max_attempts}."
             )
+            # The gain was changed on the final attempt, so take a fresh
+            # measurement at the final gain.
+            await self._counter_ref().trigger()
 
         LOGGER.debug("Finished optimising gain.")
 
@@ -135,9 +139,10 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
     async def trigger(self) -> None:
         """Trigger a detector acquisition.
 
-        If automatic gain adjustment is enabled, optimise the amplifier gain
-        before triggering the counter for the final acquisition. Otherwise,
-        trigger the counter directly using the current amplifier gain.
+        If automatic gain adjustment is enabled, optimise the amplifier gain;
+        the final measurement taken during optimisation is used as the
+        acquisition. Otherwise, trigger the counter directly using the current
+        amplifier gain.
         """
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")
@@ -145,7 +150,8 @@ class CurrentAmpDet(StandardReadable, Preparable, Triggerable):
             LOGGER.info(
                 f"{self.name} new gain = {await self._current_amp_ref().gain.get_value()}."
             )
-        await self._counter_ref().trigger()
+        else:
+            await self._counter_ref().trigger()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
