@@ -1,49 +1,21 @@
-from ophyd_async.core import Device
+from ophyd_async.core import StandardReadable
 
-from dodal.devices.current_amplifiers import (
-    SR570,
-    Femto3xxGainTable,
-    Femto3xxGainToCurrentTable,
-    Femto3xxRaiseTime,
-    FemtoDDPCA,
-)
+from dodal.devices.current_amplifiers import SR570, FemtoDDPCA
 
 
-class RasorFemto(Device):
-    def __init__(self, prefix: str, suffix: str = "GAIN", name: str = "") -> None:
-        self.ca1 = FemtoDDPCA(
-            prefix + "-01:",
-            suffix=suffix,
-            gain_table=Femto3xxGainTable,
-            gain_to_current_table=Femto3xxGainToCurrentTable,
-            raise_timetable=Femto3xxRaiseTime,
-        )
-        self.ca2 = FemtoDDPCA(
-            prefix + "-02:",
-            suffix=suffix,
-            gain_table=Femto3xxGainTable,
-            gain_to_current_table=Femto3xxGainToCurrentTable,
-            raise_timetable=Femto3xxRaiseTime,
-        )
-        self.ca3 = FemtoDDPCA(
-            prefix + "-03:",
-            suffix=suffix,
-            gain_table=Femto3xxGainTable,
-            gain_to_current_table=Femto3xxGainToCurrentTable,
-            raise_timetable=Femto3xxRaiseTime,
-        )
+class RasorFemto(StandardReadable):
+    def __init__(self, prefix: str, suffix: str = "GAIN", name: str = ""):
+        with self.add_children_as_readables():
+            self.ca1 = FemtoDDPCA(prefix + "-01:", suffix=suffix)
+            self.ca2 = FemtoDDPCA(prefix + "-02:", suffix=suffix)
+            self.ca3 = FemtoDDPCA(prefix + "-03:", suffix=suffix)
         super().__init__(name)
 
 
-class RasorSR570(Device):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        self.ca1 = SR570(
-            prefix + "-04:",
-        )
-        self.ca2 = SR570(
-            prefix + "-05:",
-        )
-        self.ca3 = SR570(
-            prefix + "-06:",
-        )
+class RasorSR570(StandardReadable):
+    def __init__(self, prefix: str, suffix: str = "SENS:SEL", name: str = ""):
+        with self.add_children_as_readables():
+            self.ca1 = SR570(prefix + "-04:", suffix=suffix)
+            self.ca2 = SR570(prefix + "-05:", suffix=suffix)
+            self.ca3 = SR570(prefix + "-06:", suffix=suffix)
         super().__init__(name)
