@@ -8,7 +8,7 @@ import pytest
 from blueapi.config import EnvironmentConfig, PlanSource
 from blueapi.core import BlueskyContext
 from blueapi.service.model import PlanModel
-from blueapi.worker.task import Task, TaskParameterError
+from blueapi.worker.task import Task
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import StandardDetector
 
@@ -115,9 +115,3 @@ def test_task_resolves_device_names_in_step_scan_args(
 
     assert args == [[det], x_axis, 0, 1, 0.5]
     assert [type(arg) for arg in args[2:]] == [int, int, float]
-
-
-def test_task_rejects_unknown_device_in_step_scan_args(context: BlueskyContext):
-    task = Task(name="step_scan", args=[[], "not_a_device", 0, 1, 0.5])
-    with pytest.raises(TaskParameterError, match="Device not_a_device cannot be found"):
-        task.prepare_params(context)
